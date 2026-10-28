@@ -39,7 +39,7 @@ public final class SampleSizeBox extends FullBox {
         super.read(ch, buf);
         IO.read(ch, 8, buf);
         sample_size = buf.getInt();
-        sample_count = buf.getInt();
+        sample_count = entryCount(ch, buf.getInt(), 4);
         entries = new Entry[sample_count];
         for (int i = 0; i < sample_count; i++) {
             Entry e = new Entry();

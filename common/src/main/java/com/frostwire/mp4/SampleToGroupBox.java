@@ -39,7 +39,7 @@ public final class SampleToGroupBox extends FullBox {
         super.read(ch, buf);
         IO.read(ch, 8, buf);
         grouping_type = buf.getInt();
-        entry_count = buf.getInt();
+        entry_count = entryCount(ch, buf.getInt(), 8);
         entries = new Entry[entry_count];
         for (int i = 0; i < entry_count; i++) {
             Entry e = new Entry();

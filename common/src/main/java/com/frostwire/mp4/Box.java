@@ -549,6 +549,24 @@ public class Box {
         throw new UnsupportedOperationException(Bits.make4cc(type));
     }
 
+    /**
+     * Returns {@code count}, a number of entries read from this box, once this box and the file
+     * still have room for that many entries of at least {@code minBytesPerEntry} bytes each (one,
+     * for entries with no fields of their own). Call it before allocating anything for the
+     * entries: a corrupt or hostile count would otherwise allocate gigabytes from a few bytes.
+     */
+    final int entryCount(InputChannel ch, int count, int minBytesPerEntry) throws IOException {
+        long room = ch.remaining();
+        long length = length();
+        if (length >= 0) {
+            room = Math.min(room, length);
+        }
+        if (count < 0 || (long) count * Math.max(1, minBytesPerEntry) > room) {
+            throw new IOException("Invalid entry count " + count + " in " + Bits.make4cc(type));
+        }
+        return count;
+    }
+
     final long length() {
         long n = size - 8;
         if (size == 1) {

@@ -37,7 +37,7 @@ public final class DataReferenceBox extends FullBox {
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
         IO.read(ch, 4, buf);
-        entry_count = buf.getInt();
+        entry_count = entryCount(ch, buf.getInt(), 8);
         entries = new Box[entry_count];
         for (int i = 0; i < entry_count; i++) {
             IO.read(ch, 8, buf);

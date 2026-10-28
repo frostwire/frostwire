@@ -72,6 +72,8 @@ public final class TrackRunBox extends FullBox {
             IO.read(ch, 4, buf);
             first_sample_flags = buf.getInt();
         }
+        // Four bytes for each per-sample field the flags say is present.
+        sample_count = entryCount(ch, sample_count, 4 * Integer.bitCount(flags & 0xF00));
         entries = new Entry[sample_count];
         for (int i = 0; i < sample_count; i++) {
             Entry e = new Entry();

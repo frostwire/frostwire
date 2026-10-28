@@ -42,7 +42,7 @@ public final class CompactSampleSizeBox extends FullBox {
         IO.read(ch, 8, buf);
         buf.get(reserved);
         field_size = buf.get();
-        sample_count = buf.getInt();
+        sample_count = entryCount(ch, buf.getInt(), field_size / 8);
         entries = new Entry[sample_count];
         for (int i = 0; i < sample_count; i++) {
             Entry e = new Entry();

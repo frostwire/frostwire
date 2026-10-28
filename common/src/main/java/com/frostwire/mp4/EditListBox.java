@@ -37,7 +37,7 @@ public final class EditListBox extends FullBox {
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
         IO.read(ch, 4, buf);
-        entry_count = buf.getInt();
+        entry_count = entryCount(ch, buf.getInt(), version == 1 ? 20 : 12);
         entries = new Entry[entry_count];
         for (int i = 0; i < entry_count; i++) {
             Entry e = new Entry();

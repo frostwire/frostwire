@@ -28,7 +28,7 @@ class IsoMediaReadFuzzTest {
   @FuzzTest
   void head(FuzzedDataProvider data) {
     byte[] bytes = data.consumeRemainingAsBytes();
-    InputChannel ch = new InputChannel(Channels.newChannel(new ByteArrayInputStream(bytes)));
+    InputChannel ch = new InputChannel(Channels.newChannel(new ByteArrayInputStream(bytes)), bytes.length);
     try {
       IsoMedia.read(ch, ByteBuffer.allocate(BUFFER_SIZE), b -> b.type != Box.mdat);
     } catch (IOException expected) {
