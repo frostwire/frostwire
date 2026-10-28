@@ -132,7 +132,7 @@ if (isRootAssembleRelease && !androidSigningEnvKeyPassword) {
 android {
     namespace "com.frostwire.android"
 
-    compileSdk = 36  // Android 15 SnowCone
+    compileSdk = 37  // Android 17
 
     defaultConfig {
         applicationId "com.frostwire.android"
