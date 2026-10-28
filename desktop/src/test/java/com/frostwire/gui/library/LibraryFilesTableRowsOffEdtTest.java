@@ -110,6 +110,11 @@ class LibraryFilesTableRowsOffEdtTest {
     String mediator = source(library.resolve("LibraryFilesTableMediator.java"));
     assertFalse(mediator.contains("addUnsorted(file)"), "one EDT event per file is back");
     assertTrue(mediator.contains("LibraryFilesTableDataLine.resolveAll(partition)"));
+    for (String caller : new String[] {"LibrarySearch.java", "LibraryExplorer.java"}) {
+      assertTrue(
+          source(library.resolve(caller)).contains("LibraryFilesTableDataLine.resolveAll("),
+          caller + " must resolve files before posting them to the EDT");
+    }
   }
 
   private static String source(Path path) throws IOException {

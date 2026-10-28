@@ -163,10 +163,9 @@ public class LibraryMediator {
     getLibrarySearch().clear();
   }
 
-  void addFilesToLibraryTable(List<File> files) {
-    for (File file : files) {
-      LibraryFilesTableMediator.instance().add(file);
-    }
+  /** Adds rows for files {@link LibraryFilesTableDataLine#resolve}d off the EDT. EDT only. */
+  void addFilesToLibraryTable(List<LibraryFilesTableDataLine.ResolvedFile> files) {
+    LibraryFilesTableMediator.instance().addResolvedFiles(files);
     getLibrarySearch().addResults(files.size());
   }
 

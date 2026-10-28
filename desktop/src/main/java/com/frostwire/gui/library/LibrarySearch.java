@@ -388,7 +388,8 @@ public class LibrarySearch extends JPanel {
               if (results.isEmpty() && !dir.toFile().equals(root)) {
                 return;
               }
-              final List<File> batch = results;
+              final List<LibraryFilesTableDataLine.ResolvedFile> batch =
+                  LibraryFilesTableDataLine.resolveAll(results);
               results = new ArrayList<>();
               GUIMediator.safeInvokeLater(
                   () -> {
@@ -426,7 +427,10 @@ public class LibrarySearch extends JPanel {
           results.add(file);
         }
       }
-      GUIMediator.safeInvokeLater(() -> LibraryMediator.instance().addFilesToLibraryTable(results));
+      List<LibraryFilesTableDataLine.ResolvedFile> resolved =
+          LibraryFilesTableDataLine.resolveAll(results);
+      GUIMediator.safeInvokeLater(
+          () -> LibraryMediator.instance().addFilesToLibraryTable(resolved));
     }
   }
 }

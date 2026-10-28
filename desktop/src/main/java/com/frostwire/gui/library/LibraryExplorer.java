@@ -490,8 +490,10 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
               final List<File> batch = files;
               files = new ArrayList<>();
               _mtsfdh.addToCache(batch);
+              List<LibraryFilesTableDataLine.ResolvedFile> resolved =
+                  LibraryFilesTableDataLine.resolveAll(batch);
               GUIMediator.safeInvokeLater(
-                  () -> LibraryMediator.instance().addFilesToLibraryTable(batch));
+                  () -> LibraryMediator.instance().addFilesToLibraryTable(resolved));
             }
           });
     }
