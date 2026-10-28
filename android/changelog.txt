@@ -11,6 +11,7 @@ FrostWire 3.2.3 build 779 UNRELEASED
   - fix:Starting distributed search no longer spams the log with connection warnings while the local relay server boots — readiness is polled quietly with backoff
   - fix:Distributed Search writes its list of known IceBridge servers to storage at most every 5 minutes (and when it stops) instead of once per server it contacts, saving flash writes and battery, and a crash can no longer leave the list truncated
   - update:Android Gradle Plugin 9.0.1 -> 9.5.0 and Gradle 9.1.0 -> 9.8.1 (build tooling only)
+  - update:groovy-swing 5.0.5 -> 5.1.3 (build script only, used by the release signing prompt)
 
 FrostWire 3.2.2 build 778 OCT/09/2026
   - fix:Peers are now verified over rUDP instead of a TCP identity port, so a peer behind NAT that can be reached over UDP can be found; the DHT announces the rUDP port, phones and servers no longer need an open TCP port, and the "identity port" setting is gone (peers on older versions that only announce a TCP port are not discovered)
