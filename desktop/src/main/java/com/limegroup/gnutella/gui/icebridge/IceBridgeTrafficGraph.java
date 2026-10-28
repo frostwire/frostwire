@@ -13,6 +13,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.geom.Path2D;
 import javax.swing.JComponent;
@@ -28,16 +29,18 @@ final class IceBridgeTrafficGraph extends JComponent {
   static final Color RECEIVED = new Color(0x1E, 0x88, 0xE5);
   static final Color SENT = new Color(0xE5, 0x39, 0x35);
 
-  // Small enough to sit in the console's toolbar, after its buttons.
-  private static final int WIDTH = 180;
-  private static final int HEIGHT = 26;
+  // It sits in the console's status bar between the rates and the totals and takes the width
+  // between them; one text line high so the bar keeps its height.
+  private static final int WIDTH = 360;
+  private static final int MIN_WIDTH = 120;
+  private static final int HEIGHT = 16;
 
   private double[] received = new double[0];
   private double[] sent = new double[0];
 
   IceBridgeTrafficGraph() {
     setPreferredSize(new Dimension(WIDTH, HEIGHT));
-    setMinimumSize(new Dimension(WIDTH, HEIGHT));
+    setMinimumSize(new Dimension(MIN_WIDTH, HEIGHT));
     setOpaque(false);
   }
 
@@ -52,8 +55,10 @@ final class IceBridgeTrafficGraph extends JComponent {
     Graphics2D g2 = (Graphics2D) g.create();
     try {
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      int w = getWidth() - 1;
-      int h = getHeight() - 1;
+      Insets insets = getInsets();
+      g2.translate(insets.left, insets.top);
+      int w = getWidth() - insets.left - insets.right - 1;
+      int h = getHeight() - insets.top - insets.bottom - 1;
       double peak = Math.max(peak(received), peak(sent));
       if (peak <= 0) {
         return;

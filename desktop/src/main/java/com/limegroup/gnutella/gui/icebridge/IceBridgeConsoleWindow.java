@@ -180,8 +180,6 @@ public final class IceBridgeConsoleWindow {
     peerCatalog.addActionListener(e -> PeerCatalogWindow.showPeerPicker());
     controls.add(peerCatalog);
     controls.add(autoScroll);
-    trafficGraph.setToolTipText(I18n.tr("Last 5 minutes: blue is received, red is sent"));
-    controls.add(trafficGraph);
     controls.add(Box.createHorizontalGlue());
 
     table.setAutoCreateRowSorter(false);
@@ -205,7 +203,10 @@ public final class IceBridgeConsoleWindow {
     frame.setLocationRelativeTo(null);
   }
 
-  /** IceBridge network traffic: current rates on the left, totals on the right. */
+  /**
+   * IceBridge network traffic: current rates on the left, the last 5 minutes graphed in the middle
+   * across the free width, totals on the right.
+   */
   private JPanel trafficBar() {
     JPanel bar = new JPanel(new BorderLayout());
     bar.setBorder(
@@ -216,7 +217,10 @@ public final class IceBridgeConsoleWindow {
         I18n.tr("IceBridge network traffic, averaged over the last few seconds"));
     trafficTotals.setToolTipText(
         I18n.tr("IceBridge network traffic since IceBridge started, packet payloads only"));
+    trafficGraph.setToolTipText(I18n.tr("Last 5 minutes: blue is received, red is sent"));
+    trafficGraph.setBorder(BorderFactory.createEmptyBorder(0, 16, 0, 16));
     bar.add(trafficRates, BorderLayout.WEST);
+    bar.add(trafficGraph, BorderLayout.CENTER);
     bar.add(trafficTotals, BorderLayout.EAST);
     return bar;
   }
