@@ -348,7 +348,7 @@ dependencies {
     implementation 'androidx.vectordrawable:vectordrawable-animated:1.2.0'
     implementation 'com.google.android.ump:user-messaging-platform:4.0.0'
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
-    implementation 'com.google.android.material:material:1.13.0'
+    implementation 'com.google.android.material:material:1.14.0'
     implementation 'com.google.code.gson:gson:2.15.0'
     implementation 'com.google.re2j:re2j:1.8'
     implementation 'com.squareup.okhttp3:okhttp:5.3.2'
