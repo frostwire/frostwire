@@ -22,7 +22,9 @@ import com.frostwire.bittorrent.PaymentOptions;
 import com.limegroup.gnutella.gui.tables.HashBasedDataLineModel;
 import com.limegroup.gnutella.gui.tables.SizeHolder;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Library specific DataLineModel. Uses HashBasedDataLineModel instead of BasicDataLineModel for
@@ -75,6 +77,22 @@ final class LibraryFilesTableModel extends HashBasedDataLineModel<LibraryFilesTa
       dl.cleanup();
     }
     return -1;
+  }
+
+  /**
+   * Appends rows for files already {@link LibraryFilesTableDataLine#resolve}d off the EDT, skipping
+   * those already shown, with one table event for the whole batch.
+   *
+   * @return how many rows were added
+   */
+  int addResolved(List<LibraryFilesTableDataLine.ResolvedFile> files) {
+    List<LibraryFilesTableDataLine> lines = new ArrayList<>(files.size());
+    for (LibraryFilesTableDataLine.ResolvedFile file : files) {
+      LibraryFilesTableDataLine line = createDataLine();
+      line.initialize(file);
+      lines.add(line);
+    }
+    return appendAll(lines);
   }
 
   /**

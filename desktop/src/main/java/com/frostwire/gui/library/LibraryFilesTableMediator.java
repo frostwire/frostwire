@@ -296,15 +296,33 @@ public final class LibraryFilesTableMediator
           final File[] files = dirHolder.getFiles();
           List<List<File>> partitionedFiles = split(Arrays.asList(files));
           for (List<File> partition : partitionedFiles) {
-            final List<File> fPartition = partition;
-            for (final File file : fPartition) {
-              GUIMediator.safeInvokeLater(() -> addUnsorted(file));
-            }
+            // canonical paths and directory flags are read here, never on the EDT
+            List<LibraryFilesTableDataLine.ResolvedFile> resolved =
+                LibraryFilesTableDataLine.resolveAll(partition);
             GUIMediator.safeInvokeLater(
-                () -> LibraryMediator.instance().getLibrarySearch().addResults(fPartition.size()));
+                () -> {
+                  addResolvedFiles(resolved);
+                  LibraryMediator.instance().getLibrarySearch().addResults(resolved.size());
+                });
           }
           GUIMediator.safeInvokeLater(this::forceResort);
         });
+  }
+
+  /**
+   * Appends rows for files {@link LibraryFilesTableDataLine#resolve}d off the EDT, in one table
+   * event. EDT only.
+   */
+  void addResolvedFiles(List<LibraryFilesTableDataLine.ResolvedFile> files) {
+    if (files.isEmpty()) {
+      return;
+    }
+    if (TABLE.isEditing()) {
+      TABLE.getCellEditor().cancelCellEditing();
+    }
+    if (DATA_MODEL.addResolved(files) > 0 && DATA_MODEL.isSorted()) {
+      forceResort();
+    }
   }
 
   /**

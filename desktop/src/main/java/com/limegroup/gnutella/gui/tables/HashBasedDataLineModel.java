@@ -19,6 +19,7 @@
 package com.limegroup.gnutella.gui.tables;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -71,6 +72,35 @@ public class HashBasedDataLineModel<T extends DataLine<E>, E> extends BasicDataL
       remapIndexes(addedAt + 1);
       return addedAt;
     }
+  }
+
+  /**
+   * Appends the lines whose objects aren't in the table yet, in order, and fires a single
+   * rows-inserted event: one lock, one index update and one event for the whole batch instead of
+   * one per line. Lines already in the table, or repeated in the batch, are cleaned up.
+   *
+   * @return how many lines were added
+   */
+  protected int appendAll(List<T> lines) {
+    int first;
+    int added = 0;
+    synchronized (getListLock()) {
+      first = _list.size();
+      for (T dl : lines) {
+        E init = dl.getInitializeObject();
+        if (_indexes.containsKey(init)) {
+          dl.cleanup();
+          continue;
+        }
+        _indexes.put(init, first + added);
+        _list.add(dl);
+        added++;
+      }
+    }
+    if (added > 0) {
+      fireTableRowsInserted(first, first + added - 1);
+    }
+    return added;
   }
 
   /**

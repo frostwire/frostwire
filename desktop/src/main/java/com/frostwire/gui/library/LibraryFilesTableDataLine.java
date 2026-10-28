@@ -30,7 +30,9 @@ import com.limegroup.gnutella.gui.tables.SizeHolder;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import javax.swing.*;
 import org.apache.commons.io.FilenameUtils;
 
@@ -113,19 +115,47 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
   }
 
   /**
-   * Initialize the object. It will fail if not given a FileDesc or a File (File is retained for
-   * compatibility with the Incomplete folder)
+   * What a row needs from the file system, read by {@link #resolve} off the EDT: resolving the
+   * canonical path can block for seconds on a network share, a sleeping drive or a reparse point.
    */
-  public void initialize(File file) {
-    super.initialize(file);
+  record ResolvedFile(File file, String fullPath, boolean directory) {}
+
+  /** Reads what a row needs from the file system. Must not run on the EDT. */
+  static ResolvedFile resolve(File file) {
     String fullPath = file.getPath();
     try {
       fullPath = file.getCanonicalPath();
     } catch (IOException ignored) {
     }
+    return new ResolvedFile(file, fullPath, file.isDirectory());
+  }
+
+  /** {@link #resolve}s every file. Must not run on the EDT. */
+  static List<ResolvedFile> resolveAll(List<File> files) {
+    List<ResolvedFile> resolved = new ArrayList<>(files.size());
+    for (File file : files) {
+      resolved.add(resolve(file));
+    }
+    return resolved;
+  }
+
+  /**
+   * Initialize the object. It will fail if not given a FileDesc or a File (File is retained for
+   * compatibility with the Incomplete folder). Reads the file system: rows shown in the table are
+   * built with {@link #initialize(ResolvedFile)} instead.
+   */
+  public void initialize(File file) {
+    initialize(resolve(file));
+  }
+
+  /** Initializes the row from a file already {@link #resolve}d off the EDT. */
+  void initialize(ResolvedFile resolved) {
+    File file = resolved.file();
+    super.initialize(file);
+    String fullPath = resolved.fullPath();
     String _name = initializer.getName();
     _type = "";
-    if (!file.isDirectory()) {
+    if (!resolved.directory()) {
       int index = _name.lastIndexOf(".");
       int index2 = fullPath.lastIndexOf(File.separator);
       _path = fullPath.substring(0, index2);
