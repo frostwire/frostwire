@@ -70,6 +70,12 @@ public final class UrlUtils {
         }
     }
 
+    /**
+     * Decodes {@code s} as UTF-8, leniently: a {@code %} not followed by two hex digits is kept as a
+     * literal {@code %}, as browsers do, instead of failing the whole string. The input comes from
+     * magnet links, the clipboard and other apps ("50% off", hand-edited links), and callers expect
+     * this never to throw.
+     */
     public static String decode(String s) {
         if (s == null) {
             return "";
@@ -77,11 +83,29 @@ public final class UrlUtils {
 
         try {
             // gotta keep using the deprecated method because we need android min sdk to be 33, a long way to go
-            return URLDecoder.decode(s, StandardCharsets.UTF_8.name());
+            return URLDecoder.decode(escapeStrayPercents(s), StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
             LOG.error("UrlUtils.decode() -> " + e.getMessage(), e);
             return "";
         }
+    }
+
+    /** Escapes each {@code %} that doesn't start a {@code %XX} escape as {@code %25}. */
+    static String escapeStrayPercents(String s) {
+        if (s.indexOf('%') < 0) {
+            return s;
+        }
+        StringBuilder sb = new StringBuilder(s.length() + 8);
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            boolean escape = i + 2 < s.length() && isHexDigit(s.charAt(i + 1)) && isHexDigit(s.charAt(i + 2));
+            sb.append(c == '%' && !escape ? "%25" : String.valueOf(c));
+        }
+        return sb.toString();
+    }
+
+    private static boolean isHexDigit(char c) {
+        return Character.digit(c, 16) >= 0 && c < 128;
     }
 
     public static String buildMagnetUrl(String infoHash, String displayFilename, String trackerParameters) {

@@ -27,7 +27,6 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.URLDecoder;
 import java.util.*;
 import org.limewire.util.StringUtils;
 
@@ -124,18 +123,14 @@ public class ExternalControl {
           original_params.put(lhs, "");
           lc_params.put(lhs.toLowerCase(GUIUtils.LOCALE_ENGLISH), "");
         } else {
-          try {
-            String lhs = arg.substring(0, pos).trim();
-            String lc_lhs = lhs.toLowerCase(GUIUtils.LOCALE_ENGLISH);
-            String rhs =
-                URLDecoder.decode(arg.substring(pos + 1).trim(), GUIUtils.DEFAULT_ENCODING);
-            original_params.put(lhs, rhs);
-            lc_params.put(lc_lhs, rhs);
-            if (lc_lhs.equals("xsource")) {
-              source_params.add(rhs);
-            }
-          } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+          String lhs = arg.substring(0, pos).trim();
+          String lc_lhs = lhs.toLowerCase(GUIUtils.LOCALE_ENGLISH);
+          // Lenient: a stray % in a forwarded value must not throw out of this handler.
+          String rhs = UrlUtils.decode(arg.substring(pos + 1).trim());
+          original_params.put(lhs, rhs);
+          lc_params.put(lc_lhs, rhs);
+          if (lc_lhs.equals("xsource")) {
+            source_params.add(rhs);
           }
         }
       }
