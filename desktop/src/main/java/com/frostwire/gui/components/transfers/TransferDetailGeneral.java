@@ -126,7 +126,12 @@ public final class TransferDetailGeneral extends JPanel
     upperPanel.add(nameLabel, "left, gapleft 2px, gapright 10px");
     upperPanel.add(torrentNameLabel = new SizeStableLabel(), "left, gapright 10px");
     upperPanel.add(new JLabel("|"), "left, gapright 10px");
-    upperPanel.add(completionPercentageLabel = new SizeStableLabel(), "left, gapright 5px");
+    completionPercentageLabel = new SizeStableLabel();
+    // Bold through the font, not HTML: the text changes every second, and every new HTML text is
+    // parsed and laid out on the EDT (frostwire/frostwire#1362).
+    completionPercentageLabel.setFont(completionPercentageLabel.getFont().deriveFont(Font.BOLD));
+    completionPercentageLabel.setText("0%");
+    upperPanel.add(completionPercentageLabel, "left, gapright 5px");
     upperPanel.add(completeLabel, "left, pushx, wrap");
     upperPanel.add(completionPercentageProgressbar = new JProgressBar(), "span 5, growx");
     // Defer HTML content to avoid EDT violation
@@ -134,7 +139,6 @@ public final class TransferDetailGeneral extends JPanel
     SwingUtilities.invokeLater(
         () -> {
           nameLabel.setText("<html><b>" + I18n.tr("Name") + ":</b></html>");
-          completionPercentageLabel.setText("<html><b>0%</b></html>");
           completeLabel.setText("<html><b>" + I18n.tr("complete") + "</b></html>");
         });
     // 2nd Section (TRANSFER)
@@ -311,7 +315,7 @@ public final class TransferDetailGeneral extends JPanel
             return;
           }
           torrentNameLabel.setText(name);
-          completionPercentageLabel.setText("<html><b>" + progress + "%</b></html>");
+          completionPercentageLabel.setText(progress + "%");
           completionPercentageProgressbar.setMaximum(100);
           completionPercentageProgressbar.setValue(progress);
           timeElapsedLabel.setText(seconds2time(activeDuration));
@@ -397,7 +401,7 @@ public final class TransferDetailGeneral extends JPanel
 
   private void clearMetadataLabels(String name) {
     torrentNameLabel.setText(name);
-    completionPercentageLabel.setText("<html><b>0%</b></html>");
+    completionPercentageLabel.setText("0%");
     completionPercentageProgressbar.setMaximum(100);
     completionPercentageProgressbar.setValue(0);
     timeElapsedLabel.setText("");

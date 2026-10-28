@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -50,6 +51,30 @@ class TransferDetailRevalidationTest {
         source,
         methodBody(source, "private void updatePieceSizeLabel(")
             + methodBody(source, "private void updateTotalPiecesLabel("));
+  }
+
+  /**
+   * A label whose text is HTML parses it and builds a View tree, measured with the stylesheet, on
+   * every new text. The labels whose text changes from one refresh to the next (progress, piece
+   * counts) set plain text; bold comes from the font (frostwire/frostwire#1362). Texts that only
+   * change with the selected transfer, like the wrapped comment, may stay HTML: an unchanged text
+   * fires no update.
+   */
+  @Test
+  void labelsThatChangeEveryRefreshSetNoHtml() throws Exception {
+    String general = readSource("TransferDetailGeneral.java");
+    String pieces = readSource("TransferDetailPieces.java");
+    String source = general + pieces;
+    for (String label :
+        List.of("completionPercentageLabel", "totalPiecesLabel", "pieceSizeLabel")) {
+      Matcher calls = Pattern.compile(label + "\\.setText\\(([^;]*)\\);").matcher(source);
+      int found = 0;
+      while (calls.find()) {
+        found++;
+        assertFalse(calls.group(1).contains("<html"), label + " is set to HTML: " + calls.group(1));
+      }
+      assertTrue(found > 0, label + ".setText not found");
+    }
   }
 
   private static void assertRefreshSetsOnlySizeStableLabels(String source, String refresh) {

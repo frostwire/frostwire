@@ -33,6 +33,7 @@ import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.SizeStableLabel;
 import java.awt.Color;
+import java.awt.Font;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,16 +65,18 @@ public final class TransferDetailPieces extends JPanel
     // their text changes on refresh; see SizeStableLabel
     pieceSizeLabel = new SizeStableLabel();
     totalPiecesLabel = new SizeStableLabel();
-    add(totalPiecesLabel, "gapleft 10px");
+    // Bold captions through the font and plain-text values: the piece count changes on every
+    // refresh, and every new HTML text is parsed and laid out on the EDT
+    // (frostwire/frostwire#1362).
+    add(boldCaption(I18n.tr("Total Pieces") + ":"), "split 2, gapleft 10px");
+    add(totalPiecesLabel);
+    add(boldCaption(I18n.tr("Piece Size") + ":"), "split 2");
     add(pieceSizeLabel, "grow, gapright 10px, wmin 130px, hmax 25px, wrap");
     hexHivePanel.setBackground(new Color(backgroundColor));
     hexHivePanel.setOpaque(true);
-    // Defer HTML content and JScrollPane creation to avoid EDT violation
-    // HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
+    // Defer the JScrollPane creation to keep it out of the constructor's EDT event.
     SwingUtilities.invokeLater(
         () -> {
-          pieceSizeLabel.setText("<html><b>" + I18n.tr("Piece Size") + "</b>:</html>");
-          totalPiecesLabel.setText("<html><b>" + I18n.tr("Total Pieces") + "</b>:</html>");
           JScrollPane jScrollPane = new JScrollPane(hexHivePanel);
           jScrollPane.setOpaque(true);
           jScrollPane.getViewport().setOpaque(true);
@@ -121,17 +124,21 @@ public final class TransferDetailPieces extends JPanel
         });
   }
 
+  private static JLabel boldCaption(String text) {
+    JLabel caption = new JLabel(text);
+    caption.setFont(caption.getFont().deriveFont(Font.BOLD));
+    return caption;
+  }
+
   private void updatePieceSizeLabel(String pieceSize) {
     if (!pieceSizeAlreadySet) {
-      pieceSizeLabel.setText(
-          "<html><b nowrap>" + I18n.tr("Piece Size") + "</b>:" + pieceSize + "</html>");
+      pieceSizeLabel.setText(pieceSize);
       pieceSizeAlreadySet = true;
     }
   }
 
   private void updateTotalPiecesLabel(String totalPieces) {
-    totalPiecesLabel.setText(
-        "<html><b>" + I18n.tr("Total Pieces") + "</b>:" + totalPieces + "</html>");
+    totalPiecesLabel.setText(totalPieces);
   }
 
   /// /////////////////////////////////////////////////////////////////////////////
