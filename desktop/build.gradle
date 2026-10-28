@@ -666,9 +666,10 @@ tasks.register('fuzz', Test) { t ->
     // With -Pfuzz.keepGoing the test passes as long as fewer findings than N were made, so
     // fail on any crash file this run wrote instead of trusting the JUnit result.
     doLast {
+        // Only this harness's inputs: seeds committed to other harnesses during the run aren't findings.
+        def inputs = 'src/test/resources/' + target.toString().replace('.', '/') + 'Inputs/**/'
         def findings = fileTree(fuzzBaseDir) {
-            include 'src/test/resources/**/crash-*', 'src/test/resources/**/timeout-*',
-                    'src/test/resources/**/oom-*', 'src/test/resources/**/slow-unit-*',
+            include inputs + 'crash-*', inputs + 'timeout-*', inputs + 'oom-*', inputs + 'slow-unit-*',
                     'crash-*', 'timeout-*', 'oom-*', 'slow-unit-*'
         }.files.findAll { it.lastModified() >= startedAt }
         if (!findings.isEmpty()) {
