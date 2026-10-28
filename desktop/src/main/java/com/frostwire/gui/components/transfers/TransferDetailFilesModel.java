@@ -20,6 +20,7 @@
 package com.frostwire.gui.components.transfers;
 
 import com.limegroup.gnutella.gui.tables.BasicDataLineModel;
+import java.util.ArrayList;
 import java.util.List;
 
 final class TransferDetailFilesModel
@@ -37,21 +38,19 @@ final class TransferDetailFilesModel
   /**
    * Replaces the entire model contents in one shot, avoiding the per-row {@code
    * fireTableRowsInserted} storm that blocks the EDT for seconds when a torrent has thousands of
-   * files.
+   * files. The new rows are built and sorted without the list lock, so a paint or a refresh never
+   * waits on the sort.
    */
   void setHolders(List<TransferDetailFiles.TransferItemHolder> holders) {
+    List<TransferDetailFilesDataLine> lines = new ArrayList<>(holders.size());
+    for (TransferDetailFiles.TransferItemHolder holder : holders) {
+      TransferDetailFilesDataLine dl = createDataLine();
+      dl.initialize(holder);
+      lines.add(dl);
+    }
     synchronized (getListLock()) {
       cleanup();
-      _list.clear();
-      for (TransferDetailFiles.TransferItemHolder holder : holders) {
-        TransferDetailFilesDataLine dl = createDataLine();
-        dl.initialize(holder);
-        _list.add(dl);
-      }
-      if (isSorted()) {
-        _list.sort(this);
-      }
     }
-    fireTableDataChanged();
+    setRows(lines);
   }
 }

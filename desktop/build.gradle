@@ -745,6 +745,7 @@ test {
         includeTestsMatching "com.frostwire.gui.bittorrent.*"
         includeTestsMatching "com.frostwire.gui.components.transfers.TransferDetailFilesShareTest"
         includeTestsMatching "com.frostwire.gui.components.transfers.KeyedRowSyncTest"
+        includeTestsMatching "com.frostwire.gui.components.transfers.TransferDetailFilesSortTest"
         includeTestsMatching "com.frostwire.gui.components.transfers.HexHivePanelTest"
         includeTestsMatching "com.frostwire.gui.components.transfers.TransferDetailActionsTest"
         includeTestsMatching "com.frostwire.gui.components.transfers.TransferDetailFilesProgressTest"
