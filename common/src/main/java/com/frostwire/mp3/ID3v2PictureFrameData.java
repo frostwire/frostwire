@@ -37,7 +37,7 @@ public class ID3v2PictureFrameData extends AbstractID3v2FrameData {
         for (marker2 = marker; marker2 < bytes.length; marker2++) {
             if (bytes[marker2] == 0) break;
         }
-        description = new EncodedText(bytes[0], BufferTools.copyBuffer(bytes, marker, marker2 - marker));
+        description = new EncodedText(EncodedText.checkTextEncoding(bytes[0]), BufferTools.copyBuffer(bytes, marker, marker2 - marker));
         imageData = BufferTools.copyBuffer(bytes, marker2 + 1, bytes.length - marker2 - 1);
     }
 

@@ -23,6 +23,18 @@ public class EncodedText {
     private byte[] value;
     private byte textEncoding;
 
+    /**
+     * Returns {@code textEncoding}, a frame's encoding byte read from a tag, if it is one of the four
+     * ID3v2 encodings. Checked while the frame is parsed, so a bad byte rejects the frame instead of
+     * making every later read of its text throw.
+     */
+    public static byte checkTextEncoding(byte textEncoding) throws InvalidDataException {
+        if (textEncoding < TEXT_ENCODING_ISO_8859_1 || textEncoding > TEXT_ENCODING_UTF_8) {
+            throw new InvalidDataException("Invalid text encoding " + textEncoding);
+        }
+        return textEncoding;
+    }
+
     public EncodedText(byte textEncoding, byte[] value) {
         this.textEncoding = textEncoding;
         this.value = value;

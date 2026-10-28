@@ -24,7 +24,7 @@ public class ID3v2UrlFrameData extends AbstractID3v2FrameData {
         for (marker = 1; marker < bytes.length; marker++) {
             if (bytes[marker] == 0) break;
         }
-        description = new EncodedText(bytes[0], BufferTools.copyBuffer(bytes, 1, marker - 1));
+        description = new EncodedText(EncodedText.checkTextEncoding(bytes[0]), BufferTools.copyBuffer(bytes, 1, marker - 1));
         int length = 0;
         for (int i = marker + 1; i < bytes.length; i++) {
             if (bytes[i] == 0) break;

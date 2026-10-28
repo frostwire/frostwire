@@ -23,18 +23,19 @@ public class ID3v2CommentFrameData extends AbstractID3v2FrameData {
     }
 
     protected void unpackFrameData(byte[] bytes) throws InvalidDataException {
+        byte encoding = EncodedText.checkTextEncoding(bytes[0]);
         language = BufferTools.byteBufferToString(bytes, 1, 3);
         int marker;
         for (marker = 4; marker < bytes.length; marker++) {
             if (bytes[marker] == 0) break;
         }
-        description = new EncodedText(bytes[0], BufferTools.copyBuffer(bytes, 4, marker - 4));
+        description = new EncodedText(encoding, BufferTools.copyBuffer(bytes, 4, marker - 4));
         int length = 0;
         for (int i = marker + 1; i < bytes.length; i++) {
             if (bytes[i] == 0) break;
             length++;
         }
-        comment = new EncodedText(bytes[0], BufferTools.copyBuffer(bytes, marker + 1, length));
+        comment = new EncodedText(encoding, BufferTools.copyBuffer(bytes, marker + 1, length));
     }
 
     protected byte[] packFrameData() {

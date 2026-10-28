@@ -14,14 +14,14 @@ public class ID3v2ObseletePictureFrameData extends ID3v2PictureFrameData {
     }
 
     @Override
-    protected void unpackFrameData(byte[] bytes) {
+    protected void unpackFrameData(byte[] bytes) throws InvalidDataException {
         mimeType = "image/" + BufferTools.byteBufferToString(bytes, 1, 3).toLowerCase();
         pictureType = bytes[4];
         int marker;
         for (marker = 5; marker < bytes.length; marker++) {
             if (bytes[marker] == 0) break;
         }
-        description = new EncodedText(bytes[0], BufferTools.copyBuffer(bytes, 5, marker - 5));
+        description = new EncodedText(EncodedText.checkTextEncoding(bytes[0]), BufferTools.copyBuffer(bytes, 5, marker - 5));
         imageData = BufferTools.copyBuffer(bytes, marker + 1, bytes.length - marker - 1);
     }
 }

@@ -18,7 +18,7 @@ public class ID3v2TextFrameData extends AbstractID3v2FrameData {
     }
 
     protected void unpackFrameData(byte[] bytes) throws InvalidDataException {
-        text = new EncodedText(bytes[0], BufferTools.copyBuffer(bytes, 1, bytes.length - 1));
+        text = new EncodedText(EncodedText.checkTextEncoding(bytes[0]), BufferTools.copyBuffer(bytes, 1, bytes.length - 1));
     }
 
     protected byte[] packFrameData() {
