@@ -7,9 +7,14 @@
 
 package com.limegroup.gnutella.gui.icebridge;
 
+import com.frostwire.search.relay.MeshRequestContext;
 import com.frostwire.search.relay.event.IceBridgeEvent;
 import com.frostwire.search.relay.event.IceBridgeEventLog;
+import com.frostwire.search.relay.icebridge.IceBridgeTrafficMeter;
+import com.frostwire.search.relay.icebridge.client.IceBridgeClient;
+import com.frostwire.search.relay.icebridge.client.IceBridgeSearchTransport;
 import com.frostwire.util.Logger;
+import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -29,6 +34,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import javax.swing.BorderFactory;
@@ -45,6 +53,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.AbstractTableModel;
@@ -64,6 +73,10 @@ public final class IceBridgeConsoleWindow {
   private static final Logger LOG = Logger.getLogger(IceBridgeConsoleWindow.class);
   private static final int MAX_ROWS = 2000;
   private static final int SEED_ROWS = 500;
+
+  /** Each traffic poll waits at most this long for the daemon, well within its 1 s interval. */
+  private static final long TRAFFIC_POLL_TIMEOUT_MS = 800;
+
   private static final SimpleDateFormat TIME_FORMAT =
       new SimpleDateFormat("HH:mm:ss.SSS", Locale.ROOT);
 
@@ -82,17 +95,35 @@ public final class IceBridgeConsoleWindow {
   private final AtomicBoolean flushScheduled = new AtomicBoolean();
   private final Consumer<IceBridgeEvent> listener = this::onEvent;
   private final List<IceBridgeEvent> all = new ArrayList<>();
+  private final JLabel trafficRates = new JLabel(" ");
+  private final JLabel trafficTotals = new JLabel(" ");
+
+  /**
+   * Reads the daemon's traffic counters once a second while the console is open: an HTTP call to
+   * the daemon's control port, so never on the EDT. Only this thread touches the meter.
+   */
+  private final ScheduledExecutorService trafficPoller =
+      Executors.newSingleThreadScheduledExecutor(
+          r -> {
+            Thread thread = new Thread(r, "icebridge-console-traffic");
+            thread.setDaemon(true);
+            return thread;
+          });
+
+  private final IceBridgeTrafficMeter trafficMeter = new IceBridgeTrafficMeter();
   private boolean paused;
 
   private IceBridgeConsoleWindow() {
     buildUi();
     seedFromLog();
     IceBridgeEventLog.instance().addListener(listener);
+    trafficPoller.scheduleWithFixedDelay(this::pollTraffic, 0, 1, TimeUnit.SECONDS);
     frame.addWindowListener(
         new WindowAdapter() {
           @Override
           public void windowClosing(WindowEvent e) {
             IceBridgeEventLog.instance().removeListener(listener);
+            trafficPoller.shutdownNow();
             frame.dispose();
             instance = null;
           }
@@ -166,8 +197,70 @@ public final class IceBridgeConsoleWindow {
     frame.setLayout(new BorderLayout());
     frame.add(top, BorderLayout.NORTH);
     frame.add(new JScrollPane(table), BorderLayout.CENTER);
+    frame.add(trafficBar(), BorderLayout.SOUTH);
     frame.setSize(new Dimension(1080, 600));
     frame.setLocationRelativeTo(null);
+  }
+
+  /** IceBridge network traffic: current rates on the left, totals on the right. */
+  private JPanel trafficBar() {
+    JPanel bar = new JPanel(new BorderLayout());
+    bar.setBorder(
+        BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(1, 0, 0, 0, UIManager.getColor("Separator.foreground")),
+            BorderFactory.createEmptyBorder(3, 8, 3, 8)));
+    trafficRates.setToolTipText(
+        I18n.tr("IceBridge network traffic, averaged over the last few seconds"));
+    trafficTotals.setToolTipText(
+        I18n.tr("IceBridge network traffic since IceBridge started, packet payloads only"));
+    bar.add(trafficRates, BorderLayout.WEST);
+    bar.add(trafficTotals, BorderLayout.EAST);
+    return bar;
+  }
+
+  private void pollTraffic() {
+    IceBridgeClient.TrafficBytes traffic = null;
+    IceBridgeClient client =
+        MeshRequestContext.transport() instanceof IceBridgeSearchTransport transport
+            ? transport.client()
+            : null;
+    if (client != null) {
+      traffic = client.trafficBytes(TRAFFIC_POLL_TIMEOUT_MS);
+    }
+    if (traffic == null) {
+      SwingUtilities.invokeLater(
+          () -> {
+            trafficRates.setText(I18n.tr("IceBridge is not running"));
+            trafficTotals.setText(" ");
+          });
+      return;
+    }
+    trafficMeter.sample(traffic.bytesIn(), traffic.bytesOut(), System.nanoTime());
+    double in = trafficMeter.bytesInPerSecond();
+    double out = trafficMeter.bytesOutPerSecond();
+    long totalIn = trafficMeter.totalBytesIn();
+    long totalOut = trafficMeter.totalBytesOut();
+    SwingUtilities.invokeLater(
+        () -> {
+          trafficRates.setText("\u2193 " + speed(in) + "    \u2191 " + speed(out));
+          trafficTotals.setText(
+              I18n.tr("Received")
+                  + ": "
+                  + GUIUtils.getBytesInHuman(totalIn)
+                  + "    "
+                  + I18n.tr("Sent")
+                  + ": "
+                  + GUIUtils.getBytesInHuman(totalOut)
+                  + "    "
+                  + I18n.tr("Total")
+                  + ": "
+                  + GUIUtils.getBytesInHuman(totalIn + totalOut));
+        });
+  }
+
+  /** A rate in KB/s, MB/s or GB/s, whichever reads best, like sizes elsewhere in the app. */
+  private static String speed(double bytesPerSecond) {
+    return GUIUtils.getBytesInHuman(bytesPerSecond) + "/s";
   }
 
   private void seedFromLog() {
