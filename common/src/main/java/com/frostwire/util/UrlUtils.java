@@ -31,6 +31,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -43,6 +44,8 @@ public final class UrlUtils {
 
     private static final Logger LOG = Logger.getLogger(UrlUtils.class);
     private final static Pattern infoHashPattern = Pattern.compile("([0-9A-Fa-f]{40})");
+    private final static Pattern magnetHexInfoHashPattern =
+            Pattern.compile("^magnet:\\?xt=urn:btih:([0-9A-Fa-f]{40})(?:&|$)");
 
     private UrlUtils() {
     }
@@ -252,6 +255,20 @@ public final class UrlUtils {
             return null;
         }
         return uri.getHost();
+    }
+
+    /**
+     * The info hash of a magnet link that starts with {@code magnet:?xt=urn:btih:} followed by a
+     * 40-digit hex hash, in lowercase; null for anything else, including base32 hashes and links cut
+     * short. Never throws: the link comes from users, web pages and other apps. Unlike
+     * {@link #extractInfoHash(String)}, it doesn't pick up 40 hex digits found elsewhere in the link.
+     */
+    public static String magnetHexInfoHash(String magnet) {
+        if (magnet == null) {
+            return null;
+        }
+        Matcher matcher = magnetHexInfoHashPattern.matcher(magnet);
+        return matcher.find() ? matcher.group(1).toLowerCase(Locale.ROOT) : null;
     }
 
     public static String extractInfoHash(String url) {

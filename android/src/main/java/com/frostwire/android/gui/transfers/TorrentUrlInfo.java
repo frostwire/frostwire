@@ -18,6 +18,7 @@
 
 package com.frostwire.android.gui.transfers;
 
+import com.frostwire.util.UrlUtils;
 import org.apache.commons.io.FilenameUtils;
 
 /**
@@ -69,11 +70,9 @@ class TorrentUrlInfo implements TorrentDownloadInfo {
 
   @Override
   public String getHash() {
-    if (url != null && url.startsWith("magnet:?xt=urn:btih:")) {
-      return url.substring(20, 60).toLowerCase();
-    }
-
-    return null;
+    // Only a 40-digit hex hash: TorrentFetcherDownload decodes it as hex. Links cut short and base32
+    // hashes used to throw StringIndexOutOfBoundsException here or yield a non-hex "hash".
+    return UrlUtils.magnetHexInfoHash(url);
   }
 
   @Override
