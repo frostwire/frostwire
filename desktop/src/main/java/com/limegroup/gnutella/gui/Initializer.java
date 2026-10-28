@@ -416,6 +416,8 @@ final class Initializer {
     // and defers native icon loading via invokeLater).
     GUIMediator.setSplashScreenString(I18n.tr("Loading Icons..."));
     IconManager.instance();
+    // The search tab's media-type buttons filter their icons; do it before the first search tab.
+    DesktopParallelExecutor.execute(com.limegroup.gnutella.gui.search.SchemaBox::prepareIcons);
     GUIMediator.safeInvokeAndWait(
         () -> {
           GUIMediator.setSplashScreenString(I18n.tr("Loading Internationalization Support..."));

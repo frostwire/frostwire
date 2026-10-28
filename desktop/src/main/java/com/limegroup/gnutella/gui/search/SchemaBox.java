@@ -30,6 +30,7 @@ import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.swing.*;
 import javax.swing.plaf.synth.SynthContext;
@@ -37,7 +38,7 @@ import javax.swing.plaf.synth.SynthRadioButtonUI;
 import net.miginfocom.swing.MigLayout;
 
 /** A group of radio buttons for each schema. */
-final class SchemaBox extends JPanel {
+public final class SchemaBox extends JPanel {
   private final SearchResultMediator resultPanel;
   private final ButtonGroup buttonGroup;
   private final Map<NamedMediaType, JToggleButton> buttonsMap;
@@ -108,6 +109,30 @@ final class SchemaBox extends JPanel {
     String incrementedCounterValue = String.valueOf(n + 1);
     button.setText(incrementedCounterValue);
     button.setToolTipText(safeTooltipFormat(tooltipPlaceHolders.get(nmt), incrementedCounterValue));
+  }
+
+  /** The media types the box shows, in order. */
+  private static final List<String> SCHEMAS =
+      List.of(
+          MediaType.SCHEMA_AUDIO,
+          MediaType.SCHEMA_VIDEO,
+          MediaType.SCHEMA_IMAGES,
+          MediaType.SCHEMA_DOCUMENTS,
+          MediaType.SCHEMA_PROGRAMS,
+          MediaType.SCHEMA_TORRENTS);
+
+  /**
+   * Computes the box's darkened and brightened media-type icons ahead of the first search tab. Call
+   * it off the EDT: each is a pixel filter, and ImageManipulator caches the results for every box.
+   */
+  public static void prepareIcons() {
+    for (String schema : SCHEMAS) {
+      Icon icon = NamedMediaType.getFromDescription(schema).getIcon();
+      if (icon != null) {
+        ImageManipulator.darken(icon);
+        ImageManipulator.brighten(icon);
+      }
+    }
   }
 
   /** Adds the given schemas as radio buttons. */
