@@ -67,7 +67,9 @@ application {
 				 '-XX:ErrorFile=./hs_err_pid%p.log',
 				 '-XX:+CreateCoredumpOnCrash',
                                  '-Xms64m',
-                                 '-Xmx512m',
+                                 // A quarter of the machine's memory, like the release launchers (which also keep
+                                 // it between 512 MB and 4 GB, a start script can't).
+                                 '-XX:MaxRAMPercentage=25',
                                  // Keep stacks on exceptions the JIT would otherwise throw preallocated and stackless.
                                  '-XX:-OmitStackTraceInFastThrow',
                                  //'-Xss2m', 2MB stack (debugging silent crashes: prolong crashes due to native stack overflows, attach gdb, etc.)
