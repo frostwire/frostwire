@@ -1029,9 +1029,15 @@ public class HexHivePanel extends JPanel implements Scrollable {
       boolean evenRow = (row % 2) == 0;
       int rowOriginX =
           evenRow ? drawingProperties.evenRowOrigin.x : drawingProperties.oddRowOrigin.x;
-      int rowMinX = Math.round(rowOriginX - halfHexWidth);
+      // the cubes are drawn at rounded centers, and their border reaches past the hexagon
+      float overhang = drawingProperties.borderOverhang();
+      int rowMinX = (int) Math.floor(rowOriginX - halfHexWidth - overhang);
       int rowMaxX =
-          Math.round(rowOriginX + ((rowHexCount - 1) * drawingProperties.hexWidth) + halfHexWidth);
+          (int)
+              Math.ceil(
+                  Math.round(rowOriginX + ((rowHexCount - 1) * drawingProperties.hexWidth))
+                      + halfHexWidth
+                      + overhang);
       minX = Math.min(minX, rowMinX);
       maxX = Math.max(maxX, rowMaxX);
     }
@@ -1579,11 +1585,20 @@ public class HexHivePanel extends JPanel implements Scrollable {
         int lastRowOriginX = lastRowEven ? evenRowOrigin.x : oddRowOrigin.x;
         int lastCenterX = Math.round(lastRowOriginX + (lastCol * hexWidth));
         int lastCenterY = Math.round(evenRowOrigin.y + (lastRow * verticalStep));
+        // Odd rows start half a cube further right: holding as many cubes as the even rows,
+        // they also end further right, so the widest row is whichever ends further right.
         int widestRowCenterX =
-            evenRowHexCount >= oddRowHexCount
-                ? Math.round(evenRowOrigin.x + Math.max(0, evenRowHexCount - 1) * hexWidth)
-                : Math.round(oddRowOrigin.x + Math.max(0, oddRowHexCount - 1) * hexWidth);
-        end.x = Math.round(Math.max(widestRowCenterX, lastCenterX) + halfHexWidth);
+            Math.round(evenRowOrigin.x + Math.max(0, evenRowHexCount - 1) * hexWidth);
+        if (numHexs > evenRowHexCount) {
+          widestRowCenterX =
+              Math.max(
+                  widestRowCenterX,
+                  Math.round(oddRowOrigin.x + Math.max(0, oddRowHexCount - 1) * hexWidth));
+        }
+        end.x =
+            (int)
+                Math.ceil(
+                    Math.max(widestRowCenterX, lastCenterX) + halfHexWidth + borderOverhang());
         end.y = Math.round(lastCenterY + halfHexHeight);
         width = Math.max(1, end.x + 1);
         height = Math.max(1, end.y + 1);
@@ -1597,7 +1612,17 @@ public class HexHivePanel extends JPanel implements Scrollable {
       if (hexWidth <= 0) {
         return 1;
       }
-      return Math.max(1, (int) Math.floor((right - halfHexWidth - rowOriginX) / hexWidth) + 1);
+      return Math.max(
+          1,
+          (int) Math.floor((right - halfHexWidth - borderOverhang() - rowOriginX) / hexWidth) + 1);
+    }
+
+    /**
+     * How far a cube's anti-aliased border reaches past its hexagon's edge. The hive's bounds and
+     * the render batches must include it, or the outermost cubes lose their outline.
+     */
+    float borderOverhang() {
+      return hexBorderStrokeWidth / 2f + 1f;
     }
 
     int getRowHexCount(int rowIndex) {

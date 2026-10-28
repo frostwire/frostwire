@@ -23,8 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.limegroup.gnutella.gui.CountingRepaintManager;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Area;
@@ -70,6 +73,34 @@ class HexHivePanelTest {
         BACKGROUND,
         bitmap.getRGB(centerX, tipY) & 0xffffff,
         "bottom tip of the second to last row was clipped");
+  }
+
+  @Test
+  void everyRowsRightmostCubeIsRenderedWhole() throws Exception {
+    // Widths where even and odd rows hold as many cubes, and others, at 1x and 2x: odd rows
+    // start half a cube to the right, so their last cube used to be cut off by the hive's width
+    for (double scale : new double[] {1.0, 2.0}) {
+      for (int width = 280; width <= 340; width++) {
+        HexHivePanel panel = newPanel();
+        panel.setSize(width, 400);
+        set(panel, "renderScale", scale);
+        panel.updateData(adapter(60));
+        BufferedImage bitmap = awaitRender(panel);
+        BufferedImage reference = renderInOnePass(panel, bitmap, scale);
+
+        Object props = get(panel, "drawingProperties");
+        Point evenOrigin = (Point) get(props, "evenRowOrigin");
+        float hexHeight = (float) get(props, "hexHeight");
+        int lastRow = rowIndexForPiece(props, 59);
+        for (int row = 0; row <= lastRow; row++) {
+          int centerY = (int) Math.round((evenOrigin.y + row * hexHeight * 0.75f) * scale);
+          assertEquals(
+              rightmostDrawnX(reference, centerY),
+              rightmostDrawnX(bitmap, centerY),
+              "row " + row + " cut off at width " + width + ", scale " + scale);
+        }
+      }
+    }
   }
 
   @Test
@@ -406,6 +437,56 @@ class HexHivePanelTest {
         return false;
       }
     };
+  }
+
+  /** Every cube drawn in one pass onto a canvas wider and taller than {@code bitmap}. */
+  private static BufferedImage renderInOnePass(
+      HexHivePanel panel, BufferedImage bitmap, double scale) throws Exception {
+    Object props = get(panel, "drawingProperties");
+    int lastRow = rowIndexForPiece(props, (int) get(props, "numHexs") - 1);
+    BufferedImage canvas =
+        new BufferedImage(
+            bitmap.getWidth() + 40, bitmap.getHeight() + 40, BufferedImage.TYPE_INT_RGB);
+    Graphics2D graphics = canvas.createGraphics();
+    graphics.setColor(new Color(BACKGROUND));
+    graphics.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+    graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    graphics.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+    graphics.scale(scale, scale);
+    Method drawRows = null;
+    for (Method method : HexHivePanel.class.getDeclaredMethods()) {
+      if (method.getName().equals("drawRowsToGraphics")) {
+        drawRows = method;
+      }
+    }
+    drawRows.setAccessible(true);
+    drawRows.invoke(
+        panel,
+        props,
+        get(panel, "latestAdapter"),
+        graphics,
+        new Rectangle(0, 0, canvas.getWidth(), canvas.getHeight()),
+        0,
+        lastRow,
+        true);
+    graphics.dispose();
+    return canvas;
+  }
+
+  private static int rowIndexForPiece(Object props, int piece) throws Exception {
+    Method method = props.getClass().getDeclaredMethod("getRowIndexForPiece", int.class);
+    method.setAccessible(true);
+    return (int) method.invoke(props, piece);
+  }
+
+  private static int rightmostDrawnX(BufferedImage image, int y) {
+    int rightmost = -1;
+    for (int x = 0; x < image.getWidth(); x++) {
+      if ((image.getRGB(x, y) & 0xffffff) != BACKGROUND) {
+        rightmost = x;
+      }
+    }
+    return rightmost;
   }
 
   private static BufferedImage awaitRender(HexHivePanel panel) throws Exception {

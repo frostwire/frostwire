@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:The Pieces tab no longer cuts off the rightmost cube of every other row at some window widths, or the outline of the outermost cubes — the hive is sized by whichever row ends further right, border included
    - update:The main window can be resized down to 1000x650, or to the screen size on smaller displays, and with "minimize to tray" on but no tray available the close button now minimizes the window instead of doing nothing
    - fix:The Library no longer runs out of memory or hangs on folders with symlink loops (also Library search, Create Torrent's size count and the MCP library tools), and Options → Apply no longer checks the save folder on disk when it didn't change or crashes when ProgramFiles isn't set — one bounded, non-recursive folder walker that follows symlinked subfolders but enters each real folder once
    - fix:FrostWire no longer stutters while transfers refresh or search results arrive — per-second labels and result counters ask for a new layout only when their size changes, and the main tabs and transfer details are sized from the tab on show
