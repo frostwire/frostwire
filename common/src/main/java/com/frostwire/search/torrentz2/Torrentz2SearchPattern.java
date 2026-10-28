@@ -17,6 +17,7 @@
  */
 
 package com.frostwire.search.torrentz2;
+import com.frostwire.search.SizeParser;
 import com.frostwire.search.CompositeFileSearchResult;
 
 import com.frostwire.regex.Matcher;
@@ -208,42 +209,7 @@ public class Torrentz2SearchPattern implements SearchPattern {
      * Parse size string like "1.95 GB", "2.5 MB", "512 KB" into bytes
      */
     private long parseSize(String sizeStr) {
-        if (sizeStr == null || sizeStr.isEmpty()) {
-            return -1;
-        }
-
-        sizeStr = sizeStr.trim().toUpperCase();
-
-        // Extract number and unit
-        String[] parts = sizeStr.split("\\s+");
-        if (parts.length < 2) {
-            return -1;
-        }
-
-        try {
-            double size = Double.parseDouble(parts[0]);
-            String unit = parts[1];
-
-            // Convert to bytes
-            switch (unit) {
-                case "B":
-                    return (long) size;
-                case "KB":
-                    return (long) (size * 1024);
-                case "MB":
-                    return (long) (size * 1024 * 1024);
-                case "GB":
-                    return (long) (size * 1024 * 1024 * 1024);
-                case "TB":
-                    return (long) (size * 1024 * 1024 * 1024 * 1024);
-                default:
-                    LOG.debug("Torrentz2: Unknown size unit: " + unit);
-                    return -1;
-            }
-        } catch (NumberFormatException e) {
-            LOG.debug("Torrentz2: Failed to parse size number from: " + sizeStr, e);
-            return -1;
-        }
+        return SizeParser.parseSize(sizeStr);
     }
 
 }

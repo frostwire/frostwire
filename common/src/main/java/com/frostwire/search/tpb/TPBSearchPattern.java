@@ -17,6 +17,7 @@
  */
 
 package com.frostwire.search.tpb;
+import com.frostwire.search.SizeParser;
 import com.frostwire.search.CompositeFileSearchResult;
 
 import com.frostwire.regex.Matcher;
@@ -290,22 +291,7 @@ public class TPBSearchPattern implements SearchPattern {
      * Convert size value from unit to bytes.
      */
     private long convertToBytes(double value, String unit) {
-        switch (unit) {
-            case "B":
-                return (long) value;
-            case "KB":
-                return (long) (value * 1024);
-            case "MB":
-                return (long) (value * 1024 * 1024);
-            case "GB":
-                return (long) (value * 1024 * 1024 * 1024);
-            case "TB":
-                return (long) (value * 1024 * 1024 * 1024 * 1024);
-            case "PB":
-                return (long) (value * 1024 * 1024 * 1024 * 1024 * 1024);
-            default:
-                return -1;
-        }
+        return SizeParser.convertToBytes(value, unit);
     }
 
     /**

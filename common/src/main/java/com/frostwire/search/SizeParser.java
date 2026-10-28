@@ -33,11 +33,12 @@ import com.frostwire.util.StringUtils;
  * @author gubatron
  */
 public final class SizeParser {
-    private static final long KILOBYTE = 1024;
-    private static final long MEGABYTE = 1024 * 1024;
-    private static final long GIGABYTE = 1024 * 1024 * 1024;
-    private static final long TERABYTE = 1024 * 1024 * 1024 * 1024;
-    private static final long PETABYTE = 1024 * 1024 * 1024 * 1024 * 1024;
+    // Long arithmetic: in int, 1024^4 and 1024^5 overflowed to 0, so every TB and PB size was 0.
+    private static final long KILOBYTE = 1024L;
+    private static final long MEGABYTE = 1024L * 1024;
+    private static final long GIGABYTE = 1024L * 1024 * 1024;
+    private static final long TERABYTE = 1024L * 1024 * 1024 * 1024;
+    private static final long PETABYTE = 1024L * 1024 * 1024 * 1024 * 1024;
 
     private SizeParser() {
         // Utility class - no instances
@@ -91,21 +92,28 @@ public final class SizeParser {
      *
      * @param value the numeric value
      * @param unit the size unit (B, KB, MB, GB, TB, PB, KiB, MiB, GiB, TiB, PiB)
-     * @return size in bytes, or -1 if unit is unrecognized
+     * @return size in bytes, or -1 if the unit is unrecognized or the size is negative, not a
+     * number or too large for a long. Sizes come from search engines' pages.
      */
     public static long convertToBytes(double value, String unit) {
-        if (unit == null) {
+        if (unit == null || !(value >= 0) || Double.isInfinite(value)) {
             return -1;
         }
 
-        return switch (unit) {
-            case "B" -> (long) value;
-            case "KB", "KIB" -> (long) (value * KILOBYTE);
-            case "MB", "MIB" -> (long) (value * MEGABYTE);
-            case "GB", "GIB" -> (long) (value * GIGABYTE);
-            case "TB", "TIB" -> (long) (value * TERABYTE);
-            case "PB", "PIB" -> (long) (value * PETABYTE);
+        long multiplier = switch (unit) {
+            case "B", "BYTES" -> 1;
+            case "KB", "KIB" -> KILOBYTE;
+            case "MB", "MIB" -> MEGABYTE;
+            case "GB", "GIB" -> GIGABYTE;
+            case "TB", "TIB" -> TERABYTE;
+            case "PB", "PIB" -> PETABYTE;
             default -> -1;
         };
+        if (multiplier < 0) {
+            return -1;
+        }
+        double bytes = value * multiplier;
+        // (long) of anything at or past 2^63 would silently become Long.MAX_VALUE.
+        return bytes < 0x1p63 ? (long) bytes : -1;
     }
 }

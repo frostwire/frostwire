@@ -17,6 +17,7 @@
  */
 
 package com.frostwire.search.nyaa;
+import com.frostwire.search.SizeParser;
 import com.frostwire.search.CompositeFileSearchResult;
 
 import com.frostwire.regex.Matcher;
@@ -29,9 +30,7 @@ import com.frostwire.util.StringUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * V2 pattern-based search for Nyaa anime torrent search.
@@ -42,7 +41,6 @@ import java.util.Map;
 public class NyaaSearchPattern implements SearchPattern {
     private static final Logger LOG = Logger.getLogger(NyaaSearchPattern.class);
     private static final String DOMAIN = "nyaa.si";
-    private static final Map<String, Long> UNIT_TO_BYTES = new HashMap<>();
     private static final Pattern searchPattern = Pattern.compile(
             "(?is)<tr class=\"default\">.*?" +
                     "<img src=\"(?<thumbnailurl>.*?)\" alt=.*?" +
@@ -54,16 +52,6 @@ public class NyaaSearchPattern implements SearchPattern {
                     "<td class=\"text-center\" data-timestamp=\"(?<timestamp>.*?)\">.*?" +
                     "<td class=\"text-center\">(?<seeds>.*?)</td>");
     private static final int MAX_RESULTS = 75;
-
-    static {
-        UNIT_TO_BYTES.put("bytes", 1L);
-        UNIT_TO_BYTES.put("B", 1L);
-        UNIT_TO_BYTES.put("KiB", 1024L);
-        UNIT_TO_BYTES.put("MiB", 1024L * 1024L);
-        UNIT_TO_BYTES.put("GiB", 1024L * 1024L * 1024L);
-        UNIT_TO_BYTES.put("TiB", 1024L * 1024L * 1024L * 1024L);
-        UNIT_TO_BYTES.put("PiB", 1024L * 1024L * 1024L * 1024L * 1024L);
-    }
 
     public NyaaSearchPattern() {
     }
@@ -182,36 +170,7 @@ public class NyaaSearchPattern implements SearchPattern {
     }
 
     private long parseSize(String sizeStr) {
-        if (StringUtils.isNullOrEmpty(sizeStr)) {
-            return -1;
-        }
-
-        try {
-            String[] parts = sizeStr.trim().split("\\s+");
-            if (parts.length < 2) {
-                return -1;
-            }
-
-            String amount = parts[0].trim();
-            String unit = parts[1].trim();
-
-            Long unitMultiplier = UNIT_TO_BYTES.get(unit);
-            if (unitMultiplier == null) {
-                unitMultiplier = 1L;
-            }
-
-            // Handle fractional and integer sizes
-            if (amount.contains(".")) {
-                float floatAmount = Float.parseFloat(amount);
-                return (long) (floatAmount * unitMultiplier);
-            } else {
-                int intAmount = Integer.parseInt(amount);
-                return intAmount * unitMultiplier;
-            }
-        } catch (Exception e) {
-            LOG.debug("Nyaa: Failed to parse size: " + sizeStr);
-            return -1;
-        }
+        return SizeParser.parseSize(sizeStr);
     }
 
     private long parseLong(String value) {

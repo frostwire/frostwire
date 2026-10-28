@@ -17,6 +17,7 @@
  */
 
 package com.frostwire.search.one337x;
+import com.frostwire.search.SizeParser;
 import com.frostwire.search.CompositeFileSearchResult;
 
 import com.frostwire.regex.Matcher;
@@ -166,36 +167,6 @@ public class One337xCrawlingStrategy implements CrawlingStrategy {
      * Parse size string like "1.23 GB", "456 MB", "789 KB" into bytes.
      */
     private long parseSize(String sizeStr) {
-        if (StringUtils.isNullOrEmpty(sizeStr)) {
-            return -1;
-        }
-
-        try {
-            sizeStr = sizeStr.trim().toUpperCase();
-            String[] parts = sizeStr.split("\\s+");
-            if (parts.length != 2) {
-                return -1;
-            }
-
-            double value = Double.parseDouble(parts[0]);
-            String unit = parts[1];
-
-            switch (unit) {
-                case "B":
-                    return (long) value;
-                case "KB":
-                    return (long) (value * 1024);
-                case "MB":
-                    return (long) (value * 1024 * 1024);
-                case "GB":
-                    return (long) (value * 1024 * 1024 * 1024);
-                case "TB":
-                    return (long) (value * 1024 * 1024 * 1024 * 1024);
-                default:
-                    return -1;
-            }
-        } catch (Exception e) {
-            return -1;
-        }
+        return SizeParser.parseSize(sizeStr);
     }
 }
