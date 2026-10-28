@@ -54,13 +54,6 @@ public final class ErrorHandler implements ErrorCallback {
 
   private static void reportNow(Throwable problem, String msg, String threadName) {
     CrashReportSpooler.record(problem);
-    GUIMediator.safeInvokeLater(
-        () -> {
-          try {
-            GUIMediator.closeStartupDialogs();
-          } catch (Throwable ignored) {
-          }
-        });
     try {
       BugManager.instance().handleBug(problem, threadName, msg);
     } catch (Throwable ignored) {
