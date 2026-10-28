@@ -6529,3 +6529,27 @@ msgstr "Trūksta"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:292
 msgid "Skip"
 msgstr "Praleisti"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "IceBridge is not running"
+msgstr "IceBridge neveikia"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "IceBridge network traffic, averaged over the last few seconds"
+msgstr "IceBridge tinklo srautas, kelių paskutinių sekundžių vidurkis"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "IceBridge network traffic since IceBridge started, packet payloads only"
+msgstr "IceBridge tinklo srautas nuo paleidimo, tik paketų turinys"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "Received"
+msgstr "Gauta"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "Sent"
+msgstr "Išsiųsta"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "Total"
+msgstr "Iš viso"

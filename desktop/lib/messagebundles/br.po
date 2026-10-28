@@ -6498,3 +6498,27 @@ msgstr "Mankout a ra"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:292
 msgid "Skip"
 msgstr "Tremen"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "IceBridge is not running"
+msgstr "N'emañ ket IceBridge o treiñ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "IceBridge network traffic, averaged over the last few seconds"
+msgstr "Tremenerezh rouedad IceBridge, keitad an eilennoù diwezhañ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "IceBridge network traffic since IceBridge started, packet payloads only"
+msgstr "Tremenerezh rouedad IceBridge abaoe loc'hañ IceBridge, danvez ar pakadoù hepken"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "Received"
+msgstr "Resevet"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "Sent"
+msgstr "Kaset"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "Total"
+msgstr "Hollad"

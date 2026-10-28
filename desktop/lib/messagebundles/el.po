@@ -7146,3 +7146,27 @@ msgstr "Λείπει"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:292
 msgid "Skip"
 msgstr "Παράλειψη"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "IceBridge is not running"
+msgstr "Το IceBridge δεν εκτελείται"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "IceBridge network traffic, averaged over the last few seconds"
+msgstr "Κίνηση δικτύου IceBridge, μέσος όρος των τελευταίων δευτερολέπτων"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "IceBridge network traffic since IceBridge started, packet payloads only"
+msgstr "Κίνηση δικτύου IceBridge από την εκκίνησή του, μόνο περιεχόμενο πακέτων"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "Received"
+msgstr "Ληφθέντα"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "Sent"
+msgstr "Απεσταλμένα"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "Total"
+msgstr "Σύνολο"

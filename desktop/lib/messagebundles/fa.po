@@ -6460,3 +6460,27 @@ msgstr "موجود نیست"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:292
 msgid "Skip"
 msgstr "رد کردن"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "IceBridge is not running"
+msgstr "IceBridge در حال اجرا نیست"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "IceBridge network traffic, averaged over the last few seconds"
+msgstr "ترافیک شبکه IceBridge، میانگین چند ثانیه اخیر"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "IceBridge network traffic since IceBridge started, packet payloads only"
+msgstr "ترافیک شبکه IceBridge از زمان شروع آن، فقط محتوای بسته‌ها"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "Received"
+msgstr "دریافتی"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "Sent"
+msgstr "ارسالی"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "Total"
+msgstr "مجموع"

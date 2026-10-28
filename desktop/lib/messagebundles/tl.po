@@ -7200,3 +7200,27 @@ msgstr "Nawawala"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:292
 msgid "Skip"
 msgstr "Laktawan"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "IceBridge is not running"
+msgstr "Hindi tumatakbo ang IceBridge"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "IceBridge network traffic, averaged over the last few seconds"
+msgstr "Trapiko ng network ng IceBridge, karaniwan sa huling ilang segundo"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "IceBridge network traffic since IceBridge started, packet payloads only"
+msgstr "Trapiko ng network ng IceBridge mula nang magsimula ito, laman lamang ng mga packet"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "Received"
+msgstr "Natanggap"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "Sent"
+msgstr "Naipadala"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "Total"
+msgstr "Kabuuan"

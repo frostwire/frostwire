@@ -6639,3 +6639,27 @@ msgstr "ਗੁੰਮ"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:292
 msgid "Skip"
 msgstr "ਛੱਡੋ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "IceBridge is not running"
+msgstr "IceBridge ਨਹੀਂ ਚੱਲ ਰਿਹਾ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "IceBridge network traffic, averaged over the last few seconds"
+msgstr "IceBridge ਨੈੱਟਵਰਕ ਟ੍ਰੈਫ਼ਿਕ, ਪਿਛਲੇ ਕੁਝ ਸਕਿੰਟਾਂ ਦੀ ਔਸਤ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "IceBridge network traffic since IceBridge started, packet payloads only"
+msgstr "IceBridge ਸ਼ੁਰੂ ਹੋਣ ਤੋਂ ਬਾਅਦ ਨੈੱਟਵਰਕ ਟ੍ਰੈਫ਼ਿਕ, ਸਿਰਫ਼ ਪੈਕੇਟ ਡਾਟਾ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "Received"
+msgstr "ਪ੍ਰਾਪਤ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "Sent"
+msgstr "ਭੇਜਿਆ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "Total"
+msgstr "ਕੁੱਲ"
