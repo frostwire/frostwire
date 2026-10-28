@@ -385,7 +385,7 @@ dependencies {
 
     // Software Ed25519 KeyFactory/Signature — AndroidKeyStore cannot import
     // jlibtorrent PKCS#8 seeds (API 34+ InvalidKeySpecException).
-    implementation 'org.bouncycastle:bcprov-jdk18on:1.83'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.86'
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.robolectric:robolectric:4.16.1'
