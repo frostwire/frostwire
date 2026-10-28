@@ -462,6 +462,50 @@ class JdkWarmUpTest {
 
   private static final String BIDI_DATA_CLASS = "jdk.internal.icu.impl.UBiDiProps ";
 
+  /**
+   * The first multi-line tooltip wraps its text with a line BreakIterator, which loaded the JDK's
+   * line-break rules on the EDT (Icebase #7c1eec7b21f2). They load once per JVM, so each case runs
+   * in a fresh one.
+   */
+  @Test
+  void warmUpLineBreaksLoadsTheLineBreakRules() throws Exception {
+    String before = runLineBreakProbe(false);
+    String after = runLineBreakProbe(true);
+    assertFalse(before.contains(LINE_BREAK_RULES_CLASS), "loaded before the warm-up");
+    assertTrue(after.contains(LINE_BREAK_RULES_CLASS), "line-break rules not loaded");
+    assertTrue(warmUpSource().contains("warmUpLineBreaks();"), "not called by warmUp");
+  }
+
+  private static final String LINE_BREAK_RULES_CLASS = "sun.text.RuleBasedBreakIterator ";
+
+  private static String runLineBreakProbe(boolean warmUp) throws IOException, InterruptedException {
+    Process probe =
+        new ProcessBuilder(
+                Path.of(System.getProperty("java.home"), "bin", "java").toString(),
+                "-Xlog:class+load=info",
+                "-Djava.awt.headless=true",
+                "-cp",
+                System.getProperty("java.class.path"),
+                LineBreakProbe.class.getName(),
+                String.valueOf(warmUp))
+            .redirectErrorStream(true)
+            .start();
+    String log = new String(probe.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+    assertTrue(probe.waitFor(120, TimeUnit.SECONDS), "probe timed out");
+    assertEquals(0, probe.exitValue(), log);
+    return log;
+  }
+
+  /** Runs in a fresh JVM: initializes JdkWarmUp and, if asked, runs the line-break warm-up. */
+  static final class LineBreakProbe {
+    public static void main(String[] args) throws Exception {
+      Class.forName(JdkWarmUp.class.getName());
+      if (Boolean.parseBoolean(args[0])) {
+        JdkWarmUp.warmUpLineBreaks();
+      }
+    }
+  }
+
   private static String runTextLayoutProbe(String mode) throws IOException, InterruptedException {
     Process probe =
         new ProcessBuilder(

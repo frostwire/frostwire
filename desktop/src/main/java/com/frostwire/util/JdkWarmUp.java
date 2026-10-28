@@ -339,6 +339,11 @@ public final class JdkWarmUp {
       LOG.warn("Tooltip painter warm-up failed: " + t.getMessage(), t);
     }
     try {
+      warmUpLineBreaks();
+    } catch (Throwable t) {
+      LOG.warn("Line break warm-up failed: " + t.getMessage(), t);
+    }
+    try {
       warmUpTextLayout();
     } catch (Throwable t) {
       LOG.warn("Text layout warm-up failed: " + t.getMessage(), t);
@@ -391,6 +396,21 @@ public final class JdkWarmUp {
             BreakIterator.getCharacterInstance(),
             new FontRenderContext(null, true, true))
         .nextOffset(50);
+  }
+
+  /**
+   * Breaks {@link #GLYPH_SAMPLE} into lines the way a wrapped multi-line tooltip does
+   * (WrappedPlainView through javax.swing.text.Utilities.getBreakLocation). The first line
+   * BreakIterator loads the JDK's line-break rules (RuleBasedBreakIterator and its resource data),
+   * which the character BreakIterator of {@link #warmUpTextLayout} does not; the first multi-line
+   * tooltip paid that on the EDT (Icebase #7c1eec7b21f2).
+   */
+  static void warmUpLineBreaks() {
+    BreakIterator lines = BreakIterator.getLineInstance();
+    lines.setText(GLYPH_SAMPLE);
+    while (lines.next() != BreakIterator.DONE) {
+      // Walking the text applies the rules, not just loads them.
+    }
   }
 
   /**
