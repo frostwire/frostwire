@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - update:SQLite JDBC 3.51.3.0 -> 3.53.4.0, the database behind the local search index
    - update:Gson 2.13.2 -> 2.15.0, the JSON library behind search results and settings
    - update:Telluride build 48 with yt-dlp 2026.10.26, for downloads from YouTube and other sites that changed since build 47
    - fix:The first multi-line tooltip no longer freezes the window for a moment — the text-wrapping rules it needs are loaded in the background at startup
