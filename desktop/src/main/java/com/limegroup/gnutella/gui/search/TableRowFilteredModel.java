@@ -22,9 +22,7 @@ import com.frostwire.gui.filters.TableLineFilter;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.settings.SearchSettings;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Filters out certain rows from the data model.
@@ -66,23 +64,27 @@ public class TableRowFilteredModel extends ResultPanelModel {
 
   /** Determines whether this line should be added. */
   public int add(SearchResultDataLine tl, int row) {
-    boolean isNotJunk = junkFilter.allow(tl);
-    boolean allow = allow(tl);
-    if (isNotJunk || !SearchSettings.hideJunk()) {
-      // System.out.println("TableRowFilteredModel.add() allow= " + allow + " isNotJunk= " +
-      // isNotJunk + " hideJunk= " + SearchSettings.hideJunk() + " " + tl.getFilename());
-      if (allow) {
-        // System.out.println("TableRowFilteredModel.add() " + tl.getFilename());
-        return super.add(tl, row);
-      } else {
-        // System.out.println("TableRowFilteredModel.add() HIDDEN " + tl.getFilename());
-        HIDDEN.add(tl);
-        _numResults += 1;
-      }
-    } else {
-      _numResults += 1;
+    if (isShown(tl)) {
+      return super.add(tl, row);
     }
+    hide(tl);
     return -1;
+  }
+
+  /** Whether the line passes the junk setting and the filter. */
+  private boolean isShown(SearchResultDataLine line) {
+    return (junkFilter.allow(line) || !SearchSettings.hideJunk()) && allow(line);
+  }
+
+  /**
+   * Counts a line that isn't shown. Junk hidden by the junk setting is dropped, lines the filter
+   * rejects are kept so a later filter can show them again.
+   */
+  private void hide(SearchResultDataLine line) {
+    if (junkFilter.allow(line) || !SearchSettings.hideJunk()) {
+      HIDDEN.add(line);
+    }
+    _numResults += 1;
   }
 
   /** Intercepts to clear the hidden map. */
@@ -99,10 +101,9 @@ public class TableRowFilteredModel extends ResultPanelModel {
     super.clear();
   }
 
-  /** Notification that the filters have changed. */
+  /** Notification that the filters have changed. Fires one table-changed event. */
   void filtersChanged() {
     rebuild();
-    fireTableDataChanged();
   }
 
   /** Sets the Junk Filter. Pass null as argument to disable the filter */
@@ -119,44 +120,29 @@ public class TableRowFilteredModel extends ResultPanelModel {
     return FILTER.allow(line);
   }
 
-  /** Rebuilds the internal map to denote a new filter. */
+  /**
+   * Re-applies the filters to every line, shown or hidden. The shown lines replace the rows in one
+   * step, sorted once and indexed once, instead of being re-added one by one: that sorted insert
+   * and re-index per line was O(N²) on the EDT, plus one table event per line.
+   */
   private void rebuild() {
-    List<SearchResultDataLine> existing = new ArrayList<>(_list);
-    List<SearchResultDataLine> hidden = new ArrayList<>(HIDDEN);
-    simpleClear();
-    // For stuff in _list, we can just re-add the DataLines as-is.
-    if (isSorted()) {
-      for (SearchResultDataLine searchResultDataLine : existing) {
-        addSorted(searchResultDataLine);
-      }
-    } else {
-      for (SearchResultDataLine searchResultDataLine : existing) {
-        add(searchResultDataLine);
-      }
+    List<SearchResultDataLine> lines;
+    synchronized (getListLock()) {
+      lines = new ArrayList<>(_list.size() + HIDDEN.size());
+      lines.addAll(_list);
     }
-    // Merge the hidden TableLines
-    Map<String, SearchResultDataLine> mergeMap = new HashMap<>();
-    for (SearchResultDataLine tl : hidden) {
-      // SearchResult sr = tl.getInitializeObject();
-      // String urn = sr.getHash();
-      if (isSorted()) {
-        addSorted(tl);
+    lines.addAll(HIDDEN);
+    HIDDEN.clear();
+    _numResults = 0;
+    List<SearchResultDataLine> shown = new ArrayList<>(lines.size());
+    for (SearchResultDataLine line : lines) {
+      if (isShown(line)) {
+        shown.add(line);
       } else {
-        add(tl);
+        hide(line);
       }
-      //            TableLine tableLine = mergeMap.get(urn);
-      //            if (tableLine == null) {
-      //                mergeMap.put(urn, tl); // re-use TableLines
-      //            } else {
-      //                tableLine.addNewResult(sr, METADATA);
-      //            }
     }
-    // And add them
-    if (isSorted()) {
-      for (SearchResultDataLine line : mergeMap.values()) addSorted(line);
-    } else {
-      for (SearchResultDataLine line : mergeMap.values()) add(line);
-    }
+    setRows(shown);
   }
 
   private int getFilteredResults() {

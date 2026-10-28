@@ -154,6 +154,14 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
     }
   }
 
+  /** Every row was replaced at once: count them and index them in one pass. */
+  @Override
+  protected void rowsReplaced() {
+    _numResults = getRowCount();
+    _indexes.clear();
+    remapIndexes(0);
+  }
+
   /** Does nothing -- lines need no cleanup. */
   protected void cleanup() {}
 

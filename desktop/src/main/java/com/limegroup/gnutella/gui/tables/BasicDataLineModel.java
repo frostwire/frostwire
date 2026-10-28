@@ -249,9 +249,16 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
     synchronized (_listLock) {
       _list.clear();
       _list.addAll(rows);
+      rowsReplaced();
     }
     fireTableDataChanged();
   }
+
+  /**
+   * Called by {@link #setRows} with {@link #_listLock} held, after the rows were replaced and
+   * before listeners hear of it, so subclasses can rebuild state derived from the row order.
+   */
+  protected void rowsReplaced() {}
 
   /** Stable sort of the lines by the column's sort key, each key read once. */
   private List<SortEntry<T>> sortByKey(List<T> lines, int column, Comparator<SortEntry<T>> byKey) {
