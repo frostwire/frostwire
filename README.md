@@ -20,6 +20,10 @@ Here you will find the sources necessary to build [FrostWire for Android](http:/
 * We prefer well named methods and code re-usability than a lot of comments. Code should be self-explanatory.
 
 
+# AI Welcome
+
+FrostWire says **yes** to AI. Use LLMs and agents for issues, bug reports, pull requests, reviews and translations. We'd rather receive well-researched issues than patches, and every PR is triple-checked with our most capable model. Read the [YES AI policy](.YES_AI/README.md), and if AI helped you, consider a donation at [frostwire.com/give](https://www.frostwire.com/give) to cover the compute.
+
 # Contribution Guidelines
 
 If you want to contribute code, start by looking at the [open issues on github.com](https://github.com/frostwire/frostwire/issues).
