@@ -16,7 +16,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.Path2D;
 import javax.swing.JComponent;
-import javax.swing.UIManager;
 
 /**
  * A small time series of IceBridge traffic: bytes received per second in blue and sent in red, over
@@ -29,7 +28,7 @@ final class IceBridgeTrafficGraph extends JComponent {
   static final Color RECEIVED = new Color(0x1E, 0x88, 0xE5);
   static final Color SENT = new Color(0xE5, 0x39, 0x35);
 
-  // Small enough to sit in the console's toolbar row next to the buttons.
+  // Small enough to sit in the console's toolbar, after its buttons.
   private static final int WIDTH = 180;
   private static final int HEIGHT = 26;
 
@@ -55,9 +54,6 @@ final class IceBridgeTrafficGraph extends JComponent {
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       int w = getWidth() - 1;
       int h = getHeight() - 1;
-      Color border = UIManager.getColor("Separator.foreground");
-      g2.setColor(border != null ? border : Color.GRAY);
-      g2.drawRect(0, 0, w, h);
       double peak = Math.max(peak(received), peak(sent));
       if (peak <= 0) {
         return;
@@ -82,7 +78,7 @@ final class IceBridgeTrafficGraph extends JComponent {
     int first = IceBridgeTrafficMeter.HISTORY_SIZE - values.length;
     for (int i = 0; i < values.length; i++) {
       double x = (first + i) * step;
-      // One pixel of margin at the top and bottom so the line isn't drawn over the border.
+      // One pixel of margin so the 1.5 px stroke isn't clipped at the top and bottom.
       double y = height - 1 - (height - 2) * Math.max(0, values[i]) / peak;
       if (i == 0) {
         path.moveTo(x, y);

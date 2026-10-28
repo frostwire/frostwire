@@ -180,6 +180,8 @@ public final class IceBridgeConsoleWindow {
     peerCatalog.addActionListener(e -> PeerCatalogWindow.showPeerPicker());
     controls.add(peerCatalog);
     controls.add(autoScroll);
+    trafficGraph.setToolTipText(I18n.tr("Last 5 minutes: blue is received, red is sent"));
+    controls.add(trafficGraph);
     controls.add(Box.createHorizontalGlue());
 
     table.setAutoCreateRowSorter(false);
@@ -189,17 +191,9 @@ public final class IceBridgeConsoleWindow {
     table.getColumnModel().getColumn(3).setPreferredWidth(150);
     table.getColumnModel().getColumn(4).setPreferredWidth(700);
 
-    // The traffic graph sits at the right end of the button row.
-    trafficGraph.setToolTipText(I18n.tr("Last 5 minutes: blue is received, red is sent"));
-    JPanel graphCell = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 4));
-    graphCell.add(trafficGraph);
-    JPanel toolbar = new JPanel(new BorderLayout());
-    toolbar.add(controls, BorderLayout.CENTER);
-    toolbar.add(graphCell, BorderLayout.EAST);
-
     JPanel top = new JPanel(new BorderLayout());
     top.add(filters, BorderLayout.NORTH);
-    top.add(toolbar, BorderLayout.SOUTH);
+    top.add(controls, BorderLayout.SOUTH);
     top.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
 
     frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
