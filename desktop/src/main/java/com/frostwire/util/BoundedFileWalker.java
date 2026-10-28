@@ -36,10 +36,18 @@ import java.util.Set;
 public final class BoundedFileWalker {
   private static final Logger LOG = Logger.getLogger(BoundedFileWalker.class);
 
-  /** Files plus directories one walk visits before it gives up. */
-  public static final int DEFAULT_MAX_ENTRIES = 250_000;
+  /**
+   * Files plus directories one walk visits before it gives up. Sized for a 512 MB heap on an old
+   * machine: the Library keeps each file it collects (about 200 bytes as a File in a HashSet) and
+   * then builds a much larger table row for it, so 100,000 files stay in the tens of MB where
+   * 250,000 could take a quarter of the heap.
+   */
+  public static final int DEFAULT_MAX_ENTRIES = 100_000;
 
-  /** Directory levels below the root one walk descends. */
+  /**
+   * Directory levels below the root one walk descends. Depth costs one open directory per level, so
+   * this only stops pathological nesting.
+   */
   public static final int DEFAULT_MAX_DEPTH = 64;
 
   /** Receives what the walk finds. Called on the walking thread. */
