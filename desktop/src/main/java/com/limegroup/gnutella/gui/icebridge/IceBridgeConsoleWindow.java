@@ -17,6 +17,7 @@ import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
@@ -44,6 +45,7 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -95,7 +97,11 @@ public final class IceBridgeConsoleWindow {
   private final AtomicBoolean flushScheduled = new AtomicBoolean();
   private final Consumer<IceBridgeEvent> listener = this::onEvent;
   private final List<IceBridgeEvent> all = new ArrayList<>();
-  private final JLabel trafficRates = new JLabel(" ");
+  // Received and sent rates, each after an arrow in its color on the graph.
+  private final JLabel receivedArrow = arrow("\u2193", IceBridgeTrafficGraph.RECEIVED);
+  private final JLabel receivedRate = new JLabel(" ");
+  private final JLabel sentArrow = arrow("\u2191", IceBridgeTrafficGraph.SENT);
+  private final JLabel sentRate = new JLabel(" ");
   private final JLabel trafficTotals = new JLabel(" ");
 
   /**
@@ -213,16 +219,41 @@ public final class IceBridgeConsoleWindow {
         BorderFactory.createCompoundBorder(
             BorderFactory.createMatteBorder(1, 0, 0, 0, UIManager.getColor("Separator.foreground")),
             BorderFactory.createEmptyBorder(3, 8, 3, 8)));
-    trafficRates.setToolTipText(
-        I18n.tr("IceBridge network traffic, averaged over the last few seconds"));
+    JPanel rates = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+    rates.setOpaque(false);
+    rates.add(receivedArrow);
+    rates.add(receivedRate);
+    rates.add(Box.createHorizontalStrut(16));
+    rates.add(sentArrow);
+    rates.add(sentRate);
+    String ratesTip = I18n.tr("IceBridge network traffic, averaged over the last few seconds");
+    for (JComponent c :
+        new JComponent[] {rates, receivedArrow, receivedRate, sentArrow, sentRate}) {
+      c.setToolTipText(ratesTip);
+    }
     trafficTotals.setToolTipText(
         I18n.tr("IceBridge network traffic since IceBridge started, packet payloads only"));
     trafficGraph.setToolTipText(I18n.tr("Last 5 minutes: blue is received, red is sent"));
     trafficGraph.setBorder(BorderFactory.createEmptyBorder(0, 16, 0, 16));
-    bar.add(trafficRates, BorderLayout.WEST);
+    bar.add(rates, BorderLayout.WEST);
     bar.add(trafficGraph, BorderLayout.CENTER);
     bar.add(trafficTotals, BorderLayout.EAST);
     return bar;
+  }
+
+  private static JLabel arrow(String text, Color color) {
+    JLabel arrow = new JLabel(text + " ");
+    arrow.setForeground(color);
+    return arrow;
+  }
+
+  /** Shows both rates after their arrows; with {@code sent} null, {@code received} is a message. */
+  private void showRates(String received, String sent) {
+    boolean running = sent != null;
+    receivedArrow.setVisible(running);
+    sentArrow.setVisible(running);
+    receivedRate.setText(received);
+    sentRate.setText(running ? sent : "");
   }
 
   private void pollTraffic() {
@@ -237,7 +268,7 @@ public final class IceBridgeConsoleWindow {
     if (traffic == null) {
       SwingUtilities.invokeLater(
           () -> {
-            trafficRates.setText(I18n.tr("IceBridge is not running"));
+            showRates(I18n.tr("IceBridge is not running"), null);
             trafficTotals.setText(" ");
           });
       return;
@@ -252,7 +283,7 @@ public final class IceBridgeConsoleWindow {
     SwingUtilities.invokeLater(
         () -> {
           trafficGraph.setHistory(receivedHistory, sentHistory);
-          trafficRates.setText("\u2193 " + speed(in) + "    \u2191 " + speed(out));
+          showRates(speed(in), speed(out));
           trafficTotals.setText(
               I18n.tr("Received")
                   + ": "
