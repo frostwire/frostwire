@@ -33,19 +33,36 @@ public class ImageManipulator extends RGBImageFilter {
     canFilterIndexColorModel = true;
   }
 
+  /**
+   * Brightened and darkened copies, cached per source icon like {@link #resize}: each is a pixel
+   * filter whose ImageIcon waits for the filtered image, and every search tab asked for all of them
+   * again on the EDT (Icebase #db0a399c0d63). Shared between callers, so not to be modified.
+   */
+  private static final Map<Icon, Icon> BRIGHTENED =
+      Collections.synchronizedMap(new WeakHashMap<>());
+
+  private static final Map<Icon, Icon> DARKENED = Collections.synchronizedMap(new WeakHashMap<>());
+
   /** Returns a slightly brighter version of the icon. */
   public static Icon brighten(Icon icon) {
-    Image img = getImage(icon);
-    if (img == null) return icon;
-    img = brighten(img);
-    return new IconUIResource(new ImageIcon(img));
+    if (icon == null) {
+      return null;
+    }
+    return BRIGHTENED.computeIfAbsent(icon, i -> filtered(i, true));
   }
 
   /** Returns a slightly darker version of the icon. */
   public static Icon darken(Icon icon) {
+    if (icon == null) {
+      return null;
+    }
+    return DARKENED.computeIfAbsent(icon, i -> filtered(i, false));
+  }
+
+  private static Icon filtered(Icon icon, boolean brighter) {
     Image img = getImage(icon);
     if (img == null) return icon;
-    img = darken(img);
+    img = brighter ? brighten(img) : darken(img);
     return new IconUIResource(new ImageIcon(img));
   }
 
