@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:A SoundCloud MP3 with a corrupt ID3 tag can no longer make FrostWire allocate gigabytes of memory while re-tagging it — frame lengths are checked against the tag before anything is copied
    - fix:A corrupt or malicious MP4/M4A file in your downloads can no longer make FrostWire run out of memory when the Library reads its tags or you extract its audio — entry counts in the file are checked against its size before anything is allocated
    - update:Anonymous crash and freeze reports now say how much memory was in use, how much of a freeze was garbage collection and what ran out in an out-of-memory error; they keep full stack traces for repeated errors, and they now cover errors in all of FrostWire's own code, including out-of-memory errors
    - update:The Library lists up to 100,000 files per folder scan (was 250,000), so a huge Torrent Data folder can't use up the memory of older computers
