@@ -25,6 +25,16 @@ public final class IceBridgeTrafficMeter {
     /** Rates average the samples taken within this long of the newest one. */
     static final long RATE_WINDOW_NANOS = TimeUnit.SECONDS.toNanos(3);
 
+    /** Intervals kept for the graph: five minutes of one-second polls. */
+    public static final int HISTORY_SIZE = 300;
+
+    /** Bytes per second in each interval between two samples, oldest first once full. */
+    private final double[] historyIn = new double[HISTORY_SIZE];
+    private final double[] historyOut = new double[HISTORY_SIZE];
+    private int historyNext;
+    private int historyCount;
+    private Sample previous;
+
     private final ArrayDeque<Sample> window = new ArrayDeque<>();
     private long lastIn = -1;
     private long lastOut = -1;
@@ -43,7 +53,16 @@ public final class IceBridgeTrafficMeter {
         totalOut += delta(lastOut, bytesOut);
         lastIn = bytesIn;
         lastOut = bytesOut;
-        window.addLast(new Sample(totalIn, totalOut, nanoTime));
+        Sample current = new Sample(totalIn, totalOut, nanoTime);
+        if (previous != null && nanoTime > previous.nanoTime) {
+            double seconds = (nanoTime - previous.nanoTime) / (double) TimeUnit.SECONDS.toNanos(1);
+            historyIn[historyNext] = (current.totalIn - previous.totalIn) / seconds;
+            historyOut[historyNext] = (current.totalOut - previous.totalOut) / seconds;
+            historyNext = (historyNext + 1) % HISTORY_SIZE;
+            historyCount = Math.min(historyCount + 1, HISTORY_SIZE);
+        }
+        previous = current;
+        window.addLast(current);
         while (window.size() > 2 && nanoTime - window.peekFirst().nanoTime > RATE_WINDOW_NANOS) {
             window.removeFirst();
         }
@@ -67,6 +86,25 @@ public final class IceBridgeTrafficMeter {
     /** Bytes sent since the meter's first sample, including the daemon's earlier traffic. */
     public long totalBytesOut() {
         return totalOut;
+    }
+
+    /** Bytes received per second in each of the last {@link #HISTORY_SIZE} intervals, oldest first. */
+    public double[] receiveHistory() {
+        return history(historyIn);
+    }
+
+    /** Bytes sent per second in each of the last {@link #HISTORY_SIZE} intervals, oldest first. */
+    public double[] sendHistory() {
+        return history(historyOut);
+    }
+
+    private double[] history(double[] ring) {
+        double[] out = new double[historyCount];
+        int start = (historyNext - historyCount + HISTORY_SIZE) % HISTORY_SIZE;
+        for (int i = 0; i < historyCount; i++) {
+            out[i] = ring[(start + i) % HISTORY_SIZE];
+        }
+        return out;
     }
 
     /**

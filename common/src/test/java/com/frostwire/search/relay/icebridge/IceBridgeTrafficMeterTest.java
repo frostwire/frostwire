@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class IceBridgeTrafficMeterTest {
@@ -62,6 +63,34 @@ class IceBridgeTrafficMeterTest {
         assertEquals(300, meter.bytesInPerSecond(), 0.001);
         meter.sample(1_300, 200, 2 * SECOND);
         assertEquals(11_300, meter.totalBytesIn());
+    }
+
+    @Test
+    void historyHoldsOneRatePerIntervalOldestFirst() {
+        IceBridgeTrafficMeter meter = new IceBridgeTrafficMeter();
+        meter.sample(0, 0, 0);
+        assertEquals(0, meter.receiveHistory().length, "no interval before the second sample");
+        meter.sample(1_000, 100, SECOND);
+        meter.sample(4_000, 100, 3 * SECOND); // 3,000 bytes over 2 s
+        assertArrayEquals(new double[]{1_000, 1_500}, meter.receiveHistory(), 0.001);
+        assertArrayEquals(new double[]{100, 0}, meter.sendHistory(), 0.001);
+    }
+
+    @Test
+    void historyKeepsTheLastFiveMinutes() {
+        IceBridgeTrafficMeter meter = new IceBridgeTrafficMeter();
+        for (int i = 0; i <= IceBridgeTrafficMeter.HISTORY_SIZE + 10; i++) {
+            meter.sample(i * 10L, 0, i * SECOND); // 10 bytes/s
+        }
+        double[] history = meter.receiveHistory();
+        assertEquals(IceBridgeTrafficMeter.HISTORY_SIZE, history.length);
+        assertEquals(10, history[0], 0.001);
+        assertEquals(10, history[history.length - 1], 0.001);
+        // A spike is the newest point.
+        meter.sample((IceBridgeTrafficMeter.HISTORY_SIZE + 10) * 10L + 5_000, 0, (IceBridgeTrafficMeter.HISTORY_SIZE + 11) * SECOND);
+        history = meter.receiveHistory();
+        assertEquals(5_000, history[history.length - 1], 0.001);
+        assertEquals(10, history[history.length - 2], 0.001);
     }
 
     @Test
