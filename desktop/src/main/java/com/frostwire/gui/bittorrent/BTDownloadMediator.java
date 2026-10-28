@@ -672,6 +672,26 @@ public final class BTDownloadMediator
   }
 
   /**
+   * Builds an HTTP-backed transfer (HTTP, SoundCloud, slide) on a background thread and adds it to
+   * the table on the EDT. Their constructors pick a free file name in the save folder: {@link
+   * org.limewire.util.FileUtils#buildFile} checks the disk for each candidate, which stalled the
+   * EDT on slow or network drives (Icebase #3d3df2cf8612).
+   */
+  private void addBuiltOffEdt(Supplier<BTDownload> build) {
+    buildThenAdd(build, DesktopParallelExecutor::execute, GUIMediator::safeInvokeLater, this::add);
+  }
+
+  /** Runs {@code build} on {@code background} and hands its result to {@code add} on {@code ui}. */
+  static <T> void buildThenAdd(
+      Supplier<T> build, Executor background, Consumer<Runnable> ui, Consumer<T> add) {
+    background.execute(
+        () -> {
+          T built = build.get();
+          ui.accept(() -> add.accept(built));
+        });
+  }
+
+  /**
    * Computes {@code decide} on {@code background} and hands the result to {@code apply} on {@code
    * ui}, unless a newer decision was started on {@code seq} in the meantime.
    */
@@ -1187,8 +1207,7 @@ public final class BTDownloadMediator
                     doRefresh();
                     return;
                   }
-                  BTDownload downloader = new SoundcloudDownload(sr);
-                  add(downloader);
+                  addBuiltOffEdt(() -> new SoundcloudDownload(sr));
                 });
           });
     } else if (trackUrl != null) {
@@ -1228,11 +1247,7 @@ public final class BTDownloadMediator
   }
 
   public void openSlide(final Slide slide) {
-    GUIMediator.safeInvokeLater(
-        () -> {
-          SlideDownload downloader = new SlideDownload(slide);
-          add(downloader);
-        });
+    addBuiltOffEdt(() -> new SlideDownload(slide));
   }
 
   public void openHttp(
@@ -1251,44 +1266,37 @@ public final class BTDownloadMediator
       final long fileSize,
       boolean extractAudio,
       final Map<String, String> httpHeaders) {
-    GUIMediator.safeInvokeLater(
-        () -> {
-          final HttpDownload downloader =
-              new HttpDownload(
-                  httpUrl, title, saveFileAs, fileSize, null, false, true, httpHeaders) {
-                @Override
-                protected void onComplete() {
-                  final File savedFile = getSaveLocation();
-                  if (savedFile.exists()) {
-                    // if extract audio and delete original, we need to do this before the file is
-                    // scanned
-                    if (extractAudio) {
-                      File m4a = extractAudio(savedFile);
-                      if (m4a != null) {
-                        GUIMediator.safeInvokeLater(
-                            () -> {
-                              GUIMediator.instance().setWindow(GUIMediator.Tabs.LIBRARY);
-                              LibraryMediator.instance().getLibraryExplorer().selectAudio();
-                              LibraryMediator.instance()
-                                  .getLibraryExplorer()
-                                  .refreshSelection(true);
+    addBuiltOffEdt(
+        () ->
+            new HttpDownload(httpUrl, title, saveFileAs, fileSize, null, false, true, httpHeaders) {
+              @Override
+              protected void onComplete() {
+                final File savedFile = getSaveLocation();
+                if (savedFile.exists()) {
+                  // if extract audio and delete original, we need to do this before the file is
+                  // scanned
+                  if (extractAudio) {
+                    File m4a = extractAudio(savedFile);
+                    if (m4a != null) {
+                      GUIMediator.safeInvokeLater(
+                          () -> {
+                            GUIMediator.instance().setWindow(GUIMediator.Tabs.LIBRARY);
+                            LibraryMediator.instance().getLibraryExplorer().selectAudio();
+                            LibraryMediator.instance().getLibraryExplorer().refreshSelection(true);
 
-                              // Wait for the table to be loaded in order to select the first row
-                              BackgroundQueuedExecutorService.schedule(
-                                  () -> {
-                                    Thread.yield();
-                                    GUIMediator.safeInvokeLater(
-                                        () ->
-                                            LibraryFilesTableMediator.instance().setSelectedRow(0));
-                                  });
-                            });
-                      }
+                            // Wait for the table to be loaded in order to select the first row
+                            BackgroundQueuedExecutorService.schedule(
+                                () -> {
+                                  Thread.yield();
+                                  GUIMediator.safeInvokeLater(
+                                      () -> LibraryFilesTableMediator.instance().setSelectedRow(0));
+                                });
+                          });
                     }
                   }
                 }
-              };
-          add(downloader);
-        });
+              }
+            });
   }
 
   /**
@@ -1306,21 +1314,17 @@ public final class BTDownloadMediator
       final String muxAudioExt,
       final long muxAudioFilesize,
       final Map<String, String> muxAudioHeaders) {
-    GUIMediator.safeInvokeLater(
-        () -> {
-          final HttpDownload downloader =
-              new HttpDownload(
-                  httpUrl, title, saveFileAs, fileSize, null, false, true, httpHeaders) {
-                @Override
-                protected void onComplete() {
-                  final File savedFile = getSaveLocation();
-                  if (savedFile.exists() && muxAudioUrl != null && !muxAudioUrl.isEmpty()) {
-                    muxDashAudio(savedFile, muxAudioUrl, muxAudioExt, muxAudioHeaders);
-                  }
+    addBuiltOffEdt(
+        () ->
+            new HttpDownload(httpUrl, title, saveFileAs, fileSize, null, false, true, httpHeaders) {
+              @Override
+              protected void onComplete() {
+                final File savedFile = getSaveLocation();
+                if (savedFile.exists() && muxAudioUrl != null && !muxAudioUrl.isEmpty()) {
+                  muxDashAudio(savedFile, muxAudioUrl, muxAudioExt, muxAudioHeaders);
                 }
-              };
-          add(downloader);
-        });
+              }
+            });
   }
 
   private void muxDashAudio(
