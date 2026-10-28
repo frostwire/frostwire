@@ -24,8 +24,11 @@ import com.frostwire.search.relay.TorrentMetadataRequest;
 import com.frostwire.search.relay.icebridge.MeshProtocolId;
 import com.frostwire.util.Hex;
 import java.lang.reflect.Method;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Test;
@@ -97,7 +100,15 @@ public class TorrentFetcherMetadataIdentityTest {
   private static IdentityKeys softwareIdentity() throws Exception {
     // This JVM has no Android JNI library. Use real software Ed25519 keys/signatures;
     // substitute only the identity container, not the production signing or wire path.
-    KeyPair keyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+    KeyPair generated = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+    // Production keys always come from IdentityKeys.softwareKeyFactory (BouncyCastle). Re-import
+    // through it: Robolectric's sandbox registers Conscrypt first, and BouncyCastle's signer
+    // cannot use a Conscrypt Ed25519 private key directly.
+    KeyFactory kf = IdentityKeys.softwareKeyFactory("Ed25519");
+    KeyPair keyPair =
+        new KeyPair(
+            kf.generatePublic(new X509EncodedKeySpec(generated.getPublic().getEncoded())),
+            kf.generatePrivate(new PKCS8EncodedKeySpec(generated.getPrivate().getEncoded())));
     IdentityKeys keys = mock(IdentityKeys.class);
     when(keys.ed25519()).thenReturn(keyPair);
     when(keys.ed25519PubRaw()).thenReturn(IdentityRecord.extractRawEd25519(keyPair.getPublic()));
