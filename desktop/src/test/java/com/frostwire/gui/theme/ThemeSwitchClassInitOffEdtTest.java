@@ -12,6 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
@@ -93,6 +95,46 @@ public class ThemeSwitchClassInitOffEdtTest {
   public void initializesTheFlatLafClassesOfEveryTheme() {
     for (ThemeMediator.ThemeEnum theme : ThemeMediator.ThemeEnum.values()) {
       ThemeSwitcher.initializeLookAndFeelClasses(theme);
+    }
+  }
+
+  /**
+   * GitHub #1348: applying a FlatLaf theme creates a UI delegate per component type, and each
+   * delegate class was read from the jar on the EDT (Icebase #54e4eb98d3ef, FlatSliderUI). The
+   * background step loads them, without initializing, so a fresh JVM has them loaded before the EDT
+   * applies the theme.
+   */
+  @Test
+  public void backgroundStepLoadsTheFlatLafDelegatesWithoutInitializingThem() throws Exception {
+    Process probe =
+        new ProcessBuilder(
+                Path.of(System.getProperty("java.home"), "bin", "java").toString(),
+                "-Xlog:class+load=info",
+                "-Xlog:class+init=info",
+                "-Djava.awt.headless=true",
+                "-cp",
+                System.getProperty("java.class.path"),
+                DelegateProbe.class.getName())
+            .redirectErrorStream(true)
+            .start();
+    String log = new String(probe.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+    assertTrue(probe.waitFor(120, TimeUnit.SECONDS), "probe timed out");
+    assertEquals(0, probe.exitValue(), log);
+    for (String delegate :
+        List.of("FlatSliderUI", "FlatButtonUI", "FlatTableUI", "FlatScrollBarUI")) {
+      assertTrue(
+          log.contains("com.formdev.flatlaf.ui." + delegate + " "),
+          delegate + " not loaded by the background step");
+    }
+    assertFalse(
+        log.contains("Initializing 'com/formdev/flatlaf/ui/FlatSliderUI'"),
+        "a delegate's static initializer ran off the EDT");
+  }
+
+  /** Runs only the background step of a switch to the dark FlatLaf theme in a fresh JVM. */
+  static final class DelegateProbe {
+    public static void main(String[] args) {
+      ThemeSwitcher.initializeLookAndFeelClasses(ThemeMediator.ThemeEnum.DARK_FLAT_LAF);
     }
   }
 

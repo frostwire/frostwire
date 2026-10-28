@@ -20,7 +20,10 @@ package com.frostwire.gui.theme;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
+import com.frostwire.util.JdkWarmUp;
 import com.frostwire.util.Logger;
+import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import javax.swing.SwingUtilities;
@@ -59,8 +62,18 @@ final class ThemeSwitcher {
   }
 
   /**
-   * Initializes the FlatLaf classes {@code theme} needs, loading FlatLaf's native library. Nimbus
-   * ships with the JDK and loads no native code, so the default theme needs nothing here.
+   * FlatLaf's UI delegates and the icons its defaults create. Applying the theme creates one
+   * delegate per component type, and each class was read from the jar on the EDT the first time
+   * (Icebase #54e4eb98d3ef, GitHub #1348).
+   */
+  static final List<String> FLATLAF_PACKAGES_TO_LOAD =
+      List.of("com.formdev.flatlaf.ui", "com.formdev.flatlaf.icons");
+
+  /**
+   * Initializes the FlatLaf classes {@code theme} needs, loading FlatLaf's native library, and
+   * loads (without initializing) FlatLaf's UI delegate and icon classes. Nimbus ships with the JDK,
+   * loads no native code and had its delegates loaded at startup, so the default theme needs
+   * nothing here.
    */
   static void initializeLookAndFeelClasses(ThemeMediator.ThemeEnum theme) {
     Class<?> lookAndFeel;
@@ -75,6 +88,12 @@ final class ThemeSwitcher {
       Class.forName(lookAndFeel.getName(), true, lookAndFeel.getClassLoader());
     } catch (ClassNotFoundException e) {
       throw new IllegalStateException(e);
+    }
+    try {
+      JdkWarmUp.loadPackagesOf(lookAndFeel, FLATLAF_PACKAGES_TO_LOAD);
+    } catch (IOException e) {
+      // Best effort: the EDT loads the delegates as it did before.
+      LOG.warn("Could not preload FlatLaf classes: " + e.getMessage());
     }
   }
 }

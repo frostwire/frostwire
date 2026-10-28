@@ -610,4 +610,16 @@ public final class JdkWarmUp {
       }
     }
   }
+
+  /**
+   * Loads, without initializing, every class of the given packages from the jar or class directory
+   * {@code anchor} comes from. For a look and feel switched to later, whose UI delegate classes
+   * {@code updateComponentTreeUI} would otherwise read from the jar on the EDT.
+   */
+  public static void loadPackagesOf(Class<?> anchor, List<String> packages) throws IOException {
+    Path location = codeSourceOf(anchor);
+    if (location != null) {
+      loadWithoutInitializing(classNamesIn(location, packages), anchor.getClassLoader());
+    }
+  }
 }
