@@ -68,6 +68,8 @@ application {
 				 '-XX:+CreateCoredumpOnCrash',
                                  '-Xms64m',
                                  '-Xmx512m',
+                                 // Keep stacks on exceptions the JIT would otherwise throw preallocated and stackless.
+                                 '-XX:-OmitStackTraceInFastThrow',
                                  //'-Xss2m', 2MB stack (debugging silent crashes: prolong crashes due to native stack overflows, attach gdb, etc.)
                                  //'-Xss768k', // 768k stack (development)
                                  '-Xss256k', // 256k stack (production)
@@ -123,6 +125,7 @@ tasks.named('run') {
     systemProperty 'fw.running.from.distribution', 'false'
     jvmArgs '-Ddebug=1'
     jvmArgs '-Dfw.debug.assertNoEdtIO=true'
+    jvmArgs '-XX:-OmitStackTraceInFastThrow'
     // NB: 'run' does not inherit applicationDefaultJvmArgs, mirror the needed flags here.
     jvmArgs '-Djava.library.path=lib/native'
     jvmArgs '--add-opens=java.desktop/java.awt=ALL-UNNAMED'
