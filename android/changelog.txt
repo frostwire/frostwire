@@ -26,6 +26,7 @@ FrostWire 3.2.3 build 779 UNRELEASED
   - update:Firebase BoM 34.12.0 -> 35.1.0 (Crashlytics 21.0.1 records correct ANR timestamps, Analytics 24.0.0)
   - update:Google services Gradle plugin 4.4.4 -> 4.5.0 (build tooling only)
   - update:Firebase Crashlytics Gradle plugin 3.0.7 -> 3.0.8 (build tooling only)
+  - update:Chaquopy 17.0.0 -> 17.2.0 (embedded Python 3.13.9 -> 3.13.16, fresher CA certificates for yt-dlp downloads)
 
 FrostWire 3.2.2 build 778 OCT/09/2026
   - fix:Peers are now verified over rUDP instead of a TCP identity port, so a peer behind NAT that can be reached over UDP can be found; the DHT announces the rUDP port, phones and servers no longer need an open TCP port, and the "identity port" setting is gone (peers on older versions that only announce a TCP port are not discovered)

@@ -43,7 +43,7 @@ plugins {
     id 'com.android.application' version '9.5.0'
     id 'com.google.gms.google-services' version '4.5.0'
     id 'com.google.firebase.crashlytics' version '3.0.8'
-    id 'com.chaquo.python' version '17.0.0'
+    id 'com.chaquo.python' version '17.2.0'
     id 'com.diffplug.spotless' version '8.10.4'
     // org.jetbrains.kotlin.android is no longer needed: AGP 9.0+ has built-in Kotlin support.
 }
