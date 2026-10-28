@@ -57,7 +57,7 @@ public final class AppleCoverBox extends AppleDataBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-        int len = (int) (length() - 16);
+        int len = payloadLength(16);
         if (len != 0) {
             value = new byte[len];
             buf = ByteBuffer.wrap(value);

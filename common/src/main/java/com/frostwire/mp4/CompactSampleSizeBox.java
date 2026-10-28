@@ -42,6 +42,10 @@ public final class CompactSampleSizeBox extends FullBox {
         IO.read(ch, 8, buf);
         buf.get(reserved);
         field_size = buf.get();
+        // 4-bit sizes are valid but not supported; anything else is a bad file.
+        if (field_size != 8 && field_size != 16) {
+            throw new IOException("Unsupported stz2 field size " + field_size);
+        }
         sample_count = entryCount(ch, buf.getInt(), field_size / 8);
         entries = new Entry[sample_count];
         for (int i = 0; i < sample_count; i++) {

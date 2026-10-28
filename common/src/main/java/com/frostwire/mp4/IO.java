@@ -33,8 +33,12 @@ final class IO {
     }
 
     public static void read(InputChannel ch, int len, ByteBuffer buf) throws IOException {
+        // Read lengths come from box sizes in the file: a bad one is a bad file, not a bug.
         if (len <= 0) {
-            throw new IllegalArgumentException("len argument must be > 0");
+            throw new IOException("Invalid read of " + len + " bytes");
+        }
+        if (len > buf.capacity()) {
+            throw new IOException("Read of " + len + " bytes is larger than the " + buf.capacity() + "-byte buffer");
         }
         buf.clear().limit(len);
         int n = 0;

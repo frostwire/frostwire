@@ -47,7 +47,7 @@ public class AppleUtf8Box extends AppleDataBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-        int len = (int) (length() - 16);
+        int len = payloadLength(16);
         if (len != 0) {
             IO.read(ch, len, buf);
             value = new byte[len];

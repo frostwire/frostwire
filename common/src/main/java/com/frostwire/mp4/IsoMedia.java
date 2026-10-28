@@ -20,6 +20,7 @@ package com.frostwire.mp4;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 
@@ -34,6 +35,7 @@ public final class IsoMedia {
     static boolean read(InputChannel ch, long len, Box p, ByteBuffer buf, OnBoxListener l) throws IOException {
         long n = ch.count();
         do {
+            long start = ch.count();
             IO.read(ch, 8, buf);
             int size = buf.getInt();
             int type = buf.getInt();
@@ -53,9 +55,19 @@ public final class IsoMedia {
             b.largesize = largesize;
             b.usertype = usertype;
             b.parent = p;
+            checkHeader(ch, b, ch.count() - start, len == -1 ? -1 : len - (start - n));
             long r = ch.count();
-            b.read(ch, buf);
+            try {
+                b.read(ch, buf);
+            } catch (BufferUnderflowException e) {
+                // The box declares fewer bytes than its own fields take.
+                throw new IOException("Box " + Bits.make4cc(type) + " is shorter than its fields", e);
+            }
             r = ch.count() - r;
+            long declared = b.length();
+            if (declared >= 0 && r > declared) {
+                throw new IOException("Box " + Bits.make4cc(type) + " read past its end");
+            }
             if (p != null) {
                 p.boxes.add(b);
             }
@@ -76,10 +88,13 @@ public final class IsoMedia {
             }
             long length = b.length();
             if (r < length) {
-                if (type != Box.mdat) {
+                if (type != Box.mdat && b.boxes != null) {
                     if (!read(ch, length - r, b, buf, l)) {
                         return false;
                     }
+                } else if (type != Box.mdat) {
+                    // A leaf box with more bytes than its fields: skip them, they aren't children.
+                    IO.skip(ch, length - r, buf);
                 } else {
                     if (length > 0) {
                         IO.skip(ch, length - r, buf);
@@ -90,6 +105,35 @@ public final class IsoMedia {
             }
         } while (len == -1 || ch.count() - n < len);
         return true;
+    }
+
+    /**
+     * Rejects a box whose header doesn't add up before anything is read for it: a size smaller
+     * than its own header, or a box larger than what is left of its parent or of the file. Sizes
+     * come from the file, and every later read and allocation trusts them.
+     *
+     * @param headerBytes the bytes the header took
+     * @param room        the bytes left in the parent from the start of this box, or -1 if unknown
+     */
+    static void checkHeader(InputChannel ch, Box b, long headerBytes, long room) throws IOException {
+        // What the header itself takes: size and type, a 64-bit size, a uuid's user type.
+        long minSize = 8 + (b.size == 1 ? 8 : 0) + (b.type == Box.uuid ? 16 : 0);
+        boolean sizeTooSmall = (b.size != 0 && b.size != 1 && b.size < minSize)
+                || (b.size == 1 && b.largesize < minSize);
+        if (sizeTooSmall) {
+            throw new IOException("Invalid size of box " + Bits.make4cc(b.type));
+        }
+        long length = b.length();
+        if (length < 0) {
+            return; // the box runs to the end of the file
+        }
+        if (room >= 0 && headerBytes + length > room) {
+            throw new IOException("Box " + Bits.make4cc(b.type) + " is larger than its parent");
+        }
+        // Media data is skipped, not read, and may be cut short in a file still downloading.
+        if (b.type != Box.mdat && length > ch.remaining()) {
+            throw new IOException("Box " + Bits.make4cc(b.type) + " is larger than the file");
+        }
     }
 
     public static void read(InputChannel ch, ByteBuffer buf, OnBoxListener l) throws IOException {

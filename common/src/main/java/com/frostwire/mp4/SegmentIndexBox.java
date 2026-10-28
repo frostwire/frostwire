@@ -35,7 +35,7 @@ public final class SegmentIndexBox extends FullBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-        int len = (int) (length() - 4);
+        int len = payloadLength(4);
         IO.read(ch, len, buf);
         data = new byte[len];
         buf.get(data);

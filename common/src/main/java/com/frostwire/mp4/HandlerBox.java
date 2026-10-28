@@ -48,7 +48,7 @@ public final class HandlerBox extends FullBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-        int len = (int) (length() - 4);
+        int len = payloadLength(4);
         IO.read(ch, len, buf);
         pre_defined = buf.getInt();
         handler_type = buf.getInt();

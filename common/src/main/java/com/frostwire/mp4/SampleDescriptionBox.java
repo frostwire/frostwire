@@ -57,10 +57,11 @@ public final class SampleDescriptionBox extends FullBox {
             } else if (handler_type == hint) {
                 e = new HintSampleEntry(type);
             } else {
-                throw new UnsupportedOperationException("Can't decode for such handler_type: " + Bits.make4cc(handler_type));
+                throw new IOException("Can't decode for such handler_type: " + Bits.make4cc(handler_type));
             }
             e.size = size;
             e.largesize = largesize;
+            IsoMedia.checkHeader(ch, e, size == 1 ? 16 : 8, -1);
             long r = ch.count();
             e.read(ch, buf);
             r = ch.count() - r;

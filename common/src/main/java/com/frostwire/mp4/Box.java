@@ -567,6 +567,20 @@ public class Box {
         return count;
     }
 
+    /**
+     * The bytes of this box after its first {@code fieldsBytes} bytes of fields. Checked, since
+     * the size comes from the file: an {@link IOException} if the box is shorter than those
+     * fields, runs to the end of the file, or is too large to hold in memory.
+     */
+    final int payloadLength(int fieldsBytes) throws IOException {
+        long length = length();
+        long n = length - fieldsBytes;
+        if (length < 0 || n < 0 || n > Integer.MAX_VALUE) {
+            throw new IOException("Invalid payload of " + n + " bytes in box " + Bits.make4cc(type));
+        }
+        return (int) n;
+    }
+
     final long length() {
         long n = size - 8;
         if (size == 1) {

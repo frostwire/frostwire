@@ -51,6 +51,7 @@ public final class DataReferenceBox extends FullBox {
             Box b = Box.empty(type);
             b.size = size;
             b.largesize = largesize;
+            IsoMedia.checkHeader(ch, b, size == 1 ? 16 : 8, -1);
             b.read(ch, buf);
             entries[i] = b;
         }

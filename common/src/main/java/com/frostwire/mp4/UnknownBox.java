@@ -35,17 +35,16 @@ public final class UnknownBox extends Box {
 
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
-        int len = (int) length();
-        if (len > 0) {
-            if (len <= MAX_DATA_SIZE) {
-                data = new byte[len];
-                buf = ByteBuffer.wrap(data);
-                IO.read(ch, len, buf);
-            } else {
-                IO.skip(ch, len, buf);
-            }
-        } else {
+        long len = length();
+        if (len < 0) {
+            // The box runs to the end of the file.
             IO.skip(ch, buf);
+        } else if (len > 0 && len <= MAX_DATA_SIZE) {
+            data = new byte[(int) len];
+            buf = ByteBuffer.wrap(data);
+            IO.read(ch, (int) len, buf);
+        } else if (len > 0) {
+            IO.skip(ch, len, buf);
         }
     }
 

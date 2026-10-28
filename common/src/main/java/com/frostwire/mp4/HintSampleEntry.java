@@ -35,7 +35,7 @@ public final class HintSampleEntry extends SampleEntry {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-        int len = (int) (length() - 8);
+        int len = payloadLength(8);
         if (len != 0) {
             IO.read(ch, len, buf);
             data = new byte[len];

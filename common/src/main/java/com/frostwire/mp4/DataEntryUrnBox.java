@@ -52,7 +52,7 @@ public final class DataEntryUrnBox extends FullBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-        int len = (int) (length() - 4);
+        int len = payloadLength(4);
         if (len != 0) {
             IO.read(ch, len, buf);
             if (buf.remaining() > 0) {
