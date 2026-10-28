@@ -29,6 +29,24 @@ class CrashReportSpoolerReportTypesTest {
   @TempDir Path tempDir;
 
   @Test
+  void strictmodeReportCarriesItsGcWindowWhenMeasured() {
+    File spoolDir = new File(tempDir.toFile(), "strictmode-gc");
+    CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.0.4", 331);
+
+    spooler.spoolStrictMode(
+        "java.awt.event.InvocationEvent#1200",
+        1,
+        new Throwable().getStackTrace(),
+        new CrashReportSpooler.GcWindow(41, 2380, 2500));
+
+    JsonObject json = spooledJson(spoolDir.toPath());
+    assertEquals(41, json.get("gc_count").getAsInt());
+    assertEquals(2380, json.get("gc_time_ms").getAsInt());
+    assertEquals(2500, json.get("gc_window_ms").getAsInt());
+    assertTrue(json.getAsJsonPrimitive("heap_used_mb").isNumber());
+  }
+
+  @Test
   void strictmodeReportHasRequiredFieldsAndValidEnums() {
     File spoolDir = new File(tempDir.toFile(), "strictmode");
     CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.0.4", 331);

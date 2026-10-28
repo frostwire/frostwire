@@ -12,11 +12,45 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.limegroup.gnutella.gui.CrashReportSpooler;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 
 class StrictEdtModeTest {
+  @Test
+  void gcWindowIsTheActivityBetweenTwoReadings() {
+    long start = TimeUnit.SECONDS.toNanos(100);
+    CrashReportSpooler.GcWindow window =
+        StrictEdtMode.gcWindow(
+            new StrictEdtMode.GcTotals(10, 400),
+            start,
+            new StrictEdtMode.GcTotals(51, 2780),
+            start + TimeUnit.MILLISECONDS.toNanos(2500));
+    assertEquals(new CrashReportSpooler.GcWindow(41, 2380, 2500), window);
+  }
+
+  @Test
+  void gcTimeIsCappedAtItsWindowAndMissingReadingsGiveNoWindow() {
+    long start = TimeUnit.SECONDS.toNanos(100);
+    // A collection that started before the window can add more time than the window holds.
+    assertEquals(
+        new CrashReportSpooler.GcWindow(1, 2500, 2500),
+        StrictEdtMode.gcWindow(
+            new StrictEdtMode.GcTotals(0, 0),
+            start,
+            new StrictEdtMode.GcTotals(1, 2600),
+            start + TimeUnit.MILLISECONDS.toNanos(2500)));
+    assertEquals(
+        null, StrictEdtMode.gcWindow(null, start, StrictEdtMode.GcTotals.now(), start + 1));
+  }
+
+  @Test
+  void gcTotalsNeverGoNegative() {
+    StrictEdtMode.GcTotals totals = StrictEdtMode.GcTotals.now();
+    assertTrue(totals.count() >= 0);
+    assertTrue(totals.timeMs() >= 0);
+  }
 
   @Test
   void identifiesMacMetalQueueFlushStall() {

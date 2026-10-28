@@ -186,6 +186,15 @@ public final class CrashReportSpooler {
   /** Queues the captured violating thread's stack, not the reporting thread's stack. */
   public static void recordStrictMode(
       String violationClass, int violationCount, StackTraceElement[] capturedStack) {
+    recordStrictMode(violationClass, violationCount, capturedStack, null);
+  }
+
+  /** Adds the GC activity during the end of the stalled event, when it was measured. */
+  public static void recordStrictMode(
+      String violationClass,
+      int violationCount,
+      StackTraceElement[] capturedStack,
+      GcWindow gcWindow) {
     try {
       if (!tryAcquire("strictmode:" + sanitizeViolationClass(violationClass))) {
         LOG.debug("Throttled anonymous strictmode report");
@@ -193,7 +202,7 @@ public final class CrashReportSpooler {
       }
       CrashReportSpooler spooler = INSTANCE;
       if (spooler != null) {
-        spooler.spoolStrictMode(violationClass, violationCount, capturedStack);
+        spooler.spoolStrictMode(violationClass, violationCount, capturedStack, gcWindow);
         UPLOAD_QUEUE.execute(spooler::uploadPending);
         LOG.info("Automatically queued anonymous strictmode report for Icebase");
       }
@@ -247,8 +256,22 @@ public final class CrashReportSpooler {
 
   void spoolStrictMode(
       String violationClass, int violationCount, StackTraceElement[] capturedStack) {
-    spoolPayload(strictModeReportFor(violationClass, violationCount, capturedStack));
+    spoolStrictMode(violationClass, violationCount, capturedStack, null);
   }
+
+  void spoolStrictMode(
+      String violationClass,
+      int violationCount,
+      StackTraceElement[] capturedStack,
+      GcWindow gcWindow) {
+    spoolPayload(strictModeReportFor(violationClass, violationCount, capturedStack, gcWindow));
+  }
+
+  /**
+   * Garbage collections, and the time spent in them, during the last {@code windowMs} of a stalled
+   * event. A stall whose window is mostly GC time was a heap problem, not slow code.
+   */
+  public record GcWindow(int count, int timeMs, int windowMs) {}
 
   void spoolWatchdog(int missedHeartbeats) {
     spoolPayload(watchdogReportFor(missedHeartbeats));
@@ -309,7 +332,10 @@ public final class CrashReportSpooler {
   }
 
   private StrictModeReport strictModeReportFor(
-      String violationClass, int violationCount, StackTraceElement[] capturedStack) {
+      String violationClass,
+      int violationCount,
+      StackTraceElement[] capturedStack,
+      GcWindow gcWindow) {
     return new StrictModeReport(
         appVersion,
         appBuild,
@@ -328,6 +354,7 @@ public final class CrashReportSpooler {
         sanitizeViolationClass(violationClass),
         clamp(violationCount, 1, 1000),
         capturedStack == null ? null : framesFor(capturedStack),
+        gcWindow,
         UUID.randomUUID().toString().replace("-", ""));
   }
 
@@ -557,6 +584,13 @@ public final class CrashReportSpooler {
     private final String violation_class;
     private final int violation_count;
     private final Frame[] stack_frames;
+
+    /** Null, and then left out of the JSON, when the stall's GC activity wasn't measured. */
+    private final Integer gc_count;
+
+    private final Integer gc_time_ms;
+    private final Integer gc_window_ms;
+
     private final String report_nonce;
 
     private StrictModeReport(
@@ -577,6 +611,7 @@ public final class CrashReportSpooler {
         String violationClass,
         int violationCount,
         Frame[] stackFrames,
+        GcWindow gcWindow,
         String nonce) {
       this.app_version = appVersion;
       this.app_build = Integer.toString(appBuild);
@@ -595,6 +630,9 @@ public final class CrashReportSpooler {
       this.violation_class = violationClass;
       this.violation_count = violationCount;
       this.stack_frames = stackFrames;
+      this.gc_count = gcWindow == null ? null : gcWindow.count();
+      this.gc_time_ms = gcWindow == null ? null : gcWindow.timeMs();
+      this.gc_window_ms = gcWindow == null ? null : gcWindow.windowMs();
       this.report_nonce = nonce;
     }
   }

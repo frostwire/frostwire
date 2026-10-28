@@ -4,6 +4,7 @@ package com.frostwire.util;
 
 import com.limegroup.gnutella.gui.CrashReportSpooler;
 import java.awt.*;
+import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
@@ -177,6 +178,11 @@ public final class StrictEdtMode {
       /** The EDT stack halfway to the threshold, while this event was still running; or null. */
       private StackTraceElement[] earlySample;
 
+      /** GC totals and the time when the early sample was due; null until then. */
+      private GcTotals gcAtEarlySample;
+
+      private long earlySampleNanos;
+
       StallWatch(AWTEvent event, long my) {
         this.event = event;
         this.my = my;
@@ -194,6 +200,9 @@ public final class StrictEdtMode {
         if (!stillRunning()) {
           return;
         }
+        // Only events already running this long pay for reading the GC counters.
+        gcAtEarlySample = GcTotals.now();
+        earlySampleNanos = System.nanoTime();
         StackTraceElement[] stack = edt.getStackTrace();
         if (stillRunning() && isInsideWatchedDispatch(stack)) {
           earlySample = stack;
@@ -219,13 +228,21 @@ public final class StrictEdtMode {
                           SHUTDOWN_THRESHOLD_MS,
                           SHUTDOWN_TAG,
                           this::stillRunning,
+                          null,
                           null);
                     }
                   },
                   SHUTDOWN_THRESHOLD_MS - thresholdMs,
                   MS);
         } else {
-          dumpEdtAndQueueReport(event, edt, thresholdMs, "", this::stillRunning, earlySample);
+          dumpEdtAndQueueReport(
+              event,
+              edt,
+              thresholdMs,
+              "",
+              this::stillRunning,
+              earlySample,
+              gcWindow(gcAtEarlySample, earlySampleNanos, GcTotals.now(), System.nanoTime()));
         }
       }
     }
@@ -236,7 +253,8 @@ public final class StrictEdtMode {
         long thresholdMs,
         String tag,
         BooleanSupplier stalledEventStillRunning,
-        StackTraceElement[] earlySample) {
+        StackTraceElement[] earlySample,
+        CrashReportSpooler.GcWindow gcWindow) {
       System.err.printf(
           "=== STRICT-EDT VIOLATION: event took > %,d ms on %s ===%n", thresholdMs, edt);
       System.err.println("Event: " + event);
@@ -281,23 +299,62 @@ public final class StrictEdtMode {
       // Production never halts: queue a throttled Icebase report and keep dispatching.
       // Bounded descriptor on purpose: the raw event string can carry coordinates and
       // other high-cardinality data that would explode server-side issue grouping.
+      if (gcWindow != null) {
+        System.err.printf(
+            "--- GC: %d collections, %,d ms in the last %,d ms ---%n",
+            gcWindow.count(), gcWindow.timeMs(), gcWindow.windowMs());
+        System.err.flush();
+      }
       maybeQueueProductionReport(
-          report.tag() + event.getClass().getName() + "#" + event.getID(), report.stack());
+          report.tag() + event.getClass().getName() + "#" + event.getID(),
+          report.stack(),
+          gcWindow);
     }
 
     private static void maybeQueueProductionReport(
-        String eventDescription, StackTraceElement[] edtStack) {
+        String eventDescription,
+        StackTraceElement[] edtStack,
+        CrashReportSpooler.GcWindow gcWindow) {
       long now = System.currentTimeMillis();
       if (now - lastProductionReportMillis < REPORT_COOLDOWN_MS) {
         return;
       }
       lastProductionReportMillis = now;
       try {
-        CrashReportSpooler.recordStrictMode(eventDescription, 1, edtStack);
+        CrashReportSpooler.recordStrictMode(eventDescription, 1, edtStack, gcWindow);
       } catch (Throwable ignored) {
         // Reporting must never break event dispatch.
       }
     }
+  }
+
+  /** Collections and time spent in them since the JVM started, over every collector. */
+  record GcTotals(long count, long timeMs) {
+    static GcTotals now() {
+      long count = 0;
+      long timeMs = 0;
+      for (GarbageCollectorMXBean collector : ManagementFactory.getGarbageCollectorMXBeans()) {
+        // -1 when a collector doesn't track it.
+        count += Math.max(0, collector.getCollectionCount());
+        timeMs += Math.max(0, collector.getCollectionTime());
+      }
+      return new GcTotals(count, timeMs);
+    }
+  }
+
+  /**
+   * The GC activity between two readings, or null without a first one. GC time is counted in whole
+   * milliseconds per collection, so it is capped at the window it was measured in.
+   */
+  static CrashReportSpooler.GcWindow gcWindow(
+      GcTotals start, long startNanos, GcTotals end, long endNanos) {
+    if (start == null || end == null) {
+      return null;
+    }
+    int windowMs = (int) Math.max(1, TimeUnit.NANOSECONDS.toMillis(endNanos - startNanos));
+    int count = (int) Math.max(0, end.count() - start.count());
+    int timeMs = (int) Math.min(windowMs, Math.max(0, end.timeMs() - start.timeMs()));
+    return new CrashReportSpooler.GcWindow(count, timeMs, windowMs);
   }
 
   /**
