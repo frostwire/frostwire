@@ -18,6 +18,7 @@ FrostWire 3.2.3 build 779 UNRELEASED
   - update:Material Components 1.13.0 -> 1.14.0 (bottom sheet, snackbar, chip, FAB and text field fixes)
   - update:Kotlin 2.2.21 -> 2.4.21 (standard library and compiler)
   - update:Coil 3.4.0 -> 3.6.3 (fixes image requests hanging when a duplicate request is cancelled, and partial-image decoding control)
+  - update:WorkManager 2.11.2 -> 2.12.0 (retried background work schedules reliably, fewer startup stalls, a memory leak fix)
 
 FrostWire 3.2.2 build 778 OCT/09/2026
   - fix:Peers are now verified over rUDP instead of a TCP identity port, so a peer behind NAT that can be reached over UDP can be found; the DHT announces the rUDP port, phones and servers no longer need an open TCP port, and the "identity port" setting is gone (peers on older versions that only announce a TCP port are not discovered)
