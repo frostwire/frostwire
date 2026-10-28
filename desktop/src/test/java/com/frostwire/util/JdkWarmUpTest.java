@@ -99,6 +99,15 @@ class JdkWarmUpTest {
     }
   }
 
+  /**
+   * MigLayout's static setup (PlatformDefaults → UnitValue → Introspector.getBeanInfo) ran on the
+   * EDT when the main window built its first MigLayout (Icebase #45e2b9508e6d).
+   */
+  @Test
+  void migLayoutDefaultsAreInitializedByTheWarmUp() {
+    assertTrue(JdkWarmUp.CLASSES_TO_INITIALIZE.contains("net.miginfocom.layout.PlatformDefaults"));
+  }
+
   @Test
   void everyClassToInitializeExistsAndLoads() {
     for (String className : JdkWarmUp.CLASSES_TO_INITIALIZE) {

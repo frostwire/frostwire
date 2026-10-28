@@ -133,12 +133,18 @@ public final class JdkWarmUp {
           + "\u30ab\u30bf\u30ab\u30ca \u4e2d\u6587\u6f22\u5b57";
 
   /**
-   * JDK classes whose static initializers are slow and would otherwise run on the EDT: DragSource
+   * Classes whose static initializers are slow and would otherwise run on the EDT: DragSource
    * decodes the drag cursors (first mouse press in a drag-enabled table), SunGraphicsCallback
-   * brings up java.util.logging through its PlatformLogger (first container paint).
+   * brings up java.util.logging through its PlatformLogger (first container paint), and MigLayout's
+   * PlatformDefaults initializes UnitValue, which runs JavaBeans introspection
+   * (Introspector.getBeanInfo) when the main window builds its first MigLayout (Icebase
+   * #45e2b9508e6d).
    */
   static final List<String> CLASSES_TO_INITIALIZE =
-      List.of("java.awt.dnd.DragSource", "sun.awt.SunGraphicsCallback");
+      List.of(
+          "java.awt.dnd.DragSource",
+          "sun.awt.SunGraphicsCallback",
+          "net.miginfocom.layout.PlatformDefaults");
 
   /**
    * FrostWire packages whose classes the splash window paints with, loaded before it shows like the
