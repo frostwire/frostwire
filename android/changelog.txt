@@ -1,4 +1,5 @@
 FrostWire 3.2.3 build 779 UNRELEASED
+  - update:Spotless 7.0.4 -> 8.10.4, the code formatter check (developers only)
   - update:Netty 4.2.18 -> 4.2.19, the networking library behind IceBridge
   - update:BouncyCastle 1.83 -> 1.86, the cryptography behind IceBridge peer identities
   - update:Gson 2.13.2 -> 2.15.0, the JSON library behind search results and settings
