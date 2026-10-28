@@ -205,6 +205,22 @@ class StrictEdtModeTest {
     assertTrue(StrictEdtMode.isWindowsToolkitOnlyStall(stack));
   }
 
+  /** Icebase #ee3999fb71eb: the same cursor update, stalled setting the cursor natively. */
+  @Test
+  void toolkitCursorSetIsWindowsToolkitOnlyStall() {
+    StackTraceElement[] stack =
+        stack(
+            new StackTraceElement[] {
+              frame("sun.awt.windows.WGlobalCursorManager", "setCursor"),
+              frame("sun.awt.GlobalCursorManager", "_updateCursor"),
+              frame("sun.awt.GlobalCursorManager$NativeUpdater", "run"),
+              frame("java.awt.event.InvocationEvent", "dispatch")
+            },
+            EDT_LOOP);
+
+    assertTrue(StrictEdtMode.isWindowsToolkitOnlyStall(stack));
+  }
+
   /** Icebase #c96101cf2130: validation start of a native resize. */
   @Test
   void nativeResizeValidationIsWindowsToolkitOnlyStall() {

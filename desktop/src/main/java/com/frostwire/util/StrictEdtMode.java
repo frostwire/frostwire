@@ -571,9 +571,15 @@ public final class StrictEdtMode {
    * in sync.
    */
   static final String[][] WINDOWS_TOOLKIT_ONLY_STALLS = {
-    // The cursor manager's own periodic update, posted by the toolkit.
+    // The cursor manager's own periodic update, posted by the toolkit: finding the window under
+    // the cursor, or setting the cursor on it (Icebase #ee3999fb71eb).
     {
       "sun.awt.windows.WGlobalCursorManager.findHeavyweightUnderCursor",
+      "sun.awt.GlobalCursorManager._updateCursor",
+      "sun.awt.GlobalCursorManager$NativeUpdater.run"
+    },
+    {
+      "sun.awt.windows.WGlobalCursorManager.setCursor",
       "sun.awt.GlobalCursorManager._updateCursor",
       "sun.awt.GlobalCursorManager$NativeUpdater.run"
     },
