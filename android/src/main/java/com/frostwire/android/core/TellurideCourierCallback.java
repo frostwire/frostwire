@@ -76,9 +76,7 @@ public class TellurideCourierCallback<
             srlAdapter.setFileType(
                 Constants.FILE_TYPE_VIDEOS,
                 true,
-                () -> {
-                  SearchResultListAdapter.FilteredSearchResults filteredSearchResults =
-                      srlAdapter.getFilteredSearchResults();
+                filteredSearchResults -> {
                   srlAdapter.updateVisualListWithAllMediaTypeFilteredSearchResults(
                       filteredSearchResults.mediaTypeFiltered, false);
                   SearchFragment.instance().refreshFileTypeCounters(false, filteredSearchResults);

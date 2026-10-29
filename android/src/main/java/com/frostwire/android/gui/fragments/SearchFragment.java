@@ -401,7 +401,7 @@ public final class SearchFragment extends AbstractFragment
       adapter.setFileType(
           fileType,
           false,
-          () -> {
+          filtered -> {
             refreshFileTypeCounters(false, fileTypeCounter.fsr);
             // Keep progress/list in sync after filter setup; do not flash promos.
             showSearchView(getView());
@@ -519,6 +519,7 @@ public final class SearchFragment extends AbstractFragment
   }
 
   public void refreshFileTypeCounters(boolean fileTypeCountersVisible, FilteredSearchResults fsr) {
+    ensureUIThreadOrCrash("SearchFragment::refreshFileTypeCounters");
     searchInput.setFileTypeCountersVisible(fileTypeCountersVisible);
     searchInput.updateFileTypeCounter(Constants.FILE_TYPE_APPLICATIONS, fsr.numApplications);
     searchInput.updateFileTypeCounter(Constants.FILE_TYPE_AUDIO, fsr.numAudio);
@@ -894,18 +895,15 @@ public final class SearchFragment extends AbstractFragment
       boolean differentFileType = searchFragment.adapter.getFileType() != fileType;
       searchFragment.adapter.setFileType(
           fileType,
-          () -> {
-            // Ask the adapter for the filtered search results
-            FilteredSearchResults fsr = searchFragment.adapter.getFilteredSearchResults();
+          fsr -> {
             // Time to report to the UI, let the adapter know about the new newResults
             if (differentFileType) {
               searchFragment.fileTypeCounter.updateFilteredSearchResults(fsr);
             } else {
               searchFragment.fileTypeCounter.add(fsr);
             }
-            SystemUtils.postToUIThread(
-                () -> searchFragment.updateFilteredSearchResults(fsr.mediaTypeFiltered, true));
-          }); // background call
+            searchFragment.updateFilteredSearchResults(fsr.mediaTypeFiltered, true);
+          });
     }
 
     @Override
@@ -1001,7 +999,7 @@ public final class SearchFragment extends AbstractFragment
             SystemUtils.HandlerThreadName.CONFIG_MANAGER,
             () -> ConfigurationManager.instance().setLastMediaTypeFilter(mediaTypeId));
         fragment.adapter.setFileType(
-            mediaTypeId, false, () -> fragment.showSearchView(rootViewRef.get()));
+            mediaTypeId, false, filtered -> fragment.showSearchView(rootViewRef.get()));
       } else {
         fragment.showSearchView(rootViewRef.get());
       }

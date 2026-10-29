@@ -67,6 +67,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.apache.commons.io.FilenameUtils;
 
@@ -80,7 +81,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
   private final PreviewClickListener previewClickListener;
   private final FWImageLoader thumbLoader;
   private int fileType;
-  private FilteredSearchResults filteredSearchResults;
+  private volatile FilteredSearchResults filteredSearchResults;
 
   protected SearchResultListAdapter(Context context) {
     super(context, R.layout.view_bittorrent_search_result_list_item);
@@ -96,10 +97,14 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
 
   /**
    * Changes the fileType, extracts all the file search results, then filters them by type and
-   * updates (FilteredSearchResults) filteredSearchResults (see getFilteredSearchResults())
+   * updates (FilteredSearchResults) filteredSearchResults (see getFilteredSearchResults()) on the
+   * search performer thread. The visible list and the callback are updated on the main thread with
+   * the results of this call.
    */
   public void setFileType(
-      final int fileType, boolean appendToPreviouslyFilteredResults, Runnable callback) {
+      final int fileType,
+      boolean appendToPreviouslyFilteredResults,
+      Consumer<FilteredSearchResults> callback) {
     boolean differentFileType = this.fileType != fileType;
     this.fileType = fileType;
     postToHandler(
@@ -110,36 +115,30 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
           synchronized (listLock) {
             fileSearchResults = extractFileSearchResults(getFullList());
           }
-          // Filter the entire list by file type
-          if (!appendToPreviouslyFilteredResults || filteredSearchResults == null) {
-            if (filteredSearchResults != null) {
-              filteredSearchResults.clear();
-              filteredSearchResults = null;
-            }
-            filteredSearchResults = newFilteredSearchResults(fileSearchResults, fileType);
+          // Filter the entire list by file type. A new object rather than clearing the previous
+          // one: the main thread may still be reading it.
+          FilteredSearchResults results = filteredSearchResults;
+          if (!appendToPreviouslyFilteredResults || results == null) {
+            results = newFilteredSearchResults(fileSearchResults, fileType);
           } else {
-            appendFilteredSearchResults(filteredSearchResults, fileSearchResults, fileType);
+            appendFilteredSearchResults(results, fileSearchResults, fileType);
           }
-          if (filteredSearchResults != null) {
-            SystemUtils.postToUIThreadAtFront(
-                () -> {
-                  if (filteredSearchResults != null) {
-                    updateVisualListWithAllMediaTypeFilteredSearchResults(
-                        filteredSearchResults.mediaTypeFiltered, differentFileType);
-                  }
-                });
-          }
-
+          filteredSearchResults = results;
+          final FilteredSearchResults filtered = results;
+          // Views (the list, file type tabs, search view) change only on the main thread: off it
+          // they race measure() and crash with "did not set the measured dimension"
+          // (frostwire/frostwire#1384).
+          SystemUtils.postToUIThreadAtFront(
+              () ->
+                  updateVisualListWithAllMediaTypeFilteredSearchResults(
+                      filtered.mediaTypeFiltered, differentFileType));
           if (callback != null) {
-            try {
-              callback.run();
-            } catch (Throwable ignored) {
-            }
+            SystemUtils.postToUIThread(() -> callback.accept(filtered));
           }
         });
   }
 
-  public void setFileType(final int fileType, Runnable callback) {
+  public void setFileType(final int fileType, Consumer<FilteredSearchResults> callback) {
     setFileType(fileType, false, callback);
   }
 

@@ -288,6 +288,9 @@ public class SearchInputView extends LinearLayout {
   }
 
   public void setFileTypeCountersVisible(boolean fileTypeCountersVisible) {
+    // A visibility change off the main thread races measure() on every ancestor and makes it
+    // throw "did not set the measured dimension" (frostwire/frostwire#1384).
+    SystemUtils.ensureUIThreadOrCrash("SearchInputView::setFileTypeCountersVisible");
     TabLayout tabLayout = findViewById(R.id.view_search_input_tab_layout_file_type);
     tabLayout.setVisibility(fileTypeCountersVisible ? View.VISIBLE : View.GONE);
   }
