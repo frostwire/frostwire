@@ -26,6 +26,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import org.limewire.util.CommonUtils;
 
@@ -63,6 +65,12 @@ public final class CrashReportSpooler {
 
   private final int appBuild;
 
+  /**
+   * The first lookup runs the Telluride launcher and reads its output, which is why reports are
+   * built on the uploader thread (frostwire/frostwire#1395).
+   */
+  private final Supplier<String> tellurideBuild;
+
   public CrashReportSpooler(File directory, HttpClient client, String appVersion, int appBuild) {
     this(
         directory,
@@ -76,11 +84,22 @@ public final class CrashReportSpooler {
 
   CrashReportSpooler(
       File directory, HttpClient client, String appVersion, int appBuild, String runTag) {
+    this(directory, client, appVersion, appBuild, runTag, CrashReportSpooler::detectTellurideBuild);
+  }
+
+  CrashReportSpooler(
+      File directory,
+      HttpClient client,
+      String appVersion,
+      int appBuild,
+      String runTag,
+      Supplier<String> tellurideBuild) {
     this.directory = directory;
     this.client = client;
     this.appVersion = appVersion;
     this.appBuild = appBuild;
     this.runTag = runTag;
+    this.tellurideBuild = tellurideBuild;
   }
 
   public static void start() {
@@ -106,8 +125,8 @@ public final class CrashReportSpooler {
       start();
       CrashReportSpooler spooler = INSTANCE;
       if (spooler != null) {
-        spooler.spool(new Throwable());
-        UPLOAD_QUEUE.execute(spooler::uploadPending);
+        Throwable test = new Throwable();
+        queue(spooler, s -> s.spool(test), "test crash");
       }
     } catch (Throwable ignored) {
       LOG.info("Unable to submit anonymous test crash report", ignored);
@@ -123,9 +142,7 @@ public final class CrashReportSpooler {
       }
       CrashReportSpooler spooler = INSTANCE;
       if (spooler != null) {
-        spooler.spool(problem);
-        UPLOAD_QUEUE.execute(spooler::uploadPending);
-        LOG.info("Automatically queued anonymous crash report for Icebase");
+        queue(spooler, s -> s.spool(problem), "crash");
       }
     } catch (Throwable ignored) {
       LOG.info("Unable to queue anonymous crash report", ignored);
@@ -223,9 +240,10 @@ public final class CrashReportSpooler {
       }
       CrashReportSpooler spooler = INSTANCE;
       if (spooler != null) {
-        spooler.spoolStrictMode(violationClass, violationCount, capturedStack, gcWindow);
-        UPLOAD_QUEUE.execute(spooler::uploadPending);
-        LOG.info("Automatically queued anonymous strictmode report for Icebase");
+        queue(
+            spooler,
+            s -> s.spoolStrictMode(violationClass, violationCount, capturedStack, gcWindow),
+            "strictmode");
       }
     } catch (Throwable ignored) {
       LOG.info("Unable to queue anonymous strictmode report", ignored);
@@ -241,9 +259,7 @@ public final class CrashReportSpooler {
       }
       CrashReportSpooler spooler = INSTANCE;
       if (spooler != null) {
-        spooler.spoolWatchdog(missedHeartbeats);
-        UPLOAD_QUEUE.execute(spooler::uploadPending);
-        LOG.info("Automatically queued anonymous watchdog report for Icebase");
+        queue(spooler, s -> s.spoolWatchdog(missedHeartbeats), "watchdog");
       }
     } catch (Throwable ignored) {
       LOG.info("Unable to queue anonymous watchdog report", ignored);
@@ -426,11 +442,35 @@ public final class CrashReportSpooler {
 
   private String tellurideBuild() {
     try {
-      Integer build = TellurideBuild.detect(FrostWireUtils.getTellurideLauncherFile());
-      return build == null ? "unavailable" : Integer.toString(build);
+      return tellurideBuild.get();
     } catch (Throwable ignored) {
       return "unavailable";
     }
+  }
+
+  private static String detectTellurideBuild() {
+    Integer build = TellurideBuild.detect(FrostWireUtils.getTellurideLauncherFile());
+    return build == null ? "unavailable" : Integer.toString(build);
+  }
+
+  /**
+   * Builds the report and uploads it on the uploader thread, never the caller's. Building one can
+   * run the Telluride launcher, and the callers include the EDT (the About window's test report)
+   * and threads reporting a frozen EDT (frostwire/frostwire#1395). recordSync stays synchronous for
+   * fatal paths.
+   */
+  private static void queue(
+      CrashReportSpooler spooler, Consumer<CrashReportSpooler> spool, String kind) {
+    UPLOAD_QUEUE.execute(
+        () -> {
+          try {
+            spool.accept(spooler);
+            LOG.info("Automatically queued anonymous " + kind + " report for Icebase");
+          } catch (Throwable t) {
+            LOG.info("Unable to queue anonymous " + kind + " report", t);
+          }
+          spooler.uploadPending();
+        });
   }
 
   private void prune() throws Exception {

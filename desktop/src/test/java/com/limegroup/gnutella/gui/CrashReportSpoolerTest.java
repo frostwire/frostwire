@@ -18,11 +18,15 @@ import static org.junit.jupiter.api.Assertions.fail;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.File;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.limewire.util.CommonUtils;
@@ -330,4 +334,51 @@ class CrashReportSpoolerTest {
     } catch (Exception ignored) {
     }
   }
+
+  /**
+   * frostwire/frostwire#1395: building a report can run the Telluride launcher. The About window's
+   * test report built it on the EDT; every entry point now builds it on the uploader thread.
+   */
+  @Test
+  void reportsAreBuiltOnTheUploaderThreadNotTheCaller() throws Exception {
+    Path directory = Files.createTempDirectory("crash-report-thread");
+    CountDownLatch release = new CountDownLatch(1);
+    AtomicReference<Thread> lookupThread = new AtomicReference<>();
+    CountDownLatch looked = new CountDownLatch(1);
+    CrashReportSpooler spooler =
+        new CrashReportSpooler(
+            directory.toFile(),
+            null,
+            "7.0.4",
+            331,
+            "",
+            () -> {
+              lookupThread.set(Thread.currentThread());
+              looked.countDown();
+              try {
+                release.await(10, TimeUnit.SECONDS);
+              } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+              }
+              return "47";
+            });
+    Field instance = CrashReportSpooler.class.getDeclaredField("INSTANCE");
+    instance.setAccessible(true);
+    Object previous = instance.get(null);
+    instance.set(null, spooler);
+    try {
+      long start = System.nanoTime();
+      CrashReportSpooler.record(new ReportThreadProbe());
+      long elapsedMs = (System.nanoTime() - start) / 1_000_000;
+
+      assertTrue(elapsedMs < 2_000, "record() waited for the report to be built: " + elapsedMs);
+      assertTrue(looked.await(10, TimeUnit.SECONDS), "the report was never built");
+      assertEquals("CrashReportUploader", lookupThread.get().getName());
+    } finally {
+      release.countDown();
+      instance.set(null, previous);
+    }
+  }
+
+  private static final class ReportThreadProbe extends RuntimeException {}
 }
