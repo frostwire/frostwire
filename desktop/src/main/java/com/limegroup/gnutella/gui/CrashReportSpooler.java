@@ -26,6 +26,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Pattern;
 import org.limewire.util.CommonUtils;
 
 /** Stores anonymous crash reports locally and uploads them outside the failing thread. */
@@ -53,13 +54,33 @@ public final class CrashReportSpooler {
   private final File directory;
   private final HttpClient client;
   private final String appVersion;
+
+  /**
+   * {@link #DEV_TAG} in front of every report's class for runs outside a distribution, so their
+   * reports get their own Icebase issues instead of mixing with users' (frostwire/frostwire#1368).
+   */
+  private final String runTag;
+
   private final int appBuild;
 
   public CrashReportSpooler(File directory, HttpClient client, String appVersion, int appBuild) {
+    this(
+        directory,
+        client,
+        appVersion,
+        appBuild,
+        runTag(
+            System.getProperty("fw.running.from.distribution"),
+            CommonUtils.isRunningFromIntelliJ()));
+  }
+
+  CrashReportSpooler(
+      File directory, HttpClient client, String appVersion, int appBuild, String runTag) {
     this.directory = directory;
     this.client = client;
     this.appVersion = appVersion;
     this.appBuild = appBuild;
+    this.runTag = runTag;
   }
 
   public static void start() {
@@ -315,8 +336,9 @@ public final class CrashReportSpooler {
         Runtime.getRuntime().maxMemory() / (1024 * 1024),
         memoryBucket(),
         heapUsedMb(),
-        problem.getClass().getName(),
+        runTag + problem.getClass().getName(),
         oomKind(problem),
+        missingClass(problem),
         frames,
         UUID.randomUUID().toString().replace("-", ""));
   }
@@ -351,7 +373,7 @@ public final class CrashReportSpooler {
         Runtime.getRuntime().maxMemory() / (1024 * 1024),
         memoryBucket(),
         heapUsedMb(),
-        sanitizeViolationClass(violationClass),
+        runTag + sanitizeViolationClass(violationClass),
         clamp(violationCount, 1, 1000),
         capturedStack == null ? null : framesFor(capturedStack),
         gcWindow,
@@ -442,6 +464,46 @@ public final class CrashReportSpooler {
     return (int) ((runtime.totalMemory() - runtime.freeMemory()) / (1024 * 1024));
   }
 
+  static final String DEV_TAG = "dev:";
+
+  /**
+   * The tag for this run: {@link #DEV_TAG} when the launcher says it isn't a distribution ({@code
+   * gradle run} sets {@code fw.running.from.distribution=false}) or it runs from an IDE. Release
+   * launchers set the flag to true; one that sets nothing counts as a release.
+   */
+  static String runTag(String distributionFlag, boolean fromIde) {
+    if ("true".equals(distributionFlag)) {
+      return "";
+    }
+    return "false".equals(distributionFlag) || fromIde ? DEV_TAG : "";
+  }
+
+  private static final Pattern CLASS_NAME =
+      Pattern.compile("[A-Za-z_$][A-Za-z0-9_$]*(?:\\.[A-Za-z_$][A-Za-z0-9_$]*)*");
+
+  /**
+   * The class a NoClassDefFoundError or ClassNotFoundException names, as a dotted class name, or
+   * null for any other problem. Only a value that is a Java class name is reported, never the rest
+   * of the message.
+   */
+  static String missingClass(Throwable problem) {
+    if (!(problem instanceof NoClassDefFoundError)
+        && !(problem instanceof ClassNotFoundException)) {
+      return null;
+    }
+    String message = problem.getMessage();
+    if (message == null) {
+      return null;
+    }
+    message = message.trim();
+    String initializationFailed = "Could not initialize class ";
+    if (message.startsWith(initializationFailed)) {
+      message = message.substring(initializationFailed.length());
+    }
+    String name = message.replace('/', '.');
+    return name.length() <= 200 && CLASS_NAME.matcher(name).matches() ? name : null;
+  }
+
   /**
    * What an OutOfMemoryError ran out of, from the JVM's message, or null for any other problem.
    * Only this fixed name is reported, never the message.
@@ -506,6 +568,9 @@ public final class CrashReportSpooler {
     /** Null, and then left out of the JSON, for anything but an OutOfMemoryError. */
     private final String oom_kind;
 
+    /** Null, and then left out of the JSON, for anything but a class loading error. */
+    private final String missing_class;
+
     private final Frame[] stack_frames;
     private final String report_nonce;
 
@@ -526,6 +591,7 @@ public final class CrashReportSpooler {
         int heapUsedMb,
         String exceptionClass,
         String oomKind,
+        String missingClass,
         Frame[] stackFrames,
         String nonce) {
       this.app_version = appVersion;
@@ -544,6 +610,7 @@ public final class CrashReportSpooler {
       this.heap_used_mb = heapUsedMb;
       this.exception_class = exceptionClass;
       this.oom_kind = oomKind;
+      this.missing_class = missingClass;
       this.stack_frames = stackFrames;
       this.report_nonce = nonce;
     }

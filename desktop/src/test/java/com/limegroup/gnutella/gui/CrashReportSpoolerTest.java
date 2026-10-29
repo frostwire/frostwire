@@ -31,7 +31,7 @@ class CrashReportSpoolerTest {
   @Test
   void writesOnlyAllowlistedAnonymousCrashFields() throws Exception {
     Path directory = Files.createTempDirectory("frostwire-crash-spool");
-    CrashReportSpooler spooler = new CrashReportSpooler(directory.toFile(), null, "7.0.4", 331);
+    CrashReportSpooler spooler = new CrashReportSpooler(directory.toFile(), null, "7.0.4", 331, "");
 
     spooler.spool(new IllegalArgumentException("must not be uploaded"));
 
@@ -82,9 +82,77 @@ class CrashReportSpoolerTest {
   }
 
   @Test
+  void classLoadingErrorsNameTheMissingClassButNotTheMessage() throws Exception {
+    Path directory = Files.createTempDirectory("frostwire-crash-spool");
+    CrashReportSpooler spooler = new CrashReportSpooler(directory.toFile(), null, "7.0.4", 331, "");
+
+    spooler.spool(new NoClassDefFoundError("com/frostwire/util/UrlUtils"));
+
+    Path report =
+        Files.list(directory)
+            .filter(path -> path.toString().endsWith(".json"))
+            .findFirst()
+            .orElseThrow();
+    JsonObject json = JsonParser.parseString(Files.readString(report)).getAsJsonObject();
+    assertEquals(NoClassDefFoundError.class.getName(), json.get("exception_class").getAsString());
+    assertEquals("com.frostwire.util.UrlUtils", json.get("missing_class").getAsString());
+  }
+
+  @Test
+  void missingClassIsOnlyEverAClassName() {
+    assertEquals(
+        "com.foo.Bar", CrashReportSpooler.missingClass(new NoClassDefFoundError("com/foo/Bar")));
+    assertEquals(
+        "com.foo.Bar",
+        CrashReportSpooler.missingClass(
+            new NoClassDefFoundError("Could not initialize class com.foo.Bar")));
+    assertEquals(
+        "com.foo.Bar$Inner",
+        CrashReportSpooler.missingClass(new ClassNotFoundException("com.foo.Bar$Inner")));
+    assertEquals(
+        null,
+        CrashReportSpooler.missingClass(
+            new NoClassDefFoundError("com/foo/Bar (wrong name: com/foo/Baz)")));
+    assertEquals(
+        null, CrashReportSpooler.missingClass(new NoClassDefFoundError("/Users/someone/x")));
+    assertEquals(null, CrashReportSpooler.missingClass(new NoClassDefFoundError()));
+    assertEquals(null, CrashReportSpooler.missingClass(new IllegalStateException("com.foo.Bar")));
+  }
+
+  @Test
+  void devRunReportsCarryTheDevTag() throws Exception {
+    Path directory = Files.createTempDirectory("frostwire-crash-spool");
+    CrashReportSpooler spooler =
+        new CrashReportSpooler(directory.toFile(), null, "7.0.4", 331, CrashReportSpooler.DEV_TAG);
+
+    spooler.spool(new IllegalStateException("not uploaded"));
+    spooler.spoolStrictMode("java.awt.event.InvocationEvent#1200", 1);
+
+    Set<String> classes = new HashSet<>();
+    for (Path report :
+        Files.list(directory).filter(path -> path.toString().endsWith(".json")).toList()) {
+      JsonObject json = JsonParser.parseString(Files.readString(report)).getAsJsonObject();
+      classes.add(
+          (json.has("exception_class") ? json.get("exception_class") : json.get("violation_class"))
+              .getAsString());
+    }
+    assertEquals(
+        Set.of("dev:java.lang.IllegalStateException", "dev:java.awt.event.InvocationEvent#1200"),
+        classes);
+  }
+
+  @Test
+  void devRunsAreTaggedAndReleasesAreNot() {
+    assertEquals(CrashReportSpooler.DEV_TAG, CrashReportSpooler.runTag("false", false));
+    assertEquals(CrashReportSpooler.DEV_TAG, CrashReportSpooler.runTag(null, true));
+    assertEquals("", CrashReportSpooler.runTag("true", true));
+    assertEquals("", CrashReportSpooler.runTag(null, false));
+  }
+
+  @Test
   void outOfMemoryReportsSayWhatRanOutButNotTheMessage() throws Exception {
     Path directory = Files.createTempDirectory("frostwire-crash-spool");
-    CrashReportSpooler spooler = new CrashReportSpooler(directory.toFile(), null, "7.0.4", 331);
+    CrashReportSpooler spooler = new CrashReportSpooler(directory.toFile(), null, "7.0.4", 331, "");
 
     spooler.spool(new OutOfMemoryError("Metaspace"));
 
@@ -127,7 +195,7 @@ class CrashReportSpoolerTest {
   @Test
   void capsSpoolAndCreatesFreshNoncePerReport() throws Exception {
     Path directory = Files.createTempDirectory("frostwire-crash-spool");
-    CrashReportSpooler spooler = new CrashReportSpooler(directory.toFile(), null, "7.0.4", 331);
+    CrashReportSpooler spooler = new CrashReportSpooler(directory.toFile(), null, "7.0.4", 331, "");
 
     for (int i = 0; i < 10; i++) {
       spooler.spool(new RuntimeException("report " + i));
@@ -215,8 +283,14 @@ class CrashReportSpoolerTest {
       for (String name : newcomers) {
         JsonObject json =
             JsonParser.parseString(Files.readString(spoolDir().resolve(name))).getAsJsonObject();
+        // The test JVM runs with fw.running.from.distribution=false, a dev run.
+        String runTag =
+            CrashReportSpooler.runTag(
+                System.getProperty("fw.running.from.distribution"),
+                CommonUtils.isRunningFromIntelliJ());
         assertEquals(
-            IllegalStateException.class.getName(), json.get("exception_class").getAsString());
+            runTag + IllegalStateException.class.getName(),
+            json.get("exception_class").getAsString());
         assertFalse(json.toString().contains("sync probe"));
         assertTrue(json.get("report_nonce").getAsString().matches("[0-9a-f]{32}"));
       }
