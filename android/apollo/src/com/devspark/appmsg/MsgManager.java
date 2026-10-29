@@ -35,7 +35,6 @@ import java.util.Queue;
  * @author Evgeny Shishkin
  * @author Angel Leon
  */
-@SuppressWarnings("deprecation")
 class MsgManager extends Handler {
 
     private static final int MESSAGE_DISPLAY = 0xc2007;
@@ -48,6 +47,7 @@ class MsgManager extends Handler {
     private Animation inAnimation, outAnimation;
 
     private MsgManager() {
+        super(Looper.getMainLooper());
         msgQueue = new LinkedList<>();
     }
 
@@ -62,11 +62,16 @@ class MsgManager extends Handler {
     }
 
     /**
-     * Inserts a {@link AppMsg} to be displayed.
+     * Inserts a {@link AppMsg} to be displayed. The queue and the animations are only touched on the
+     * main thread: callers show messages from background threads, and the main thread used to
+     * display a message queued here before this method had loaded the fade-in animation, starting a
+     * null animation (frostwire/frostwire#1372).
      */
     void add(AppMsg appMsg) {
-        msgQueue.add(appMsg);
-
+        if (!SystemUtils.isUIThread()) {
+            SystemUtils.postToUIThread(() -> add(appMsg));
+            return;
+        }
         if (appMsg.getActivity() != null) {
             if (inAnimation == null) {
                 inAnimation = AnimationUtils.loadAnimation(appMsg.getActivity(),
@@ -77,13 +82,18 @@ class MsgManager extends Handler {
                         android.R.anim.fade_out);
             }
         }
+        msgQueue.add(appMsg);
         displayMsg();
     }
 
     /**
-     * Removes all {@link AppMsg} from the queue.
+     * Removes all {@link AppMsg} from the queue, on the main thread like {@link #add(AppMsg)}.
      */
     void clearMsg(AppMsg appMsg) {
+        if (!SystemUtils.isUIThread()) {
+            SystemUtils.postToUIThread(() -> clearMsg(appMsg));
+            return;
+        }
         msgQueue.remove(appMsg);
     }
 
