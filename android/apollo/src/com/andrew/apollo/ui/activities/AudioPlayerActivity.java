@@ -22,6 +22,7 @@ import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
+import android.content.ComponentName;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -74,6 +75,7 @@ import com.andrew.apollo.widgets.ShuffleButton;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.gui.util.OffMainQuery;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.android.offers.FWBannerView;
@@ -98,6 +100,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public final class AudioPlayerActivity extends AbstractActivity implements
         OnSeekBarChangeListener,
         DeleteDialog.DeleteDialogCallback {
+
+    private final OffMainQuery<SearchableInfo> searchableInfoQuery =
+            OffMainQuery.on(SystemUtils.HandlerThreadName.MISC);
 
     private static final Logger LOG = Logger.getLogger(AudioPlayerActivity.class);
 
@@ -327,8 +332,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         // Add voice search
         final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         if (searchManager != null && searchView != null) {
-            final SearchableInfo searchableInfo = searchManager.getSearchableInfo(getComponentName());
-            searchView.setSearchableInfo(searchableInfo);
+            // A binder call into the system's search service: off the main thread (frostwire/frostwire#1374).
+            final ComponentName component = getComponentName();
+            BaseActivity.bindSearchableInfo(searchView, () -> searchManager.getSearchableInfo(component), searchableInfoQuery);
             // Perform the search
             searchView.setOnQueryTextListener(new OnQueryTextListener() {
 
