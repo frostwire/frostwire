@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - update:Crash reports name the class Java couldn't load when FrostWire is missing one, and reports from development builds are kept apart from users' reports
    - fix:Building the main window at startup no longer stalls while Java sets up drag and drop — its data-transfer service is looked up in the background at startup
    - fix:Starting FrostWire on Windows no longer freezes while the tray icon is added, nor does hiding the window to the tray — the tray icon is added and removed in the background
    - update:Gradle 9.8.1 -> 9.8.2 for building FrostWire (developers only)
