@@ -174,13 +174,17 @@ public final class FWImageLoader {
       MemoryCache memCache = new MemoryCache.Builder().maxSizePercent(appContext, 0.25).build();
       coilBuilder.memoryCache(() -> memCache);
 
-      // Configure disk cache using okio.Path
-      File cacheDir = createDefaultCacheDir(appContext);
-      long maxSize = calculateDiskCacheSize(cacheDir);
-      Path cachePath = Path.get(cacheDir.getAbsolutePath());
-      DiskCache diskCache =
-          new DiskCache.Builder().directory(cachePath).maxSizeBytes(maxSize).build();
-      coilBuilder.diskCache(() -> diskCache);
+      // Configure disk cache using okio.Path. Coil calls this factory lazily on its own threads.
+      // Building it here did storage I/O (getExternalFilesDir is a binder call that may create
+      // the folder, then StatFs) while getInstance held the class lock that the main thread waits
+      // on (frostwire/frostwire#1389).
+      coilBuilder.diskCache(
+          () -> {
+            File cacheDir = createDefaultCacheDir(appContext);
+            long maxSize = calculateDiskCacheSize(cacheDir);
+            Path cachePath = Path.get(cacheDir.getAbsolutePath());
+            return new DiskCache.Builder().directory(cachePath).maxSizeBytes(maxSize).build();
+          });
 
       if (DEBUG_ERRORS) {
         coilBuilder.logger(new DebugLogger());
