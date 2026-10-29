@@ -1,12 +1,17 @@
 package com.limegroup.gnutella.gui.options.panes;
 
 import com.limegroup.gnutella.gui.DialogOption;
+import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.shell.FrostAssociations;
 import com.limegroup.gnutella.gui.shell.LimeAssociationOption;
+import com.limegroup.gnutella.gui.shell.ShellAssociationManager;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.QuestionsHandler;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.swing.*;
 
@@ -21,6 +26,12 @@ public final class AssociationPreferencePaneItem extends AbstractPaneItem {
           "You can use FrostWire to open certain filetypes and protocols. You can also instruct FrostWire to always regain these associations if another program takes them.");
 
   /** a mapping of checkboxes to associations */
+  /**
+   * Whether each association was ours when last read or applied; compared with the check boxes
+   * instead of reading the registry on the EDT. Empty until the first read arrives.
+   */
+  private Map<LimeAssociationOption, Boolean> registered = Map.of();
+
   private final Map<JCheckBox, LimeAssociationOption> associations = new HashMap<>();
 
   /** Check box to check associations on startup. */
@@ -85,7 +96,22 @@ public final class AssociationPreferencePaneItem extends AbstractPaneItem {
    * <p>Sets the options for the fields in this `PaneItem` when the window is shown.
    */
   public void initOptions() {
-    for (JCheckBox box : associations.keySet()) box.setSelected(associations.get(box).isEnabled());
+    // Whether each association is ours is a registry read: snapshot it off the EDT and show it when
+    // it arrives (frostwire/frostwire#1378).
+    List<LimeAssociationOption> options = new ArrayList<>(associations.values());
+    BackgroundQueuedExecutorService.schedule(
+        () -> {
+          Map<LimeAssociationOption, Boolean> states =
+              ShellAssociationManager.registeredStates(options);
+          GUIMediator.safeInvokeLater(
+              () -> {
+                registered = states;
+                for (Map.Entry<JCheckBox, LimeAssociationOption> entry : associations.entrySet()) {
+                  Boolean ours = states.get(entry.getValue());
+                  if (ours != null) entry.getKey().setSelected(ours);
+                }
+              });
+        });
     DialogOption choice = DialogOption.parseInt(QuestionsHandler.GRAB_ASSOCIATIONS.getValue());
     switch (choice) {
       case YES:
@@ -106,17 +132,12 @@ public final class AssociationPreferencePaneItem extends AbstractPaneItem {
    * a setting could not be applied.
    */
   public boolean applyOptions() {
+    Map<LimeAssociationOption, Boolean> choices = new HashMap<>();
     for (Map.Entry<JCheckBox, LimeAssociationOption> entry : associations.entrySet()) {
-      LimeAssociationOption option = entry.getValue();
-      if (entry.getKey().isSelected()) {
-        option.setAllowed(true);
-        option.setEnabled(true);
-      } else {
-        // only disallow options that were previously enabled.
-        if (option.isEnabled()) option.setAllowed(false);
-        option.setEnabled(false);
-      }
+      choices.put(entry.getValue(), entry.getKey().isSelected());
     }
+    ShellAssociationManager.applyChoices(choices, BackgroundQueuedExecutorService::schedule);
+    registered = choices;
     DialogOption value = DialogOption.INVALID;
     if (always.isSelected()) value = DialogOption.YES;
     else if (never.isSelected()) value = DialogOption.NO;
@@ -126,7 +147,8 @@ public final class AssociationPreferencePaneItem extends AbstractPaneItem {
 
   public boolean isDirty() {
     for (Map.Entry<JCheckBox, LimeAssociationOption> option : associations.entrySet()) {
-      if (option.getKey().isSelected() != option.getValue().isEnabled()) return true;
+      Boolean ours = registered.get(option.getValue());
+      if (ours != null && option.getKey().isSelected() != ours) return true;
     }
     switch (DialogOption.parseInt(QuestionsHandler.GRAB_ASSOCIATIONS.getValue())) {
       case YES:
