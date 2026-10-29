@@ -1,25 +1,23 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.frostwire.android.gui.views;
 
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.os.Bundle;
@@ -30,15 +28,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-
-import com.frostwire.android.R;
-import com.frostwire.android.util.Debug;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
 import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
@@ -46,6 +35,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import com.frostwire.android.R;
+import com.frostwire.android.util.Debug;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author gubatron
@@ -53,290 +50,292 @@ import androidx.appcompat.widget.Toolbar;
  */
 public abstract class AbstractActivity extends AppCompatActivity {
 
-    private final int layoutResId;
-    private final ArrayList<String> fragmentTags;
+  private final int layoutResId;
+  private final ArrayList<String> fragmentTags;
 
-    private boolean paused;
+  private boolean paused;
 
-    private static boolean menuIconsVisible = false;
+  private static boolean menuIconsVisible = false;
 
-    public AbstractActivity(@LayoutRes int layoutResId) {
-        this.layoutResId = layoutResId;
-        this.fragmentTags = new ArrayList<>();
-        this.paused = false;
+  public AbstractActivity(@LayoutRes int layoutResId) {
+    this.layoutResId = layoutResId;
+    this.fragmentTags = new ArrayList<>();
+    this.paused = false;
+  }
+
+  @Override
+  protected void onResume() {
+    paused = false;
+    try {
+      super.onResume();
+    } catch (Throwable t) {
+      // Rare exception, first seen on Jan 20th 2020, Android 9, Galaxy S9 (starqltesq) build 619
+      // Caused by: java.lang.IllegalArgumentException:
+      // at android.os.Parcel.createException (Parcel.java:1970)
+      // at android.os.Parcel.readException (Parcel.java:1934)
+      // at android.os.Parcel.readException (Parcel.java:1884)
+      // at android.app.IActivityManager$Stub$Proxy.isTopOfTask (IActivityManager.java:7844)
+      // at android.app.Activity.isTopOfTask (Activity.java:6543)
+      // at android.app.Activity.onResume (Activity.java:1403)
+      // at androidx.fragment.app.FragmentActivity.onResume (FragmentActivity.java:456)
+      // at com.frostwire.android.gui.views.AbstractActivity.onResume (AbstractActivity.java:80)
+    }
+  }
+
+  @Override
+  protected void onPause() {
+    paused = true;
+    super.onPause();
+  }
+
+  public boolean isPaused() {
+    return paused;
+  }
+
+  /**
+   * Returns a list of the currently attached fragments with a non null TAG.
+   *
+   * <p>If you are in API >= 26, the new method {@link FragmentManager#getFragments()} give you
+   * access to a list of all fragments that are added to the FragmentManager.
+   *
+   * @return the list of attached fragments with TAG.
+   */
+  public final List<Fragment> getFragments() {
+    List<Fragment> result = new LinkedList<>();
+
+    FragmentManager fm = getSupportFragmentManager();
+    for (String tag : fragmentTags) {
+      Fragment f = fm.findFragmentByTag(tag);
+      if (f != null) {
+        result.add(f);
+      }
     }
 
-    @Override
-    protected void onResume() {
-        paused = false;
-        try {
-            super.onResume();
-        } catch (Throwable t) {
-            // Rare exception, first seen on Jan 20th 2020, Android 9, Galaxy S9 (starqltesq) build 619
-            //Caused by: java.lang.IllegalArgumentException:
-            //at android.os.Parcel.createException (Parcel.java:1970)
-            //at android.os.Parcel.readException (Parcel.java:1934)
-            //at android.os.Parcel.readException (Parcel.java:1884)
-            //at android.app.IActivityManager$Stub$Proxy.isTopOfTask (IActivityManager.java:7844)
-            //at android.app.Activity.isTopOfTask (Activity.java:6543)
-            //at android.app.Activity.onResume (Activity.java:1403)
-            //at androidx.fragment.app.FragmentActivity.onResume (FragmentActivity.java:456)
-            //at com.frostwire.android.gui.views.AbstractActivity.onResume (AbstractActivity.java:80)
-        }
-    }
+    return result;
+  }
 
-    @Override
-    protected void onPause() {
-        paused = true;
-        super.onPause();
-    }
-
-    public boolean isPaused() {
-        return paused;
-    }
-
-    /**
-     * Returns a list of the currently attached fragments with
-     * a non null TAG.
-     * <p>
-     * If you are in API >= 26, the new method {@link FragmentManager#getFragments()}
-     * give you access to a list of all fragments that are added to the FragmentManager.
-     *
-     * @return the list of attached fragments with TAG.
-     */
-    public final List<Fragment> getFragments() {
-        List<Fragment> result = new LinkedList<>();
-
-        FragmentManager fm = getSupportFragmentManager();
-        for (String tag : fragmentTags) {
-            Fragment f = fm.findFragmentByTag(tag);
-            if (f != null) {
-                result.add(f);
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getSupportFragmentManager().registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
-            @Override
-            public void onFragmentAttached(@NonNull FragmentManager fm, @NonNull Fragment fragment, @NonNull Context context) {
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    getSupportFragmentManager()
+        .registerFragmentLifecycleCallbacks(
+            new FragmentManager.FragmentLifecycleCallbacks() {
+              @Override
+              public void onFragmentAttached(
+                  @NonNull FragmentManager fm,
+                  @NonNull Fragment fragment,
+                  @NonNull Context context) {
                 String tag = fragment.getTag();
                 if (tag != null && !fragmentTags.contains(tag)) {
-                    fragmentTags.add(tag);
+                  fragmentTags.add(tag);
                 }
-            }
-        }, false);
-        setContentView(layoutResId);
-        initComponents(savedInstanceState);
-        setToolbar();
+              }
+            },
+            false);
+    setContentView(layoutResId);
+    initComponents(savedInstanceState);
+    setToolbar();
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+  }
+
+  @Override
+  protected void onTitleChanged(CharSequence title, int color) {
+    super.onTitleChanged(title, color);
+    Toolbar toolbar = findToolbar();
+    if (toolbar != null) {
+      toolbar.setTitle(title);
+    }
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    if (item.getItemId() == android.R.id.home) {
+      getOnBackPressedDispatcher().onBackPressed();
+      return true;
+    }
+    return super.onOptionsItemSelected(item);
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    boolean r = super.onCreateOptionsMenu(menu);
+    setMenuIconsVisible(menu);
+    return r;
+  }
+
+  @Override
+  public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+    super.onCreateContextMenu(menu, v, menuInfo);
+    setMenuIconsVisible(menu);
+  }
+
+  @Nullable
+  @Override
+  public ActionMode startSupportActionMode(@NonNull ActionMode.Callback callback) {
+    return super.startSupportActionMode(new ActionModeCallback(callback));
+  }
+
+  @Override
+  public void unregisterReceiver(BroadcastReceiver receiver) {
+    try {
+      super.unregisterReceiver(receiver);
+    } catch (Throwable e) {
+      if (Debug.isEnabled()) {
+        // rethrow to actually see it and fix it
+        throw e;
+      }
+      // else, ignore exception, it could be to a bad call from
+      // third party frameworks
+    }
+  }
+
+  protected void initComponents(Bundle savedInstanceState) {}
+
+  protected void initToolbar(Toolbar toolbar) {}
+
+  private void setToolbar() {
+    Toolbar toolbar = findToolbar();
+    if (toolbar != null) {
+      setSupportActionBar(toolbar);
+      toolbar.setTitle(getTitle());
+      initToolbar(toolbar);
+    }
+  }
+
+  protected final <T extends View> T findView(@IdRes int id) {
+    return super.findViewById(id);
+  }
+
+  @SuppressWarnings("unchecked")
+  protected final <T extends Fragment> T findFragment(@IdRes int id) {
+    return (T) getSupportFragmentManager().findFragmentById(id);
+  }
+
+  /**
+   * Returns the first fragment of type T (and with a non null tag) found in the internal fragment
+   * manager.
+   *
+   * <p>This method should cover 98% of the actual UI designs, if you ever get to have two fragments
+   * of the same type in the activity, review the components design. If you present two different
+   * sets of information with the same type, that's not a good OOP design, and if you present the
+   * same information, that's not a good UI/UX design.
+   *
+   * @param clazz the class of the fragment to lookup
+   * @param <T> the type of the fragment to lookup
+   * @return the first fragment of type T if found.
+   */
+  @SuppressWarnings("unchecked")
+  public final <T extends Fragment> T findFragment(Class<T> clazz) {
+    for (Fragment f : getFragments()) {
+      if (clazz.isInstance(f)) {
+        return (T) f;
+      }
+    }
+    return null;
+  }
+
+  public final Toolbar findToolbar() {
+    return findView(R.id.toolbar_main);
+  }
+
+  protected final void setToolbarView(View view, int gravity) {
+    FrameLayout placeholder = findView(R.id.toolbar_main_placeholder);
+    if (placeholder != null) {
+      placeholder.removeAllViews();
+    }
+    if (view != null && placeholder != null) {
+      FrameLayout.LayoutParams params =
+          new FrameLayout.LayoutParams(
+              ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+      params.gravity = gravity;
+      placeholder.addView(view, params);
+      placeholder.setVisibility(View.VISIBLE);
+    }
+  }
+
+  protected final void setToolbarView(View view) {
+    setToolbarView(view, Gravity.START | Gravity.CENTER_VERTICAL);
+  }
+
+  /**
+   * This settings is application wide and apply to all activities and fragments that use our
+   * internal abstract activity. This enable or disable the menu icons for both options and context
+   * menu.
+   *
+   * @param visible if icons are visible or not
+   */
+  public static void setMenuIconsVisible(boolean visible) {
+    menuIconsVisible = visible;
+  }
+
+  private static void setMenuIconsVisible(Menu menu) {
+    if (menu == null) { // in case the framework changes
+      return;
+    }
+
+    // android by default set the field to false
+    if (!menuIconsVisible) {
+      return; // quick return
+    }
+
+    Class<?> clazz = menu.getClass();
+    Field f = null;
+    while (clazz != null && f == null) {
+      try {
+        f = clazz.getDeclaredField("mOptionalIconsVisible");
+      } catch (Throwable e) {
+        // next, no need to get them all, balanced cost of exception
+      }
+      clazz = clazz.getSuperclass();
+    }
+
+    if (f == null) {
+      // the menu framework changed, nothing we can do, but visual
+      // will reveal that a fix is necessary
+      return;
+    }
+
+    try {
+      f.setAccessible(true);
+      f.set(menu, menuIconsVisible);
+    } catch (Throwable e) {
+      // ignore, unable to set icons for the menu, but visual
+      // will reveal that a fix is necessary
+    }
+  }
+
+  private static final class ActionModeCallback implements ActionMode.Callback {
+
+    private final ActionMode.Callback cb;
+
+    private ActionModeCallback(ActionMode.Callback cb) {
+      this.cb = cb;
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+      boolean r = cb.onCreateActionMode(mode, menu);
+      setMenuIconsVisible(menu);
+      return r;
     }
 
     @Override
-    protected void onTitleChanged(CharSequence title, int color) {
-        super.onTitleChanged(title, color);
-        Toolbar toolbar = findToolbar();
-        if (toolbar != null) {
-            toolbar.setTitle(title);
-        }
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+      return cb.onPrepareActionMode(mode, menu);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            getOnBackPressedDispatcher().onBackPressed();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+      return cb.onActionItemClicked(mode, item);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        boolean r = super.onCreateOptionsMenu(menu);
-        setMenuIconsVisible(menu);
-        return r;
+    public void onDestroyActionMode(ActionMode mode) {
+      cb.onDestroyActionMode(mode);
     }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        setMenuIconsVisible(menu);
-    }
-
-    @Nullable
-    @Override
-    public ActionMode startSupportActionMode(@NonNull ActionMode.Callback callback) {
-        return super.startSupportActionMode(new ActionModeCallback(callback));
-    }
-
-    @Override
-    public void unregisterReceiver(BroadcastReceiver receiver) {
-        try {
-            super.unregisterReceiver(receiver);
-        } catch (Throwable e) {
-            if (Debug.isEnabled()) {
-                // rethrow to actually see it and fix it
-                throw e;
-            }
-            // else, ignore exception, it could be to a bad call from
-            // third party frameworks
-        }
-    }
-
-    protected void initComponents(Bundle savedInstanceState) {
-    }
-
-    protected void initToolbar(Toolbar toolbar) {
-    }
-
-    private void setToolbar() {
-        Toolbar toolbar = findToolbar();
-        if (toolbar != null) {
-            setSupportActionBar(toolbar);
-            toolbar.setTitle(getTitle());
-            initToolbar(toolbar);
-        }
-    }
-
-    protected final <T extends View> T findView(@IdRes int id) {
-        return super.findViewById(id);
-    }
-
-    @SuppressWarnings("unchecked")
-    protected final <T extends Fragment> T findFragment(@IdRes int id) {
-        return (T) getSupportFragmentManager().findFragmentById(id);
-    }
-
-    /**
-     * Returns the first fragment of type T (and with a non null tag) found in the
-     * internal fragment manager.
-     * <p>
-     * This method should cover 98% of the actual UI designs, if you ever get to have
-     * two fragments of the same type in the activity, review the components design.
-     * If you present two different sets of information with the same type, that's not
-     * a good OOP design, and if you present the same information, that's not a good
-     * UI/UX design.
-     *
-     * @param clazz the class of the fragment to lookup
-     * @param <T>   the type of the fragment to lookup
-     * @return the first fragment of type T if found.
-     */
-    @SuppressWarnings("unchecked")
-    public final <T extends Fragment> T findFragment(Class<T> clazz) {
-        for (Fragment f : getFragments()) {
-            if (clazz.isInstance(f)) {
-                return (T) f;
-            }
-        }
-        return null;
-    }
-
-    public final Toolbar findToolbar() {
-        return findView(R.id.toolbar_main);
-    }
-
-    protected final void setToolbarView(View view, int gravity) {
-        FrameLayout placeholder = findView(R.id.toolbar_main_placeholder);
-        if (placeholder != null) {
-            placeholder.removeAllViews();
-        }
-        if (view != null && placeholder != null) {
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
-            params.gravity = gravity;
-            placeholder.addView(view, params);
-            placeholder.setVisibility(View.VISIBLE);
-        }
-    }
-
-    protected final void setToolbarView(View view) {
-        setToolbarView(view, Gravity.START | Gravity.CENTER_VERTICAL);
-    }
-
-    /**
-     * This settings is application wide and apply to all activities and
-     * fragments that use our internal abstract activity. This enable
-     * or disable the menu icons for both options and context menu.
-     *
-     * @param visible if icons are visible or not
-     */
-    public static void setMenuIconsVisible(boolean visible) {
-        menuIconsVisible = visible;
-    }
-
-    private static void setMenuIconsVisible(Menu menu) {
-        if (menu == null) { // in case the framework changes
-            return;
-        }
-
-        // android by default set the field to false
-        if (!menuIconsVisible) {
-            return; // quick return
-        }
-
-        Class<?> clazz = menu.getClass();
-        Field f = null;
-        while (clazz != null && f == null) {
-            try {
-                f = clazz.getDeclaredField("mOptionalIconsVisible");
-            } catch (Throwable e) {
-                // next, no need to get them all, balanced cost of exception
-            }
-            clazz = clazz.getSuperclass();
-        }
-
-        if (f == null) {
-            // the menu framework changed, nothing we can do, but visual
-            // will reveal that a fix is necessary
-            return;
-        }
-
-        try {
-            f.setAccessible(true);
-            f.set(menu, menuIconsVisible);
-        } catch (Throwable e) {
-            // ignore, unable to set icons for the menu, but visual
-            // will reveal that a fix is necessary
-        }
-    }
-
-    private static final class ActionModeCallback implements ActionMode.Callback {
-
-        private final ActionMode.Callback cb;
-
-        private ActionModeCallback(ActionMode.Callback cb) {
-            this.cb = cb;
-        }
-
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            boolean r = cb.onCreateActionMode(mode, menu);
-            setMenuIconsVisible(menu);
-            return r;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return cb.onPrepareActionMode(mode, menu);
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            return cb.onActionItemClicked(mode, item);
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            cb.onDestroyActionMode(mode);
-        }
-    }
+  }
 }
