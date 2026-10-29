@@ -43,17 +43,27 @@ public class HideExitDialog extends JDialog {
     setLocationRelativeTo(frame);
   }
 
+  /**
+   * The message, one plain label per line. An HTML label built here made Swing load its HTML kit
+   * and lay out the text on the EDT during the window-close event (frostwire/frostwire#1394).
+   */
+  static JLabel[] messageLabels() {
+    return new JLabel[] {
+      new JLabel(I18n.tr("Closing the FrostWire window will only hide the application")),
+      new JLabel(I18n.tr("This way file transfers may continue in the background."))
+    };
+  }
+
   private void setupUI() {
     setResizable(false);
     getContentPane().setLayout(new GridBagLayout());
     GridBagConstraints c;
-    JLabel _label =
-        new JLabel(
-            "<html>"
-                + I18n.tr("Closing the FrostWire window will only hide the application")
-                + "<p>"
-                + I18n.tr("This way file transfers may continue in the background.")
-                + "</html>");
+    JPanel _label = new JPanel();
+    _label.setOpaque(false);
+    _label.setLayout(new BoxLayout(_label, BoxLayout.Y_AXIS));
+    for (JLabel line : messageLabels()) {
+      _label.add(line);
+    }
     c = new GridBagConstraints();
     c.gridwidth = GridBagConstraints.REMAINDER;
     c.anchor = GridBagConstraints.WEST;

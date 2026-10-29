@@ -869,6 +869,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.icebridge.IceBridgeTrafficGraphTest"
         includeTestsMatching "com.limegroup.gnutella.ExternalControlForwardedUrlTest"
         includeTestsMatching "com.frostwire.gui.searchfield.*"
+        includeTestsMatching "com.frostwire.gui.HideExitDialogMessageTest"
         includeTestsMatching "com.limegroup.gnutella.gui.CrashReportSpoolerTest"
         includeTestsMatching "com.limegroup.gnutella.gui.SizeStableLabelTest"
         includeTestsMatching "com.limegroup.gnutella.gui.VisibleCardLayoutTest"
