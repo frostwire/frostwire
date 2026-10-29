@@ -42,6 +42,7 @@ import com.limegroup.gnutella.gui.options.OptionsMediator;
 import com.limegroup.gnutella.gui.search.SearchMediator;
 import com.limegroup.gnutella.gui.shell.FrostAssociations;
 import com.limegroup.gnutella.gui.shell.ShellAssociationManager;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.gui.util.BackgroundSettingsSave;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.settings.LibrarySettings;
@@ -545,17 +546,18 @@ public final class GUIMediator {
 
   /**
    * Shows the user notification area. The user notification icon and tooltip created by the
-   * NotifyUser object are not modified.
+   * NotifyUser object are not modified. Adding the tray icon is a native toolkit call, so it runs
+   * on the background queue (frostwire/frostwire#1369); AWT's tray classes are thread-safe.
    */
   private static void showTrayIcon() {
-    NotifyUserProxy.instance().showTrayIcon();
+    BackgroundQueuedExecutorService.schedule(() -> NotifyUserProxy.instance().showTrayIcon());
   }
 
-  /** Hides the user notification area. */
+  /** Hides the user notification area, on the background queue like {@link #showTrayIcon()}. */
   private static void hideTrayIcon() {
     // Do not use hideNotify() here, since that will
     // create multiple tray icons.
-    NotifyUserProxy.instance().hideTrayIcon();
+    BackgroundQueuedExecutorService.schedule(() -> NotifyUserProxy.instance().hideTrayIcon());
   }
 
   /**

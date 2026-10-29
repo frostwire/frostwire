@@ -10,7 +10,10 @@ public final class NotifyUserProxy implements NotifyUser {
   /** The NotifyUser object that this class is serving as a proxy for. */
   private NotifyUser _notifier;
 
-  /** Flag for whether or not the application is currently in the tray. */
+  /**
+   * Flag for whether or not the application is currently in the tray. Show and hide are
+   * synchronized: they run on the startup thread, the GUI background queue and the shutdown thread.
+   */
   private boolean _inTray;
 
   /**
@@ -42,7 +45,7 @@ public final class NotifyUserProxy implements NotifyUser {
   }
 
   @Override
-  public boolean showTrayIcon() {
+  public synchronized boolean showTrayIcon() {
     if (_inTray) return true;
     boolean notify = _notifier.showTrayIcon();
     _inTray = true;
@@ -50,7 +53,7 @@ public final class NotifyUserProxy implements NotifyUser {
   }
 
   @Override
-  public void hideTrayIcon() {
+  public synchronized void hideTrayIcon() {
     if (!_inTray) return;
     _notifier.hideTrayIcon();
     _inTray = false;

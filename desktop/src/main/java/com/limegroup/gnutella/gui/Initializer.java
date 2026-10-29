@@ -80,6 +80,7 @@ import java.awt.*;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.function.Consumer;
 import javax.swing.*;
 import org.limewire.util.CommonUtils;
 import org.limewire.util.I18NConvert;
@@ -380,18 +381,27 @@ final class Initializer {
 
   /** Loads the system tray & other notifications. */
   private void loadTrayAndNotifications() {
-    // Create the user desktop notifier object.
-    // This must be done before the GUI is made visible,
-    // otherwise the user can close it and not see the
-    // tray icon.
-    GUIMediator.safeInvokeAndWait(
+    loadTrayAndNotifications(
         () -> {
-          // stopwatch.resetAndLog("enter evt queue");
           NotifyUserProxy.instance();
           if (!ApplicationSettings.DISPLAY_TRAY_ICON.getValue())
             NotifyUserProxy.instance().hideTrayIcon();
-          SettingsWarningManager.checkSettingsLoadSaveFailure();
-        });
+        },
+        SettingsWarningManager::checkSettingsLoadSaveFailure,
+        GUIMediator::safeInvokeAndWait);
+  }
+
+  /**
+   * Creates the user desktop notifier, which adds the tray icon, on the calling startup thread,
+   * then runs {@code onEdt} on the EDT through {@code invokeAndWait}. Adding the tray icon is a
+   * native toolkit call (SystemTray.add) that stalled the EDT at startup
+   * (frostwire/frostwire#1369); AWT's tray classes are thread-safe. It must happen before the GUI
+   * is made visible, otherwise the user can close it and not see the tray icon.
+   */
+  static void loadTrayAndNotifications(
+      Runnable addTrayIcon, Runnable onEdt, Consumer<Runnable> invokeAndWait) {
+    addTrayIcon.run();
+    invokeAndWait.accept(onEdt);
   }
 
   /** Hides the splash screen and sets the UI for allowing viz. */
