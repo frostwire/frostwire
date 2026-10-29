@@ -65,6 +65,34 @@ public class DirectionDetectorScrollListenerTest {
   }
 
   @Test
+  public void theIdleResetWaitsForTheDelay() {
+    scrollDownTo(1);
+    scrollDownTo(2);
+    scrollDownTo(3);
+
+    listener.onScrollStateChanged(null, SCROLL_STATE_IDLE);
+    shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(399));
+    scrollDownTo(4); // the votes are still there: this is the fourth
+
+    assertEquals(1, downs.get());
+  }
+
+  @Test
+  public void aNewIdleRestartsTheDelay() {
+    scrollDownTo(1);
+    scrollDownTo(2);
+    scrollDownTo(3);
+
+    listener.onScrollStateChanged(null, SCROLL_STATE_IDLE);
+    shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(300));
+    listener.onScrollStateChanged(null, SCROLL_STATE_IDLE);
+    shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(300)); // 600 ms after the first
+    scrollDownTo(4); // only 300 ms after the second idle: no reset yet
+
+    assertEquals(1, downs.get());
+  }
+
+  @Test
   public void aDirectionIsReportedAfterEnoughVotes() {
     for (int i = 1; i <= 4; i++) {
       scrollDownTo(i);

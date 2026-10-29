@@ -41,6 +41,14 @@ public final class DirectionDetectorScrollListener implements AbsListView.OnScro
   private final AtomicBoolean inMotion = new AtomicBoolean(false);
   private final AtomicBoolean enabledScrollDown = new AtomicBoolean(true);
   private final AtomicBoolean enabledScrollUp = new AtomicBoolean(true);
+  private final Runnable idleCheck =
+      () -> {
+        if (!inMotion.get()) {
+          onIdle();
+        }
+      };
+  private final Runnable enableScrollUp = () -> enabledScrollUp.set(true);
+  private final Runnable enableScrollDown = () -> enabledScrollDown.set(true);
 
   public DirectionDetectorScrollListener(final ScrollDirectionListener scrollDirectionListener) {
     this.scrollDirectionListener = scrollDirectionListener;
@@ -52,13 +60,7 @@ public final class DirectionDetectorScrollListener implements AbsListView.OnScro
       case SCROLL_STATE_IDLE:
         inMotion.set(false);
         // wait a little longer to call victory
-        runLater(
-            400,
-            () -> {
-              if (!inMotion.get()) {
-                onIdle();
-              }
-            });
+        runLater(400, idleCheck);
         break;
       case SCROLL_STATE_FLING:
         inMotion.set(true);
@@ -76,6 +78,8 @@ public final class DirectionDetectorScrollListener implements AbsListView.OnScro
    * delay, freezing the list for 400 ms whenever a scroll stopped (frostwire/frostwire#1385).
    */
   private void runLater(long delayMillis, Runnable r) {
+    // Restart the delay instead of stacking: an earlier task would fire too soon.
+    mainHandler.removeCallbacks(r);
     mainHandler.postDelayed(r, delayMillis);
   }
 
@@ -125,7 +129,7 @@ public final class DirectionDetectorScrollListener implements AbsListView.OnScro
   private void disable(final long interval, final AtomicBoolean flag) {
     // stop listening for 500 seconds to be able to detect rate of change.
     flag.set(false);
-    runLater(interval, () -> flag.set(true));
+    runLater(interval, flag == enabledScrollUp ? enableScrollUp : enableScrollDown);
   }
 
   private void checkCandidates() {
