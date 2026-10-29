@@ -57,7 +57,6 @@ import com.frostwire.android.gui.dialogs.ConfirmListDialogDefaultAdapter;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.dialogs.NewTransferDialog;
 import com.frostwire.android.gui.dialogs.TellurideSearchResultDownloadDialog;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.tasks.AsyncDownloadSoundcloudFromUrl;
 import com.frostwire.android.gui.tasks.AsyncStartDownload;
 import com.frostwire.android.gui.transfers.HttpSlideSearchResult;
@@ -242,8 +241,7 @@ public final class SearchFragment extends AbstractFragment
       list.setOnScrollListener(
           new ComposedOnScrollListener(
               new FastScrollDisabledWhenIdleOnScrollListener(),
-              new DirectionDetectorScrollListener(
-                  new ScrollDirectionListener(this), Engine.instance().getThreadPool())));
+              new DirectionDetectorScrollListener(new ScrollDirectionListener(this))));
     }
     if (headerBanner != null) {
       if (getCurrentQuery() == null || Offers.disabledAds()) {

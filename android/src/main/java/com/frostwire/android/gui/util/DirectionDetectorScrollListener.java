@@ -18,10 +18,10 @@
 
 package com.frostwire.android.gui.util;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.AbsListView;
 import androidx.annotation.NonNull;
-import com.frostwire.android.util.SystemUtils;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -32,7 +32,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public final class DirectionDetectorScrollListener implements AbsListView.OnScrollListener {
   private final ScrollDirectionVotes votes = new ScrollDirectionVotes();
-  private final ExecutorService threadPool;
+  // Scroll callbacks arrive on the main thread; the delayed tasks run there too, so the votes and
+  // flags are only ever touched by one thread.
+  private final Handler mainHandler = new Handler(Looper.getMainLooper());
   private final ScrollDirectionListener scrollDirectionListener;
   private int lastFirstVisibleItem;
   private final AtomicBoolean enabled = new AtomicBoolean(true);
@@ -40,9 +42,7 @@ public final class DirectionDetectorScrollListener implements AbsListView.OnScro
   private final AtomicBoolean enabledScrollDown = new AtomicBoolean(true);
   private final AtomicBoolean enabledScrollUp = new AtomicBoolean(true);
 
-  public DirectionDetectorScrollListener(
-      final ScrollDirectionListener scrollDirectionListener, final ExecutorService threadPool) {
-    this.threadPool = threadPool;
+  public DirectionDetectorScrollListener(final ScrollDirectionListener scrollDirectionListener) {
     this.scrollDirectionListener = scrollDirectionListener;
   }
 
@@ -52,7 +52,7 @@ public final class DirectionDetectorScrollListener implements AbsListView.OnScro
       case SCROLL_STATE_IDLE:
         inMotion.set(false);
         // wait a little longer to call victory
-        submitRunnable(
+        runLater(
             400,
             () -> {
               if (!inMotion.get()) {
@@ -71,20 +71,12 @@ public final class DirectionDetectorScrollListener implements AbsListView.OnScro
     }
   }
 
-  private void submitRunnable(long delay, Runnable r) {
-    if (delay > 0) {
-      try {
-        Thread.sleep(delay);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-    }
-
-    if (threadPool != null) {
-      threadPool.execute(r);
-    } else {
-      SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, r);
-    }
+  /**
+   * Runs r on the main thread after delayMillis. It used to sleep the calling (main) thread for the
+   * delay, freezing the list for 400 ms whenever a scroll stopped (frostwire/frostwire#1385).
+   */
+  private void runLater(long delayMillis, Runnable r) {
+    mainHandler.postDelayed(r, delayMillis);
   }
 
   private void onFling() {
@@ -133,7 +125,7 @@ public final class DirectionDetectorScrollListener implements AbsListView.OnScro
   private void disable(final long interval, final AtomicBoolean flag) {
     // stop listening for 500 seconds to be able to detect rate of change.
     flag.set(false);
-    submitRunnable(interval, () -> flag.set(true));
+    runLater(interval, () -> flag.set(true));
   }
 
   private void checkCandidates() {
