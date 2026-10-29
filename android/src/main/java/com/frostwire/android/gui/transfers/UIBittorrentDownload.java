@@ -37,6 +37,7 @@ import java.lang.ref.WeakReference;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -603,10 +604,21 @@ public final class UIBittorrentDownload implements BittorrentDownload {
 
   @Override
   public boolean equals(@Nullable Object other) {
+    if (this == other) {
+      return true;
+    }
     if (!(other instanceof UIBittorrentDownload)) {
       return false;
     }
-    return getInfoHash().equals(((UIBittorrentDownload) other).getInfoHash());
+    // Read live: the best hash changes from v1 to v2 when a hybrid torrent's metadata arrives.
+    // A transfer without a hash (an invalid handle) equals only itself; it used to throw.
+    String infoHash = getInfoHash();
+    return infoHash != null && infoHash.equals(((UIBittorrentDownload) other).getInfoHash());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(getInfoHash());
   }
 
   public void addListener(TransferStateListener listener) {
