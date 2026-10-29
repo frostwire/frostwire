@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -20,7 +20,6 @@ package com.frostwire.android.gui.services;
 
 import com.frostwire.android.util.Debug;
 import com.frostwire.util.ThreadPool;
-
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -29,145 +28,151 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * This executor helps to keep track of potential context leaks
- * and excessive submission of tasks.
+ * This executor helps to keep track of potential context leaks and excessive submission of tasks.
  *
  * @author gubatron
  * @author aldenml
  */
-final public class EngineThreadPool extends ThreadPool {
+public final class EngineThreadPool extends ThreadPool {
 
-    // look at AsyncTask for a more dynamic calculation, but it yields
-    // 17 in a medium hardware phone
-    private static final int CORE_POOL_SIZE = 1;
-    private static final int MAXIMUM_POOL_SIZE = 8;
-    private static final int KEEP_ALIVE_TIME_IN_SECS = 2;
-    private static final int MAX_DEBUG_QUEUED_TASKS = 100;
+  // look at AsyncTask for a more dynamic calculation, but it yields
+  // 17 in a medium hardware phone
+  private static final int CORE_POOL_SIZE = 1;
+  private static final int MAXIMUM_POOL_SIZE = 8;
+  private static final int KEEP_ALIVE_TIME_IN_SECS = 2;
+  private static final int MAX_DEBUG_QUEUED_TASKS = 100;
 
-    private final WeakHashMap<Object, String> taskStack;
-    private final WeakHashMap<Thread, TaskInfo> taskInfo;
+  private final WeakHashMap<Object, String> taskStack;
+  private final WeakHashMap<Thread, TaskInfo> taskInfo;
 
-    EngineThreadPool() {
-        super("Engine", CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE_TIME_IN_SECS, new LinkedBlockingQueue<>(4), false);
-        taskStack = new WeakHashMap<>();
-        taskInfo = new WeakHashMap<>();
+  EngineThreadPool() {
+    super(
+        "Engine",
+        CORE_POOL_SIZE,
+        MAXIMUM_POOL_SIZE,
+        KEEP_ALIVE_TIME_IN_SECS,
+        new LinkedBlockingQueue<>(4),
+        false);
+    taskStack = new WeakHashMap<>();
+    taskInfo = new WeakHashMap<>();
+  }
+
+  @Override
+  public void execute(Runnable command) {
+    verifyTask(command);
+    super.execute(command);
+  }
+
+  @Override
+  public Future<?> submit(Runnable task) {
+    verifyTask(task);
+    return super.submit(task);
+  }
+
+  @Override
+  public <T> Future<T> submit(Runnable task, T result) {
+    verifyTask(task);
+    return super.submit(task, result);
+  }
+
+  @Override
+  public <T> Future<T> submit(Callable<T> task) {
+    verifyTask(task);
+    return super.submit(task);
+  }
+
+  @Override
+  protected void beforeExecute(Thread t, Runnable r) {
+    if (Debug.isEnabled()) {
+      String stack = taskStack.get(r);
+      if (stack != null) {
+        taskInfo.put(t, new TaskInfo(System.nanoTime(), stack));
+      }
     }
 
-    @Override
-    public void execute(Runnable command) {
-        verifyTask(command);
-        super.execute(command);
+    super.beforeExecute(t, r);
+  }
+
+  private void verifyTask(Object task) {
+    if (Debug.hasContext(task)) {
+      throw new RuntimeException("Runnable/task contains context, possible context leak");
     }
 
-    @Override
-    public Future<?> submit(Runnable task) {
-        verifyTask(task);
-        return super.submit(task);
+    if (Debug.isEnabled()) {
+      taskStack.put(task, getStack());
+      if (getQueue().size() > 0) {
+        System.out.println("EngineThreadPool::verifyTask - " + getQueue().size() + " tasks queued");
+      }
     }
 
-    @Override
-    public <T> Future<T> submit(Runnable task, T result) {
-        verifyTask(task);
-        return super.submit(task, result);
+    // if debug/development, allow only MAX_DEBUG_QUEUED_TASKS tasks in the queue
+    if (Debug.isEnabled() && getQueue().size() > MAX_DEBUG_QUEUED_TASKS) {
+      dumpTasks();
+      throw new RuntimeException(
+          "Too many tasks (" + getQueue().size() + "/" + MAX_DEBUG_QUEUED_TASKS + ") in the queue");
     }
+    String threadName = "EngineThreadPool:" + Thread.currentThread().getStackTrace()[6].toString();
+    Thread.currentThread().setName(threadName);
+    // System.out.println("Thread renamed to -> "+ threadName);
+  }
 
-    @Override
-    public <T> Future<T> submit(Callable<T> task) {
-        verifyTask(task);
-        return super.submit(task);
+  private void dumpTasks() {
+    System.out.println("==============================================");
+    System.out.println("EngineThreadPool::dumpTasks()");
+    System.out.println("Active threads: " + getActiveCount());
+    System.out.println("Running threads in engine pool");
+    long now = System.nanoTime();
+    for (Map.Entry<Thread, TaskInfo> e : taskInfo.entrySet()) {
+      String threadName = e.getKey().getName();
+      if (threadName != null && threadName.contains("thread-idle")) {
+        continue;
+      }
+      System.out.println("Thread name: " + threadName);
+      System.out.println("\tTime running: " + ((now - e.getValue().time) / 1000000) + "ms");
+      System.out.println("\tStack trace:");
+      System.out.println(e.getValue().stack);
     }
+    System.out.println("==============================================");
+    Set<Thread> threads = Thread.getAllStackTraces().keySet();
+    System.out.println("All threads in the JVM (" + threads.size() + "):");
+    int i = 1;
+    for (Thread t : threads) {
+      System.out.println(i + ": " + t.getName());
+      i++;
+    }
+    System.out.println("==============================================");
+  }
 
-    @Override
-    protected void beforeExecute(Thread t, Runnable r) {
-        if (Debug.isEnabled()) {
-            String stack = taskStack.get(r);
-            if (stack != null) {
-                taskInfo.put(t, new TaskInfo(System.nanoTime(), stack));
-            }
+  private static String getStack() {
+    StackTraceElement[] callStack = Thread.currentThread().getStackTrace();
+    StringBuilder sb = new StringBuilder();
+    for (int i = 5; i < callStack.length; i++) {
+      StackTraceElement caller = callStack[i];
+      sb.append("\t\t at ");
+      sb.append(caller.getClassName()).append(".").append(caller.getMethodName());
+
+      String fileName = caller.getFileName();
+      int lineNumber = caller.getLineNumber();
+      if (fileName != null) {
+        sb.append("(").append(fileName);
+        if (lineNumber > 0) {
+          sb.append(":").append(lineNumber);
         }
-
-        super.beforeExecute(t, r);
+        sb.append(")");
+      }
+      sb.append("\n");
     }
+    return sb.toString();
+  }
 
-    private void verifyTask(Object task) {
-        if (Debug.hasContext(task)) {
-            throw new RuntimeException("Runnable/task contains context, possible context leak");
-        }
+  private static final class TaskInfo {
 
-        if (Debug.isEnabled()) {
-            taskStack.put(task, getStack());
-            if (getQueue().size() > 0) {
-                System.out.println("EngineThreadPool::verifyTask - " + getQueue().size() + " tasks queued");
-            }
-        }
+    final long time;
+    final String stack;
 
-        // if debug/development, allow only MAX_DEBUG_QUEUED_TASKS tasks in the queue
-        if (Debug.isEnabled() && getQueue().size() > MAX_DEBUG_QUEUED_TASKS) {
-            dumpTasks();
-            throw new RuntimeException("Too many tasks (" + getQueue().size() + "/" + MAX_DEBUG_QUEUED_TASKS + ") in the queue");
-        }
-        String threadName = "EngineThreadPool:" + Thread.currentThread().getStackTrace()[6].toString();
-        Thread.currentThread().setName(threadName);
-        //System.out.println("Thread renamed to -> "+ threadName);
+    TaskInfo(long time, String stack) {
+      this.time = time;
+      this.stack = stack;
     }
-
-    private void dumpTasks() {
-        System.out.println("==============================================");
-        System.out.println("EngineThreadPool::dumpTasks()");
-        System.out.println("Active threads: " + getActiveCount());
-        System.out.println("Running threads in engine pool");
-        long now = System.nanoTime();
-        for (Map.Entry<Thread, TaskInfo> e : taskInfo.entrySet()) {
-            String threadName = e.getKey().getName();
-            if (threadName != null && threadName.contains("thread-idle")) {
-                continue;
-            }
-            System.out.println("Thread name: " + threadName);
-            System.out.println("\tTime running: " + ((now - e.getValue().time) / 1000000) + "ms");
-            System.out.println("\tStack trace:");
-            System.out.println(e.getValue().stack);
-        }
-        System.out.println("==============================================");
-        Set<Thread> threads = Thread.getAllStackTraces().keySet();
-        System.out.println("All threads in the JVM (" + threads.size() +"):");
-        int i=1;
-        for (Thread t : threads) {
-            System.out.println(i + ": " + t.getName());
-            i++;
-        }
-        System.out.println("==============================================");
-    }
-
-    private static String getStack() {
-        StackTraceElement[] callStack = Thread.currentThread().getStackTrace();
-        StringBuilder sb = new StringBuilder();
-        for (int i = 5; i < callStack.length; i++) {
-            StackTraceElement caller = callStack[i];
-            sb.append("\t\t at ");
-            sb.append(caller.getClassName()).append(".").append(caller.getMethodName());
-
-            String fileName = caller.getFileName();
-            int lineNumber = caller.getLineNumber();
-            if (fileName != null) {
-                sb.append("(").append(fileName);
-                if (lineNumber > 0) {
-                    sb.append(":").append(lineNumber);
-                }
-                sb.append(")");
-            }
-            sb.append("\n");
-        }
-        return sb.toString();
-    }
-
-    private static final class TaskInfo {
-
-        final long time;
-        final String stack;
-
-        TaskInfo(long time, String stack) {
-            this.time = time;
-            this.stack = stack;
-        }
-    }
+  }
 }
