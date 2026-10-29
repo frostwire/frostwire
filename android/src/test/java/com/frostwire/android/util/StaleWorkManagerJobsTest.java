@@ -17,6 +17,7 @@ import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import androidx.test.core.app.ApplicationProvider;
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
@@ -60,6 +61,20 @@ public class StaleWorkManagerJobsTest {
 
     assertFalse(
         Arrays.asList(context.databaseList()).contains(StaleWorkManagerJobs.WORK_MANAGER_DATABASE));
+  }
+
+  @Test
+  public void workManagersCurrentDatabaseInNoBackupIsDeleted() throws Exception {
+    File noBackup = context.getNoBackupFilesDir();
+    File db = new File(noBackup, StaleWorkManagerJobs.WORK_MANAGER_DATABASE);
+    File wal = new File(noBackup, StaleWorkManagerJobs.WORK_MANAGER_DATABASE + "-wal");
+    assertTrue(db.createNewFile());
+    assertTrue(wal.createNewFile());
+
+    StaleWorkManagerJobs.remove(context);
+
+    assertFalse(db.exists());
+    assertFalse(wal.exists());
   }
 
   @Test

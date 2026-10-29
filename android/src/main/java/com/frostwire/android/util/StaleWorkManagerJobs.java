@@ -11,6 +11,7 @@ import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.Context;
 import com.frostwire.util.Logger;
+import java.io.File;
 
 /**
  * Removes what WorkManager left behind (frostwire/frostwire#1388).
@@ -28,6 +29,7 @@ public final class StaleWorkManagerJobs {
   static final String WORK_MANAGER_JOB_SERVICE =
       "androidx.work.impl.background.systemjob.SystemJobService";
   static final String WORK_MANAGER_DATABASE = "androidx.work.workdb";
+  private static final String[] DATABASE_FILE_SUFFIXES = {"", "-wal", "-shm", "-journal"};
 
   private StaleWorkManagerJobs() {}
 
@@ -45,12 +47,28 @@ public final class StaleWorkManagerJobs {
           }
         }
       }
-      if (context.deleteDatabase(WORK_MANAGER_DATABASE) || cancelled > 0) {
+      boolean deleted = deleteDatabase(context);
+      if (deleted || cancelled > 0) {
         LOG.info("StaleWorkManagerJobs: cancelled " + cancelled + " jobs, removed old database");
       }
-    } catch (Throwable t) {
-      LOG.warn("StaleWorkManagerJobs: cleanup failed", t);
+    } catch (RuntimeException e) {
+      // Best effort: state left by old versions. SecurityException or IllegalStateException
+      // from the system services must not stop the app from starting.
+      LOG.warn("StaleWorkManagerJobs: cleanup failed", e);
     }
     return cancelled;
+  }
+
+  /**
+   * WorkManager keeps its database in no_backup/ (since 2.1, on API 23+), and kept it in databases/
+   * before that. Deletes both, with SQLite's side files.
+   */
+  private static boolean deleteDatabase(Context context) {
+    boolean deleted = context.deleteDatabase(WORK_MANAGER_DATABASE);
+    File noBackup = context.getNoBackupFilesDir();
+    for (String suffix : DATABASE_FILE_SUFFIXES) {
+      deleted |= new File(noBackup, WORK_MANAGER_DATABASE + suffix).delete();
+    }
+    return deleted;
   }
 }

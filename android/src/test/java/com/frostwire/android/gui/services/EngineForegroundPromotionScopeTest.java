@@ -17,17 +17,19 @@ import java.nio.file.Path;
 import org.junit.Test;
 
 /**
- * Guards the contract that prevents
- * {@code RemoteServiceException: Context.startForegroundService() did not then call
- * Service.startForeground()}. The service was started with startForegroundService, so it must
- * either successfully call startForeground() or fully stop itself to clear the pending requirement;
- * it must never abort the start request another way (throwing from onCreate, or swallow-and-return).
+ * Guards the contract that prevents {@code RemoteServiceException: Context.startForegroundService()
+ * did not then call Service.startForeground()}. The service was started with
+ * startForegroundService, so it must either successfully call startForeground() or fully stop
+ * itself to clear the pending requirement; it must never abort the start request another way
+ * (throwing from onCreate, or swallow-and-return).
  */
 public class EngineForegroundPromotionScopeTest {
 
   @Test
   public void promotionFailureFullyStopsService() throws Exception {
-    String source = readProjectFile("src/main/java/com/frostwire/android/gui/services/EngineForegroundService.java");
+    String source =
+        readProjectFile(
+            "src/main/java/com/frostwire/android/gui/services/EngineForegroundService.java");
     String tryShow = blockStartingAt(source, "private boolean tryShowPersistentNotification");
     assertTrue(
         "a failed foreground promotion must call stopSelf() to clear the pending startForeground requirement",
@@ -39,27 +41,27 @@ public class EngineForegroundPromotionScopeTest {
 
   @Test
   public void stickyRestartGuardFullyStopsService() throws Exception {
-    String source = readProjectFile("src/main/java/com/frostwire/android/gui/services/EngineForegroundService.java");
+    String source =
+        readProjectFile(
+            "src/main/java/com/frostwire/android/gui/services/EngineForegroundService.java");
     String onStart = blockStartingAt(source, "public int onStartCommand");
     String guard = onStart.substring(0, onStart.indexOf("tryShowPersistentNotification("));
     assertTrue(
-        "the background sticky restart path must fully stop itself",
-        guard.contains("stopSelf();"));
+        "the background sticky restart path must fully stop itself", guard.contains("stopSelf();"));
     assertFalse(
         "the background sticky restart path must not rely on stopSelfResult(startId)",
         guard.contains("stopSelfResult"));
   }
 
   @Test
-  public void onCreateGuardsOnDemandWorkManagerInit() throws Exception {
-    String source = readProjectFile("src/main/java/com/frostwire/android/gui/services/EngineForegroundService.java");
-    String onCreate = blockStartingAt(source, "public void onCreate()");
-    assertTrue(
-        "onCreate must guard WorkManager scheduling: the initializer is removed in the manifest, so getInstance can throw",
-        onCreate.contains("safeScheduleNotificationWork()"));
-    assertFalse(
-        "onCreate must not call the unguarded scheduleNotificationWork directly",
-        onCreate.contains("scheduleNotificationWork();"));
+  public void onCreateNoLongerTouchesWorkManager() throws Exception {
+    // frostwire/frostwire#1388: WorkManager is gone; a call in onCreate would throw before the
+    // service could satisfy its startForegroundService() requirement.
+    String source =
+        readProjectFile(
+            "src/main/java/com/frostwire/android/gui/services/EngineForegroundService.java");
+    assertFalse("WorkManager is no longer used", source.contains("WorkManager"));
+    assertFalse("WorkManager is no longer used", source.contains("androidx.work"));
   }
 
   private static String blockStartingAt(String source, String marker) {
