@@ -138,15 +138,21 @@ public final class TransferManager {
       return;
     }
     UIBittorrentDownload ui = new UIBittorrentDownload(this, dl);
-    boolean added;
+    // The list may already hold this transfer: added by another thread, or under its v1 hash
+    // before a hybrid torrent's metadata switched it to v2. Map whichever row is in the list.
+    BittorrentDownload row;
     synchronized (downloadsListMonitor) {
-      added = !bittorrentDownloadsList.contains(ui) && bittorrentDownloadsList.add(ui);
-    }
-    if (!added) {
-      return; // another thread added this transfer; its row is the one in the map
+      int index = bittorrentDownloadsList.indexOf(ui);
+      row = index >= 0 ? bittorrentDownloadsList.get(index) : ui;
+      if (index < 0) {
+        bittorrentDownloadsList.add(ui);
+      }
     }
     synchronized (downloadsMapMonitor) {
-      bittorrentDownloadsMap.put(hash, ui);
+      bittorrentDownloadsMap.put(hash, row);
+    }
+    if (row != ui) {
+      return;
     }
     LOG.info("downloadAdded: " + ui.getDisplayName() + " hash=" + hash);
   }
