@@ -22,6 +22,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
+import android.content.ComponentName;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -55,6 +56,7 @@ import com.andrew.apollo.widgets.RepeatingImageButton;
 import com.andrew.apollo.widgets.ShuffleButton;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.adapters.menu.CreateNewPlaylistMenuAction;
+import com.frostwire.android.gui.util.OffMainQuery;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.offers.HeaderBanner;
@@ -64,6 +66,7 @@ import com.frostwire.util.Logger;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * A base {@link Activity} used to update the bottom bar and
@@ -74,6 +77,10 @@ import java.util.Objects;
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public abstract class BaseActivity extends AbstractActivity {
+
+    private final OffMainQuery<SearchableInfo> searchableInfoQuery =
+            OffMainQuery.on(SystemUtils.HandlerThreadName.MISC);
+
     /**
      * Play state and meta change listener
      */
@@ -154,12 +161,12 @@ public abstract class BaseActivity extends AbstractActivity {
         getMenuInflater().inflate(R.menu.player_search, menu);
 
         final SearchView searchView = (SearchView) menu.findItem(R.id.menu_player_search).getActionView();
-        // Add voice search
-        final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        final SearchableInfo searchableInfo = searchManager.getSearchableInfo(getComponentName());
 
         if (searchView != null) { // rare NPE can occur
-            searchView.setSearchableInfo(searchableInfo);
+            // Add voice search
+            final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+            final ComponentName component = getComponentName();
+            bindSearchableInfo(searchView, () -> searchManager.getSearchableInfo(component), searchableInfoQuery);
             // Perform the search
             searchView.setOnQueryTextListener(new OnQueryTextListener() {
 
@@ -178,6 +185,17 @@ public abstract class BaseActivity extends AbstractActivity {
             });
         }
         return super.onCreateOptionsMenu(menu);
+    }
+
+    /**
+     * Looks up the search configuration off the main thread and sets it on the search view when it
+     * arrives: {@code SearchManager.getSearchableInfo} is a binder call into the system's search
+     * service, which froze the app here when the system was slow to answer (frostwire/frostwire#1374).
+     */
+    static void bindSearchableInfo(SearchView searchView,
+                                   Supplier<SearchableInfo> lookup,
+                                   OffMainQuery<SearchableInfo> query) {
+        query.run(lookup, searchView::setSearchableInfo);
     }
 
     @Override
