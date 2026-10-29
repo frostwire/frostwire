@@ -151,7 +151,6 @@ abstract class AbstractLibraryTableMediator<
       if (value >= 0) {
         if (SCROLL_PANE.getVerticalScrollBar().getMaximum() >= value) {
           SCROLL_PANE.getVerticalScrollBar().setValue(value);
-          Toolkit.getDefaultToolkit().sync();
           needToScrollTo = -1;
         }
       }

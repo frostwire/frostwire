@@ -60,7 +60,7 @@ public final class LibraryCoverArtPanel extends JPanel {
           () -> {
             defaultCoverArt = GUIMediator.getThemeImage("default_cover_art").getImage();
             if (tagsReader == null) {
-              SwingUtilities.invokeLater(() -> setPrivateImage(defaultCoverArt));
+              showImage(defaultCoverArt);
             }
           });
     }
@@ -79,7 +79,7 @@ public final class LibraryCoverArtPanel extends JPanel {
     BackgroundExecutorService.schedule(
         () -> {
           Image image = retrieveImage();
-          setPrivateImage(image);
+          showImage(image);
         });
   }
 
@@ -99,7 +99,7 @@ public final class LibraryCoverArtPanel extends JPanel {
         () -> {
           Image image = retrieveImage();
           if (tagsReader.getFile() != null) {
-            setPrivateImage(image);
+            showImage(image);
           }
         });
   }
@@ -112,6 +112,22 @@ public final class LibraryCoverArtPanel extends JPanel {
     return tagsReader.getArtwork();
   }
 
+  /**
+   * Draws a cover loaded off the EDT. The drawing goes to the EDT so it never races paint() over
+   * the shared background image.
+   */
+  void showImage(Image image) {
+    SwingUtilities.invokeLater(() -> setPrivateImage(image));
+  }
+
+  BufferedImage background() {
+    return background;
+  }
+
+  /**
+   * EDT only. Never calls Toolkit.sync(): repaint() is asynchronous and background is a software
+   * image, so sync() would only block the EDT until the GPU drains its queue.
+   */
   private void setPrivateImage(Image image) {
     coverArtImage = image;
     if (coverArtImage == null) {
@@ -125,6 +141,5 @@ public final class LibraryCoverArtPanel extends JPanel {
     g2.drawImage(coverArtImage, 0, 0, getWidth(), getHeight(), null);
     g2.dispose();
     repaint();
-    getToolkit().sync();
   }
 }

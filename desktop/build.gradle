@@ -906,6 +906,7 @@ test {
         includeTestsMatching "com.frostwire.gui.library.LibraryActionsHolderTest"
         includeTestsMatching "com.frostwire.gui.library.SavedFilesDirectoryHolderTest"
         includeTestsMatching "com.frostwire.gui.library.LibraryFilesTableRowsOffEdtTest"
+        includeTestsMatching "com.frostwire.gui.library.LibraryCoverArtPanelEdtTest"
         includeTestsMatching "com.limegroup.gnutella.gui.actions.OpenMagnetClipboardPrefillTest"
         includeTestsMatching "com.limegroup.gnutella.gui.dnd.TransferVisualizerTest"
         includeTestsMatching "com.limegroup.gnutella.gui.util.RestartDialogGateTest"
