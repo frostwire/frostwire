@@ -1,4 +1,5 @@
 FrostWire 3.2.3 build 779 UNRELEASED
+  - fix:FrostWire no longer crashes on Android 12 when your network changes while it is starting — the torrent engine waits until it is fully started before stopping (#1387)
   - fix:Removing or updating a transfer no longer freezes the app while the torrent engine is busy — transfer lists no longer wait on the engine while locked (#1386)
   - fix:Search results no longer freeze for almost half a second every time you stop scrolling (#1385)
   - fix:Searching no longer crashes the app with "did not set the measured dimension" (a crash seen for years under DrawerLayout and other names) — search results now update the screen only from the main thread (#1384)
