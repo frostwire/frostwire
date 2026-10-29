@@ -256,7 +256,6 @@ public class MusicPlaybackService extends MediaSessionService {
 
     public static final String NOW_IN_FOREGROUND = "nowinforeground";
 
-    static final String FROM_MEDIA_BUTTON = "frommediabutton";
 
     /**
      * Used to easily notify a list that it should refresh. i.e. A playlist
@@ -550,23 +549,7 @@ public class MusicPlaybackService extends MediaSessionService {
         LOG.info("onStartCommand: Got new intent " + intent + ", startId = " + startId, true);
         mServiceStartId = startId;
 
-        // For Android 14+ (API 34), check if we can legitimately start as foreground service
-        boolean canStartForeground = true;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            // On Android 14+, be more cautious about when we try to start foreground
-            boolean isAppInForeground = SystemUtils.isAppInForeground(this);
-            boolean isMediaButtonIntent = intent != null && intent.getBooleanExtra(FROM_MEDIA_BUTTON, false);
-            boolean isServiceCommand = intent != null && SERVICECMD.equals(intent.getAction());
-            
-            // Allow foreground start if app is in foreground, or if this is a media button/command
-            canStartForeground = isAppInForeground || isMediaButtonIntent || isServiceCommand;
-            
-            if (!canStartForeground) {
-                LOG.warn("onStartCommand: Cannot start foreground service - app not in foreground and no media intent. Will skip temp notification.");
-            }
-        }
-
-        maybeStartTemporaryForegroundNotification(canStartForeground);
+        promoteForStart();
 
         if (intent != null) {
             final String action = intent.getAction();
@@ -589,27 +572,37 @@ public class MusicPlaybackService extends MediaSessionService {
         return START_STICKY;
     }
 
-    private void maybeStartTemporaryForegroundNotification(boolean canStartForeground) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O || !canStartForeground) {
-            return;
-        }
-        if (mForegroundNotificationStarted) {
-            LOG.info("onStartCommand: Skipping temporary foreground notification because service is already in foreground");
-            return;
-        }
+    /**
+     * A start through {@code ContextCompat.startForegroundService()} (MusicUtils, Media3's media
+     * button handling) must be followed by {@code startForeground()} before the system's deadline,
+     * whatever the app's state is by now and whether the service was promoted before: the system
+     * decided whether that start was allowed when it was made, and kills the app with
+     * ForegroundServiceDidNotStartInTimeException if the promotion never comes
+     * (frostwire/frostwire#1371). Promoting a service that is already in the foreground only updates
+     * its notification, so Media3's current notification is reused when there is one.
+     */
+    private void promoteForStart() {
         try {
             createNotificationChannel();
-            Notification tempNotification = new Notification.Builder(this, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
-                    .setContentTitle("FrostWire")
-                    .setContentText("Loading playback controls...")
-                    .setSmallIcon(R.drawable.frostwire_notification_flat)
-                    .setCategory(Notification.CATEGORY_TRANSPORT)
-                    .setOnlyAlertOnce(true)
-                    .build();
-            startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, tempNotification);
+            MediaNotification current = mNotificationProvider != null && mMediaSession != null ?
+                    mNotificationProvider.getCachedNotification(mMediaSession) : null;
+            if (current != null) {
+                startForeground(current.notificationId, current.notification);
+            } else {
+                Notification tempNotification = new Notification.Builder(this, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
+                        .setContentTitle("FrostWire")
+                        .setContentText("Loading playback controls...")
+                        .setSmallIcon(R.drawable.frostwire_notification_flat)
+                        .setCategory(Notification.CATEGORY_TRANSPORT)
+                        .setOnlyAlertOnce(true)
+                        .build();
+                startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, tempNotification);
+            }
             mForegroundNotificationStarted = true;
-            LOG.info("onStartCommand: Called startForeground() with temporary notification");
+            LOG.info("onStartCommand: Called startForeground() with " + (current != null ? "the media" : "a temporary") + " notification");
         } catch (Throwable e) {
+            // ForegroundServiceStartNotAllowedException: a plain startService() from the background,
+            // which has no startForeground() deadline.
             LOG.error("onStartCommand: Failed to call startForeground()", e);
         }
     }

@@ -48,7 +48,7 @@ jobs:
 
       - name: Run non-Robolectric unit tests
         working-directory: android
-        run: ./gradlew testPlus1DebugUnitTest --tests "com.frostwire.android.gui.RelaySearchWiringTest" --tests "com.frostwire.android.core.*" --tests "com.frostwire.android.gui.transfers.TorrentUrlInfoTest" --no-daemon --continue
+        run: ./gradlew testPlus1DebugUnitTest --tests "com.frostwire.android.gui.RelaySearchWiringTest" --tests "com.frostwire.android.core.*" --tests "com.frostwire.android.gui.transfers.TorrentUrlInfoTest" --tests "com.andrew.apollo.MusicPlaybackServiceForegroundStartTest" --no-daemon --continue
 
       - name: Upload test results
         if: always()
