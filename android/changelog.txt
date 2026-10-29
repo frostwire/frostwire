@@ -1,4 +1,5 @@
 FrostWire 3.2.3 build 779 UNRELEASED
+  - fix:FrostWire no longer crash-loops in the background on a few devices with "too many scheduled jobs" — the unused WorkManager is gone and the jobs older versions left behind are cleaned up (#1388)
   - fix:FrostWire no longer crashes on Android 12 when your network changes while it is starting — the torrent engine waits until it is fully started before stopping (#1387)
   - fix:Removing or updating a transfer no longer freezes the app while the torrent engine is busy — transfer lists no longer wait on the engine while locked (#1386)
   - fix:Search results no longer freeze for almost half a second every time you stop scrolling (#1385)
