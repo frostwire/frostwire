@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -23,14 +23,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
-import android.net.ConnectivityManager;
 import android.os.Build;
 import android.telephony.TelephonyManager;
-
 import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
 import com.frostwire.android.core.Constants;
@@ -40,7 +37,6 @@ import com.frostwire.android.gui.MainApplication;
 import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
-
 import java.io.File;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -52,373 +48,386 @@ import java.util.concurrent.TimeUnit;
  */
 public final class Engine implements IEngineService {
 
-    private static final Logger LOG = Logger.getLogger(Engine.class);
+  private static final Logger LOG = Logger.getLogger(Engine.class);
 
-    private static final ExecutorService MAIN_THREAD_POOL = new EngineThreadPool();
+  private static final ExecutorService MAIN_THREAD_POOL = new EngineThreadPool();
 
-    //private EngineIntentService service;
+  // private EngineIntentService service;
 
-    private EngineBroadcastReceiver receiver;
+  private EngineBroadcastReceiver receiver;
 
-    private static final Object pythonStarterLock = new Object();
-    private static final CountDownLatch pythonStarterLatch = new CountDownLatch(1);
-    private static Python pythonInstance;
+  private static final Object pythonStarterLock = new Object();
+  private static final CountDownLatch pythonStarterLatch = new CountDownLatch(1);
+  private static Python pythonInstance;
 
-    // the startServices call is a special call that can be made
-    // to early (relatively speaking) during the application startup
-    // the creation of the service is not (and can't be) synchronized
-    // with the main activity resume.
-    private boolean pendingStartServices = false;
+  // the startServices call is a special call that can be made
+  // to early (relatively speaking) during the application startup
+  // the creation of the service is not (and can't be) synchronized
+  // with the main activity resume.
+  private boolean pendingStartServices = false;
 
-    private EngineForegroundService engineForegroundService;
+  private EngineForegroundService engineForegroundService;
 
-    private volatile boolean wasShutdown;
-    private volatile boolean disconnected;
+  private volatile boolean wasShutdown;
+  private volatile boolean disconnected;
 
-    private CoreMediaPlayer mediaPlayer;
+  private CoreMediaPlayer mediaPlayer;
 
-    private Engine() {
-    }
+  private Engine() {}
 
-    public boolean wasShutdown() {
-        return wasShutdown;
-    }
+  public boolean wasShutdown() {
+    return wasShutdown;
+  }
 
-    private static class Loader {
-        static final Engine INSTANCE = new Engine();
-    }
+  private static class Loader {
+    static final Engine INSTANCE = new Engine();
+  }
 
-    public static Engine instance() {
-        return Engine.Loader.INSTANCE;
-    }
+  public static Engine instance() {
+    return Engine.Loader.INSTANCE;
+  }
 
-    /**
-     * Initialize Engine during application creation.
-     *
-     * @param application the Application context
-     */
-    public void onApplicationCreate(Application application) {
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-            LOG.info("Engine::onApplicationCreate(): Starting EngineForegroundService...");
-            mediaPlayer = new ApolloMediaPlayer();
-            synchronized (this) {
-                if (!wasShutdown) startEngineService(application);
-            }
+  /**
+   * Initialize Engine during application creation.
+   *
+   * @param application the Application context
+   */
+  public void onApplicationCreate(Application application) {
+    SystemUtils.postToHandler(
+        SystemUtils.HandlerThreadName.MISC,
+        () -> {
+          LOG.info("Engine::onApplicationCreate(): Starting EngineForegroundService...");
+          mediaPlayer = new ApolloMediaPlayer();
+          synchronized (this) {
+            if (!wasShutdown) startEngineService(application);
+          }
         });
-    }
+  }
 
-    @Override
-    public CoreMediaPlayer getMediaPlayer() {
-        return mediaPlayer;
-    }
+  @Override
+  public CoreMediaPlayer getMediaPlayer() {
+    return mediaPlayer;
+  }
 
-    private synchronized EngineForegroundService getForegroundService() {
-        EngineForegroundService liveService = EngineForegroundService.getInstance();
-        engineForegroundService = liveService != null && liveService.acceptsStarts() ? liveService : null;
-        return engineForegroundService;
-    }
+  private synchronized EngineForegroundService getForegroundService() {
+    EngineForegroundService liveService = EngineForegroundService.getInstance();
+    engineForegroundService =
+        liveService != null && liveService.acceptsStarts() ? liveService : null;
+    return engineForegroundService;
+  }
 
-    synchronized void onForegroundServiceCreated(EngineForegroundService service) {
-        if (service == null || !service.acceptsStarts()) return;
-        engineForegroundService = service;
-        if (pendingStartServices) {
-            boolean restartAfterShutdown = wasShutdown;
-            pendingStartServices = false;
-            wasShutdown = false;
-            service.startServices(restartAfterShutdown);
+  synchronized void onForegroundServiceCreated(EngineForegroundService service) {
+    if (service == null || !service.acceptsStarts()) return;
+    engineForegroundService = service;
+    if (pendingStartServices) {
+      boolean restartAfterShutdown = wasShutdown;
+      pendingStartServices = false;
+      wasShutdown = false;
+      service.startServices(restartAfterShutdown);
+    }
+  }
+
+  synchronized void onForegroundServiceDestroyed(EngineForegroundService service) {
+    if (engineForegroundService == service) {
+      engineForegroundService = null;
+    }
+    if (pendingStartServices && EngineForegroundService.getInstance() == null) {
+      startEngineService(getApplication());
+    }
+  }
+
+  public byte getState() {
+    EngineForegroundService service = getForegroundService();
+    return service != null ? service.getState() : IEngineService.STATE_INVALID;
+  }
+
+  public boolean isStarted() {
+    EngineForegroundService service = getForegroundService();
+    return service != null && service.isStarted();
+  }
+
+  public boolean isStarting() {
+    EngineForegroundService service = getForegroundService();
+    return service != null && service.isStarting();
+  }
+
+  public boolean isStopped() {
+    EngineForegroundService service = getForegroundService();
+    return service != null && service.isStopped();
+  }
+
+  public boolean isStopping() {
+    EngineForegroundService service = getForegroundService();
+    return service != null && service.isStopping();
+  }
+
+  public boolean isDisconnected() {
+    EngineForegroundService service = getForegroundService();
+    return disconnected || (service != null && service.isDisconnected());
+  }
+
+  /**
+   * IceBridge distributed search and TORRENT_FETCH must work after the user leaves and comes back
+   * hours later. If the stack was reaped or never started, bring it up and wait until the search
+   * transport is wired (or {@code timeoutMs} elapses). Call from a background thread — never the UI
+   * thread. No-op when already ready.
+   */
+  public void ensureDistributedSearchReady(long timeoutMs) {
+    if (wasShutdown
+        || !com.frostwire.android.search.AndroidRelayStack.isParticipationEnabled()
+        || SearchEngine.DISTRIBUTED.isReady()) {
+      return;
+    }
+    LOG.info("Engine: IceBridge down at search time — restarting");
+    long budgetMs = Math.max(0L, timeoutMs);
+    long startedAt = System.nanoTime();
+    ensureServicesRunning();
+    EngineForegroundService svc = getForegroundService();
+    if (svc != null && !svc.isRelayStackRunning()) {
+      CountDownLatch latch = new CountDownLatch(1);
+      svc.ensureRelayStack(false, latch::countDown);
+      try {
+        long remaining =
+            Math.max(0L, budgetMs - TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt));
+        if (remaining > 0 && !latch.await(remaining, TimeUnit.MILLISECONDS)) {
+          LOG.warn("Engine: IceBridge restart timed out");
         }
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        return;
+      }
     }
-
-    synchronized void onForegroundServiceDestroyed(EngineForegroundService service) {
-        if (engineForegroundService == service) {
-            engineForegroundService = null;
-        }
-        if (pendingStartServices && EngineForegroundService.getInstance() == null) {
-            startEngineService(getApplication());
-        }
-    }
-
-    public byte getState() {
-        EngineForegroundService service = getForegroundService();
-        return service != null ? service.getState() : IEngineService.STATE_INVALID;
-    }
-
-    public boolean isStarted() {
-        EngineForegroundService service = getForegroundService();
-        return service != null && service.isStarted();
-    }
-
-    public boolean isStarting() {
-        EngineForegroundService service = getForegroundService();
-        return service != null && service.isStarting();
-    }
-
-    public boolean isStopped() {
-        EngineForegroundService service = getForegroundService();
-        return service != null && service.isStopped();
-    }
-
-    public boolean isStopping() {
-        EngineForegroundService service = getForegroundService();
-        return service != null && service.isStopping();
-    }
-
-    public boolean isDisconnected() {
-        EngineForegroundService service = getForegroundService();
-        return disconnected || (service != null && service.isDisconnected());
-    }
-
-    /**
-     * IceBridge distributed search and TORRENT_FETCH must work after the user
-     * leaves and comes back hours later. If the stack was reaped or never
-     * started, bring it up and wait until the search transport is wired
-     * (or {@code timeoutMs} elapses). Call from a background thread — never
-     * the UI thread. No-op when already ready.
-     */
-    public void ensureDistributedSearchReady(long timeoutMs) {
-        if (wasShutdown || !com.frostwire.android.search.AndroidRelayStack.isParticipationEnabled()
-                || SearchEngine.DISTRIBUTED.isReady()) {
-            return;
-        }
-        LOG.info("Engine: IceBridge down at search time — restarting");
-        long budgetMs = Math.max(0L, timeoutMs);
-        long startedAt = System.nanoTime();
+    while (!wasShutdown
+        && com.frostwire.android.search.AndroidRelayStack.isParticipationEnabled()
+        && !SearchEngine.DISTRIBUTED.isReady()
+        && TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt) < budgetMs) {
+      if (getForegroundService() == null) {
         ensureServicesRunning();
-        EngineForegroundService svc = getForegroundService();
-        if (svc != null && !svc.isRelayStackRunning()) {
-            CountDownLatch latch = new CountDownLatch(1);
-            svc.ensureRelayStack(false, latch::countDown);
-            try {
-                long remaining = Math.max(0L,
-                        budgetMs - TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt));
-                if (remaining > 0 && !latch.await(remaining, TimeUnit.MILLISECONDS)) {
-                    LOG.warn("Engine: IceBridge restart timed out");
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return;
-            }
+      }
+      try {
+        long remaining = budgetMs - TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt);
+        if (remaining > 0) {
+          Thread.sleep(Math.min(200L, remaining));
         }
-        while (!wasShutdown && com.frostwire.android.search.AndroidRelayStack.isParticipationEnabled()
-                && !SearchEngine.DISTRIBUTED.isReady()
-                && TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt) < budgetMs) {
-            if (getForegroundService() == null) {
-                ensureServicesRunning();
-            }
-            try {
-                long remaining = budgetMs - TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt);
-                if (remaining > 0) {
-                    Thread.sleep(Math.min(200L, remaining));
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return;
-            }
-        }
-        if (!SearchEngine.DISTRIBUTED.isReady()) {
-            LOG.warn("Engine: IceBridge still not ready after " + timeoutMs + "ms");
-        }
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        return;
+      }
     }
+    if (!SearchEngine.DISTRIBUTED.isReady()) {
+      LOG.warn("Engine: IceBridge still not ready after " + timeoutMs + "ms");
+    }
+  }
 
-    @Override
-    public synchronized void startServices() {
-        LOG.info("Engine::startServices(): Requesting startServices from EngineForegroundService");
-        if (!com.frostwire.android.search.AndroidRelayStack.isNetworkAllowed()) {
-            if (!wasShutdown) disconnected = true;
-            return;
+  @Override
+  public synchronized void startServices() {
+    LOG.info("Engine::startServices(): Requesting startServices from EngineForegroundService");
+    if (!com.frostwire.android.search.AndroidRelayStack.isNetworkAllowed()) {
+      if (!wasShutdown) disconnected = true;
+      return;
+    }
+    disconnected = false;
+    EngineForegroundService service = getForegroundService();
+    if (service != null) {
+      boolean restartAfterShutdown = wasShutdown;
+      pendingStartServices = false;
+      wasShutdown = false;
+      service.startServices(restartAfterShutdown);
+    } else {
+      pendingStartServices = true;
+      // A stopped instance may still be awaiting onDestroy. Never reuse it.
+      if (EngineForegroundService.getInstance() == null) {
+        startEngineService(getApplication());
+      }
+    }
+  }
+
+  private synchronized void ensureServicesRunning() {
+    if (!wasShutdown) startServices();
+  }
+
+  public synchronized void resumeServicesIfDisconnected() {
+    if (disconnected) startServices();
+  }
+
+  public static void startPython() {
+    if (Python.isStarted()) {
+      LOG.info("Engine::startPython aborted, already started.");
+      return;
+    }
+    if (SystemUtils.isUIThread()) {
+      SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, Engine::startPython);
+      return;
+    }
+    try {
+
+      long a = System.currentTimeMillis();
+      AndroidPlatform androidPlatform = new AndroidPlatform(SystemUtils.getApplicationContext());
+      synchronized (pythonStarterLock) {
+        LOG.info("Engine::startPython Python runtime first instantiation in synchronized space...");
+        Python.start(androidPlatform);
+        pythonInstance = Python.getInstance();
+        if (pythonStarterLatch.getCount() > 0) {
+          pythonStarterLatch.countDown();
         }
-        disconnected = false;
-        EngineForegroundService service = getForegroundService();
-        if (service != null) {
-            boolean restartAfterShutdown = wasShutdown;
-            pendingStartServices = false;
-            wasShutdown = false;
-            service.startServices(restartAfterShutdown);
+        if (pythonInstance != null) {
+          LOG.info("Engine::startPython Python runtime first instantiated in synchronized space.");
         } else {
-            pendingStartServices = true;
-            // A stopped instance may still be awaiting onDestroy. Never reuse it.
-            if (EngineForegroundService.getInstance() == null) {
-                startEngineService(getApplication());
-            }
+          LOG.warn(
+              "Engine::startPython Python runtime first instantiation in synchronized space FAILED.");
         }
+      }
+      long b = System.currentTimeMillis();
+      LOG.info("Engine::startPython Python runtime first instantiated in " + (b - a) + " ms");
+    } catch (Throwable t) {
+      LOG.error("Engine::startPython Python runtime first instantiation FAILED.", t);
+      // keep trying every 10 seconds until Python is started
+      if (!Python.isStarted()) {
+        LOG.info(
+            "Engine::startPython Python runtime first instantiation FAILED, retrying in 10 seconds...");
+        SystemUtils.postToHandlerDelayed(
+            SystemUtils.HandlerThreadName.MISC, Engine::startPython, 10000);
+      }
+    }
+  }
+
+  public static Python getPythonInstance() {
+    try {
+      if (!pythonStarterLatch.await(30, java.util.concurrent.TimeUnit.SECONDS)) {
+        LOG.error("Engine::getPythonInstance() timed out after 30s waiting for Python startup");
+        return null;
+      }
+    } catch (InterruptedException e) {
+      LOG.error("Engine::getPythonInstance() interrupted", e);
+      Thread.currentThread().interrupt();
+      return null;
+    }
+    return pythonInstance;
+  }
+
+  public synchronized void stopServices(boolean disconnected) {
+    // A later connectivity broadcast must not turn an explicit stop into auto-resume.
+    if (disconnected && wasShutdown && !this.disconnected) return;
+    LOG.info("Stopping Engine services...");
+    TellurideCourier.abortCurrentQuery();
+    this.disconnected = disconnected;
+    stopEngineService(disconnected);
+  }
+
+  private void startEngineService(Context context) {
+    if (context == null) return;
+    Intent serviceIntent = new Intent(context, EngineForegroundService.class);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+      // Check if conditions are appropriate for starting the service
+      if (!SystemUtils.isAppInForeground(context)) {
+        LOG.warn("Engine::startEngineService() - App is not in foreground, delaying start.");
+        return; // Delay or prevent the start if app is not in foreground
+      }
+    }
+    try {
+      ContextCompat.startForegroundService(context, serviceIntent);
+      registerStatusReceiver(context);
+
+    } catch (Throwable t) {
+      LOG.error(
+          "Engine::startEngineService() - Failed starting foreground service: " + t.getMessage(),
+          t);
+    }
+  }
+
+  private synchronized void stopEngineService(boolean disconnected) {
+    wasShutdown = true;
+    pendingStartServices = false;
+    EngineForegroundService service = getForegroundService();
+    if (service != null) {
+      service.stopServices(disconnected);
+    }
+    Context context = getApplication();
+    if (context != null) {
+      Intent serviceIntent = new Intent(context, EngineForegroundService.class);
+      context.stopService(serviceIntent);
+    }
+  }
+
+  @Override
+  public Application getApplication() {
+    return (Application) MainApplication.context();
+  }
+
+  /**
+   * Tip: Try using SystemUtils.HandlerFactory.postTo(one of few predetermined threads, run) if
+   * possible
+   */
+  public ExecutorService getThreadPool() {
+    return MAIN_THREAD_POOL;
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.S)
+  public void notifyDownloadFinished(String displayName, File file, String optionalInfoHash) {
+    EngineForegroundService service = getForegroundService();
+    if (service != null) {
+      service.notifyDownloadFinished(displayName, file, optionalInfoHash);
+    }
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.S)
+  public void notifyDownloadFinished(String displayName, File file) {
+    notifyDownloadFinished(displayName, file, null);
+  }
+
+  @Override
+  public synchronized void shutdown() {
+    LOG.info("Engine::shutdown() Shutting down EngineForegroundService...");
+    disconnected = false;
+    stopEngineService(false);
+  }
+
+  private void registerStatusReceiver(Context context) {
+    if (receiver != null) return;
+    receiver = new EngineBroadcastReceiver();
+
+    IntentFilter fileFilter = new IntentFilter();
+
+    fileFilter.addAction(Intent.ACTION_MEDIA_BUTTON);
+    fileFilter.addAction(Intent.ACTION_MEDIA_EJECT);
+    fileFilter.addAction(Intent.ACTION_MEDIA_MOUNTED);
+    fileFilter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
+    fileFilter.addDataScheme("file");
+
+    IntentFilter audioFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+
+    IntentFilter telephonyFilter = new IntentFilter(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
+
+    try {
+      ContextCompat.registerReceiver(
+          context, receiver, fileFilter, ContextCompat.RECEIVER_EXPORTED);
+    } catch (Throwable t) {
+      LOG.error(t.getMessage(), t);
     }
 
-    private synchronized void ensureServicesRunning() {
-        if (!wasShutdown) startServices();
+    // Connectivity is now monitored through NetworkManager using modern NetworkCallback API
+    // (replaces deprecated CONNECTIVITY_ACTION)
+    // Register for local broadcasts from NetworkManager about network changes
+    try {
+      LocalBroadcastManager.getInstance(context)
+          .registerReceiver(
+              receiver, new IntentFilter(Constants.ACTION_NOTIFY_DATA_INTERNET_CONNECTION));
+    } catch (Throwable t) {
+      LOG.error(t.getMessage(), t);
     }
 
-    public synchronized void resumeServicesIfDisconnected() {
-        if (disconnected) startServices();
+    try {
+      ContextCompat.registerReceiver(
+          context, receiver, audioFilter, ContextCompat.RECEIVER_EXPORTED);
+    } catch (Throwable t) {
+      LOG.error(t.getMessage(), t);
     }
 
-    public static void startPython() {
-        if (Python.isStarted()) {
-            LOG.info("Engine::startPython aborted, already started.");
-            return;
-        }
-        if (SystemUtils.isUIThread()) {
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, Engine::startPython);
-            return;
-        }
-        try {
-
-            long a = System.currentTimeMillis();
-            AndroidPlatform androidPlatform = new AndroidPlatform(SystemUtils.getApplicationContext());
-            synchronized (pythonStarterLock) {
-                LOG.info("Engine::startPython Python runtime first instantiation in synchronized space...");
-                Python.start(androidPlatform);
-                pythonInstance = Python.getInstance();
-                if (pythonStarterLatch.getCount() > 0) {
-                    pythonStarterLatch.countDown();
-                }
-                if (pythonInstance != null) {
-                    LOG.info("Engine::startPython Python runtime first instantiated in synchronized space.");
-                } else {
-                    LOG.warn("Engine::startPython Python runtime first instantiation in synchronized space FAILED.");
-                }
-            }
-            long b = System.currentTimeMillis();
-            LOG.info("Engine::startPython Python runtime first instantiated in " + (b - a) + " ms");
-        } catch (Throwable t) {
-            LOG.error("Engine::startPython Python runtime first instantiation FAILED.", t);
-            // keep trying every 10 seconds until Python is started
-            if (!Python.isStarted()) {
-                LOG.info("Engine::startPython Python runtime first instantiation FAILED, retrying in 10 seconds...");
-                SystemUtils.postToHandlerDelayed(SystemUtils.HandlerThreadName.MISC, Engine::startPython, 10000);
-            }
-        }
+    try {
+      ContextCompat.registerReceiver(
+          context, receiver, telephonyFilter, ContextCompat.RECEIVER_EXPORTED);
+    } catch (Throwable t) {
+      LOG.error(t.getMessage(), t);
     }
-
-    public static Python getPythonInstance() {
-        try {
-            if (!pythonStarterLatch.await(30, java.util.concurrent.TimeUnit.SECONDS)) {
-                LOG.error("Engine::getPythonInstance() timed out after 30s waiting for Python startup");
-                return null;
-            }
-        } catch (InterruptedException e) {
-            LOG.error("Engine::getPythonInstance() interrupted", e);
-            Thread.currentThread().interrupt();
-            return null;
-        }
-        return pythonInstance;
-    }
-
-    public synchronized void stopServices(boolean disconnected) {
-        // A later connectivity broadcast must not turn an explicit stop into auto-resume.
-        if (disconnected && wasShutdown && !this.disconnected) return;
-        LOG.info("Stopping Engine services...");
-        TellurideCourier.abortCurrentQuery();
-        this.disconnected = disconnected;
-        stopEngineService(disconnected);
-    }
-
-    private void startEngineService(Context context) {
-        if (context == null) return;
-        Intent serviceIntent = new Intent(context, EngineForegroundService.class);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            // Check if conditions are appropriate for starting the service
-            if (!SystemUtils.isAppInForeground(context)) {
-                LOG.warn("Engine::startEngineService() - App is not in foreground, delaying start.");
-                return; // Delay or prevent the start if app is not in foreground
-            }
-        }
-        try {
-            ContextCompat.startForegroundService(context, serviceIntent);
-            registerStatusReceiver(context);
-
-        } catch (Throwable t) {
-            LOG.error("Engine::startEngineService() - Failed starting foreground service: " + t.getMessage(), t);
-        }
-    }
-
-    private synchronized void stopEngineService(boolean disconnected) {
-        wasShutdown = true;
-        pendingStartServices = false;
-        EngineForegroundService service = getForegroundService();
-        if (service != null) {
-            service.stopServices(disconnected);
-        }
-        Context context = getApplication();
-        if (context != null) {
-            Intent serviceIntent = new Intent(context, EngineForegroundService.class);
-            context.stopService(serviceIntent);
-        }
-    }
-
-    @Override
-    public Application getApplication() {
-        return (Application) MainApplication.context();
-    }
-
-    /**
-     * Tip: Try using SystemUtils.HandlerFactory.postTo(one of few predetermined threads, run) if possible
-     */
-    public ExecutorService getThreadPool() {
-        return MAIN_THREAD_POOL;
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.S)
-    public void notifyDownloadFinished(String displayName, File file, String optionalInfoHash) {
-        EngineForegroundService service = getForegroundService();
-        if (service != null) {
-            service.notifyDownloadFinished(displayName, file, optionalInfoHash);
-        }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.S)
-    public void notifyDownloadFinished(String displayName, File file) {
-        notifyDownloadFinished(displayName, file, null);
-    }
-
-
-    @Override
-    public synchronized void shutdown() {
-        LOG.info("Engine::shutdown() Shutting down EngineForegroundService...");
-        disconnected = false;
-        stopEngineService(false);
-    }
-
-    private void registerStatusReceiver(Context context) {
-        if (receiver != null) return;
-        receiver = new EngineBroadcastReceiver();
-
-        IntentFilter fileFilter = new IntentFilter();
-
-        fileFilter.addAction(Intent.ACTION_MEDIA_BUTTON);
-        fileFilter.addAction(Intent.ACTION_MEDIA_EJECT);
-        fileFilter.addAction(Intent.ACTION_MEDIA_MOUNTED);
-        fileFilter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
-        fileFilter.addDataScheme("file");
-
-        IntentFilter audioFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
-
-        IntentFilter telephonyFilter = new IntentFilter(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
-
-        try {
-            ContextCompat.registerReceiver(context, receiver, fileFilter, ContextCompat.RECEIVER_EXPORTED);
-        } catch (Throwable t) {
-            LOG.error(t.getMessage(), t);
-        }
-
-        // Connectivity is now monitored through NetworkManager using modern NetworkCallback API (replaces deprecated CONNECTIVITY_ACTION)
-        // Register for local broadcasts from NetworkManager about network changes
-        try {
-            LocalBroadcastManager.getInstance(context).registerReceiver(receiver,
-                    new IntentFilter(Constants.ACTION_NOTIFY_DATA_INTERNET_CONNECTION));
-        } catch (Throwable t) {
-            LOG.error(t.getMessage(), t);
-        }
-
-        try {
-            ContextCompat.registerReceiver(context, receiver, audioFilter, ContextCompat.RECEIVER_EXPORTED);
-        } catch (Throwable t) {
-            LOG.error(t.getMessage(), t);
-        }
-
-        try {
-            ContextCompat.registerReceiver(context, receiver, telephonyFilter, ContextCompat.RECEIVER_EXPORTED);
-        } catch (Throwable t) {
-            LOG.error(t.getMessage(), t);
-        }
-    }
+  }
 }
