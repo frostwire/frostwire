@@ -58,7 +58,12 @@ public class FWImageLoaderCreationTest {
           }
         };
 
-    assertNotNull(FWImageLoader.getInstance(context));
+    FWImageLoader loader = FWImageLoader.getInstance(context);
+    assertNotNull(loader);
     assertEquals("storage looked up while creating the loader", 0, lookups.get());
+
+    // onLowMemory runs on the main thread and frees memory only.
+    loader.clearMemoryCache();
+    assertEquals("storage looked up while freeing memory", 0, lookups.get());
   }
 }

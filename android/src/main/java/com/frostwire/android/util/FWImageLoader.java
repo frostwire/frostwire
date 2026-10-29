@@ -80,9 +80,9 @@ public final class FWImageLoader {
 
   private coil3.ImageLoader coilImageLoader;
 
-  private boolean shutdown;
+  private volatile boolean shutdown;
 
-  private static FWImageLoader instance;
+  private static volatile FWImageLoader instance;
 
   public static FWImageLoader getInstance(Context context) {
     if (instance == null || instance.shutdown) {
@@ -642,6 +642,17 @@ public final class FWImageLoader {
     return null;
   }
 
+  /** Frees the memory cache only: no disk I/O, so it is safe on the main thread. */
+  public void clearMemoryCache() {
+    if (coilImageLoader != null) {
+      MemoryCache memoryCache = coilImageLoader.getMemoryCache();
+      if (memoryCache != null) {
+        memoryCache.clear();
+      }
+    }
+  }
+
+  /** Clears the memory and disk caches. Disk I/O: never on the main thread. */
   public void clear() {
     if (coilImageLoader != null) {
       try {
@@ -669,22 +680,22 @@ public final class FWImageLoader {
       }
       LOG.info("FWImageLoader shutdown requested");
       shutdown = true;
-
-      // Coil doesn't have the HandlerDispatcher race condition that Picasso had,
-      // so we can safely shutdown and clear the cache
-      if (coilImageLoader != null) {
-        try {
-          LOG.info("Clearing Coil cache during shutdown");
-          clear();
-          LOG.info("Shutting down Coil ImageLoader");
-          coilImageLoader.shutdown();
-        } catch (Throwable t) {
-          LOG.warn("Failed to clear/shutdown Coil ImageLoader during shutdown", t);
-        }
-      }
-
       // Null out the singleton instance reference
-      instance = null;
+      if (instance == this) {
+        instance = null;
+      }
+    }
+    // Outside the class lock: clearing the disk cache is disk I/O, and getInstance callers on the
+    // main thread wait for that lock (frostwire/frostwire#1389).
+    if (coilImageLoader != null) {
+      try {
+        LOG.info("Clearing Coil cache during shutdown");
+        clear();
+        LOG.info("Shutting down Coil ImageLoader");
+        coilImageLoader.shutdown();
+      } catch (Throwable t) {
+        LOG.warn("Failed to clear/shutdown Coil ImageLoader during shutdown", t);
+      }
     }
   }
 

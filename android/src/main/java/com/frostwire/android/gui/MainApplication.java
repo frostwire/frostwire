@@ -188,7 +188,11 @@ public class MainApplication extends Application {
   @Override
   public void onLowMemory() {
     ImageCache.getInstance(this).evictAll();
-    FWImageLoader.getInstance(this).clear();
+    // Runs on the main thread: free memory only. clear() also wiped the disk cache here (#1389).
+    FWImageLoader loader = FWImageLoader.getInstanceIfExists();
+    if (loader != null) {
+      loader.clearMemoryCache();
+    }
     // Ensure FWImageLoader instance is healthy after memory pressure
     FWImageLoader.ensureHealthyInstance(this);
     super.onLowMemory();
