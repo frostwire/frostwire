@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import androidx.annotation.Nullable;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.adapters.TransferListAdapter;
@@ -110,22 +111,35 @@ public final class CancelMenuAction extends MenuAction {
   }
 
   public static class CancelMenuActionDialog extends AbstractDialog {
-    private static Transfer transfer;
-    private static boolean deleteData;
-    private static boolean deleteTorrent;
-    private static MenuAction menuAction;
+    // Per instance, not static: the FragmentManager re-creates this dialog with the no-arg
+    // constructor, and after process death statics are null (frostwire/frostwire#1381).
+    private Transfer transfer;
+    private boolean deleteData;
+    private boolean deleteTorrent;
+    private MenuAction menuAction;
 
     public static CancelMenuActionDialog newInstance(
         Transfer t, boolean delete_data, boolean delete_torrent, MenuAction action) {
-      transfer = t;
-      deleteData = delete_data;
-      deleteTorrent = delete_torrent;
-      menuAction = action;
-      return new CancelMenuActionDialog();
+      CancelMenuActionDialog dialog = new CancelMenuActionDialog();
+      dialog.transfer = t;
+      dialog.deleteData = delete_data;
+      dialog.deleteTorrent = delete_torrent;
+      dialog.menuAction = action;
+      return dialog;
     }
 
     public CancelMenuActionDialog() {
       super(R.layout.dialog_default);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+      super.onCreate(savedInstanceState);
+      if (transfer == null) {
+        // Re-created from saved state: a Transfer can't be saved, so there is nothing to cancel.
+        setShowsDialog(false);
+        dismissAllowingStateLoss();
+      }
     }
 
     @Override

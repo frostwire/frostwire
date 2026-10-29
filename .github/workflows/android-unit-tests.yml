@@ -48,7 +48,7 @@ jobs:
 
       - name: Run non-Robolectric unit tests
         working-directory: android
-        run: ./gradlew testPlus1DebugUnitTest --tests "com.frostwire.android.gui.RelaySearchWiringTest" --tests "com.frostwire.android.core.*" --tests "com.frostwire.android.gui.transfers.TorrentUrlInfoTest" --tests "com.andrew.apollo.MusicPlaybackServiceForegroundStartTest" --tests "com.devspark.appmsg.MsgManagerThreadingTest" --tests "com.frostwire.android.gui.util.OffMainQueryTest" --tests "com.frostwire.android.gui.fragments.TransferDetailTrackersAdapterTest" --tests "com.andrew.apollo.ui.activities.BaseActivitySearchableInfoTest" --tests "com.frostwire.android.gui.services.EngineThreadPoolTest" --no-daemon --continue
+        run: ./gradlew testPlus1DebugUnitTest --tests "com.frostwire.android.gui.RelaySearchWiringTest" --tests "com.frostwire.android.core.*" --tests "com.frostwire.android.gui.transfers.TorrentUrlInfoTest" --tests "com.andrew.apollo.MusicPlaybackServiceForegroundStartTest" --tests "com.devspark.appmsg.MsgManagerThreadingTest" --tests "com.frostwire.android.gui.util.OffMainQueryTest" --tests "com.frostwire.android.gui.fragments.TransferDetailTrackersAdapterTest" --tests "com.andrew.apollo.ui.activities.BaseActivitySearchableInfoTest" --tests "com.frostwire.android.gui.services.EngineThreadPoolTest" --tests "com.frostwire.android.gui.adapters.menu.CancelMenuActionDialogRestoreTest" --no-daemon --continue
 
       - name: Upload test results
         if: always()
