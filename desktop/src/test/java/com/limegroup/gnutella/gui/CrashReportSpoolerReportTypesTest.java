@@ -31,7 +31,7 @@ class CrashReportSpoolerReportTypesTest {
   @Test
   void strictmodeReportCarriesItsGcWindowWhenMeasured() {
     File spoolDir = new File(tempDir.toFile(), "strictmode-gc");
-    CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.0.4", 331);
+    CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.0.4", 331, "");
 
     spooler.spoolStrictMode(
         "java.awt.event.InvocationEvent#1200",
@@ -49,7 +49,7 @@ class CrashReportSpoolerReportTypesTest {
   @Test
   void strictmodeReportHasRequiredFieldsAndValidEnums() {
     File spoolDir = new File(tempDir.toFile(), "strictmode");
-    CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.0.4", 331);
+    CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.0.4", 331, "");
 
     spooler.spoolStrictMode("com.example.BlockingCall", 3);
 
@@ -99,7 +99,7 @@ class CrashReportSpoolerReportTypesTest {
   @Test
   void strictmodeReportPreservesCapturedEdtStack() {
     File spoolDir = new File(tempDir.toFile(), "edt-stack");
-    CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.1.1", 333);
+    CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.1.1", 333, "");
     StackTraceElement[] captured = {
       new StackTraceElement("java.lang.Object", "wait0", "Object.java", -2),
       new StackTraceElement("com.frostwire.Example", "blockingCall", "Example.java", 42),
@@ -123,7 +123,7 @@ class CrashReportSpoolerReportTypesTest {
   @Test
   void strictmodeStackUsesExistingFrameLimit() {
     File spoolDir = new File(tempDir.toFile(), "long-stack");
-    CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.1.1", 333);
+    CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.1.1", 333, "");
     StackTraceElement[] captured = new StackTraceElement[100];
     Arrays.fill(
         captured, new StackTraceElement("com.frostwire.Example", "run", "Example.java", 42));
@@ -136,7 +136,7 @@ class CrashReportSpoolerReportTypesTest {
   @Test
   void watchdogReportHasRequiredFieldsAndValidEnums() {
     File spoolDir = new File(tempDir.toFile(), "watchdog");
-    CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.0.4", 331);
+    CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.0.4", 331, "");
 
     spooler.spoolWatchdog(2);
 
@@ -181,7 +181,7 @@ class CrashReportSpoolerReportTypesTest {
   @Test
   void violationClassIsSanitizedToAsciiAndTruncated() {
     File spoolDir = new File(tempDir.toFile(), "sanitize");
-    CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.0.4", 331);
+    CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.0.4", 331, "");
 
     StringBuilder raw = new StringBuilder();
     for (int i = 0; i < 300; i++) {
@@ -199,7 +199,7 @@ class CrashReportSpoolerReportTypesTest {
   @Test
   void nullViolationClassFallsBackToUnknown() {
     File spoolDir = new File(tempDir.toFile(), "null-class");
-    CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.0.4", 331);
+    CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.0.4", 331, "");
 
     spooler.spoolStrictMode(null, 1);
 
@@ -209,13 +209,13 @@ class CrashReportSpoolerReportTypesTest {
   @Test
   void countsAreClampedToValidatorRanges() {
     CrashReportSpooler lowStrict =
-        new CrashReportSpooler(new File(tempDir.toFile(), "low-strict"), null, "7.0.4", 331);
+        new CrashReportSpooler(new File(tempDir.toFile(), "low-strict"), null, "7.0.4", 331, "");
     CrashReportSpooler lowWatch =
-        new CrashReportSpooler(new File(tempDir.toFile(), "low-watch"), null, "7.0.4", 331);
+        new CrashReportSpooler(new File(tempDir.toFile(), "low-watch"), null, "7.0.4", 331, "");
     CrashReportSpooler highStrict =
-        new CrashReportSpooler(new File(tempDir.toFile(), "high-strict"), null, "7.0.4", 331);
+        new CrashReportSpooler(new File(tempDir.toFile(), "high-strict"), null, "7.0.4", 331, "");
     CrashReportSpooler highWatch =
-        new CrashReportSpooler(new File(tempDir.toFile(), "high-watch"), null, "7.0.4", 331);
+        new CrashReportSpooler(new File(tempDir.toFile(), "high-watch"), null, "7.0.4", 331, "");
 
     lowStrict.spoolStrictMode("com.example.BlockingCall", 0);
     lowWatch.spoolWatchdog(0);
@@ -247,7 +247,7 @@ class CrashReportSpoolerReportTypesTest {
   @Test
   void strictmodeReportsCarryFreshNonces() {
     File spoolDir = new File(tempDir.toFile(), "nonces");
-    CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.0.4", 331);
+    CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.0.4", 331, "");
 
     spooler.spoolStrictMode("com.example.First", 1);
     spooler.spoolWatchdog(1);
