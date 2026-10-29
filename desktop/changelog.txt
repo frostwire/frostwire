@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:Sending a test report from the About window no longer freezes FrostWire, and crash and freeze reports are now put together in the background (#1395)
    - fix:Closing the FrostWire window no longer freezes before the "Do you want to hide FrostWire?" dialog appears — its message is plain text instead of HTML (#1394)
    - fix:The Transfers list no longer does extra work on every repaint for cloud downloads and torrents still fetching their details — their Seeds value is worked out once per update
    - fix:Resizing the window or opening an item in the Library no longer freezes the UI while the graphics driver catches up — the cover art no longer waits for the GPU to finish drawing
