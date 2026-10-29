@@ -30,8 +30,11 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.transfers.UIBittorrentDownload;
+import com.frostwire.android.gui.util.OffMainQuery;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.jlibtorrent.PeerInfo;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,6 +50,8 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
   private TextView peerNumberTextView;
   private RecyclerView recyclerView;
   private PeersAdapter adapter;
+  private final OffMainQuery<List<PeerInfo>> peersQuery =
+      OffMainQuery.on(SystemUtils.HandlerThreadName.DOWNLOADER);
 
   public TransferDetailPeersFragment() {
     super(R.layout.fragment_transfer_detail_peers);
@@ -88,9 +93,18 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
       recyclerView.setAdapter(adapter);
     }
     if (adapter != null) {
-      List<PeerInfo> peerInfos = uiBittorrentDownload.getDl().getTorrentHandle().peerInfo();
-      adapter.updatePeers(peerInfos);
-      peerNumberTextView.setText(getString(R.string.n_peers, peerInfos.size()));
+      // peerInfo() waits for libtorrent's network thread: read it off the main thread
+      // (frostwire/frostwire#1373).
+      final UIBittorrentDownload download = uiBittorrentDownload;
+      peersQuery.run(
+          () -> download.getDl().getTorrentHandle().peerInfo(),
+          peerInfos -> {
+            if (!isAdded() || adapter == null) {
+              return;
+            }
+            adapter.updatePeers(peerInfos);
+            peerNumberTextView.setText(getString(R.string.n_peers, peerInfos.size()));
+          });
     }
   }
 

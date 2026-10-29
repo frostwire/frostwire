@@ -275,7 +275,10 @@ android {
                 filter {
                     excludeTestsMatching "com.frostwire.android.gui.dialogs.*"
                     excludeTestsMatching "com.frostwire.android.gui.views.*"
-                    excludeTestsMatching "com.frostwire.android.gui.fragments.*"
+                    // The fragment tests that boot MainApplication; tests that run with a plain
+                    // Application (application = Application.class) don't hang and aren't excluded.
+                    excludeTestsMatching "com.frostwire.android.gui.fragments.SearchFragmentSearchBoxStructureTest"
+                    excludeTestsMatching "com.frostwire.android.gui.fragments.preference.*"
                     excludeTestsMatching "com.frostwire.android.search.AndroidKarmaChainStoreTest"
                 }
             }

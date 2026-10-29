@@ -32,9 +32,11 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
+import com.frostwire.android.gui.util.OffMainQuery;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 import com.frostwire.android.gui.views.EditTextDialog;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.jlibtorrent.AnnounceEntry;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.regex.Matcher;
@@ -44,6 +46,7 @@ import com.frostwire.util.Ref;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * @author gubatron
@@ -74,7 +77,12 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
       return;
     }
     if (adapter == null && isAdded()) {
-      adapter = new TrackerListAdapter(uiBittorrentDownload, getParentFragmentManager());
+      adapter =
+          new TrackerListAdapter(
+              uiBittorrentDownload,
+              getParentFragmentManager(),
+              OffMainQuery.on(SystemUtils.HandlerThreadName.DOWNLOADER),
+              readTrackers(uiBittorrentDownload));
     }
     // ensureComponentsReferenced();
     if (recyclerView.getAdapter() == null) {
@@ -157,12 +165,14 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
         value = value.trim();
         Matcher matcher = validTrackerUrlPattern.matcher(value);
         if (matcher.matches()) {
-          torrentHandle.addTracker(new AnnounceEntry(value));
-          torrentHandle.saveResumeData();
-          torrentHandle.forceReannounce();
-          if (Ref.alive(adapterRef)) {
-            adapterRef.get().refreshFromTorrentHandle();
-          }
+          final AnnounceEntry newTracker = new AnnounceEntry(value);
+          changeTrackers(
+              adapterRef.get(),
+              () -> {
+                torrentHandle.addTracker(newTracker);
+                torrentHandle.saveResumeData();
+                torrentHandle.forceReannounce();
+              });
         } else if (Ref.alive(clickedViewRef)) {
           UIUtils.showShortMessage(clickedViewRef.get(), R.string.invalid_tracker_url);
           Ref.free(clickedViewRef);
@@ -247,20 +257,23 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
           value = value.trim();
           Matcher matcher = validTrackerUrlPattern.matcher(value);
           if (matcher.matches()) {
-            AnnounceEntry newTracker = new AnnounceEntry(value);
-            TorrentHandle th = trackerViewHolder.torrentHandle;
-            List<AnnounceEntry> originalTrackers = th.trackers();
-            int trackerIndex = trackerViewHolder.findCurrentTrackerIndex();
-            if (trackerIndex < 0 || trackerIndex >= originalTrackers.size()) {
-              return;
-            }
-            originalTrackers.set(trackerIndex, newTracker);
-            th.replaceTrackers(originalTrackers);
-            th.saveResumeData();
-            th.forceReannounce();
-            if (Ref.alive(trackerViewHolder.adapterRef)) {
-              trackerViewHolder.adapterRef.get().refreshFromTorrentHandle();
-            }
+            final AnnounceEntry newTracker = new AnnounceEntry(value);
+            final TorrentHandle th = trackerViewHolder.torrentHandle;
+            final String url = trackerViewHolder.trackerUrl;
+            final int offset = trackerViewHolder.trackerOffset;
+            changeTrackers(
+                trackerViewHolder.adapterRef.get(),
+                () -> {
+                  List<AnnounceEntry> trackers = th.trackers();
+                  int trackerIndex = findTrackerIndex(trackers, url, offset);
+                  if (trackerIndex < 0) {
+                    return;
+                  }
+                  trackers.set(trackerIndex, newTracker);
+                  th.replaceTrackers(trackers);
+                  th.saveResumeData();
+                  th.forceReannounce();
+                });
           } else {
             UIUtils.showShortMessage(vhRef.get().itemView, R.string.invalid_tracker_url);
           }
@@ -271,12 +284,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
         if (!Ref.alive(vhRef)) {
           return null;
         }
-        TrackerItemViewHolder viewHolder = vhRef.get();
-        AnnounceEntry selectedTracker = viewHolder.getSelectedTracker();
-        if (selectedTracker == null) {
-          return null;
-        }
-        return selectedTracker.url();
+        return vhRef.get().trackerUrl;
       }
     }
 
@@ -294,54 +302,44 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
           return;
         }
         TrackerItemViewHolder viewHolder = vhRef.get();
-        AnnounceEntry trackerToRemove = viewHolder.getSelectedTracker();
-        if (trackerToRemove != null) {
+        final String url = viewHolder.trackerUrl;
+        final int offset = viewHolder.trackerOffset;
+        if (url != null) {
           UIUtils.showYesNoDialog(
               fm,
-              trackerToRemove.url(),
+              url,
               R.string.remove_tracker,
               (dialog, which) -> {
                 if (Ref.alive(vhRef)) {
                   TrackerItemViewHolder latestViewHolder = vhRef.get();
-                  List<AnnounceEntry> trackers1 = latestViewHolder.torrentHandle.trackers();
-                  int trackerIndex = latestViewHolder.findCurrentTrackerIndex();
-                  if (trackerIndex < 0 || trackerIndex >= trackers1.size()) {
-                    return;
-                  }
-                  trackers1.remove(trackerIndex);
-                  latestViewHolder.torrentHandle.replaceTrackers(trackers1);
-                  latestViewHolder.torrentHandle.saveResumeData();
-                  latestViewHolder.torrentHandle.forceReannounce();
-                  if (Ref.alive(latestViewHolder.adapterRef)) {
-                    latestViewHolder.adapterRef.get().refreshFromTorrentHandle();
-                  }
+                  final TorrentHandle th = latestViewHolder.torrentHandle;
+                  changeTrackers(
+                      latestViewHolder.adapterRef.get(),
+                      () -> {
+                        List<AnnounceEntry> trackers = th.trackers();
+                        int trackerIndex = findTrackerIndex(trackers, url, offset);
+                        if (trackerIndex < 0) {
+                          return;
+                        }
+                        trackers.remove(trackerIndex);
+                        th.replaceTrackers(trackers);
+                        th.saveResumeData();
+                        th.forceReannounce();
+                      });
                 }
               });
         }
       }
     }
 
-    private AnnounceEntry getSelectedTracker() {
-      List<AnnounceEntry> trackers = torrentHandle.trackers();
-      int trackerIndex = findCurrentTrackerIndex(trackers);
-      if (trackerIndex < 0 || trackerIndex >= trackers.size()) {
-        return null;
-      }
-      return trackers.get(trackerIndex);
-    }
-
-    private int findCurrentTrackerIndex() {
-      return findCurrentTrackerIndex(torrentHandle.trackers());
-    }
-
-    private int findCurrentTrackerIndex(List<AnnounceEntry> trackers) {
+    private static int findTrackerIndex(
+        List<AnnounceEntry> trackers, String trackerUrl, int trackerOffset) {
       if (trackers == null || trackers.isEmpty()) {
         return -1;
       }
       if (trackerUrl != null) {
         for (int i = 0; i < trackers.size(); i++) {
-          AnnounceEntry entry = trackers.get(i);
-          if (trackerUrl.equals(entry.url())) {
+          if (trackerUrl.equals(trackers.get(i).url())) {
             return i;
           }
         }
@@ -350,22 +348,52 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
     }
   }
 
-  private static final class TrackerListAdapter
-      extends ListAdapter<AnnounceEntry, TrackerItemViewHolder> {
+  /** A copy of the torrent's trackers, read from its handle (a call that waits for libtorrent). */
+  private static Supplier<List<AnnounceEntry>> readTrackers(UIBittorrentDownload download) {
+    return () -> {
+      TorrentHandle th = download.getDl().getTorrentHandle();
+      List<AnnounceEntry> trackers = th != null ? th.trackers() : null;
+      return trackers != null ? new ArrayList<>(trackers) : new ArrayList<>();
+    };
+  }
+
+  /**
+   * Runs a change to the torrent's trackers on the DOWNLOADER thread, then refreshes the list there
+   * too (the same serial thread, so the refresh sees the change). jlibtorrent's tracker calls wait
+   * for libtorrent's network thread and froze the app on the main thread
+   * (frostwire/frostwire#1373).
+   */
+  private static void changeTrackers(TrackerListAdapter adapter, Runnable change) {
+    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, change);
+    if (adapter != null) {
+      adapter.refreshFromTorrentHandle();
+    }
+  }
+
+  static final class TrackerListAdapter extends ListAdapter<AnnounceEntry, TrackerItemViewHolder> {
     private final UIBittorrentDownload uiBittorrentDownload;
     private final WeakReference<FragmentManager> fragmentManagerRef;
+    private final OffMainQuery<List<AnnounceEntry>> trackersQuery;
+    private final Supplier<List<AnnounceEntry>> readTrackers;
 
-    public TrackerListAdapter(
-        UIBittorrentDownload uiBittorrentDownload, FragmentManager fragmentManager) {
+    TrackerListAdapter(
+        UIBittorrentDownload uiBittorrentDownload,
+        FragmentManager fragmentManager,
+        OffMainQuery<List<AnnounceEntry>> trackersQuery,
+        Supplier<List<AnnounceEntry>> readTrackers) {
       super(new TrackerItemCallback());
       this.uiBittorrentDownload = uiBittorrentDownload;
       this.fragmentManagerRef = Ref.weak(fragmentManager);
+      this.trackersQuery = trackersQuery;
+      this.readTrackers = readTrackers;
     }
 
+    /**
+     * Reads the trackers off the main thread and shows them when they arrive: {@code trackers()}
+     * waits for libtorrent's network thread (frostwire/frostwire#1373).
+     */
     public void refreshFromTorrentHandle() {
-      TorrentHandle th = uiBittorrentDownload.getDl().getTorrentHandle();
-      List<AnnounceEntry> trackers = th != null ? th.trackers() : null;
-      submitList(trackers != null ? new ArrayList<>(trackers) : new ArrayList<>());
+      trackersQuery.run(readTrackers, this::submitList);
     }
 
     @Override

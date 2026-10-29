@@ -113,7 +113,9 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
   public void onResume() {
     super.onResume();
     syncTransferFromIntent();
-    ensureTorrentHandle(); // Purposefully not async.
+    // BTEngine.find waits for libtorrent's network thread, which froze the app here on the main
+    // thread (frostwire/frostwire#1373); the tabs already handle a handle that isn't found yet.
+    ensureTorrentHandleAsync();
     // Populate cache off the UI thread (updateCachedState performs
     // blocking JNI); the timer paints the header from cache right after.
     SystemUtils.postToHandler(
