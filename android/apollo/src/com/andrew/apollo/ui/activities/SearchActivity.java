@@ -21,6 +21,7 @@ package com.andrew.apollo.ui.activities;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -61,6 +62,8 @@ import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.NavUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractActivity;
+import com.frostwire.android.gui.util.OffMainQuery;
+import com.frostwire.android.util.SystemUtils;
 
 import java.util.Locale;
 
@@ -71,6 +74,9 @@ import java.util.Locale;
  */
 public final class SearchActivity extends AbstractActivity implements LoaderCallbacks<Cursor>,
         OnScrollListener, OnQueryTextListener, OnItemClickListener {
+
+    private final OffMainQuery<SearchableInfo> searchableInfoQuery =
+            OffMainQuery.on(SystemUtils.HandlerThreadName.MISC);
     /**
      * Grid view column count. ONE - list, TWO - normal grid
      */
@@ -169,8 +175,9 @@ public final class SearchActivity extends AbstractActivity implements LoaderCall
 
         // Add voice search
         final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        final SearchableInfo searchableInfo = searchManager.getSearchableInfo(getComponentName());
-        mSearchView.setSearchableInfo(searchableInfo);
+        // A binder call into the system's search service: off the main thread (frostwire/frostwire#1374).
+        final ComponentName component = getComponentName();
+        BaseActivity.bindSearchableInfo(mSearchView, () -> searchManager.getSearchableInfo(component), searchableInfoQuery);
         return super.onCreateOptionsMenu(menu);
     }
 
