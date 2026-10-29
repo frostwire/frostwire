@@ -111,9 +111,6 @@ public final class EngineThreadPool extends ThreadPool {
       throw new RuntimeException(
           "Too many tasks (" + getQueue().size() + "/" + MAX_DEBUG_QUEUED_TASKS + ") in the queue");
     }
-    String threadName = "EngineThreadPool:" + Thread.currentThread().getStackTrace()[6].toString();
-    Thread.currentThread().setName(threadName);
-    // System.out.println("Thread renamed to -> "+ threadName);
   }
 
   private void dumpTasks() {
