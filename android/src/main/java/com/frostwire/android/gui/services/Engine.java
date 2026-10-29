@@ -66,6 +66,11 @@ public final class Engine implements IEngineService {
   // with the main activity resume.
   private boolean pendingStartServices = false;
 
+  // startForegroundService() was called and the service has neither promoted itself with
+  // startForeground() nor been destroyed. Stopping it in that window crashes the app with
+  // ForegroundServiceDidNotStartInTimeException (frostwire/frostwire#1387).
+  private boolean foregroundStartPending;
+
   private EngineForegroundService engineForegroundService;
 
   private volatile boolean wasShutdown;
@@ -117,6 +122,7 @@ public final class Engine implements IEngineService {
   }
 
   synchronized void onForegroundServiceCreated(EngineForegroundService service) {
+    foregroundStartPending = false;
     if (service == null || !service.acceptsStarts()) return;
     engineForegroundService = service;
     if (pendingStartServices) {
@@ -128,6 +134,7 @@ public final class Engine implements IEngineService {
   }
 
   synchronized void onForegroundServiceDestroyed(EngineForegroundService service) {
+    foregroundStartPending = false;
     if (engineForegroundService == service) {
       engineForegroundService = null;
     }
@@ -314,7 +321,7 @@ public final class Engine implements IEngineService {
     stopEngineService(disconnected);
   }
 
-  private void startEngineService(Context context) {
+  private synchronized void startEngineService(Context context) {
     if (context == null) return;
     Intent serviceIntent = new Intent(context, EngineForegroundService.class);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -326,6 +333,7 @@ public final class Engine implements IEngineService {
     }
     try {
       ContextCompat.startForegroundService(context, serviceIntent);
+      foregroundStartPending = true;
       registerStatusReceiver(context);
 
     } catch (Throwable t) {
@@ -341,6 +349,12 @@ public final class Engine implements IEngineService {
     EngineForegroundService service = getForegroundService();
     if (service != null) {
       service.stopServices(disconnected);
+    }
+    if (foregroundStartPending) {
+      // Don't stop a service that still owes startForeground(): the system kills the app for it.
+      // The service checks wasShutdown() right after promoting itself and stops itself then.
+      LOG.info("Engine::stopEngineService() - start pending, the service will stop once promoted");
+      return;
     }
     Context context = getApplication();
     if (context != null) {
