@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -21,18 +21,14 @@ package com.frostwire.android.gui;
 import android.app.Application;
 import android.content.Context;
 import android.os.Build;
-
-import android.app.Application;
 import androidx.work.Configuration;
 import androidx.work.WorkManager;
-
 import com.andrew.apollo.cache.ImageCache;
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.DataStoreManager;
-import com.frostwire.android.core.FrostwirePreferences;
 import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.AbstractActivity;
@@ -46,14 +42,11 @@ import com.frostwire.platform.SystemPaths;
 import com.frostwire.search.CrawlCacheManager;
 import com.frostwire.search.LibTorrentMagnetDownloader;
 import com.frostwire.util.Logger;
-
-import org.apache.commons.io.FileUtils;
-
+import dalvik.system.ZipPathValidator;
 import java.io.File;
 import java.util.Locale;
 import java.util.Random;
-
-import dalvik.system.ZipPathValidator;
+import org.apache.commons.io.FileUtils;
 
 /**
  * @author gubatron
@@ -61,349 +54,375 @@ import dalvik.system.ZipPathValidator;
  */
 public class MainApplication extends Application implements Configuration.Provider {
 
-    private static final Logger LOG = Logger.getLogger(MainApplication.class);
+  private static final Logger LOG = Logger.getLogger(MainApplication.class);
 
-    private static final Object appContextLock = new Object();
+  private static final Object appContextLock = new Object();
 
-    private static Context appContext;
-    private static volatile Throwable btEngineInitializationFailure;
+  private static Context appContext;
+  private static volatile Throwable btEngineInitializationFailure;
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
+  @Override
+  public void onCreate() {
+    super.onCreate();
 
-        // CRITICAL PATH ONLY: Keep UI thread work minimal for fast startup
+    // CRITICAL PATH ONLY: Keep UI thread work minimal for fast startup
 
-        // Configure WorkManager early - needed for background tasks
-        initializeWorkManager();
+    // Configure WorkManager early - needed for background tasks
+    initializeWorkManager();
 
-        // Enable StrictMode in debug builds
-        RunStrict.enableStrictModePolicies(BuildConfig.DEBUG);
-        // Clear ZipPathValidator on Android 14+ (API 34+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            ZipPathValidator.clearCallback();
-        }
-
-        // Set platform - needed early for system paths
-        Platforms.set(new AndroidPlatform(this));
-
-        // Store app context - needed early for singletons
-        LOG.info("MainApplication::onCreate waiting for appContextLock");
-        synchronized (appContextLock) {
-            if (appContext == null) {
-                appContext = this;
-            }
-        }
-        LOG.info("MainApplication::onCreate DONE waiting for appContextLock");
-
-        // NetworkManager is queried during early activity resume paths, so its singleton
-        // must exist before deferred background initialization starts.
-        NetworkManager.create(this);
-
-        // DEFERRED INITIALIZATION: Move heavy work off UI thread
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, this::initializeInBackground);
-
-        // Register lifecycle callbacks to handle app background/foreground transitions
-        registerActivityLifecycleCallbacks(new ImageLoaderLifecycleCallbacks());
+    // Enable StrictMode in debug builds
+    RunStrict.enableStrictModePolicies(BuildConfig.DEBUG);
+    // Clear ZipPathValidator on Android 14+ (API 34+)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+      ZipPathValidator.clearCallback();
     }
 
-    /**
-     * Performs heavy initialization work off the UI thread.
-     * This reduces onCreate() time from 200-500ms to <100ms.
-     *
-     * Note: NotificationUpdateDaemon will be started by EngineForegroundService
-     * to avoid duplicate scheduling issues.
-     */
-    private void initializeInBackground() {
-        LOG.info("MainApplication::initializeInBackground starting...");
+    // Set platform - needed early for system paths
+    Platforms.set(new AndroidPlatform(this));
 
-        // Initialize DataStore + ConfigurationRepository (reads preferences from DataStore)
-        DataStoreManager.INSTANCE.initialize(this);
-        ConfigurationManager.create(this);
+    // Store app context - needed early for singletons
+    LOG.info("MainApplication::onCreate waiting for appContextLock");
+    synchronized (appContextLock) {
+      if (appContext == null) {
+        appContext = this;
+      }
+    }
+    LOG.info("MainApplication::onCreate DONE waiting for appContextLock");
 
-        // CRITICAL: Wait for ConfigurationManager to be fully initialized before using it
-        // This prevents race condition where BTEngineInitializer reads preferences before they're loaded
-        ConfigurationManager.instance();
+    // NetworkManager is queried during early activity resume paths, so its singleton
+    // must exist before deferred background initialization starts.
+    NetworkManager.create(this);
 
-        // Set menu icons visible
-        AbstractActivity.setMenuIconsVisible(true);
+    // DEFERRED INITIALIZATION: Move heavy work off UI thread
+    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, this::initializeInBackground);
 
-        // Initialize network state refresh
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
-                () -> NetworkManager.queryNetworkStatusBackground(NetworkManager.instance()));
+    // Register lifecycle callbacks to handle app background/foreground transitions
+    registerActivityLifecycleCallbacks(new ImageLoaderLifecycleCallbacks());
+  }
 
-        // Start the engine (heavy initialization)
-        Engine.instance().onApplicationCreate(this);
+  /**
+   * Performs heavy initialization work off the UI thread. This reduces onCreate() time from
+   * 200-500ms to <100ms.
+   *
+   * <p>Note: NotificationUpdateDaemon will be started by EngineForegroundService to avoid duplicate
+   * scheduling issues.
+   */
+  private void initializeInBackground() {
+    LOG.info("MainApplication::initializeInBackground starting...");
 
-        // Start BitTorrent engine on dedicated thread
-        // Now safe to start since ConfigurationManager is fully initialized
-        new Thread(new BTEngineInitializer()).start();
+    // Initialize DataStore + ConfigurationRepository (reads preferences from DataStore)
+    DataStoreManager.INSTANCE.initialize(this);
+    ConfigurationManager.create(this);
 
-        // Load theme asynchronously
-        ThemeManager.loadSavedThemeModeAsync(ThemeManager::applyThemeMode);
+    // CRITICAL: Wait for ConfigurationManager to be fully initialized before using it
+    // This prevents race condition where BTEngineInitializer reads preferences before they're
+    // loaded
+    ConfigurationManager.instance();
 
-        // Start image loader
-        FWImageLoader.start(this);
+    // Set menu icons visible
+    AbstractActivity.setMenuIconsVisible(true);
 
-        // Initialize search components
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.SEARCH_PERFORMER,
-                () -> this.initializeCrawlPagedWebSearchPerformer(this));
+    // Initialize network state refresh
+    SystemUtils.postToHandler(
+        SystemUtils.HandlerThreadName.MISC,
+        () -> NetworkManager.queryNetworkStatusBackground(NetworkManager.instance()));
 
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.SEARCH_PERFORMER, SearchMediator::instance);
+    // Start the engine (heavy initialization)
+    Engine.instance().onApplicationCreate(this);
 
-        // Pre-warm yt_dlp version so Settings > About shows it instantly (no 5s placeholder delay)
-        TellurideCourier.ytDlpVersion(v -> { /* cached for AboutFragment */ });
+    // Start BitTorrent engine on dedicated thread
+    // Now safe to start since ConfigurationManager is fully initialized
+    new Thread(new BTEngineInitializer()).start();
 
-        // Clean temp directory
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, MainApplication::cleanTemp);
+    // Load theme asynchronously
+    ThemeManager.loadSavedThemeModeAsync(ThemeManager::applyThemeMode);
 
-        // Query yt-dlp version
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-            TellurideCourier.ytDlpVersion((version) ->
-                    LOG.info("MainApplication::initializeInBackground -> yt_dlp version: " + version));
+    // Start image loader
+    FWImageLoader.start(this);
+
+    // Initialize search components
+    SystemUtils.postToHandler(
+        SystemUtils.HandlerThreadName.SEARCH_PERFORMER,
+        () -> this.initializeCrawlPagedWebSearchPerformer(this));
+
+    SystemUtils.postToHandler(
+        SystemUtils.HandlerThreadName.SEARCH_PERFORMER, SearchMediator::instance);
+
+    // Pre-warm yt_dlp version so Settings > About shows it instantly (no 5s placeholder delay)
+    TellurideCourier.ytDlpVersion(
+        v -> {
+          /* cached for AboutFragment */
         });
 
-        LOG.info("MainApplication::initializeInBackground complete");
+    // Clean temp directory
+    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, MainApplication::cleanTemp);
+
+    // Query yt-dlp version
+    SystemUtils.postToHandler(
+        SystemUtils.HandlerThreadName.MISC,
+        () -> {
+          TellurideCourier.ytDlpVersion(
+              (version) ->
+                  LOG.info(
+                      "MainApplication::initializeInBackground -> yt_dlp version: " + version));
+        });
+
+    LOG.info("MainApplication::initializeInBackground complete");
+  }
+
+  @Override
+  public Configuration getWorkManagerConfiguration() {
+    return new Configuration.Builder()
+        .setMaxSchedulerLimit(20) // Reduced from default 100 to prevent alarm limit issues
+        .setMinimumLoggingLevel(BuildConfig.DEBUG ? android.util.Log.DEBUG : android.util.Log.ERROR)
+        .build();
+  }
+
+  private void initializeWorkManager() {
+    try {
+      // Ensure WorkManager is initialized with our custom configuration
+      WorkManager.initialize(this, getWorkManagerConfiguration());
+      LOG.info("WorkManager initialized with reduced scheduler limit to prevent alarm overflow");
+    } catch (IllegalStateException e) {
+      // WorkManager already initialized, that's fine
+      LOG.info("WorkManager was already initialized");
+    }
+  }
+
+  public static Context context() {
+    return appContext;
+  }
+
+  public static boolean hasBTEngineInitializationFailure() {
+    return btEngineInitializationFailure != null;
+  }
+
+  public static void recordBTEngineInitializationFailure(Throwable failure) {
+    if (failure == null || btEngineInitializationFailure != null) {
+      return;
+    }
+    btEngineInitializationFailure = failure;
+    LOG.error("BitTorrent engine initialization failed", failure);
+  }
+
+  @Override
+  public void onLowMemory() {
+    ImageCache.getInstance(this).evictAll();
+    FWImageLoader.getInstance(this).clear();
+    // Ensure FWImageLoader instance is healthy after memory pressure
+    FWImageLoader.ensureHealthyInstance(this);
+    super.onLowMemory();
+  }
+
+  @Override
+  @SuppressWarnings("deprecation") // TRIM_MEMORY_MODERATE deprecated API 35; value unchanged
+  public void onTrimMemory(int level) {
+    super.onTrimMemory(level);
+    if (level >= TRIM_MEMORY_MODERATE) {
+      // On moderate to severe memory pressure, ensure our FWImageLoader is healthy
+      FWImageLoader.ensureHealthyInstance(this);
+    }
+  }
+
+  private void initializeCrawlPagedWebSearchPerformer(Context context) {
+    CrawlCacheManager.setCache(new DiskCrawlCache(context));
+    CrawlCacheManager.setMagnetDownloader(new LibTorrentMagnetDownloader());
+  }
+
+  // don't try to refactor this into an async call since this guy runs on a thread
+  // outside the Engine thread pool
+  private static class BTEngineInitializer implements Runnable {
+    BTEngineInitializer() {}
+
+    public void run() {
+      try {
+        SystemPaths paths = Platforms.get().systemPaths();
+
+        BTContext ctx = new BTContext();
+        ctx.homeDir = paths.libtorrent();
+        ctx.torrentsDir = paths.torrents();
+        ctx.dataDir = paths.data();
+        ctx.optimizeMemory = true;
+
+        // Get configured port range or use default range [1024, 57000]
+        ConfigurationManager cm = ConfigurationManager.instance();
+        int configuredStartPort =
+            cm.getInt(
+                Constants.PREF_KEY_TORRENT_INCOMING_PORT_START,
+                Constants.DEFAULT_TORRENT_INCOMING_PORT_START);
+        int configuredEndPort =
+            cm.getInt(
+                Constants.PREF_KEY_TORRENT_INCOMING_PORT_END,
+                Constants.DEFAULT_TORRENT_INCOMING_PORT_END);
+        if (configuredStartPort < 1
+            || configuredEndPort < configuredStartPort
+            || configuredEndPort > 65535) {
+          configuredStartPort = Constants.DEFAULT_TORRENT_INCOMING_PORT_START;
+          configuredEndPort = Constants.DEFAULT_TORRENT_INCOMING_PORT_END;
+        }
+
+        int port0, port1;
+        if (configuredStartPort == Constants.DEFAULT_TORRENT_INCOMING_PORT_START
+            && configuredEndPort == Constants.DEFAULT_TORRENT_INCOMING_PORT_END) {
+          // Use default port range [37000, 57000] when user hasn't configured specific ports
+          port0 = 37000 + new Random().nextInt(20000);
+          port1 = port0 + 10; // 10 retries
+        } else {
+          // Use user-configured port range
+          if (configuredStartPort == configuredEndPort) {
+            // Single port specified
+            port0 = configuredStartPort;
+            port1 = port0 + 1; // Just try the single port
+          } else {
+            // Port range specified
+            port0 = configuredStartPort;
+            port1 = configuredEndPort;
+          }
+        }
+
+        String iface = "0.0.0.0:%1$d,[::]:%1$d";
+        ctx.interfaces = String.format(Locale.US, iface, port0);
+        ctx.retries = port1 - port0;
+
+        ctx.enableDht =
+            ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
+        // I2P Configuration.
+        // Port and tunnel params are stored as Strings (EditTextPreference requires this).
+        // Parse them back to int with safe fallbacks.
+        ctx.i2pEnabled = cm.getBoolean(Constants.PREF_KEY_NETWORK_I2P_ENABLED);
+        ctx.i2pHostname = cm.getString(Constants.PREF_KEY_NETWORK_I2P_HOSTNAME);
+        ctx.i2pPort = parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_PORT), 7656);
+        ctx.i2pAllowMixed = cm.getBoolean(Constants.PREF_KEY_NETWORK_I2P_ALLOW_MIXED);
+        ctx.i2pInboundQuantity =
+            parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_INBOUND_QUANTITY), 3);
+        ctx.i2pOutboundQuantity =
+            parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_OUTBOUND_QUANTITY), 3);
+        ctx.i2pInboundLength =
+            parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_INBOUND_LENGTH), 3);
+        ctx.i2pOutboundLength =
+            parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_OUTBOUND_LENGTH), 3);
+        ctx.natpmpGateway = cm.getString(Constants.PREF_KEY_NETWORK_NATPMP_GATEWAY);
+        ctx.natpmpLeaseDuration =
+            parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_NATPMP_LEASE_DURATION), 3600);
+        ctx.allowMultipleConnectionsPerPid =
+            cm.getBoolean(Constants.PREF_KEY_NETWORK_ALLOW_MULTIPLE_CONNECTIONS_PER_PID);
+        String[] vStrArray = Constants.FROSTWIRE_VERSION_STRING.split("\\.");
+        ctx.version[0] = Integer.parseInt(vStrArray[0]);
+        ctx.version[1] = Integer.parseInt(vStrArray[1]);
+        ctx.version[2] = Integer.parseInt(vStrArray[2]);
+        ctx.version[3] = BuildConfig.VERSION_CODE;
+
+        BTEngine.ctx = ctx;
+        BTEngine.onCtxSetupComplete();
+        BTEngine.getInstance().start();
+      } catch (Throwable t) {
+        MainApplication.recordBTEngineInitializationFailure(t);
+      }
+    }
+  }
+
+  /**
+   * Parses an I2P integer preference that is stored as a String (because EditTextPreference always
+   * reads/writes strings). Returns the fallback value if the stored string is null, empty, or not a
+   * valid integer.
+   */
+  private static int parseI2PInt(String value, int fallback) {
+    if (value == null || value.isEmpty()) {
+      return fallback;
+    }
+    try {
+      return Integer.parseInt(value.trim());
+    } catch (NumberFormatException e) {
+      return fallback;
+    }
+  }
+
+  private static void cleanTemp() {
+    try {
+      File tmp = Platforms.get().systemPaths().temp();
+      if (tmp.exists()) {
+        FileUtils.cleanDirectory(tmp);
+      }
+    } catch (Throwable e) {
+      LOG.error("Error during setup of temp directory", e);
+    }
+  }
+
+  /**
+   * Lifecycle callbacks to handle FWImageLoader health during app transitions. This helps prevent
+   * crashes when the app is backgrounded and foregrounded.
+   */
+  private static class ImageLoaderLifecycleCallbacks
+      implements Application.ActivityLifecycleCallbacks {
+    private int activityCount = 0;
+
+    @Override
+    public void onActivityCreated(
+        android.app.Activity activity, android.os.Bundle savedInstanceState) {
+      // No action needed
     }
 
     @Override
-    public Configuration getWorkManagerConfiguration() {
-        return new Configuration.Builder()
-                .setMaxSchedulerLimit(20) // Reduced from default 100 to prevent alarm limit issues
-                .setMinimumLoggingLevel(BuildConfig.DEBUG ? android.util.Log.DEBUG : android.util.Log.ERROR)
-                .build();
-    }
-
-    private void initializeWorkManager() {
+    public void onActivityStarted(android.app.Activity activity) {
+      activityCount++;
+      // When first activity starts, ensure FWImageLoader is healthy
+      if (activityCount == 1) {
+        LOG.info("App coming to foreground, ensuring FWImageLoader is healthy");
         try {
-            // Ensure WorkManager is initialized with our custom configuration
-            WorkManager.initialize(this, getWorkManagerConfiguration());
-            LOG.info("WorkManager initialized with reduced scheduler limit to prevent alarm overflow");
-        } catch (IllegalStateException e) {
-            // WorkManager already initialized, that's fine
-            LOG.info("WorkManager was already initialized");
+          FWImageLoader.ensureHealthyInstance(activity.getApplicationContext());
+        } catch (Throwable t) {
+          LOG.error("Error ensuring FWImageLoader health on app foreground", t);
         }
-    }
-
-    public static Context context() {
-        return appContext;
-    }
-
-    public static boolean hasBTEngineInitializationFailure() {
-        return btEngineInitializationFailure != null;
-    }
-
-    public static void recordBTEngineInitializationFailure(Throwable failure) {
-        if (failure == null || btEngineInitializationFailure != null) {
-            return;
-        }
-        btEngineInitializationFailure = failure;
-        LOG.error("BitTorrent engine initialization failed", failure);
+      }
     }
 
     @Override
-    public void onLowMemory() {
-        ImageCache.getInstance(this).evictAll();
-        FWImageLoader.getInstance(this).clear();
-        // Ensure FWImageLoader instance is healthy after memory pressure
-        FWImageLoader.ensureHealthyInstance(this);
-        super.onLowMemory();
+    public void onActivityResumed(android.app.Activity activity) {
+      // Ensure FWImageLoader is healthy when activities resume
+      try {
+        FWImageLoader.ensureHealthyInstance(activity.getApplicationContext());
+      } catch (Throwable t) {
+        LOG.error("Error ensuring FWImageLoader health on activity resume", t);
+      }
     }
 
     @Override
-    @SuppressWarnings("deprecation") // TRIM_MEMORY_MODERATE deprecated API 35; value unchanged
-    public void onTrimMemory(int level) {
-        super.onTrimMemory(level);
-        if (level >= TRIM_MEMORY_MODERATE) {
-            // On moderate to severe memory pressure, ensure our FWImageLoader is healthy
-            FWImageLoader.ensureHealthyInstance(this);
-        }
+    public void onActivityPaused(android.app.Activity activity) {
+      // No action needed
     }
 
-    private void initializeCrawlPagedWebSearchPerformer(Context context) {
-        CrawlCacheManager.setCache(new DiskCrawlCache(context));
-        CrawlCacheManager.setMagnetDownloader(new LibTorrentMagnetDownloader());
-    }
-
-    // don't try to refactor this into an async call since this guy runs on a thread
-    // outside the Engine thread pool
-    private static class BTEngineInitializer implements Runnable {
-        BTEngineInitializer() {
-        }
-
-        public void run() {
-            try {
-                SystemPaths paths = Platforms.get().systemPaths();
-
-                BTContext ctx = new BTContext();
-                ctx.homeDir = paths.libtorrent();
-                ctx.torrentsDir = paths.torrents();
-                ctx.dataDir = paths.data();
-                ctx.optimizeMemory = true;
-
-                // Get configured port range or use default range [1024, 57000]
-                ConfigurationManager cm = ConfigurationManager.instance();
-                int configuredStartPort = cm.getInt(Constants.PREF_KEY_TORRENT_INCOMING_PORT_START,
-                        Constants.DEFAULT_TORRENT_INCOMING_PORT_START);
-                int configuredEndPort = cm.getInt(Constants.PREF_KEY_TORRENT_INCOMING_PORT_END,
-                        Constants.DEFAULT_TORRENT_INCOMING_PORT_END);
-                if (configuredStartPort < 1
-                        || configuredEndPort < configuredStartPort
-                        || configuredEndPort > 65535) {
-                    configuredStartPort = Constants.DEFAULT_TORRENT_INCOMING_PORT_START;
-                    configuredEndPort = Constants.DEFAULT_TORRENT_INCOMING_PORT_END;
+    @Override
+    public void onActivityStopped(android.app.Activity activity) {
+      activityCount--;
+      // When last activity stops, clear cache to free memory
+      if (activityCount == 0) {
+        LOG.info("App going to background, clearing FWImageLoader cache");
+        SystemUtils.postToHandler(
+            SystemUtils.HandlerThreadName.MISC,
+            () -> {
+              try {
+                // Get the instance without recreating it
+                FWImageLoader fwImageLoader = FWImageLoader.getInstanceIfExists();
+                if (fwImageLoader != null) {
+                  // Clear cache to free memory (disk I/O must not run on main thread)
+                  fwImageLoader.clear();
                 }
-
-                int port0, port1;
-                if (configuredStartPort == Constants.DEFAULT_TORRENT_INCOMING_PORT_START
-                        && configuredEndPort == Constants.DEFAULT_TORRENT_INCOMING_PORT_END) {
-                    // Use default port range [37000, 57000] when user hasn't configured specific ports
-                    port0 = 37000 + new Random().nextInt(20000);
-                    port1 = port0 + 10; // 10 retries
-                } else {
-                    // Use user-configured port range
-                    if (configuredStartPort == configuredEndPort) {
-                        // Single port specified
-                        port0 = configuredStartPort;
-                        port1 = port0 + 1; // Just try the single port
-                    } else {
-                        // Port range specified
-                        port0 = configuredStartPort;
-                        port1 = configuredEndPort;
-                    }
-                }
-
-                String iface = "0.0.0.0:%1$d,[::]:%1$d";
-                ctx.interfaces = String.format(Locale.US, iface, port0);
-                ctx.retries = port1 - port0;
-
-                ctx.enableDht = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
-                // I2P Configuration.
-                // Port and tunnel params are stored as Strings (EditTextPreference requires this).
-                // Parse them back to int with safe fallbacks.
-                ctx.i2pEnabled = cm.getBoolean(Constants.PREF_KEY_NETWORK_I2P_ENABLED);
-                ctx.i2pHostname = cm.getString(Constants.PREF_KEY_NETWORK_I2P_HOSTNAME);
-                ctx.i2pPort = parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_PORT), 7656);
-                ctx.i2pAllowMixed = cm.getBoolean(Constants.PREF_KEY_NETWORK_I2P_ALLOW_MIXED);
-                ctx.i2pInboundQuantity = parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_INBOUND_QUANTITY), 3);
-                ctx.i2pOutboundQuantity = parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_OUTBOUND_QUANTITY), 3);
-                ctx.i2pInboundLength = parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_INBOUND_LENGTH), 3);
-                ctx.i2pOutboundLength = parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_OUTBOUND_LENGTH), 3);
-                ctx.natpmpGateway = cm.getString(Constants.PREF_KEY_NETWORK_NATPMP_GATEWAY);
-                ctx.natpmpLeaseDuration = parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_NATPMP_LEASE_DURATION), 3600);
-                ctx.allowMultipleConnectionsPerPid = cm.getBoolean(Constants.PREF_KEY_NETWORK_ALLOW_MULTIPLE_CONNECTIONS_PER_PID);
-                String[] vStrArray = Constants.FROSTWIRE_VERSION_STRING.split("\\.");
-                ctx.version[0] = Integer.parseInt(vStrArray[0]);
-                ctx.version[1] = Integer.parseInt(vStrArray[1]);
-                ctx.version[2] = Integer.parseInt(vStrArray[2]);
-                ctx.version[3] = BuildConfig.VERSION_CODE;
-
-                BTEngine.ctx = ctx;
-                BTEngine.onCtxSetupComplete();
-                BTEngine.getInstance().start();
-            } catch (Throwable t) {
-                MainApplication.recordBTEngineInitializationFailure(t);
-            }
-        }
+              } catch (Throwable t) {
+                LOG.error("Error clearing FWImageLoader cache on app background", t);
+              }
+            });
+      }
     }
 
-    /**
-     * Parses an I2P integer preference that is stored as a String
-     * (because EditTextPreference always reads/writes strings). Returns the fallback
-     * value if the stored string is null, empty, or not a valid integer.
-     */
-    private static int parseI2PInt(String value, int fallback) {
-        if (value == null || value.isEmpty()) {
-            return fallback;
-        }
-        try {
-            return Integer.parseInt(value.trim());
-        } catch (NumberFormatException e) {
-            return fallback;
-        }
+    @Override
+    public void onActivitySaveInstanceState(
+        android.app.Activity activity, android.os.Bundle outState) {
+      // No action needed
     }
 
-    private static void cleanTemp() {
-        try {
-            File tmp = Platforms.get().systemPaths().temp();
-            if (tmp.exists()) {
-                FileUtils.cleanDirectory(tmp);
-            }
-        } catch (Throwable e) {
-            LOG.error("Error during setup of temp directory", e);
-        }
+    @Override
+    public void onActivityDestroyed(android.app.Activity activity) {
+      // No action needed
     }
-
-    /**
-     * Lifecycle callbacks to handle FWImageLoader health during app transitions.
-     * This helps prevent crashes when the app is backgrounded and foregrounded.
-     */
-    private static class ImageLoaderLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
-        private int activityCount = 0;
-        
-        @Override
-        public void onActivityCreated(android.app.Activity activity, android.os.Bundle savedInstanceState) {
-            // No action needed
-        }
-
-        @Override
-        public void onActivityStarted(android.app.Activity activity) {
-            activityCount++;
-            // When first activity starts, ensure FWImageLoader is healthy
-            if (activityCount == 1) {
-                LOG.info("App coming to foreground, ensuring FWImageLoader is healthy");
-                try {
-                    FWImageLoader.ensureHealthyInstance(activity.getApplicationContext());
-                } catch (Throwable t) {
-                    LOG.error("Error ensuring FWImageLoader health on app foreground", t);
-                }
-            }
-        }
-
-        @Override
-        public void onActivityResumed(android.app.Activity activity) {
-            // Ensure FWImageLoader is healthy when activities resume
-            try {
-                FWImageLoader.ensureHealthyInstance(activity.getApplicationContext());
-            } catch (Throwable t) {
-                LOG.error("Error ensuring FWImageLoader health on activity resume", t);
-            }
-        }
-
-        @Override
-        public void onActivityPaused(android.app.Activity activity) {
-            // No action needed
-        }
-
-        @Override
-        public void onActivityStopped(android.app.Activity activity) {
-            activityCount--;
-            // When last activity stops, clear cache to free memory
-            if (activityCount == 0) {
-                LOG.info("App going to background, clearing FWImageLoader cache");
-                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-                    try {
-                        // Get the instance without recreating it
-                        FWImageLoader fwImageLoader = FWImageLoader.getInstanceIfExists();
-                        if (fwImageLoader != null) {
-                            // Clear cache to free memory (disk I/O must not run on main thread)
-                            fwImageLoader.clear();
-                        }
-                    } catch (Throwable t) {
-                        LOG.error("Error clearing FWImageLoader cache on app background", t);
-                    }
-                });
-            }
-        }
-
-        @Override
-        public void onActivitySaveInstanceState(android.app.Activity activity, android.os.Bundle outState) {
-            // No action needed
-        }
-
-        @Override
-        public void onActivityDestroyed(android.app.Activity activity) {
-            // No action needed
-        }
-    }
+  }
 }
