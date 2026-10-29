@@ -39,6 +39,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import com.frostwire.android.R;
 import com.frostwire.android.util.Debug;
+import com.frostwire.android.util.SavedStateSizes;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -132,9 +133,30 @@ public abstract class AbstractActivity extends AppCompatActivity {
               }
             },
             false);
+    // frostwire/frostwire#1390: name the fragment whose saved state is too large. Recursive, and
+    // called after each fragment (and child fragment) has finished saving.
+    getSupportFragmentManager()
+        .registerFragmentLifecycleCallbacks(
+            new FragmentManager.FragmentLifecycleCallbacks() {
+              @Override
+              public void onFragmentSaveInstanceState(
+                  @NonNull FragmentManager fm,
+                  @NonNull Fragment fragment,
+                  @NonNull Bundle outState) {
+                SavedStateSizes.check(fragment.getClass().getName(), outState);
+              }
+            },
+            true);
     setContentView(layoutResId);
     initComponents(savedInstanceState);
     setToolbar();
+  }
+
+  @Override
+  protected void onSaveInstanceState(@NonNull Bundle outState) {
+    super.onSaveInstanceState(outState);
+    // After super: the fragments' and view hierarchy's state are in outState by now (#1390).
+    SavedStateSizes.check(getClass().getName(), outState);
   }
 
   @Override
