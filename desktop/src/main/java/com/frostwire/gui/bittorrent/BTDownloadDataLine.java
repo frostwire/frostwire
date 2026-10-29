@@ -256,6 +256,7 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
 
   private SizeHolder cachedBytesDownloadedHolder;
   private SizeHolder cachedBytesUploadedHolder;
+  private SeedsHolder cachedSeedsHolder = new SeedsHolder("");
 
   /**
    * Cache the last update time to debounce rapid successive updates Helps reduce excessive JNI
@@ -369,7 +370,7 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
     } else if (column == TIME_COLUMN) {
       return timeRemaining();
     } else if (column == SEEDS_COLUMN) {
-      return new SeedsHolder(seeds);
+      return cachedSeedsHolder;
     } else if (column == PEERS_COLUMN) {
       return peers;
     } else if (column == SHARE_RATIO_COLUMN) {
@@ -504,6 +505,7 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
       uploadSpeed = initializer.getUploadSpeed();
       timeLeft = initializer.getETA();
       seeds = initializer.getSeedsString();
+      cachedSeedsHolder = new SeedsHolder(seeds);
       peers = initializer.getPeersString();
       shareRatio = initializer.getShareRatio();
       seedToPeerRatio = initializer.getSeedToPeerRatio();

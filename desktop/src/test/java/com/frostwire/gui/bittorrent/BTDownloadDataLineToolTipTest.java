@@ -8,9 +8,11 @@
 package com.frostwire.gui.bittorrent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.frostwire.transfers.TransferState;
+import com.limegroup.gnutella.gui.tables.SeedsHolder;
 import java.lang.reflect.Proxy;
 import java.util.List;
 import java.util.Set;
@@ -23,6 +25,10 @@ class BTDownloadDataLineToolTipTest {
   private static final Set<String> ALLOWED = Set.of("getDisplayName", "isCompleted");
 
   private static BTDownload recording(List<String> calls) {
+    return recording(calls, "3 (7)");
+  }
+
+  private static BTDownload recording(List<String> calls, String seedsAndPeers) {
     return (BTDownload)
         Proxy.newProxyInstance(
             BTDownload.class.getClassLoader(),
@@ -36,7 +42,7 @@ class BTDownloadDataLineToolTipTest {
                 case "getDownloadSpeed" -> 2048.0;
                 case "getETA" -> 90L;
                 case "getSize" -> 4096L;
-                case "getSeedsString", "getPeersString" -> "3 (7)";
+                case "getSeedsString", "getPeersString" -> seedsAndPeers;
                 case "equals" -> proxy == args[0];
                 case "hashCode" -> System.identityHashCode(proxy);
                 default -> {
@@ -72,5 +78,25 @@ class BTDownloadDataLineToolTipTest {
     assertEquals("ubuntu.iso", tip[0]);
     assertTrue(tip[2].endsWith("42%"), tip[2]);
     assertTrue(tip[7].endsWith("3 (7)"), tip[7]);
+  }
+
+  /**
+   * getValueAt() runs for every row on each paint, on the EDT. The Seeds cell was a new SeedsHolder
+   * per call, parsed from "" for HTTP and metadata-fetching downloads with a caught
+   * NumberFormatException each time (frostwire/frostwire#1380).
+   */
+  @Test
+  void seedsCellIsBuiltByUpdateNotPerPaint() {
+    BTDownloadDataLine line = new BTDownloadDataLine();
+    line.setInitializeObject(recording(new CopyOnWriteArrayList<>(), ""));
+    line.update();
+    int seedsColumn = -1;
+    for (int i = 0; i < line.getColumnCount(); i++) {
+      if (line.getValueAt(i) instanceof SeedsHolder) {
+        seedsColumn = i;
+      }
+    }
+    assertTrue(seedsColumn >= 0, "a Seeds column");
+    assertSame(line.getValueAt(seedsColumn), line.getValueAt(seedsColumn));
   }
 }

@@ -8,19 +8,42 @@ package com.limegroup.gnutella.gui.tables;
  */
 public class SeedsHolder implements Comparable<SeedsHolder> {
   private final String stringForm;
-  private int connected;
-  private int seeds;
+  private final int connected;
+  private final int seeds;
 
+  /**
+   * Parses "connected/total" without throwing: HTTP downloads and torrents still fetching metadata
+   * report "", and an exception per row and paint walked the whole paint stack on the EDT
+   * (frostwire/frostwire#1380). Anything else than two plain counts is 0/0.
+   */
   public SeedsHolder(String seedsString) {
     stringForm = seedsString;
-    String[] split = seedsString.split("/");
-    try {
-      connected = Integer.parseInt(split[0].trim());
-      seeds = Integer.parseInt(split[1].trim());
-    } catch (Exception e) {
-      connected = 0;
-      seeds = 0;
+    int slash = seedsString == null ? -1 : seedsString.indexOf('/');
+    int parsedConnected = slash < 0 ? -1 : parseCount(seedsString.substring(0, slash));
+    int parsedSeeds = slash < 0 ? -1 : parseCount(seedsString.substring(slash + 1));
+    if (parsedConnected < 0 || parsedSeeds < 0) {
+      parsedConnected = 0;
+      parsedSeeds = 0;
     }
+    connected = parsedConnected;
+    seeds = parsedSeeds;
+  }
+
+  /** A non-negative count of at most 9 digits, surrounding blanks allowed; -1 otherwise. */
+  static int parseCount(String text) {
+    String digits = text.trim();
+    if (digits.isEmpty() || digits.length() > 9) {
+      return -1;
+    }
+    int value = 0;
+    for (int i = 0; i < digits.length(); i++) {
+      char c = digits.charAt(i);
+      if (c < '0' || c > '9') {
+        return -1;
+      }
+      value = value * 10 + (c - '0');
+    }
+    return value;
   }
 
   @Override
