@@ -398,14 +398,8 @@ public final class SearchFragment extends AbstractFragment
     switchView(getView(), R.id.fragment_search_search_progress);
     showSupportBanner();
     if (adapter != null) {
-      adapter.setFileType(
-          fileType,
-          false,
-          filtered -> {
-            refreshFileTypeCounters(false, fileTypeCounter.fsr);
-            // Keep progress/list in sync after filter setup; do not flash promos.
-            showSearchView(getView());
-          });
+      // The adapter shows the filtered list when it's ready; the counters were reset above.
+      adapter.setFileType(fileType, false, null);
     }
   }
 
@@ -439,16 +433,11 @@ public final class SearchFragment extends AbstractFragment
     list.setAdapter(adapter);
   }
 
-  private void updateFilteredSearchResults(
-      List<FileSearchResult> allFilteredSearchResults, boolean clearBeforeAdding) {
-    SystemUtils.ensureUIThreadOrCrash(
-        "SearchFragment::updateFilteredSearchResults(List<FileSearchResult> allFilteredSearchResults)");
+  /** The adapter has shown a new filtered list: update the counters and leave the promos. */
+  private void onFilteredSearchResults() {
+    SystemUtils.ensureUIThreadOrCrash("SearchFragment::onFilteredSearchResults");
     if (isAdded()) {
       try {
-        if (adapter != null) {
-          adapter.updateVisualListWithAllMediaTypeFilteredSearchResults(
-              allFilteredSearchResults, clearBeforeAdding);
-        }
         refreshFileTypeCounters(true, fileTypeCounter.fsr);
         showSearchView(getView());
       } catch (Throwable t) {
@@ -892,17 +881,12 @@ public final class SearchFragment extends AbstractFragment
       searchFragment.adapter.sortByKeywordsRelevance(searchFragment.currentQuery);
 
       // Sets the file type in the adapter and filters search results by file type
-      boolean differentFileType = searchFragment.adapter.getFileType() != fileType;
       searchFragment.adapter.setFileType(
           fileType,
           fsr -> {
-            // Time to report to the UI, let the adapter know about the new newResults
-            if (differentFileType) {
-              searchFragment.fileTypeCounter.updateFilteredSearchResults(fsr);
-            } else {
-              searchFragment.fileTypeCounter.add(fsr);
-            }
-            searchFragment.updateFilteredSearchResults(fsr.mediaTypeFiltered, true);
+            // fsr counts every result so far, not only this batch: replace, don't add.
+            searchFragment.fileTypeCounter.updateFilteredSearchResults(fsr);
+            searchFragment.onFilteredSearchResults();
           });
     }
 
@@ -999,7 +983,13 @@ public final class SearchFragment extends AbstractFragment
             SystemUtils.HandlerThreadName.CONFIG_MANAGER,
             () -> ConfigurationManager.instance().setLastMediaTypeFilter(mediaTypeId));
         fragment.adapter.setFileType(
-            mediaTypeId, false, filtered -> fragment.showSearchView(rootViewRef.get()));
+            mediaTypeId,
+            false,
+            filtered -> {
+              // This call may have superseded an onResults one: take the counters from here too.
+              fragment.fileTypeCounter.updateFilteredSearchResults(filtered);
+              fragment.onFilteredSearchResults();
+            });
       } else {
         fragment.showSearchView(rootViewRef.get());
       }

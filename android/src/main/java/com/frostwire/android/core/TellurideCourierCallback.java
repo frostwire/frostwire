@@ -23,6 +23,7 @@ import com.frostwire.android.gui.adapters.SearchResultListAdapter;
 import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.search.SearchListener;
 import com.frostwire.search.telluride.TellurideSearchPerformer;
 import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.util.Logger;
@@ -77,10 +78,16 @@ public class TellurideCourierCallback<
                 Constants.FILE_TYPE_VIDEOS,
                 true,
                 filteredSearchResults -> {
-                  srlAdapter.updateVisualListWithAllMediaTypeFilteredSearchResults(
-                      filteredSearchResults.mediaTypeFiltered, false);
-                  SearchFragment.instance().refreshFileTypeCounters(false, filteredSearchResults);
-                  SearchMediator.instance().getListener().onStopped(searchPerformer.getToken());
+                  // The adapter has already shown the audio and video results. The search screen
+                  // may have been destroyed while yt-dlp was running.
+                  SearchFragment fragment = SearchFragment.instance();
+                  if (fragment != null && fragment.isAdded()) {
+                    fragment.refreshFileTypeCounters(false, filteredSearchResults);
+                  }
+                  SearchListener listener = SearchMediator.instance().getListener();
+                  if (listener != null && searchPerformer != null) {
+                    listener.onStopped(searchPerformer.getToken());
+                  }
                 });
           }
         });

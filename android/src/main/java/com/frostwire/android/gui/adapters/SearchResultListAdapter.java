@@ -67,6 +67,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.apache.commons.io.FilenameUtils;
@@ -80,7 +81,8 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
   private final OnLinkClickListener linkListener;
   private final PreviewClickListener previewClickListener;
   private final FWImageLoader thumbLoader;
-  private int fileType;
+  private volatile int fileType;
+  private final AtomicInteger fileTypeGeneration = new AtomicInteger();
   private volatile FilteredSearchResults filteredSearchResults;
 
   protected SearchResultListAdapter(Context context) {
@@ -98,15 +100,15 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
   /**
    * Changes the fileType, extracts all the file search results, then filters them by type and
    * updates (FilteredSearchResults) filteredSearchResults (see getFilteredSearchResults()) on the
-   * search performer thread. The visible list and the callback are updated on the main thread with
-   * the results of this call.
+   * search performer thread. Then, on the main thread, it replaces the visible list with the
+   * results and passes them to the callback, unless a later call has superseded this one.
    */
   public void setFileType(
       final int fileType,
       boolean appendToPreviouslyFilteredResults,
       Consumer<FilteredSearchResults> callback) {
-    boolean differentFileType = this.fileType != fileType;
     this.fileType = fileType;
+    final int generation = fileTypeGeneration.incrementAndGet();
     postToHandler(
         SystemUtils.HandlerThreadName.SEARCH_PERFORMER,
         () -> {
@@ -115,26 +117,29 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
           synchronized (listLock) {
             fileSearchResults = extractFileSearchResults(getFullList());
           }
-          // Filter the entire list by file type. A new object rather than clearing the previous
-          // one: the main thread may still be reading it.
-          FilteredSearchResults results = filteredSearchResults;
-          if (!appendToPreviouslyFilteredResults || results == null) {
-            results = newFilteredSearchResults(fileSearchResults, fileType);
-          } else {
-            appendFilteredSearchResults(results, fileSearchResults, fileType);
-          }
-          filteredSearchResults = results;
-          final FilteredSearchResults filtered = results;
+          // Filter the entire list by file type into a new object: the main thread may still be
+          // reading the previous one, so it is never cleared or appended to in place.
+          FilteredSearchResults previous = filteredSearchResults;
+          FilteredSearchResults filtered =
+              appendToPreviouslyFilteredResults && previous != null
+                  ? appendFilteredSearchResults(previous.copy(), fileSearchResults, fileType)
+                  : newFilteredSearchResults(fileSearchResults, fileType);
+          filteredSearchResults = filtered;
           // Views (the list, file type tabs, search view) change only on the main thread: off it
           // they race measure() and crash with "did not set the measured dimension"
-          // (frostwire/frostwire#1384).
-          SystemUtils.postToUIThreadAtFront(
-              () ->
-                  updateVisualListWithAllMediaTypeFilteredSearchResults(
-                      filtered.mediaTypeFiltered, differentFileType));
-          if (callback != null) {
-            SystemUtils.postToUIThread(() -> callback.accept(filtered));
-          }
+          // (frostwire/frostwire#1384). One FIFO task per call, and a superseded call does
+          // nothing, so the list always ends up showing the latest file type.
+          SystemUtils.postToUIThread(
+              () -> {
+                if (generation != fileTypeGeneration.get()) {
+                  return;
+                }
+                updateVisualListWithAllMediaTypeFilteredSearchResults(
+                    filtered.mediaTypeFiltered, true);
+                if (callback != null) {
+                  callback.accept(filtered);
+                }
+              });
         });
   }
 
@@ -523,6 +528,25 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     public int numFilteredApplications;
     public int numFilteredDocuments;
     public int numFilteredTorrents;
+
+    /** A copy to append to, so readers of this one never see it change. */
+    FilteredSearchResults copy() {
+      FilteredSearchResults copy = new FilteredSearchResults();
+      copy.mediaTypeFiltered.addAll(mediaTypeFiltered);
+      copy.numAudio = numAudio;
+      copy.numVideo = numVideo;
+      copy.numPictures = numPictures;
+      copy.numApplications = numApplications;
+      copy.numDocuments = numDocuments;
+      copy.numTorrents = numTorrents;
+      copy.numFilteredAudio = numFilteredAudio;
+      copy.numFilteredVideo = numFilteredVideo;
+      copy.numFilteredPictures = numFilteredPictures;
+      copy.numFilteredApplications = numFilteredApplications;
+      copy.numFilteredDocuments = numFilteredDocuments;
+      copy.numFilteredTorrents = numFilteredTorrents;
+      return copy;
+    }
 
     private void increment(MediaType mt, boolean passedFilter) {
       if (mt != null) {
