@@ -11,6 +11,7 @@ import com.frostwire.gui.theme.PlatformFonts;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
+import java.awt.datatransfer.SystemFlavorMap;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineBreakMeasurer;
 import java.awt.image.BufferedImage;
@@ -290,6 +291,11 @@ public final class JdkWarmUp {
         LOG.warn("Warm-up of " + className + " failed: " + t.getMessage(), t);
       }
     }
+    try {
+      warmUpDataTransfer();
+    } catch (Throwable t) {
+      LOG.warn("Data transfer warm-up failed: " + t.getMessage(), t);
+    }
     Path location = codeSourceOf(JdkWarmUp.class);
     try {
       if (location != null) {
@@ -405,6 +411,17 @@ public final class JdkWarmUp {
    * which the character BreakIterator of {@link #warmUpTextLayout} does not; the first multi-line
    * tooltip paid that on the EDT (Icebase #7c1eec7b21f2).
    */
+  /**
+   * Looks up the JDK's data-transfer service and builds the default flavor map, as the main
+   * window's first {@code new DropTarget(...)} does: the lookup is a ServiceLoader scan of the
+   * module graph that loaded the provider from the boot class path on the EDT
+   * (frostwire/frostwire#1370, Icebase #c412f1f06e67). The provider builds the map under its own
+   * lock.
+   */
+  static void warmUpDataTransfer() {
+    SystemFlavorMap.getDefaultFlavorMap();
+  }
+
   static void warmUpLineBreaks() {
     BreakIterator lines = BreakIterator.getLineInstance();
     lines.setText(GLYPH_SAMPLE);

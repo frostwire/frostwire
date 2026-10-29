@@ -506,6 +506,52 @@ class JdkWarmUpTest {
     }
   }
 
+  /**
+   * The main window's first DropTarget looked up the JDK's data-transfer service on the EDT
+   * (frostwire/frostwire#1370): a ServiceLoader scan that loads the provider class. It loads once
+   * per JVM, so each case runs in a fresh one.
+   */
+  @Test
+  void warmUpDataTransferLoadsTheDataTransferService() throws Exception {
+    String before = runDataTransferProbe(false);
+    String after = runDataTransferProbe(true);
+    assertFalse(before.contains(DATA_TRANSFER_SERVICE_CLASS), "loaded before the warm-up");
+    assertTrue(after.contains(DATA_TRANSFER_SERVICE_CLASS), "data-transfer service not loaded");
+    assertTrue(warmUpSource().contains("warmUpDataTransfer();"), "not called by warmUp");
+  }
+
+  private static final String DATA_TRANSFER_SERVICE_CLASS =
+      "sun.awt.datatransfer.DesktopDatatransferServiceImpl ";
+
+  private static String runDataTransferProbe(boolean warmUp)
+      throws IOException, InterruptedException {
+    Process probe =
+        new ProcessBuilder(
+                Path.of(System.getProperty("java.home"), "bin", "java").toString(),
+                "-Xlog:class+load=info",
+                "-Djava.awt.headless=true",
+                "-cp",
+                System.getProperty("java.class.path"),
+                DataTransferProbe.class.getName(),
+                String.valueOf(warmUp))
+            .redirectErrorStream(true)
+            .start();
+    String log = new String(probe.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+    assertTrue(probe.waitFor(120, TimeUnit.SECONDS), "probe timed out");
+    assertEquals(0, probe.exitValue(), log);
+    return log;
+  }
+
+  /** Runs in a fresh JVM: initializes JdkWarmUp and, if asked, runs the data-transfer warm-up. */
+  static final class DataTransferProbe {
+    public static void main(String[] args) throws Exception {
+      Class.forName(JdkWarmUp.class.getName());
+      if (Boolean.parseBoolean(args[0])) {
+        JdkWarmUp.warmUpDataTransfer();
+      }
+    }
+  }
+
   private static String runTextLayoutProbe(String mode) throws IOException, InterruptedException {
     Process probe =
         new ProcessBuilder(
