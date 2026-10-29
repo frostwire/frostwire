@@ -84,11 +84,12 @@ public class TellurideCourierCallback<
                   if (fragment != null && fragment.isAdded()) {
                     fragment.refreshFileTypeCounters(false, filteredSearchResults);
                   }
-                  SearchListener listener = SearchMediator.instance().getListener();
-                  if (listener != null && searchPerformer != null) {
-                    listener.onStopped(searchPerformer.getToken());
-                  }
                 });
+            // Not from the callback above: a later setFileType (a tab swipe) supersedes it.
+            SearchListener listener = SearchMediator.instance().getListener();
+            if (listener != null && searchPerformer != null) {
+              listener.onStopped(searchPerformer.getToken());
+            }
           }
         });
   }

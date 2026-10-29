@@ -122,7 +122,8 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
           FilteredSearchResults previous = filteredSearchResults;
           FilteredSearchResults filtered =
               appendToPreviouslyFilteredResults && previous != null
-                  ? appendFilteredSearchResults(previous.copy(), fileSearchResults, fileType)
+                  ? appendFilteredSearchResults(
+                      previous.copyFiltered(), fileSearchResults, fileType)
                   : newFilteredSearchResults(fileSearchResults, fileType);
           filteredSearchResults = filtered;
           // Views (the list, file type tabs, search view) change only on the main thread: off it
@@ -145,6 +146,13 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
 
   public void setFileType(final int fileType, Consumer<FilteredSearchResults> callback) {
     setFileType(fileType, false, callback);
+  }
+
+  /** Also drops the filter updates still queued for the main thread, so they can't refill it. */
+  @Override
+  public void clear() {
+    fileTypeGeneration.incrementAndGet();
+    super.clear();
   }
 
   public FilteredSearchResults getFilteredSearchResults() {
@@ -529,16 +537,13 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     public int numFilteredDocuments;
     public int numFilteredTorrents;
 
-    /** A copy to append to, so readers of this one never see it change. */
-    FilteredSearchResults copy() {
+    /**
+     * A copy to append another file type to, so readers of this one never see it change. Only the
+     * filtered list and counts are kept: appending counts every result's type again.
+     */
+    FilteredSearchResults copyFiltered() {
       FilteredSearchResults copy = new FilteredSearchResults();
       copy.mediaTypeFiltered.addAll(mediaTypeFiltered);
-      copy.numAudio = numAudio;
-      copy.numVideo = numVideo;
-      copy.numPictures = numPictures;
-      copy.numApplications = numApplications;
-      copy.numDocuments = numDocuments;
-      copy.numTorrents = numTorrents;
       copy.numFilteredAudio = numFilteredAudio;
       copy.numFilteredVideo = numFilteredVideo;
       copy.numFilteredPictures = numFilteredPictures;

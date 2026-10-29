@@ -17,6 +17,7 @@ import android.app.Application;
 import android.os.Looper;
 import androidx.test.core.app.ApplicationProvider;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.Platform;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.FileSearchResult;
@@ -108,6 +109,29 @@ public class SearchResultListAdapterFileTypeCallbackTest {
     runMainLooperUntil(() -> both.get() != null);
     assertEquals(List.of(song, movie), both.get().mediaTypeFiltered);
     assertEquals(2, adapter.getCount());
+    // Each result's type is counted once, not once per appended pass.
+    assertEquals(1, both.get().numAudio);
+    assertEquals(1, both.get().numVideo);
+    assertEquals(1, both.get().numFilteredAudio);
+    assertEquals(1, both.get().numFilteredVideo);
+  }
+
+  @Test
+  public void clearingDropsFilterUpdatesStillQueued() throws Exception {
+    adapter.addResults(Arrays.asList(file("song.mp3")));
+    AtomicReference<SearchResultListAdapter.FilteredSearchResults> late = new AtomicReference<>();
+    adapter.setFileType(Constants.FILE_TYPE_AUDIO, false, late::set);
+
+    adapter.clear(); // the user cleared the search before the filter reached the main thread
+
+    // A marker queued behind the filter on the same threads: once it has run, so would the filter.
+    AtomicReference<Boolean> drained = new AtomicReference<>();
+    SystemUtils.postToHandler(
+        SystemUtils.HandlerThreadName.SEARCH_PERFORMER,
+        () -> SystemUtils.postToUIThread(() -> drained.set(true)));
+    runMainLooperUntil(() -> drained.get() != null);
+    assertNull("a cleared search's filter still ran its callback", late.get());
+    assertEquals(0, adapter.getCount());
   }
 
   /** The filtering runs on a real handler thread; the main looper is paused until idled here. */

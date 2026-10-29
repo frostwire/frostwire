@@ -436,7 +436,8 @@ public final class SearchFragment extends AbstractFragment
   /** The adapter has shown a new filtered list: update the counters and leave the promos. */
   private void onFilteredSearchResults() {
     SystemUtils.ensureUIThreadOrCrash("SearchFragment::onFilteredSearchResults");
-    if (isAdded()) {
+    // No search (cleared, or a tab swipe on the promos): keep the promos and hidden tabs.
+    if (isAdded() && currentQuery != null) {
       try {
         refreshFileTypeCounters(true, fileTypeCounter.fsr);
         showSearchView(getView());
