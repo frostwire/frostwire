@@ -32,6 +32,7 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.util.FWImageLoader;
 import com.frostwire.android.util.RunStrict;
+import com.frostwire.android.util.SavedStateSizes;
 import com.frostwire.android.util.StaleWorkManagerJobs;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTContext;
@@ -340,10 +341,28 @@ public class MainApplication extends Application {
       implements Application.ActivityLifecycleCallbacks {
     private int activityCount = 0;
 
+    private static final androidx.fragment.app.FragmentManager.FragmentLifecycleCallbacks
+        SAVED_STATE_SIZE_CHECK =
+            new androidx.fragment.app.FragmentManager.FragmentLifecycleCallbacks() {
+              @Override
+              public void onFragmentSaveInstanceState(
+                  @androidx.annotation.NonNull androidx.fragment.app.FragmentManager fm,
+                  @androidx.annotation.NonNull androidx.fragment.app.Fragment fragment,
+                  @androidx.annotation.NonNull android.os.Bundle outState) {
+                SavedStateSizes.check(fragment.getClass().getName(), outState);
+              }
+            };
+
     @Override
     public void onActivityCreated(
         android.app.Activity activity, android.os.Bundle savedInstanceState) {
-      // No action needed
+      // frostwire/frostwire#1390: name the fragment whose saved state is too large. Called after
+      // each fragment, and child fragment, has finished saving.
+      if (activity instanceof androidx.fragment.app.FragmentActivity) {
+        ((androidx.fragment.app.FragmentActivity) activity)
+            .getSupportFragmentManager()
+            .registerFragmentLifecycleCallbacks(SAVED_STATE_SIZE_CHECK, true);
+      }
     }
 
     @Override
@@ -401,7 +420,8 @@ public class MainApplication extends Application {
     @Override
     public void onActivitySaveInstanceState(
         android.app.Activity activity, android.os.Bundle outState) {
-      // No action needed
+      // After the activity's own onSaveInstanceState, so subclasses' keys are included (#1390).
+      SavedStateSizes.check(activity.getClass().getName(), outState);
     }
 
     @Override

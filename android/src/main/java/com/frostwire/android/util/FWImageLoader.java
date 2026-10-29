@@ -645,9 +645,13 @@ public final class FWImageLoader {
   /** Frees the memory cache only: no disk I/O, so it is safe on the main thread. */
   public void clearMemoryCache() {
     if (coilImageLoader != null) {
-      MemoryCache memoryCache = coilImageLoader.getMemoryCache();
-      if (memoryCache != null) {
-        memoryCache.clear();
+      try {
+        MemoryCache memoryCache = coilImageLoader.getMemoryCache();
+        if (memoryCache != null) {
+          memoryCache.clear();
+        }
+      } catch (RuntimeException e) {
+        LOG.error("Error while clearing Coil memory cache", e);
       }
     }
   }

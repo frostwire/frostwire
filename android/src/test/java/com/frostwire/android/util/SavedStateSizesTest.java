@@ -12,7 +12,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import android.app.Application;
+import android.os.BadParcelableException;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import org.junit.After;
@@ -37,6 +40,7 @@ public class SavedStateSizesTest {
   public void captureReports() {
     original = SavedStateSizes.reporter;
     SavedStateSizes.reporter = reported::set;
+    SavedStateSizes.resetReported();
   }
 
   @After
@@ -72,6 +76,39 @@ public class SavedStateSizesTest {
   }
 
   @Test
+  public void eachOwnerIsReportedOncePerProcess() {
+    Bundle state = new Bundle();
+    state.putByteArray("big", new byte[250 * 1024]);
+    SavedStateSizes.check("TransfersFragment", state);
+    reported.set(null);
+
+    SavedStateSizes.check("TransfersFragment", state);
+
+    assertNull("leaving the app again reported the same screen again", reported.get());
+  }
+
+  @Test
+  public void aRestoredValueThatCannotBeReadDoesNotBreakTheSave() {
+    // A fragment's restored state, still parcelled, holding a value whose class can't be loaded
+    // (a custom Parcelable read with the wrong class loader): reading it throws.
+    Bundle restored = new Bundle();
+    restored.putParcelable("adapter", new Unreadable());
+    restored.putByteArray("results", new byte[300 * 1024]);
+    Parcel parcel = Parcel.obtain();
+    parcel.writeBundle(restored);
+    parcel.setDataPosition(0);
+    Bundle parcelled = parcel.readBundle(getClass().getClassLoader());
+    parcel.recycle();
+    Bundle state = new Bundle();
+    state.putBundle("android:support:fragments", parcelled);
+
+    SavedStateSizes.check("MainActivity", state);
+
+    // The system's own save copies the parcelled bytes; it must still work after the check.
+    assertTrue(SavedStateSizes.sizeOf(state) > 300 * 1024);
+  }
+
+  @Test
   public void checkingLeavesTheStateUnchanged() {
     Bundle state = new Bundle();
     state.putByteArray("big", new byte[250 * 1024]);
@@ -82,5 +119,31 @@ public class SavedStateSizesTest {
     assertEquals(2, state.size());
     assertEquals(7, state.getInt("position"));
     assertEquals(250 * 1024, state.getByteArray("big").length);
+  }
+
+  /** Writes fine; reading it back fails, like a Parcelable whose class can't be loaded. */
+  public static final class Unreadable implements Parcelable {
+    @Override
+    public int describeContents() {
+      return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+      dest.writeInt(1);
+    }
+
+    public static final Creator<Unreadable> CREATOR =
+        new Creator<Unreadable>() {
+          @Override
+          public Unreadable createFromParcel(Parcel source) {
+            throw new BadParcelableException("ClassNotFoundException when unmarshalling");
+          }
+
+          @Override
+          public Unreadable[] newArray(int size) {
+            return new Unreadable[size];
+          }
+        };
   }
 }

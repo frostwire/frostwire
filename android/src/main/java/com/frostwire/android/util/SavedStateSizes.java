@@ -9,11 +9,14 @@ package com.frostwire.android.util;
 
 import android.os.Bundle;
 import android.os.Parcel;
+import androidx.annotation.VisibleForTesting;
 import com.frostwire.util.Logger;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 /**
@@ -35,50 +38,71 @@ public final class SavedStateSizes {
   private static final int MAX_DEPTH = 3;
   private static final int TOP_KEYS = 5;
 
+  @VisibleForTesting
   static Consumer<String> reporter =
       message -> {
         LOG.warn(message);
         try {
-          FirebaseCrashlytics.getInstance().recordException(new SavedStateTooLarge(message));
+          FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+          crashlytics.setCustomKey("savedStateReport", message);
+          crashlytics.recordException(new SavedStateTooLarge(message));
         } catch (RuntimeException e) {
           LOG.warn("SavedStateSizes: could not record the report", e);
         }
       };
 
+  /** Owners already reported in this process: leaving the app repeatedly reports once. */
+  private static final Set<String> REPORTED = ConcurrentHashMap.newKeySet();
+
   private SavedStateSizes() {}
 
-  /** Reports owner's saved state if it is over the threshold. Must not modify outState. */
+  /**
+   * Reports owner's saved state if it is over the threshold, once per owner per process. It only
+   * reads copies of outState, and it never throws: it runs inside the system's save.
+   */
   public static void check(String owner, Bundle outState) {
-    if (outState == null) {
+    if (outState == null || REPORTED.contains(owner)) {
       return;
     }
-    int total = sizeOf(outState);
-    if (total < REPORT_BYTES) {
-      return;
+    try {
+      // A copy: the system copies a parcelled bundle's raw bytes without unparcelling it, and
+      // reading the copy can't unparcel (and so can't fail on) anything in outState.
+      Bundle state = new Bundle(outState);
+      int total = sizeOf(state);
+      if (total < REPORT_BYTES || !REPORTED.add(owner)) {
+        return;
+      }
+      List<Entry> entries = new ArrayList<>();
+      collect("", state, 0, entries);
+      Collections.sort(entries, (a, b) -> Integer.compare(b.bytes, a.bytes));
+      StringBuilder message =
+          new StringBuilder("Saved state of ").append(owner).append(": ").append(kb(total));
+      for (int i = 0; i < Math.min(TOP_KEYS, entries.size()); i++) {
+        message.append(i == 0 ? " — " : ", ").append(entries.get(i).path);
+        message.append(" ").append(kb(entries.get(i).bytes));
+      }
+      reporter.accept(message.toString());
+    } catch (RuntimeException e) {
+      // e.g. BadParcelableException reading a restored value with the wrong class loader.
+      LOG.warn("SavedStateSizes: could not measure the saved state of " + owner, e);
     }
-    List<Entry> entries = new ArrayList<>();
-    collect("", outState, 0, entries);
-    Collections.sort(entries, (a, b) -> Integer.compare(b.bytes, a.bytes));
-    StringBuilder message =
-        new StringBuilder("Saved state of ").append(owner).append(": ").append(kb(total));
-    for (int i = 0; i < Math.min(TOP_KEYS, entries.size()); i++) {
-      message.append(i == 0 ? " — " : ", ").append(entries.get(i).path);
-      message.append(" ").append(kb(entries.get(i).bytes));
-    }
-    reporter.accept(message.toString());
   }
 
-  /** The leaves (non-bundle values, or bundles at MAX_DEPTH) of bundle, with their sizes. */
+  /**
+   * The leaves (non-bundle values, or bundles at MAX_DEPTH) of bundle, which must be a copy the
+   * caller owns, with their sizes.
+   */
   static void collect(String prefix, Bundle bundle, int depth, List<Entry> out) {
+    int total = sizeOf(bundle);
     for (String key : new ArrayList<>(bundle.keySet())) {
       Object value = bundle.get(key);
       String path = prefix.isEmpty() ? key : prefix + "/" + key;
       if (value instanceof Bundle && depth < MAX_DEPTH) {
-        collect(path, (Bundle) value, depth + 1, out);
+        collect(path, new Bundle((Bundle) value), depth + 1, out);
       } else {
-        Bundle single = new Bundle(bundle);
-        single.keySet().retainAll(Collections.singleton(key));
-        out.add(new Entry(path, sizeOf(single)));
+        Bundle without = new Bundle(bundle);
+        without.remove(key);
+        out.add(new Entry(path, total - sizeOf(without)));
       }
     }
   }
@@ -91,6 +115,11 @@ public final class SavedStateSizes {
     } finally {
       parcel.recycle();
     }
+  }
+
+  @VisibleForTesting
+  static void resetReported() {
+    REPORTED.clear();
   }
 
   private static String kb(int bytes) {
