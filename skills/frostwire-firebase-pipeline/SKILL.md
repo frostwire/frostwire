@@ -73,6 +73,8 @@ App frames are `com.frostwire.*`, `com.andrew.apollo.*` and other vendored packa
 | Framework/OEM only | Only `android.*`/`com.android.*`/vendor frames, one OEM or OS version, no app frame on any thread | Ticket asking whether to mute; don't close in Crashlytics until answered |
 | Non-fatal | `NON_FATAL` issues are exceptions the app logged on purpose | Treat as app bugs unless the code logs an expected condition; then fix the logging, not the condition |
 
+**Order of work:** the newest release first (unless the maintainer names another), then by events; between issues with comparable counts, crashes before ANRs.
+
 Check master first: `git log frostwire-android-<ver>-build-<NNN>..HEAD -- <files on the stack>`. A stack whose path master already changed is folded (Icebase pipeline §2.2), not re-ticketed.
 
 ## 3. Ticket
@@ -87,6 +89,7 @@ As the Icebase pipeline's §2, with these differences:
 
 As the Icebase pipeline's §3–§4, sequential unless the maintainer asks for parallel agents, with the Android gates:
 - **Test:** JUnit 4 under `android/src/test/java/<package of the code>` (Robolectric `@RunWith(RobolectricTestRunner.class)` when it needs Android classes; vendored Apollo classes are reachable from the same package). Add the class to the `--tests` filter in `.github/workflows/android-unit-tests.yml`. Run from `android/`: `./gradlew testPlus1DebugUnitTest --tests '<FQCN>'`. Revert the fix, watch it fail, restore.
+- **When no automated test can express the failure** (an OEM-only crash, an ANR that needs a device's timing): say what limits it, in the commit body, the ticket's closing comment and the report, instead of skipping the test silently.
 - **Gates:** `./gradlew spotlessCheck compilePlus1DebugJavaWithJavac` and the CI test filter; `assemblePlus1Debug` for manifest, service or resource changes; the full `testPlus1DebugUnitTest` for anything shared. A change in `common/` also needs desktop's `./gradlew compileJava` and its tests.
 - **Review:** a `frostwire-code-reviewer` pass on the diff (Android checklist: main-thread rules, lifecycle, minSdk 26 dead guards, background execution limits, foreground-service types) before committing.
 - **Commits:** `[android] Imperative summary` (`[all]` when `common/` changes), body citing the Crashlytics issue id and `frostwire/frostwire#N`, then the session trailers. Spotless whole-file reformats of legacy files go in their own commit first.
@@ -96,6 +99,8 @@ As the Icebase pipeline's §3–§4, sequential unless the maintainer asks for p
 ## 5. Close or ask, report back, memory
 
 As the Icebase pipeline's §5–§6. The report table has: ticket, what users saw, Crashlytics ids (events/users), fix or "questions", state. Say what was not verified on a device (most ANR and service fixes need one: name the Android versions and OEMs from the events). End with a MentisDB `LessonLearned` per fixed group and a `Checkpoint` summary on chain `frostwire`.
+
+Also keep one MentisDB thought per Crashlytics issue you worked, so regressions link across releases: `entity_type: CrashlyticsIssue`, tags `issue:<id>`, `build:<versionCode>`, `error_type:FATAL|ANR|NON_FATAL`, `status:fixed|regressed|questions`, with the ticket, fix commit and verification. Search `issue:<id>` before working an issue; when Crashlytics reopens one as regressed, update that trail (why the earlier fix didn't hold) instead of starting a second one. Crashlytics notes and the GitHub ticket hold the issue's state; MentisDB holds the memory.
 
 ## 6. Polling (only when the maintainer asks)
 
