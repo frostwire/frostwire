@@ -1,5 +1,5 @@
 FrostWire 3.2.3 build 779 UNRELEASED
-  - fix:Confirming "cancel transfer" no longer crashes the app when Android had closed it in the background while the dialog was open — the stale dialog now closes instead (#1381)
+  - fix:Confirming "cancel transfer" or "delete files" no longer crashes the app when Android had closed it in the background while the dialog was open — the stale dialog now closes instead (#1381)
   - fix:Less work on the main thread while scrolling and loading images — background tasks no longer take a stack trace of the screen's thread each time they are queued (#1375)
   - fix:Opening the music player, now-playing or music search screens no longer freezes while the system's search service is slow to answer (#1374)
   - fix:Opening a transfer's details and its Trackers or Peers tabs no longer freezes the app while the torrent engine is busy — tracker and peer lists load in the background (#1373)
