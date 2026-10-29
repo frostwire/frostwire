@@ -233,7 +233,11 @@ public final class GUIMediator {
   private static void showDialogsForFirstVisibility() {
     if (_displayedMessage) return;
     _displayedMessage = true;
-    getAssociationManager().checkAndGrab(true);
+    // Registry I/O off the EDT; only the question to the user runs on it
+    // (frostwire/frostwire#1378).
+    getAssociationManager()
+        .checkAndGrabInBackground(
+            BackgroundQueuedExecutorService::schedule, GUIMediator::safeInvokeLater);
     if (TipOfTheDayMessages.hasLocalizedMessages() && StartupSettings.SHOW_TOTD.getValue()) {
       // Construct it first...
       TipOfTheDayMediator.instance();

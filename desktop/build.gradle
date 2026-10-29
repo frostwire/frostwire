@@ -864,6 +864,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.NativeFileIconControllerTest"
         includeTestsMatching "com.limegroup.gnutella.gui.IconManagerNativeInitTest"
         includeTestsMatching "com.limegroup.gnutella.gui.NativeUiChooserTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.shell.ShellAssociationManagerThreadingTest"
         includeTestsMatching "com.limegroup.gnutella.gui.ImageManipulatorCacheTest"
         includeTestsMatching "com.limegroup.gnutella.gui.icebridge.IceBridgeTrafficGraphTest"
         includeTestsMatching "com.limegroup.gnutella.ExternalControlForwardedUrlTest"
