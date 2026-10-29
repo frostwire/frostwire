@@ -6,6 +6,8 @@ import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.options.ConfigureOptionsAction;
 import com.limegroup.gnutella.settings.QuestionsHandler;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.Executor;
 
 /** Stores all the LimeAssociationOptions that FrostWire is set to use. */
@@ -51,6 +53,39 @@ public class ShellAssociationManager {
             edt.execute(() -> promptToReassociate(background));
           }
         });
+  }
+
+  /**
+   * Applies the user's choices from the setup wizard or Options: a chosen association is allowed
+   * and registered; an unchosen one is unregistered, and disallowed if it was ours. That reads and
+   * writes the Windows registry, so it runs on {@code registry} (frostwire/frostwire#1378).
+   */
+  public static void applyChoices(Map<LimeAssociationOption, Boolean> choices, Executor registry) {
+    Map<LimeAssociationOption, Boolean> snapshot = new LinkedHashMap<>(choices);
+    registry.execute(
+        () -> {
+          for (Map.Entry<LimeAssociationOption, Boolean> choice : snapshot.entrySet()) {
+            LimeAssociationOption option = choice.getKey();
+            if (choice.getValue()) {
+              option.setAllowed(true);
+              option.setEnabled(true);
+            } else {
+              // only disallow options that were previously enabled.
+              if (option.isEnabled()) option.setAllowed(false);
+              option.setEnabled(false);
+            }
+          }
+        });
+  }
+
+  /** Whether each association is registered to us: registry reads, call off the EDT. */
+  public static Map<LimeAssociationOption, Boolean> registeredStates(
+      Iterable<LimeAssociationOption> options) {
+    Map<LimeAssociationOption, Boolean> states = new LinkedHashMap<>();
+    for (LimeAssociationOption option : options) {
+      states.put(option, option.isEnabled());
+    }
+    return states;
   }
 
   /**

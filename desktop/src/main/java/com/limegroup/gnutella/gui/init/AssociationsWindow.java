@@ -23,6 +23,8 @@ import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.Line;
 import com.limegroup.gnutella.gui.shell.FrostAssociations;
 import com.limegroup.gnutella.gui.shell.LimeAssociationOption;
+import com.limegroup.gnutella.gui.shell.ShellAssociationManager;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.QuestionsHandler;
 import java.awt.*;
 import java.util.HashMap;
@@ -103,17 +105,12 @@ public class AssociationsWindow extends SetupWindow {
   }
 
   public void applySettings(boolean loadCoreComponents) {
+    // The registry work runs off the EDT (frostwire/frostwire#1378).
+    Map<LimeAssociationOption, Boolean> choices = new HashMap<>();
     for (Map.Entry<JCheckBox, LimeAssociationOption> entry : associations.entrySet()) {
-      LimeAssociationOption option = entry.getValue();
-      if (entry.getKey().isSelected()) {
-        option.setAllowed(true);
-        option.setEnabled(true);
-      } else {
-        // only disallow options that were previously enabled.
-        if (option.isEnabled()) option.setAllowed(false);
-        option.setEnabled(false);
-      }
+      choices.put(entry.getValue(), entry.getKey().isSelected());
     }
+    ShellAssociationManager.applyChoices(choices, BackgroundQueuedExecutorService::schedule);
     DialogOption value = DialogOption.INVALID;
     if (always.isSelected()) value = DialogOption.YES;
     else if (never.isSelected()) value = DialogOption.NO;

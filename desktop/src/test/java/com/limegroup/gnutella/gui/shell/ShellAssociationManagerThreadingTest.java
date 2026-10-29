@@ -37,7 +37,9 @@ class ShellAssociationManagerThreadingTest {
   /** A shell association that records the thread of every registry call. */
   private static final class RecordingAssociation implements ShellAssociation {
     final List<Thread> callers = new CopyOnWriteArrayList<>();
+    final List<String> calls = new CopyOnWriteArrayList<>();
     private final boolean available;
+    private boolean registered;
 
     RecordingAssociation(boolean available) {
       this.available = available;
@@ -46,7 +48,7 @@ class ShellAssociationManagerThreadingTest {
     @Override
     public boolean isRegistered() {
       callers.add(Thread.currentThread());
-      return false;
+      return registered;
     }
 
     @Override
@@ -58,11 +60,15 @@ class ShellAssociationManagerThreadingTest {
     @Override
     public void register() {
       callers.add(Thread.currentThread());
+      calls.add("register");
+      registered = true;
     }
 
     @Override
     public void unregister() {
       callers.add(Thread.currentThread());
+      calls.add("unregister");
+      registered = false;
     }
   }
 
@@ -84,6 +90,24 @@ class ShellAssociationManagerThreadingTest {
     assertFalse(association.callers.isEmpty());
     association.callers.forEach(caller -> assertEquals(worker, caller));
     assertTrue(edt.isEmpty(), "asked the user although every association was available");
+  }
+
+  @Test
+  void theUsersChoicesAreAppliedOnTheRegistryExecutor() {
+    RecordingAssociation chosen = new RecordingAssociation(true);
+    RecordingAssociation dropped = new RecordingAssociation(false);
+    dropped.registered = true;
+    LimeAssociationOption chosenOption = new LimeAssociationOption(chosen, null, "torrent", "t");
+    LimeAssociationOption droppedOption = new LimeAssociationOption(dropped, null, "magnet", "m");
+    List<Runnable> registry = new ArrayList<>();
+
+    ShellAssociationManager.applyChoices(
+        java.util.Map.of(chosenOption, true, droppedOption, false), registry::add);
+
+    assertTrue(chosen.callers.isEmpty() && dropped.callers.isEmpty(), "applied on the caller");
+    registry.remove(0).run();
+    assertTrue(chosen.calls.contains("register"));
+    assertEquals(List.of("unregister"), dropped.calls);
   }
 
   @Test
