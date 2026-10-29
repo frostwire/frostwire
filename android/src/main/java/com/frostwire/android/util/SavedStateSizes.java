@@ -83,7 +83,9 @@ public final class SavedStateSizes {
       }
       reporter.accept(message.toString());
     } catch (RuntimeException e) {
-      // e.g. BadParcelableException reading a restored value with the wrong class loader.
+      // e.g. BadParcelableException reading a restored value with the wrong class loader. Allow
+      // a later save of this owner to be measured.
+      REPORTED.remove(owner);
       LOG.warn("SavedStateSizes: could not measure the saved state of " + owner, e);
     }
   }
@@ -93,17 +95,27 @@ public final class SavedStateSizes {
    * caller owns, with their sizes.
    */
   static void collect(String prefix, Bundle bundle, int depth, List<Entry> out) {
-    int total = sizeOf(bundle);
     for (String key : new ArrayList<>(bundle.keySet())) {
+      // On API 33+ a value still waiting to be read is shared with the original bundle and gets
+      // read there too; that's harmless (the system then writes the read object).
       Object value = bundle.get(key);
       String path = prefix.isEmpty() ? key : prefix + "/" + key;
       if (value instanceof Bundle && depth < MAX_DEPTH) {
         collect(path, new Bundle((Bundle) value), depth + 1, out);
       } else {
-        Bundle without = new Bundle(bundle);
-        without.remove(key);
-        out.add(new Entry(path, total - sizeOf(without)));
+        out.add(new Entry(path, sizeOfValue(value)));
       }
+    }
+  }
+
+  /** One value alone, so a large state is marshalled about once, not once per key. */
+  private static int sizeOfValue(Object value) {
+    Parcel parcel = Parcel.obtain();
+    try {
+      parcel.writeValue(value);
+      return parcel.dataSize();
+    } finally {
+      parcel.recycle();
     }
   }
 
