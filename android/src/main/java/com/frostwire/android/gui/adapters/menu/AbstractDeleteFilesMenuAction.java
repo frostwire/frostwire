@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import androidx.annotation.Nullable;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
@@ -64,13 +65,15 @@ public abstract class AbstractDeleteFilesMenuAction extends MenuAction {
 
   @SuppressWarnings("WeakerAccess")
   public static class DeleteFileMenuActionDialog extends AbstractDialog {
-    private static AbstractDeleteFilesMenuAction action;
+    // Per instance, not static: the FragmentManager re-creates this dialog with the no-arg
+    // constructor, and after process death a static is null (frostwire/frostwire#1381).
+    private AbstractDeleteFilesMenuAction action;
 
     public static DeleteFileMenuActionDialog newInstance(
         AbstractDeleteFilesMenuAction action,
         AbstractDialog.OnDialogClickListener onDialogClickListener) {
-      DeleteFileMenuActionDialog.action = action;
       DeleteFileMenuActionDialog deleteFileMenuActionDialog = new DeleteFileMenuActionDialog();
+      deleteFileMenuActionDialog.action = action;
       if (onDialogClickListener != null) {
         deleteFileMenuActionDialog.setOnDialogClickListener(onDialogClickListener);
       }
@@ -79,6 +82,17 @@ public abstract class AbstractDeleteFilesMenuAction extends MenuAction {
 
     public DeleteFileMenuActionDialog() {
       super(R.layout.dialog_default);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+      super.onCreate(savedInstanceState);
+      if (action == null) {
+        // Re-created from saved state: the files to delete can't be saved, so there is nothing to
+        // do.
+        setShowsDialog(false);
+        dismissAllowingStateLoss();
+      }
     }
 
     @Override
@@ -91,17 +105,20 @@ public abstract class AbstractDeleteFilesMenuAction extends MenuAction {
       noButton.setText(R.string.cancel);
       Button yesButton = dlg.findViewById(R.id.dialog_default_button_yes);
       yesButton.setText(R.string.delete);
-      noButton.setOnClickListener(new ButtonOnClickListener(dlg, false));
-      yesButton.setOnClickListener(new ButtonOnClickListener(dlg, true));
+      noButton.setOnClickListener(new ButtonOnClickListener(action, dlg, false));
+      yesButton.setOnClickListener(new ButtonOnClickListener(action, dlg, true));
     }
   }
 
   private static final class ButtonOnClickListener implements View.OnClickListener {
 
+    private final AbstractDeleteFilesMenuAction action;
     private final Dialog newDeleteFilesDialog;
     private final boolean delete;
 
-    ButtonOnClickListener(Dialog newDeleteFilesDialog, boolean delete) {
+    ButtonOnClickListener(
+        AbstractDeleteFilesMenuAction action, Dialog newDeleteFilesDialog, boolean delete) {
+      this.action = action;
       this.newDeleteFilesDialog = newDeleteFilesDialog;
       this.delete = delete;
     }
@@ -109,13 +126,11 @@ public abstract class AbstractDeleteFilesMenuAction extends MenuAction {
     @Override
     public void onClick(View view) {
       if (delete) {
-        DeleteFileMenuActionDialog.action.onDeleteClicked();
+        action.onDeleteClicked();
       }
       newDeleteFilesDialog.dismiss();
-      if (DeleteFileMenuActionDialog.action.getOnDialogClickListener() != null) {
-        DeleteFileMenuActionDialog.action
-            .getOnDialogClickListener()
-            .onDialogClick(null, delete ? 1 : 0);
+      if (action.getOnDialogClickListener() != null) {
+        action.getOnDialogClickListener().onDialogClick(null, delete ? 1 : 0);
       }
     }
   }

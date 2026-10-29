@@ -61,8 +61,12 @@ public class CancelMenuActionDialogRestoreTest {
   }
 
   private static Fragment cancelDialogIn(FragmentActivity activity) {
+    return dialogIn(activity, CancelMenuAction.CancelMenuActionDialog.class);
+  }
+
+  private static Fragment dialogIn(FragmentActivity activity, Class<?> type) {
     for (Fragment fragment : activity.getSupportFragmentManager().getFragments()) {
-      if (fragment instanceof CancelMenuAction.CancelMenuActionDialog && fragment.isAdded()) {
+      if (type.isInstance(fragment) && fragment.isAdded()) {
         return fragment;
       }
     }
@@ -101,5 +105,32 @@ public class CancelMenuActionDialogRestoreTest {
         CancelMenuAction.CancelMenuActionDialog.class.getDeclaredField("transfer");
     field.setAccessible(true);
     assertSame("the first dialog still cancels the first transfer", first, field.get(a));
+  }
+
+  /** The delete-files dialog had the same static state and threw on either button. */
+  @Test
+  public void aDeleteDialogRecreatedWithoutItsActionIsNotShown() {
+    ActivityController<FragmentActivity> controller =
+        Robolectric.buildActivity(FragmentActivity.class);
+    controller.get().setTheme(R.style.Theme_FrostWire);
+    controller.setup();
+    AbstractDeleteFilesMenuAction action =
+        new AbstractDeleteFilesMenuAction(
+            controller.get(), R.drawable.contextmenu_icon_trash, R.string.delete_files, null) {
+          @Override
+          protected void onDeleteClicked() {}
+        };
+
+    AbstractDeleteFilesMenuAction.DeleteFileMenuActionDialog.newInstance(action, null)
+        .show(controller.get().getSupportFragmentManager());
+    ShadowLooper.idleMainLooper();
+    assertNotNull(
+        dialogIn(controller.get(), AbstractDeleteFilesMenuAction.DeleteFileMenuActionDialog.class));
+
+    controller.recreate();
+    ShadowLooper.idleMainLooper();
+
+    assertNull(
+        dialogIn(controller.get(), AbstractDeleteFilesMenuAction.DeleteFileMenuActionDialog.class));
   }
 }
