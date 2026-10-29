@@ -21,8 +21,6 @@ package com.frostwire.android.gui;
 import android.app.Application;
 import android.content.Context;
 import android.os.Build;
-import androidx.work.Configuration;
-import androidx.work.WorkManager;
 import com.andrew.apollo.cache.ImageCache;
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.BuildConfig;
@@ -34,6 +32,7 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.util.FWImageLoader;
 import com.frostwire.android.util.RunStrict;
+import com.frostwire.android.util.StaleWorkManagerJobs;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTContext;
 import com.frostwire.bittorrent.BTEngine;
@@ -52,7 +51,7 @@ import org.apache.commons.io.FileUtils;
  * @author gubatron
  * @author aldenml
  */
-public class MainApplication extends Application implements Configuration.Provider {
+public class MainApplication extends Application {
 
   private static final Logger LOG = Logger.getLogger(MainApplication.class);
 
@@ -66,9 +65,6 @@ public class MainApplication extends Application implements Configuration.Provid
     super.onCreate();
 
     // CRITICAL PATH ONLY: Keep UI thread work minimal for fast startup
-
-    // Configure WorkManager early - needed for background tasks
-    initializeWorkManager();
 
     // Enable StrictMode in debug builds
     RunStrict.enableStrictModePolicies(BuildConfig.DEBUG);
@@ -109,6 +105,9 @@ public class MainApplication extends Application implements Configuration.Provid
    */
   private void initializeInBackground() {
     LOG.info("MainApplication::initializeInBackground starting...");
+
+    // Older versions' WorkManager jobs crash-looped the app at the 100-job limit (#1388).
+    StaleWorkManagerJobs.remove(this);
 
     // Initialize DataStore + ConfigurationRepository (reads preferences from DataStore)
     DataStoreManager.INSTANCE.initialize(this);
@@ -168,25 +167,6 @@ public class MainApplication extends Application implements Configuration.Provid
         });
 
     LOG.info("MainApplication::initializeInBackground complete");
-  }
-
-  @Override
-  public Configuration getWorkManagerConfiguration() {
-    return new Configuration.Builder()
-        .setMaxSchedulerLimit(20) // Reduced from default 100 to prevent alarm limit issues
-        .setMinimumLoggingLevel(BuildConfig.DEBUG ? android.util.Log.DEBUG : android.util.Log.ERROR)
-        .build();
-  }
-
-  private void initializeWorkManager() {
-    try {
-      // Ensure WorkManager is initialized with our custom configuration
-      WorkManager.initialize(this, getWorkManagerConfiguration());
-      LOG.info("WorkManager initialized with reduced scheduler limit to prevent alarm overflow");
-    } catch (IllegalStateException e) {
-      // WorkManager already initialized, that's fine
-      LOG.info("WorkManager was already initialized");
-    }
   }
 
   public static Context context() {

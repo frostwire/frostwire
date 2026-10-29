@@ -33,7 +33,6 @@ import android.widget.RemoteViews;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
-import androidx.work.WorkManager;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.ConfigurationRepository;
@@ -175,24 +174,6 @@ public class EngineForegroundService extends Service implements IEngineService {
     initializeNotifiedStorage();
     // Start notification daemon
     startPermanentNotificationUpdatesTask(this);
-
-    // Schedule initial tasks
-    safeScheduleNotificationWork();
-  }
-
-  /**
-   * WorkManager is on-demand initialized (its manifest initializer is removed and {@code
-   * MainApplication} is the {@code Configuration.Provider}), so {@code getInstance} can throw
-   * before the app finishes initializing. A throw here would abort {@code onCreate}, the pending
-   * {@code startForegroundService()} requirement would never be satisfied, and the system would
-   * kill the process with a {@code RemoteServiceException}.
-   */
-  private void safeScheduleNotificationWork() {
-    try {
-      scheduleNotificationWork();
-    } catch (Throwable t) {
-      LOG.warn("EngineForegroundService::safeScheduleNotificationWork failed", t);
-    }
   }
 
   private void initializeNotifiedStorage() {
@@ -325,20 +306,7 @@ public class EngineForegroundService extends Service implements IEngineService {
     }
     super.onDestroy();
     Engine.instance().onForegroundServiceDestroyed(this);
-    LOG.info(
-        "EngineForegroundService::onDestroy() - Stopping service and cleaning up WorkManager jobs");
-
-    // Cancel all WorkManager jobs to prevent alarm limit issues
-    try {
-      WorkManager.getInstance(this).cancelUniqueWork("TorrentEngineWork");
-      WorkManager.getInstance(this).cancelUniqueWork("NotificationWork");
-      LOG.info("EngineForegroundService::onDestroy() - Cancelled WorkManager jobs");
-    } catch (Exception e) {
-      LOG.warn(
-          "EngineForegroundService::onDestroy() - Error cancelling WorkManager jobs: "
-              + e.getMessage(),
-          e);
-    }
+    LOG.info("EngineForegroundService::onDestroy() - Stopping service");
 
     if (notificationUpdateDaemon != null) {
       cancelAllNotificationsTask(this);
@@ -568,22 +536,6 @@ public class EngineForegroundService extends Service implements IEngineService {
         .setOngoing(true)
         .setPriority(NotificationCompat.PRIORITY_LOW)
         .build();
-  }
-
-  private void scheduleNotificationWork() {
-    // Cancel any existing notification work to prevent duplicates
-    WorkManager.getInstance(this).cancelUniqueWork("NotificationWork");
-
-    // The NotificationUpdateDaemon is already being started, so we don't need this duplicate work
-    // Commenting out to prevent duplicate periodic work scheduling
-    /*
-    WorkManager.getInstance(this)
-            .enqueueUniquePeriodicWork(
-                "NotificationWork",
-                androidx.work.ExistingPeriodicWorkPolicy.REPLACE,
-                new androidx.work.PeriodicWorkRequest.Builder(NotificationWorker.class, 15, TimeUnit.MINUTES).build()
-            );
-    */
   }
 
   public void shutdown() {
