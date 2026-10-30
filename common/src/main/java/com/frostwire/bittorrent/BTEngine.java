@@ -18,6 +18,8 @@
 
 package com.frostwire.bittorrent;
 
+import static com.frostwire.jlibtorrent.alerts.AlertType.*;
+
 import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import com.frostwire.concurrent.concurrent.ThreadExecutor;
 import com.frostwire.jlibtorrent.*;
@@ -28,14 +30,11 @@ import com.frostwire.platform.Platforms;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
-
-import static com.frostwire.jlibtorrent.alerts.AlertType.*;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 
 /**
  * @author gubatron
@@ -1097,7 +1096,8 @@ public final class BTEngine extends SessionManager {
         result = ctx.dataDir;
       } else {
         LOG.warn(
-            "Unable to setup save dir path, review your logic, both saveDir and ctx.dataDir are null.");
+            "Unable to setup save dir path, review your logic, both saveDir and ctx.dataDir are"
+                + " null.");
       }
     } else {
       result = saveDir;
@@ -1179,7 +1179,8 @@ public final class BTEngine extends SessionManager {
       } else {
         if (infoHashV1 == null) {
           LOG.info(
-              "BTEngine.download() - new v2-only torrent added, will be handled by torrent_added alert");
+              "BTEngine.download() - new v2-only torrent added, will be handled by torrent_added"
+                  + " alert");
           // Store priorities for V2-only torrents to apply them when the ADD_TORRENT alert fires
           if (priorities != null) {
             try {
@@ -1197,7 +1198,8 @@ public final class BTEngine extends SessionManager {
           }
         } else {
           LOG.warn(
-              "BTEngine.download() - new download: torrent was not successfully added, torrent handle not found");
+              "BTEngine.download() - new download: torrent was not successfully added, torrent"
+                  + " handle not found");
         }
       }
     }

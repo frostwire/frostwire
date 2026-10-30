@@ -1,23 +1,24 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.frostwire.bittorrent;
 
+import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.*;
 import com.frostwire.jlibtorrent.swig.add_torrent_params;
@@ -28,1040 +29,1059 @@ import com.frostwire.platform.Platforms;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
-import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import com.frostwire.util.Logger;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 
 /**
  * @author gubatron
  * @author aldenml
  */
 public final class BTDownload implements BittorrentDownload {
-    private static final Logger LOG = Logger.getLogger(BTDownload.class);
-    private static final long SAVE_RESUME_RESOLUTION_MILLIS = 10000;
-    private static final long STATUS_CACHE_MILLIS = 1000; // Cache status for 1 second to avoid ANR
-    /**
-     * Shared workers for status cache refreshes. Each transfer keeps at most one refresh in flight
-     * (statusRefreshScheduled), so the queue is bounded by the number of transfers; a new thread
-     * per refresh meant a native thread creation per transfer every second, started from UI
-     * callers of the cached getters.
-     */
-    static final ExecutorService STATUS_REFRESH_EXECUTOR =
-            ExecutorsHelper.newFixedSizeUnboundedThreadPool(2, "BTDownload-StatusRefresh");
-    private static final int[] ALERT_TYPES = {
-            AlertType.TORRENT_FINISHED.swig(),
-            AlertType.TORRENT_REMOVED.swig(),
-            AlertType.TORRENT_CHECKED.swig(),
-            AlertType.STATE_CHANGED.swig(),
-            AlertType.SAVE_RESUME_DATA.swig(),
-            AlertType.PIECE_FINISHED.swig(),
-            AlertType.STORAGE_MOVED.swig()};
-    private static final String EXTRA_DATA_KEY = "extra_data";
-    private static final String WAS_PAUSED_EXTRA_KEY = "was_paused";
-    private final BTEngine engine;
-    private final TorrentHandle th;
-    private final File savePath;
-    private final Date created;
-    private final PiecesTracker piecesTracker;
-    private volatile boolean piecesTrackerInitialized;
-    private final File parts;
-    private final Map<String, String> extra;
-    private final PaymentOptions paymentOptions;
-    private final InnerListener innerListener;
-    private BTDownloadListener listener;
-    private Set<File> incompleteFilesToRemove;
-    private long lastSaveResumeTime;
-    private String predominantFileExtension;
-    private volatile boolean removing;
-    private volatile TorrentStatus cachedStatus;
-    private volatile long lastStatusUpdateTime;
-    private final AtomicBoolean statusRefreshScheduled = new AtomicBoolean(false);
-    private final Object statusRefreshLock = new Object();
+  private static final Logger LOG = Logger.getLogger(BTDownload.class);
+  private static final long SAVE_RESUME_RESOLUTION_MILLIS = 10000;
+  private static final long STATUS_CACHE_MILLIS = 1000; // Cache status for 1 second to avoid ANR
 
-    public BTDownload(BTEngine engine, TorrentHandle th) {
-        this.engine = engine;
-        this.th = th;
-        this.savePath = new File(th.savePath());
-        // Cache the initial status to avoid blocking JNI call during initialization
-        TorrentStatus initialStatus = th.status();
-        this.created = new Date(initialStatus.addedTime());
-        this.cachedStatus = initialStatus;
-        this.lastStatusUpdateTime = System.currentTimeMillis();
-        TorrentInfo ti = th.torrentFile();
-        this.piecesTracker = ti != null ? new PiecesTracker(ti) : null;
-        this.parts = ti != null ? createPartsFile(savePath.getAbsolutePath(), ti) : null;
-        this.extra = createExtra();
-        this.paymentOptions = loadPaymentOptions(ti);
-        this.innerListener = new InnerListener();
-        engine.addListener(innerListener);
-        try {
-            // Backfill resume for torrents that never persist it otherwise
-            // (zero-piece torrents never check, born-complete seeds may never
-            // get dirty). Restoring without resume falls back to the default
-            // data dir and strands such torrents at 0% forever.
-            String infoHash = engine.canonicalInfoHash(th);
-            if (infoHash != null && !engine.resumeDataFile(infoHash).exists()) {
-                LOG.info("BTDownload::backfill missing resume for " + infoHash);
-                doResumeData(true);
-            }
-            engine.ensureResumeTorrentFile(th);
-        } catch (Throwable e) {
-            LOG.warn("BTDownload::backfill resume failed", e);
-        }
-    }
+  /**
+   * Shared workers for status cache refreshes. Each transfer keeps at most one refresh in flight
+   * (statusRefreshScheduled), so the queue is bounded by the number of transfers; a new thread per
+   * refresh meant a native thread creation per transfer every second, started from UI callers of
+   * the cached getters.
+   */
+  static final ExecutorService STATUS_REFRESH_EXECUTOR =
+      ExecutorsHelper.newFixedSizeUnboundedThreadPool(2, "BTDownload-StatusRefresh");
 
-    private static boolean isPaused(TorrentStatus s) {
-        return s.flags().and_(TorrentFlags.PAUSED).nonZero();
-    }
+  private static final int[] ALERT_TYPES = {
+    AlertType.TORRENT_FINISHED.swig(),
+    AlertType.TORRENT_REMOVED.swig(),
+    AlertType.TORRENT_CHECKED.swig(),
+    AlertType.STATE_CHANGED.swig(),
+    AlertType.SAVE_RESUME_DATA.swig(),
+    AlertType.PIECE_FINISHED.swig(),
+    AlertType.STORAGE_MOVED.swig()
+  };
+  private static final String EXTRA_DATA_KEY = "extra_data";
+  private static final String WAS_PAUSED_EXTRA_KEY = "was_paused";
+  private final BTEngine engine;
+  private final TorrentHandle th;
+  private final File savePath;
+  private final Date created;
+  private final PiecesTracker piecesTracker;
+  private volatile boolean piecesTrackerInitialized;
+  private final File parts;
+  private final Map<String, String> extra;
+  private final PaymentOptions paymentOptions;
+  private final InnerListener innerListener;
+  private BTDownloadListener listener;
+  private Set<File> incompleteFilesToRemove;
+  private long lastSaveResumeTime;
+  private String predominantFileExtension;
+  private volatile boolean removing;
+  private volatile TorrentStatus cachedStatus;
+  private volatile long lastStatusUpdateTime;
+  private final AtomicBoolean statusRefreshScheduled = new AtomicBoolean(false);
+  private final Object statusRefreshLock = new Object();
 
-    public Map<String, String> getExtra() {
-        return extra;
-    }
-
-    /** The signed-search source carried forward from the distributed result, if any. */
-    public byte[] getDistributedSourcePeerPub() {
-        return DistributedSourceAttribution.get(extra);
-    }
-
-    /**
-     * Attach distributed-search provenance to this transfer and persist it in resume data. The
-     * first source wins so reopening the same transfer from another result cannot rewrite history.
-     */
-    public synchronized boolean setDistributedSourcePeerPub(byte[] sourcePeerPub) {
-        if (DistributedSourceAttribution.get(extra) != null) {
-            return false;
-        }
-        if (!DistributedSourceAttribution.putIfAbsent(extra, sourcePeerPub)) {
-            return false;
-        }
+  public BTDownload(BTEngine engine, TorrentHandle th) {
+    this.engine = engine;
+    this.th = th;
+    this.savePath = new File(th.savePath());
+    // Cache the initial status to avoid blocking JNI call during initialization
+    TorrentStatus initialStatus = th.status();
+    this.created = new Date(initialStatus.addedTime());
+    this.cachedStatus = initialStatus;
+    this.lastStatusUpdateTime = System.currentTimeMillis();
+    TorrentInfo ti = th.torrentFile();
+    this.piecesTracker = ti != null ? new PiecesTracker(ti) : null;
+    this.parts = ti != null ? createPartsFile(savePath.getAbsolutePath(), ti) : null;
+    this.extra = createExtra();
+    this.paymentOptions = loadPaymentOptions(ti);
+    this.innerListener = new InnerListener();
+    engine.addListener(innerListener);
+    try {
+      // Backfill resume for torrents that never persist it otherwise
+      // (zero-piece torrents never check, born-complete seeds may never
+      // get dirty). Restoring without resume falls back to the default
+      // data dir and strands such torrents at 0% forever.
+      String infoHash = engine.canonicalInfoHash(th);
+      if (infoHash != null && !engine.resumeDataFile(infoHash).exists()) {
+        LOG.info("BTDownload::backfill missing resume for " + infoHash);
         doResumeData(true);
-        return true;
+      }
+      engine.ensureResumeTorrentFile(th);
+    } catch (Throwable e) {
+      LOG.warn("BTDownload::backfill resume failed", e);
     }
+  }
 
-    /** Merge provenance from a newer alert wrapper into the long-lived transfer wrapper. */
-    public void copyDistributedSourcePeerFrom(BTDownload other) {
-        byte[] source = other == null ? null : other.getDistributedSourcePeerPub();
-        if (source != null) {
-            // The newer alert wrapper already persisted the attribute to the shared resume file.
-            // Copy only the in-memory view here; this can run on Swing's EDT.
-            DistributedSourceAttribution.putIfAbsent(extra, source);
-        }
+  private static boolean isPaused(TorrentStatus s) {
+    return s.flags().and_(TorrentFlags.PAUSED).nonZero();
+  }
+
+  public Map<String, String> getExtra() {
+    return extra;
+  }
+
+  /** The signed-search source carried forward from the distributed result, if any. */
+  public byte[] getDistributedSourcePeerPub() {
+    return DistributedSourceAttribution.get(extra);
+  }
+
+  /**
+   * Attach distributed-search provenance to this transfer and persist it in resume data. The first
+   * source wins so reopening the same transfer from another result cannot rewrite history.
+   */
+  public synchronized boolean setDistributedSourcePeerPub(byte[] sourcePeerPub) {
+    if (DistributedSourceAttribution.get(extra) != null) {
+      return false;
     }
-
-    /** Returns the v1 info hash used by signed karma endorsements; v2-only torrents are unsupported. */
-    public String getV1InfoHash() {
-        try {
-            if (th == null || !th.isValid()) {
-                return null;
-            }
-            TorrentInfo info = th.torrentFile();
-            if (info == null || !info.isValid()) {
-                return null;
-            }
-            Sha1Hash hash = info.infoHashV1();
-            return hash == null ? null : hash.toHex();
-        } catch (Throwable unavailable) {
-            return null;
-        }
+    if (!DistributedSourceAttribution.putIfAbsent(extra, sourcePeerPub)) {
+      return false;
     }
+    doResumeData(true);
+    return true;
+  }
 
-    @Override
-    public String getName() {
-        if (th == null) {
-            return null;
-        }
-        return th.name();
+  /** Merge provenance from a newer alert wrapper into the long-lived transfer wrapper. */
+  public void copyDistributedSourcePeerFrom(BTDownload other) {
+    byte[] source = other == null ? null : other.getDistributedSourcePeerPub();
+    if (source != null) {
+      // The newer alert wrapper already persisted the attribute to the shared resume file.
+      // Copy only the in-memory view here; this can run on Swing's EDT.
+      DistributedSourceAttribution.putIfAbsent(extra, source);
     }
+  }
 
-    @Override
-    public String getDisplayName() {
-        Priority[] priorities = th.filePriorities();
-        int count = 0;
-        int index = 0;
-        for (int i = 0; i < priorities.length; i++) {
-            if (!Priority.IGNORE.equals(priorities[i])) {
-                count++;
-                index = i;
-            }
-        }
-        return count != 1 ? th.name() : FilenameUtils.getName(th.torrentFile().files().filePath(index));
-    }
-
-    public long getSize() {
-        TorrentInfo ti = th.torrentFile();
-        return ti != null ? ti.totalSize() : 0;
-    }
-
-    public PaymentOptions getPaymentOptions() {
-        return paymentOptions;
-    }
-
-    public boolean isPaused() {
-        TorrentStatus status = getCachedStatus();
-        return status != null && (isPaused(status) || engine.isPausedCached() || !engine.isRunning());
-    }
-
-    public boolean isSeeding() {
-        TorrentStatus status = getCachedStatus();
-        return status != null && status.isSeeding();
-    }
-
-    public boolean isFinished() {
-        return isFinished(false);
-    }
-
-    public boolean isFinished(boolean force) {
-        if (!th.isValid()) {
-            return false;
-        }
-        if (force) {
-            return th.status(force).isFinished();
-        }
-        TorrentStatus status = getCachedStatus();
-        return status != null && status.isFinished();
-    }
-
-    public TransferState getState() {
-        if (!engine.isRunning()) {
-            return TransferState.STOPPED;
-        }
-        // Use cached paused state to avoid blocking EDT
-        if (engine.isPausedCached()) {
-            return TransferState.PAUSED;
-        }
-        if (!th.isValid()) {
-            return TransferState.ERROR;
-        }
-        TorrentStatus status = getCachedStatus();
-        if (status == null) {
-            return TransferState.DOWNLOADING;
-        }
-        final boolean isPaused = isPaused(status);
-        if (isPaused) {
-            return TransferState.PAUSED;
-        }
-        final boolean done = status.isFinished()
-                || Float.compare(status.progress(), 1f) >= 0
-                || (status.totalWanted() > 0 && status.totalWantedDone() >= status.totalWanted());
-        if (done) {
-            return TransferState.SEEDING;
-        }
-        final TorrentStatus.State state = status.state();
-        switch (state) {
-            case CHECKING_FILES:
-                return TransferState.CHECKING;
-            case DOWNLOADING_METADATA:
-                return TransferState.DOWNLOADING_METADATA;
-            case DOWNLOADING:
-                return TransferState.DOWNLOADING;
-            case FINISHED:
-                return TransferState.FINISHED;
-            case SEEDING:
-                return TransferState.SEEDING;
-            case CHECKING_RESUME_DATA:
-                return TransferState.CHECKING;
-            case UNKNOWN:
-                return TransferState.UNKNOWN;
-            default:
-                return TransferState.UNKNOWN;
-        }
-    }
-
-    /**
-     * If we have a torrent which is downloaded as a folder, this will return the parent of that folder.
-     * (e.g. default save location for torrents)
-     * <p>
-     * If you want to have the folder where the torrent's data files are located you
-     * want to use getContentSavePath().
-     */
-    @Override
-    public File getSavePath() {
-        return savePath;
-    }
-
-    @Override
-    public File previewFile() {
+  /**
+   * Returns the v1 info hash used by signed karma endorsements; v2-only torrents are unsupported.
+   */
+  public String getV1InfoHash() {
+    try {
+      if (th == null || !th.isValid()) {
         return null;
+      }
+      TorrentInfo info = th.torrentFile();
+      if (info == null || !info.isValid()) {
+        return null;
+      }
+      Sha1Hash hash = info.infoHashV1();
+      return hash == null ? null : hash.toHex();
+    } catch (Throwable unavailable) {
+      return null;
+    }
+  }
+
+  @Override
+  public String getName() {
+    if (th == null) {
+      return null;
+    }
+    return th.name();
+  }
+
+  @Override
+  public String getDisplayName() {
+    Priority[] priorities = th.filePriorities();
+    int count = 0;
+    int index = 0;
+    for (int i = 0; i < priorities.length; i++) {
+      if (!Priority.IGNORE.equals(priorities[i])) {
+        count++;
+        index = i;
+      }
+    }
+    return count != 1 ? th.name() : FilenameUtils.getName(th.torrentFile().files().filePath(index));
+  }
+
+  public long getSize() {
+    TorrentInfo ti = th.torrentFile();
+    return ti != null ? ti.totalSize() : 0;
+  }
+
+  public PaymentOptions getPaymentOptions() {
+    return paymentOptions;
+  }
+
+  public boolean isPaused() {
+    TorrentStatus status = getCachedStatus();
+    return status != null && (isPaused(status) || engine.isPausedCached() || !engine.isRunning());
+  }
+
+  public boolean isSeeding() {
+    TorrentStatus status = getCachedStatus();
+    return status != null && status.isSeeding();
+  }
+
+  public boolean isFinished() {
+    return isFinished(false);
+  }
+
+  public boolean isFinished(boolean force) {
+    if (!th.isValid()) {
+      return false;
+    }
+    if (force) {
+      return th.status(force).isFinished();
+    }
+    TorrentStatus status = getCachedStatus();
+    return status != null && status.isFinished();
+  }
+
+  public TransferState getState() {
+    if (!engine.isRunning()) {
+      return TransferState.STOPPED;
+    }
+    // Use cached paused state to avoid blocking EDT
+    if (engine.isPausedCached()) {
+      return TransferState.PAUSED;
+    }
+    if (!th.isValid()) {
+      return TransferState.ERROR;
+    }
+    TorrentStatus status = getCachedStatus();
+    if (status == null) {
+      return TransferState.DOWNLOADING;
+    }
+    final boolean isPaused = isPaused(status);
+    if (isPaused) {
+      return TransferState.PAUSED;
+    }
+    final boolean done =
+        status.isFinished()
+            || Float.compare(status.progress(), 1f) >= 0
+            || (status.totalWanted() > 0 && status.totalWantedDone() >= status.totalWanted());
+    if (done) {
+      return TransferState.SEEDING;
+    }
+    final TorrentStatus.State state = status.state();
+    switch (state) {
+      case CHECKING_FILES:
+        return TransferState.CHECKING;
+      case DOWNLOADING_METADATA:
+        return TransferState.DOWNLOADING_METADATA;
+      case DOWNLOADING:
+        return TransferState.DOWNLOADING;
+      case FINISHED:
+        return TransferState.FINISHED;
+      case SEEDING:
+        return TransferState.SEEDING;
+      case CHECKING_RESUME_DATA:
+        return TransferState.CHECKING;
+      case UNKNOWN:
+        return TransferState.UNKNOWN;
+      default:
+        return TransferState.UNKNOWN;
+    }
+  }
+
+  /**
+   * If we have a torrent which is downloaded as a folder, this will return the parent of that
+   * folder. (e.g. default save location for torrents)
+   *
+   * <p>If you want to have the folder where the torrent's data files are located you want to use
+   * getContentSavePath().
+   */
+  @Override
+  public File getSavePath() {
+    return savePath;
+  }
+
+  @Override
+  public File previewFile() {
+    return null;
+  }
+
+  @Override
+  public int getProgress() {
+    if (th == null || !th.isValid()) {
+      return 0;
+    }
+    TorrentStatus ts = getCachedStatus();
+    if (ts == null) {
+      return 0;
+    }
+    float fp = ts.progress();
+    TorrentStatus.State state = ts.state();
+    if (Float.compare(fp, 1f) == 0 && state != TorrentStatus.State.CHECKING_FILES) {
+      return 100;
+    }
+    int p = (int) (fp * 100);
+    if (p > 0 && state != TorrentStatus.State.CHECKING_FILES) {
+      return Math.min(p, 100);
+    }
+    return 0;
+  }
+
+  @Override
+  public boolean isComplete() {
+    return getProgress() == 100;
+  }
+
+  public long getBytesReceived() {
+    TorrentStatus status = getCachedStatus();
+    return status != null ? status.totalDone() : 0;
+  }
+
+  public long getTotalBytesReceived() {
+    TorrentStatus status = getCachedStatus();
+    return status != null ? status.allTimeDownload() : 0;
+  }
+
+  public long getBytesSent() {
+    TorrentStatus status = getCachedStatus();
+    return status != null ? status.totalUpload() : 0;
+  }
+
+  public long getTotalBytesSent() {
+    TorrentStatus status = getCachedStatus();
+    return status != null ? status.allTimeUpload() : 0;
+  }
+
+  public long getDownloadSpeed() {
+    if (!th.isValid() || isFinished() || isPaused() || isSeeding()) {
+      return 0;
+    }
+    TorrentStatus status = getCachedStatus();
+    return status != null ? status.downloadPayloadRate() : 0;
+  }
+
+  public long getUploadSpeed() {
+    if (!th.isValid() || (isFinished() && !isSeeding()) || isPaused()) {
+      return 0;
+    }
+    TorrentStatus status = getCachedStatus();
+    return status != null ? status.uploadPayloadRate() : 0;
+  }
+
+  @Override
+  public boolean isDownloading() {
+    return getDownloadSpeed() > 0;
+  }
+
+  /**
+   * Gets cached status without blocking on EDT. Returns stale cached data immediately if available,
+   * scheduling async refresh if cache is stale. This prevents EDT blocking during rendering by
+   * never synchronously calling expensive JNI methods.
+   */
+  private TorrentStatus getCachedStatus() {
+    if (!th.isValid()) {
+      return null;
+    }
+    long now = System.currentTimeMillis();
+    long lastUpdate = lastStatusUpdateTime;
+
+    // If cache is still valid, return it immediately (fast path)
+    if (cachedStatus != null && (now - lastUpdate) <= STATUS_CACHE_MILLIS) {
+      return cachedStatus;
     }
 
-    @Override
-    public int getProgress() {
-        if (th == null || !th.isValid()) {
-            return 0;
-        }
-        TorrentStatus ts = getCachedStatus();
-        if (ts == null) {
-            return 0;
-        }
-        float fp = ts.progress();
-        TorrentStatus.State state = ts.state();
-        if (Float.compare(fp, 1f) == 0 && state != TorrentStatus.State.CHECKING_FILES) {
-            return 100;
-        }
-        int p = (int) (fp * 100);
-        if (p > 0 && state != TorrentStatus.State.CHECKING_FILES) {
-            return Math.min(p, 100);
-        }
-        return 0;
+    // Cache is stale or null, return what we have and schedule async refresh
+    // This prevents EDT blocking during rendering
+    if (statusRefreshScheduled.compareAndSet(false, true)) {
+      scheduleStatusRefresh();
     }
 
-    @Override
-    public boolean isComplete() {
-        return getProgress() == 100;
-    }
+    return cachedStatus; // Return stale data (null if no cache yet)
+  }
 
-    public long getBytesReceived() {
-        TorrentStatus status = getCachedStatus();
-        return status != null ? status.totalDone() : 0;
-    }
-
-    public long getTotalBytesReceived() {
-        TorrentStatus status = getCachedStatus();
-        return status != null ? status.allTimeDownload() : 0;
-    }
-
-    public long getBytesSent() {
-        TorrentStatus status = getCachedStatus();
-        return status != null ? status.totalUpload() : 0;
-    }
-
-    public long getTotalBytesSent() {
-        TorrentStatus status = getCachedStatus();
-        return status != null ? status.allTimeUpload() : 0;
-    }
-
-    public long getDownloadSpeed() {
-        if (!th.isValid() || isFinished() || isPaused() || isSeeding()) {
-            return 0;
-        }
-        TorrentStatus status = getCachedStatus();
-        return status != null ? status.downloadPayloadRate() : 0;
-    }
-
-    public long getUploadSpeed() {
-        if (!th.isValid() || (isFinished() && !isSeeding()) || isPaused()) {
-            return 0;
-        }
-        TorrentStatus status = getCachedStatus();
-        return status != null ? status.uploadPayloadRate() : 0;
-    }
-
-    @Override
-    public boolean isDownloading() {
-        return getDownloadSpeed() > 0;
-    }
-
-    /**
-     * Gets cached status without blocking on EDT.
-     * Returns stale cached data immediately if available, scheduling async refresh if cache is stale.
-     * This prevents EDT blocking during rendering by never synchronously calling expensive JNI methods.
-     */
-    private TorrentStatus getCachedStatus() {
-        if (!th.isValid()) {
-            return null;
-        }
-        long now = System.currentTimeMillis();
-        long lastUpdate = lastStatusUpdateTime;
-
-        // If cache is still valid, return it immediately (fast path)
-        if (cachedStatus != null && (now - lastUpdate) <= STATUS_CACHE_MILLIS) {
-            return cachedStatus;
-        }
-
-        // Cache is stale or null, return what we have and schedule async refresh
-        // This prevents EDT blocking during rendering
-        if (statusRefreshScheduled.compareAndSet(false, true)) {
-            scheduleStatusRefresh();
-        }
-
-        return cachedStatus; // Return stale data (null if no cache yet)
-    }
-
-    /**
-     * Schedules asynchronous refresh of status cache to avoid blocking operations on EDT.
-     */
-    private void scheduleStatusRefresh() {
-        STATUS_REFRESH_EXECUTOR.execute(() -> {
-            try {
-                refreshStatusCache();
-            } catch (Exception e) {
-                LOG.warn("Error refreshing torrent status cache: " + e.getMessage());
-            } finally {
-                statusRefreshScheduled.set(false);
-            }
+  /** Schedules asynchronous refresh of status cache to avoid blocking operations on EDT. */
+  private void scheduleStatusRefresh() {
+    STATUS_REFRESH_EXECUTOR.execute(
+        () -> {
+          try {
+            refreshStatusCache();
+          } catch (Exception e) {
+            LOG.warn("Error refreshing torrent status cache: " + e.getMessage());
+          } finally {
+            statusRefreshScheduled.set(false);
+          }
         });
-    }
+  }
 
-    /**
-     * Refreshes the native status cache synchronously. Call only from a background worker; state
-     * change alerts use this to publish fresh transfer status without waiting for the UI poll.
-     */
-    public void refreshStatusCache() {
-        synchronized (statusRefreshLock) {
-            if (!th.isValid()) {
-                invalidateStatusCache();
-                return;
-            }
-            try {
-                cachedStatus = th.status();
-                lastStatusUpdateTime = System.currentTimeMillis();
-            } catch (Throwable t) {
-                invalidateStatusCache();
-                LOG.warn("Error refreshing torrent status cache", t);
-            }
-        }
+  /**
+   * Refreshes the native status cache synchronously. Call only from a background worker; state
+   * change alerts use this to publish fresh transfer status without waiting for the UI poll.
+   */
+  public void refreshStatusCache() {
+    synchronized (statusRefreshLock) {
+      if (!th.isValid()) {
+        invalidateStatusCache();
+        return;
+      }
+      try {
+        cachedStatus = th.status();
+        lastStatusUpdateTime = System.currentTimeMillis();
+      } catch (Throwable t) {
+        invalidateStatusCache();
+        LOG.warn("Error refreshing torrent status cache", t);
+      }
     }
+  }
 
-    /**
-     * Invalidates the cached status to force a refresh on next access.
-     */
-    private void invalidateStatusCache() {
-        cachedStatus = null;
-        lastStatusUpdateTime = 0;
-        statusRefreshScheduled.set(false); // Allow immediate refresh on next access
-    }
+  /** Invalidates the cached status to force a refresh on next access. */
+  private void invalidateStatusCache() {
+    cachedStatus = null;
+    lastStatusUpdateTime = 0;
+    statusRefreshScheduled.set(false); // Allow immediate refresh on next access
+  }
 
-    public int getConnectedPeers() {
-        TorrentStatus status = getCachedStatus();
-        return status != null ? status.numPeers() : 0;
-    }
+  public int getConnectedPeers() {
+    TorrentStatus status = getCachedStatus();
+    return status != null ? status.numPeers() : 0;
+  }
 
-    public TorrentHandle getTorrentHandle() {
-        return th;
-    }
+  public TorrentHandle getTorrentHandle() {
+    return th;
+  }
 
-    public int getTotalPeers() {
-        TorrentStatus status = getCachedStatus();
-        return status != null ? status.listPeers() : 0;
-    }
+  public int getTotalPeers() {
+    TorrentStatus status = getCachedStatus();
+    return status != null ? status.listPeers() : 0;
+  }
 
-    public int getConnectedSeeds() {
-        TorrentStatus status = getCachedStatus();
-        return status != null ? status.numSeeds() : 0;
-    }
+  public int getConnectedSeeds() {
+    TorrentStatus status = getCachedStatus();
+    return status != null ? status.numSeeds() : 0;
+  }
 
-    public int getTotalSeeds() {
-        TorrentStatus status = getCachedStatus();
-        return status != null ? status.listSeeds() : 0;
-    }
+  public int getTotalSeeds() {
+    TorrentStatus status = getCachedStatus();
+    return status != null ? status.listSeeds() : 0;
+  }
 
-    public long getActiveDuration() {
-        TorrentStatus status = getCachedStatus();
-        return status != null ? status.activeDuration() : 0;
-    }
+  public long getActiveDuration() {
+    TorrentStatus status = getCachedStatus();
+    return status != null ? status.activeDuration() : 0;
+  }
 
-    public long getSeedingDuration() {
-        TorrentStatus status = getCachedStatus();
-        return status != null ? status.seedingDuration() : 0;
-    }
+  public long getSeedingDuration() {
+    TorrentStatus status = getCachedStatus();
+    return status != null ? status.seedingDuration() : 0;
+  }
 
-    public boolean isAnnouncingToDht() {
-        TorrentStatus status = getCachedStatus();
-        return status != null && status.announcingToDht();
-    }
+  public boolean isAnnouncingToDht() {
+    TorrentStatus status = getCachedStatus();
+    return status != null && status.announcingToDht();
+  }
 
-    public boolean isAnnouncingToLsd() {
-        TorrentStatus status = getCachedStatus();
-        return status != null && status.announcingToLsd();
-    }
+  public boolean isAnnouncingToLsd() {
+    TorrentStatus status = getCachedStatus();
+    return status != null && status.announcingToLsd();
+  }
 
-    @Override
-    public File getContentSavePath() {
-        try {
-            if (!th.isValid()) {
-                return null;
-            }
-            TorrentInfo ti = th.torrentFile();
-            if (ti != null && ti.swig() != null) {
-                return new File(savePath.getAbsolutePath(), ti.numFiles() > 1 ? th.name() : ti.files().filePath(0));
-            }
-        } catch (Throwable e) {
-            LOG.warn("Could not retrieve download content save path", e);
-        }
+  @Override
+  public File getContentSavePath() {
+    try {
+      if (!th.isValid()) {
         return null;
+      }
+      TorrentInfo ti = th.torrentFile();
+      if (ti != null && ti.swig() != null) {
+        return new File(
+            savePath.getAbsolutePath(), ti.numFiles() > 1 ? th.name() : ti.files().filePath(0));
+      }
+    } catch (Throwable e) {
+      LOG.warn("Could not retrieve download content save path", e);
     }
+    return null;
+  }
 
-    public String getInfoHash() {
+  public String getInfoHash() {
+    try {
+      return th.infoHash().toString().toLowerCase();
+    } catch (Throwable t) {
+      LOG.error(t.getMessage(), t);
+      return null;
+    }
+  }
+
+  @Override
+  public Date getCreated() {
+    return created;
+  }
+
+  @Override
+  public long getETA() {
+    if (!th.isValid()) {
+      return 0;
+    }
+    TorrentInfo ti = th.torrentFile();
+    if (ti == null) {
+      return 0;
+    }
+    TorrentStatus status = getCachedStatus();
+    if (status == null) {
+      return 0;
+    }
+    long left = ti.totalSize() - status.totalDone();
+    long rate = status.downloadPayloadRate();
+    if (left <= 0) {
+      return 0;
+    }
+    if (rate <= 0) {
+      return -1;
+    }
+    return left / rate;
+  }
+
+  public void pause() {
+    pause(true);
+  }
+
+  public void pauseForPolicy() {
+    pause(false);
+  }
+
+  private void pause(boolean explicitlyPaused) {
+    if (!th.isValid()) {
+      return;
+    }
+    if (explicitlyPaused) {
+      extra.put(WAS_PAUSED_EXTRA_KEY, Boolean.TRUE.toString());
+    }
+    th.unsetFlags(TorrentFlags.AUTO_MANAGED);
+    th.pause();
+    invalidateStatusCache();
+    com.frostwire.concurrent.concurrent.ThreadExecutor.startThread(
+        () -> doResumeData(true), "BTDownload::pause() saveResumeData");
+  }
+
+  public void resume() {
+    if (!th.isValid()) {
+      return;
+    }
+    extra.put(WAS_PAUSED_EXTRA_KEY, Boolean.FALSE.toString());
+    th.setFlags(TorrentFlags.AUTO_MANAGED);
+    th.resume();
+    invalidateStatusCache();
+    com.frostwire.concurrent.concurrent.ThreadExecutor.startThread(
+        () -> doResumeData(true), "BTDownload::resume() saveResumeData");
+  }
+
+  public void remove() {
+    remove(false, false);
+  }
+
+  @Override
+  public void remove(boolean deleteData) {
+    remove(false, deleteData);
+  }
+
+  public void remove(boolean deleteTorrent, boolean deleteData) {
+    String infoHash = engine.canonicalInfoHash(th);
+    incompleteFilesToRemove = getIncompleteFiles();
+    // prevent any further resume serialization during removal
+    removing = true;
+    engine.removeListener(innerListener);
+    if (th.isValid()) {
+      if (deleteData) {
+        engine.remove(th, SessionHandle.DELETE_FILES);
+      } else {
+        engine.remove(th);
+      }
+    }
+    if (deleteTorrent) {
+      File torrent = engine.readTorrentPath(infoHash);
+      if (torrent != null) {
+        Platforms.get().fileSystem().delete(torrent);
+      }
+    }
+    // remove any leftover resume/torrent sidecar files under both v1 and v2 hash names
+    Set<String> hashesToDelete = new HashSet<>();
+    if (infoHash != null) {
+      hashesToDelete.add(infoHash);
+    }
+    try {
+      TorrentInfo ti = th.torrentFile();
+      if (ti != null) {
+        String v1 = null;
         try {
-            return th.infoHash().toString().toLowerCase();
-        } catch (Throwable t) {
-            LOG.error(t.getMessage(), t);
-            return null;
+          v1 = ti.infoHashV1() != null ? ti.infoHashV1().toString().toLowerCase() : null;
+        } catch (Throwable ignore) {
         }
-    }
-
-    @Override
-    public Date getCreated() {
-        return created;
-    }
-
-    @Override
-    public long getETA() {
-        if (!th.isValid()) {
-            return 0;
+        if (v1 != null && !v1.isEmpty()) {
+          hashesToDelete.add(v1);
         }
-        TorrentInfo ti = th.torrentFile();
-        if (ti == null) {
-            return 0;
-        }
-        TorrentStatus status = getCachedStatus();
-        if (status == null) {
-            return 0;
-        }
-        long left = ti.totalSize() - status.totalDone();
-        long rate = status.downloadPayloadRate();
-        if (left <= 0) {
-            return 0;
-        }
-        if (rate <= 0) {
-            return -1;
-        }
-        return left / rate;
-    }
-
-    public void pause() {
-        pause(true);
-    }
-
-    public void pauseForPolicy() {
-        pause(false);
-    }
-
-    private void pause(boolean explicitlyPaused) {
-        if (!th.isValid()) {
-            return;
-        }
-        if (explicitlyPaused) {
-            extra.put(WAS_PAUSED_EXTRA_KEY, Boolean.TRUE.toString());
-        }
-        th.unsetFlags(TorrentFlags.AUTO_MANAGED);
-        th.pause();
-        invalidateStatusCache();
-        com.frostwire.concurrent.concurrent.ThreadExecutor.startThread(() -> doResumeData(true), "BTDownload::pause() saveResumeData");
-    }
-
-    public void resume() {
-        if (!th.isValid()) {
-            return;
-        }
-        extra.put(WAS_PAUSED_EXTRA_KEY, Boolean.FALSE.toString());
-        th.setFlags(TorrentFlags.AUTO_MANAGED);
-        th.resume();
-        invalidateStatusCache();
-        com.frostwire.concurrent.concurrent.ThreadExecutor.startThread(() -> doResumeData(true), "BTDownload::resume() saveResumeData");
-    }
-
-    public void remove() {
-        remove(false, false);
-    }
-
-    @Override
-    public void remove(boolean deleteData) {
-        remove(false, deleteData);
-    }
-
-    public void remove(boolean deleteTorrent, boolean deleteData) {
-        String infoHash = engine.canonicalInfoHash(th);
-        incompleteFilesToRemove = getIncompleteFiles();
-        // prevent any further resume serialization during removal
-        removing = true;
-        engine.removeListener(innerListener);
-        if (th.isValid()) {
-            if (deleteData) {
-                engine.remove(th, SessionHandle.DELETE_FILES);
-            } else {
-                engine.remove(th);
-            }
-        }
-        if (deleteTorrent) {
-            File torrent = engine.readTorrentPath(infoHash);
-            if (torrent != null) {
-                Platforms.get().fileSystem().delete(torrent);
-            }
-        }
-        // remove any leftover resume/torrent sidecar files under both v1 and v2 hash names
-        Set<String> hashesToDelete = new HashSet<>();
-        if (infoHash != null) {
-            hashesToDelete.add(infoHash);
-        }
+        Sha256Hash v2 = null;
         try {
-            TorrentInfo ti = th.torrentFile();
-            if (ti != null) {
-                String v1 = null;
-                try { v1 = ti.infoHashV1() != null ? ti.infoHashV1().toString().toLowerCase() : null; } catch (Throwable ignore) {}
-                if (v1 != null && !v1.isEmpty()) {
-                    hashesToDelete.add(v1);
-                }
-                Sha256Hash v2 = null;
-                try { v2 = ti.infoHashV2(); } catch (Throwable ignore) {}
-                if (v2 != null && !v2.isAllZeros()) {
-                    hashesToDelete.add(v2.toString().toLowerCase());
-                }
+          v2 = ti.infoHashV2();
+        } catch (Throwable ignore) {
+        }
+        if (v2 != null && !v2.isAllZeros()) {
+          hashesToDelete.add(v2.toString().toLowerCase());
+        }
+      }
+    } catch (Throwable ignore) {
+    }
+    for (String h : hashesToDelete) {
+      //noinspection ResultOfMethodCallIgnored
+      engine.resumeDataFile(h).delete();
+      //noinspection ResultOfMethodCallIgnored
+      engine.resumeTorrentFile(h).delete();
+    }
+  }
+
+  @Override
+  public String getPredominantFileExtension() {
+    if (predominantFileExtension == null && th != null) {
+      TorrentInfo torrentInfo = th.torrentFile();
+      if (torrentInfo != null) {
+        FileStorage files = torrentInfo.files();
+        Map<String, Long> extensionByteSums = new HashMap<>();
+        int numFiles = files.numFiles();
+        files.paths();
+        for (int i = 0; i < numFiles; i++) {
+          String path = files.filePath(i);
+          String extension = FilenameUtils.getExtension(path);
+          if ("".equals(extension)) {
+            // skip folders
+            continue;
+          }
+          if (extensionByteSums.containsKey(extension)) {
+            Long bytes = extensionByteSums.get(extension);
+            extensionByteSums.put(extension, bytes + files.fileSize(i));
+          } else {
+            extensionByteSums.put(extension, files.fileSize(i));
+          }
+        }
+        String extensionCandidate = null;
+        Set<String> exts = extensionByteSums.keySet();
+        for (String ext : exts) {
+          if (extensionCandidate == null) {
+            extensionCandidate = ext;
+          } else {
+            Long extSum = extensionByteSums.get(ext);
+            Long extSumCandidate = extensionByteSums.get(extensionCandidate);
+            if (extSum != null && extSumCandidate != null && extSum > extSumCandidate) {
+              extensionCandidate = ext;
             }
-        } catch (Throwable ignore) { }
-        for (String h : hashesToDelete) {
-            //noinspection ResultOfMethodCallIgnored
-            engine.resumeDataFile(h).delete();
-            //noinspection ResultOfMethodCallIgnored
-            engine.resumeTorrentFile(h).delete();
+          }
         }
+        predominantFileExtension = extensionCandidate;
+      }
     }
+    return predominantFileExtension;
+  }
 
-    @Override
-    public String getPredominantFileExtension() {
-        if (predominantFileExtension == null && th != null) {
-            TorrentInfo torrentInfo = th.torrentFile();
-            if (torrentInfo != null) {
-                FileStorage files = torrentInfo.files();
-                Map<String, Long> extensionByteSums = new HashMap<>();
-                int numFiles = files.numFiles();
-                files.paths();
-                for (int i = 0; i < numFiles; i++) {
-                    String path = files.filePath(i);
-                    String extension = FilenameUtils.getExtension(path);
-                    if ("".equals(extension)) {
-                        // skip folders
-                        continue;
-                    }
-                    if (extensionByteSums.containsKey(extension)) {
-                        Long bytes = extensionByteSums.get(extension);
-                        extensionByteSums.put(extension, bytes + files.fileSize(i));
-                    } else {
-                        extensionByteSums.put(extension, files.fileSize(i));
-                    }
-                }
-                String extensionCandidate = null;
-                Set<String> exts = extensionByteSums.keySet();
-                for (String ext : exts) {
-                    if (extensionCandidate == null) {
-                        extensionCandidate = ext;
-                    } else {
-                        Long extSum = extensionByteSums.get(ext);
-                        Long extSumCandidate = extensionByteSums.get(extensionCandidate);
-                        if (extSum != null && extSumCandidate != null && extSum > extSumCandidate) {
-                            extensionCandidate = ext;
-                        }
-                    }
-                }
-                predominantFileExtension = extensionCandidate;
+  public BTDownloadListener getListener() {
+    return listener;
+  }
+
+  public void setListener(BTDownloadListener listener) {
+    this.listener = listener;
+  }
+
+  private void torrentFinished() {
+    if (listener != null) {
+      try {
+        LOG.info("BTDownload::torrentFinished", true);
+        listener.finished(this);
+      } catch (Throwable e) {
+        LOG.error("Error calling listener (finished)", e);
+      }
+    }
+    doResumeData(true);
+  }
+
+  private void torrentRemoved() {
+    engine.removeListener(innerListener);
+    if (parts != null) {
+      //noinspection ResultOfMethodCallIgnored
+      parts.delete();
+    }
+    if (listener != null) {
+      try {
+        listener.removed(this, incompleteFilesToRemove);
+      } catch (Throwable e) {
+        LOG.error("Error calling listener (removed)", e);
+      }
+    }
+  }
+
+  private void torrentChecked() {
+    try {
+      if (th.isValid()) {
+        // trigger items calculation
+        getItems();
+      }
+    } catch (Throwable e) {
+      LOG.warn("Error handling torrent checked logic", e);
+    }
+  }
+
+  private void pieceFinished(PieceFinishedAlert alert) {
+    try {
+      if (piecesTracker != null) {
+        piecesTracker.setComplete(alert.pieceIndex(), true);
+      }
+    } catch (Throwable e) {
+      LOG.warn("Error handling piece finished logic", e);
+    }
+  }
+
+  public boolean isPartial() {
+    if (th.isValid()) {
+      Priority[] priorities = th.filePriorities();
+      for (Priority p : priorities) {
+        if (Priority.IGNORE.equals(p)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public String magnetUri() {
+    return th.makeMagnetUri();
+  }
+
+  public int getDownloadRateLimit() {
+    return th.getDownloadLimit();
+  }
+
+  public void setDownloadRateLimit(int limit) {
+    th.setDownloadLimit(limit);
+  }
+
+  public int getUploadRateLimit() {
+    return th.getUploadLimit();
+  }
+
+  public void setUploadRateLimit(int limit) {
+    th.setUploadLimit(limit);
+  }
+
+  public void requestTrackerAnnounce() {
+    th.forceReannounce();
+  }
+
+  public void requestTrackerScrape() {
+    th.scrapeTracker();
+  }
+
+  public void forceRecheck() {
+    if (!th.isValid()) {
+      return;
+    }
+    th.forceRecheck();
+  }
+
+  public Set<String> trackers() {
+    if (!th.isValid()) {
+      return new HashSet<>();
+    }
+    List<AnnounceEntry> trackers = th.trackers();
+    Set<String> urls = new HashSet<>(trackers.size());
+    for (AnnounceEntry e : trackers) {
+      urls.add(e.url());
+    }
+    return urls;
+  }
+
+  public void trackers(Set<String> trackers) {
+    List<AnnounceEntry> list = new ArrayList<>(trackers.size());
+    for (String url : trackers) {
+      list.add(new AnnounceEntry(url));
+    }
+    th.replaceTrackers(list);
+    doResumeData(true);
+  }
+
+  @Override
+  public List<TransferItem> getItems() {
+    ArrayList<TransferItem> items = new ArrayList<>();
+    if (th != null && th.isValid()) {
+      TorrentInfo ti = th.torrentFile();
+      if (ti != null && ti.isValid()) {
+        FileStorage fs = ti.files();
+        int numFiles = ti.numFiles();
+        for (int i = 0; i < numFiles; i++) {
+          BTDownloadItem item =
+              new BTDownloadItem(th, i, fs.filePath(i), fs.fileSize(i), piecesTracker, savePath);
+          items.add(item);
+        }
+        if (piecesTracker != null && !piecesTrackerInitialized) {
+          int numPieces = ti.numPieces();
+          // One-time initialization: sync piecesTracker with already-completed
+          // pieces. After this, pieceFinished() alerts keep it up-to-date.
+          // Fetch the full piece bitfield in one JNI call instead of
+          // calling havePiece(i) once per piece.
+          try {
+            TorrentStatus status = th.status(TorrentHandle.QUERY_PIECES);
+            PieceIndexBitfield pieces = status.pieces();
+            for (int i = 0; i < numPieces; i++) {
+              if (pieces.getBit(i)) {
+                piecesTracker.setComplete(i, true);
+              }
             }
+          } catch (Throwable e) {
+            LOG.warn("Error fetching piece status in getItems()", e);
+          }
+          piecesTrackerInitialized = true;
         }
-        return predominantFileExtension;
+      }
     }
+    return items;
+  }
 
-    public BTDownloadListener getListener() {
-        return listener;
-    }
+  public File getTorrentFile() {
+    return engine.readTorrentPath(engine.canonicalInfoHash(th));
+  }
 
-    public void setListener(BTDownloadListener listener) {
-        this.listener = listener;
-    }
-
-    private void torrentFinished() {
-        if (listener != null) {
-            try {
-                LOG.info("BTDownload::torrentFinished", true);
-                listener.finished(this);
-            } catch (Throwable e) {
-                LOG.error("Error calling listener (finished)", e);
-            }
-        }
-        doResumeData(true);
-    }
-
-    private void torrentRemoved() {
-        engine.removeListener(innerListener);
-        if (parts != null) {
-            //noinspection ResultOfMethodCallIgnored
-            parts.delete();
-        }
-        if (listener != null) {
-            try {
-                listener.removed(this, incompleteFilesToRemove);
-            } catch (Throwable e) {
-                LOG.error("Error calling listener (removed)", e);
-            }
-        }
-    }
-
-    private void torrentChecked() {
-        try {
-            if (th.isValid()) {
-                // trigger items calculation
-                getItems();
-            }
-        } catch (Throwable e) {
-            LOG.warn("Error handling torrent checked logic", e);
-        }
-    }
-
-    private void pieceFinished(PieceFinishedAlert alert) {
-        try {
-            if (piecesTracker != null) {
-                piecesTracker.setComplete(alert.pieceIndex(), true);
-            }
-        } catch (Throwable e) {
-            LOG.warn("Error handling piece finished logic", e);
-        }
-    }
-
-    public boolean isPartial() {
-        if (th.isValid()) {
-            Priority[] priorities = th.filePriorities();
-            for (Priority p : priorities) {
-                if (Priority.IGNORE.equals(p)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public String magnetUri() {
-        return th.makeMagnetUri();
-    }
-
-    public int getDownloadRateLimit() {
-        return th.getDownloadLimit();
-    }
-
-    public void setDownloadRateLimit(int limit) {
-        th.setDownloadLimit(limit);
-    }
-
-    public int getUploadRateLimit() {
-        return th.getUploadLimit();
-    }
-
-    public void setUploadRateLimit(int limit) {
-        th.setUploadLimit(limit);
-    }
-
-    public void requestTrackerAnnounce() {
-        th.forceReannounce();
-    }
-
-    public void requestTrackerScrape() {
-        th.scrapeTracker();
-    }
-
-    public void forceRecheck() {
-        if (!th.isValid()) {
-            return;
-        }
-        th.forceRecheck();
-    }
-
-    public Set<String> trackers() {
-        if (!th.isValid()) {
-            return new HashSet<>();
-        }
-        List<AnnounceEntry> trackers = th.trackers();
-        Set<String> urls = new HashSet<>(trackers.size());
-        for (AnnounceEntry e : trackers) {
-            urls.add(e.url());
-        }
-        return urls;
-    }
-
-    public void trackers(Set<String> trackers) {
-        List<AnnounceEntry> list = new ArrayList<>(trackers.size());
-        for (String url : trackers) {
-            list.add(new AnnounceEntry(url));
-        }
-        th.replaceTrackers(list);
-        doResumeData(true);
-    }
-
-    @Override
-    public List<TransferItem> getItems() {
-        ArrayList<TransferItem> items = new ArrayList<>();
-        if (th != null && th.isValid()) {
-            TorrentInfo ti = th.torrentFile();
-            if (ti != null && ti.isValid()) {
-                FileStorage fs = ti.files();
-                int numFiles = ti.numFiles();
-                for (int i = 0; i < numFiles; i++) {
-                    BTDownloadItem item = new BTDownloadItem(th, i, fs.filePath(i), fs.fileSize(i), piecesTracker, savePath);
-                    items.add(item);
-                }
-                if (piecesTracker != null && !piecesTrackerInitialized) {
-                    int numPieces = ti.numPieces();
-                    // One-time initialization: sync piecesTracker with already-completed
-                    // pieces. After this, pieceFinished() alerts keep it up-to-date.
-                    // Fetch the full piece bitfield in one JNI call instead of
-                    // calling havePiece(i) once per piece.
-                    try {
-                        TorrentStatus status = th.status(TorrentHandle.QUERY_PIECES);
-                        PieceIndexBitfield pieces = status.pieces();
-                        for (int i = 0; i < numPieces; i++) {
-                            if (pieces.getBit(i)) {
-                                piecesTracker.setComplete(i, true);
-                            }
-                        }
-                    } catch (Throwable e) {
-                        LOG.warn("Error fetching piece status in getItems()", e);
-                    }
-                    piecesTrackerInitialized = true;
-                }
-            }
-        }
-        return items;
-    }
-
-    public File getTorrentFile() {
-        return engine.readTorrentPath(engine.canonicalInfoHash(th));
-    }
-
-    public Set<File> getIncompleteFiles() {
-        Set<File> s = new HashSet<>();
-        try {
-            if (!th.isValid()) {
-                return s;
-            }
-            long[] progress = th.fileProgress(TorrentHandle.PIECE_GRANULARITY);
-            TorrentInfo ti = th.torrentFile();
-            if (ti == null) {
-                // still downloading the info (from magnet)
-                return s;
-            }
-            FileStorage fs = ti.files();
-            String prefix = savePath.getAbsolutePath();
-            long createdTime = created.getTime();
-            for (int i = 0; i < progress.length; i++) {
-                String fePath = fs.filePath(i);
-                long feSize = fs.fileSize(i);
-                if (progress[i] < feSize) {
-                    // lets see if indeed the file is incomplete
-                    File f = new File(prefix, fePath);
-                    if (!f.exists()) {
-                        continue; // nothing to do here
-                    }
-                    if (f.lastModified() >= createdTime) {
-                        // we have a file modified (supposedly) by this transfer
-                        s.add(f);
-                    }
-                }
-            }
-        } catch (Throwable e) {
-            LOG.error("Error calculating the incomplete files set", e);
-        }
+  public Set<File> getIncompleteFiles() {
+    Set<File> s = new HashSet<>();
+    try {
+      if (!th.isValid()) {
         return s;
-    }
-
-    public boolean isSequentialDownload() {
-        TorrentStatus status = getCachedStatus();
-        return status != null && status.flags().and_(TorrentFlags.SEQUENTIAL_DOWNLOAD).eq(TorrentFlags.SEQUENTIAL_DOWNLOAD);
-    }
-
-    public void setSequentialDownload(boolean sequential) {
-        if (!th.isValid()) {
-            System.out.println("BTDownload::setSequentialDownload( " + sequential + ") aborted. Torrent Handle Invalid.");
-            return;
+      }
+      long[] progress = th.fileProgress(TorrentHandle.PIECE_GRANULARITY);
+      TorrentInfo ti = th.torrentFile();
+      if (ti == null) {
+        // still downloading the info (from magnet)
+        return s;
+      }
+      FileStorage fs = ti.files();
+      String prefix = savePath.getAbsolutePath();
+      long createdTime = created.getTime();
+      for (int i = 0; i < progress.length; i++) {
+        String fePath = fs.filePath(i);
+        long feSize = fs.fileSize(i);
+        if (progress[i] < feSize) {
+          // lets see if indeed the file is incomplete
+          File f = new File(prefix, fePath);
+          if (!f.exists()) {
+            continue; // nothing to do here
+          }
+          if (f.lastModified() >= createdTime) {
+            // we have a file modified (supposedly) by this transfer
+            s.add(f);
+          }
         }
-        if (sequential) {
-            th.setFlags(TorrentFlags.SEQUENTIAL_DOWNLOAD);
-        } else {
-            th.unsetFlags(TorrentFlags.SEQUENTIAL_DOWNLOAD);
+      }
+    } catch (Throwable e) {
+      LOG.error("Error calculating the incomplete files set", e);
+    }
+    return s;
+  }
+
+  public boolean isSequentialDownload() {
+    TorrentStatus status = getCachedStatus();
+    return status != null
+        && status
+            .flags()
+            .and_(TorrentFlags.SEQUENTIAL_DOWNLOAD)
+            .eq(TorrentFlags.SEQUENTIAL_DOWNLOAD);
+  }
+
+  public void setSequentialDownload(boolean sequential) {
+    if (!th.isValid()) {
+      System.out.println(
+          "BTDownload::setSequentialDownload( "
+              + sequential
+              + ") aborted. Torrent Handle Invalid.");
+      return;
+    }
+    if (sequential) {
+      th.setFlags(TorrentFlags.SEQUENTIAL_DOWNLOAD);
+    } else {
+      th.unsetFlags(TorrentFlags.SEQUENTIAL_DOWNLOAD);
+    }
+    invalidateStatusCache();
+  }
+
+  public File partsFile() {
+    return parts;
+  }
+
+  private PaymentOptions loadPaymentOptions(TorrentInfo ti) {
+    try {
+      BTInfoAdditionalMetadataHolder holder =
+          new BTInfoAdditionalMetadataHolder(ti, getDisplayName());
+      return holder.getPaymentOptions();
+    } catch (Throwable e) {
+      return null;
+    }
+  }
+
+  private void serializeResumeData(SaveResumeDataAlert alert) {
+    try {
+      if (removing) {
+        return;
+      }
+      if (th.isValid()) {
+        // Same canonical hash BTEngine uses to name the session .torrent,
+        // so restore's <torrent-name>.resume lookup always matches.
+        String infoHash = engine.canonicalInfoHash(th);
+        File file = engine.resumeDataFile(infoHash);
+        entry e = add_torrent_params.write_resume_data(alert.swig().getParams());
+        Map<String, String> extraSnapshot;
+        synchronized (extra) {
+          extraSnapshot = new HashMap<>(extra);
         }
-        invalidateStatusCache();
+        e.dict().put(EXTRA_DATA_KEY, Entry.fromMap(extraSnapshot).swig());
+        FileUtils.writeByteArrayToFile(file, Vectors.byte_vector2bytes(e.bencode()));
+        LOG.info("BTDownload::serializeResumeData saved resume for " + infoHash);
+        engine.ensureResumeTorrentFile(th);
+      }
+    } catch (Throwable e) {
+      LOG.warn("Error saving resume data", e);
     }
+  }
 
-    public File partsFile() {
-        return parts;
+  private void doResumeData(boolean force) {
+    long now = System.currentTimeMillis();
+    if (force || (now - lastSaveResumeTime) >= SAVE_RESUME_RESOLUTION_MILLIS) {
+      lastSaveResumeTime = now;
+    } else {
+      // skip, too fast, see SAVE_RESUME_RESOLUTION_MILLIS
+      return;
     }
+    try {
+      if (th == null || !th.isValid()) {
+        return;
+      }
+      if (force) {
+        // Unconditional: torrents that never got dirty (born-complete seeds)
+        // must still persist resume data, otherwise a restart restores
+        // them under the default data dir and they sit at 0% forever.
+        th.saveResumeData();
+      } else if (th.needSaveResumeData()) {
+        th.saveResumeData(TorrentHandle.ONLY_IF_MODIFIED);
+      }
+    } catch (Throwable e) {
+      LOG.warn("Error triggering resume data", e);
+    }
+  }
 
-    private PaymentOptions loadPaymentOptions(TorrentInfo ti) {
-        try {
-            BTInfoAdditionalMetadataHolder holder = new BTInfoAdditionalMetadataHolder(ti, getDisplayName());
-            return holder.getPaymentOptions();
-        } catch (Throwable e) {
-            return null;
+  /**
+   * Creates a parts file for the torrent, handling both v1 and v2 torrents. For v2-only torrents,
+   * uses the torrent handle's info hash; for others, uses v1 hash.
+   */
+  private File createPartsFile(String savePath, TorrentInfo ti) {
+    try {
+      String hash;
+      if (ti.infoHashV1() != null) {
+        // Use v1 hash for v1-only and hybrid torrents
+        hash = ti.infoHashV1().toString();
+      } else {
+        // For v2-only torrents, use the torrent handle's hash
+        hash = th.infoHash().toString();
+      }
+      return new File(savePath, "." + hash + ".parts");
+    } catch (Exception e) {
+      LOG.warn("Error creating parts file path: " + e.getMessage());
+      // Fallback to using the torrent handle's hash
+      try {
+        return new File(savePath, "." + th.infoHash().toString() + ".parts");
+      } catch (Exception e2) {
+        LOG.error("Failed to create parts file path", e2);
+        return null;
+      }
+    }
+  }
+
+  private Map<String, String> createExtra() {
+    Map<String, String> map = new HashMap<>();
+    try {
+      String infoHash = engine.canonicalInfoHash(th);
+      File file = engine.resumeDataFile(infoHash);
+      if (file.exists()) {
+        byte[] arr = FileUtils.readFileToByteArray(file);
+        entry e = entry.bdecode(Vectors.bytes2byte_vector(arr));
+        string_entry_map d = e.dict();
+        if (d.containsKey(EXTRA_DATA_KEY)) {
+          readExtra(d.get(EXTRA_DATA_KEY).dict(), map);
         }
+      }
+    } catch (Throwable e) {
+      LOG.error("Error reading extra data from resume file", e);
+    }
+    return map;
+  }
+
+  private void readExtra(string_entry_map dict, Map<String, String> map) {
+    string_vector keys = new string_vector(dict.keySet());
+    for (String k : keys) {
+      entry e = dict.get(k);
+      if (e.type() == entry.data_type.string_t) {
+        map.put(k, e.string());
+      }
+    }
+  }
+
+  public boolean wasPaused() {
+    boolean flag = false;
+    if (extra.containsKey(WAS_PAUSED_EXTRA_KEY)) {
+      try {
+        flag = Boolean.parseBoolean(extra.get(WAS_PAUSED_EXTRA_KEY));
+      } catch (Throwable e) {
+        // ignore
+      }
+    }
+    return flag;
+  }
+
+  private final class InnerListener implements AlertListener {
+    @Override
+    public int[] types() {
+      return ALERT_TYPES;
     }
 
-    private void serializeResumeData(SaveResumeDataAlert alert) {
-        try {
-            if (removing) {
-                return;
+    @Override
+    public void alert(Alert<?> alert) {
+      if (!(alert instanceof TorrentAlert<?>)) {
+        return;
+      }
+      if (!((TorrentAlert<?>) alert).handle().swig().op_eq(th.swig())) {
+        return;
+      }
+      AlertType type = alert.type();
+      switch (type) {
+        case STATE_CHANGED:
+          if (listener != null) {
+            try {
+              listener.stateChanged(BTDownload.this);
+            } catch (Throwable t) {
+              LOG.error("Error calling listener (state changed)", t);
             }
+          }
+          break;
+        case TORRENT_FINISHED:
+          try {
             if (th.isValid()) {
-                // Same canonical hash BTEngine uses to name the session .torrent,
-                // so restore's <torrent-name>.resume lookup always matches.
-                String infoHash = engine.canonicalInfoHash(th);
-                File file = engine.resumeDataFile(infoHash);
-                entry e = add_torrent_params.write_resume_data(alert.swig().getParams());
-                Map<String, String> extraSnapshot;
-                synchronized (extra) {
-                    extraSnapshot = new HashMap<>(extra);
-                }
-                e.dict().put(EXTRA_DATA_KEY, Entry.fromMap(extraSnapshot).swig());
-                FileUtils.writeByteArrayToFile(file, Vectors.byte_vector2bytes(e.bencode()));
-                LOG.info("BTDownload::serializeResumeData saved resume for " + infoHash);
-                engine.ensureResumeTorrentFile(th);
+              cachedStatus = th.status();
+              lastStatusUpdateTime = System.currentTimeMillis();
             }
-        } catch (Throwable e) {
-            LOG.warn("Error saving resume data", e);
-        }
+          } catch (Throwable t) {
+            invalidateStatusCache();
+          }
+          torrentFinished();
+          break;
+        case TORRENT_REMOVED:
+          invalidateStatusCache();
+          torrentRemoved();
+          break;
+        case TORRENT_CHECKED:
+          invalidateStatusCache();
+          torrentChecked();
+          doResumeData(true);
+          break;
+        case SAVE_RESUME_DATA:
+          serializeResumeData((SaveResumeDataAlert) alert);
+          break;
+        case PIECE_FINISHED:
+          pieceFinished((PieceFinishedAlert) alert);
+          doResumeData(false);
+          break;
+        case STORAGE_MOVED:
+          doResumeData(true);
+          break;
+      }
     }
-
-    private void doResumeData(boolean force) {
-        long now = System.currentTimeMillis();
-        if (force || (now - lastSaveResumeTime) >= SAVE_RESUME_RESOLUTION_MILLIS) {
-            lastSaveResumeTime = now;
-        } else {
-            // skip, too fast, see SAVE_RESUME_RESOLUTION_MILLIS
-            return;
-        }
-        try {
-            if (th == null || !th.isValid()) {
-                return;
-            }
-            if (force) {
-                // Unconditional: torrents that never got dirty (born-complete seeds)
-                // must still persist resume data, otherwise a restart restores
-                // them under the default data dir and they sit at 0% forever.
-                th.saveResumeData();
-            } else if (th.needSaveResumeData()) {
-                th.saveResumeData(TorrentHandle.ONLY_IF_MODIFIED);
-            }
-        } catch (Throwable e) {
-            LOG.warn("Error triggering resume data", e);
-        }
-    }
-
-    /**
-     * Creates a parts file for the torrent, handling both v1 and v2 torrents.
-     * For v2-only torrents, uses the torrent handle's info hash; for others, uses v1 hash.
-     */
-    private File createPartsFile(String savePath, TorrentInfo ti) {
-        try {
-            String hash;
-            if (ti.infoHashV1() != null) {
-                // Use v1 hash for v1-only and hybrid torrents
-                hash = ti.infoHashV1().toString();
-            } else {
-                // For v2-only torrents, use the torrent handle's hash
-                hash = th.infoHash().toString();
-            }
-            return new File(savePath, "." + hash + ".parts");
-        } catch (Exception e) {
-            LOG.warn("Error creating parts file path: " + e.getMessage());
-            // Fallback to using the torrent handle's hash
-            try {
-                return new File(savePath, "." + th.infoHash().toString() + ".parts");
-            } catch (Exception e2) {
-                LOG.error("Failed to create parts file path", e2);
-                return null;
-            }
-        }
-    }
-
-    private Map<String, String> createExtra() {
-        Map<String, String> map = new HashMap<>();
-        try {
-            String infoHash = engine.canonicalInfoHash(th);
-            File file = engine.resumeDataFile(infoHash);
-            if (file.exists()) {
-                byte[] arr = FileUtils.readFileToByteArray(file);
-                entry e = entry.bdecode(Vectors.bytes2byte_vector(arr));
-                string_entry_map d = e.dict();
-                if (d.containsKey(EXTRA_DATA_KEY)) {
-                    readExtra(d.get(EXTRA_DATA_KEY).dict(), map);
-                }
-            }
-        } catch (Throwable e) {
-            LOG.error("Error reading extra data from resume file", e);
-        }
-        return map;
-    }
-
-    private void readExtra(string_entry_map dict, Map<String, String> map) {
-        string_vector keys = new string_vector(dict.keySet());
-        for (String k : keys) {
-            entry e = dict.get(k);
-            if (e.type() == entry.data_type.string_t) {
-                map.put(k, e.string());
-            }
-        }
-    }
-
-    public boolean wasPaused() {
-        boolean flag = false;
-        if (extra.containsKey(WAS_PAUSED_EXTRA_KEY)) {
-            try {
-                flag = Boolean.parseBoolean(extra.get(WAS_PAUSED_EXTRA_KEY));
-            } catch (Throwable e) {
-                // ignore
-            }
-        }
-        return flag;
-    }
-
-    private final class InnerListener implements AlertListener {
-        @Override
-        public int[] types() {
-            return ALERT_TYPES;
-        }
-
-        @Override
-        public void alert(Alert<?> alert) {
-            if (!(alert instanceof TorrentAlert<?>)) {
-                return;
-            }
-            if (!((TorrentAlert<?>) alert).handle().swig().op_eq(th.swig())) {
-                return;
-            }
-            AlertType type = alert.type();
-            switch (type) {
-                case STATE_CHANGED:
-                    if (listener != null) {
-                        try {
-                            listener.stateChanged(BTDownload.this);
-                        } catch (Throwable t) {
-                            LOG.error("Error calling listener (state changed)", t);
-                        }
-                    }
-                    break;
-                case TORRENT_FINISHED:
-                    try {
-                        if (th.isValid()) {
-                            cachedStatus = th.status();
-                            lastStatusUpdateTime = System.currentTimeMillis();
-                        }
-                    } catch (Throwable t) {
-                        invalidateStatusCache();
-                    }
-                    torrentFinished();
-                    break;
-                case TORRENT_REMOVED:
-                    invalidateStatusCache();
-                    torrentRemoved();
-                    break;
-                case TORRENT_CHECKED:
-                    invalidateStatusCache();
-                    torrentChecked();
-                    doResumeData(true);
-                    break;
-                case SAVE_RESUME_DATA:
-                    serializeResumeData((SaveResumeDataAlert) alert);
-                    break;
-                case PIECE_FINISHED:
-                    pieceFinished((PieceFinishedAlert) alert);
-                    doResumeData(false);
-                    break;
-                case STORAGE_MOVED:
-                    doResumeData(true);
-                    break;
-            }
-        }
-    }
-
+  }
 }
