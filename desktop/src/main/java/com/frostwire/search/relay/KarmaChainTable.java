@@ -215,6 +215,7 @@ public final class KarmaChainTable implements KarmaChainStore {
     }
     ensureOpen();
     List<KarmaChainEntry> loaded = new ArrayList<>();
+    int rows = 0;
     synchronized (connection) {
       try (Statement s = connection.createStatement();
           ResultSet rs =
@@ -226,6 +227,7 @@ public final class KarmaChainTable implements KarmaChainStore {
                       + CHAIN_TABLE
                       + " ORDER BY seq ASC")) {
         while (rs.next()) {
+          rows++;
           int idx = 1;
           try {
             KarmaChainEntry.Kind kind =
@@ -273,15 +275,46 @@ public final class KarmaChainTable implements KarmaChainStore {
         throw new IllegalStateException("Failed to load karma chain", e);
       }
     }
-    if (loaded.isEmpty()) {
-      return new KarmaChain(ownerPub);
+    KarmaChain chain = loaded.isEmpty() ? null : KarmaChain.load(ownerPub, loaded);
+    if (chain != null) {
+      return chain;
     }
-    KarmaChain chain = KarmaChain.load(ownerPub, loaded);
-    if (chain == null) {
-      LOG.warn("Persisted karma chain failed verification; starting fresh");
-      return new KarmaChain(ownerPub);
+    if (rows > 0) {
+      String keptIn = setAsideRejectedChain();
+      LOG.warn("Persisted karma chain failed verification; kept it in " + keptIn + ", starting fresh");
     }
-    return chain;
+    return new KarmaChain(ownerPub);
+  }
+
+  /**
+   * Moves the chain's rows to a new {@code karma_chain_rejected_<millis>} table and empties the
+   * chain table. A fresh chain reuses the same sequence numbers, and its appends replace rows by
+   * seq, so without this a chain the verifier rejects (a writer bug, or a rule added later) would be
+   * overwritten and the user's karma lost for good.
+   *
+   * @throws IllegalStateException if the rows can't be moved; the chain table is then unchanged
+   */
+  private String setAsideRejectedChain() {
+    String keptIn = CHAIN_TABLE + "_rejected_" + System.currentTimeMillis();
+    synchronized (connection) {
+      try {
+        boolean autoCommit = connection.getAutoCommit();
+        connection.setAutoCommit(false);
+        try (Statement s = connection.createStatement()) {
+          s.execute("CREATE TABLE " + keptIn + " AS SELECT * FROM " + CHAIN_TABLE);
+          s.execute("DELETE FROM " + CHAIN_TABLE);
+          connection.commit();
+        } catch (SQLException e) {
+          connection.rollback();
+          throw e;
+        } finally {
+          connection.setAutoCommit(autoCommit);
+        }
+      } catch (SQLException e) {
+        throw new IllegalStateException("Could not set the rejected karma chain aside", e);
+      }
+    }
+    return keptIn;
   }
 
   /** Get the aggregate karma score for a peer. Returns 0 if the peer has no endorsements. */

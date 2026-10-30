@@ -205,6 +205,7 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
         }
         ensureOpen();
         List<KarmaChainEntry> loaded = new ArrayList<>();
+        int rows = 0;
         synchronized (db) {
             try (Cursor c = db.rawQuery(
                     "SELECT kind, prev_hash, endorser_pub, timestamp, " +
@@ -212,6 +213,7 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
                             "peer_pub, info_hash, score_delta, signature " +
                             "FROM " + CHAIN_TABLE + " ORDER BY seq ASC", null)) {
                 while (c.moveToNext()) {
+                    rows++;
                     try {
                         int idx = 0;
                         KarmaChainEntry.Kind kind = "EC".equals(c.getString(idx++))
@@ -253,15 +255,41 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
                 LOG.warn("loadChain failed", e);
             }
         }
-        if (loaded.isEmpty()) {
-            return new KarmaChain(ownerPub);
+        KarmaChain chain = loaded.isEmpty() ? null : KarmaChain.load(ownerPub, loaded);
+        if (chain != null) {
+            return chain;
         }
-        KarmaChain chain = KarmaChain.load(ownerPub, loaded);
-        if (chain == null) {
-            LOG.warn("Persisted karma chain failed verification; starting fresh");
-            return new KarmaChain(ownerPub);
+        if (rows > 0) {
+            String keptIn = setAsideRejectedChain();
+            LOG.warn("Persisted karma chain failed verification; kept it in " + keptIn
+                    + ", starting fresh");
         }
-        return chain;
+        return new KarmaChain(ownerPub);
+    }
+
+    /**
+     * Moves the chain's rows to a new {@code karma_chain_rejected_<millis>} table and empties the
+     * chain table. A fresh chain reuses the same sequence numbers, and its appends replace rows by
+     * seq, so without this a chain the verifier rejects (a writer bug, or a rule added later) would
+     * be overwritten and the user's karma lost for good.
+     *
+     * @throws IllegalStateException if the rows can't be moved; the chain table is then unchanged
+     */
+    private String setAsideRejectedChain() {
+        String keptIn = CHAIN_TABLE + "_rejected_" + System.currentTimeMillis();
+        synchronized (db) {
+            db.beginTransaction();
+            try {
+                db.execSQL("CREATE TABLE " + keptIn + " AS SELECT * FROM " + CHAIN_TABLE);
+                db.execSQL("DELETE FROM " + CHAIN_TABLE);
+                db.setTransactionSuccessful();
+            } catch (RuntimeException e) {
+                throw new IllegalStateException("Could not set the rejected karma chain aside", e);
+            } finally {
+                db.endTransaction();
+            }
+        }
+        return keptIn;
     }
 
     public boolean isOpen() {
