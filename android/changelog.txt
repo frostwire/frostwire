@@ -1,4 +1,5 @@
 FrostWire 3.2.3 build 779 UNRELEASED
+  - fix:Music home screen shortcuts (artist, album, genre, playlist) and asking your assistant to play music on FrostWire work again instead of crashing (#1404)
   - fix:Album art and thumbnails no longer download again every time you switch away from FrostWire and back — the image disk cache is kept, capped at 50 MB (#1389)
   - fix:Distributed search no longer accepts a peer's karma chain that declares an invalid energy value to endorse other peers without the per-epoch limit (#1401)
   - fix:Distributed search (IceBridge) no longer uses Android 13-only APIs when it creates its identity, stores its access token and caches block headers, which could stop it from working on Android 8 to 12 (#1400)
