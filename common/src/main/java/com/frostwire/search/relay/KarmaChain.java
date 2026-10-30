@@ -7,12 +7,16 @@
 
 package com.frostwire.search.relay;
 
+import com.frostwire.util.Bencode;
+import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 
 import java.security.PrivateKey;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * In-memory representation of a node's karma chain with energy tracking
@@ -209,6 +213,80 @@ public final class KarmaChain {
 
     public synchronized long currentEpoch() {
         return currentEpoch;
+    }
+
+    /** Largest remote manifest {@link #parseManifest(byte[], byte[])} accepts, in bytes. */
+    static final int MAX_REMOTE_MANIFEST_BYTES = 64 * 1024;
+
+    /** Most entries {@link #parseManifest(byte[], byte[])} accepts in one manifest. */
+    static final int MAX_REMOTE_MANIFEST_ENTRIES = 256;
+
+    /**
+     * Parses a peer's karma chain manifest, as {@link KarmaChainPublisher}
+     * publishes it, and verifies it: every entry must be signed by
+     * {@code owner}, and the entries must pass {@link #verify(List)}, or
+     * {@link #verifyTail(List, byte[], long)} against the manifest's
+     * {@code base} when it has one.
+     *
+     * @param manifest the manifest's bencoded bytes (untrusted)
+     * @param owner    the 32-byte Ed25519 key the manifest was fetched under
+     * @return the verified entries (unmodifiable), or null if the manifest
+     *         is too large, is missing fields, has the wrong shape, or does
+     *         not verify
+     * @throws IllegalArgumentException if {@code manifest} is not canonical
+     *         bencode, or a hex or base64 field in it is malformed
+     */
+    public static List<KarmaChainEntry> parseManifest(byte[] manifest, byte[] owner) {
+        if (manifest == null || manifest.length > MAX_REMOTE_MANIFEST_BYTES) {
+            return null;
+        }
+        return parseManifest(Bencode.asDictionary(Bencode.decode(manifest)), owner);
+    }
+
+    /**
+     * As {@link #parseManifest(byte[], byte[])}, for a manifest already
+     * decoded to {@link Bencode}'s neutral form.
+     *
+     * @throws IllegalArgumentException if a hex or base64 field is malformed
+     */
+    static List<KarmaChainEntry> parseManifest(Map<String, Object> dict, byte[] owner) {
+        if (dict == null) {
+            return null;
+        }
+        List<Object> entryDicts = Bencode.asList(dict.get("entries"));
+        if (entryDicts == null || entryDicts.size() > MAX_REMOTE_MANIFEST_ENTRIES) {
+            return null;
+        }
+        List<KarmaChainEntry> chain = new ArrayList<>(entryDicts.size());
+        for (Object e : entryDicts) {
+            Map<String, Object> entryDict = Bencode.asDictionary(e);
+            if (entryDict == null) {
+                return null;
+            }
+            KarmaChainEntry entry = KarmaChainEntry.fromDictionary(entryDict, owner);
+            if (entry == null || !Arrays.equals(owner, entry.endorserPub())) {
+                return null;
+            }
+            chain.add(entry);
+        }
+        Object baseValue = dict.get("base");
+        if (baseValue != null) {
+            Map<String, Object> baseDict = Bencode.asDictionary(baseValue);
+            if (baseDict == null) {
+                return null;
+            }
+            Long baseSeq = Bencode.asLong(baseDict.get("seq"));
+            String basePrevHash = Bencode.asString(baseDict.get("ph"));
+            if (baseSeq == null || basePrevHash == null) {
+                return null;
+            }
+            if (!verifyTail(chain, Hex.decode(basePrevHash), baseSeq)) {
+                return null;
+            }
+        } else if (!verify(chain)) {
+            return null;
+        }
+        return Collections.unmodifiableList(chain);
     }
 
     /**

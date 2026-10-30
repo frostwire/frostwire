@@ -9,6 +9,7 @@ package com.frostwire.search.relay;
 
 import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.search.relay.icebridge.IceBridgeConstants;
+import com.frostwire.util.Bencode;
 import com.frostwire.util.Hex;
 
 import java.security.KeyPair;
@@ -28,7 +29,8 @@ import java.util.TreeMap;
  * optionally published as a BEP 46 mutable item by known public key + salt.
  *
  * <p>The canonical signature payload is the bencoded dictionary returned by
- * {@link #toCanonicalEntry()}, which is the full record without {@code sig}.
+ * {@link #canonicalBytes()} (pure Java, see {@link Bencode}), which is the full
+ * record without {@code sig}.
  *
  * <p>Wire schema versions:
  * <ul>
@@ -142,16 +144,39 @@ public final class IdentityRecord {
 
     public Entry toEntry() {
         Map<String, Object> map = canonicalMap();
-        map.put("sig", new Entry(b64(signature)));
-        return Entry.fromMap(map);
+        map.put("sig", b64(signature));
+        return toLibtorrentEntry(map);
+    }
+
+    /** The full record, signature included, as canonical bencode (what {@link #fromBencode} reads). */
+    public byte[] toBencode() {
+        Map<String, Object> map = canonicalMap();
+        map.put("sig", b64(signature));
+        return Bencode.encode(map);
     }
 
     public Entry toCanonicalEntry() {
-        return Entry.fromMap(canonicalMap());
+        return toLibtorrentEntry(canonicalMap());
+    }
+
+    /**
+     * The libtorrent entry whose {@code bencode()} equals {@code Bencode.encode(map)}: integers
+     * through {@code Entry(long)} (libtorrent's bdecode reads {@link Long#MIN_VALUE} as 0),
+     * strings through their UTF-8 bytes.
+     */
+    private static Entry toLibtorrentEntry(Map<String, Object> map) {
+        Map<String, Object> entries = new TreeMap<>();
+        for (Map.Entry<String, Object> e : map.entrySet()) {
+            Object value = e.getValue();
+            entries.put(e.getKey(), value instanceof Long
+                    ? new Entry((Long) value)
+                    : Entry.bdecode(Bencode.encode(value)));
+        }
+        return Entry.fromMap(entries);
     }
 
     public byte[] canonicalBytes() {
-        return toCanonicalEntry().bencode();
+        return Bencode.encode(canonicalMap());
     }
 
     public boolean verifySignature() {
@@ -191,96 +216,95 @@ public final class IdentityRecord {
                 IceBridgeConstants.SOFTWARE_VERSION, VERSION, now, now, ed25519.getPrivate());
     }
 
+    /**
+     * Parses and verifies a record libtorrent has decoded (a BEP 46 item).
+     * Adapter over {@link #fromBencode(byte[])} through the entry's bytes.
+     *
+     * @throws IllegalArgumentException as {@link #fromBencode(byte[])} does
+     */
     public static IdentityRecord fromEntry(Entry entry) {
-        Map<String, Entry> map = entry.dictionary();
-        int version = (int) map.get("v").integer();
-        if (version == 1) {
-            IdentityRecord record = new IdentityRecord(
-                    Hex.decode(map.get("node_id").string()),
-                    b64decode(map.get("ed25519_pub").string()),
-                    b64decode(map.get("x25519_pub").string()),
-                    (int) map.get("utp_port").integer(),
-                    0,
-                    "BOTH",
-                    NodeCapabilities.DEFAULT_BOTH,
-                    "",
-                    1,
-                    map.get("first_seen").integer(),
-                    map.get("last_seen").integer(),
-                    b64decode(map.get("sig").string()));
-            if (!record.verifySignature()) {
-                throw new IllegalArgumentException("Invalid identity signature");
-            }
-            return record;
-        }
-        if (version == 2) {
-            String role = map.containsKey("role") ? map.get("role").string() : "BOTH";
-            IdentityRecord record = new IdentityRecord(
-                    Hex.decode(map.get("node_id").string()),
-                    b64decode(map.get("ed25519_pub").string()),
-                    b64decode(map.get("x25519_pub").string()),
-                    (int) map.get("utp_port").integer(),
-                    map.containsKey("rudp_port") ? (int) map.get("rudp_port").integer() : 0,
-                    role,
-                    NodeCapabilities.fromRole(role),
-                    "",
-                    2,
-                    map.get("first_seen").integer(),
-                    map.get("last_seen").integer(),
-                    b64decode(map.get("sig").string()));
-            if (!record.verifySignature()) {
-                throw new IllegalArgumentException("Invalid identity signature");
-            }
-            return record;
-        }
-        if (version == 3) {
-            String role = map.containsKey("role") ? map.get("role").string() : "BOTH";
-            long caps = map.containsKey("caps")
-                    ? map.get("caps").integer()
-                    : NodeCapabilities.fromRole(role);
-            IdentityRecord record = new IdentityRecord(
-                    Hex.decode(map.get("node_id").string()),
-                    b64decode(map.get("ed25519_pub").string()),
-                    b64decode(map.get("x25519_pub").string()),
-                    (int) map.get("utp_port").integer(),
-                    map.containsKey("rudp_port") ? (int) map.get("rudp_port").integer() : 0,
-                    role,
-                    caps,
-                    "",
-                    3,
-                    map.get("first_seen").integer(),
-                    map.get("last_seen").integer(),
-                    b64decode(map.get("sig").string()));
-            if (!record.verifySignature()) {
-                throw new IllegalArgumentException("Invalid identity signature");
-            }
-            return record;
-        }
-        if (version != VERSION) {
+        return fromBencode(entry.bencode());
+    }
+
+    /**
+     * Parses a bencoded identity record (wire versions 1 to {@link #VERSION})
+     * and verifies its signature.
+     *
+     * @param bencoded the record's bytes (untrusted)
+     * @return the verified record, never null
+     * @throws IllegalArgumentException if the bytes are not canonical bencode
+     *         of a dictionary, a required field is missing or has the wrong
+     *         type, the version is unsupported, a field is malformed, or the
+     *         signature does not verify
+     */
+    public static IdentityRecord fromBencode(byte[] bencoded) {
+        return fromDictionary(Bencode.decodeDictionary(bencoded));
+    }
+
+    /**
+     * As {@link #fromBencode(byte[])}, for a record already decoded to
+     * {@link Bencode}'s neutral form.
+     *
+     * @throws IllegalArgumentException as {@link #fromBencode(byte[])} does
+     */
+    static IdentityRecord fromDictionary(Map<String, Object> map) {
+        int version = (int) requiredLong(map, "v");
+        if (version < 1 || version > VERSION) {
             throw new IllegalArgumentException("Unsupported identity version: " + version);
         }
-        String role = map.containsKey("role") ? map.get("role").string() : "BOTH";
-        long caps = map.containsKey("caps")
-                ? map.get("caps").integer()
-                : NodeCapabilities.fromRole(role);
-        String ibVer = map.containsKey("ib_ver") ? map.get("ib_ver").string() : "";
+        // v1: no rudp/role/caps/ib_ver. v2: +rudp+role. v3: +caps. v4: +ib_ver.
+        String role = version >= 2 ? optionalString(map, "role", "BOTH") : "BOTH";
+        int rudpPort = version >= 2 ? (int) optionalLong(map, "rudp_port", 0) : 0;
+        long caps;
+        if (version >= 3) {
+            caps = optionalLong(map, "caps", NodeCapabilities.fromRole(role));
+        } else if (version == 2) {
+            caps = NodeCapabilities.fromRole(role);
+        } else {
+            caps = NodeCapabilities.DEFAULT_BOTH;
+        }
+        String ibVer = version >= 4 ? optionalString(map, "ib_ver", "") : "";
         IdentityRecord record = new IdentityRecord(
-                Hex.decode(map.get("node_id").string()),
-                b64decode(map.get("ed25519_pub").string()),
-                b64decode(map.get("x25519_pub").string()),
-                (int) map.get("utp_port").integer(),
-                map.containsKey("rudp_port") ? (int) map.get("rudp_port").integer() : 0,
+                Hex.decode(requiredString(map, "node_id")),
+                b64decode(requiredString(map, "ed25519_pub")),
+                b64decode(requiredString(map, "x25519_pub")),
+                (int) requiredLong(map, "utp_port"),
+                rudpPort,
                 role,
                 caps,
-                ibVer != null ? ibVer : "",
-                VERSION,
-                map.get("first_seen").integer(),
-                map.get("last_seen").integer(),
-                b64decode(map.get("sig").string()));
+                ibVer,
+                version,
+                requiredLong(map, "first_seen"),
+                requiredLong(map, "last_seen"),
+                b64decode(requiredString(map, "sig")));
         if (!record.verifySignature()) {
             throw new IllegalArgumentException("Invalid identity signature");
         }
         return record;
+    }
+
+    private static long requiredLong(Map<String, Object> map, String key) {
+        Long value = Bencode.asLong(map.get(key));
+        if (value == null) {
+            throw new IllegalArgumentException("missing integer field " + key);
+        }
+        return value;
+    }
+
+    private static long optionalLong(Map<String, Object> map, String key, long fallback) {
+        return map.containsKey(key) ? requiredLong(map, key) : fallback;
+    }
+
+    private static String requiredString(Map<String, Object> map, String key) {
+        String value = Bencode.asString(map.get(key));
+        if (value == null) {
+            throw new IllegalArgumentException("missing string field " + key);
+        }
+        return value;
+    }
+
+    private static String optionalString(Map<String, Object> map, String key, String fallback) {
+        return map.containsKey(key) ? requiredString(map, key) : fallback;
     }
 
     public static byte[] extractRawEd25519(PublicKey ed25519) {
@@ -330,24 +354,25 @@ public final class IdentityRecord {
     private Map<String, Object> canonicalMap() {
         // Signature domain must match the wire version that was signed.
         // v1: no rudp/role/caps/ib_ver. v2: +rudp+role. v3: +caps. v4: +ib_ver.
+        // Bencode sorts the keys by their bytes, as libtorrent's entry did.
         Map<String, Object> map = new TreeMap<>();
-        map.put("ed25519_pub", new Entry(b64(ed25519Pub)));
-        map.put("first_seen", new Entry(firstSeen));
+        map.put("ed25519_pub", b64(ed25519Pub));
+        map.put("first_seen", firstSeen);
         if (wireVersion >= 4) {
-            map.put("ib_ver", new Entry(icebridgeVersion != null ? icebridgeVersion : ""));
+            map.put("ib_ver", icebridgeVersion != null ? icebridgeVersion : "");
         }
-        map.put("last_seen", new Entry(lastSeen));
-        map.put("node_id", new Entry(Hex.encode(nodeId)));
+        map.put("last_seen", lastSeen);
+        map.put("node_id", Hex.encode(nodeId));
         if (wireVersion >= 2) {
-            map.put("rudp_port", new Entry((long) rudpPort));
-            map.put("role", new Entry(role));
+            map.put("rudp_port", (long) rudpPort);
+            map.put("role", role);
         }
         if (wireVersion >= 3) {
-            map.put("caps", new Entry(capabilities));
+            map.put("caps", capabilities);
         }
-        map.put("utp_port", new Entry((long) utpPort));
-        map.put("v", new Entry((long) wireVersion));
-        map.put("x25519_pub", new Entry(b64(x25519Pub)));
+        map.put("utp_port", (long) utpPort);
+        map.put("v", (long) wireVersion);
+        map.put("x25519_pub", b64(x25519Pub));
         return map;
     }
 

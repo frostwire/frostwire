@@ -8,6 +8,7 @@
 package com.frostwire.search.relay;
 
 import com.frostwire.jlibtorrent.Entry;
+import com.frostwire.util.Bencode;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 
@@ -58,6 +59,10 @@ public final class KarmaChainEntry {
     public static final byte[] GENESIS_PREV_HASH = new byte[32];
 
     private static final Logger LOG = Logger.getLogger(KarmaChainEntry.class);
+
+    /** The manifest entry fields {@link #fromDictionary(Map, byte[])} reads. */
+    private static final String[] MANIFEST_FIELDS =
+            {"k", "seq", "bh", "bkh", "ph", "pub", "s", "ep", "en", "pp", "ih", "sd"};
 
     private final Kind kind;
     private final byte[] prevHash;
@@ -365,7 +370,9 @@ public final class KarmaChainEntry {
 
     /**
      * Reconstruct with a fallback endorser key for dicts whose
-     * {@code pub} field was omitted by the publisher.
+     * {@code pub} field was omitted by the publisher. Adapter over
+     * {@link #fromDictionary(Map, byte[])} for dictionaries libtorrent
+     * has decoded; returns null for anything that one rejects.
      *
      * @param ownerPub manifest-level owner key, or null to require inline pub
      */
@@ -374,82 +381,129 @@ public final class KarmaChainEntry {
             return null;
         }
         try {
-            Entry kindEntry = dict.get("k");
-            Entry seqEntry = dict.get("seq");
-            Entry bhEntry = dict.get("bh");
-            Entry bkhEntry = dict.get("bkh");
-            Entry phEntry = dict.get("ph");
-            Entry pubEntry = dict.get("pub");
-            Entry sigEntry = dict.get("s");
-            if (kindEntry == null || seqEntry == null || bhEntry == null
-                    || bkhEntry == null || phEntry == null
-                    || sigEntry == null) {
-                return null;
-            }
-            if (pubEntry == null) {
-                if (ownerPub == null || ownerPub.length != 32) {
-                    return null;
+            // Only the fields fromDictionary reads, so an unrelated extra
+            // value is ignored as before.
+            Map<String, Object> neutral = new TreeMap<>();
+            for (String field : MANIFEST_FIELDS) {
+                Entry value = dict.get(field);
+                if (value != null) {
+                    neutral.put(field, Bencode.decode(value.bencode()));
                 }
             }
-
-            String kindCode = kindEntry.string();
-            Kind kind;
-            if ("EC".equals(kindCode)) {
-                kind = Kind.EPOCH_COMMITMENT;
-            } else if ("EN".equals(kindCode)) {
-                kind = Kind.ENDORSEMENT;
-            } else {
-                return null;
-            }
-
-            Builder b = new Builder();
-            b.kind = kind;
-            b.prevHash = Hex.decode(phEntry.string());
-            b.seq = seqEntry.integer();
-            b.endorserPub = pubEntry != null
-                    ? Base64.getUrlDecoder().decode(pubEntry.string())
-                    : ownerPub.clone();
-            b.timestamp = 0L;
-            b.signature = Base64.getUrlDecoder().decode(sigEntry.string());
-            b.blockHeight = bhEntry.integer();
-            b.blockHash = Hex.decode(bkhEntry.string());
-
-            if (kind == Kind.EPOCH_COMMITMENT) {
-                Entry epEntry = dict.get("ep");
-                Entry enEntry = dict.get("en");
-                if (epEntry == null || enEntry == null) {
-                    return null;
-                }
-                b.epoch = epEntry.integer();
-                try {
-                    b.energy = Double.parseDouble(enEntry.string());
-                } catch (NumberFormatException e) {
-                    return null;
-                }
-                if (b.energy < 0 || b.energy > KarmaConstants.MAX_ENERGY + 0.01) {
-                    return null;
-                }
-            } else {
-                Entry ppEntry = dict.get("pp");
-                Entry ihEntry = dict.get("ih");
-                Entry sdEntry = dict.get("sd");
-                if (ppEntry == null || ihEntry == null) {
-                    return null;
-                }
-                b.peerPub = Base64.getUrlDecoder().decode(ppEntry.string());
-                b.infoHash = Hex.decode(ihEntry.string());
-                if (b.infoHash.length != 20) {
-                    return null;
-                }
-                // Score deltas are always 1 in this protocol version; the
-                // publisher omits the field in that case to fit the DHT cap.
-                b.scoreDelta = sdEntry == null ? 1 : (int) sdEntry.integer();
-            }
-            return b.build();
+            return fromDictionary(neutral, ownerPub);
         } catch (Throwable t) {
             LOG.debug("Failed to reconstruct chain entry from manifest", t);
             return null;
         }
+    }
+
+    /**
+     * Parses one bencoded manifest entry dictionary (see
+     * {@link #reconstruct(Map)} for the fields). Does not verify the
+     * signature.
+     *
+     * @return the entry, or null if the dictionary is missing required
+     *         fields or has the wrong shape for its kind
+     * @throws IllegalArgumentException if {@code bencoded} is not canonical
+     *         bencode of a dictionary, or a hex or base64 field is malformed
+     */
+    public static KarmaChainEntry fromBencode(byte[] bencoded) {
+        return fromDictionary(Bencode.decodeDictionary(bencoded), null);
+    }
+
+    /**
+     * As {@link #fromBencode(byte[])}, with the manifest owner's key as
+     * the fallback for an omitted {@code pub} field.
+     *
+     * @throws IllegalArgumentException as {@link #fromBencode(byte[])} does
+     */
+    public static KarmaChainEntry fromBencode(byte[] bencoded, byte[] ownerPub) {
+        return fromDictionary(Bencode.decodeDictionary(bencoded), ownerPub);
+    }
+
+    /**
+     * Parses one manifest entry from its dictionary in {@link Bencode}'s
+     * neutral form. Does not verify the signature.
+     *
+     * @param ownerPub manifest-level owner key, or null to require inline pub
+     * @return the entry, or null if the dictionary is null, is missing
+     *         required fields, or has the wrong shape for its kind
+     * @throws IllegalArgumentException if a hex or base64 field is malformed
+     */
+    static KarmaChainEntry fromDictionary(Map<String, Object> dict, byte[] ownerPub) {
+        if (dict == null) {
+            return null;
+        }
+        String kindCode = Bencode.asString(dict.get("k"));
+        Long seq = Bencode.asLong(dict.get("seq"));
+        Long bh = Bencode.asLong(dict.get("bh"));
+        String bkh = Bencode.asString(dict.get("bkh"));
+        String ph = Bencode.asString(dict.get("ph"));
+        Object pubValue = dict.get("pub");
+        String pub = Bencode.asString(pubValue);
+        String sig = Bencode.asString(dict.get("s"));
+        if (kindCode == null || seq == null || bh == null || bkh == null || ph == null
+                || sig == null || (pubValue != null && pub == null)) {
+            return null;
+        }
+        if (pub == null && (ownerPub == null || ownerPub.length != 32)) {
+            return null;
+        }
+
+        Kind kind;
+        if ("EC".equals(kindCode)) {
+            kind = Kind.EPOCH_COMMITMENT;
+        } else if ("EN".equals(kindCode)) {
+            kind = Kind.ENDORSEMENT;
+        } else {
+            return null;
+        }
+
+        Builder b = new Builder();
+        b.kind = kind;
+        b.prevHash = Hex.decode(ph);
+        b.seq = seq;
+        b.endorserPub = pub != null
+                ? Base64.getUrlDecoder().decode(pub)
+                : ownerPub.clone();
+        b.timestamp = 0L;
+        b.signature = Base64.getUrlDecoder().decode(sig);
+        b.blockHeight = bh;
+        b.blockHash = Hex.decode(bkh);
+
+        if (kind == Kind.EPOCH_COMMITMENT) {
+            Long ep = Bencode.asLong(dict.get("ep"));
+            String en = Bencode.asString(dict.get("en"));
+            if (ep == null || en == null) {
+                return null;
+            }
+            b.epoch = ep;
+            try {
+                b.energy = Double.parseDouble(en);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+            if (b.energy < 0 || b.energy > KarmaConstants.MAX_ENERGY + 0.01) {
+                return null;
+            }
+        } else {
+            String pp = Bencode.asString(dict.get("pp"));
+            String ih = Bencode.asString(dict.get("ih"));
+            Object sdValue = dict.get("sd");
+            Long sd = Bencode.asLong(sdValue);
+            if (pp == null || ih == null || (sdValue != null && sd == null)) {
+                return null;
+            }
+            b.peerPub = Base64.getUrlDecoder().decode(pp);
+            b.infoHash = Hex.decode(ih);
+            if (b.infoHash.length != 20) {
+                return null;
+            }
+            // Score deltas are always 1 in this protocol version; the
+            // publisher omits the field in that case to fit the DHT cap.
+            b.scoreDelta = sd == null ? 1 : (int) sd.longValue();
+        }
+        return b.build();
     }
 
     /**
@@ -541,28 +595,29 @@ public final class KarmaChainEntry {
         byte[] canonicalBytes;
 
         void canonicalBytesForSigning() {
+            // Bencode sorts the keys by their bytes, as libtorrent's entry did.
             Map<String, Object> map = new TreeMap<>();
-            map.put("bh", new Entry(blockHeight));
-            map.put("bk", new Entry(Hex.encode(blockHash)));
-            map.put("k", new Entry(kind.code));
-            map.put("ph", new Entry(Hex.encode(prevHash)));
-            map.put("pub", new Entry(Base64.getUrlEncoder().withoutPadding().encodeToString(endorserPub)));
-            map.put("seq", new Entry(seq));
+            map.put("bh", blockHeight);
+            map.put("bk", Hex.encode(blockHash));
+            map.put("k", kind.code);
+            map.put("ph", Hex.encode(prevHash));
+            map.put("pub", Base64.getUrlEncoder().withoutPadding().encodeToString(endorserPub));
+            map.put("seq", seq);
             // Note: timestamp is NOT included in the signed canonical form
             // so that two entries created at the same logical state produce
             // identical signatures. Timestamp is informational and part of
             // the public record but not part of the integrity contract.
 
             if (kind == Kind.EPOCH_COMMITMENT) {
-                map.put("e", new Entry(String.format(java.util.Locale.ROOT, "%.2f", energy)));
-                map.put("ep", new Entry(epoch));
+                map.put("e", String.format(java.util.Locale.ROOT, "%.2f", energy));
+                map.put("ep", epoch);
             } else { // ENDORSEMENT
-                map.put("ih", new Entry(Hex.encode(infoHash)));
-                map.put("pp", new Entry(Base64.getUrlEncoder().withoutPadding().encodeToString(peerPub)));
-                map.put("sd", new Entry(scoreDelta));
+                map.put("ih", Hex.encode(infoHash));
+                map.put("pp", Base64.getUrlEncoder().withoutPadding().encodeToString(peerPub));
+                map.put("sd", (long) scoreDelta);
             }
 
-            this.canonicalBytes = Entry.fromMap(map).bencode();
+            this.canonicalBytes = Bencode.encode(map);
         }
 
         KarmaChainEntry build() {

@@ -222,6 +222,8 @@ class KarmaChainPublisherTest {
                 dicts.stream().map(d -> KarmaChainEntry.reconstruct(d.dictionary(), verifyOwner))
                         .collect(Collectors.toList())),
                 "full publisher output must pass full-chain verify");
+        assertEquals(chain, KarmaChain.parseManifest(manifest.bencode(), verifyOwner),
+                "the pure-Java manifest parser must accept the publisher's bytes");
     }
 
     @Test
@@ -262,6 +264,10 @@ class KarmaChainPublisherTest {
         assertTrue(KarmaChain.verifyTail(tail,
                 Hex.decode(base.get("ph").string()), base.get("seq").integer()),
                 "truncated tail must pass verifyTail with its base");
+        assertEquals(tail, KarmaChain.parseManifest(manifest.bencode(), tailOwner),
+                "the pure-Java manifest parser must verify the tail against its base");
+        assertNull(KarmaChain.parseManifest(manifest.bencode(), FAKE_PEER_PUB),
+                "a manifest fetched under another key must not verify");
 
         KarmaChainEntry endorsement = tail.get(1);
         assertFalse(KarmaChain.verifyTail(java.util.Collections.singletonList(endorsement),

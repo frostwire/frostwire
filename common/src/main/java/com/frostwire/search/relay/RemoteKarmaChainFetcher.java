@@ -10,9 +10,6 @@ package com.frostwire.search.relay;
 import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.util.Logger;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -298,66 +295,16 @@ public final class RemoteKarmaChainFetcher implements AutoCloseable {
         boolean complete;
     }
 
-    private List<KarmaChainEntry> parseAndVerify(Entry manifest, byte[] owner) {
-        Map<String, Entry> dict;
+    /**
+     * Verifies a manifest libtorrent has decoded: its canonical bytes go
+     * through {@link KarmaChain#parseManifest(byte[], byte[])}.
+     */
+    private static List<KarmaChainEntry> parseAndVerify(Entry manifest, byte[] owner) {
         try {
-            dict = manifest.dictionary();
-        } catch (Throwable t) {
+            return KarmaChain.parseManifest(manifest.bencode(), owner);
+        } catch (IllegalArgumentException e) {
             return null;
         }
-        Entry entriesEntry = dict.get("entries");
-        if (entriesEntry == null) {
-            return null;
-        }
-        List<Entry> entryDicts;
-        try {
-            entryDicts = entriesEntry.list();
-        } catch (Throwable t) {
-            return null;
-        }
-        if (entryDicts.size() > 256 || manifest.bencode().length > 64 * 1024) return null;
-        List<KarmaChainEntry> chain = new ArrayList<>(entryDicts.size());
-        for (Entry e : entryDicts) {
-            Map<String, Entry> entryDict;
-            try {
-                entryDict = e.dictionary();
-            } catch (Throwable t) {
-                return null;
-            }
-            KarmaChainEntry entry = KarmaChainEntry.reconstruct(entryDict, owner);
-            if (entry == null || !Arrays.equals(owner, entry.endorserPub())) {
-                return null;
-            }
-            chain.add(entry);
-        }
-        Entry baseEntry = dict.get("base");
-        if (baseEntry != null) {
-            Map<String, Entry> baseDict;
-            try {
-                baseDict = baseEntry.dictionary();
-            } catch (Throwable t) {
-                return null;
-            }
-            Entry seqEntry = baseDict.get("seq");
-            Entry phEntry = baseDict.get("ph");
-            if (seqEntry == null || phEntry == null) {
-                return null;
-            }
-            byte[] basePrevHash;
-            long baseSeq;
-            try {
-                basePrevHash = com.frostwire.util.Hex.decode(phEntry.string());
-                baseSeq = seqEntry.integer();
-            } catch (Throwable t) {
-                return null;
-            }
-            if (!KarmaChain.verifyTail(chain, basePrevHash, baseSeq)) {
-                return null;
-            }
-        } else if (!KarmaChain.verify(chain)) {
-            return null;
-        }
-        return Collections.unmodifiableList(chain);
     }
 
     private static String cacheKey(byte[] peerPub) {
