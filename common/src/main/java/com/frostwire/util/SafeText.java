@@ -89,23 +89,24 @@ public final class SafeText {
         if (cp >= 0x1F900 && cp <= 0x1F9FF) return false;
         if (cp >= 0x1FA00 && cp <= 0x1FA6F) return false;
         if (cp >= 0x1FA70 && cp <= 0x1FAFF) return false;
+        // Ranges, not Character.UnicodeBlock constants: Android only has these blocks' constants
+        // from API 34, and common/ runs there too (frostwire/frostwire#1400). The ranges above
+        // already cover SUPPLEMENTAL_SYMBOLS_AND_PICTOGRAPHS, CHESS_SYMBOLS and
+        // SYMBOLS_AND_PICTOGRAPHS_EXTENDED_A.
+        if (cp >= 0x1F650 && cp <= 0x1F67F) return false; // ORNAMENTAL_DINGBATS
+        if (cp >= 0x1FB00 && cp <= 0x1FBFF) return false; // SYMBOLS_FOR_LEGACY_COMPUTING
         if (cp >= 0xE0100 && cp <= 0xE01EF) return false;
         if (cp >= 0xE0000 && cp <= 0xE007F) return false;
         Character.UnicodeBlock block = Character.UnicodeBlock.of(cp);
         if (block == Character.UnicodeBlock.EMOTICONS ||
             block == Character.UnicodeBlock.MISCELLANEOUS_SYMBOLS_AND_PICTOGRAPHS ||
             block == Character.UnicodeBlock.TRANSPORT_AND_MAP_SYMBOLS ||
-            block == Character.UnicodeBlock.SUPPLEMENTAL_SYMBOLS_AND_PICTOGRAPHS ||
             block == Character.UnicodeBlock.VARIATION_SELECTORS_SUPPLEMENT ||
             block == Character.UnicodeBlock.TAGS ||
             block == Character.UnicodeBlock.MISCELLANEOUS_SYMBOLS ||
             block == Character.UnicodeBlock.MAHJONG_TILES ||
             block == Character.UnicodeBlock.DOMINO_TILES ||
             block == Character.UnicodeBlock.PLAYING_CARDS ||
-            block == Character.UnicodeBlock.ORNAMENTAL_DINGBATS ||
-            block == Character.UnicodeBlock.CHESS_SYMBOLS ||
-            block == Character.UnicodeBlock.SYMBOLS_AND_PICTOGRAPHS_EXTENDED_A ||
-            block == Character.UnicodeBlock.SYMBOLS_FOR_LEGACY_COMPUTING ||
             block == Character.UnicodeBlock.ALCHEMICAL_SYMBOLS) {
             return false;
         }
