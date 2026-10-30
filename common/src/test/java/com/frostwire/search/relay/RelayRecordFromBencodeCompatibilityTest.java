@@ -140,26 +140,47 @@ class RelayRecordFromBencodeCompatibilityTest {
 
   // --- Endorsement budget: floor(energy) endorsements per commitment ---
 
+  /**
+   * A chain's first commitment always has energy 5 (nothing carried over), and a later one's
+   * follows from the previous commitment; only the first commitment of a published tail, whose
+   * prefix is omitted, can declare any energy up to MAX_ENERGY. So the budget for every finite
+   * energy is checked on tails (frostwire/frostwire#1415 rejects a full chain whose first
+   * commitment isn't 5 as unsafe; before it, these were full chains).
+   */
   @Test
   void theEndorsementBudgetIsEnforcedForFiniteEnergies() throws Exception {
     double[] energies = {0.0, -0.0, 0.5, 0.999, 1.0, 2.5, 3.0, KarmaConstants.MAX_ENERGY};
     for (double energy : energies) {
       int budget = (int) Math.floor(energy);
-      List<KarmaChainEntry> full = chain(energy, budget);
-      assertTrue(KarmaChain.verify(full), "at budget, energy " + energy);
-      assertTrue(KarmaChain.verifyTail(full, KarmaChainEntry.GENESIS_PREV_HASH, 0));
-      List<KarmaChainEntry> parsed = KarmaChain.parseManifest(manifest(full), owner);
+      List<KarmaChainEntry> tail = tail(energy, budget);
+      assertTrue(KarmaChain.verifyTail(tail, TAIL_BASE, TAIL_SEQ), "at budget, energy " + energy);
+      List<KarmaChainEntry> parsed = KarmaChain.parseManifest(manifestWithBase(tail), owner);
       assertNotNull(parsed, "manifest at budget, energy " + energy);
       assertEquals(budget + 1, parsed.size());
       assertEquals(
           String.format(Locale.ROOT, "%.3f", energy),
           String.format(Locale.ROOT, "%.3f", parsed.get(0).energy()));
 
-      List<KarmaChainEntry> over = chain(energy, budget + 1);
-      assertFalse(KarmaChain.verify(over), "over budget, energy " + energy);
-      assertFalse(KarmaChain.verifyTail(over, KarmaChainEntry.GENESIS_PREV_HASH, 0));
-      assertNull(KarmaChain.parseManifest(manifest(over), owner), "manifest over, " + energy);
+      List<KarmaChainEntry> over = tail(energy, budget + 1);
+      assertFalse(KarmaChain.verifyTail(over, TAIL_BASE, TAIL_SEQ), "over budget, " + energy);
+      assertNull(
+          KarmaChain.parseManifest(manifestWithBase(over), owner), "manifest over, " + energy);
     }
+  }
+
+  @Test
+  void theEndorsementBudgetIsEnforcedForAFullChain() throws Exception {
+    double energy = KarmaConstants.KARMA_ENERGY_PER_EPOCH;
+    int budget = (int) Math.floor(energy);
+    List<KarmaChainEntry> full = chain(energy, budget);
+    assertTrue(KarmaChain.verify(full));
+    assertTrue(KarmaChain.verifyTail(full, KarmaChainEntry.GENESIS_PREV_HASH, 0));
+    assertNotNull(KarmaChain.parseManifest(manifest(full), owner));
+
+    List<KarmaChainEntry> over = chain(energy, budget + 1);
+    assertFalse(KarmaChain.verify(over));
+    assertFalse(KarmaChain.verifyTail(over, KarmaChainEntry.GENESIS_PREV_HASH, 0));
+    assertNull(KarmaChain.parseManifest(manifest(over), owner));
   }
 
   // --- Endorsement score delta "sd" ---
@@ -338,6 +359,61 @@ class RelayRecordFromBencodeCompatibilityTest {
               keyPair.getPrivate()));
     }
     return entries;
+  }
+
+  private static final long TAIL_SEQ = 3;
+  private static final byte[] TAIL_BASE = new byte[32];
+
+  static {
+    TAIL_BASE[0] = 0x42;
+  }
+
+  /**
+   * As {@link #chain}, but published as a tail: the commitment is entry {@link #TAIL_SEQ} and links
+   * to {@link #TAIL_BASE}, the hash of an omitted entry.
+   */
+  private static List<KarmaChainEntry> tail(double energy, int endorsements) {
+    List<KarmaChainEntry> entries = new ArrayList<>();
+    entries.add(
+        KarmaChainEntry.createEpochCommitment(
+            TAIL_BASE,
+            TAIL_SEQ,
+            owner,
+            new BitcoinBlockReference(144, new byte[32]),
+            energy,
+            keyPair.getPrivate()));
+    for (int i = 0; i < endorsements; i++) {
+      KarmaChainEntry prev = entries.get(entries.size() - 1);
+      byte[] peer = new byte[32];
+      peer[0] = (byte) (i + 1);
+      entries.add(
+          KarmaChainEntry.createEndorsement(
+              prev.entryHash(),
+              TAIL_SEQ + entries.size(),
+              owner,
+              new BitcoinBlockReference(145 + i, new byte[32]),
+              peer,
+              new byte[20],
+              1,
+              keyPair.getPrivate()));
+    }
+    return entries;
+  }
+
+  /** A manifest of a {@link #tail}, with the {@code base} the publisher adds to trimmed chains. */
+  private static byte[] manifestWithBase(List<KarmaChainEntry> entries) {
+    Map<String, Object> m = new TreeMap<>();
+    List<Object> dicts = new ArrayList<>();
+    for (KarmaChainEntry e : entries) {
+      dicts.add(manifestDict(e));
+    }
+    Map<String, Object> base = new TreeMap<>();
+    base.put("ph", Hex.encode(TAIL_BASE));
+    base.put("seq", TAIL_SEQ);
+    m.put("base", base);
+    m.put("entries", dicts);
+    m.put("v", 1L);
+    return Bencode.encode(m);
   }
 
   /** A manifest entry dictionary as {@link KarmaChainPublisher} writes it (no per-entry pub). */

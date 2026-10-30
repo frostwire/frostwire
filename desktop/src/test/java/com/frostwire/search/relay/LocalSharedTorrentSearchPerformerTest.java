@@ -554,26 +554,40 @@ class LocalSharedTorrentSearchPerformerTest {
       int endorsementCount) {
     try {
       java.util.List<com.frostwire.jlibtorrent.Entry> entries = new java.util.ArrayList<>();
-      // Use MAX_ENERGY in the EC so the verifier permits up to
-      // MAX_ENERGY endorsements in this epoch.
-      KarmaChainEntry ec =
-          KarmaChainEntry.createEpochCommitment(
-              KarmaChainEntry.GENESIS_PREV_HASH,
-              0,
-              ownerPub,
-              block,
-              KarmaConstants.MAX_ENERGY,
-              keyPair.getPrivate());
-      entries.add(entryDict(ec));
-      byte[] prev = ec.entryHash();
-      for (int i = 0; i < endorsementCount; i++) {
+      // A chain that follows the epoch rules (frostwire/frostwire#1415): each commitment grants
+      // 5 + half the previous commitment's unused energy, so more endorsements than one epoch
+      // allows go into the next epoch.
+      byte[] prev = KarmaChainEntry.GENESIS_PREV_HASH;
+      long seq = 0;
+      double energy = 0;
+      int used = 0;
+      BitcoinBlockReference epochBlock = null;
+      for (int i = 0; i < endorsementCount || seq == 0; i++) {
+        if (epochBlock == null || used >= Math.floor(energy)) {
+          long height =
+              epochBlock == null
+                  ? block.height()
+                  : epochBlock.height() + KarmaConstants.BLOCKS_PER_EPOCH;
+          epochBlock = new BitcoinBlockReference(height, block.hash());
+          energy = KarmaConstants.energyAtEpoch(Math.max(0, energy - used));
+          used = 0;
+          KarmaChainEntry ec =
+              KarmaChainEntry.createEpochCommitment(
+                  prev, seq++, ownerPub, epochBlock, energy, keyPair.getPrivate());
+          entries.add(entryDict(ec));
+          prev = ec.entryHash();
+        }
+        if (i >= endorsementCount) {
+          break;
+        }
         byte[] fakePeer = new byte[32];
         fakePeer[31] = (byte) (i + 1);
         KarmaChainEntry en =
             KarmaChainEntry.createEndorsement(
-                prev, i + 1, ownerPub, block, fakePeer, new byte[20], 1, keyPair.getPrivate());
+                prev, seq++, ownerPub, epochBlock, fakePeer, new byte[20], 1, keyPair.getPrivate());
         entries.add(entryDict(en));
         prev = en.entryHash();
+        used++;
       }
       java.util.Map<String, Object> manifest = new java.util.HashMap<>();
       manifest.put("v", new com.frostwire.jlibtorrent.Entry(1L));
@@ -581,7 +595,7 @@ class LocalSharedTorrentSearchPerformerTest {
           "pub",
           new com.frostwire.jlibtorrent.Entry(
               java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(ownerPub)));
-      manifest.put("len", new com.frostwire.jlibtorrent.Entry((long) (endorsementCount + 1)));
+      manifest.put("len", new com.frostwire.jlibtorrent.Entry((long) entries.size()));
       manifest.put(
           "head", new com.frostwire.jlibtorrent.Entry(com.frostwire.util.Hex.encode(prev)));
       manifest.put("ts", new com.frostwire.jlibtorrent.Entry(0L));
