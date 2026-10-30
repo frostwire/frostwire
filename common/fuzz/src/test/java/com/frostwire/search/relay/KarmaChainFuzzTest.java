@@ -54,5 +54,27 @@ class KarmaChainFuzzTest {
         throw new AssertionError("accepted chain has an entry not signed by the owner: " + entry);
       }
     }
+    assertEndorsementBudget(chain);
+  }
+
+  /**
+   * The point of epoch energy: an accepted chain never has more endorsements after a commitment
+   * than floor(energy), and the energy is a finite value in range. A "NaN" energy once lifted the
+   * budget because every comparison with NaN is false (frostwire/frostwire#1401).
+   */
+  private static void assertEndorsementBudget(List<KarmaChainEntry> chain) {
+    double energy = -1;
+    int endorsements = 0;
+    for (KarmaChainEntry entry : chain) {
+      if (entry.kind() == KarmaChainEntry.Kind.EPOCH_COMMITMENT) {
+        energy = entry.energy();
+        endorsements = 0;
+        if (!Double.isFinite(energy) || energy < 0 || energy > KarmaConstants.MAX_ENERGY + 0.01) {
+          throw new AssertionError("accepted a commitment with energy " + energy);
+        }
+      } else if (energy >= 0 && ++endorsements > Math.floor(energy)) {
+        throw new AssertionError("accepted " + endorsements + " endorsements on energy " + energy);
+      }
+    }
   }
 }
