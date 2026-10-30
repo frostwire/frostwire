@@ -10,7 +10,6 @@ package com.frostwire.search;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Locale;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -94,10 +93,6 @@ class SizeParserCompatibilityTest {
     }
   }
 
-  @Disabled(
-      "frostwire/frostwire#1360: parseSize(s, \"&nbsp;\") upper-cases the input before splitting,"
-          + " so the documented \"1.23&nbsp;GB\" never matches the lower-case separator (no caller"
-          + " uses this overload; TPB splits on &nbsp; itself)")
   @Test
   void htmlNonBreakingSpaceSeparatorFromTheJavadoc() {
     assertEquals(1320702443L, SizeParser.parseSize("1.23&nbsp;GB", "&nbsp;"));
@@ -127,10 +122,6 @@ class SizeParserCompatibilityTest {
     }
   }
 
-  @Disabled(
-      "frostwire/frostwire#1360: parseSize upper-cases with the default locale, so in Turkish"
-          + " \"GiB\" becomes \"GİB\" and Nyaa's binary units no longer parse (Nyaa's own parser,"
-          + " replaced by the fix, matched them exactly)")
   @Test
   void binaryUnitsParseInTheTurkishLocale() {
     Locale saved = Locale.getDefault();
