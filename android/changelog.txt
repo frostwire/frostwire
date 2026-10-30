@@ -1,4 +1,5 @@
 FrostWire 3.2.3 build 779 UNRELEASED
+  - fix:MP3 tags read correctly in more files: UTF-16 comments and picture descriptions, tags with an extended header, and a short last tag field (#1409)
   - fix:Every valid magnet link form (base32 hash, parameters in any order, upper-case MAGNET:) is checked against the torrent it downloads (#1408)
   - fix:Music home screen shortcuts (artist, album, genre, playlist) and asking your assistant to play music on FrostWire work again instead of crashing (#1404)
   - fix:Album art and thumbnails no longer download again every time you switch away from FrostWire and back — the image disk cache is kept, capped at 50 MB (#1389)
