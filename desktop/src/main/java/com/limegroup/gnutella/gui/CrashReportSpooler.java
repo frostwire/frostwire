@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -352,6 +353,7 @@ public final class CrashReportSpooler {
         Runtime.getRuntime().maxMemory() / (1024 * 1024),
         memoryBucket(),
         heapUsedMb(),
+        ThreadCensus.take(),
         runTag + problem.getClass().getName(),
         oomKind(problem),
         missingClass(problem),
@@ -389,6 +391,7 @@ public final class CrashReportSpooler {
         Runtime.getRuntime().maxMemory() / (1024 * 1024),
         memoryBucket(),
         heapUsedMb(),
+        ThreadCensus.take(),
         runTag + sanitizeViolationClass(violationClass),
         clamp(violationCount, 1, 1000),
         capturedStack == null ? null : framesFor(capturedStack),
@@ -412,6 +415,7 @@ public final class CrashReportSpooler {
         Runtime.getRuntime().maxMemory() / (1024 * 1024),
         memoryBucket(),
         heapUsedMb(),
+        ThreadCensus.take(),
         clamp(missedHeartbeats, 1, 100),
         UUID.randomUUID().toString().replace("-", ""));
   }
@@ -603,6 +607,13 @@ public final class CrashReportSpooler {
     private final String max_memory_mb;
     private final String memory_bucket;
     private final int heap_used_mb;
+
+    /** Null, and then left out of the JSON, when the thread census couldn't be taken. */
+    private final Integer thread_count;
+
+    private final Integer thread_peak;
+    private final Integer thread_stack_mb;
+    private final List<ThreadCensus.Group> thread_groups;
     private final String exception_class;
 
     /** Null, and then left out of the JSON, for anything but an OutOfMemoryError. */
@@ -629,6 +640,7 @@ public final class CrashReportSpooler {
         long maxMemoryMb,
         String memoryBucket,
         int heapUsedMb,
+        ThreadCensus threads,
         String exceptionClass,
         String oomKind,
         String missingClass,
@@ -648,6 +660,10 @@ public final class CrashReportSpooler {
       this.max_memory_mb = Long.toString(maxMemoryMb);
       this.memory_bucket = memoryBucket;
       this.heap_used_mb = heapUsedMb;
+      this.thread_count = threads == null ? null : threads.count;
+      this.thread_peak = threads == null ? null : threads.peak;
+      this.thread_stack_mb = threads == null ? null : threads.stackMb;
+      this.thread_groups = threads == null ? null : threads.groups;
       this.exception_class = exceptionClass;
       this.oom_kind = oomKind;
       this.missing_class = missingClass;
@@ -688,6 +704,13 @@ public final class CrashReportSpooler {
     private final String max_memory_mb;
     private final String memory_bucket;
     private final int heap_used_mb;
+
+    /** Null, and then left out of the JSON, when the thread census couldn't be taken. */
+    private final Integer thread_count;
+
+    private final Integer thread_peak;
+    private final Integer thread_stack_mb;
+    private final List<ThreadCensus.Group> thread_groups;
     private final String violation_class;
     private final int violation_count;
     private final Frame[] stack_frames;
@@ -715,6 +738,7 @@ public final class CrashReportSpooler {
         long maxMemoryMb,
         String memoryBucket,
         int heapUsedMb,
+        ThreadCensus threads,
         String violationClass,
         int violationCount,
         Frame[] stackFrames,
@@ -734,6 +758,10 @@ public final class CrashReportSpooler {
       this.max_memory_mb = Long.toString(maxMemoryMb);
       this.memory_bucket = memoryBucket;
       this.heap_used_mb = heapUsedMb;
+      this.thread_count = threads == null ? null : threads.count;
+      this.thread_peak = threads == null ? null : threads.peak;
+      this.thread_stack_mb = threads == null ? null : threads.stackMb;
+      this.thread_groups = threads == null ? null : threads.groups;
       this.violation_class = violationClass;
       this.violation_count = violationCount;
       this.stack_frames = stackFrames;
@@ -762,6 +790,13 @@ public final class CrashReportSpooler {
     private final String max_memory_mb;
     private final String memory_bucket;
     private final int heap_used_mb;
+
+    /** Null, and then left out of the JSON, when the thread census couldn't be taken. */
+    private final Integer thread_count;
+
+    private final Integer thread_peak;
+    private final Integer thread_stack_mb;
+    private final List<ThreadCensus.Group> thread_groups;
     private final int missed_heartbeats;
     private final String report_nonce;
 
@@ -780,6 +815,7 @@ public final class CrashReportSpooler {
         long maxMemoryMb,
         String memoryBucket,
         int heapUsedMb,
+        ThreadCensus threads,
         int missedHeartbeats,
         String nonce) {
       this.app_version = appVersion;
@@ -796,6 +832,10 @@ public final class CrashReportSpooler {
       this.max_memory_mb = Long.toString(maxMemoryMb);
       this.memory_bucket = memoryBucket;
       this.heap_used_mb = heapUsedMb;
+      this.thread_count = threads == null ? null : threads.count;
+      this.thread_peak = threads == null ? null : threads.peak;
+      this.thread_stack_mb = threads == null ? null : threads.stackMb;
+      this.thread_groups = threads == null ? null : threads.groups;
       this.missed_heartbeats = missedHeartbeats;
       this.report_nonce = nonce;
     }

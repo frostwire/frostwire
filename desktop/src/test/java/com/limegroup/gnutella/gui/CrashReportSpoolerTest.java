@@ -61,9 +61,16 @@ class CrashReportSpoolerTest {
                 "max_memory_mb",
                 "memory_bucket",
                 "heap_used_mb",
+                "thread_count",
+                "thread_peak",
+                "thread_groups",
                 "exception_class",
                 "stack_frames",
                 "report_nonce"));
+    // Left out when the JVM uses the OS default thread stack size (Windows).
+    if (json.has("thread_stack_mb")) {
+      expected.add("thread_stack_mb");
+    }
 
     assertEquals(expected, json.keySet());
     assertEquals(1, json.get("schema_version").getAsInt());

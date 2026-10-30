@@ -74,10 +74,17 @@ class CrashReportSpoolerReportTypesTest {
                 "max_memory_mb",
                 "memory_bucket",
                 "heap_used_mb",
+                "thread_count",
+                "thread_peak",
+                "thread_groups",
                 "violation_class",
                 "violation_count",
                 "report_nonce"));
 
+    // Left out when the JVM uses the OS default thread stack size (Windows).
+    if (json.has("thread_stack_mb")) {
+      expected.add("thread_stack_mb");
+    }
     assertEquals(expected, json.keySet());
     assertEquals(1, json.get("schema_version").getAsInt());
     assertEquals("strictmode", json.get("report_type").getAsString());
@@ -161,9 +168,16 @@ class CrashReportSpoolerReportTypesTest {
                 "max_memory_mb",
                 "memory_bucket",
                 "heap_used_mb",
+                "thread_count",
+                "thread_peak",
+                "thread_groups",
                 "missed_heartbeats",
                 "report_nonce"));
 
+    // Left out when the JVM uses the OS default thread stack size (Windows).
+    if (json.has("thread_stack_mb")) {
+      expected.add("thread_stack_mb");
+    }
     assertEquals(expected, json.keySet());
     assertEquals(1, json.get("schema_version").getAsInt());
     assertEquals("watchdog", json.get("report_type").getAsString());
