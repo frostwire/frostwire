@@ -778,7 +778,7 @@ public final class BTDownloadMediator
     endorseSourcePeerAction.setEnabled(false);
     DesktopParallelExecutor.execute(
         () -> {
-          boolean endorsed = writer.endorseSourcePeer(source, infoHash);
+          boolean endorsed = endorseSourcePeer(writer, source, infoHash);
           GUIMediator.safeInvokeLater(
               () -> {
                 JOptionPane.showMessageDialog(
@@ -796,6 +796,11 @@ public final class BTDownloadMediator
                 }
               });
         });
+  }
+
+  /** Writes the endorsement the user confirmed; runs off the EDT. */
+  static boolean endorseSourcePeer(KarmaChainWriter writer, byte[] source, byte[] infoHash) {
+    return writer.endorseSourcePeer(source, infoHash);
   }
 
   private void notifyTransferTabSelectionListener(BTDownload selected) {
