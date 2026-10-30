@@ -552,7 +552,6 @@ final class Initializer {
       if (!relayLifecycle.getAsBoolean()) return;
       KarmaEndorsementTrigger endorsementTrigger =
           new KarmaEndorsementTrigger(
-              localIndex,
               com.frostwire.search.relay.IdentityLifecycle.ownEd25519Keys(
                   identity,
                   com.frostwire.search.relay.RelayConstants.identityFile(

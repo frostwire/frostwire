@@ -64,9 +64,8 @@ public final class KarmaEndorsementTrigger implements BTEngineListener, AutoClos
   private final ExecutorService executor =
       ExecutorsHelper.newFixedSizeUnboundedThreadPool(1, THREAD_NAME_PREFIX);
 
-  public KarmaEndorsementTrigger(
-      LocalIndex index, byte[] ownEd25519Pub, KarmaEndorsementSink sink) {
-    this(index, ownEd25519Pub, sink, () -> true);
+  public KarmaEndorsementTrigger(byte[] ownEd25519Pub, KarmaEndorsementSink sink) {
+    this(ownEd25519Pub, sink, () -> true);
   }
 
   /**
@@ -75,11 +74,8 @@ public final class KarmaEndorsementTrigger implements BTEngineListener, AutoClos
    * own internal stages (e.g. a guarded KarmaChainWriter).
    */
   public KarmaEndorsementTrigger(
-      LocalIndex index,
-      byte[] ownEd25519Pub,
-      KarmaEndorsementSink sink,
-      BooleanSupplier permitted) {
-    this(index, ownKeys(ownEd25519Pub), sink, permitted);
+      byte[] ownEd25519Pub, KarmaEndorsementSink sink, BooleanSupplier permitted) {
+    this(ownKeys(ownEd25519Pub), sink, permitted);
   }
 
   /**
@@ -87,14 +83,7 @@ public final class KarmaEndorsementTrigger implements BTEngineListener, AutoClos
    * identities'. A source with any of them is never endorsed.
    */
   public KarmaEndorsementTrigger(
-      LocalIndex index,
-      Collection<byte[]> ownKeys,
-      KarmaEndorsementSink sink,
-      BooleanSupplier permitted) {
-    if (index == null) {
-      // Unused since the trigger endorses the download's own source; still required here.
-      throw new IllegalArgumentException("index is null");
-    }
+      Collection<byte[]> ownKeys, KarmaEndorsementSink sink, BooleanSupplier permitted) {
     if (ownKeys == null || ownKeys.isEmpty()) {
       throw new IllegalArgumentException("ownKeys is null or empty");
     }
@@ -267,7 +256,7 @@ public final class KarmaEndorsementTrigger implements BTEngineListener, AutoClos
 
   /**
    * Permanently revoke admission and discard queued updates without waiting. An in-flight
-   * sink/provider may ignore interruption. Does not close the borrowed sink/index.
+   * sink/provider may ignore interruption. Does not close the borrowed sink.
    */
   @Override
   public void close() {

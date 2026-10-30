@@ -323,7 +323,6 @@ public final class AndroidRelayStack implements AutoCloseable {
       SearchEngine.DISTRIBUTED_WIRING.karmaChainWriter(karmaWriter);
       endorsementListener =
           new KarmaEndorsementTrigger(
-              li,
               com.frostwire.search.relay.IdentityLifecycle.ownEd25519Keys(ident, identityFile),
               karmaWriter,
               permitted);

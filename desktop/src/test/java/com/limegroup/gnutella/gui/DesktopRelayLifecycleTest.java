@@ -200,7 +200,7 @@ class DesktopRelayLifecycleTest {
       KarmaChainWriter writer = new KarmaChainWriter(identity, source, store, owner);
       owner.own(writer, writer::awaitStopped);
       KarmaEndorsementTrigger trigger =
-          new KarmaEndorsementTrigger(index, identity.ed25519PubRaw(), writer, owner);
+          new KarmaEndorsementTrigger(identity.ed25519PubRaw(), writer, owner);
       owner.own(trigger, trigger::awaitStopped);
       KarmaChainCommitScheduler scheduler =
           new KarmaChainCommitScheduler(

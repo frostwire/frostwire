@@ -9,9 +9,7 @@ package com.frostwire.search.relay;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
@@ -21,14 +19,10 @@ class KarmaEndorsementTriggerTest {
   @Test
   void constructorRejectsNulls() {
     byte[] ownPub = new byte[32];
-    LocalIndex index = new NoopLocalIndex();
     KarmaEndorsementSink sink = (p, h) -> {};
     assertThrows(
-        IllegalArgumentException.class, () -> new KarmaEndorsementTrigger(null, ownPub, sink));
-    assertThrows(
-        IllegalArgumentException.class, () -> new KarmaEndorsementTrigger(index, null, sink));
-    assertThrows(
-        IllegalArgumentException.class, () -> new KarmaEndorsementTrigger(index, ownPub, null));
+        IllegalArgumentException.class, () -> new KarmaEndorsementTrigger((byte[]) null, sink));
+    assertThrows(IllegalArgumentException.class, () -> new KarmaEndorsementTrigger(ownPub, null));
   }
 
   @Test
@@ -39,8 +33,7 @@ class KarmaEndorsementTriggerTest {
     // way to call it with null from a test is via the public method,
     // the null check is exercised. We verify the trigger constructs OK.
     byte[] ownPub = new byte[32];
-    KarmaEndorsementTrigger trigger =
-        new KarmaEndorsementTrigger(new NoopLocalIndex(), ownPub, (p, h) -> {});
+    KarmaEndorsementTrigger trigger = new KarmaEndorsementTrigger(ownPub, (p, h) -> {});
     assertNotNull(trigger);
   }
 
@@ -52,8 +45,7 @@ class KarmaEndorsementTriggerTest {
     // implements BTEngineListener.
     byte[] ownPub = new byte[32];
     RecordingSink sink = new RecordingSink();
-    KarmaEndorsementTrigger trigger =
-        new KarmaEndorsementTrigger(new NoopLocalIndex(), ownPub, sink);
+    KarmaEndorsementTrigger trigger = new KarmaEndorsementTrigger(ownPub, sink);
     assertNotNull(trigger);
     assertTrue(trigger instanceof com.frostwire.bittorrent.BTEngineListener);
     assertEquals(0, sink.callCount());
@@ -62,8 +54,7 @@ class KarmaEndorsementTriggerTest {
   @Test
   void startedAndStoppedAreNoOps() {
     byte[] ownPub = new byte[32];
-    KarmaEndorsementTrigger trigger =
-        new KarmaEndorsementTrigger(new NoopLocalIndex(), ownPub, (p, h) -> {});
+    KarmaEndorsementTrigger trigger = new KarmaEndorsementTrigger(ownPub, (p, h) -> {});
     // These should not throw
     trigger.started(null);
     trigger.stopped(null);
@@ -83,40 +74,6 @@ class KarmaEndorsementTriggerTest {
 
     int callCount() {
       return calls.get();
-    }
-  }
-
-  private static final class NoopLocalIndex implements LocalIndex {
-    @Override
-    public void upsert(LocalSharedTorrent torrent) {}
-
-    @Override
-    public void delete(String infoHashHex) {}
-
-    @Override
-    public Optional<LocalSharedTorrent> get(String infoHashHex) {
-      return Optional.empty();
-    }
-
-    @Override
-    public List<LocalSharedTorrent> search(String query, int limit) {
-      return new ArrayList<>();
-    }
-
-    @Override
-    public void markPublished(String infoHashHex, long timestamp) {}
-
-    @Override
-    public List<String> needsRepublish(long nowSec, long thresholdSec) {
-      return new ArrayList<>();
-    }
-
-    @Override
-    public void updateLastSeen(String infoHashHex, long ts) {}
-
-    @Override
-    public int size() {
-      return 0;
     }
   }
 }

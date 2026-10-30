@@ -15,7 +15,6 @@ import com.frostwire.search.relay.KarmaChainEntry;
 import com.frostwire.search.relay.KarmaChainStore;
 import com.frostwire.search.relay.KarmaChainWriter;
 import com.frostwire.search.relay.KarmaEndorsementTrigger;
-import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalSharedTorrent;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -174,9 +173,8 @@ public class KarmaEndorsementTriggerLifecycleTest {
 
     @Test
     public void triggerCloseIsTerminalWithoutDownloads() {
-        LocalIndex index = mock(LocalIndex.class);
         KarmaEndorsementTrigger trigger =
-                new KarmaEndorsementTrigger(index, new byte[32], (peer, hash) -> {});
+                new KarmaEndorsementTrigger(new byte[32], (peer, hash) -> {});
         trigger.close();
         // Null updates are safe no-ops after close; the trigger cannot restart.
         trigger.downloadUpdate(null, null);
@@ -186,19 +184,13 @@ public class KarmaEndorsementTriggerLifecycleTest {
 
     @Test
     public void triggerRejectsNullConstruction() {
-        LocalIndex index = mock(LocalIndex.class);
         try {
-            new KarmaEndorsementTrigger(null, new byte[32], (peer, hash) -> {});
-            assertTrue("null index must be rejected", false);
-        } catch (IllegalArgumentException expected) {
-        }
-        try {
-            new KarmaEndorsementTrigger(index, null, (peer, hash) -> {});
+            new KarmaEndorsementTrigger((byte[]) null, (peer, hash) -> {});
             assertTrue("null pub must be rejected", false);
         } catch (IllegalArgumentException expected) {
         }
         try {
-            new KarmaEndorsementTrigger(index, new byte[32], null);
+            new KarmaEndorsementTrigger(new byte[32], null);
             assertTrue("null sink must be rejected", false);
         } catch (IllegalArgumentException expected) {
         }

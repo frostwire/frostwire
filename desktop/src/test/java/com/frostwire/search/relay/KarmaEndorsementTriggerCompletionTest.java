@@ -168,9 +168,7 @@ class KarmaEndorsementTriggerCompletionTest {
     IdentityKeys identity = IdentityKeys.generate(4);
     KarmaChainWriter writer = new KarmaChainWriter(identity, blocks, new MemoryStore());
     KarmaEndorsementTrigger trigger =
-        track(
-            new KarmaEndorsementTrigger(
-                new EmptyIndex(), List.of(identity.ed25519PubRaw()), writer, () -> true));
+        track(new KarmaEndorsementTrigger(List.of(identity.ed25519PubRaw()), writer, () -> true));
     byte[] infoHash = Hex.decode(HASH);
 
     trigger.offer(new FakeTransfer(TransferState.SEEDING, true, SOURCE, HASH));
@@ -261,7 +259,7 @@ class KarmaEndorsementTriggerCompletionTest {
   }
 
   private KarmaEndorsementTrigger trigger(LocalIndex index, KarmaEndorsementSink sink) {
-    return track(new KarmaEndorsementTrigger(index, List.of(OWN, PREVIOUS_OWN), sink, () -> true));
+    return track(new KarmaEndorsementTrigger(List.of(OWN, PREVIOUS_OWN), sink, () -> true));
   }
 
   private KarmaEndorsementTrigger track(KarmaEndorsementTrigger trigger) {
