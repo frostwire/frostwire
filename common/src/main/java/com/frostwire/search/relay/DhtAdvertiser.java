@@ -307,7 +307,7 @@ public final class DhtAdvertiser implements AutoCloseable {
 
     /**
      * Narrow adapter for the existing publisher APIs, not a new native session.
-     * In jlibtorrent 2.0.12.9 construction starts no session or alert thread. Guard
+     * In jlibtorrent (2.0.12.9 through 2.0.15.1) construction starts no session or alert thread. Guard
      * at the actual put/announce boundary as publishers can block while building
      * a manifest. The delegated mutable put owns its native callback; it returns
      * no cancellation handle, so accepted native work cannot be revoked here.

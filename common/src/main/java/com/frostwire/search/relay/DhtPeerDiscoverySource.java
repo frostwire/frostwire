@@ -156,7 +156,7 @@ public final class DhtPeerDiscoverySource implements PeerDiscoverySource {
         return (int) Math.max(0, TimeUnit.NANOSECONDS.toSeconds(deadlineNanos - System.nanoTime()));
     }
 
-    /** jlibtorrent 2.0.12.9 waits in SECONDS. Round down; never expand the caller's budget. */
+    /** jlibtorrent (2.0.12.9 through 2.0.15.1) waits in SECONDS. Round down; never expand the caller's budget. */
     static SessionManager.MutableItem getMutableItem(SessionManager session, byte[] pub, byte[] salt,
                                                      int timeoutMs) {
         int seconds = timeoutMs / 1000;
