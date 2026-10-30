@@ -39,6 +39,15 @@ public final class SampleSizeBox extends FullBox {
         super.read(ch, buf);
         IO.read(ch, 8, buf);
         sample_size = buf.getInt();
+        if (sample_size != 0) {
+            // Every sample has this size and there is no table (ISO/IEC 14496-12 8.7.3.2).
+            sample_count = buf.getInt();
+            if (sample_count < 0) {
+                throw new IOException("Invalid sample count " + sample_count + " in stsz");
+            }
+            entries = new Entry[0];
+            return;
+        }
         sample_count = entryCount(ch, buf.getInt(), 4);
         entries = new Entry[sample_count];
         for (int i = 0; i < sample_count; i++) {
@@ -55,7 +64,9 @@ public final class SampleSizeBox extends FullBox {
         buf.putInt(sample_size);
         buf.putInt(sample_count);
         IO.write(ch, 8, buf);
-        IsoMedia.write(ch, sample_count, 4, entries, buf);
+        if (sample_size == 0) {
+            IsoMedia.write(ch, sample_count, 4, entries, buf);
+        }
     }
 
     @Override
@@ -63,7 +74,9 @@ public final class SampleSizeBox extends FullBox {
         long s = 0;
         s += 4; // full box
         s += 8;
-        s += sample_count * 4;
+        if (sample_size == 0) {
+            s += sample_count * 4;
+        }
         length(s);
     }
 

@@ -551,14 +551,19 @@ public class Box {
 
     /**
      * Returns {@code count}, a number of entries read from this box, once this box and the file
-     * still have room for that many entries of at least {@code minBytesPerEntry} bytes each (one,
-     * for entries with no fields of their own). Call it before allocating anything for the
-     * entries: a corrupt or hostile count would otherwise allocate gigabytes from a few bytes.
+     * still have room for that many entries of at least {@code minBytesPerEntry} bytes each. Call it
+     * before allocating anything for the entries: a corrupt or hostile count would otherwise
+     * allocate gigabytes from a few bytes.
+     *
+     * <p>Entries with no fields in this box ({@code minBytesPerEntry} 0, such as a trun whose
+     * samples all take tfhd's defaults) take no room in it, but each stands for at least one byte of
+     * media later in the file: their count is bounded by the rest of the file instead
+     * (frostwire/frostwire#1354).
      */
     final int entryCount(InputChannel ch, int count, int minBytesPerEntry) throws IOException {
         long room = ch.remaining();
         long length = length();
-        if (length >= 0) {
+        if (length >= 0 && minBytesPerEntry > 0) {
             room = Math.min(room, length);
         }
         if (count < 0 || (long) count * Math.max(1, minBytesPerEntry) > room) {
