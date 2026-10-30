@@ -46,6 +46,14 @@ jobs:
         working-directory: android
         run: ./gradlew compilePlus1DebugJavaWithJavac compilePlus1DebugUnitTestJavaWithJavac --no-daemon
 
+      # An API newer than minSdk 26 passes every desktop test and then crashes older phones
+      # (frostwire/frostwire#1400): fail on any lint NewApi issue, in android/ and common/.
+      - name: Check for APIs newer than minSdk (lint NewApi)
+        working-directory: android
+        run: |
+          ./gradlew lintPlus1Debug --no-daemon
+          python3 ../.github/scripts/check_android_newapi.py build/reports/lint-results-plus1Debug.xml
+
       - name: Run non-Robolectric unit tests
         working-directory: android
         run: ./gradlew testPlus1DebugUnitTest --tests "com.frostwire.android.gui.RelaySearchWiringTest" --tests "com.frostwire.android.core.*" --tests "com.frostwire.android.gui.transfers.TorrentUrlInfoTest" --tests "com.andrew.apollo.MusicPlaybackServiceForegroundStartTest" --tests "com.devspark.appmsg.MsgManagerThreadingTest" --tests "com.frostwire.android.gui.util.OffMainQueryTest" --tests "com.frostwire.android.gui.fragments.TransferDetailTrackersAdapterTest" --tests "com.andrew.apollo.ui.activities.BaseActivitySearchableInfoTest" --tests "com.frostwire.android.gui.services.EngineThreadPoolTest" --tests "com.frostwire.android.gui.adapters.menu.CancelMenuActionDialogRestoreTest" --tests "com.frostwire.android.gui.adapters.SearchResultListAdapterFileTypeCallbackTest" --tests "com.frostwire.android.gui.util.DirectionDetectorScrollListenerTest" --tests "com.frostwire.android.gui.transfers.TransferManagerLockScopeStructureTest" --tests "com.frostwire.android.gui.services.EngineStopBeforeForegroundTest" --tests "com.frostwire.android.util.StaleWorkManagerJobsTest" --tests "com.frostwire.android.gui.MainApplicationStructureTest" --tests "com.frostwire.android.util.FWImageLoaderCreationTest" --tests "com.frostwire.android.util.SavedStateSizesTest" --no-daemon --continue
