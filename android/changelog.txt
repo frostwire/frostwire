@@ -1,4 +1,5 @@
 FrostWire 3.2.3 build 779 UNRELEASED
+  - fix:Distributed search (IceBridge) no longer uses Android 13-only APIs when it creates its identity, stores its access token and caches block headers, which could stop it from working on Android 8 to 12 (#1400)
   - fix:IceBridge answers a malformed request on its local control port with an error instead of logging a stack trace and dropping the connection (#1396)
   - fix:Opening search no longer freezes on phones with slow storage — the image cache folder is set up in the background (#1389)
   - fix:FrostWire no longer crash-loops in the background on a few devices with "too many scheduled jobs" — the unused WorkManager is gone and the jobs older versions left behind are cleaned up (#1388)
