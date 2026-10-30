@@ -28,8 +28,8 @@ import org.junit.jupiter.api.Test;
  * A persisted karma chain that fails verification starts a fresh chain, and the fresh chain's
  * entries reuse its sequence numbers. They must not overwrite the old rows: the old chain is kept
  * aside, so a verifier bug or a new rule never destroys a user's karma for good. Only the writer,
- * which will append, moves it: a reader such as a settings pane must not change the store while
- * the writer runs.
+ * which will append, moves it: a reader such as a settings pane must not change the store while the
+ * writer runs.
  */
 class KarmaChainTableRejectedChainTest {
 

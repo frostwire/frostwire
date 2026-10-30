@@ -290,7 +290,8 @@ public final class KarmaChainTable implements KarmaChainStore {
     }
     if (rows > 0 && setAsideIfRejected) {
       String keptIn = setAsideRejectedChain();
-      LOG.warn("Persisted karma chain failed verification; kept it in " + keptIn + ", starting fresh");
+      LOG.warn(
+          "Persisted karma chain failed verification; kept it in " + keptIn + ", starting fresh");
     }
     return new KarmaChain(ownerPub);
   }
@@ -298,8 +299,8 @@ public final class KarmaChainTable implements KarmaChainStore {
   /**
    * Moves the chain's rows to a new {@code karma_chain_rejected_<millis>} table and empties the
    * chain table. A fresh chain reuses the same sequence numbers, and its appends replace rows by
-   * seq, so without this a chain the verifier rejects (a writer bug, or a rule added later) would be
-   * overwritten and the user's karma lost for good.
+   * seq, so without this a chain the verifier rejects (a writer bug, or a rule added later) would
+   * be overwritten and the user's karma lost for good.
    *
    * @throws IllegalStateException if the rows can't be moved; the chain table is then unchanged
    */
