@@ -24,7 +24,6 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.security.Signature;
-import java.security.spec.NamedParameterSpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
@@ -441,23 +440,13 @@ public final class IdentityKeys {
      * Generate an X25519 key pair in a way that works on both desktop JDKs
      * and Android Conscrypt.
      *
-     * <p>Desktop: {@code XDH} + {@link NamedParameterSpec#X25519}.
-     * Android Conscrypt's {@code OpenSSLXDHKeyPairGenerator} rejects
-     * {@code AlgorithmParameterSpec} ({@code InvalidAlgorithmParameterException:
-     * No AlgorithmParameterSpec classes are supported}); fall back to plain
-     * {@code generateKeyPair()} (defaults to X25519) or algorithm name
-     * {@code "X25519"}.
+     * <p>By algorithm name {@code "X25519"} first (desktop JDK 11+, BouncyCastle on every Android
+     * version), then Conscrypt's {@code XDH} with no parameters (it rejects any
+     * {@code AlgorithmParameterSpec} and defaults to X25519). It no longer uses
+     * {@code NamedParameterSpec}, which Android only has from API 33: on Android 8-12 it threw
+     * NoClassDefFoundError past the GeneralSecurityException fallbacks (frostwire/frostwire#1400).
      */
     static KeyPair generateX25519KeyPair() throws GeneralSecurityException {
-        // Preferred: modern XDH API with NamedParameterSpec (OpenJDK desktop).
-        try {
-            KeyPairGenerator xdh = KeyPairGenerator.getInstance("XDH");
-            xdh.initialize(NamedParameterSpec.X25519);
-            return xdh.generateKeyPair();
-        } catch (GeneralSecurityException ignored) {
-            // Fall through — Android Conscrypt path.
-        }
-        // Android API 33+ / some providers expose the curve by name.
         try {
             return KeyPairGenerator.getInstance("X25519").generateKeyPair();
         } catch (GeneralSecurityException ignored) {
