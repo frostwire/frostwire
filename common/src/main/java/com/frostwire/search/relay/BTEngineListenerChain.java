@@ -153,6 +153,11 @@ public final class BTEngineListenerChain implements BTEngineListener {
     forEach(d -> d.downloadUpdate(engine, dl));
   }
 
+  @Override
+  public void downloadFinished(BTEngine engine, BTDownload dl) {
+    forEach(d -> d.downloadFinished(engine, dl));
+  }
+
   public int size() {
     return delegates.size();
   }

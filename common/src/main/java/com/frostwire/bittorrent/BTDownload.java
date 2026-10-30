@@ -684,6 +684,9 @@ public final class BTDownload implements BittorrentDownload {
         LOG.error("Error calling listener (finished)", e);
       }
     }
+    // The UI owns the single per-download listener; engine listeners (karma endorsement) hear
+    // completion through the engine.
+    engine.fireDownloadFinished(this);
     doResumeData(true);
   }
 

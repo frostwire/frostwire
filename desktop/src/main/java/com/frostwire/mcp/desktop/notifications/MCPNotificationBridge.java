@@ -211,6 +211,15 @@ public class MCPNotificationBridge implements BTEngineListener, SearchListener {
     }
   }
 
+  /** Passes completion on to the listener this bridge wraps (karma endorsement listens). */
+  @Override
+  public void downloadFinished(BTEngine engine, BTDownload dl) {
+    BTEngineListener delegate = delegateBTEngineListener;
+    if (delegate != null) {
+      delegate.downloadFinished(engine, dl);
+    }
+  }
+
   @Override
   public void onResults(long token, List<? extends SearchResult> results) {
     if (server != null && !results.isEmpty()) {

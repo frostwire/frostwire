@@ -1045,6 +1045,19 @@ public final class BTEngine extends SessionManager {
     }
   }
 
+  /** Called by a download on its TORRENT_FINISHED alert, on the alert thread. */
+  void fireDownloadFinished(BTDownload dl) {
+    BTEngineListener snapshot = listener;
+    if (snapshot == null) {
+      return;
+    }
+    try {
+      snapshot.downloadFinished(this, dl);
+    } catch (Throwable e) {
+      LOG.error("Unable to notify a finished download", e);
+    }
+  }
+
   private void fireDownloadUpdate(TorrentHandle th) {
     try {
       BTDownload dl = new BTDownload(this, th);
