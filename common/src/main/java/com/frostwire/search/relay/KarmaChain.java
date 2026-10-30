@@ -133,6 +133,7 @@ public final class KarmaChain {
       throw new IllegalStateException(
           "Cannot commit epoch " + newEpoch + " (current is " + currentEpoch + ")");
     }
+    requireNotBelowHead(block);
 
     // Compute new energy: KARMA_ENERGY_PER_EPOCH + (previousRemaining * decay)
     double previousRemaining = currentEnergy - endorsementsThisEpoch;
@@ -190,6 +191,7 @@ public final class KarmaChain {
       throw new IllegalStateException(
           "Block is from a past epoch (" + currentBlock.epoch() + " < " + currentEpoch + ")");
     }
+    requireNotBelowHead(currentBlock);
     if (endorsementsThisEpoch >= Math.floor(currentEnergy)) {
       throw new IllegalStateException(
           "Energy exhausted for epoch "
@@ -203,6 +205,21 @@ public final class KarmaChain {
 
     return KarmaChainEntry.createEndorsement(
         headHash(), nextSeq(), ownerPub, currentBlock, peerPub, infoHash, 1, signingKey);
+  }
+
+  /**
+   * {@link #verify} rejects a chain whose block heights go down, so an entry is never signed at a
+   * block below the head's. The caller's Bitcoin tip can lag behind the block the head was made at
+   * (another API, or another thread that appended first).
+   */
+  private void requireNotBelowHead(BitcoinBlockReference block) {
+    if (!entries.isEmpty()) {
+      long headHeight = entries.get(entries.size() - 1).blockHeight();
+      if (block.height() < headHeight) {
+        throw new IllegalStateException(
+            "Block " + block.height() + " is below the chain head's block " + headHeight);
+      }
+    }
   }
 
   /**
