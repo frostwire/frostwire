@@ -12,7 +12,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
 
     steps:
       - uses: actions/checkout@v5
@@ -51,7 +51,7 @@ jobs:
       - name: Check for APIs newer than minSdk (lint NewApi)
         working-directory: android
         run: |
-          ./gradlew lintPlus1Debug --no-daemon
+          ./gradlew lintPlus1Debug -PlintNewApiOnly --no-daemon
           python3 ../.github/scripts/check_android_newapi.py build/reports/lint-results-plus1Debug.xml
 
       - name: Run non-Robolectric unit tests

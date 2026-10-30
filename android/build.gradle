@@ -264,6 +264,10 @@ android {
     }
     lint {
         abortOnError false
+        // CI checks only NewApi (frostwire/frostwire#1400); local lint runs everything.
+        if (project.hasProperty('lintNewApiOnly')) {
+            checkOnly.add('NewApi')
+        }
     }
 
     testOptions {
