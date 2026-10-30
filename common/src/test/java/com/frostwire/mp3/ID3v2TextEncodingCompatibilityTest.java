@@ -15,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -85,11 +84,6 @@ class ID3v2TextEncodingCompatibilityTest {
     assertArrayEquals(JPEG, pic.getImageData());
   }
 
-  @Disabled(
-      "Not caused by frostwire/frostwire#1358, fails before it too: the COMM, WXXX, APIC and PIC"
-          + " parsers end a UTF-16 description at the first zero byte instead of a zero code unit"
-          + " (00 00), so a UTF-16 comment decodes as empty and a UTF-16 picture's image data"
-          + " gains a leading zero byte")
   @ParameterizedTest
   @ValueSource(ints = {1, 2})
   void utf16EncodingsDecodeEveryFrameType(int encoding) throws Exception {
