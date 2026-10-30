@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:The Pirate Bay results with base32 or reordered magnet links get their correct info hash (#1408)
    - fix:Windows with a search box lay out faster: the search field no longer re-measures its prompt text on every size check (#1410)
    - fix:Fragmented MP4/M4A files (such as downloaded YouTube audio) open again: a stricter check from an earlier fix rejected their sample runs (#1354)
    - fix:On computers set to Turkish or Azeri, Nyaa search results show their sizes again, IceBridge client mode is respected and distributed search finds the same peers as everyone else (#1407)

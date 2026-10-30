@@ -1,4 +1,5 @@
 FrostWire 3.2.3 build 779 UNRELEASED
+  - fix:Every valid magnet link form (base32 hash, parameters in any order, upper-case MAGNET:) is checked against the torrent it downloads (#1408)
   - fix:Music home screen shortcuts (artist, album, genre, playlist) and asking your assistant to play music on FrostWire work again instead of crashing (#1404)
   - fix:Album art and thumbnails no longer download again every time you switch away from FrostWire and back — the image disk cache is kept, capped at 50 MB (#1389)
   - fix:Distributed search no longer accepts a peer's karma chain that declares an invalid energy value to endorse other peers without the per-epoch limit (#1401)
