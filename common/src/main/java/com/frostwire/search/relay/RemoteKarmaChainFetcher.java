@@ -50,6 +50,7 @@ public final class RemoteKarmaChainFetcher implements AutoCloseable {
   private static final Logger LOG = Logger.getLogger(RemoteKarmaChainFetcher.class);
 
   private final KarmaChainSource source;
+  private BlockHeaderSource blocks;
   // A shared, bounded pool prevents per-directory or per-key thread growth. Idle threads
   // retire. close()/evict() cancel only this fetcher's work, never another owner's pool.
   private static final ThreadPoolExecutor WORKERS =
@@ -88,6 +89,15 @@ public final class RemoteKarmaChainFetcher implements AutoCloseable {
 
   public RemoteKarmaChainFetcher(KarmaChainSource source) {
     this(source, 1024, 60_000, System::nanoTime);
+  }
+
+  /**
+   * As {@link #RemoteKarmaChainFetcher(KarmaChainSource)}, verifying chains against Bitcoin through
+   * {@code blocks} (null: offline checks only).
+   */
+  public RemoteKarmaChainFetcher(KarmaChainSource source, BlockHeaderSource blocks) {
+    this(source, 1024, 60_000, System::nanoTime);
+    this.blocks = blocks;
   }
 
   RemoteKarmaChainFetcher(KarmaChainSource source, int maxEntries, long ttlMs, LongSupplier clock) {
