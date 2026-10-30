@@ -273,10 +273,19 @@ public final class KarmaChain {
    *     base64 field in it is malformed
    */
   public static List<KarmaChainEntry> parseManifest(byte[] manifest, byte[] owner) {
+    return parseManifest(manifest, owner, null);
+  }
+
+  /**
+   * As {@link #parseManifest(byte[], byte[])}, also checking the entries' Bitcoin blocks against
+   * {@code blocks} when it is not null; see {@link #verify(List, BlockHeaderSource)}.
+   */
+  public static List<KarmaChainEntry> parseManifest(
+      byte[] manifest, byte[] owner, BlockHeaderSource blocks) {
     if (manifest == null || manifest.length > MAX_REMOTE_MANIFEST_BYTES) {
       return null;
     }
-    return parseManifest(Bencode.asDictionary(Bencode.decode(manifest)), owner);
+    return parseManifest(Bencode.asDictionary(Bencode.decode(manifest)), owner, blocks);
   }
 
   /**
@@ -286,6 +295,11 @@ public final class KarmaChain {
    * @throws IllegalArgumentException if a hex or base64 field is malformed
    */
   static List<KarmaChainEntry> parseManifest(Map<String, Object> dict, byte[] owner) {
+    return parseManifest(dict, owner, null);
+  }
+
+  static List<KarmaChainEntry> parseManifest(
+      Map<String, Object> dict, byte[] owner, BlockHeaderSource blocks) {
     if (dict == null) {
       return null;
     }
@@ -316,10 +330,10 @@ public final class KarmaChain {
       if (baseSeq == null || basePrevHash == null) {
         return null;
       }
-      if (!verifyTail(chain, Hex.decode(basePrevHash), baseSeq)) {
+      if (!verifyTail(chain, Hex.decode(basePrevHash), baseSeq, blocks)) {
         return null;
       }
-    } else if (!verify(chain)) {
+    } else if (!verify(chain, blocks)) {
       return null;
     }
     return Collections.unmodifiableList(chain);
@@ -329,6 +343,10 @@ public final class KarmaChain {
    * Validates the entire chain: hash links, signatures, epoch ordering, energy budgets, and
    * monotonic block heights. Returns true if valid. Used when loading a peer's published chain.
    */
+  public static boolean verify(List<KarmaChainEntry> chainEntries, BlockHeaderSource blocks) {
+    return verify(chainEntries);
+  }
+
   public static boolean verify(List<KarmaChainEntry> chainEntries) {
     if (chainEntries == null || chainEntries.isEmpty()) {
       return false;
@@ -435,6 +453,11 @@ public final class KarmaChain {
    * with an epoch commitment so its endorsement budget is independently verifiable without the
    * omitted prefix.
    */
+  public static boolean verifyTail(
+      List<KarmaChainEntry> tail, byte[] basePrevHash, long baseSeq, BlockHeaderSource blocks) {
+    return verifyTail(tail, basePrevHash, baseSeq);
+  }
+
   public static boolean verifyTail(List<KarmaChainEntry> tail, byte[] basePrevHash, long baseSeq) {
     if (tail == null || tail.isEmpty()) {
       return false;
