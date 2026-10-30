@@ -216,6 +216,27 @@ class KarmaChainVerifyHardeningTest {
         "self-endorsement");
   }
 
+  /** A "tail" from seq 0 is the whole chain: its first commitment has nothing carried over. */
+  @Test
+  void aTailFromTheFirstEntryIsHeldToTheFullChainRules() throws Exception {
+    Chain inflated = new Chain().ec(144 * 5, 5, 10.0);
+    for (int i = 0; i < 10; i++) {
+      inflated.en(144 * 5);
+    }
+
+    assertFalse(
+        KarmaChain.verifyTail(inflated.entries, KarmaChainEntry.GENESIS_PREV_HASH, 0),
+        "a published base of seq 0 must not lift the first commitment's energy");
+    assertFalse(
+        KarmaChain.verifyTail(new Chain(0, key(9)).ec(144 * 5, 5, 5.0).entries, key(9), 0),
+        "seq 0 links to genesis");
+    assertTrue(
+        KarmaChain.verifyTail(
+            new Chain().ec(144 * 5, 5, 5.0).en(144 * 5).entries,
+            KarmaChainEntry.GENESIS_PREV_HASH,
+            0));
+  }
+
   @Test
   void chainRefusesToEndorseItsOwner() throws Exception {
     KarmaChain chain = new KarmaChain(owner);
