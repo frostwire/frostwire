@@ -101,9 +101,10 @@ Run Gradle from `desktop/`, never from the repo root, and `set -o pipefail` when
 ## 4. Triage findings
 
 1. **Dedupe by root cause, not by token.** Jazzer's `DEDUP_TOKEN` hashes the whole stack, so one bug reached through two getters gives two tokens. Group findings by the exception type plus the top app frame (`com.frostwire.*`, `com.limegroup.*`, `org.limewire.*`, our copies under `org.apache.commons.*`). One group, one root cause, one ticket. Distinct top frames in the same copied pattern (all ID3 frame classes trusting a length byte) are one ticket with every site listed.
-2. **Minimize the input.** Start from the shortest crash file in the group and delete chunks and zero bytes while it still throws the same exception at the same top app frame. A scratch single-file Java program (outside the repo) that calls the target in a loop and runs with `java -cp desktop/build/classes/java/main` (plus any jar the target needs) does hundreds of tries per second; by hand, drop each candidate into the inputs directory and run `./gradlew fuzzTest --tests '<FQCN>'`. Stop when every remaining byte is needed, and explain each byte in the ticket ("`ID3` + v2.2 header + a `TT2` frame of size 0").
-3. **Decide whether it is reachable and what users see.** Find the production callers of the target and whether they catch the exception. A finding is still a bug when a caller swallows it: it drops a whole search page, a file's tags, or a peer's response. Say what the user loses.
-4. **Check master and the existing tickets**, as the Icebase pipeline's §1–§2 say: `gh issue list --repo frostwire/frostwire --state all --label fuzzing --search "<class or method>"`. Fold into an open ticket instead of opening a new one.
+2. **Minimize the input, and keep the original.** Start from the shortest crash file in the group and delete chunks and zero bytes while it still throws the same exception at the same top app frame. A scratch single-file Java program (outside the repo) that calls the target in a loop and runs with `java -cp desktop/build/classes/java/main` (plus any jar the target needs) does hundreds of tries per second; by hand, drop each candidate into the inputs directory and run `./gradlew fuzzTest --tests '<FQCN>'`. Stop when every remaining byte is needed, and explain each byte in the ticket ("`ID3` + v2.2 header + a `TT2` frame of size 0"). Keep the raw crash file Jazzer wrote, byte for byte: it is the evidence, and minimizing can drop the path that mattered.
+3. **Map the boundary the input crosses.** Before any fix exists, write down what the format allows on each side of the field or rule the input breaks: the largest valid length, an empty but valid value, the last valid nesting depth, a real-world file that is lenient there. These become the compatibility fixtures in §6, and choosing them before the fix keeps the fix from choosing them.
+4. **Decide whether it is reachable and what users see.** Find the production callers of the target and whether they catch the exception. A finding is still a bug when a caller swallows it: it drops a whole search page, a file's tags, or a peer's response. Say what the user loses.
+5. **Check master and the existing tickets**, as the Icebase pipeline's §1–§2 say: `gh issue list --repo frostwire/frostwire --state all --label fuzzing --search "<class or method>"`. Fold into an open ticket instead of opening a new one.
 
 ## 5. Ticket
 
@@ -116,16 +117,43 @@ Open tickets as the Icebase pipeline's §2 says, with these differences:
   - the minimized input as hex or base64, with the meaning of each byte;
   - the repro: put the input in `common/fuzz/src/test/resources/<pkg>/<Class>Inputs/<method>/` and run `./gradlew fuzzTest --tests '<FQCN>'` from `desktop/`;
   - the production callers and what the user loses;
+  - the boundary from §4.3: the valid inputs on each side that the fix must keep accepting, with the values they decode to;
+  - **the behavior change**, when the fix will reject something the old code accepted: classify that input as *still supported* (the fix must keep accepting it), *deprecated* (accepted with a warning, with a removal date) or *rejected as unsafe* (with the reason). Leniency users rely on is a de facto contract: if real files or peers depend on it, say so and ask the maintainer before rejecting it;
   - the suspected cause with `file:line`, fix options, and a test plan.
 - **Order the queue** as the Icebase pipeline's §3.2 does. Severity for fuzz findings: allocation and hang findings on network input first (a peer or web page can stall or crash the app), then exceptions on network input, then exceptions on local files.
 
 ## 6. Fix
 
-Follow the Icebase pipeline's §3–§5: one ticket at a time on master, root cause everywhere, gates, changelog line, push, CI green, close or ask. Fuzz findings add two things to each fix:
-- **A deterministic regression test in the normal test suite** (`common/src/test/java/...` or `desktop/src/test/java/...`, in a package already in the `test` task's `includeTestsMatching` list, or add it there). It feeds the minimized input to the target as a byte or string literal and asserts the documented outcome (the documented exception, an empty result, `-1`). Verify it fails with the fix reverted. This test is what CI runs; the fuzz corpus is not.
-- **The crash input committed next to the harness** in the same push as the fix: move the minimized file into the harness's inputs directory with a descriptive name (`crash-empty-text-frame`), so `fuzzTest` replays it from now on. Run `./gradlew fuzzTest --tests '<FQCN>'` and then fuzz the target again for 5 minutes with no `-Pfuzz.ignore`, to see that the group is gone and that the fix didn't just move the crash one frame down.
+Follow the Icebase pipeline's §3–§5: one ticket at a time on master, root cause everywhere, gates, changelog line, push, CI green, close or ask.
 
-The changelog line describes the user's view ("A malformed tag in a downloaded MP3 no longer breaks reading its title"), as in the Icebase pipeline.
+**A fuzz fix has two acceptance criteria, and passing only the first isn't done:**
+1. the crashing input no longer fails;
+2. the parser still accepts the language it is meant to accept, and still decodes it to the same values.
+
+"No longer crashes" alone rewards a patch that just rejects more input, valid input included. In #1401, rejecting ports outside 0–65535 broke existing valid data and was caught only because a compatibility test already existed. Each fix adds:
+
+- **A deterministic regression test in the normal test suite** (`common/src/test/java/...` or `desktop/src/test/java/...`, in a package already in the `test` task's `includeTestsMatching` list, or add it there). It feeds the minimized input to the target as a byte or string literal and asserts the documented outcome: the documented exception, an empty result, `-1`. Verify it fails with the fix reverted. This test is what CI runs; the fuzz corpus is not.
+- **Compatibility fixtures in the same test class**, from the boundary written down in §4.3:
+  - valid inputs right at the boundary, on both sides (the largest valid length and the first invalid one, an empty but valid field), asserting the **decoded values**, not just that nothing threw;
+  - the inputs the ticket classified as *still supported* or *deprecated*, accepted as before;
+  - the ones classified *rejected as unsafe*, rejected with the documented exception.
+
+  Check that the fixtures pass on the pre-fix code too, except those deliberately rejected. A fixture that only passes after the fix means the fix changed accepted behavior, and that must be in the ticket.
+- **A bounded-work check for allocation and hang findings.** Catching the `OutOfMemoryError` after the allocation, or timing out a loop, is not a fix: the input must be rejected before the work. Assert it:
+  - for allocations, compare `((com.sun.management.ThreadMXBean) ManagementFactory.getThreadMXBean()).getThreadAllocatedBytes(Thread.currentThread().getId())` before and after decoding a hostile length field, and require a small bound (kilobytes, not the advertised size);
+  - for hangs, use a hostile input sized to take seconds before the fix and assert it finishes in milliseconds (`assertTimeoutPreemptively`).
+- **Both crash inputs committed next to the harness** in the same push as the fix:
+  - the minimized file, with a descriptive name (`crash-empty-text-frame`);
+  - the raw file Jazzer wrote, unchanged, as `raw-crash-<sha1>`.
+
+  `fuzzTest` replays both from then on. Run `./gradlew fuzzTest --tests '<FQCN>'`, then fuzz the target again for 5 minutes with no `-Pfuzz.ignore`, to see that the group is gone and that the fix didn't just move the crash one frame down.
+
+**Keep the oracle independent of the fix.** The same agent writes the parser change and the tests that judge it, so:
+- commit the tests and fixtures before the fix, in their own commit, and show them failing (the regression test) or passing (the fixtures) on the pre-fix code;
+- never weaken an assertion, fixture or harness in the fix commit. A test that must change because the behavior deliberately changed is changed in its own commit, citing the ticket's classification;
+- have a reviewer that hasn't seen the fix (a `frostwire-code-reviewer` subagent given only the ticket and the test commit) check that the tests cover the boundary and the decoded values. Then review the fix separately.
+
+**Changelog:** the line describes the user's view ("A malformed tag in a downloaded MP3 no longer breaks reading its title"), as in the Icebase pipeline. When the fix rejects something the old code accepted, the line says so and how it was classified ("…files with a zero-length title frame are now rejected as unsafe; files with an empty title still open"), so a deliberate security boundary isn't mistaken for a regression. No later "compatibility mode" may bring back the unsafe behavior: if one is ever needed, its fixtures must include the original reproducer, still rejected.
 
 ## 7. Report back, hygiene and memory
 
