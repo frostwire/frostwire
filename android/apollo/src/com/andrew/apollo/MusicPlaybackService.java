@@ -68,7 +68,6 @@ import androidx.datastore.preferences.core.Preferences;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 
 import com.andrew.apollo.cache.ImageCache;
@@ -743,7 +742,6 @@ public class MusicPlaybackService extends MediaSessionService {
         return false;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.S)
     public void handleCommandIntent(Intent intent) {
         if (SystemUtils.isUIThread()) {
             SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> handleCommandIntent(intent));

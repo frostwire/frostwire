@@ -31,7 +31,6 @@ import android.os.Build;
 import android.os.IBinder;
 import android.widget.RemoteViews;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -684,7 +683,6 @@ public class EngineForegroundService extends Service implements IEngineService {
         });
   }
 
-  @RequiresApi(api = Build.VERSION_CODES.S)
   public void notifyDownloadFinished(String displayName, File file, String infoHash) {
     try {
       NotifiedStorage storage = notifiedStorage;

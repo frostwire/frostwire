@@ -25,7 +25,6 @@ import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.os.Build;
 import android.telephony.TelephonyManager;
-import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.chaquo.python.Python;
@@ -376,7 +375,6 @@ public final class Engine implements IEngineService {
     return MAIN_THREAD_POOL;
   }
 
-  @RequiresApi(api = Build.VERSION_CODES.S)
   public void notifyDownloadFinished(String displayName, File file, String optionalInfoHash) {
     EngineForegroundService service = getForegroundService();
     if (service != null) {
@@ -384,7 +382,6 @@ public final class Engine implements IEngineService {
     }
   }
 
-  @RequiresApi(api = Build.VERSION_CODES.S)
   public void notifyDownloadFinished(String displayName, File file) {
     notifyDownloadFinished(displayName, file, null);
   }
