@@ -108,7 +108,16 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
         metrics.controlRequest();
 
         // SEC5: Require a valid bearer token (supports multiple) on all endpoints except /health.
-        String path = new QueryStringDecoder(request.uri()).path();
+        String path;
+        try {
+            path = new QueryStringDecoder(request.uri()).path();
+        } catch (IllegalArgumentException malformedEscape) {
+            // A path like "/%" or "/%zz" (frostwire/frostwire#1396): answer 400 like the query
+            // decoders below do, instead of throwing out of the handler before the token check.
+            sendJson(ctx, request, HttpResponseStatus.BAD_REQUEST,
+                    ApiResponse.error("malformed request path"));
+            return;
+        }
         if (!"/health".equals(path)) {
             String token = request.headers().get("X-IceBridge-Token");
             if (authTokens == null || !authTokens.isValid(token)) {
