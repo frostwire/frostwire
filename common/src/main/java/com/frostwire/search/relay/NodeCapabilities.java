@@ -7,6 +7,8 @@
 
 package com.frostwire.search.relay;
 
+import java.util.Locale;
+
 /**
  * Bitflags advertised by a node (IdentityRecord / peer registry).
  *
@@ -62,7 +64,8 @@ public final class NodeCapabilities {
         if (role == null || role.isEmpty()) {
             return DEFAULT_BOTH;
         }
-        switch (role.toUpperCase()) {
+        // Locale.ROOT: in Turkish "client" upper-cases to "CLİENT" (frostwire/frostwire#1407)
+        switch (role.toUpperCase(Locale.ROOT)) {
             case "FORWARDER":
                 return DEFAULT_FORWARDER;
             case "CLIENT":

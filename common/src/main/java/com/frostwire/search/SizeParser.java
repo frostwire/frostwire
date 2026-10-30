@@ -18,6 +18,7 @@
 
 package com.frostwire.search;
 
+import java.util.Locale;
 import com.frostwire.util.StringUtils;
 
 /**
@@ -69,8 +70,9 @@ public final class SizeParser {
         }
 
         try {
-            // Handle non-breaking space (char 160) and normalize
-            sizeStr = sizeStr.replace((char) 160, ' ').trim().toUpperCase();
+            // Handle non-breaking space (char 160); split before upper-casing the unit, so a
+            // lower-case separator such as "&nbsp;" still matches
+            sizeStr = sizeStr.replace((char) 160, ' ').trim();
 
             // Split by separator
             String[] parts = sizeStr.split(separator);
@@ -79,7 +81,8 @@ public final class SizeParser {
             }
 
             double value = Double.parseDouble(parts[0].trim());
-            String unit = parts[1].trim();
+            // Locale.ROOT: in Turkish "GiB".toUpperCase() is "GİB" (frostwire/frostwire#1407)
+            String unit = parts[1].trim().toUpperCase(Locale.ROOT);
 
             return convertToBytes(value, unit);
         } catch (NumberFormatException e) {

@@ -12,6 +12,7 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Foundation for responsibility-based routing of search queries.
@@ -36,7 +37,9 @@ public final class KeyspaceRouter {
         if (keywords == null) {
             throw new IllegalArgumentException("keywords is null");
         }
-        String normalized = keywords.trim().toLowerCase();
+        // Locale.ROOT: every peer must hash the same bytes; in Turkish "ISO" lower-cases to "ıso"
+        // (frostwire/frostwire#1407)
+        String normalized = keywords.trim().toLowerCase(Locale.ROOT);
         try {
             MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
             return sha1.digest(normalized.getBytes(StandardCharsets.UTF_8));

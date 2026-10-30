@@ -20,6 +20,7 @@ import com.limegroup.gnutella.settings.SharingSettings;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
 public class DownloadTorrentTool implements MCPTool {
@@ -78,7 +79,7 @@ public class DownloadTorrentTool implements MCPTool {
       return CompletableFuture.supplyAsync(
               () -> {
                 try {
-                  switch (source.toLowerCase()) {
+                  switch (source.toLowerCase(Locale.ROOT)) {
                     case "magnet":
                       return downloadMagnet(value, saveDir);
                     case "url":
