@@ -552,7 +552,13 @@ final class Initializer {
       if (!relayLifecycle.getAsBoolean()) return;
       KarmaEndorsementTrigger endorsementTrigger =
           new KarmaEndorsementTrigger(
-              localIndex, identity.ed25519PubRaw(), karmaWriter, relayLifecycle);
+              localIndex,
+              com.frostwire.search.relay.IdentityLifecycle.ownEd25519Keys(
+                  identity,
+                  com.frostwire.search.relay.RelayConstants.identityFile(
+                      CommonUtils.getUserSettingsDir())),
+              karmaWriter,
+              relayLifecycle);
       relayLifecycle.own(endorsementTrigger, endorsementTrigger::awaitStopped);
       BTEngineListenerChain.install(btEngine, endorsementTrigger);
       relayResources.add(() -> BTEngineListenerChain.remove(btEngine, endorsementTrigger));

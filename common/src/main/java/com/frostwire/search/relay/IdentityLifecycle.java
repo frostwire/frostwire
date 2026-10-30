@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -209,6 +211,17 @@ public final class IdentityLifecycle {
 
   public static boolean meetsDifficultyRequirement(IdentityKeys identity) {
     return difficultyBits(identity) >= KarmaConstants.IDENTITY_DIFFICULTY;
+  }
+
+  /**
+   * The Ed25519 keys this node has signed as, current identity first, for checks that must never
+   * endorse ourselves.
+   */
+  public static List<byte[]> ownEd25519Keys(IdentityKeys current, File identityFile) {
+    Objects.requireNonNull(current, "current");
+    List<byte[]> keys = new ArrayList<>(2);
+    keys.add(current.ed25519PubRaw());
+    return keys;
   }
 
   /** Multi-line identity summary for clipboard export. */
