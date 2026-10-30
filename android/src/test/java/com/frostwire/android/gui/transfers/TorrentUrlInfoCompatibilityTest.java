@@ -10,7 +10,6 @@ package com.frostwire.android.gui.transfers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -78,9 +77,6 @@ public class TorrentUrlInfoCompatibilityTest {
     assertNull(hash("magnet:?xt=urn:btih:" + HEX.substring(0, 39) + "g"));
   }
 
-  @Ignore(
-      "frostwire/frostwire#1367: a base32 btih (valid per BEP 9) gives a null hash, so"
-          + " TorrentFetcherDownload skips its info-hash check; it is not converted to hex")
   @Test
   public void base32HashesAreTheSameInfoHashInHex() {
     assertEquals(HEX, hash("magnet:?xt=urn:btih:" + BASE32));
@@ -88,9 +84,6 @@ public class TorrentUrlInfoCompatibilityTest {
     assertEquals(HEX, hash("magnet:?xt=urn:btih:" + BASE32.toLowerCase()));
   }
 
-  @Ignore(
-      "frostwire/frostwire#1367: the hash is read only when xt is the first parameter; a magnet"
-          + " with dn or tr first gives null and skips the info-hash check")
   @Test
   public void xtNeedNotBeTheFirstParameter() {
     assertEquals(HEX, hash("magnet:?dn=ubuntu&xt=urn:btih:" + HEX));
@@ -98,9 +91,6 @@ public class TorrentUrlInfoCompatibilityTest {
         HEX, hash("magnet:?tr=udp%3A%2F%2Fx%3A1&dn=a&xt=urn:btih:" + HEX + "&x.pe=1.2.3.4:5"));
   }
 
-  @Ignore(
-      "frostwire/frostwire#1367: the magnet:?xt=urn:btih: prefix is matched case-sensitively; an"
-          + " upper-case scheme or urn gives null and skips the info-hash check")
   @Test
   public void schemeAndUrnInUpperCase() {
     assertEquals(HEX, hash("MAGNET:?xt=urn:btih:" + HEX));
