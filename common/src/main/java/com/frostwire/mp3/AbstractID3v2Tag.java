@@ -131,7 +131,12 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
 
     protected int unpackFrames(byte[] bytes, int offset, int framesLength) {
         int currentOffset = offset;
-        while (currentOffset <= framesLength) {
+        // Frames fill the tag after its 10-byte header. This compared the offset, which counts that
+        // header, with framesLength, which doesn't, and stopped ten bytes early: a short last frame
+        // was skipped (frostwire/frostwire#1409). Read while a whole frame header still fits.
+        int framesEnd = HEADER_LENGTH + framesLength;
+        int frameHeaderLength = obseleteFormat ? 6 : 10;
+        while (currentOffset + frameHeaderLength <= framesEnd) {
             ID3v2Frame frame;
             try {
                 frame = createFrame(bytes, currentOffset);
