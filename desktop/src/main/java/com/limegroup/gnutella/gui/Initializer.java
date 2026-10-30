@@ -581,7 +581,9 @@ final class Initializer {
       // 6. Wire the karma cache into the LOCAL search engine so
       //    user searches can weight results by the publisher's karma.
       RemoteKarmaChainFetcher karmaFetcher =
-          new RemoteKarmaChainFetcher(new DhtKarmaChainSource(btEngine));
+          new RemoteKarmaChainFetcher(
+              new DhtKarmaChainSource(btEngine),
+              new com.frostwire.search.relay.TipCachingBlockHeaderSource(blockSource));
       PeerKarmaCache karmaCache = new PeerKarmaCache(karmaFetcher);
       relayResources.add(karmaCache);
       LocalSearchEngineWire.setKarmaCache(karmaCache);

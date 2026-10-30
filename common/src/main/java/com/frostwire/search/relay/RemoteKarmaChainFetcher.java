@@ -228,7 +228,8 @@ public final class RemoteKarmaChainFetcher implements AutoCloseable {
               : source.fetchManifest(pub);
       if (manifest != null
           && !state.task.isCancelled()
-          && System.nanoTime() - state.lookupDeadline < 0) entries = parseAndVerify(manifest, pub);
+          && System.nanoTime() - state.lookupDeadline < 0)
+        entries = parseAndVerify(manifest, pub, blocks);
     } catch (Throwable t) {
       LOG.debug("Remote karma fetch failed for peer " + key, t);
     } finally {
@@ -327,11 +328,15 @@ public final class RemoteKarmaChainFetcher implements AutoCloseable {
 
   /**
    * Verifies a manifest libtorrent has decoded: its canonical bytes go through {@link
-   * KarmaChain#parseManifest(byte[], byte[])}.
+   * KarmaChain#parseManifest(byte[], byte[], BlockHeaderSource)}, with this fetcher's block source
+   * (if any).
    */
-  private static List<KarmaChainEntry> parseAndVerify(Entry manifest, byte[] owner) {
+  private static List<KarmaChainEntry> parseAndVerify(
+      Entry manifest, byte[] owner, BlockHeaderSource blocks) {
     try {
-      return KarmaChain.parseManifest(manifest.bencode(), owner);
+      // On a worker thread: block lookups may use the network (offline falls back, see
+      // KarmaChain.checkBlocks).
+      return KarmaChain.parseManifest(manifest.bencode(), owner, blocks);
     } catch (IllegalArgumentException e) {
       return null;
     }

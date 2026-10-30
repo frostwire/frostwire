@@ -382,7 +382,10 @@ public final class AndroidRelayStack implements AutoCloseable {
           .applyForRole(readConfiguredRole());
       int meshRudpPort = PeerRegistrySync.ICEBRIDGE_RUDP_PORT;
       karmaCache =
-          new PeerKarmaCache(new RemoteKarmaChainFetcher(new DhtKarmaChainSource(btEngine)));
+          new PeerKarmaCache(
+              new RemoteKarmaChainFetcher(
+                  new DhtKarmaChainSource(btEngine),
+                  new com.frostwire.search.relay.TipCachingBlockHeaderSource(blockSource)));
       pd = new PeerDirectory(karmaCache);
 
       observer.phase(RelayStartupTracker.Phase.SERVER);
