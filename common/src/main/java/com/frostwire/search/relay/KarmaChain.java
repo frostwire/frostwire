@@ -110,6 +110,18 @@ public final class KarmaChain {
    */
   public synchronized KarmaChainEntry commitEpoch(
       BitcoinBlockReference block, PrivateKey signingKey) {
+    KarmaChainEntry entry = prepareEpochCommitment(block, signingKey);
+    accept(entry);
+    return entry;
+  }
+
+  /**
+   * Signs the {@code EPOCH_COMMITMENT} that {@link #commitEpoch} would append, without changing the
+   * chain. A caller that must persist the entry first stores it, then passes it to {@link #accept},
+   * so a failed write leaves the chain as it was.
+   */
+  synchronized KarmaChainEntry prepareEpochCommitment(
+      BitcoinBlockReference block, PrivateKey signingKey) {
     if (block == null) {
       throw new IllegalArgumentException("block is null");
     }
@@ -125,15 +137,9 @@ public final class KarmaChain {
     // Compute new energy: KARMA_ENERGY_PER_EPOCH + (previousRemaining * decay)
     double previousRemaining = currentEnergy - endorsementsThisEpoch;
     if (previousRemaining < 0) previousRemaining = 0;
-    currentEnergy = KarmaConstants.energyAtEpoch(previousRemaining);
-    currentEpoch = newEpoch;
-    endorsementsThisEpoch = 0;
-
-    KarmaChainEntry entry =
-        KarmaChainEntry.createEpochCommitment(
-            headHash(), nextSeq(), ownerPub, block, currentEnergy, signingKey);
-    entries.add(entry);
-    return entry;
+    double energy = KarmaConstants.energyAtEpoch(previousRemaining);
+    return KarmaChainEntry.createEpochCommitment(
+        headHash(), nextSeq(), ownerPub, block, energy, signingKey);
   }
 
   /**
@@ -147,6 +153,17 @@ public final class KarmaChain {
    * Appends an ENDORSEMENT entry to the chain. Returns the appended entry.
    */
   public synchronized KarmaChainEntry endorse(
+      byte[] peerPub, byte[] infoHash, BitcoinBlockReference currentBlock, PrivateKey signingKey) {
+    KarmaChainEntry entry = prepareEndorsement(peerPub, infoHash, currentBlock, signingKey);
+    accept(entry);
+    return entry;
+  }
+
+  /**
+   * Signs the {@code ENDORSEMENT} that {@link #endorse} would append, after the same checks,
+   * without changing the chain; see {@link #prepareEpochCommitment}.
+   */
+  synchronized KarmaChainEntry prepareEndorsement(
       byte[] peerPub, byte[] infoHash, BitcoinBlockReference currentBlock, PrivateKey signingKey) {
     if (peerPub == null) {
       throw new IllegalArgumentException("peerPub is null");
@@ -181,12 +198,34 @@ public final class KarmaChain {
               + ")");
     }
 
-    KarmaChainEntry entry =
-        KarmaChainEntry.createEndorsement(
-            headHash(), nextSeq(), ownerPub, currentBlock, peerPub, infoHash, 1, signingKey);
+    return KarmaChainEntry.createEndorsement(
+        headHash(), nextSeq(), ownerPub, currentBlock, peerPub, infoHash, 1, signingKey);
+  }
+
+  /**
+   * Appends an entry made by {@link #prepareEpochCommitment} or {@link #prepareEndorsement} and
+   * advances the epoch and energy state. The entry must extend the current head: if the chain
+   * changed since it was prepared, it is refused and the chain is left as it was.
+   *
+   * @throws IllegalStateException if the entry doesn't link to the current head
+   */
+  synchronized void accept(KarmaChainEntry entry) {
+    if (entry == null) {
+      throw new IllegalArgumentException("entry is null");
+    }
+    if (entry.seq() != nextSeq()
+        || !Arrays.equals(entry.prevHash(), headHash())
+        || !Arrays.equals(entry.endorserPub(), ownerPub)) {
+      throw new IllegalStateException("Entry seq=" + entry.seq() + " does not extend this chain");
+    }
     entries.add(entry);
-    endorsementsThisEpoch++;
-    return entry;
+    if (entry.kind() == KarmaChainEntry.Kind.EPOCH_COMMITMENT) {
+      currentEpoch = entry.epoch();
+      currentEnergy = entry.energy();
+      endorsementsThisEpoch = 0;
+    } else {
+      endorsementsThisEpoch++;
+    }
   }
 
   /** True when this chain already contains an endorsement for this peer and torrent pair. */

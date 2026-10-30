@@ -196,11 +196,15 @@ public final class KarmaChainWriter implements KarmaEndorsementSink, AutoCloseab
         if (!isPermitted(permitted) || !canEndorseSourcePeer(peerEd25519Pub, infoHash)) {
           return false;
         }
-        KarmaChainEntry endorsement = chain.endorse(peerEd25519Pub, infoHash, block, signingKey);
-        table.append(endorsement);
+        KarmaChainEntry endorsement;
+        try {
+          endorsement = chain.prepareEndorsement(peerEd25519Pub, infoHash, block, signingKey);
+        } catch (IllegalStateException e) {
+          LOG.debug("Endorsement rejected by chain: " + e.getMessage());
+          return false;
+        }
+        appendPersistedFirst(endorsement);
         appended = true;
-      } catch (IllegalStateException e) {
-        LOG.debug("Endorsement rejected by chain: " + e.getMessage());
       } finally {
         writeLock.unlock();
       }
@@ -228,7 +232,16 @@ public final class KarmaChainWriter implements KarmaEndorsementSink, AutoCloseab
   }
 
   private void appendCommitment(BitcoinBlockReference block) {
-    KarmaChainEntry commitment = chain.commitEpoch(block, signingKey);
-    table.append(commitment);
+    appendPersistedFirst(chain.prepareEpochCommitment(block, signingKey));
+  }
+
+  /**
+   * Stores the entry, then adds it to the in-memory chain, so a failed write (which throws) leaves
+   * memory and the store holding the same entries, and the next attempt re-signs from the stored
+   * head. Callers hold {@link #writeLock}, so the chain can't move between the two steps.
+   */
+  private void appendPersistedFirst(KarmaChainEntry entry) {
+    table.append(entry);
+    chain.accept(entry);
   }
 }
