@@ -4883,10 +4883,16 @@ msgid "Ignore Adult Content"
 msgstr "Abaikan Konten Dewasa"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:46
+#, fuzzy
+#| msgid ""
+#| "Your karma reputation is anchored to a hash-linked chain of endorsements you "
+#| "issue to peers after completing downloads from them. Endorsements are "
+#| "created automatically when a download finishes."
 msgid ""
 "Your karma reputation is anchored to a hash-linked chain of endorsements you "
 "issue to peers after completing downloads from them. Endorsements are "
-"created automatically when a download finishes."
+"created automatically when a download from a distributed-search peer "
+"completes, and can also be given manually."
 msgstr "Reputasi Anda berlandaskan rantai rekomendasi berbasis hash yang Anda berikan kepada peer setelah selesai mengunduh dari mereka. Rekomendasi dibuat otomatis saat unduhan selesai."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:57
@@ -4943,9 +4949,14 @@ msgid "Copy Full Public Key"
 msgstr "Salin Kunci Publik Lengkap"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:247
+#, fuzzy
+#| msgid ""
+#| "Manual endorsement requires a completed download from this peer. "
+#| "Endorsements are automatically created when a download from a peer completes."
 msgid ""
 "Manual endorsement requires a completed download from this peer. "
-"Endorsements are automatically created when a download from a peer completes."
+"Endorsements are created automatically when a download from a distributed-"
+"search peer completes, and can also be given manually."
 msgstr "Rekomendasi manual memerlukan unduhan yang selesai dari peer ini. Rekomendasi dibuat otomatis saat unduhan dari peer selesai."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/LibraryFoldersPaneItem.java:45

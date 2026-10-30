@@ -4981,10 +4981,16 @@ msgid "Ignore Adult Content"
 msgstr "Ignoreer volwasse inhoud"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:46
+#, fuzzy
+#| msgid ""
+#| "Your karma reputation is anchored to a hash-linked chain of endorsements you "
+#| "issue to peers after completing downloads from them. Endorsements are "
+#| "created automatically when a download finishes."
 msgid ""
 "Your karma reputation is anchored to a hash-linked chain of endorsements you "
 "issue to peers after completing downloads from them. Endorsements are "
-"created automatically when a download finishes."
+"created automatically when a download from a distributed-search peer "
+"completes, and can also be given manually."
 msgstr ""
 "Jou karma-reputasie is geanker aan 'n hash-gekoppelde ketting van "
 "endossemente wat jy aan eweknieë uitreik nadat jy aflaaie van hulle voltooi "
@@ -5044,9 +5050,14 @@ msgid "Copy Full Public Key"
 msgstr "Kopieer volle publieke sleutel"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:247
+#, fuzzy
+#| msgid ""
+#| "Manual endorsement requires a completed download from this peer. "
+#| "Endorsements are automatically created when a download from a peer completes."
 msgid ""
 "Manual endorsement requires a completed download from this peer. "
-"Endorsements are automatically created when a download from a peer completes."
+"Endorsements are created automatically when a download from a distributed-"
+"search peer completes, and can also be given manually."
 msgstr ""
 "Handmatige endossement vereis 'n voltooide aflaai van hierdie eweknie. "
 "Endossemente word outomaties geskep wanneer 'n aflaai van 'n eweknie voltooi."

@@ -5008,10 +5008,16 @@ msgid "Ignore Adult Content"
 msgstr "Erwuessenen Inhalt ignoréieren"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:46
+#, fuzzy
+#| msgid ""
+#| "Your karma reputation is anchored to a hash-linked chain of endorsements you "
+#| "issue to peers after completing downloads from them. Endorsements are "
+#| "created automatically when a download finishes."
 msgid ""
 "Your karma reputation is anchored to a hash-linked chain of endorsements you "
 "issue to peers after completing downloads from them. Endorsements are "
-"created automatically when a download finishes."
+"created automatically when a download from a distributed-search peer "
+"completes, and can also be given manually."
 msgstr ""
 "Deng Karma-Reputatioun ass verankert un enger Hash-verlinkte Kette vun "
 "Empfehlungen déi s du u Peeren ausgess nodeems s du Eroflueden vun hinnen "
@@ -5072,9 +5078,14 @@ msgid "Copy Full Public Key"
 msgstr "Vollen ëffentleche Schlëssel kopéieren"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:247
+#, fuzzy
+#| msgid ""
+#| "Manual endorsement requires a completed download from this peer. "
+#| "Endorsements are automatically created when a download from a peer completes."
 msgid ""
 "Manual endorsement requires a completed download from this peer. "
-"Endorsements are automatically created when a download from a peer completes."
+"Endorsements are created automatically when a download from a distributed-"
+"search peer completes, and can also be given manually."
 msgstr ""
 "Manuell Empfehlung erfuerdert en ofgeschlossenen Eroflueden vun dësem Peer. "
 "Empfehlungen gi automatesch erstallt wann en Eroflueden vun engem Peer "

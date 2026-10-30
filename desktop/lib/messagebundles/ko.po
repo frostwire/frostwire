@@ -4886,10 +4886,16 @@ msgid "Ignore Adult Content"
 msgstr "성인 컨텐츠를 무시"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:46
+#, fuzzy
+#| msgid ""
+#| "Your karma reputation is anchored to a hash-linked chain of endorsements you "
+#| "issue to peers after completing downloads from them. Endorsements are "
+#| "created automatically when a download finishes."
 msgid ""
 "Your karma reputation is anchored to a hash-linked chain of endorsements you "
 "issue to peers after completing downloads from them. Endorsements are "
-"created automatically when a download finishes."
+"created automatically when a download from a distributed-search peer "
+"completes, and can also be given manually."
 msgstr ""
 "카르마 평판은 다운로드 완료 후 피어에게 부여하는 지지(endorse)들의 해시 연결 "
 "체인에 고정됩니다. 다운로드가 완료되면 지지가 자동 생성됩니다."
@@ -4948,9 +4954,14 @@ msgid "Copy Full Public Key"
 msgstr "전체 공개 키 복사"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:247
+#, fuzzy
+#| msgid ""
+#| "Manual endorsement requires a completed download from this peer. "
+#| "Endorsements are automatically created when a download from a peer completes."
 msgid ""
 "Manual endorsement requires a completed download from this peer. "
-"Endorsements are automatically created when a download from a peer completes."
+"Endorsements are created automatically when a download from a distributed-"
+"search peer completes, and can also be given manually."
 msgstr ""
 "수동 지지는 이 피어에서의 완료된 다운로드가 필요합니다. 피어에서의 다운로드"
 "가 완료되면 지지가 자동 생성됩니다."

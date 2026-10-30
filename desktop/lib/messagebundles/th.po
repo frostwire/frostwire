@@ -4936,10 +4936,16 @@ msgid "Ignore Adult Content"
 msgstr "ละเว้นเนื้อหาสำหรับผู้ใหญ่"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:46
+#, fuzzy
+#| msgid ""
+#| "Your karma reputation is anchored to a hash-linked chain of endorsements you "
+#| "issue to peers after completing downloads from them. Endorsements are "
+#| "created automatically when a download finishes."
 msgid ""
 "Your karma reputation is anchored to a hash-linked chain of endorsements you "
 "issue to peers after completing downloads from them. Endorsements are "
-"created automatically when a download finishes."
+"created automatically when a download from a distributed-search peer "
+"completes, and can also be given manually."
 msgstr "ชื่อเสียงของคุณผูกกับสายโซ่การรับรองที่เชื่อมด้วยแฮชซึ่งคุณให้แก่เพียร์หลังดาวน์โหลดจากพวกเขาเสร็จ การรับรองจะถูกสร้างอัตโนมัติเมื่อการดาวน์โหลดเสร็จสิ้น"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:57
@@ -5000,9 +5006,14 @@ msgid "Copy Full Public Key"
 msgstr "คัดลอกคีย์สาธารณะแบบเต็ม"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:247
+#, fuzzy
+#| msgid ""
+#| "Manual endorsement requires a completed download from this peer. "
+#| "Endorsements are automatically created when a download from a peer completes."
 msgid ""
 "Manual endorsement requires a completed download from this peer. "
-"Endorsements are automatically created when a download from a peer completes."
+"Endorsements are created automatically when a download from a distributed-"
+"search peer completes, and can also be given manually."
 msgstr "การรับรองด้วยตนเองต้องมีการดาวน์โหลดที่เสร็จสมบูรณ์จากเพียร์นี้ การรับรองจะถูกสร้างอัตโนมัติเมื่อการดาวน์โหลดจากเพียร์เสร็จสิ้น"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/LibraryFoldersPaneItem.java:45

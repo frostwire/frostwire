@@ -4970,10 +4970,16 @@ msgid "Ignore Adult Content"
 msgstr "Παράβλεψη περιεχομένου για ενήλικες"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:46
+#, fuzzy
+#| msgid ""
+#| "Your karma reputation is anchored to a hash-linked chain of endorsements you "
+#| "issue to peers after completing downloads from them. Endorsements are "
+#| "created automatically when a download finishes."
 msgid ""
 "Your karma reputation is anchored to a hash-linked chain of endorsements you "
 "issue to peers after completing downloads from them. Endorsements are "
-"created automatically when a download finishes."
+"created automatically when a download from a distributed-search peer "
+"completes, and can also be given manually."
 msgstr "Η φήμη σας βασίζεται σε μια αλυσίδα εγκρίσεων συνδεδεμένων με hash που δίνετε σε ομότιμους αφού ολοκληρώσετε λήψεις από αυτούς. Οι εγκρίσεις δημιουργούνται αυτόματα όταν ολοκληρώνεται μια λήψη."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:57
@@ -5030,9 +5036,14 @@ msgid "Copy Full Public Key"
 msgstr "Αντιγραφή πλήρους δημόσιου κλειδιού"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:247
+#, fuzzy
+#| msgid ""
+#| "Manual endorsement requires a completed download from this peer. "
+#| "Endorsements are automatically created when a download from a peer completes."
 msgid ""
 "Manual endorsement requires a completed download from this peer. "
-"Endorsements are automatically created when a download from a peer completes."
+"Endorsements are created automatically when a download from a distributed-"
+"search peer completes, and can also be given manually."
 msgstr "Η χειροκίνητη έγκριση απαιτεί ολοκληρωμένη λήψη από αυτόν τον ομότιμο. Οι εγκρίσεις δημιουργούνται αυτόματα όταν ολοκληρώνεται μια λήψη από ομότιμο."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/LibraryFoldersPaneItem.java:45

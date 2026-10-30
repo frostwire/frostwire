@@ -5018,10 +5018,16 @@ msgid "Ignore Adult Content"
 msgstr "Ignorar contenido para adultos"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:46
+#, fuzzy
+#| msgid ""
+#| "Your karma reputation is anchored to a hash-linked chain of endorsements you "
+#| "issue to peers after completing downloads from them. Endorsements are "
+#| "created automatically when a download finishes."
 msgid ""
 "Your karma reputation is anchored to a hash-linked chain of endorsements you "
 "issue to peers after completing downloads from them. Endorsements are "
-"created automatically when a download finishes."
+"created automatically when a download from a distributed-search peer "
+"completes, and can also be given manually."
 msgstr ""
 "Tu reputación de karma está anclada a una cadena de respaldos enlazados por "
 "hash que emites a pares tras completar descargas de ellos. Los respaldos se "
@@ -5081,9 +5087,14 @@ msgid "Copy Full Public Key"
 msgstr "Copiar clave pública completa"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:247
+#, fuzzy
+#| msgid ""
+#| "Manual endorsement requires a completed download from this peer. "
+#| "Endorsements are automatically created when a download from a peer completes."
 msgid ""
 "Manual endorsement requires a completed download from this peer. "
-"Endorsements are automatically created when a download from a peer completes."
+"Endorsements are created automatically when a download from a distributed-"
+"search peer completes, and can also be given manually."
 msgstr ""
 "El respaldo manual requiere una descarga completa de este par. Los respaldos "
 "se crean automáticamente cuando se completa una descarga de un par."

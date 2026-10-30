@@ -4906,10 +4906,16 @@ msgid "Ignore Adult Content"
 msgstr "अश्लील सामग्री को छोड़ें"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:46
+#, fuzzy
+#| msgid ""
+#| "Your karma reputation is anchored to a hash-linked chain of endorsements you "
+#| "issue to peers after completing downloads from them. Endorsements are "
+#| "created automatically when a download finishes."
 msgid ""
 "Your karma reputation is anchored to a hash-linked chain of endorsements you "
 "issue to peers after completing downloads from them. Endorsements are "
-"created automatically when a download finishes."
+"created automatically when a download from a distributed-search peer "
+"completes, and can also be given manually."
 msgstr ""
 "आपकी कर्म प्रतिष्ठा उनसे डाउनलोड पूर्ण होने पर पीयरों को दिए गए समर्थन की हैश-लिंक्ड "
 "श्रृंखला से जुड़ी है। डाउनलोड पूर्ण होने पर समर्थन स्वतः बनते हैं।"
@@ -4968,9 +4974,14 @@ msgid "Copy Full Public Key"
 msgstr "पूर्ण सार्वजनिक कुंजी कॉपी करें"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:247
+#, fuzzy
+#| msgid ""
+#| "Manual endorsement requires a completed download from this peer. "
+#| "Endorsements are automatically created when a download from a peer completes."
 msgid ""
 "Manual endorsement requires a completed download from this peer. "
-"Endorsements are automatically created when a download from a peer completes."
+"Endorsements are created automatically when a download from a distributed-"
+"search peer completes, and can also be given manually."
 msgstr ""
 "मैन्युअल समर्थन हेतु इस पीयर से पूर्ण डाउनलोड आवश्यक है। पीयर से डाउनलोड पूर्ण होने पर "
 "समर्थन स्वतः बनते हैं।"

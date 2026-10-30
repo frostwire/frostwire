@@ -45,7 +45,8 @@ public final class KarmaSettingsPaneItem extends AbstractPaneItem {
       I18n.tr(
           "Your karma reputation is anchored to a hash-linked chain of endorsements "
               + "you issue to peers after completing downloads from them. Endorsements are "
-              + "created automatically when a download finishes.");
+              + "created automatically when a download from a distributed-search peer "
+              + "completes, and can also be given manually.");
 
   private final JLabel EPOCH_LABEL = new JLabel(NA);
   private final JLabel ENERGY_LABEL = new JLabel(NA);
@@ -256,7 +257,8 @@ public final class KarmaSettingsPaneItem extends AbstractPaneItem {
         GUIMediator.getAppFrame(),
         I18n.tr(
             "Manual endorsement requires a completed download from this peer. "
-                + "Endorsements are automatically created when a download from a peer completes."),
+                + "Endorsements are created automatically when a download from a "
+                + "distributed-search peer completes, and can also be given manually."),
         I18n.tr("Endorse Peer"),
         JOptionPane.INFORMATION_MESSAGE);
   }

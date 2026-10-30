@@ -5025,10 +5025,16 @@ msgid "Ignore Adult Content"
 msgstr "Baliwalain ang Pang-may edad na nilalaman"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:46
+#, fuzzy
+#| msgid ""
+#| "Your karma reputation is anchored to a hash-linked chain of endorsements you "
+#| "issue to peers after completing downloads from them. Endorsements are "
+#| "created automatically when a download finishes."
 msgid ""
 "Your karma reputation is anchored to a hash-linked chain of endorsements you "
 "issue to peers after completing downloads from them. Endorsements are "
-"created automatically when a download finishes."
+"created automatically when a download from a distributed-search peer "
+"completes, and can also be given manually."
 msgstr ""
 "Ang karma reputation mo ay naka-angkla sa hash-linked chain ng mga "
 "endorsement na ibinibigay mo sa mga peer pagkatapos makapag-download mula sa "
@@ -5088,9 +5094,14 @@ msgid "Copy Full Public Key"
 msgstr "Kopyahin ang Buong Public Key"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:247
+#, fuzzy
+#| msgid ""
+#| "Manual endorsement requires a completed download from this peer. "
+#| "Endorsements are automatically created when a download from a peer completes."
 msgid ""
 "Manual endorsement requires a completed download from this peer. "
-"Endorsements are automatically created when a download from a peer completes."
+"Endorsements are created automatically when a download from a distributed-"
+"search peer completes, and can also be given manually."
 msgstr ""
 "Kailangan ng tapos na download mula sa peer na ito para sa manual "
 "endorsement. Awtomatikong nagagawa ang mga endorsement kapag natapos ang "

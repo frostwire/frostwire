@@ -5003,10 +5003,16 @@ msgid "Ignore Adult Content"
 msgstr "Përbuzi Përmbajtjet për të Rritur"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:46
+#, fuzzy
+#| msgid ""
+#| "Your karma reputation is anchored to a hash-linked chain of endorsements you "
+#| "issue to peers after completing downloads from them. Endorsements are "
+#| "created automatically when a download finishes."
 msgid ""
 "Your karma reputation is anchored to a hash-linked chain of endorsements you "
 "issue to peers after completing downloads from them. Endorsements are "
-"created automatically when a download finishes."
+"created automatically when a download from a distributed-search peer "
+"completes, and can also be given manually."
 msgstr ""
 "Reputacioni juaj karma është ankoruar në një zinxhir të lidhur me hash të "
 "miratimeve që ju lëshoni për bashkëpunëtorët pas përfundimit të shkarkimeve "
@@ -5066,9 +5072,14 @@ msgid "Copy Full Public Key"
 msgstr "Kopjo Çelësin Publik të Plotë"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:247
+#, fuzzy
+#| msgid ""
+#| "Manual endorsement requires a completed download from this peer. "
+#| "Endorsements are automatically created when a download from a peer completes."
 msgid ""
 "Manual endorsement requires a completed download from this peer. "
-"Endorsements are automatically created when a download from a peer completes."
+"Endorsements are created automatically when a download from a distributed-"
+"search peer completes, and can also be given manually."
 msgstr ""
 "Miratimi manual kërkon një shkarkimin e përfunduar nga ky koleg. Miratimeve "
 "krijohen automatikisht kur një shkarkimi nga një koleg përfundon."

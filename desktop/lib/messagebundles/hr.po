@@ -4962,10 +4962,16 @@ msgid "Ignore Adult Content"
 msgstr "Ignoriraj sadržaj za odrasle"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:46
+#, fuzzy
+#| msgid ""
+#| "Your karma reputation is anchored to a hash-linked chain of endorsements you "
+#| "issue to peers after completing downloads from them. Endorsements are "
+#| "created automatically when a download finishes."
 msgid ""
 "Your karma reputation is anchored to a hash-linked chain of endorsements you "
 "issue to peers after completing downloads from them. Endorsements are "
-"created automatically when a download finishes."
+"created automatically when a download from a distributed-search peer "
+"completes, and can also be given manually."
 msgstr ""
 "Tvoja karma reputacija usidrena je na hash-povezani lanac podrški koje "
 "izdaješ peerovima nakon dovršenih preuzimanja od njih. Podrške se stvaraju "
@@ -5025,9 +5031,14 @@ msgid "Copy Full Public Key"
 msgstr "Kopiraj puni javni ključ"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:247
+#, fuzzy
+#| msgid ""
+#| "Manual endorsement requires a completed download from this peer. "
+#| "Endorsements are automatically created when a download from a peer completes."
 msgid ""
 "Manual endorsement requires a completed download from this peer. "
-"Endorsements are automatically created when a download from a peer completes."
+"Endorsements are created automatically when a download from a distributed-"
+"search peer completes, and can also be given manually."
 msgstr ""
 "Ručna podrška zahtijeva dovršeno preuzimanje od ovog peera. Podrške se "
 "automatski stvaraju po dovršetku preuzimanja od peera."
