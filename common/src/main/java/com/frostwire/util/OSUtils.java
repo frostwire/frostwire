@@ -20,6 +20,7 @@ package com.frostwire.util;
 
 import java.io.File;
 import java.util.Locale;
+import java.util.function.BooleanSupplier;
 
 /**
  * Provides methods to get operating system properties, resources and versions,
@@ -272,16 +273,27 @@ public class OSUtils {
         return OSUtils.isAnyMac() && major >= 10 && minor >= 15;
     }
 
-    private static File APP_X_MANIFEST_XML = null;
+    /** Null until the first Windows call reads it from disk. */
+    private static volatile Boolean windowsAppStoreInstall;
 
+    /**
+     * Whether FrostWire runs from a Microsoft Store install (an AppxManifest.xml in its folder).
+     * The answer can't change while it runs, so the disk is read once: menus, search and the
+     * shutdown window ask on the EDT, where each file system query could stall on antivirus or
+     * a slow disk (frostwire/frostwire#1406). GUILoader asks first, on the startup thread.
+     */
     public static boolean isWindowsAppStoreInstall() {
-        if (!isWindows()) {
-            return false;
+        return isWindows() && windowsAppStoreInstall(() -> new File("AppxManifest.xml").isFile());
+    }
+
+    /** {@code manifestIsFile} runs on the first call only; later calls return its answer. */
+    static boolean windowsAppStoreInstall(BooleanSupplier manifestIsFile) {
+        Boolean answer = windowsAppStoreInstall;
+        if (answer == null) {
+            answer = manifestIsFile.getAsBoolean();
+            windowsAppStoreInstall = answer;
         }
-        if (APP_X_MANIFEST_XML == null) {
-            APP_X_MANIFEST_XML = new File("AppxManifest.xml");
-        }
-        return APP_X_MANIFEST_XML.exists() && APP_X_MANIFEST_XML.isFile();
+        return answer;
     }
 
 }
