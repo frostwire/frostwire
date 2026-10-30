@@ -37,4 +37,16 @@ public interface KarmaChainStore extends AutoCloseable {
      * @return the verified chain, or an empty chain if none exists
      */
     KarmaChain loadChain(byte[] ownerPub);
+
+    /**
+     * Load the chain for the {@link KarmaChainWriter} that will append to it. Like
+     * {@link #loadChain}, but a persisted chain that fails verification is first moved aside,
+     * because the fresh chain's appends would otherwise overwrite it. Only the writer calls this;
+     * readers use {@link #loadChain}, which never changes the store.
+     *
+     * @throws IllegalStateException if a rejected chain can't be moved aside
+     */
+    default KarmaChain loadChainForWriting(byte[] ownerPub) {
+        return loadChain(ownerPub);
+    }
 }

@@ -200,6 +200,15 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
 
     @Override
     public KarmaChain loadChain(byte[] ownerPub) {
+        return load(ownerPub, false);
+    }
+
+    @Override
+    public KarmaChain loadChainForWriting(byte[] ownerPub) {
+        return load(ownerPub, true);
+    }
+
+    private KarmaChain load(byte[] ownerPub, boolean setAsideIfRejected) {
         if (ownerPub == null || ownerPub.length != 32) {
             throw new IllegalArgumentException("ownerPub must be 32 bytes");
         }
@@ -259,7 +268,7 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
         if (chain != null) {
             return chain;
         }
-        if (rows > 0) {
+        if (rows > 0 && setAsideIfRejected) {
             String keptIn = setAsideRejectedChain();
             LOG.warn("Persisted karma chain failed verification; kept it in " + keptIn
                     + ", starting fresh");

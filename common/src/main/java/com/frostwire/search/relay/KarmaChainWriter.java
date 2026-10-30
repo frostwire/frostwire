@@ -74,7 +74,7 @@ public final class KarmaChainWriter implements KarmaEndorsementSink, AutoCloseab
     this.blockSource = blockSource;
     this.table = table;
     this.lifecycle = new DhtAdvertiser.Lifecycle(permitted);
-    this.chain = table.loadChain(ownerPub);
+    this.chain = table.loadChainForWriting(ownerPub);
   }
 
   /**
