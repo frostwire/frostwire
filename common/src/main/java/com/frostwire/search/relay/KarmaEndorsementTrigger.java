@@ -13,6 +13,11 @@ import com.frostwire.bittorrent.BTEngineListener;
 import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.Logger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,7 +43,7 @@ public final class KarmaEndorsementTrigger implements BTEngineListener, AutoClos
   private static final String THREAD_NAME_PREFIX = "karma-endorse-";
 
   private final LocalIndex index;
-  private final byte[] ownEd25519Pub;
+  private final List<byte[]> ownKeys;
   private final KarmaEndorsementSink sink;
   private final Set<String> creditedInfoHashes = ConcurrentHashMap.newKeySet();
   private final DhtAdvertiser.Lifecycle lifecycle;
@@ -61,19 +66,56 @@ public final class KarmaEndorsementTrigger implements BTEngineListener, AutoClos
       byte[] ownEd25519Pub,
       KarmaEndorsementSink sink,
       BooleanSupplier permitted) {
+    this(index, ownKeys(ownEd25519Pub), sink, permitted);
+  }
+
+  /**
+   * As above, with every key this node has signed as: the current identity's first, then earlier
+   * identities'. A source with any of them is never endorsed.
+   */
+  public KarmaEndorsementTrigger(
+      LocalIndex index,
+      Collection<byte[]> ownKeys,
+      KarmaEndorsementSink sink,
+      BooleanSupplier permitted) {
     if (index == null) {
       throw new IllegalArgumentException("index is null");
     }
-    if (ownEd25519Pub == null) {
-      throw new IllegalArgumentException("ownEd25519Pub is null");
+    if (ownKeys == null || ownKeys.isEmpty()) {
+      throw new IllegalArgumentException("ownKeys is null or empty");
+    }
+    for (byte[] key : ownKeys) {
+      if (key == null) {
+        throw new IllegalArgumentException("ownKeys has a null key");
+      }
     }
     if (sink == null) {
       throw new IllegalArgumentException("sink is null");
     }
     this.index = index;
-    this.ownEd25519Pub = ownEd25519Pub.clone();
+    List<byte[]> keys = new ArrayList<>(ownKeys.size());
+    for (byte[] key : ownKeys) {
+      keys.add(key.clone());
+    }
+    this.ownKeys = Collections.unmodifiableList(keys);
     this.sink = sink;
     this.lifecycle = new DhtAdvertiser.Lifecycle(permitted);
+  }
+
+  private static List<byte[]> ownKeys(byte[] ownEd25519Pub) {
+    if (ownEd25519Pub == null) {
+      throw new IllegalArgumentException("ownEd25519Pub is null");
+    }
+    return Collections.singletonList(ownEd25519Pub);
+  }
+
+  private boolean isOwnKey(byte[] key) {
+    for (byte[] own : ownKeys) {
+      if (Arrays.equals(own, key)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
@@ -91,6 +133,14 @@ public final class KarmaEndorsementTrigger implements BTEngineListener, AutoClos
 
   @Override
   public void downloadUpdate(BTEngine engine, BTDownload dl) {
+    if (dl == null) {
+      return;
+    }
+    offer(Transfer.of(dl));
+  }
+
+  /** Hands a transfer event to the worker. */
+  void offer(Transfer dl) {
     if (dl == null || !lifecycle.getAsBoolean()) {
       return;
     }
@@ -102,13 +152,13 @@ public final class KarmaEndorsementTrigger implements BTEngineListener, AutoClos
     }
   }
 
-  private void endorse(BTDownload dl) {
+  private void endorse(Transfer dl) {
     if (!lifecycle.enter()) {
       close();
       return;
     }
     try {
-      TransferState state = dl.getState();
+      TransferState state = dl.state();
       if (!lifecycle.getAsBoolean()) {
         return;
       }
@@ -118,7 +168,7 @@ public final class KarmaEndorsementTrigger implements BTEngineListener, AutoClos
       // Distributed-search source endorsements are explicitly user initiated from the
       // transfer UI; do not silently consume karma when this automatic completion listener
       // sees the same attributed transfer.
-      if (dl.getDistributedSourcePeerPub() != null) {
+      if (dl.distributedSourcePeerPub() != null) {
         return;
       }
       if (!lifecycle.getAsBoolean()) {
@@ -126,7 +176,7 @@ public final class KarmaEndorsementTrigger implements BTEngineListener, AutoClos
       }
       String infoHashHex;
       try {
-        infoHashHex = dl.getInfoHash();
+        infoHashHex = dl.infoHash();
       } catch (Throwable t) {
         LOG.debug("Failed to read info hash from BTDownload", t);
         return;
@@ -151,7 +201,7 @@ public final class KarmaEndorsementTrigger implements BTEngineListener, AutoClos
         return;
       }
       // Exclude self-endorsement
-      if (java.util.Arrays.equals(peerPub, ownEd25519Pub)) {
+      if (isOwnKey(peerPub)) {
         return;
       }
       // Exclude placeholder zero pubkey
@@ -206,5 +256,50 @@ public final class KarmaEndorsementTrigger implements BTEngineListener, AutoClos
 
   private static byte[] hexToBytes(String hex) {
     return com.frostwire.util.Hex.decode(hex);
+  }
+
+  /** What the trigger reads from a transfer; {@link #of} adapts a {@link BTDownload}. */
+  interface Transfer {
+    TransferState state();
+
+    boolean isFinished();
+
+    /** The verified distributed-search source carried by the transfer, or null. */
+    byte[] distributedSourcePeerPub();
+
+    /** The info hash libtorrent reports (v1 when the torrent has one), lowercase hex, or null. */
+    String infoHash();
+
+    /** The v1 info hash signed endorsements use, or null for a v2-only torrent. */
+    String v1InfoHash();
+
+    static Transfer of(BTDownload dl) {
+      return new Transfer() {
+        @Override
+        public TransferState state() {
+          return dl.getState();
+        }
+
+        @Override
+        public boolean isFinished() {
+          return dl.isFinished();
+        }
+
+        @Override
+        public byte[] distributedSourcePeerPub() {
+          return dl.getDistributedSourcePeerPub();
+        }
+
+        @Override
+        public String infoHash() {
+          return dl.getInfoHash();
+        }
+
+        @Override
+        public String v1InfoHash() {
+          return dl.getV1InfoHash();
+        }
+      };
+    }
   }
 }

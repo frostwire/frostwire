@@ -30,4 +30,10 @@ public interface BTEngineListener {
   void downloadAdded(BTEngine engine, BTDownload dl);
 
   void downloadUpdate(BTEngine engine, BTDownload dl);
+
+  /**
+   * A download finished: every wanted piece is on disk. Called on a libtorrent alert thread, so
+   * implementations must return quickly and do any slow work elsewhere.
+   */
+  default void downloadFinished(BTEngine engine, BTDownload dl) {}
 }

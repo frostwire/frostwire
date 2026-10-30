@@ -129,9 +129,10 @@ public final class KarmaChainWriter implements KarmaEndorsementSink, AutoCloseab
     endorseSourcePeer(peerEd25519Pub, infoHash, () -> true);
   }
 
-  void onDownloadCompletedFromPeer(
+  /** As {@link #endorseSourcePeer}, under the caller's lifecycle; true if it was appended. */
+  boolean onDownloadCompletedFromPeer(
       byte[] peerEd25519Pub, byte[] infoHash, BooleanSupplier permitted) {
-    endorseSourcePeer(peerEd25519Pub, infoHash, permitted);
+    return endorseSourcePeer(peerEd25519Pub, infoHash, permitted);
   }
 
   /**
