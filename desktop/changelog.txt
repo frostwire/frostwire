@@ -1,4 +1,8 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:Karma: a download that finishes from a distributed-search peer now endorses that peer automatically, once per peer and torrent (#1414)
+   - fix:Karma: Options shows your karma and endorsements from the right database instead of "missing" or 0 (#1412)
+   - fix:Karma: your karma chain can no longer be lost: each entry is saved before it is used, never signed at an older Bitcoin block, and a chain that fails verification is kept aside instead of overwritten (#1413)
+   - fix:Distributed search rejects karma chains with forged epochs or energy that got around the endorsement limit (#1415)
    - fix:The first search no longer freezes the window on slow machines while the size and seeds sliders are built: their look-and-feel painters are prepared at startup (#1419)
    - fix:On Windows, Browse for the save folder opens faster: FrostWire prepares the Windows folder list in the background first (#1411)
    - fix:MP3 tags read correctly in more files: UTF-16 comments and picture descriptions are no longer empty, tags with an extended header are read, and a short last tag field is no longer dropped (#1409)
