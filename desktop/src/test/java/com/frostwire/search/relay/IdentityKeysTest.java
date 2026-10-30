@@ -46,6 +46,25 @@ class IdentityKeysTest {
         assertEquals(20, keys.nodeId().length, "Node ID is SHA-1 length (20 bytes)");
     }
 
+    /**
+     * frostwire/frostwire#1400: X25519 keys come from BouncyCastle as an explicit provider (it
+     * isn't registered on Android, where Conscrypt lacks X25519 on Android 8-9), without the
+     * Android-13-only NamedParameterSpec, and survive a save/load round trip.
+     */
+    @Test
+    void x25519KeysComeFromBouncyCastleAndRoundTrip() throws Exception {
+        java.security.KeyPair pair = IdentityKeys.generateX25519KeyPair();
+        assertTrue(pair.getPublic().getClass().getName().startsWith("org.bouncycastle."),
+                pair.getPublic().getClass().getName());
+
+        File file = new File(tempDir, "identity-x25519.dat");
+        IdentityKeys created = IdentityKeys.loadOrCreate(file);
+        IdentityKeys loaded = IdentityKeys.load(file);
+        assertEquals(32, created.x25519PubRaw().length);
+        assertArrayEquals(created.x25519PubRaw(), loaded.x25519PubRaw());
+        assertArrayEquals(created.ed25519PubRaw(), loaded.ed25519PubRaw());
+    }
+
     @Test
     void nodeIdIsSha1OfEd25519PubRaw() throws Exception {
         IdentityKeys keys = IdentityKeys.generate();

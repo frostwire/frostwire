@@ -440,13 +440,24 @@ public final class IdentityKeys {
      * Generate an X25519 key pair in a way that works on both desktop JDKs
      * and Android Conscrypt.
      *
-     * <p>By algorithm name {@code "X25519"} first (desktop JDK 11+, BouncyCastle on every Android
-     * version), then Conscrypt's {@code XDH} with no parameters (it rejects any
+     * <p>BouncyCastle's {@code "X25519"} first, as an explicit provider (it isn't registered on
+     * Android; it works on every Android version), then {@code "X25519"} from any registered
+     * provider (desktop JDK 11+), then Conscrypt's {@code XDH} with no parameters (it rejects any
      * {@code AlgorithmParameterSpec} and defaults to X25519). It no longer uses
      * {@code NamedParameterSpec}, which Android only has from API 33: on Android 8-12 it threw
      * NoClassDefFoundError past the GeneralSecurityException fallbacks (frostwire/frostwire#1400).
      */
     static KeyPair generateX25519KeyPair() throws GeneralSecurityException {
+        // BouncyCastle explicitly: it isn't a registered provider on Android, where Conscrypt has
+        // no X25519 key generator on Android 8-9 (or 10+ without an updated Conscrypt).
+        Provider bc = bouncyCastleProviderOrNull();
+        if (bc != null) {
+            try {
+                return KeyPairGenerator.getInstance("X25519", bc).generateKeyPair();
+            } catch (GeneralSecurityException ignored) {
+                // Fall through.
+            }
+        }
         try {
             return KeyPairGenerator.getInstance("X25519").generateKeyPair();
         } catch (GeneralSecurityException ignored) {
