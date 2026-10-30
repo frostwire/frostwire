@@ -240,7 +240,14 @@ public final class  JdkHttpClient extends AbstractHttpClient {
                 throw new ResponseCodeNotSupportedException(responseCode);
             }
             try (InputStream in = conn.getInputStream()) {
-                return new String(in.readAllBytes(), StandardCharsets.UTF_8);
+                // Not InputStream.readAllBytes(): Android only has it from API 33 (#1400).
+                java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+                byte[] buffer = new byte[8192];
+                int n;
+                while ((n = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, n);
+                }
+                return new String(out.toByteArray(), StandardCharsets.UTF_8);
             }
         } finally {
             conn.disconnect();

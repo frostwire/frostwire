@@ -13,8 +13,9 @@ import com.frostwire.util.Logger;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
@@ -198,7 +199,10 @@ public final class IceBridgeTokens {
                     || !tokensFile.setReadable(true, true) || !tokensFile.setWritable(true, true)) {
                 throw new IOException("Could not restrict token file permissions");
             }
-            try (BufferedWriter w = new BufferedWriter(new FileWriter(tokensFile, StandardCharsets.UTF_8, true))) {
+            // Not FileWriter(File, Charset, boolean): Android only has it from API 33, and
+            // Android runs IceBridgeServer in-process (#1400).
+            try (BufferedWriter w = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(tokensFile, true), StandardCharsets.UTF_8))) {
                 w.write("\n# generated " + java.time.Instant.now() + "\n");
                 w.write(token + "\n");
             }

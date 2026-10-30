@@ -14,8 +14,11 @@ import com.frostwire.util.http.HttpClient;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ConcurrentHashMap;
@@ -109,8 +112,9 @@ public final class HttpBlockHeaderFetcher implements BlockHeaderSource {
         if (!cacheFile.exists()) {
             return;
         }
-        try (BufferedReader reader = new BufferedReader(
-                new FileReader(cacheFile, StandardCharsets.UTF_8))) {
+        // Not FileReader(File, Charset): Android only has it from API 33 (#1400).
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                new FileInputStream(cacheFile), StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
@@ -133,7 +137,9 @@ public final class HttpBlockHeaderFetcher implements BlockHeaderSource {
     }
 
     private synchronized void persistCache() {
-        try (PrintWriter writer = new PrintWriter(cacheFile, StandardCharsets.UTF_8)) {
+        // Not PrintWriter(File, Charset): Android only has it from API 33 (#1400).
+        try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(
+                new FileOutputStream(cacheFile), StandardCharsets.UTF_8))) {
             cache.forEach((height, hash) ->
                     writer.println(height + " " + Hex.encode(hash)));
         } catch (IOException e) {
