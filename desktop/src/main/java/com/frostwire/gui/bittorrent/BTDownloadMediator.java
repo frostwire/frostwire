@@ -786,7 +786,8 @@ public final class BTDownloadMediator
                     endorsed
                         ? I18n.tr("Source peer endorsed.")
                         : I18n.tr(
-                            "Could not create the endorsement. Karma energy or Bitcoin connectivity may be unavailable."),
+                            "Could not create the endorsement. Karma energy or Bitcoin connectivity"
+                                + " may be unavailable."),
                     I18n.tr("Endorse Source Peer"),
                     endorsed ? JOptionPane.INFORMATION_MESSAGE : JOptionPane.WARNING_MESSAGE);
                 int selectedRow = TABLE.getSelectedRow();
@@ -860,13 +861,16 @@ public final class BTDownloadMediator
         GUIMediator.safeInvokeLater(
             () -> {
               LOG.error(
-                  "openTorrentFileForSeed(): BTEngine.getInstance().download(torrentFile, saveDir, null) failed: ",
+                  "openTorrentFileForSeed(): BTEngine.getInstance().download(torrentFile, saveDir,"
+                      + " null) failed: ",
                   e);
               if (!e.toString().contains("No files selected by user")) {
                 // could not read torrent file or bad torrent file.
                 GUIMediator.showError(
                     I18n.tr(
-                        "FrostWire was unable to load the torrent file \"{0}\", - it may be malformed or FrostWire does not have permission to access this file.",
+                        "FrostWire was unable to load the torrent file \"{0}\", - it may be"
+                            + " malformed or FrostWire does not have permission to access this"
+                            + " file.",
                         torrentFile.getName()),
                     QuestionsHandler.TORRENT_OPEN_FAILURE);
               }
@@ -994,7 +998,8 @@ public final class BTDownloadMediator
       // could not read torrent file or bad torrent file.
       GUIMediator.showError(
           I18n.tr(
-              "FrostWire was unable to load the torrent file \"{0}\", - it may be malformed or FrostWire does not have permission to access this file.",
+              "FrostWire was unable to load the torrent file \"{0}\", - it may be malformed or"
+                  + " FrostWire does not have permission to access this file.",
               torrentFile.getName()),
           QuestionsHandler.TORRENT_OPEN_FAILURE);
     }
@@ -1397,7 +1402,8 @@ public final class BTDownloadMediator
       Mp4Demuxer.audio(mp4, extractedAudio, inf, null);
     } catch (IOException e) {
       LOG.error(
-          "BTDownloadMediator.extractAudioAndRemoveOriginalVideo() error extracting audio from mp4 file: "
+          "BTDownloadMediator.extractAudioAndRemoveOriginalVideo() error extracting audio from mp4"
+              + " file: "
               + mp4.getAbsolutePath(),
           e);
       return null;
