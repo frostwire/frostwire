@@ -28,7 +28,7 @@ Everything in the Icebase pipeline's §0 applies. For fuzzing that means:
 - **Fix it everywhere.** Copied parsers repeat the same mistake: all ID3 frame classes share `BufferTools.copyBuffer`, all MP4 boxes share `IO.read`. Search for the pattern and fix every site, one commit each, or one shared helper.
 - **Fuzz input is not secret, but tickets are public.** A crash input can be posted as hex or base64. Check it holds nothing from your machine (paths, user names) before posting.
 - **Harnesses never touch the network, the real file system outside a temp dir, native code (jlibtorrent), Swing or the EDT.** A native crash kills the fuzzer with no usable report, and network or UI state makes runs non-deterministic.
-- **CI never runs fuzzing.** `fuzzTest` and `fuzz` are not part of `test`, `check` or `build`. A finding never turns CI red until its fix lands with a normal regression test (§6).
+- **CI never runs fuzzing; it only replays.** `fuzzTest` and `fuzz` are not part of `test`, `check` or `build`. The desktop tests workflow runs `fuzzTest` as its own step, which replays the committed seeds and fixed-crash inputs as plain JUnit, so a fix can't silently regress. Crash inputs are committed only with their fix (§6), so a finding never turns CI red before its fix lands.
 
 ## 1. Choose targets
 
@@ -96,7 +96,7 @@ Run Gradle from `desktop/`, never from the repo root, and `set -o pipefail` when
 - **Where the output goes:**
   - Crash inputs are written to the harness's committed inputs directory as `crash-<sha1>` (also `timeout-`, `oom-`). Move them out of the tree (to a scratch directory) until their fix lands. A crash file left in the inputs directory makes `fuzzTest` fail, by design.
   - The generated corpus is written to `common/fuzz/.cifuzz-corpus/`, which is git-ignored. Keep it between runs on the same machine; it is what makes the next run start deep.
-- **CI isolation:** CI runs `./gradlew test` (desktop tests), `./gradlew build` and `jar` (Build) and the android unit tests. `fuzzTest` and `fuzz` are custom `Test` tasks that `check` does not depend on, and the `test` task's class directories don't include the fuzz source set. If you change the Gradle wiring, recheck `.github/workflows/*` and confirm with `./gradlew test --dry-run` and `./gradlew build --dry-run` that neither lists `fuzzTest`, `fuzz` or `compileFuzzTestJava` (in a git worktree add `-x spotlessCheck`: Spotless's ratchet can't find the repository from a worktree).
+- **CI isolation:** CI runs `./gradlew test` and then `./gradlew fuzzTest` (desktop tests: replay only), `./gradlew build` and `jar` (Build) and the android unit tests. `fuzz` never runs in CI. `fuzzTest` and `fuzz` are custom `Test` tasks that `check` does not depend on, and the `test` task's class directories don't include the fuzz source set. If you change the Gradle wiring, recheck `.github/workflows/*` and confirm with `./gradlew test --dry-run` and `./gradlew build --dry-run` that neither lists `fuzzTest`, `fuzz` or `compileFuzzTestJava` (in a git worktree add `-x spotlessCheck`: Spotless's ratchet can't find the repository from a worktree).
 
 ## 4. Triage findings
 

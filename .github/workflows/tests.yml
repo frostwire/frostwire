@@ -43,3 +43,12 @@ jobs:
           else
             ./gradlew test --tests "com.frostwire.${{ github.event.inputs.test_suite }}.*"
           fi
+
+      # Replays every committed fuzz seed and fixed-crash input as plain JUnit (no fuzzing),
+      # so a parser fix can't silently regress (skills/frostwire-fuzz-pipeline). Crash inputs
+      # are only committed together with their fix, so this never turns red on a new finding.
+      - name: Replay fuzz corpus
+        if: github.event.inputs.test_suite == 'all' || github.event.inputs.test_suite == ''
+        run: |
+          cd desktop
+          ./gradlew fuzzTest
