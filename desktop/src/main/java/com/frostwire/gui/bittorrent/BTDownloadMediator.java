@@ -716,6 +716,12 @@ public final class BTDownloadMediator
 
   /** Reads libtorrent and the karma chain: not on the EDT. */
   private boolean canEndorseSourcePeer(BTDownload download) {
+    return canEndorseSourcePeer(
+        download, com.limegroup.gnutella.gui.search.SearchEngine.getDistributedKarmaChainWriter());
+  }
+
+  /** Reads libtorrent and the karma chain: not on the EDT. */
+  private static boolean canEndorseSourcePeer(BTDownload download, KarmaChainWriter writer) {
     if (!(download instanceof BittorrentDownload)
         || download.getState() != TransferState.SEEDING
         || !download.isCompleted()) {
@@ -727,8 +733,6 @@ public final class BTDownloadMediator
     }
     byte[] source = torrent.getDistributedSourcePeerPub();
     String infoHash = torrent.getV1InfoHash();
-    KarmaChainWriter writer =
-        com.limegroup.gnutella.gui.search.SearchEngine.getDistributedKarmaChainWriter();
     return source != null
         && infoHash != null
         && writer != null
@@ -744,7 +748,11 @@ public final class BTDownloadMediator
     // The checks read libtorrent and the karma chain; ask the user only once they pass.
     DesktopParallelExecutor.execute(
         () -> {
-          if (!canEndorseSourcePeer(download)) {
+          // Endorse with the writer that passed the checks; the relay stack may replace or drop
+          // it while the dialog is open (a revoked writer refuses to write).
+          KarmaChainWriter writer =
+              com.limegroup.gnutella.gui.search.SearchEngine.getDistributedKarmaChainWriter();
+          if (!canEndorseSourcePeer(download, writer)) {
             return;
           }
           com.frostwire.bittorrent.BTDownload torrent = ((BittorrentDownload) download).getDl();
@@ -754,13 +762,12 @@ public final class BTDownloadMediator
             return;
           }
           byte[] infoHash = Hex.decode(infoHashHex);
-          GUIMediator.safeInvokeLater(() -> confirmAndEndorse(download, source, infoHash));
+          GUIMediator.safeInvokeLater(() -> confirmAndEndorse(download, writer, source, infoHash));
         });
   }
 
-  private void confirmAndEndorse(BTDownload download, byte[] source, byte[] infoHash) {
-    KarmaChainWriter writer =
-        com.limegroup.gnutella.gui.search.SearchEngine.getDistributedKarmaChainWriter();
+  private void confirmAndEndorse(
+      BTDownload download, KarmaChainWriter writer, byte[] source, byte[] infoHash) {
     int answer =
         JOptionPane.showConfirmDialog(
             GUIMediator.getAppFrame(),
@@ -798,9 +805,9 @@ public final class BTDownloadMediator
         });
   }
 
-  /** Writes the endorsement the user confirmed; runs off the EDT. */
+  /** Writes the endorsement the user confirmed; runs off the EDT. False without a writer. */
   static boolean endorseSourcePeer(KarmaChainWriter writer, byte[] source, byte[] infoHash) {
-    return writer.endorseSourcePeer(source, infoHash);
+    return writer != null && writer.endorseSourcePeer(source, infoHash);
   }
 
   private void notifyTransferTabSelectionListener(BTDownload selected) {
