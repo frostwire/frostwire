@@ -1,4 +1,8 @@
 FrostWire 3.2.3 build 779 UNRELEASED
+  - fix:Karma: a download that finishes from a distributed-search peer now endorses that peer automatically, once per peer and torrent (#1414)
+  - fix:Karma: your karma chain can no longer be lost: each entry is saved before it is used, never signed at an older Bitcoin block, and a chain that fails verification is kept aside instead of overwritten; Endorse source no longer checks the chain on the UI thread (#1413)
+  - fix:Distributed search rejects karma chains with forged epochs or energy that got around the endorsement limit (#1415)
+  - fix:App start no longer waits behind other background work while it looks up its files folder
   - fix:MP3 tags read correctly in more files: UTF-16 comments and picture descriptions, tags with an extended header, and a short last tag field (#1409)
   - fix:Every valid magnet link form (base32 hash, parameters in any order, upper-case MAGNET:) is checked against the torrent it downloads (#1408)
   - fix:Music home screen shortcuts (artist, album, genre, playlist) and asking your assistant to play music on FrostWire work again instead of crashing (#1404)
