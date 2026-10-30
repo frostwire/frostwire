@@ -1,0 +1,3 @@
+# IceBridge host cache - host:port,ROLE,lastSuccessfulPingMs,consecutiveFailures
+1.2.3.4:6888,BOTH,1712345678900,0
+relay.example.com:6888,FORWARDER,1712345678900,2
