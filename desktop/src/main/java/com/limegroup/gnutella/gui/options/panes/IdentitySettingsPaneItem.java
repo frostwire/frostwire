@@ -68,8 +68,9 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
   private static final String TITLE = I18n.tr("Identity");
   private static final String LABEL =
       I18n.tr(
-          "Your FrostWire identity is a cryptographic keypair that uniquely identifies you on the distributed search network. "
-              + "Back it up using the seed phrase to avoid losing your identity and karma reputation.");
+          "Your FrostWire identity is a cryptographic keypair that uniquely identifies you on the"
+              + " distributed search network. Back it up using the seed phrase to avoid losing your"
+              + " identity and karma reputation.");
 
   private final JLabel FINGERPRINT_LABEL = new JLabel("—");
   private final JLabel NODE_ID_LABEL = new JLabel("—");
@@ -221,12 +222,13 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
             "<html>"
                 + I18n.tr(
                     replacing
-                        ? "Creating a new random identity will permanently replace your current node ID and karma identity. "
-                            + "FrostWire will save a backup copy first, but you should also export your identity or seed phrase. "
-                            + "FrostWire will restart when finished."
-                        : "Generate a new FrostWire identity with proof-of-work ({0} leading zero bits). "
-                            + "This may take a few seconds. FrostWire will restart when finished so the "
-                            + "relay stack can load the new keys.",
+                        ? "Creating a new random identity will permanently replace your current"
+                              + " node ID and karma identity. FrostWire will save a backup copy"
+                              + " first, but you should also export your identity or seed phrase."
+                              + " FrostWire will restart when finished."
+                        : "Generate a new FrostWire identity with proof-of-work ({0} leading zero"
+                              + " bits). This may take a few seconds. FrostWire will restart when"
+                              + " finished so the relay stack can load the new keys.",
                     String.valueOf(KarmaConstants.IDENTITY_DIFFICULTY))
                 + "</html>",
             I18n.tr(replacing ? "Create New Identity" : "Initialize Identity"),
@@ -258,7 +260,8 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
                   JOptionPane.showMessageDialog(
                       GUIMediator.getAppFrame(),
                       I18n.tr(
-                          "Identity created successfully. FrostWire will now restart to load it into the relay stack."),
+                          "Identity created successfully. FrostWire will now restart to load it"
+                              + " into the relay stack."),
                       I18n.tr("Restart Required"),
                       JOptionPane.INFORMATION_MESSAGE);
                   GUIMediator.shutdown();
@@ -328,8 +331,9 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
                   + I18n.tr("WARNING:")
                   + "</b> "
                   + I18n.tr(
-                      "Anyone with this phrase can impersonate you and access your karma reputation. "
-                          + "Write it down on paper and store it securely. Never share it with anyone.")
+                      "Anyone with this phrase can impersonate you and access your karma"
+                          + " reputation. Write it down on paper and store it securely. Never share"
+                          + " it with anyone.")
                   + "</html>");
 
       JPanel panel = new JPanel(new BorderLayout(0, 10));
@@ -365,10 +369,10 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
             GUIMediator.getAppFrame(),
             "<html>"
                 + I18n.tr(
-                    "Restoring from a seed phrase will <b>permanently replace</b> your current identity, "
-                        + "including your karma reputation and node ID. This cannot be undone.<br><br>"
-                        + "Make sure you have backed up your current identity first.<br><br>"
-                        + "FrostWire will need to restart after restoring.")
+                    "Restoring from a seed phrase will <b>permanently replace</b> your current"
+                        + " identity, including your karma reputation and node ID. This cannot be"
+                        + " undone.<br><br>Make sure you have backed up your current identity"
+                        + " first.<br><br>FrostWire will need to restart after restoring.")
                 + "</html>",
             I18n.tr("Confirm Identity Replacement"),
             JOptionPane.YES_NO_OPTION,
@@ -381,8 +385,8 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
         JOptionPane.showInputDialog(
             GUIMediator.getAppFrame(),
             I18n.tr(
-                "Enter your 24-word seed phrase. Words may be separated by spaces, commas, or line breaks. "
-                    + "Uppercase letters are accepted."),
+                "Enter your 24-word seed phrase. Words may be separated by spaces, commas, or line"
+                    + " breaks. Uppercase letters are accepted."),
             I18n.tr("Restore Identity"),
             JOptionPane.PLAIN_MESSAGE);
     if (mnemonic == null || mnemonic.trim().isEmpty()) {
@@ -395,7 +399,8 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
       JOptionPane.showMessageDialog(
           GUIMediator.getAppFrame(),
           I18n.tr(
-              "Identity restored successfully. FrostWire will now restart to apply the new identity."),
+              "Identity restored successfully. FrostWire will now restart to apply the new"
+                  + " identity."),
           I18n.tr("Restart Required"),
           JOptionPane.INFORMATION_MESSAGE);
 
@@ -441,8 +446,9 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
             GUIMediator.getAppFrame(),
             "<html>"
                 + I18n.tr(
-                    "Importing an identity file will <b>permanently replace</b> your current identity. "
-                        + "This cannot be undone. FrostWire will need to restart after importing.")
+                    "Importing an identity file will <b>permanently replace</b> your current"
+                        + " identity. This cannot be undone. FrostWire will need to restart after"
+                        + " importing.")
                 + "</html>",
             I18n.tr("Confirm Identity Replacement"),
             JOptionPane.YES_NO_OPTION,
