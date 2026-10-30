@@ -107,6 +107,12 @@
     volatile *** right;
 }
 
+# Netty 4.2.19 reads -XX:MaxDirectMemorySize through java.lang.management, which Android
+# doesn't have. PlatformDependent calls RuntimeJvmArgs only when !isAndroid(), and the method
+# catches Throwable anyway, so the reference is never resolved on Android.
+-dontwarn java.lang.management.ManagementFactory
+-dontwarn java.lang.management.RuntimeMXBean
+
 # Netty (rUDP transport) references optional codecs it never loads on Android
 # (brotli/zstd/lz4/lzma, UDT, SCTP, protobuf-nano, tcnative, log facades).
 # Rules below are the -dontwarn set R8 generates for those references.
