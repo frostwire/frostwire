@@ -52,9 +52,11 @@ public final class AndroidPaths implements SystemPaths {
 
     public AndroidPaths(Application app) {
         this.app = app;
-        // All disk operations must be done in the background
+        // All disk operations must be done in the background. Not on the shared MISC queue: the
+        // caller (MainApplication.onCreate, on the main thread) waits for this, and must not wait
+        // behind whatever MISC is already running.
         final CountDownLatch waitForInternalFiles = new CountDownLatch(1);
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () -> {
             internalFilesDir = app.getFilesDir();
             waitForInternalFiles.countDown();
         });
