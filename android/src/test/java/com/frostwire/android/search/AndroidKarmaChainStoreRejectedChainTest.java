@@ -33,7 +33,9 @@ import static org.junit.Assert.assertTrue;
 /**
  * A persisted karma chain that fails verification starts a fresh chain, and the fresh chain's
  * entries reuse its sequence numbers. They must not overwrite the old rows: the old chain is kept
- * aside, so a verifier bug or a new rule never destroys a user's karma for good.
+ * aside, so a verifier bug or a new rule never destroys a user's karma for good. Only the writer,
+ * which will append, moves it: a reader such as a settings screen must not change the store while
+ * the writer runs.
  */
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 34)
@@ -69,7 +71,7 @@ public class AndroidKarmaChainStoreRejectedChainTest {
     public void aChainThatFailsVerificationIsKeptAside() {
         store.append(orphanEndorsement());
 
-        assertTrue(store.loadChain(pubRaw).entries().isEmpty());
+        assertTrue(store.loadChainForWriting(pubRaw).entries().isEmpty());
 
         List<String> rejected = rejectedTables();
         assertEquals("the rejected chain is kept in its own table", 1, rejected.size());
@@ -80,7 +82,7 @@ public class AndroidKarmaChainStoreRejectedChainTest {
     @Test
     public void theFreshChainDoesNotOverwriteTheRejectedOne() {
         store.append(orphanEndorsement());
-        KarmaChain fresh = store.loadChain(pubRaw);
+        KarmaChain fresh = store.loadChainForWriting(pubRaw);
 
         store.append(fresh.commitEpoch(block(850000L), keyPair.getPrivate()));
 
@@ -94,9 +96,19 @@ public class AndroidKarmaChainStoreRejectedChainTest {
         KarmaChain chain = new KarmaChain(pubRaw);
         store.append(chain.commitEpoch(block(850000L), keyPair.getPrivate()));
 
-        assertEquals(1, store.loadChain(pubRaw).entries().size());
+        assertEquals(1, store.loadChainForWriting(pubRaw).entries().size());
 
         assertTrue(rejectedTables().isEmpty());
+    }
+
+    @Test
+    public void aReaderLeavesARejectedChainInPlace() {
+        store.append(orphanEndorsement());
+
+        assertTrue(store.loadChain(pubRaw).entries().isEmpty());
+
+        assertTrue(rejectedTables().isEmpty());
+        assertEquals(1, count(AndroidKarmaChainStore.CHAIN_TABLE));
     }
 
     private static KarmaChainEntry orphanEndorsement() {

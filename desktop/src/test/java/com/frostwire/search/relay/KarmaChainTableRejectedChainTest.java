@@ -27,10 +27,13 @@ import org.junit.jupiter.api.Test;
 /**
  * A persisted karma chain that fails verification starts a fresh chain, and the fresh chain's
  * entries reuse its sequence numbers. They must not overwrite the old rows: the old chain is kept
- * aside, so a verifier bug or a new rule never destroys a user's karma for good.
+ * aside, so a verifier bug or a new rule never destroys a user's karma for good. Only the writer,
+ * which will append, moves it: a reader such as a settings pane must not change the store while
+ * the writer runs.
  */
 class KarmaChainTableRejectedChainTest {
 
+  private static IdentityKeys identity;
   private static KeyPair keyPair;
   private static byte[] pubRaw;
 
@@ -40,8 +43,9 @@ class KarmaChainTableRejectedChainTest {
 
   @BeforeAll
   static void setUpClass() throws Exception {
-    keyPair = java.security.KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
-    pubRaw = IdentityRecord.extractRawEd25519(keyPair.getPublic());
+    identity = IdentityKeys.generate(4);
+    keyPair = identity.ed25519();
+    pubRaw = identity.ed25519PubRaw();
   }
 
   @BeforeEach
@@ -69,7 +73,7 @@ class KarmaChainTableRejectedChainTest {
   void aChainThatFailsVerificationIsKeptAside() throws Exception {
     table.append(orphanEndorsement());
 
-    assertTrue(table.loadChain(pubRaw).entries().isEmpty());
+    assertTrue(table.loadChainForWriting(pubRaw).entries().isEmpty());
 
     List<String> rejected = rejectedTables();
     assertEquals(1, rejected.size(), "the rejected chain is kept in its own table");
@@ -81,7 +85,7 @@ class KarmaChainTableRejectedChainTest {
   void theFreshChainDoesNotOverwriteTheRejectedOne() throws Exception {
     KarmaChainEntry orphan = orphanEndorsement();
     table.append(orphan);
-    KarmaChain fresh = table.loadChain(pubRaw);
+    KarmaChain fresh = table.loadChainForWriting(pubRaw);
 
     KarmaChainEntry commitment = fresh.commitEpoch(block(850000L), keyPair.getPrivate());
     table.append(commitment);
@@ -96,9 +100,29 @@ class KarmaChainTableRejectedChainTest {
     KarmaChain chain = new KarmaChain(pubRaw);
     table.append(chain.commitEpoch(block(850000L), keyPair.getPrivate()));
 
-    assertEquals(1, table.loadChain(pubRaw).entries().size());
+    assertEquals(1, table.loadChainForWriting(pubRaw).entries().size());
 
     assertEquals(List.of(), rejectedTables());
+  }
+
+  @Test
+  void aReaderLeavesARejectedChainInPlace() throws Exception {
+    table.append(orphanEndorsement());
+
+    assertTrue(table.loadChain(pubRaw).entries().isEmpty());
+
+    assertEquals(List.of(), rejectedTables());
+    assertEquals(1, count(KarmaChainTable.CHAIN_TABLE));
+  }
+
+  @Test
+  void theWriterSetsARejectedChainAsideWhenItStarts() throws Exception {
+    table.append(orphanEndorsement());
+
+    new KarmaChainWriter(identity, new FixedTip(850100L), table);
+
+    assertEquals(1, rejectedTables().size());
+    assertEquals(0, count(KarmaChainTable.CHAIN_TABLE));
   }
 
   private static KarmaChainEntry orphanEndorsement() {
@@ -139,6 +163,24 @@ class KarmaChainTableRejectedChainTest {
         ResultSet rs = s.executeQuery("SELECT COUNT(*) FROM " + tableName)) {
       rs.next();
       return rs.getLong(1);
+    }
+  }
+
+  private static final class FixedTip implements BlockHeaderSource {
+    private final long tip;
+
+    FixedTip(long tip) {
+      this.tip = tip;
+    }
+
+    @Override
+    public BitcoinBlockReference getBlock(long height) {
+      return block(height);
+    }
+
+    @Override
+    public long getChainTipHeight() {
+      return tip;
     }
   }
 
