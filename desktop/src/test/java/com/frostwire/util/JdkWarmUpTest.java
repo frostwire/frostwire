@@ -365,6 +365,26 @@ class JdkWarmUpTest {
   }
 
   /**
+   * The first search built Nimbus's Slider painters by reflection on the EDT, for the search
+   * options panel's range sliders (Icebase #8a8cc233ad87, GitHub #1419). The same panel shows a
+   * checkbox per search engine.
+   */
+  @Test
+  void warmUpCreatesTheSearchOptionsPanelsNimbusPainters() throws Exception {
+    javax.swing.UIDefaults nimbus = new NimbusLookAndFeel().getDefaults();
+    for (String prefix : JdkWarmUp.SEARCH_OPTIONS_PAINTER_KEY_PREFIXES) {
+      assertTrue(JdkWarmUp.createPainters(nimbus, prefix) > 0, prefix);
+    }
+    assertTrue(JdkWarmUp.SEARCH_OPTIONS_PAINTER_KEY_PREFIXES.contains("Slider"));
+    assertTrue(JdkWarmUp.SEARCH_OPTIONS_PAINTER_KEY_PREFIXES.contains("CheckBox["));
+    assertTrue(
+        warmUpSource()
+            .replaceAll("\\s+", "")
+            .contains("createPainters(UIManager.getDefaults(),prefix)"),
+        "not called by warmUp");
+  }
+
+  /**
    * The header's tab buttons paint with PlatformFonts.sansSerif(BOLD, 10), a strike of its own
    * whose glyphs the main window's first paint rasterized on the EDT (Icebase #a06500b144a5, GitHub
    * #1341).
