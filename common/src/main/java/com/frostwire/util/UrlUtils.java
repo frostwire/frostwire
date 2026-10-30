@@ -44,8 +44,8 @@ public final class UrlUtils {
 
     private static final Logger LOG = Logger.getLogger(UrlUtils.class);
     private final static Pattern infoHashPattern = Pattern.compile("([0-9A-Fa-f]{40})");
-    private final static Pattern magnetHexInfoHashPattern =
-            Pattern.compile("^magnet:\\?xt=urn:btih:([0-9A-Fa-f]{40})(?:&|$)");
+    private final static Pattern hexInfoHashPattern = Pattern.compile("[0-9A-Fa-f]{40}");
+    private final static Pattern base32InfoHashPattern = Pattern.compile("[A-Za-z2-7]{32}");
 
     private UrlUtils() {
     }
@@ -258,17 +258,58 @@ public final class UrlUtils {
     }
 
     /**
-     * The info hash of a magnet link that starts with {@code magnet:?xt=urn:btih:} followed by a
-     * 40-digit hex hash, in lowercase; null for anything else, including base32 hashes and links cut
-     * short. Never throws: the link comes from users, web pages and other apps. Unlike
-     * {@link #extractInfoHash(String)}, it doesn't pick up 40 hex digits found elsewhere in the link.
+     * The v1 info hash of a magnet link, as 40 lowercase hex digits, from its first
+     * {@code xt=urn:btih:} parameter: 40 hex digits, or 32 base32 digits converted to hex (BEP 9).
+     * The scheme, the parameter name and the urn are matched in any case and {@code xt} may come
+     * after other parameters (frostwire/frostwire#1408). Null for anything else, including v2-only
+     * ({@code urn:btmh:}) magnets and links cut short. Never throws: the link comes from users, web
+     * pages and other apps. Unlike {@link #extractInfoHash(String)}, it doesn't pick up 40 hex
+     * digits found elsewhere in the link.
      */
     public static String magnetHexInfoHash(String magnet) {
-        if (magnet == null) {
+        if (magnet == null || !magnet.regionMatches(true, 0, "magnet:?", 0, 8)) {
             return null;
         }
-        Matcher matcher = magnetHexInfoHashPattern.matcher(magnet);
-        return matcher.find() ? matcher.group(1).toLowerCase(Locale.ROOT) : null;
+        for (String param : magnet.substring(8).split("&")) {
+            int eq = param.indexOf('=');
+            if (eq < 0 || !param.substring(0, eq).equalsIgnoreCase("xt")) {
+                continue;
+            }
+            String urn = param.substring(eq + 1);
+            if (urn.indexOf('%') >= 0) {
+                urn = decode(urn);
+            }
+            if (!urn.regionMatches(true, 0, "urn:btih:", 0, 9)) {
+                continue;
+            }
+            String hash = urn.substring(9);
+            if (hexInfoHashPattern.matcher(hash).matches()) {
+                return hash.toLowerCase(Locale.ROOT);
+            }
+            if (base32InfoHashPattern.matcher(hash).matches()) {
+                return base32ToHex(hash);
+            }
+            return null;
+        }
+        return null;
+    }
+
+    /** RFC 4648 base32 (no padding) to lowercase hex: 32 digits are exactly 20 bytes. */
+    private static String base32ToHex(String base32) {
+        StringBuilder hex = new StringBuilder(40);
+        long buffer = 0;
+        int bits = 0;
+        for (int i = 0; i < base32.length(); i++) {
+            char c = Character.toUpperCase(base32.charAt(i));
+            int value = c >= 'A' && c <= 'Z' ? c - 'A' : c - '2' + 26;
+            buffer = (buffer << 5) | value;
+            bits += 5;
+            while (bits >= 4) {
+                bits -= 4;
+                hex.append(Character.forDigit((int) ((buffer >> bits) & 0xF), 16));
+            }
+        }
+        return hex.toString();
     }
 
     public static String extractInfoHash(String url) {

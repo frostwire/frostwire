@@ -27,6 +27,7 @@ import com.frostwire.search.SearchPattern;
 import com.frostwire.util.HtmlManipulator;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
+import com.frostwire.util.UrlUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.util.ArrayList;
@@ -186,7 +187,6 @@ public class TPBSearchPattern implements SearchPattern {
                     // Construct magnet link from captured part
                     String magnetLink = "magnet" + magnetRaw;
 
-                    // Extract info hash: substring(20, 60) for 40-char SHA1, then lowercase
                     String infoHash = extractInfoHash(magnetLink);
                     if (StringUtils.isNullOrEmpty(infoHash)) {
                         LOG.warn("TPB: Could not extract info hash from magnet link");
@@ -231,19 +231,12 @@ public class TPBSearchPattern implements SearchPattern {
     }
 
     /**
-     * Extract info hash (40 char SHA1) from magnet link.
-     * Magnet format: magnet:?xt=urn:btih:XXXXXXXX... (hash starts at position 20)
+     * The info hash of a scraped magnet link, as 40 lowercase hex digits, or null. It used to take
+     * characters 20 to 60 of the link, which gave garbage for a base32 hash or for xt after other
+     * parameters (frostwire/frostwire#1408).
      */
     private String extractInfoHash(String magnetLink) {
-        try {
-            // NUANCE: Exactly as in legacy - substring(20, 60) for 40-char hash, then lowercase
-            if (magnetLink.length() >= 60) {
-                return magnetLink.substring(20, 60).toLowerCase();
-            }
-        } catch (Exception e) {
-            LOG.warn("Error extracting hash from magnet link: " + e.getMessage());
-        }
-        return null;
+        return UrlUtils.magnetHexInfoHash(magnetLink);
     }
 
     /**
