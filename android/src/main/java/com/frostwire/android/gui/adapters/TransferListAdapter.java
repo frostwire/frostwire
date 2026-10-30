@@ -475,7 +475,7 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
     }
     if (bittorrentDownload.getState() == TransferState.SEEDING) {
       items.add(new StopSeedingAction(context, bittorrentDownload));
-      if (EndorseSourcePeerMenuAction.canEndorse(bittorrentDownload)) {
+      if (EndorseSourcePeerMenuAction.mayOffer(bittorrentDownload)) {
         items.add(new EndorseSourcePeerMenuAction(context, bittorrentDownload));
       }
     }
