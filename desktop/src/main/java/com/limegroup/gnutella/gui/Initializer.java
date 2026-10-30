@@ -1174,7 +1174,12 @@ final class Initializer {
   private void failPreferencesPermissions() {
     fail(
         I18n.tr(
-            "FrostWire could not create a temporary preferences folder.\n\nThis is generally caused by a lack of permissions.  Please make sure that FrostWire (and you) have access to create files/folders on your computer.  If the problem persists, please visit www.frostwire.com and click the 'Support' link.\n\nFrostWire will now exit.  Thank You."));
+            "FrostWire could not create a temporary preferences folder.\n\n"
+                + "This is generally caused by a lack of permissions.  Please make sure that"
+                + " FrostWire (and you) have access to create files/folders on your computer.  If"
+                + " the problem persists, please visit www.frostwire.com and click the 'Support'"
+                + " link.\n\n"
+                + "FrostWire will now exit.  Thank You."));
   }
 
   /** Shows a msg & fails. */

@@ -223,12 +223,12 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
                 + I18n.tr(
                     replacing
                         ? "Creating a new random identity will permanently replace your current"
-                              + " node ID and karma identity. FrostWire will save a backup copy"
-                              + " first, but you should also export your identity or seed phrase."
-                              + " FrostWire will restart when finished."
+                            + " node ID and karma identity. FrostWire will save a backup copy"
+                            + " first, but you should also export your identity or seed phrase."
+                            + " FrostWire will restart when finished."
                         : "Generate a new FrostWire identity with proof-of-work ({0} leading zero"
-                              + " bits). This may take a few seconds. FrostWire will restart when"
-                              + " finished so the relay stack can load the new keys.",
+                            + " bits). This may take a few seconds. FrostWire will restart when"
+                            + " finished so the relay stack can load the new keys.",
                     String.valueOf(KarmaConstants.IDENTITY_DIFFICULTY))
                 + "</html>",
             I18n.tr(replacing ? "Create New Identity" : "Initialize Identity"),
