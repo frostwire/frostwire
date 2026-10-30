@@ -46,6 +46,12 @@ public final class KarmaChainWriter implements KarmaEndorsementSink, AutoCloseab
   private final BlockHeaderSource blockSource;
   private final KarmaChainStore table;
   private final KarmaChain chain;
+
+  /**
+   * False when the store couldn't hand over the persisted chain: appending to a chain that wasn't
+   * loaded would overwrite it, so nothing is written until the next start loads it.
+   */
+  private final boolean storeLoaded;
   private final ReentrantLock writeLock = new ReentrantLock();
   private final DhtAdvertiser.Lifecycle lifecycle;
 
@@ -74,7 +80,18 @@ public final class KarmaChainWriter implements KarmaEndorsementSink, AutoCloseab
     this.blockSource = blockSource;
     this.table = table;
     this.lifecycle = new DhtAdvertiser.Lifecycle(permitted);
-    this.chain = table.loadChainForWriting(ownerPub);
+    KarmaChain loaded;
+    boolean storeLoaded = true;
+    try {
+      loaded = table.loadChainForWriting(ownerPub);
+    } catch (IllegalStateException e) {
+      // This runs during relay start-up, which must go on without karma.
+      LOG.warn("Could not load the karma chain; not writing to it until the next start", e);
+      loaded = new KarmaChain(ownerPub);
+      storeLoaded = false;
+    }
+    this.chain = loaded;
+    this.storeLoaded = storeLoaded;
   }
 
   /**
@@ -145,6 +162,7 @@ public final class KarmaChainWriter implements KarmaEndorsementSink, AutoCloseab
         && infoHash != null
         && infoHash.length == 20
         && !java.util.Arrays.equals(peerEd25519Pub, ownerPub)
+        && storeLoaded
         && lifecycle.getAsBoolean()
         && (chain.currentEpoch() < 0 || chain.availableEnergy() > 0)
         && !chain.hasEndorsement(peerEd25519Pub, infoHash);
@@ -218,7 +236,10 @@ public final class KarmaChainWriter implements KarmaEndorsementSink, AutoCloseab
   }
 
   private boolean isPermitted(BooleanSupplier permitted) {
-    return lifecycle.getAsBoolean() && permitted.getAsBoolean() && !lifecycle.isClosed();
+    return storeLoaded
+        && lifecycle.getAsBoolean()
+        && permitted.getAsBoolean()
+        && !lifecycle.isClosed();
   }
 
   /** Non-waiting permanent revocation; does not close borrowed resources or interrupt providers. */
