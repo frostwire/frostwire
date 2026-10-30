@@ -49,6 +49,7 @@ class LibraryCoverArtPanelEdtTest {
           holder[0].setSize(10, 10);
         });
     LibraryCoverArtPanel panel = holder[0];
+    awaitDefaultCover(panel);
     BufferedImage cover = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
     Graphics2D g = cover.createGraphics();
     g.setColor(Color.RED);
@@ -78,6 +79,31 @@ class LibraryCoverArtPanelEdtTest {
     }
     SwingUtilities.invokeAndWait(() -> {});
     assertEquals(Color.RED.getRGB(), panel.background().getRGB(5, 5));
+  }
+
+  /**
+   * A new panel loads the default cover art in the background and then draws it on the EDT. If that
+   * lands after the test's cover it paints over it (a slow CI runner did), so let it land first:
+   * the background stops being transparent, or the theme image isn't available here and nothing
+   * will be drawn. Then clear the background so the busy-EDT check starts from a known state.
+   */
+  private static void awaitDefaultCover(LibraryCoverArtPanel panel) throws Exception {
+    long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+    int[] pixel = new int[1];
+    do {
+      SwingUtilities.invokeAndWait(() -> pixel[0] = panel.background().getRGB(5, 5));
+      if (pixel[0] != 0) {
+        break;
+      }
+      Thread.sleep(20);
+    } while (System.nanoTime() < deadline);
+    SwingUtilities.invokeAndWait(
+        () -> {
+          Graphics2D g = panel.background().createGraphics();
+          g.setBackground(new Color(0, 0, 0, 0));
+          g.clearRect(0, 0, 10, 10);
+          g.dispose();
+        });
   }
 
   @Test
