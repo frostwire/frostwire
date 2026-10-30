@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -147,27 +146,43 @@ class BoxEntryCountCompatibilityTest {
     assertEquals(200, trun.data_offset);
   }
 
-  @Disabled(
-      "frostwire/frostwire#1354: a trun with no per-sample fields (all samples use tfhd's"
-          + " defaults) and more samples than its box has bytes is valid ISO/IEC 14496-12, but"
-          + " Box.entryCount counts at least one byte per sample and rejects it")
+  /**
+   * frostwire/frostwire#1354, still supported: a trun with no per-sample fields (every sample
+   * takes tfhd's defaults, as in DASH audio fragments) is 12 bytes whatever its count. Its samples'
+   * data follows in the mdat, so a real file always has at least one byte per sample after it.
+   */
   @Test
-  void trackRunsWithoutPerSampleFieldsDecodeAnyCount() throws IOException {
-    for (int count : new int[] {13, 1024}) {
-      TrackRunBox trun = only(read(fragment(fullBox("trun", 0, 0x001, ints(count, 200)))));
+  void trackRunsWithoutPerSampleFieldsDecodeAnyCountTheFileHoldsMediaFor() throws IOException {
+    for (int count : new int[] {13, 1024, 100_000}) {
+      TrackRunBox trun =
+          only(read(fragmentWithMedia(fullBox("trun", 0, 0x001, ints(count, 200)), count)));
       assertEquals(count, trun.sample_count);
+      assertEquals(count, trun.entries.length);
+      assertEquals(200, trun.data_offset);
     }
   }
 
-  @Disabled(
-      "frostwire/frostwire#1354: an stsz with a constant sample_size has no table, whatever"
-          + " sample_count says; SampleSizeBox reads a table anyway (it did before the fix too)"
-          + " and now rejects the count as larger than the box")
+  /**
+   * frostwire/frostwire#1354, rejected as unsafe: a field-less trun claiming more samples than the
+   * rest of the file has bytes describes media that isn't there (a truncated or hostile file).
+   */
+  @Test
+  void aFieldlessTrackRunTheFileCantBackIsRejected() {
+    assertThrows(
+        IOException.class, () -> read(fragment(fullBox("trun", 0, 0x001, ints(1024, 200)))));
+  }
+
+  /**
+   * frostwire/frostwire#1354, still supported: an stsz with a constant sample_size has no table,
+   * whatever sample_count says (ISO/IEC 14496-12 §8.7.3.2). Before the fix the box was read as if
+   * it had one and silently lost.
+   */
   @Test
   void constantSizeSampleTablesDecode() throws IOException {
     SampleSizeBox stsz = only(read(fragment(fullBox("stsz", 0, 0, ints(1024, 1000)))));
     assertEquals(1024, stsz.sample_size);
     assertEquals(1000, stsz.sample_count);
+    assertEquals(0, stsz.entries.length);
   }
 
   @Test
@@ -193,7 +208,8 @@ class BoxEntryCountCompatibilityTest {
         Arguments.of("stco", 0, 0, 1 << 24), // claims 64 MiB
         Arguments.of("elst", 1, 0, 1 << 27), // claims 2.5 GiB of 20-byte edits
         Arguments.of("stts", 0, 0, 1 << 28), // claims 2 GiB
-        Arguments.of("trun", 0, 0xf00, 1 << 27)); // claims 2 GiB of 16-byte samples
+        Arguments.of("trun", 0, 0xf00, 1 << 27), // claims 2 GiB of 16-byte samples
+        Arguments.of("trun", 0, 0x001, Integer.MAX_VALUE)); // field-less: 2^31 samples, no data
   }
 
   @ParameterizedTest
@@ -255,6 +271,15 @@ class BoxEntryCountCompatibilityTest {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     out.writeBytes(box);
     out.writeBytes(ByteBuffer.allocate(16).putInt(16).putInt(Bits.make4cc("mdat")).array());
+    return out.toByteArray();
+  }
+
+  /** {@code box} followed by an mdat holding {@code mediaBytes} bytes of sample data. */
+  private static byte[] fragmentWithMedia(byte[] box, int mediaBytes) {
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    out.writeBytes(box);
+    out.writeBytes(ByteBuffer.allocate(8).putInt(8 + mediaBytes).putInt(Bits.make4cc("mdat")).array());
+    out.writeBytes(new byte[mediaBytes]);
     return out.toByteArray();
   }
 
