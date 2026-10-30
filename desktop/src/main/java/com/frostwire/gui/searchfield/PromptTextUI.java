@@ -144,6 +144,12 @@ public abstract class PromptTextUI extends TextUI {
     if (!desiredBackground.equals(promptComponent.getBackground())) {
       promptComponent.setBackground(desiredBackground);
     }
+    syncPromptProperties(txt, promptComponent);
+    return promptComponent;
+  }
+
+  /** Copies the field's enabled, opaque, bounds, border, selection, editable and margin state. */
+  static void syncPromptProperties(JTextComponent txt, JTextComponent promptComponent) {
     promptComponent.setEnabled(txt.isEnabled());
     promptComponent.setOpaque(txt.isOpaque());
     promptComponent.setBounds(txt.getBounds());
@@ -155,7 +161,6 @@ public abstract class PromptTextUI extends TextUI {
     promptComponent.setSelectionColor(txt.getSelectionColor());
     promptComponent.setEditable(txt.isEditable());
     promptComponent.setMargin(txt.getMargin());
-    return promptComponent;
   }
 
   /**
