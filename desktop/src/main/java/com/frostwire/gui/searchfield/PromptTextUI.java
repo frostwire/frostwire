@@ -148,19 +148,38 @@ public abstract class PromptTextUI extends TextUI {
     return promptComponent;
   }
 
-  /** Copies the field's enabled, opaque, bounds, border, selection, editable and margin state. */
+  /**
+   * Copies the field's enabled, opaque, bounds, border, selection, editable and margin state, only
+   * what changed: this runs on every size query, and setMargin invalidates the prompt's layout even
+   * when the insets are equal (frostwire/frostwire#1410).
+   */
   static void syncPromptProperties(JTextComponent txt, JTextComponent promptComponent) {
-    promptComponent.setEnabled(txt.isEnabled());
-    promptComponent.setOpaque(txt.isOpaque());
-    promptComponent.setBounds(txt.getBounds());
+    if (promptComponent.isEnabled() != txt.isEnabled()) {
+      promptComponent.setEnabled(txt.isEnabled());
+    }
+    if (promptComponent.isOpaque() != txt.isOpaque()) {
+      promptComponent.setOpaque(txt.isOpaque());
+    }
+    Rectangle desiredBounds = txt.getBounds();
+    if (!desiredBounds.equals(promptComponent.getBounds())) {
+      promptComponent.setBounds(desiredBounds);
+    }
     Border desiredBorder = txt.getBorder();
     if (desiredBorder != promptComponent.getBorder()) {
       promptComponent.setBorder(desiredBorder);
     }
-    promptComponent.setSelectedTextColor(txt.getSelectedTextColor());
-    promptComponent.setSelectionColor(txt.getSelectionColor());
-    promptComponent.setEditable(txt.isEditable());
-    promptComponent.setMargin(txt.getMargin());
+    if (!Objects.equals(promptComponent.getSelectedTextColor(), txt.getSelectedTextColor())) {
+      promptComponent.setSelectedTextColor(txt.getSelectedTextColor());
+    }
+    if (!Objects.equals(promptComponent.getSelectionColor(), txt.getSelectionColor())) {
+      promptComponent.setSelectionColor(txt.getSelectionColor());
+    }
+    if (promptComponent.isEditable() != txt.isEditable()) {
+      promptComponent.setEditable(txt.isEditable());
+    }
+    if (!Objects.equals(promptComponent.getMargin(), txt.getMargin())) {
+      promptComponent.setMargin(txt.getMargin());
+    }
   }
 
   /**
