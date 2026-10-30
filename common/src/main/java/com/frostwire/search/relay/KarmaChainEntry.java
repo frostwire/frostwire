@@ -391,8 +391,9 @@ public final class KarmaChainEntry {
                 }
             }
             return fromDictionary(neutral, ownerPub);
-        } catch (Throwable t) {
-            LOG.debug("Failed to reconstruct chain entry from manifest", t);
+        } catch (RuntimeException e) {
+            // Malformed peer data. Errors (e.g. a missing API on an old Android) must surface.
+            LOG.debug("Failed to reconstruct chain entry from manifest", e);
             return null;
         }
     }

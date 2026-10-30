@@ -234,4 +234,26 @@ class BencodeTest {
     assertEquals("é😀", Bencode.asString(decoded.get("日本")));
     assertTrue(decoded.get("bin") instanceof byte[]);
   }
+
+  /**
+   * frostwire/frostwire#1398: our own unsigned compare, since Android has the JDK one from API 33.
+   */
+  @Test
+  void compareUnsignedOrdersBytesLikeLibtorrent() {
+    byte[] low = {0x7f};
+    byte[] high = {(byte) 0x80};
+    assertTrue(Bencode.compareUnsigned(low, high) < 0, "0x80 sorts after 0x7f as unsigned");
+    assertTrue(Bencode.compareUnsigned(high, low) > 0);
+    assertTrue(Bencode.compareUnsigned(new byte[] {1}, new byte[] {1, 0}) < 0, "prefix first");
+    assertEquals(
+        0, Bencode.compareUnsigned(new byte[] {1, (byte) 0xff}, new byte[] {1, (byte) 0xff}));
+    byte[][] keys = {{(byte) 0xff}, {0}, {(byte) 0x80, 1}, {(byte) 0x80}, {}};
+    for (byte[] a : keys) {
+      for (byte[] b : keys) {
+        assertEquals(
+            Integer.signum(java.util.Arrays.compareUnsigned(a, b)),
+            Integer.signum(Bencode.compareUnsigned(a, b)));
+      }
+    }
+  }
 }

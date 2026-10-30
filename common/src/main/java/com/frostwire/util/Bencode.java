@@ -54,9 +54,10 @@ import java.util.Map;
  * bytes}. libtorrent's {@code bdecode} is more lenient (it accepts unsorted keys, for one); bytes
  * produced by {@code Entry.bencode()} are always canonical.
  *
- * <p>{@link #decode} is for untrusted input: it never allocates more than the input's size, never
- * recurses deeper than {@code maxDepth}, and throws {@link IllegalArgumentException} for every
- * malformed, non-canonical or over-limit input and for nothing else.
+ * <p>{@link #decode} is for untrusted input: string copies are bounded by the input's size and
+ * {@code maxStringLength}, the number of values (and so the list and map overhead) by {@code
+ * maxItems}, recursion by {@code maxDepth}, and it throws {@link IllegalArgumentException} for
+ * every malformed, non-canonical or over-limit input and for nothing else.
  */
 public final class Bencode {
 
@@ -148,8 +149,9 @@ public final class Bencode {
   }
 
   /**
-   * A byte string's text, decoded as UTF-8 with invalid sequences replaced by U+FFFD (what
-   * libtorrent's {@code Entry.string()} returns), or null if the value isn't a byte string.
+   * A byte string's text, decoded as UTF-8 with invalid sequences replaced by U+FFFD, or null if
+   * the value isn't a byte string. jlibtorrent's {@code Entry.string()} returns the same only from
+   * 2.0.15.0 (frostwire-jlibtorrent#336); 2.0.12.9 decodes strings as JNI modified UTF-8.
    */
   public static String asString(Object value) {
     if (value instanceof byte[]) {
@@ -194,7 +196,7 @@ public final class Bencode {
         order[i] = i;
         i++;
       }
-      Arrays.sort(order, (a, b) -> Arrays.compareUnsigned(keys[a], keys[b]));
+      Arrays.sort(order, (a, b) -> compareUnsigned(keys[a], keys[b]));
       out.write('d');
       for (int k = 0; k < order.length; k++) {
         if (k > 0 && Arrays.equals(keys[order[k - 1]], keys[order[k]])) {
@@ -294,7 +296,7 @@ public final class Bencode {
         }
         int keyAt = pos;
         byte[] key = string();
-        if (previous != null && Arrays.compareUnsigned(previous, key) >= 0) {
+        if (previous != null && compareUnsigned(previous, key) >= 0) {
           throw new IllegalArgumentException("dictionary key out of order at " + keyAt);
         }
         previous = key;
@@ -381,5 +383,21 @@ public final class Bencode {
         throw new IllegalArgumentException("dictionary key is not UTF-8 at " + at, e);
       }
     }
+  }
+
+  /**
+   * Compares two byte arrays as unsigned bytes, lexicographically, like libtorrent's key order.
+   * Arrays.compareUnsigned(byte[], byte[]) would do, but Android only has it from API 33 and
+   * FrostWire runs on API 26+ (frostwire/frostwire#1398).
+   */
+  static int compareUnsigned(byte[] a, byte[] b) {
+    int n = Math.min(a.length, b.length);
+    for (int i = 0; i < n; i++) {
+      int d = (a[i] & 0xff) - (b[i] & 0xff);
+      if (d != 0) {
+        return d;
+      }
+    }
+    return a.length - b.length;
   }
 }
