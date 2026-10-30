@@ -61,7 +61,8 @@ public class SystemUtilsHandlerRestartTest {
         misc.join(5_000);
 
         CountDownLatch second = new CountDownLatch(1);
-        SystemUtils.postToHandlerDelayed(SystemUtils.HandlerThreadName.SEARCH_PERFORMER, second::countDown, 1);
+        // No delay: Robolectric's clock doesn't advance on background threads.
+        SystemUtils.postToHandlerDelayed(SystemUtils.HandlerThreadName.SEARCH_PERFORMER, second::countDown, 0);
         assertTrue("the task was dropped", second.await(5, TimeUnit.SECONDS));
     }
 
