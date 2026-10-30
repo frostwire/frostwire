@@ -23,6 +23,7 @@ import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.ButtonRow;
 import com.limegroup.gnutella.gui.FileChooserHandler;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.ShellFolderWarmUp;
 import com.limegroup.gnutella.settings.SharingSettings;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -65,6 +66,9 @@ public class TorrentSaveFolderComponent extends JPanel {
     folderTextField.setEnabled(!isPortable);
     buttonRow.setButtonsEnabled(!isPortable);
     add(buttonRow, gbc);
+    // Browse opens a JFileChooser, which waits on the Windows shell on the EDT; warm it up now
+    // (frostwire/frostwire#1411).
+    ShellFolderWarmUp.warmUpForDirectoryChooser(FileChooserHandler.getLastInputDirectory());
   }
 
   /**
