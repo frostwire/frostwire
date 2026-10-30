@@ -12,6 +12,7 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.BTEngineListener;
 import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import com.frostwire.transfers.TransferState;
+import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,14 +28,23 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 
 /**
- * BTEngineListener that watches for download completion and fires a {@link KarmaEndorsementSink}
- * callback when the torrent was published by a peer (not by ourselves).
+ * Endorses the distributed-search peer a download came from when the download completes
+ * (SPEC_KARMA_CHAIN.md Step 7). The source is the verified signer of the search result the user
+ * downloaded, which BTEngine attaches to the transfer ({@link
+ * BTDownload#getDistributedSourcePeerPub}) and keeps in its resume data. A download without one
+ * endorses no one.
  *
- * <p>Deduplication: tracks already-credited info hashes so each download triggers exactly one
- * endorsement, even if multiple {@code downloadUpdate} events fire after completion.
+ * <p>Events: {@code downloadFinished} on completion, and {@code downloadAdded}/{@code
+ * downloadUpdate}, so a transfer restored already complete (finished while the relay was off, or
+ * whose endorsement failed) is tried again. They arrive on libtorrent's alert thread, so {@link
+ * #offer} only reads the in-memory source and the handle's info hash, keeps the newest event per
+ * info hash and hands it to one worker; the worker reads the transfer's state and writes.
  *
- * <p>Self-exclusion: endorsements are only fired for peers whose Ed25519 pubkey is non-zero AND
- * differs from our own pubkey.
+ * <p>Deduplication: an info hash is marked done only after its endorsement was appended (or can
+ * never be: already in the chain, an own or invalid key, a v2-only torrent), so a failure is
+ * retried on the next event. Never endorsed: any of this node's keys, current or earlier
+ * identity's, and the all-zero key. The manual "Endorse Source Peer" action stays; the chain
+ * refuses a second endorsement of the same peer and torrent.
  */
 public final class KarmaEndorsementTrigger implements BTEngineListener, AutoCloseable {
 
@@ -42,14 +52,17 @@ public final class KarmaEndorsementTrigger implements BTEngineListener, AutoClos
 
   private static final String THREAD_NAME_PREFIX = "karma-endorse-";
 
-  private final LocalIndex index;
   private final List<byte[]> ownKeys;
   private final KarmaEndorsementSink sink;
   private final Set<String> creditedInfoHashes = ConcurrentHashMap.newKeySet();
+
+  /** Newest event per info hash not yet taken by the worker; one queued task per entry. */
+  private final ConcurrentHashMap<String, Transfer> pending = new ConcurrentHashMap<>();
+
   private final DhtAdvertiser.Lifecycle lifecycle;
-  // The shared factory bounds this to one running callback and four queued updates.
+  // offer() queues at most one task per info hash, so the queue is bounded by the transfers.
   private final ExecutorService executor =
-      ExecutorsHelper.newFixedSizeThreadPool(1, THREAD_NAME_PREFIX);
+      ExecutorsHelper.newFixedSizeUnboundedThreadPool(1, THREAD_NAME_PREFIX);
 
   public KarmaEndorsementTrigger(
       LocalIndex index, byte[] ownEd25519Pub, KarmaEndorsementSink sink) {
@@ -79,6 +92,7 @@ public final class KarmaEndorsementTrigger implements BTEngineListener, AutoClos
       KarmaEndorsementSink sink,
       BooleanSupplier permitted) {
     if (index == null) {
+      // Unused since the trigger endorses the download's own source; still required here.
       throw new IllegalArgumentException("index is null");
     }
     if (ownKeys == null || ownKeys.isEmpty()) {
@@ -92,7 +106,6 @@ public final class KarmaEndorsementTrigger implements BTEngineListener, AutoClos
     if (sink == null) {
       throw new IllegalArgumentException("sink is null");
     }
-    this.index = index;
     List<byte[]> keys = new ArrayList<>(ownKeys.size());
     for (byte[] key : ownKeys) {
       keys.add(key.clone());
@@ -128,112 +141,128 @@ public final class KarmaEndorsementTrigger implements BTEngineListener, AutoClos
 
   @Override
   public void downloadAdded(BTEngine engine, BTDownload dl) {
-    // No-op: we only act on downloadUpdate when state transitions to FINISHED
+    if (dl != null) {
+      offer(Transfer.of(dl));
+    }
   }
 
   @Override
   public void downloadUpdate(BTEngine engine, BTDownload dl) {
-    if (dl == null) {
-      return;
+    if (dl != null) {
+      offer(Transfer.of(dl));
     }
-    offer(Transfer.of(dl));
   }
 
-  /** Hands a transfer event to the worker. */
+  @Override
+  public void downloadFinished(BTEngine engine, BTDownload dl) {
+    if (dl != null) {
+      offer(Transfer.of(dl));
+    }
+  }
+
+  /**
+   * Queues a transfer event for the worker, replacing a queued event for the same info hash. Runs
+   * on libtorrent's alert thread: reads only the in-memory source attribution and the handle's info
+   * hash, neither of which waits for libtorrent.
+   */
   void offer(Transfer dl) {
     if (dl == null || !lifecycle.getAsBoolean()) {
       return;
     }
+    String key;
     try {
-      executor.execute(() -> endorse(dl));
+      if (dl.distributedSourcePeerPub() == null) {
+        return;
+      }
+      key = dl.infoHash();
+    } catch (Throwable t) {
+      LOG.debug("Karma endorsement: could not read the transfer", t);
+      return;
+    }
+    if (key == null || key.isEmpty()) {
+      return;
+    }
+    String infoHashKey = key.toLowerCase(Locale.ROOT);
+    if (creditedInfoHashes.contains(infoHashKey) || pending.put(infoHashKey, dl) != null) {
+      // Done, or a queued task will take this newer event.
+      return;
+    }
+    try {
+      executor.execute(() -> drain(infoHashKey));
     } catch (RejectedExecutionException e) {
-      // No credit was claimed: a later update can retry unless this generation closed.
-      LOG.debug("Karma endorsement update rejected (closed or queue full)");
+      // Closed: nothing will run it.
+      pending.remove(infoHashKey, dl);
     }
   }
 
-  private void endorse(Transfer dl) {
+  private void drain(String infoHashKey) {
+    Transfer dl = pending.remove(infoHashKey);
+    if (dl == null) {
+      return;
+    }
     if (!lifecycle.enter()) {
       close();
       return;
     }
     try {
-      TransferState state = dl.state();
-      if (!lifecycle.getAsBoolean()) {
-        return;
-      }
-      if (state != TransferState.FINISHED && state != TransferState.SEEDING && !dl.isFinished()) {
-        return;
-      }
-      // Distributed-search source endorsements are explicitly user initiated from the
-      // transfer UI; do not silently consume karma when this automatic completion listener
-      // sees the same attributed transfer.
-      if (dl.distributedSourcePeerPub() != null) {
-        return;
-      }
-      if (!lifecycle.getAsBoolean()) {
-        return;
-      }
-      String infoHashHex;
-      try {
-        infoHashHex = dl.infoHash();
-      } catch (Throwable t) {
-        LOG.debug("Failed to read info hash from BTDownload", t);
-        return;
-      }
-      if (infoHashHex == null || infoHashHex.isEmpty()) {
-        return;
-      }
-      if (!lifecycle.getAsBoolean()) {
-        return;
-      }
-      infoHashHex = infoHashHex.toLowerCase(Locale.ROOT);
-      // Deduplicate
-      if (!creditedInfoHashes.add(infoHashHex)) {
-        return;
-      }
-      LocalSharedTorrent torrent = index.get(infoHashHex).orElse(null);
-      if (torrent == null || !lifecycle.getAsBoolean()) {
-        return;
-      }
-      byte[] peerPub = torrent.publisherEd25519Pub();
-      if (peerPub == null) {
-        return;
-      }
-      // Exclude self-endorsement
-      if (isOwnKey(peerPub)) {
-        return;
-      }
-      // Exclude placeholder zero pubkey
-      boolean allZero = true;
-      for (byte b : peerPub) {
-        if (b != 0) {
-          allZero = false;
-          break;
-        }
-      }
-      if (allZero) {
-        return;
-      }
-      final byte[] peerPubFinal = peerPub.clone();
-      final byte[] infoHashFinal = hexToBytes(infoHashHex);
-      if (!lifecycle.getAsBoolean()) {
-        return;
-      }
-      if (sink instanceof KarmaChainWriter) {
-        ((KarmaChainWriter) sink)
-            .onDownloadCompletedFromPeer(peerPubFinal, infoHashFinal, lifecycle);
-      } else {
-        sink.onDownloadCompletedFromPeer(peerPubFinal, infoHashFinal);
+      if (endorse(dl)) {
+        creditedInfoHashes.add(infoHashKey);
       }
     } catch (Throwable t) {
-      LOG.warn("KarmaEndorsementTrigger error on downloadUpdate", t);
+      LOG.warn("KarmaEndorsementTrigger: endorsement failed", t);
     } finally {
       lifecycle.leave();
       if (lifecycle.isClosed()) {
         close();
       }
     }
+  }
+
+  /**
+   * Endorses the transfer's source if it completed. True when nothing is left to do for this
+   * transfer; false when a later event should try again (not complete yet, no energy or Bitcoin
+   * block right now, the store failed).
+   */
+  private boolean endorse(Transfer dl) {
+    TransferState state = dl.state();
+    if (state != TransferState.FINISHED && state != TransferState.SEEDING && !dl.isFinished()) {
+      return false;
+    }
+    byte[] source = dl.distributedSourcePeerPub();
+    if (source == null || source.length != 32 || isZero(source) || isOwnKey(source)) {
+      return true;
+    }
+    String v1InfoHash = dl.v1InfoHash();
+    if (v1InfoHash == null || v1InfoHash.isEmpty()) {
+      // Signed endorsements name the v1 info hash; v2-only torrents can't be endorsed.
+      return true;
+    }
+    byte[] infoHash = Hex.decode(v1InfoHash);
+    if (!lifecycle.getAsBoolean()) {
+      return false;
+    }
+    if (sink instanceof KarmaChainWriter) {
+      KarmaChainWriter writer = (KarmaChainWriter) sink;
+      if (writer.chain().hasEndorsement(source, infoHash)) {
+        return true;
+      }
+      if (!writer.canEndorseSourcePeer(source, infoHash)) {
+        // No energy left this epoch, or the writer was revoked.
+        return false;
+      }
+      return writer.onDownloadCompletedFromPeer(source, infoHash, lifecycle);
+    }
+    sink.onDownloadCompletedFromPeer(source, infoHash);
+    return true;
+  }
+
+  private static boolean isZero(byte[] key) {
+    for (byte b : key) {
+      if (b != 0) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**
@@ -252,10 +281,6 @@ public final class KarmaEndorsementTrigger implements BTEngineListener, AutoClos
       throw new IllegalArgumentException("timeout must be >= 0");
     }
     return executor.awaitTermination(timeout, unit);
-  }
-
-  private static byte[] hexToBytes(String hex) {
-    return com.frostwire.util.Hex.decode(hex);
   }
 
   /** What the trigger reads from a transfer; {@link #of} adapts a {@link BTDownload}. */
