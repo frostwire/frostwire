@@ -1,4 +1,10 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - jlibtorrent: updated 2.0.12.9 → 2.0.15.1: libtorrent RC_2_0 with the fixes of libtorrent 2.0.13, 2.0.14, 2.0.15 and the unreleased 2.0.16 (123 commits), and OpenSSL 3.6.0 → 4.1.0
+   - jlibtorrent: BitTorrent memory leaks: every torrent, magnet, resume-data and DHT message it decoded leaked a native copy of its input (100,000 parses of a 13.5 KB torrent leaked 1.7 GB; now flat), and identity secret keys no longer stay behind in leaked native memory
+   - jlibtorrent: Fewer JNI calls: data moves between Java and libtorrent in one call instead of one call per byte (1 MB: 6 ms → 0.4 ms into libtorrent, 3-4 ms → 0.1 ms back), so reading torrents, resume data and DHT items is faster and lighter
+   - jlibtorrent: Torrents whose file names have emoji or other characters outside the basic plane download with the right names, and text that isn't valid UTF-8 can no longer corrupt libtorrent's JNI layer
+   - jlibtorrent: libtorrent fixes: a data corruption bug in memory-mapped storage, short disk reads on Windows, trackers stuck after a pause, DNS leaks of peer and tracker host names, web seeds for single-file torrents, wrong seeding/active/finished times, external IP not reported with UPnP/NAT-PMP, a race removing an auto-managed torrent, and move-storage rollback
+   - jlibtorrent: the native library is extracted once and reused instead of copied out on every start (#1382)
    - fix:Karma: a download that finishes from a distributed-search peer now endorses that peer automatically, once per peer and torrent (#1414)
    - fix:Karma: Options shows your karma and endorsements from the right database instead of "missing" or 0 (#1412)
    - fix:Karma: your karma chain can no longer be lost: each entry is saved before it is used, never signed at an older Bitcoin block, and a chain that fails verification is kept aside instead of overwritten (#1413)
