@@ -282,8 +282,7 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
 
   private long getKarmaScore(IdentityKeys identity) {
     try {
-      File homeDir = CommonUtils.getUserSettingsDir();
-      File karmaDb = new File(homeDir, "frostwire-karma.db");
+      File karmaDb = karmaDbFile(CommonUtils.getUserSettingsDir());
       if (!karmaDb.exists()) {
         return 0;
       }
@@ -295,6 +294,11 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
       LOG.warn("Failed to read karma score", t);
       return 0;
     }
+  }
+
+  /** The database this pane reads the local karma chain from. */
+  static File karmaDbFile(File userSettingsDir) {
+    return new File(userSettingsDir, "frostwire-karma.db");
   }
 
   private int getSharedCount() {

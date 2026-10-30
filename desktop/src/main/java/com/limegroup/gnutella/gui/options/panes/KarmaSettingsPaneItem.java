@@ -171,7 +171,7 @@ public final class KarmaSettingsPaneItem extends AbstractPaneItem {
       return;
     }
 
-    File dbFile = new File(CommonUtils.getUserSettingsDir(), "frostwire-shared-torrents.db");
+    File dbFile = karmaDbFile(CommonUtils.getUserSettingsDir());
     if (!dbFile.exists()) {
       EPOCH_LABEL.setText(I18n.tr("(no karma database)"));
       ENERGY_LABEL.setText(I18n.tr("(no karma database)"));
@@ -204,6 +204,11 @@ public final class KarmaSettingsPaneItem extends AbstractPaneItem {
     } catch (Throwable t) {
       LOG.warn("Failed to read karma status", t);
     }
+  }
+
+  /** The database this pane reads the local karma chain from. */
+  static File karmaDbFile(File userSettingsDir) {
+    return new File(userSettingsDir, "frostwire-shared-torrents.db");
   }
 
   private void fillTopPeers(KarmaChainTable table) {
