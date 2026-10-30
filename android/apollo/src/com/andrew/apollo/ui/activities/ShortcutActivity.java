@@ -20,12 +20,15 @@ package com.andrew.apollo.ui.activities;
 
 import android.app.Activity;
 import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.loader.app.LoaderManager;
 import androidx.loader.app.LoaderManager.LoaderCallbacks;
 import androidx.loader.content.Loader;
 
@@ -35,9 +38,11 @@ import com.andrew.apollo.loaders.SearchLoader;
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
+import com.frostwire.android.util.SystemUtils;
+import com.frostwire.util.Logger;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * This class is opened when the user touches a Home screen shortcut or album
@@ -49,13 +54,18 @@ import java.util.List;
  */
 public final class ShortcutActivity extends AppCompatActivity {
 
+    private static final Logger LOG = Logger.getLogger(ShortcutActivity.class);
+
     /**
      * If true, this class will begin playback and open
      * {@link AudioPlayerActivity}, false will close the class after playback,
      * which is what happens when a user starts playing something from an
      * app-widget
      */
-    private static final String OPEN_AUDIO_PLAYER = null;
+    private static final String OPEN_AUDIO_PLAYER = "open_audio_player";
+
+    /** {@link Config#MIME_TYPE} of a playlist shortcut, as ProfileActivity sets it. */
+    static final String PLAYLIST_MIME_TYPE = "vnd.android.cursor.dir/playlist";
 
     /**
      * Gather the intent action and extras
@@ -77,10 +87,6 @@ public final class ShortcutActivity extends AppCompatActivity {
      */
     private String mVoiceQuery;
 
-    /**
-     * Used with the loader and voice queries
-     */
-    private final ArrayList<Song> mSong = new ArrayList<>();
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -102,6 +108,90 @@ public final class ShortcutActivity extends AppCompatActivity {
         // Get the voice search query
         mVoiceQuery = Capitalize.capitalize(mIntent.getStringExtra(SearchManager.QUERY));
 
+        if (MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH.equals(mIntent.getAction()) && mVoiceQuery != null) {
+            // The loader resolves the spoken query to songs, then allDone() plays them
+            LoaderManager.getInstance(this).initLoader(0, null, mSongAlbumArtistQuery);
+        } else if (mIntent.hasExtra(Config.MIME_TYPE)) {
+            // A home screen shortcut: its song list is a MediaStore query, kept off the main thread
+            final Context appContext = getApplicationContext();
+            final String mimeType = mIntent.getStringExtra(Config.MIME_TYPE);
+            final long id = mIntent.getLongExtra(Config.ID, -1);
+            playOffMain(() -> songListForShortcut(appContext, mimeType, id));
+        } else {
+            // Nothing to play
+            finish();
+        }
+    }
+
+    /**
+     * Looks up the songs on the MISC thread (MediaStore queries; MusicUtils refuses them on the
+     * main thread), then plays them and finishes on the main thread.
+     */
+    private void playOffMain(final Supplier<long[]> lookup) {
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            long[] songs = null;
+            try {
+                songs = lookup.get();
+            } catch (RuntimeException e) {
+                // e.g. no permission to read the music library; finish either way
+                LOG.warn("ShortcutActivity: could not look up the songs to play: " + e.getMessage(), e);
+            }
+            final long[] list = songs;
+            final boolean shuffle = MusicUtils.isShuffleEnabled();
+            runOnUiThread(() -> {
+                if (isFinishing() || isDestroyed()) {
+                    return;
+                }
+                mList = list;
+                mShouldShuffle = shuffle;
+                allDone();
+            });
+        });
+    }
+
+    /**
+     * The songs a voice search's best match stands for: the song itself, else its album, else its
+     * artist. Queries MediaStore: never on the main thread.
+     */
+    static long[] songListForVoiceMatch(final Context context, final Song match) {
+        if (match.mSongName != null) {
+            return new long[]{match.mSongId};
+        }
+        // The SearchLoader's id triples as the song, album and artist id
+        if (match.mAlbumName != null) {
+            return MusicUtils.getSongListForAlbum(context, match.mSongId);
+        }
+        if (match.mArtistName != null) {
+            return MusicUtils.getSongListForArtist(context, match.mSongId);
+        }
+        return null;
+    }
+
+    /**
+     * The songs a home screen shortcut stands for, from the {@link Config#MIME_TYPE} and
+     * {@link Config#ID} that ProfileActivity put in it, or null for an unknown type.
+     * Queries MediaStore: never on the main thread.
+     */
+    static long[] songListForShortcut(final Context context, final String mimeType, final long id) {
+        if (MediaStore.Audio.Artists.CONTENT_TYPE.equals(mimeType)) {
+            return MusicUtils.getSongListForArtist(context, id);
+        }
+        if (MediaStore.Audio.Albums.CONTENT_TYPE.equals(mimeType)) {
+            return MusicUtils.getSongListForAlbum(context, id);
+        }
+        if (MediaStore.Audio.Genres.CONTENT_TYPE.equals(mimeType)) {
+            return MusicUtils.getSongListForGenre(context, id);
+        }
+        if (PLAYLIST_MIME_TYPE.equals(mimeType)) {
+            return MusicUtils.getSongListForPlaylist(context, id);
+        }
+        if (context.getString(R.string.playlist_favorites).equals(mimeType)) {
+            return MusicUtils.getSongListForFavorites(context);
+        }
+        if (context.getString(R.string.playlist_last_added).equals(mimeType)) {
+            return MusicUtils.getSongListForLastAdded(context);
+        }
+        return null;
     }
 
     /**
@@ -117,60 +207,20 @@ public final class ShortcutActivity extends AppCompatActivity {
 
         @Override
         public void onLoadFinished(@NonNull Loader<List<Song>> loader, List<Song> data) {
-            // If the user searched for a playlist or genre, this list will
-            // return empty
-            if (data.isEmpty()) {
-                // Before running the playlist loader, try to play the
-                // "Favorites" playlist
-                if (isFavorite()) {
-                    MusicUtils.playFavorites(ShortcutActivity.this);
-                }
-                // Finish up
-                allDone();
+            final Context appContext = getApplicationContext();
+            if (data == null || data.isEmpty()) {
+                // A playlist or genre search finds no songs; the "Favorites" playlist is the one
+                // that can still be played
+                final boolean favorite = isFavorite();
+                playOffMain(() -> favorite ? MusicUtils.getSongListForFavorites(appContext) : null);
                 return;
             }
-
-            // Start fresh
-            mSong.clear();
-            // Add the data to the adapter
-            mSong.addAll(data);
-
-            // What's about to happen is similar to the above process. Apollo
-            // runs a
-            // series of checks to see if anything comes up. When it does, it
-            // assumes (pretty accurately) that it should begin to play that
-            // thing.
-            // The fancy search query used in {@link SearchLoader} is the key to
-            // this. It allows the user to perform very specific queries. i.e.
-            // "Listen to Ethio
-
-            final String song = mSong.get(0).mSongName;
-            final String album = mSong.get(0).mAlbumName;
-            final String artist = mSong.get(0).mArtistName;
-            // This tripes as the song, album, and artist Id
-            final long id = mSong.get(0).mSongId;
-            // First, try to play a song
-            if (mList == null && song != null) {
-                mList = new long[]{
-                        id
-                };
-            } else
-                // Second, try to play an album
-                if (mList == null && album != null) {
-                    mList = MusicUtils.getSongListForAlbum(ShortcutActivity.this, id);
-                } else
-                    // Third, try to play an artist
-                    if (mList == null && artist != null) {
-                        mList = MusicUtils.getSongListForArtist(ShortcutActivity.this, id);
-                    }
-            // Finish up
-            allDone();
+            final Song match = data.get(0);
+            playOffMain(() -> songListForVoiceMatch(appContext, match));
         }
 
         @Override
         public void onLoaderReset(@NonNull androidx.loader.content.Loader<List<Song>> loader) {
-            // Clear the data
-            mSong.clear();
         }
     };
 
@@ -203,16 +253,19 @@ public final class ShortcutActivity extends AppCompatActivity {
      */
     private void allDone() {
         final boolean shouldOpenAudioPlayer = mIntent.getBooleanExtra(OPEN_AUDIO_PLAYER, true);
-        // Play the list
         if (mList != null && mList.length > 0) {
-            MusicUtils.playFDs(mList, 0, mShouldShuffle);
-        }
+            // A shortcut can start the app, so the playback service may not be running yet
+            final long[] list = mList;
+            final boolean shuffle = mShouldShuffle;
+            MusicUtils.executeWithMusicPlaybackService(getApplicationContext(),
+                    () -> MusicUtils.playFDs(list, 0, shuffle));
 
-        // Open the now playing screen
-        if (shouldOpenAudioPlayer) {
-            final Intent intent = new Intent(this, AudioPlayerActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
+            // Open the now playing screen
+            if (shouldOpenAudioPlayer) {
+                final Intent intent = new Intent(this, AudioPlayerActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            }
         }
         // All done
         finish();

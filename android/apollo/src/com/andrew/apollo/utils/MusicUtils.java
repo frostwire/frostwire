@@ -2017,13 +2017,17 @@ public final class MusicUtils {
         }
         final Cursor cursor = LastAddedLoader.makeLastAddedCursor(context);
         if (cursor != null) {
-            final int count = cursor.getCount();
-            final long[] list = new long[count];
-            for (int i = 0; i < count; i++) {
-                cursor.moveToNext();
-                list[i] = cursor.getLong(0);
+            try {
+                final int count = cursor.getCount();
+                final long[] list = new long[count];
+                for (int i = 0; i < count; i++) {
+                    cursor.moveToNext();
+                    list[i] = cursor.getLong(0);
+                }
+                return list;
+            } finally {
+                cursor.close();
             }
-            return list;
         }
         return sEmptyList;
     }

@@ -19,7 +19,8 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Shortcut Activity theme -->
-    <style name="Theme.Transparent" parent="@android:style/Theme.Holo.NoActionBar">
+    <!-- ShortcutActivity is an AppCompatActivity: its theme must derive from Theme.AppCompat (frostwire/frostwire#1404) -->
+    <style name="Theme.Transparent" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@color/transparent</item>
         <item name="android:windowContentOverlay">@null</item>
