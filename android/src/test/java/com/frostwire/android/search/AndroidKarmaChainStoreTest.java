@@ -84,7 +84,7 @@ public class AndroidKarmaChainStoreTest {
         store = new AndroidKarmaChainStore(context, "test-karma-chain.db", active::get);
         KarmaChainEntry entry = KarmaChainEntry.createEpochCommitment(
                 KarmaChainEntry.GENESIS_PREV_HASH, 0, pubRaw,
-                block(850000L), KarmaConstants.MAX_ENERGY, keyPair.getPrivate());
+                block(850000L), KarmaConstants.KARMA_ENERGY_PER_EPOCH, keyPair.getPrivate());
         active.set(false);
         assertThrows(IllegalStateException.class, () -> store.append(entry));
         store.close();
@@ -104,7 +104,7 @@ public class AndroidKarmaChainStoreTest {
     public void appendEpochCommitment_persistsAndLoads() {
         KarmaChainEntry entry = KarmaChainEntry.createEpochCommitment(
                 KarmaChainEntry.GENESIS_PREV_HASH, 0, pubRaw,
-                block(850000L), KarmaConstants.MAX_ENERGY,
+                block(850000L), KarmaConstants.KARMA_ENERGY_PER_EPOCH,
                 keyPair.getPrivate());
         store.append(entry);
 
@@ -117,7 +117,7 @@ public class AndroidKarmaChainStoreTest {
     public void appendEndorsement_afterEpoch_loadsBoth() {
         KarmaChainEntry ec = KarmaChainEntry.createEpochCommitment(
                 KarmaChainEntry.GENESIS_PREV_HASH, 0, pubRaw,
-                block(850000L), KarmaConstants.MAX_ENERGY,
+                block(850000L), KarmaConstants.KARMA_ENERGY_PER_EPOCH,
                 keyPair.getPrivate());
         store.append(ec);
 
@@ -151,7 +151,7 @@ public class AndroidKarmaChainStoreTest {
     public void appendEndorsement_updatesPeerKarma() {
         KarmaChainEntry ec = KarmaChainEntry.createEpochCommitment(
                 KarmaChainEntry.GENESIS_PREV_HASH, 0, pubRaw,
-                block(850000L), KarmaConstants.MAX_ENERGY,
+                block(850000L), KarmaConstants.KARMA_ENERGY_PER_EPOCH,
                 keyPair.getPrivate());
         store.append(ec);
 
