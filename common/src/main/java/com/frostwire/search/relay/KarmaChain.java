@@ -177,6 +177,9 @@ public final class KarmaChain {
     if (signingKey == null) {
       throw new IllegalArgumentException("signingKey is null");
     }
+    if (Arrays.equals(peerPub, ownerPub)) {
+      throw new IllegalStateException("A chain cannot endorse its own owner");
+    }
     if (hasEndorsement(peerPub, infoHash)) {
       throw new IllegalStateException("This source peer was already endorsed for this torrent");
     }
@@ -340,13 +343,19 @@ public final class KarmaChain {
   }
 
   /**
-   * Validates the entire chain: hash links, signatures, epoch ordering, energy budgets, and
-   * monotonic block heights. Returns true if valid. Used when loading a peer's published chain.
+   * As {@link #verify(List)}, then checks the Bitcoin blocks the entries name against {@code
+   * blocks}, if not null, with an offline fallback; see {@link #checkBlocks}.
    */
   public static boolean verify(List<KarmaChainEntry> chainEntries, BlockHeaderSource blocks) {
-    return verify(chainEntries);
+    return verify(chainEntries) && checkBlocks(chainEntries, blocks);
   }
 
+  /**
+   * Validates the entire chain: genesis link, one owner, signatures, hash links, seq, monotonic
+   * block heights, and the epoch and budget rules of {@link #checkEpochsAndBudget}. Offline: block
+   * heights and hashes aren't compared with Bitcoin; {@link #verify(List, BlockHeaderSource)} does
+   * that. Used when loading our own chain and a peer's published chain.
+   */
   public static boolean verify(List<KarmaChainEntry> chainEntries) {
     if (chainEntries == null || chainEntries.isEmpty()) {
       return false;
@@ -395,51 +404,7 @@ public final class KarmaChain {
       }
     }
 
-    // Epoch commitments must be in monotonically increasing order
-    long lastEpoch = -1;
-    for (KarmaChainEntry e : chainEntries) {
-      if (e.kind() == KarmaChainEntry.Kind.EPOCH_COMMITMENT) {
-        Long ep = e.epoch();
-        if (ep != null && ep <= lastEpoch) {
-          return false;
-        }
-        if (ep != null) lastEpoch = ep;
-      }
-    }
-
-    // Endorsements must follow an epoch commitment in the chain.
-    // An endorsement can be in any epoch >= the most recent commitment's epoch.
-    // The energy budget is tracked per-epoch based on the most recent commitment.
-    long lastCommitmentEpoch = -1;
-    int endorsementsInCurrentEpoch = 0;
-    double energyAtCurrentEpoch = 0;
-    for (KarmaChainEntry e : chainEntries) {
-      if (e.kind() == KarmaChainEntry.Kind.EPOCH_COMMITMENT) {
-        lastCommitmentEpoch = e.epoch();
-        endorsementsInCurrentEpoch = 0;
-        energyAtCurrentEpoch = e.energy();
-        // NaN fails every comparison, which would lift the budget below (#1401).
-        if (!Double.isFinite(energyAtCurrentEpoch)
-            || energyAtCurrentEpoch < 0
-            || energyAtCurrentEpoch > KarmaConstants.MAX_ENERGY + 0.01) {
-          return false;
-        }
-      } else if (e.kind() == KarmaChainEntry.Kind.ENDORSEMENT) {
-        if (lastCommitmentEpoch < 0) {
-          return false; // Endorsement before any epoch commitment
-        }
-        long entryEpoch = e.blockHeight() / KarmaConstants.BLOCKS_PER_EPOCH;
-        if (entryEpoch < lastCommitmentEpoch) {
-          return false; // Endorsement block before the committed epoch
-        }
-        endorsementsInCurrentEpoch++;
-        if (endorsementsInCurrentEpoch > Math.floor(energyAtCurrentEpoch)) {
-          return false; // Over budget
-        }
-      }
-    }
-
-    return true;
+    return checkEpochsAndBudget(chainEntries, true);
   }
 
   /**
@@ -451,13 +416,9 @@ public final class KarmaChain {
    * signatures, seq continuity from {@code baseSeq}, the first entry's prevHash equal to {@code
    * basePrevHash}, and the same monotonicity/budget checks as the full chain. A tail must begin
    * with an epoch commitment so its endorsement budget is independently verifiable without the
-   * omitted prefix.
+   * omitted prefix; that commitment's energy can't be recomputed and is only bounded, unless the
+   * tail starts at seq 0, where it is the whole chain and held to the full chain's rules.
    */
-  public static boolean verifyTail(
-      List<KarmaChainEntry> tail, byte[] basePrevHash, long baseSeq, BlockHeaderSource blocks) {
-    return verifyTail(tail, basePrevHash, baseSeq);
-  }
-
   public static boolean verifyTail(List<KarmaChainEntry> tail, byte[] basePrevHash, long baseSeq) {
     if (tail == null || tail.isEmpty()) {
       return false;
@@ -466,6 +427,9 @@ public final class KarmaChain {
       return false;
     }
     if (baseSeq < 0) {
+      return false;
+    }
+    if (baseSeq == 0 && !Arrays.equals(basePrevHash, KarmaChainEntry.GENESIS_PREV_HASH)) {
       return false;
     }
     if (tail.get(0).kind() != KarmaChainEntry.Kind.EPOCH_COMMITMENT) {
@@ -516,45 +480,133 @@ public final class KarmaChain {
       }
     }
 
-    // Epoch commitments in increasing order.
-    long lastEpoch = -1;
-    for (KarmaChainEntry e : tail) {
-      if (e.kind() == KarmaChainEntry.Kind.EPOCH_COMMITMENT) {
-        Long ep = e.epoch();
-        if (ep != null && ep <= lastEpoch) {
-          return false;
-        }
-        if (ep != null) lastEpoch = ep;
-      }
-    }
+    // A tail from seq 0 is the whole chain: hold it to the full chain's rules.
+    return checkEpochsAndBudget(tail, baseSeq == 0);
+  }
 
-    // Endorsement budget per most-recent commitment in the tail.
+  /**
+   * As {@link #verifyTail(List, byte[], long)}, then checks the Bitcoin blocks against {@code
+   * blocks}, if not null; see {@link #checkBlocks}.
+   */
+  public static boolean verifyTail(
+      List<KarmaChainEntry> tail, byte[] basePrevHash, long baseSeq, BlockHeaderSource blocks) {
+    return verifyTail(tail, basePrevHash, baseSeq) && checkBlocks(tail, blocks);
+  }
+
+  /**
+   * Largest difference allowed between a commitment's declared energy and the decay rule: the
+   * signed form keeps two decimals ({@code %.2f}), and the writer computes from the unrounded
+   * value.
+   */
+  private static final double ENERGY_TOLERANCE = 0.01 + 1e-9;
+
+  /**
+   * The checks that hold a chain to its endorsement budget, shared by {@link #verify(List)} and
+   * {@link #verifyTail}:
+   *
+   * <ul>
+   *   <li>a commitment's epoch is its Bitcoin height's ({@code ep == bh / 144}), and epochs
+   *       strictly increase, so two commitments can't share an epoch or a height's epoch;
+   *   <li>its energy is {@link KarmaConstants#energyAtEpoch} of the previous commitment's unused
+   *       energy (one decay step, however many epochs were skipped, as {@link #commitEpoch}
+   *       computes it), within {@link #ENERGY_TOLERANCE}; a full chain's first commitment has
+   *       nothing carried (5). A tail's first commitment follows an omitted prefix, so its energy
+   *       is only bounded by {@link KarmaConstants#MAX_ENERGY};
+   *   <li>an endorsement follows a commitment, sits in its epoch or later, names someone other than
+   *       the chain's owner, and stays within the floor of the commitment's energy.
+   * </ul>
+   *
+   * Heights and hashes aren't checked against Bitcoin here; see {@link #checkBlocks}.
+   */
+  private static boolean checkEpochsAndBudget(
+      List<KarmaChainEntry> entries, boolean startsAtGenesis) {
     long lastCommitmentEpoch = -1;
-    int endorsementsInCurrentEpoch = 0;
-    double energyAtCurrentEpoch = 0;
-    for (KarmaChainEntry e : tail) {
+    double energy = 0;
+    int endorsements = 0;
+    boolean energyKnown = startsAtGenesis;
+    for (KarmaChainEntry e : entries) {
       if (e.kind() == KarmaChainEntry.Kind.EPOCH_COMMITMENT) {
-        lastCommitmentEpoch = e.epoch();
-        endorsementsInCurrentEpoch = 0;
-        energyAtCurrentEpoch = e.energy();
+        Long epoch = e.epoch();
+        Double declared = e.energy();
+        if (epoch == null
+            || declared == null
+            || epoch != KarmaConstants.epochForHeight(e.blockHeight())
+            || epoch <= lastCommitmentEpoch) {
+          return false;
+        }
         // NaN fails every comparison, which would lift the budget below (#1401).
-        if (!Double.isFinite(energyAtCurrentEpoch)
-            || energyAtCurrentEpoch < 0
-            || energyAtCurrentEpoch > KarmaConstants.MAX_ENERGY + 0.01) {
+        if (!Double.isFinite(declared)
+            || declared < 0
+            || declared > KarmaConstants.MAX_ENERGY + ENERGY_TOLERANCE) {
           return false;
         }
+        if (energyKnown) {
+          double expected = KarmaConstants.energyAtEpoch(Math.max(0, energy - endorsements));
+          if (Math.abs(declared - expected) > ENERGY_TOLERANCE) {
+            return false;
+          }
+        }
+        energyKnown = true;
+        lastCommitmentEpoch = epoch;
+        energy = declared;
+        endorsements = 0;
       } else if (e.kind() == KarmaChainEntry.Kind.ENDORSEMENT) {
-        long entryEpoch = e.blockHeight() / KarmaConstants.BLOCKS_PER_EPOCH;
-        if (entryEpoch < lastCommitmentEpoch) {
+        if (lastCommitmentEpoch < 0
+            || KarmaConstants.epochForHeight(e.blockHeight()) < lastCommitmentEpoch
+            || Arrays.equals(e.peerPub(), e.endorserPub())) {
           return false;
         }
-        endorsementsInCurrentEpoch++;
-        if (endorsementsInCurrentEpoch > Math.floor(energyAtCurrentEpoch)) {
+        endorsements++;
+        if (endorsements > Math.floor(energy)) {
           return false;
         }
       }
     }
+    return true;
+  }
 
+  /**
+   * Checks the entries' Bitcoin blocks against {@code blocks}: no height beyond the tip plus {@link
+   * KarmaConstants#EPOCH_TOLERANCE_BLOCKS}, and each commitment's block hash equal to Bitcoin's at
+   * its height. This is what stops a chain from claiming epochs that haven't happened yet, which
+   * the structural checks alone can't.
+   *
+   * <p>Offline fallback: with no source, an unknown tip ({@code -1}), or a height the source can't
+   * resolve (or that throws), that check is skipped and the chain is judged by the structural
+   * checks only, so verifying never depends on the network. Endorsement block hashes aren't looked
+   * up: they don't change the budget, and one lookup per commitment bounds the work per chain.
+   */
+  private static boolean checkBlocks(List<KarmaChainEntry> entries, BlockHeaderSource blocks) {
+    if (blocks == null) {
+      return true;
+    }
+    long tip;
+    try {
+      tip = blocks.getChainTipHeight();
+    } catch (Throwable t) {
+      tip = -1;
+    }
+    if (tip >= 0) {
+      for (KarmaChainEntry e : entries) {
+        if (e.blockHeight() > tip + KarmaConstants.EPOCH_TOLERANCE_BLOCKS) {
+          return false;
+        }
+      }
+    }
+    for (KarmaChainEntry e : entries) {
+      if (e.kind() != KarmaChainEntry.Kind.EPOCH_COMMITMENT) {
+        continue;
+      }
+      BitcoinBlockReference real;
+      try {
+        real = blocks.getBlock(e.blockHeight());
+      } catch (Throwable t) {
+        real = null;
+      }
+      if (real != null && !Arrays.equals(real.hash(), e.blockHash())) {
+        return false;
+      }
+    }
     return true;
   }
 }
