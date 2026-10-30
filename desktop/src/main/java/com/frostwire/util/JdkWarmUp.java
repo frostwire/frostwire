@@ -208,6 +208,12 @@ public final class JdkWarmUp {
   /** Painters of tooltips, built the first time the pointer rests on a component with one. */
   static final String TOOLTIP_PAINTER_KEY_PREFIX = "ToolTip[";
 
+  /**
+   * Painters of the search options panel, built on the first search: its range sliders (the slider,
+   * its thumb and its track) and a checkbox per search engine.
+   */
+  static final List<String> SEARCH_OPTIONS_PAINTER_KEY_PREFIXES = List.of("Slider", "CheckBox[");
+
   private static final String PAINTER_KEY_SUFFIX = "Painter";
 
   /**
@@ -343,6 +349,13 @@ public final class JdkWarmUp {
       createPainters(UIManager.getDefaults(), TOOLTIP_PAINTER_KEY_PREFIX);
     } catch (Throwable t) {
       LOG.warn("Tooltip painter warm-up failed: " + t.getMessage(), t);
+    }
+    try {
+      for (String prefix : SEARCH_OPTIONS_PAINTER_KEY_PREFIXES) {
+        createPainters(UIManager.getDefaults(), prefix);
+      }
+    } catch (Throwable t) {
+      LOG.warn("Search options painter warm-up failed: " + t.getMessage(), t);
     }
     try {
       warmUpLineBreaks();
