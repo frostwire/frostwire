@@ -44,6 +44,11 @@ public final class Hex {
      */
     public static byte[] decode(final char[] data) {
         final int len = data.length;
+        // Hex from peers (karma chain, identity records) can be any length: reject odd input as
+        // the javadoc says, instead of reading past the end (frostwire/frostwire#1399).
+        if ((len & 0x01) != 0) {
+            throw new IllegalArgumentException("Odd number of characters.");
+        }
         final byte[] out = new byte[len >> 1];
         // two characters form the hex value.
         for (int i = 0, j = 0; j < len; i++) {
