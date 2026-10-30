@@ -397,23 +397,9 @@ public class MainApplication extends Application {
     @Override
     public void onActivityStopped(android.app.Activity activity) {
       activityCount--;
-      // When last activity stops, clear cache to free memory
+      // When the last activity stops, free the image memory cache; the disk cache stays.
       if (activityCount == 0) {
-        LOG.info("App going to background, clearing FWImageLoader cache");
-        SystemUtils.postToHandler(
-            SystemUtils.HandlerThreadName.MISC,
-            () -> {
-              try {
-                // Get the instance without recreating it
-                FWImageLoader fwImageLoader = FWImageLoader.getInstanceIfExists();
-                if (fwImageLoader != null) {
-                  // Clear cache to free memory (disk I/O must not run on main thread)
-                  fwImageLoader.clear();
-                }
-              } catch (Throwable t) {
-                LOG.error("Error clearing FWImageLoader cache on app background", t);
-              }
-            });
+        FWImageLoader.onAppBackgrounded();
       }
     }
 

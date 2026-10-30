@@ -656,6 +656,20 @@ public final class FWImageLoader {
     }
   }
 
+  /**
+   * The app went to the background: frees the memory cache, so the process holds less while it can
+   * be killed, and keeps the disk cache. The disk cache is what spares re-downloading artwork on
+   * the next visit; its size is already bounded (2% of the storage, 5 to 50 MB, least recently used
+   * evicted first). Clearing it here wiped it on every app switch (frostwire/frostwire#1389). Main
+   * thread safe.
+   */
+  public static void onAppBackgrounded() {
+    FWImageLoader loader = getInstanceIfExists();
+    if (loader != null) {
+      loader.clearMemoryCache();
+    }
+  }
+
   /** Clears the memory and disk caches. Disk I/O: never on the main thread. */
   public void clear() {
     if (coilImageLoader != null) {
