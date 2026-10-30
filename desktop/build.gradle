@@ -879,6 +879,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.TipOfTheDayHtmlFontTest"
         includeTestsMatching "com.limegroup.gnutella.gui.StatusLineEngineNotReadyTest"
         includeTestsMatching "com.limegroup.gnutella.gui.options.panes.TorrentSaveFolderPaneItemTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.options.panes.KarmaDatabasePathTest"
         includeTestsMatching "com.limegroup.gnutella.gui.VPNStatusButtonRefreshTest"
         includeTestsMatching "com.limegroup.gnutella.gui.VPNsEngineNotReadyTest"
         includeTestsMatching "com.limegroup.gnutella.gui.CrashReportSpoolerReportTypesTest"
