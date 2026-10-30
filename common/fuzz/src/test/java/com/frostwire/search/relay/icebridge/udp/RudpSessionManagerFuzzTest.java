@@ -17,14 +17,12 @@ import com.frostwire.search.relay.icebridge.peer.PeerRecord;
 import com.frostwire.search.relay.icebridge.peer.PeerRegistry;
 import io.netty.channel.embedded.EmbeddedChannel;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Drives {@link RudpSessionManager} the way remote IceBridge peers can: honest peers (real keys,
@@ -73,8 +71,12 @@ class RudpSessionManagerFuzzTest {
   private static final Field SESSIONS_BY_ID = field("sessionsByRemoteId");
   private static final Field SESSIONS_BY_ADDRESS = field("sessionsByAddress");
   private static final Field REASSEMBLER = field("reassembler");
-  private static final Field SCHEDULER = field("scheduler");
-  private static final Method TICK = tick();
+  /**
+   * How far each retransmit/evict tick moves the manager's clock, in turn: past the path-challenge
+   * window (5 s), the retransmit and half-open timeout (15 s), fragment-group expiry (30 s) and
+   * idle eviction (120 s). The tick operation consumes no input, so seeds keep their meaning.
+   */
+  private static final long[] TICK_SECONDS = {1, 6, 16, 31, 121};
 
   /** What one remote peer knows about an association it completed with us. */
   private static final class Association {
@@ -117,8 +119,11 @@ class RudpSessionManagerFuzzTest {
     private boolean listenerFull;
     private int maxSessions;
     private RudpSessionManager manager;
+    private long nanos = TimeUnit.HOURS.toNanos(1);
+    private int ticks;
 
     void run(FuzzedDataProvider data) throws Exception {
+      // The harness owns time: no scheduler thread, and the clock moves only in tick() (#1397).
       manager =
           new RudpSessionManager(
               LOCAL,
@@ -131,8 +136,9 @@ class RudpSessionManagerFuzzTest {
                 if (payload.length > FragmentReassembler.MAX_ASSEMBLED_SIZE) {
                   throw new AssertionError("delivered " + payload.length + " bytes");
                 }
-              });
-      ((ScheduledExecutorService) SCHEDULER.get(manager)).shutdownNow();
+              },
+              () -> nanos,
+              false);
       manager.setChannel(channel);
       maxSessions = data.consumeInt(1, 6);
       manager.setMaxSessions(maxSessions);
@@ -335,18 +341,9 @@ class RudpSessionManagerFuzzTest {
               System.currentTimeMillis()));
     }
 
-    private void tick() throws IllegalAccessException {
-      try {
-        TICK.invoke(manager);
-      } catch (InvocationTargetException e) {
-        if (e.getCause() instanceof RuntimeException runtime) {
-          throw runtime;
-        }
-        if (e.getCause() instanceof Error error) {
-          throw error;
-        }
-        throw new IllegalStateException(e.getCause());
-      }
+    private void tick() {
+      nanos += TimeUnit.SECONDS.toNanos(TICK_SECONDS[ticks++ % TICK_SECONDS.length]);
+      manager.tick();
     }
 
     private void receive(RudpPacket packet, InetSocketAddress from) {
@@ -499,16 +496,6 @@ class RudpSessionManagerFuzzTest {
       field.setAccessible(true);
       return field;
     } catch (NoSuchFieldException e) {
-      throw new IllegalStateException(e);
-    }
-  }
-
-  private static Method tick() {
-    try {
-      Method method = RudpSessionManager.class.getDeclaredMethod("retransmitAndEvict");
-      method.setAccessible(true);
-      return method;
-    } catch (NoSuchMethodException e) {
       throw new IllegalStateException(e);
     }
   }
