@@ -25,9 +25,11 @@ public class TorrentUrlInfoTest {
   }
 
   @Test
-  public void shortAndBase32MagnetsHaveNoHash() {
+  public void shortMagnetsHaveNoHashAndBase32IsDecoded() {
     assertNull(new TorrentUrlInfo("magnet:?xt=urn:btih:\u0006").getHash());
-    assertNull(
+    // Null before frostwire/frostwire#1408; base32 hashes are decoded to hex now (BEP 9).
+    assertEquals(
+        "00443214c74254b635cf84653a56d7c675be77df",
         new TorrentUrlInfo(
                 "magnet:?xt=urn:btih:ABCDEFGHIJKLMNOPQRSTUVWXYZ234567&dn=a-long-enough-name")
             .getHash());

@@ -33,7 +33,10 @@ class UrlUtilsMagnetHashTest {
         assertNull(UrlUtils.magnetHexInfoHash("magnet:?xt=urn:btih:\u0006"));
         assertNull(UrlUtils.magnetHexInfoHash("magnet:?xt=urn:btih:ag.etmagnet:?xt=urn:btih:urn:btih:ag.etmagne:?xt=ur\u0006"));
         // A base32 hash, then more parameters: 40 characters past the prefix, but not a hex hash.
-        assertNull(UrlUtils.magnetHexInfoHash("magnet:?xt=urn:btih:ABCDEFGHIJKLMNOPQRSTUVWXYZ234567&dn=a-long-name"));
+        // Before frostwire/frostwire#1408 this was null; base32 is now decoded (still supported per
+        // BEP 9), so the old "take 40 characters" bug can't come back as a wrong hash either.
+        assertEquals("00443214c74254b635cf84653a56d7c675be77df",
+                UrlUtils.magnetHexInfoHash("magnet:?xt=urn:btih:ABCDEFGHIJKLMNOPQRSTUVWXYZ234567&dn=a-long-name"));
         // 41 hex digits, a hash of the wrong length.
         assertNull(UrlUtils.magnetHexInfoHash("magnet:?xt=urn:btih:" + HASH + "f"));
         // 40 hex digits elsewhere in the link don't count.
