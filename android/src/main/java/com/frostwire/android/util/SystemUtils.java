@@ -280,7 +280,11 @@ public final class SystemUtils {
 
         public static void postTo(final HandlerThreadName threadName, final Runnable r) {
             try {
-                get(threadName.name()).post(r);
+                // post returns false when the looper has quit: the task would be dropped.
+                Handler handler = get(threadName.name());
+                if (!handler.post(r)) {
+                    replace(threadName.name(), handler).post(r);
+                }
             } catch (Throwable t) {
                 LOG.error(t.getMessage(), t);
             }
@@ -288,24 +292,38 @@ public final class SystemUtils {
 
         public static void postDelayedTo(final HandlerThreadName threadName, final Runnable r, long delayMillis) {
             try {
-                get(threadName.name()).postDelayed(r, delayMillis);
+                Handler handler = get(threadName.name());
+                if (!handler.postDelayed(r, delayMillis)) {
+                    replace(threadName.name(), handler).postDelayed(r, delayMillis);
+                }
             } catch (Throwable t) {
                 LOG.error(t.getMessage(), t);
             }
         }
 
-        private static Handler get(@NonNull final String threadName) {
-            if (!handlers.containsKey(threadName)) {
+        private static synchronized Handler get(@NonNull final String threadName) {
+            Handler handler = handlers.get(threadName);
+            if (handler == null) {
                 HandlerThread handlerThread = new HandlerThread("SystemUtils::HandlerThread - " + threadName);
                 handlerThread.start();
-                Handler handler = new Handler(handlerThread.getLooper());
+                handler = new Handler(handlerThread.getLooper());
                 handlers.put(threadName, handler);
-                return handler;
             }
-            return handlers.get(threadName);
+            return handler;
         }
 
-        public static void stopAll() {
+        /**
+         * Replaces {@code dead}, a Handler whose looper has quit, with one on a new thread, unless
+         * another caller already replaced it.
+         */
+        private static synchronized Handler replace(@NonNull final String threadName, Handler dead) {
+            if (handlers.get(threadName) == dead) {
+                handlers.remove(threadName);
+            }
+            return get(threadName);
+        }
+
+        public static synchronized void stopAll() {
             try {
                 handlers.values().forEach(handler -> ((HandlerThread) handler.getLooper().getThread()).quitSafely());
                 handlers.clear();
