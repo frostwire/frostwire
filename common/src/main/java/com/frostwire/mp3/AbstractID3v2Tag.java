@@ -107,13 +107,26 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
 
     protected abstract void unpackFlags(byte[] bytes);
 
+    /**
+     * Reads the extended header at {@code offset} and returns the offset just after it, where the
+     * frames start. It used to return the header's length, so frames were parsed from the wrong place
+     * (frostwire/frostwire#1409). The size field differs by version: v2.3 stores a plain integer that
+     * excludes its own four bytes, v2.4 a synchsafe one that includes them.
+     */
     private int unpackExtendedHeader(byte[] bytes, int offset) throws InvalidDataException {
-        extendedHeaderLength = BufferTools.unpackSynchsafeInteger(bytes[offset], bytes[offset + 1], bytes[offset + 2], bytes[offset + 3]) + 4;
-        if (extendedHeaderLength < 4 || extendedHeaderLength > bytes.length - offset - 4) {
+        if (offset + 4 > bytes.length) {
             throw new InvalidDataException("Extended header runs past the end of the tag");
         }
-        extendedHeaderData = BufferTools.copyBuffer(bytes, offset + 4, extendedHeaderLength);
-        return extendedHeaderLength;
+        if (version.startsWith("4.")) {
+            extendedHeaderLength = BufferTools.unpackSynchsafeInteger(bytes[offset], bytes[offset + 1], bytes[offset + 2], bytes[offset + 3]);
+        } else {
+            extendedHeaderLength = BufferTools.unpackInteger(bytes[offset], bytes[offset + 1], bytes[offset + 2], bytes[offset + 3]) + 4;
+        }
+        if (extendedHeaderLength < 4 || extendedHeaderLength > bytes.length - offset) {
+            throw new InvalidDataException("Extended header runs past the end of the tag");
+        }
+        extendedHeaderData = BufferTools.copyBuffer(bytes, offset + 4, extendedHeaderLength - 4);
+        return offset + extendedHeaderLength;
     }
 
     protected int unpackFrames(byte[] bytes, int offset, int framesLength) {
@@ -198,7 +211,17 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
     protected abstract void packFlags(byte[] bytes, int i);
 
     private int packExtendedHeader(byte[] bytes, int offset) {
-        BufferTools.packSynchsafeInteger(extendedHeaderLength, bytes, offset);
+        // The size field as unpackExtendedHeader reads it: v2.4 synchsafe and counting itself, v2.3 a
+        // plain integer that doesn't.
+        if (version.startsWith("4.")) {
+            BufferTools.packSynchsafeInteger(extendedHeaderLength, bytes, offset);
+        } else {
+            int n = extendedHeaderLength - 4;
+            bytes[offset] = (byte) (n >>> 24);
+            bytes[offset + 1] = (byte) (n >>> 16);
+            bytes[offset + 2] = (byte) (n >>> 8);
+            bytes[offset + 3] = (byte) n;
+        }
         BufferTools.copyIntoByteBuffer(extendedHeaderData, 0, extendedHeaderData.length, bytes, offset + 4);
         return offset + 4 + extendedHeaderData.length;
     }
