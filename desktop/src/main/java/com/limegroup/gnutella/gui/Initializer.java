@@ -464,7 +464,7 @@ final class Initializer {
       relayLog.info("Relay stack home dir: " + homeDir.getAbsolutePath());
 
       // 1. Open the local torrent index (SQLite + FTS5).
-      File dbFile = new File(homeDir, LocalIndexTable.DEFAULT_DB_NAME);
+      File dbFile = KarmaChainTable.defaultDbFile(CommonUtils.getUserSettingsDir());
       relayLog.info("Opening local index at: " + dbFile.getAbsolutePath());
       LocalIndexTable localIndex = LocalIndexTable.open(dbFile);
       relayLog.info("Local index opened, size=" + localIndex.size());
@@ -530,7 +530,7 @@ final class Initializer {
                   "relay-shutdown"));
       File homeDir =
           com.frostwire.search.relay.RelayConstants.relayHomeDir(CommonUtils.getUserSettingsDir());
-      File dbFile = new File(homeDir, LocalIndexTable.DEFAULT_DB_NAME);
+      File dbFile = KarmaChainTable.defaultDbFile(CommonUtils.getUserSettingsDir());
       BTEngine btEngine = BTEngine.getInstance();
       if (!relayLifecycle.getAsBoolean()) return;
 

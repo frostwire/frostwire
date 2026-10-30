@@ -206,9 +206,9 @@ public final class KarmaSettingsPaneItem extends AbstractPaneItem {
     }
   }
 
-  /** The database this pane reads the local karma chain from. */
+  /** The database this pane reads the local karma chain from: the one the writer appends to. */
   static File karmaDbFile(File userSettingsDir) {
-    return new File(userSettingsDir, "frostwire-shared-torrents.db");
+    return KarmaChainTable.defaultDbFile(userSettingsDir);
   }
 
   private void fillTopPeers(KarmaChainTable table) {

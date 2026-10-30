@@ -102,6 +102,15 @@ public final class KarmaChainTable implements KarmaChainStore {
     }
   }
 
+  /**
+   * The database the local karma chain lives in: the relay stack's shared-torrents database, {@code
+   * userSettingsDir/libtorrent/frostwire-shared-torrents.db}. The writer and every reader open it
+   * through this method.
+   */
+  public static File defaultDbFile(File userSettingsDir) {
+    return new File(RelayConstants.relayHomeDir(userSettingsDir), LocalIndexTable.DEFAULT_DB_NAME);
+  }
+
   public static KarmaChainTable open(File dbFile) {
     return new KarmaChainTable(dbFile);
   }

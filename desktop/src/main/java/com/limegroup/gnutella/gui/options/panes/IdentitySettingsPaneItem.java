@@ -296,9 +296,9 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
     }
   }
 
-  /** The database this pane reads the local karma chain from. */
+  /** The database this pane reads the local karma chain from: the one the writer appends to. */
   static File karmaDbFile(File userSettingsDir) {
-    return new File(userSettingsDir, "frostwire-karma.db");
+    return KarmaChainTable.defaultDbFile(userSettingsDir);
   }
 
   private int getSharedCount() {
