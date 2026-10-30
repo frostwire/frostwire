@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - improvement:Crash and freeze reports include how many threads FrostWire runs, the largest groups of threads by kind and the memory they use, to diagnose "unable to create native thread" crashes (#1393)
    - fix:Pressing Play or selecting a file in the Library no longer freezes FrostWire while it checks every file in the folder on disk (#1402)
    - fix:Distributed search no longer accepts a peer's karma chain that declares an invalid energy value to endorse other peers without the per-epoch limit (#1401)
    - fix:IceBridge answers a malformed request on its local control port with an error instead of logging a stack trace and dropping the connection (#1396)
