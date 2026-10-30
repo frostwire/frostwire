@@ -215,12 +215,27 @@ public final class IdentityLifecycle {
 
   /**
    * The Ed25519 keys this node has signed as, current identity first, for checks that must never
-   * endorse ourselves.
+   * endorse ourselves: the current identity's and, when readable, the one it replaced, which {@link
+   * #install} keeps in {@code identity.dat.bak}. Only the latest replaced identity is kept on disk,
+   * so older ones can't be listed.
    */
   public static List<byte[]> ownEd25519Keys(IdentityKeys current, File identityFile) {
     Objects.requireNonNull(current, "current");
     List<byte[]> keys = new ArrayList<>(2);
-    keys.add(current.ed25519PubRaw());
+    byte[] currentKey = current.ed25519PubRaw();
+    keys.add(currentKey);
+    File parent = identityFile == null ? null : identityFile.getParentFile();
+    File backup = parent == null ? null : new File(parent, RelayConstants.IDENTITY_FILE + ".bak");
+    if (backup != null && backup.isFile()) {
+      try {
+        byte[] previous = IdentityKeys.load(backup).ed25519PubRaw();
+        if (!java.util.Arrays.equals(previous, currentKey)) {
+          keys.add(previous);
+        }
+      } catch (Throwable t) {
+        LOG.warn("Could not read the previous identity at " + backup + ": " + t.getMessage());
+      }
+    }
     return keys;
   }
 
