@@ -11,6 +11,7 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.LongSupplier;
 
 /**
  * State for one rUDP association between two IceBridge servents.
@@ -56,17 +57,31 @@ final class RudpSession {
     private final ConcurrentNavigableMap<Integer, PendingPacket> pending =
             new ConcurrentSkipListMap<>(Integer::compareUnsigned);
 
+    private final LongSupplier nanoClock;
+
     RudpSession(long localConnectionId,
                 long remoteConnectionId,
                 InetSocketAddress remoteAddress,
                 byte[] remotePub,
                 boolean weAreInitiator) {
+        this(localConnectionId, remoteConnectionId, remoteAddress, remotePub, weAreInitiator,
+                System::nanoTime);
+    }
+
+    /** With the session manager's nanosecond clock (#1397). */
+    RudpSession(long localConnectionId,
+                long remoteConnectionId,
+                InetSocketAddress remoteAddress,
+                byte[] remotePub,
+                boolean weAreInitiator,
+                LongSupplier nanoClock) {
+        this.nanoClock = nanoClock;
         this.localConnectionId = localConnectionId;
         this.remoteConnectionId = remoteConnectionId;
         this.remoteAddress = remoteAddress;
         this.remotePub = remotePub == null ? null : remotePub.clone();
         this.weAreInitiator = weAreInitiator;
-        this.lastActivityMs = System.nanoTime() / 1_000_000;
+        this.lastActivityMs = nanoClock.getAsLong() / 1_000_000;
     }
 
     long localConnectionId() {
@@ -122,7 +137,7 @@ final class RudpSession {
     }
 
     void markActivity() {
-        lastActivityMs = System.nanoTime() / 1_000_000;
+        lastActivityMs = nanoClock.getAsLong() / 1_000_000;
     }
 
     long lastActivityMs() {

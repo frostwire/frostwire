@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.LongSupplier;
 
 /**
  * Bounded version-2 signed rUDP transport; see {@link RudpAuth} for the wire
@@ -67,10 +68,12 @@ public final class RudpSessionManager {
     private final PeerRegistry registry;
     private final IceBridgeMetrics metrics;
     private final RudpMessageListener messageListener;
-    private final FragmentReassembler reassembler = new FragmentReassembler();
-    private final RateLimiter helloPerIp = new RateLimiter(10, 2, 4096, 60_000);
-    private final RateLimiter helloGlobal = new RateLimiter(200, 50, 2, 60_000);
-    private final RateLimiter packetGlobal = new RateLimiter(2000, 2000, 1, 60_000);
+    // One clock for every timer here, so tests and fuzz harnesses can move time (#1397).
+    private final LongSupplier nanoClock;
+    private final FragmentReassembler reassembler;
+    private final RateLimiter helloPerIp;
+    private final RateLimiter helloGlobal;
+    private final RateLimiter packetGlobal;
     // A CID has exactly one owner and exactly one map entry, including simultaneous open.
     private final Map<Long, RudpSession> sessionsByRemoteId = new HashMap<>();
     private final Map<InetSocketAddress, RudpSession> sessionsByAddress = new HashMap<>();
@@ -82,17 +85,40 @@ public final class RudpSessionManager {
 
     public RudpSessionManager(IdentityKeys identity, PeerRegistry registry,
                               IceBridgeMetrics metrics, RudpMessageListener listener) {
+        this(identity, registry, metrics, listener, System::nanoTime, true);
+    }
+
+    /**
+     * With a nanosecond clock. Without the scheduler, retransmission and eviction run only when
+     * {@link #tick()} is called, so a test or fuzz harness owns time and runs single-threaded.
+     */
+    RudpSessionManager(IdentityKeys identity, PeerRegistry registry, IceBridgeMetrics metrics,
+                       RudpMessageListener listener, LongSupplier nanoClock, boolean startScheduler) {
         this.identity = identity;
         this.registry = registry;
         this.metrics = metrics;
         this.messageListener = listener;
-        scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
-            Thread t = new Thread(r, "icebridge-rudp-manager");
-            t.setDaemon(true);
-            return t;
-        });
-        scheduler.scheduleWithFixedDelay(this::retransmitAndEvict,
-                RETRANSMIT_INTERVAL_MS, RETRANSMIT_INTERVAL_MS, TimeUnit.MILLISECONDS);
+        this.nanoClock = nanoClock;
+        this.reassembler = new FragmentReassembler(nanoClock);
+        this.helloPerIp = new RateLimiter(10, 2, 4096, 60_000, nanoClock);
+        this.helloGlobal = new RateLimiter(200, 50, 2, 60_000, nanoClock);
+        this.packetGlobal = new RateLimiter(2000, 2000, 1, 60_000, nanoClock);
+        if (startScheduler) {
+            scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
+                Thread t = new Thread(r, "icebridge-rudp-manager");
+                t.setDaemon(true);
+                return t;
+            });
+            scheduler.scheduleWithFixedDelay(this::retransmitAndEvict,
+                    RETRANSMIT_INTERVAL_MS, RETRANSMIT_INTERVAL_MS, TimeUnit.MILLISECONDS);
+        } else {
+            scheduler = null;
+        }
+    }
+
+    /** One retransmit-and-evict pass, as the scheduler runs every RETRANSMIT_INTERVAL_MS. */
+    void tick() {
+        retransmitAndEvict();
     }
 
     public synchronized void setChannel(Channel channel) {
@@ -308,7 +334,7 @@ public final class RudpSessionManager {
         do {
             cid = random.nextLong();
         } while (cid == 0 || cid == -1 || sessionsByRemoteId.containsKey(cid));
-        RudpSession session = new RudpSession(cid, cid, address, expectedPub, true);
+        RudpSession session = new RudpSession(cid, cid, address, expectedPub, true, nanoClock);
         try {
             session.helloPayload = RudpAuth.createHelloPayload(identity, cid, expectedPub);
             sessionsByRemoteId.put(cid, session);
@@ -481,7 +507,7 @@ public final class RudpSessionManager {
         if (packet.type() == RudpPacket.Type.PATH_RESPONSE) {
             if (packet.sequence() == 0 && packet.ackThrough() == 0 && sender.equals(session.candidateAddress)
                     && Arrays.equals(packet.payload(), session.pathChallenge)
-                    && System.nanoTime() - session.pathChallengeNanos < TimeUnit.SECONDS.toNanos(5)) {
+                    && nanoClock.getAsLong() - session.pathChallengeNanos < TimeUnit.SECONDS.toNanos(5)) {
                 rebindSessionAddress(session, sender);
                 session.candidateAddress = null;
                 session.pathChallenge = null;
@@ -590,7 +616,7 @@ public final class RudpSessionManager {
             return;
         }
         RudpSession donor = outbound != null ? outbound : newest(samePub);
-        RudpSession session = new RudpSession(packet.connectionId(), packet.connectionId(), sender, peer, false);
+        RudpSession session = new RudpSession(packet.connectionId(), packet.connectionId(), sender, peer, false, nanoClock);
         try {
             session.helloPayload = hello;
             session.ackPayload = RudpAuth.createAckPayload(identity, packet.connectionId(), hello);
@@ -815,7 +841,7 @@ public final class RudpSessionManager {
     }
 
     private void challengePath(RudpSession session, InetSocketAddress candidate) {
-        long now = System.nanoTime();
+        long now = nanoClock.getAsLong();
         if (session.pathChallenge != null && now - session.pathChallengeNanos < TimeUnit.SECONDS.toNanos(5)) {
             return;
         }
@@ -909,7 +935,9 @@ public final class RudpSessionManager {
 
     public synchronized void shutdown() {
         closed = true;
-        scheduler.shutdownNow();
+        if (scheduler != null) {
+            scheduler.shutdownNow();
+        }
         for (RudpSession session : new ArrayList<>(sessionsByRemoteId.values())) {
             dropSession(session);
         }
@@ -1050,8 +1078,8 @@ public final class RudpSessionManager {
         return 0;
     }
 
-    private static long nowMs() {
-        return System.nanoTime() / 1_000_000;
+    private long nowMs() {
+        return nanoClock.getAsLong() / 1_000_000;
     }
 
     synchronized long createInitiatorSessionForTest(InetSocketAddress address) {

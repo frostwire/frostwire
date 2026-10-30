@@ -16,6 +16,7 @@ import io.netty.channel.embedded.EmbeddedChannel;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.LongSupplier;
 
 /** In-memory wire fixture. Never bypasses manager authentication or packet signing. */
 final class RudpFixture implements AutoCloseable {
@@ -32,6 +33,12 @@ final class RudpFixture implements AutoCloseable {
 
   RudpFixture(RudpMessageListener listener) throws Exception {
     manager = new RudpSessionManager(local, registry, metrics, listener);
+    manager.setChannel(channel);
+  }
+
+  /** On a test-owned clock, with no scheduler thread: time moves only through the clock. */
+  RudpFixture(RudpMessageListener listener, LongSupplier nanoClock) throws Exception {
+    manager = new RudpSessionManager(local, registry, metrics, listener, nanoClock, false);
     manager.setChannel(channel);
   }
 

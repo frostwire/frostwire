@@ -10,6 +10,7 @@ package com.frostwire.search.relay;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.LongSupplier;
 
 /**
  * Per-peer token-bucket rate limiter. Each peer has its own
@@ -39,7 +40,8 @@ public final class RateLimiter {
     private final Map<String, Bucket> buckets = new HashMap<>();
     private final int maxBuckets;
     private final long idleMs;
-    private long nextCleanupMs = System.nanoTime() / 1_000_000L;
+    private final LongSupplier nanoClock;
+    private long nextCleanupMs;
     private final AtomicLong totalAllowed = new AtomicLong();
     private final AtomicLong totalRejected = new AtomicLong();
 
@@ -48,6 +50,12 @@ public final class RateLimiter {
     }
 
     public RateLimiter(double capacity, double refillPerSec, int maxBuckets, long idleMs) {
+        this(capacity, refillPerSec, maxBuckets, idleMs, System::nanoTime);
+    }
+
+    /** With a nanosecond clock, so tests and fuzz harnesses can move time (#1397). */
+    public RateLimiter(double capacity, double refillPerSec, int maxBuckets, long idleMs,
+                       LongSupplier nanoClock) {
         if (!Double.isFinite(capacity) || capacity <= 0) {
             throw new IllegalArgumentException("capacity must be > 0");
         }
@@ -61,6 +69,12 @@ public final class RateLimiter {
         }
         this.maxBuckets = maxBuckets;
         this.idleMs = idleMs;
+        this.nanoClock = nanoClock;
+        this.nextCleanupMs = nowMs();
+    }
+
+    private long nowMs() {
+        return nanoClock.getAsLong() / 1_000_000L;
     }
 
     /**
@@ -88,7 +102,7 @@ public final class RateLimiter {
         if (key == null || key.isEmpty() || key.length() > 256 || tokens <= 0 || tokens > capacity) {
             return false;
         }
-        long now = System.nanoTime() / 1_000_000L;
+        long now = nowMs();
         if (now - nextCleanupMs >= 0) {
             evictIdle(idleMs);
             nextCleanupMs = now + Math.min(idleMs, 60_000L);
@@ -119,7 +133,7 @@ public final class RateLimiter {
         if (idleMs < 0) {
             throw new IllegalArgumentException("idleMs must be >= 0");
         }
-        long now = System.nanoTime() / 1_000_000L;
+        long now = nowMs();
         int removed = 0;
         java.util.Iterator<Bucket> iterator = buckets.values().iterator();
         while (iterator.hasNext()) {

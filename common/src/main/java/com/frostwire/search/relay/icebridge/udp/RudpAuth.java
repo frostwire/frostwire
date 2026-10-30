@@ -67,6 +67,11 @@ final class RudpAuth {
     }
 
     static boolean intendedFor(byte[] hello, byte[] pub) {
+        // Only a full HELLO has the 32-byte intended recipient at 32..64. A shorter one used to
+        // throw, or be zero-padded into "intended for anyone" (#1397).
+        if (hello == null || hello.length != HELLO_PAYLOAD_LENGTH) {
+            return false;
+        }
         byte[] expected = Arrays.copyOfRange(hello, 32, 64);
         return Arrays.equals(expected, new byte[32]) || Arrays.equals(expected, pub);
     }

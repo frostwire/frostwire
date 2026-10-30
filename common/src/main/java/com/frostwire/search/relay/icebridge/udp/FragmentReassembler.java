@@ -10,6 +10,7 @@ package com.frostwire.search.relay.icebridge.udp;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.LongSupplier;
 
 /** Bounded retained assemblies. A completed group remains owned until release. */
 final class FragmentReassembler {
@@ -20,6 +21,16 @@ final class FragmentReassembler {
     // Each slot reserves up to 256 KiB of fragments plus a completed copy.
     // Thus retained payload bytes are bounded by 32 MiB, including blocked delivery.
     private final Map<String, Group> groups = new HashMap<>();
+    private final LongSupplier nanoClock;
+
+    FragmentReassembler() {
+        this(System::nanoTime);
+    }
+
+    /** With a nanosecond clock, so tests and fuzz harnesses can expire groups (#1397). */
+    FragmentReassembler(LongSupplier nanoClock) {
+        this.nanoClock = nanoClock;
+    }
 
     enum State { REJECTED, RETAINED, COMPLETE }
 
@@ -44,7 +55,7 @@ final class FragmentReassembler {
             if (groups.size() >= MAX_PENDING_GROUPS) {
                 return new Result(State.REJECTED, null);
             }
-            group = new Group(total);
+            group = new Group(total, nanoClock.getAsLong());
             groups.put(key, group);
         }
         if (group.fragments.length != total) {
@@ -85,7 +96,7 @@ final class FragmentReassembler {
     }
 
     synchronized boolean hasExpired(String prefix) {
-        long now = System.nanoTime();
+        long now = nanoClock.getAsLong();
         return groups.entrySet().stream().anyMatch(e -> e.getKey().startsWith(prefix)
                 && (now - e.getValue().createdNanos) / 1_000_000 > GROUP_TIMEOUT_MS);
     }
@@ -96,12 +107,13 @@ final class FragmentReassembler {
 
     private static final class Group {
         final byte[][] fragments;
-        final long createdNanos = System.nanoTime();
+        final long createdNanos;
         int count;
         int bytes;
         byte[] completed;
 
-        Group(int total) {
+        Group(int total, long createdNanos) {
+            this.createdNanos = createdNanos;
             fragments = new byte[total][];
         }
     }
