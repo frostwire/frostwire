@@ -700,7 +700,7 @@ public class EngineForegroundService extends Service implements IEngineService {
       i.putExtra(Constants.EXTRA_DOWNLOAD_COMPLETE_PATH, file.getAbsolutePath());
       PendingIntent pi =
           PendingIntent.getActivity(
-              context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+              context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
       NotificationManager manager =
           (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
       Notification notification =
