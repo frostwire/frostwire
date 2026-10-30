@@ -186,7 +186,9 @@ public final class KarmaEndorsementTrigger implements BTEngineListener, AutoClos
 
   private void drain(String infoHashKey) {
     Transfer dl = pending.remove(infoHashKey);
-    if (dl == null) {
+    // An event offered while this transfer's endorsement ran queued this task; the one worker
+    // thread has finished that endorsement by now.
+    if (dl == null || creditedInfoHashes.contains(infoHashKey)) {
       return;
     }
     if (!lifecycle.enter()) {
