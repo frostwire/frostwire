@@ -248,13 +248,15 @@ public final class IdentityRecord {
      * @throws IllegalArgumentException as {@link #fromBencode(byte[])} does
      */
     static IdentityRecord fromDictionary(Map<String, Object> map) {
-        int version = (int) requiredLong(map, "v");
-        if (version < 1 || version > VERSION) {
-            throw new IllegalArgumentException("Unsupported identity version: " + version);
+        // Range-checked before narrowing: (int) of 2^32+4 read as 4 and still verified (#1401).
+        long wireVersion = requiredLong(map, "v");
+        if (wireVersion < 1 || wireVersion > VERSION) {
+            throw new IllegalArgumentException("Unsupported identity version: " + wireVersion);
         }
+        int version = (int) wireVersion;
         // v1: no rudp/role/caps/ib_ver. v2: +rudp+role. v3: +caps. v4: +ib_ver.
         String role = version >= 2 ? optionalString(map, "role", "BOTH") : "BOTH";
-        int rudpPort = version >= 2 ? (int) optionalLong(map, "rudp_port", 0) : 0;
+        int rudpPort = version >= 2 ? port(optionalLong(map, "rudp_port", 0), "rudp_port") : 0;
         long caps;
         if (version >= 3) {
             caps = optionalLong(map, "caps", NodeCapabilities.fromRole(role));
@@ -268,7 +270,7 @@ public final class IdentityRecord {
                 Hex.decode(requiredString(map, "node_id")),
                 b64decode(requiredString(map, "ed25519_pub")),
                 b64decode(requiredString(map, "x25519_pub")),
-                (int) requiredLong(map, "utp_port"),
+                port(requiredLong(map, "utp_port"), "utp_port"),
                 rudpPort,
                 role,
                 caps,
@@ -281,6 +283,17 @@ public final class IdentityRecord {
             throw new IllegalArgumentException("Invalid identity signature");
         }
         return record;
+    }
+
+    /**
+     * Narrows a signed wire integer without truncating it. Only values outside the int range are
+     * rejected: records with any int port (e.g. -1) were accepted before, and still verify.
+     */
+    private static int port(long value, String key) {
+        if (value < Integer.MIN_VALUE || value > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException(key + " out of range: " + value);
+        }
+        return (int) value;
     }
 
     private static long requiredLong(Map<String, Object> map, String key) {

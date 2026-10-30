@@ -365,6 +365,12 @@ public final class KarmaChain {
                 lastCommitmentEpoch = e.epoch();
                 endorsementsInCurrentEpoch = 0;
                 energyAtCurrentEpoch = e.energy();
+                // NaN fails every comparison, which would lift the budget below (#1401).
+                if (!Double.isFinite(energyAtCurrentEpoch)
+                        || energyAtCurrentEpoch < 0
+                        || energyAtCurrentEpoch > KarmaConstants.MAX_ENERGY + 0.01) {
+                    return false;
+                }
             } else if (e.kind() == KarmaChainEntry.Kind.ENDORSEMENT) {
                 if (lastCommitmentEpoch < 0) {
                     return false; // Endorsement before any epoch commitment
@@ -477,6 +483,12 @@ public final class KarmaChain {
                 lastCommitmentEpoch = e.epoch();
                 endorsementsInCurrentEpoch = 0;
                 energyAtCurrentEpoch = e.energy();
+                // NaN fails every comparison, which would lift the budget below (#1401).
+                if (!Double.isFinite(energyAtCurrentEpoch)
+                        || energyAtCurrentEpoch < 0
+                        || energyAtCurrentEpoch > KarmaConstants.MAX_ENERGY + 0.01) {
+                    return false;
+                }
             } else if (e.kind() == KarmaChainEntry.Kind.ENDORSEMENT) {
                 long entryEpoch = e.blockHeight() / KarmaConstants.BLOCKS_PER_EPOCH;
                 if (entryEpoch < lastCommitmentEpoch) {

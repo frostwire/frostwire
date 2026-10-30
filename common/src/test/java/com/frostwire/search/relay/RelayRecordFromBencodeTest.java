@@ -172,6 +172,50 @@ class RelayRecordFromBencodeTest {
     assertThrows(IllegalArgumentException.class, () -> IdentityRecord.fromBencode(new byte[0]));
   }
 
+  /**
+   * frostwire/frostwire#1401: energy "NaN" passed the range check (both comparisons are false) and
+   * then lifted KarmaChain.verify's endorsement budget, which compares against floor(energy).
+   */
+  @Test
+  void karmaCommitmentWithNonFiniteEnergyIsRejected() {
+    for (String energy : new String[] {"NaN", "Infinity", "-Infinity"}) {
+      Map<String, Object> dict = manifestDict(chain.get(0));
+      dict.put("en", energy);
+      assertNull(KarmaChainEntry.fromBencode(Bencode.encode(dict), owner), energy);
+    }
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            KarmaChainEntry.createEpochCommitment(
+                new byte[32],
+                0,
+                owner,
+                new BitcoinBlockReference(144, new byte[32]),
+                Double.NaN,
+                keyPair.getPrivate()));
+  }
+
+  /** frostwire/frostwire#1401: wire integers are range-checked, not truncated by (int). */
+  @Test
+  void outOfRangeWireIntegersAreRejectedNotTruncated() {
+    Map<String, Object> endorsement = manifestDict(chain.get(1));
+    endorsement.put("sd", (1L << 32) + 1);
+    assertNull(KarmaChainEntry.fromBencode(Bencode.encode(endorsement), owner));
+
+    IdentityRecord record =
+        IdentityRecord.createSigned(new byte[20], keyPair, new byte[32], 6881, 6882, "BOTH");
+    Map<String, Object> dict = Bencode.decodeDictionary(record.toBencode());
+    long wrappingVersion = (1L << 32) + ((Number) dict.get("v")).longValue();
+    Map<String, Object> wrapped = new TreeMap<>(dict);
+    wrapped.put("v", wrappingVersion);
+    assertRejected(wrapped);
+    for (long port : new long[] {(1L << 32) + 6881, Integer.MIN_VALUE - 1L}) {
+      Map<String, Object> badPort = new TreeMap<>(dict);
+      badPort.put("utp_port", port);
+      assertRejected(badPort);
+    }
+  }
+
   private static void assertRejected(Map<String, Object> dict) {
     byte[] bytes = Bencode.encode(dict);
     assertThrows(IllegalArgumentException.class, () -> IdentityRecord.fromBencode(bytes));

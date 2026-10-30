@@ -124,7 +124,7 @@ public final class KarmaChainEntry {
         if (signingKey == null) {
             throw new IllegalArgumentException("signingKey is null");
         }
-        if (energy < 0 || energy > KarmaConstants.MAX_ENERGY) {
+        if (!Double.isFinite(energy) || energy < 0 || energy > KarmaConstants.MAX_ENERGY) {
             throw new IllegalArgumentException("energy must be in [0, " + KarmaConstants.MAX_ENERGY + "]");
         }
 
@@ -484,7 +484,10 @@ public final class KarmaChainEntry {
             } catch (NumberFormatException e) {
                 return null;
             }
-            if (b.energy < 0 || b.energy > KarmaConstants.MAX_ENERGY + 0.01) {
+            // Not just the range: NaN fails both comparisons and would lift the endorsement
+            // budget in KarmaChain.verify (frostwire/frostwire#1401).
+            if (!Double.isFinite(b.energy)
+                    || b.energy < 0 || b.energy > KarmaConstants.MAX_ENERGY + 0.01) {
                 return null;
             }
         } else {
@@ -493,6 +496,10 @@ public final class KarmaChainEntry {
             Object sdValue = dict.get("sd");
             Long sd = Bencode.asLong(sdValue);
             if (pp == null || ih == null || (sdValue != null && sd == null)) {
+                return null;
+            }
+            // Reject rather than truncate: (int) of an out-of-range value still verified (#1401).
+            if (sd != null && (sd < Integer.MIN_VALUE || sd > Integer.MAX_VALUE)) {
                 return null;
             }
             b.peerPub = Base64.getUrlDecoder().decode(pp);
