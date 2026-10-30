@@ -33,12 +33,11 @@ public class ID3v2PictureFrameData extends AbstractID3v2FrameData {
         mimeType = BufferTools.byteBufferToString(bytes, 1, marker - 1);
         pictureType = bytes[marker + 1];
         marker += 2;
-        int marker2;
-        for (marker2 = marker; marker2 < bytes.length; marker2++) {
-            if (bytes[marker2] == 0) break;
-        }
-        description = new EncodedText(EncodedText.checkTextEncoding(bytes[0]), BufferTools.copyBuffer(bytes, marker, marker2 - marker));
-        imageData = BufferTools.copyBuffer(bytes, marker2 + 1, bytes.length - marker2 - 1);
+        byte encoding = EncodedText.checkTextEncoding(bytes[0]);
+        int marker2 = BufferTools.indexOfRequiredTerminator(bytes, marker, encoding);
+        description = new EncodedText(encoding, BufferTools.copyBuffer(bytes, marker, marker2 - marker));
+        int imageStart = marker2 + BufferTools.terminatorLength(encoding);
+        imageData = BufferTools.copyBuffer(bytes, imageStart, bytes.length - imageStart);
     }
 
     protected byte[] packFrameData() {
@@ -57,15 +56,16 @@ public class ID3v2PictureFrameData extends AbstractID3v2FrameData {
             descriptionLength = description.toBytes().length;
             BufferTools.copyIntoByteBuffer(description.toBytes(), 0, descriptionLength, bytes, mimeTypeLength + 3);
         }
-        bytes[mimeTypeLength + descriptionLength + 3] = 0;
+        // The terminator, one or two zero bytes, is already zero in the new array.
+        int terminatorLength = BufferTools.terminatorLength(bytes[0]);
         if (imageData != null && imageData.length > 0) {
-            BufferTools.copyIntoByteBuffer(imageData, 0, imageData.length, bytes, mimeTypeLength + descriptionLength + 4);
+            BufferTools.copyIntoByteBuffer(imageData, 0, imageData.length, bytes, mimeTypeLength + descriptionLength + 3 + terminatorLength);
         }
         return bytes;
     }
 
     protected int getLength() {
-        int length = 4;
+        int length = 3 + BufferTools.terminatorLength(description != null ? description.getTextEncoding() : 0);
         if (mimeType != null) length += mimeType.length();
         if (description != null) length += description.toBytes().length;
         if (imageData != null) length += imageData.length;

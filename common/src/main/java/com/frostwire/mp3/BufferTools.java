@@ -222,4 +222,40 @@ public class BufferTools {
         }
         return newString.toString();
     }
+
+    /**
+     * Where the text starting at {@code from} ends, for an ID3v2 text {@code encoding}: the next zero
+     * byte, or for UTF-16 (encodings 1 and 2) the next zero code unit, two zero bytes an even number
+     * of bytes after {@code from}. A UTF-16 character often has a zero byte of its own ('A' is 00 41),
+     * so ending at the first zero byte cut UTF-16 text short (frostwire/frostwire#1409).
+     * {@code bytes.length} when there is no terminator.
+     */
+    public static int indexOfTerminator(byte[] bytes, int from, byte encoding) {
+        if (terminatorLength(encoding) == 2) {
+            for (int i = from; i + 1 < bytes.length; i += 2) {
+                if (bytes[i] == 0 && bytes[i + 1] == 0) return i;
+            }
+            return bytes.length;
+        }
+        for (int i = from; i < bytes.length; i++) {
+            if (bytes[i] == 0) return i;
+        }
+        return bytes.length;
+    }
+
+    /**
+     * {@link #indexOfTerminator}, for a field the frame must end with a terminator (a description
+     * followed by more fields): an {@link InvalidDataException} when there is none, as for any other
+     * field the frame is too short to hold (frostwire/frostwire#1357).
+     */
+    public static int indexOfRequiredTerminator(byte[] bytes, int from, byte encoding) throws InvalidDataException {
+        int end = indexOfTerminator(bytes, from, encoding);
+        if (end == bytes.length) throw new InvalidDataException("No terminator after the text field");
+        return end;
+    }
+
+    /** Bytes in the text terminator of an ID3v2 text encoding: two for UTF-16, one otherwise. */
+    public static int terminatorLength(byte encoding) {
+        return encoding == EncodedText.TEXT_ENCODING_UTF_16 || encoding == EncodedText.TEXT_ENCODING_UTF_16BE ? 2 : 1;
+    }
 }

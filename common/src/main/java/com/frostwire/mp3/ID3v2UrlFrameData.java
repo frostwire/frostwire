@@ -20,11 +20,11 @@ public class ID3v2UrlFrameData extends AbstractID3v2FrameData {
     }
 
     protected void unpackFrameData(byte[] bytes) throws InvalidDataException {
-        int marker;
-        for (marker = 1; marker < bytes.length; marker++) {
-            if (bytes[marker] == 0) break;
-        }
-        description = new EncodedText(EncodedText.checkTextEncoding(bytes[0]), BufferTools.copyBuffer(bytes, 1, marker - 1));
+        byte encoding = EncodedText.checkTextEncoding(bytes[0]);
+        int marker = BufferTools.indexOfRequiredTerminator(bytes, 1, encoding);
+        description = new EncodedText(encoding, BufferTools.copyBuffer(bytes, 1, marker - 1));
+        // The URL itself is always ISO-8859-1, ended by a single zero byte or the frame's end.
+        marker += BufferTools.terminatorLength(encoding) - 1;
         int length = 0;
         for (int i = marker + 1; i < bytes.length; i++) {
             if (bytes[i] == 0) break;
@@ -42,15 +42,16 @@ public class ID3v2UrlFrameData extends AbstractID3v2FrameData {
             descriptionLength = description.toBytes().length;
             BufferTools.copyIntoByteBuffer(description.toBytes(), 0, descriptionLength, bytes, 1);
         }
-        bytes[descriptionLength + 1] = 0;
+        // The terminator, one or two zero bytes, is already zero in the new array.
+        int terminatorLength = BufferTools.terminatorLength(bytes[0]);
         if (url != null && url.length() > 0) {
-            BufferTools.stringIntoByteBuffer(url, 0, url.length(), bytes, descriptionLength + 2);
+            BufferTools.stringIntoByteBuffer(url, 0, url.length(), bytes, descriptionLength + 1 + terminatorLength);
         }
         return bytes;
     }
 
     protected int getLength() {
-        int length = 2;
+        int length = 1 + BufferTools.terminatorLength(description != null ? description.getTextEncoding() : 0);
         if (description != null) length += description.toBytes().length;
         if (url != null) length += url.length();
         return length;

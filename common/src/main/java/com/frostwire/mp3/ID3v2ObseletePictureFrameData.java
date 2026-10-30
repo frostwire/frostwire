@@ -17,11 +17,10 @@ public class ID3v2ObseletePictureFrameData extends ID3v2PictureFrameData {
     protected void unpackFrameData(byte[] bytes) throws InvalidDataException {
         mimeType = "image/" + BufferTools.byteBufferToString(bytes, 1, 3).toLowerCase();
         pictureType = bytes[4];
-        int marker;
-        for (marker = 5; marker < bytes.length; marker++) {
-            if (bytes[marker] == 0) break;
-        }
-        description = new EncodedText(EncodedText.checkTextEncoding(bytes[0]), BufferTools.copyBuffer(bytes, 5, marker - 5));
-        imageData = BufferTools.copyBuffer(bytes, marker + 1, bytes.length - marker - 1);
+        byte encoding = EncodedText.checkTextEncoding(bytes[0]);
+        int marker = BufferTools.indexOfRequiredTerminator(bytes, 5, encoding);
+        description = new EncodedText(encoding, BufferTools.copyBuffer(bytes, 5, marker - 5));
+        int imageStart = marker + BufferTools.terminatorLength(encoding);
+        imageData = BufferTools.copyBuffer(bytes, imageStart, bytes.length - imageStart);
     }
 }

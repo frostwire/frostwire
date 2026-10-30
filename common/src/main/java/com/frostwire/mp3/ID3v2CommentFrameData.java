@@ -25,17 +25,11 @@ public class ID3v2CommentFrameData extends AbstractID3v2FrameData {
     protected void unpackFrameData(byte[] bytes) throws InvalidDataException {
         byte encoding = EncodedText.checkTextEncoding(bytes[0]);
         language = BufferTools.byteBufferToString(bytes, 1, 3);
-        int marker;
-        for (marker = 4; marker < bytes.length; marker++) {
-            if (bytes[marker] == 0) break;
-        }
+        int marker = BufferTools.indexOfRequiredTerminator(bytes, 4, encoding);
         description = new EncodedText(encoding, BufferTools.copyBuffer(bytes, 4, marker - 4));
-        int length = 0;
-        for (int i = marker + 1; i < bytes.length; i++) {
-            if (bytes[i] == 0) break;
-            length++;
-        }
-        comment = new EncodedText(encoding, BufferTools.copyBuffer(bytes, marker + 1, length));
+        int start = marker + BufferTools.terminatorLength(encoding);
+        int end = BufferTools.indexOfTerminator(bytes, start, encoding);
+        comment = new EncodedText(encoding, BufferTools.copyBuffer(bytes, start, end - start));
     }
 
     protected byte[] packFrameData() {
@@ -56,15 +50,16 @@ public class ID3v2CommentFrameData extends AbstractID3v2FrameData {
             descriptionLength = description.toBytes().length;
             BufferTools.copyIntoByteBuffer(description.toBytes(), 0, descriptionLength, bytes, 4);
         }
-        bytes[descriptionLength + 4] = 0;
+        // The terminator, one or two zero bytes, is already zero in the new array.
+        int terminatorLength = BufferTools.terminatorLength(bytes[0]);
         if (comment != null && comment.toBytes().length > 0) {
-            BufferTools.copyIntoByteBuffer(comment.toBytes(), 0, comment.toBytes().length, bytes, descriptionLength + 5);
+            BufferTools.copyIntoByteBuffer(comment.toBytes(), 0, comment.toBytes().length, bytes, descriptionLength + 4 + terminatorLength);
         }
         return bytes;
     }
 
     protected int getLength() {
-        int length = 5;
+        int length = 4 + BufferTools.terminatorLength(comment != null ? comment.getTextEncoding() : 0);
         if (description != null) length += description.toBytes().length;
         if (comment != null) length += comment.toBytes().length;
         return length;
