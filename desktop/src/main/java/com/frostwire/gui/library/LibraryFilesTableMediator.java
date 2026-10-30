@@ -365,9 +365,10 @@ public final class LibraryFilesTableMediator
     List<MediaSource> result = new ArrayList<>(size);
     for (int i = 0; i < size; i++) {
       try {
-        File file = DATA_MODEL.get(i).getFile();
-        if (PlaybackUtil.isPlayableFile(file)) {
-          result.add(new MediaSource(DATA_MODEL.get(i).getFile()));
+        // The row's cached flag: checking each file on disk here stalled Play (#1402).
+        LibraryFilesTableDataLine line = DATA_MODEL.get(i);
+        if (line.isPlayableFile()) {
+          result.add(new MediaSource(line.getFile()));
         }
       } catch (Exception e) {
         return Collections.emptyList();
@@ -546,11 +547,12 @@ public final class LibraryFilesTableMediator
       return;
     }
     File selectedFile = DATA_MODEL.getFile(rows[0]);
+    LibraryFilesTableDataLine selectedLine = DATA_MODEL.get(rows[0]);
     if (OSUtils.isWindows()) {
-      if (selectedFile.isDirectory()) {
+      if (!selectedLine.isRegularFile()) {
         GUIMediator.launchExplorer(selectedFile);
         return;
-      } else if (!PlaybackUtil.isPlayableFile(selectedFile)) {
+      } else if (!selectedLine.isPlayableFile()) {
         String extension = FilenameUtils.getExtension(selectedFile.getName());
         if (extension != null && extension.equalsIgnoreCase("torrent")) {
           GUIMediator.instance().openTorrentFile(selectedFile, true);
@@ -599,6 +601,7 @@ public final class LibraryFilesTableMediator
       return;
     }
     File selectedFile = getFile(sel[0]);
+    LibraryFilesTableDataLine selectedLine = DATA_MODEL.get(sel[0]);
     //  always turn on Launch, Delete, Magnet Lookup, Bitzi Lookup
     LAUNCH_ACTION.setEnabled(true);
     LAUNCH_OS_ACTION.setEnabled(true);
@@ -612,7 +615,8 @@ public final class LibraryFilesTableMediator
     OPEN_IN_FOLDER_ACTION.setEnabled(
         sel.length == 1
             && selectedFile != null
-            && selectedFile.isFile()
+            && selectedLine != null
+            && selectedLine.isRegularFile()
             && selectedFile.getParentFile() != null);
     if (sel.length == 1) {
       LibraryMediator.instance()

@@ -105,6 +105,10 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
    */
   private PlayableIconCell cachedIconCell;
 
+  // Read off the EDT when the row is built, so selection and Play never touch the disk (#1402).
+  private boolean regularFile;
+  private boolean playableFile;
+
   LibraryFilesTableDataLine(LibraryFilesTableModel ltm) {
     super();
     _model = ltm;
@@ -168,6 +172,8 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
     }
     _sizeHolder = ZERO_SIZED_HOLDER;
     lastModified = new Date(0);
+    regularFile = !resolved.directory();
+    playableFile = regularFile && PlaybackUtil.isPlayableFile(file.getName());
     final LibraryActionsHolder holder =
         new LibraryActionsHolder(this, false, PlaybackUtil.isPlayableFile(file.getName()));
     this.actionsHolder = holder;
@@ -247,6 +253,16 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
   }
 
   /** Returns the file of this data line. */
+  /** Whether the row is a file, not a directory, as of when the folder was read. */
+  public boolean isRegularFile() {
+    return regularFile;
+  }
+
+  /** Whether the row is a file with a playable extension, as of when the folder was read. */
+  public boolean isPlayableFile() {
+    return playableFile;
+  }
+
   public File getFile() {
     return initializer;
   }
