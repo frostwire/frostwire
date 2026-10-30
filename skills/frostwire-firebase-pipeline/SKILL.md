@@ -50,6 +50,7 @@ $S top --version "3.2.2 (9090778)" --days 7 --types ANR  # FATAL, ANR, NON_FATAL
 $S issue <issue-id>                                      # state, first/last seen version, console uri
 $S events <issue-id> --version "3.2.2 (9090778)" --count 3   # stacks: exceptions, crashed/blamed/main threads
 $S events <issue-id> --version "..." --threads all       # every thread, for ANRs and deadlocks
+$S events <issue-id> --days 90 --count 20                # events default to the last 7 days: widen for issues last seen on an older release
 ```
 
 Version names are `X.Y.Z (versionCode)`; the last three digits of the version code are the build, and the release tag is `frostwire-android-X.Y.Z-build-NNN` (3.2.2 (9090778) is `frostwire-android-3.2.2-build-778`). The interval filter needs both a start and an end; the script sets both.

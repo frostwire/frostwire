@@ -12,7 +12,7 @@ Read:
   crashlytics.py top [--version "3.2.2 (9090778)"] [--hours N | --days N] [--state OPEN]
                      [--types FATAL,ANR,NON_FATAL] [--limit N]
   crashlytics.py issue ISSUE_ID
-  crashlytics.py events ISSUE_ID [--version V] [--count N] [--threads all]
+  crashlytics.py events ISSUE_ID [--version V] [--count N] [--threads all] [--hours N | --days N]
 Write (the pipeline's "close once the ticket exists" step):
   crashlytics.py note ISSUE_ID "GitHub frostwire/frostwire#1370"
   crashlytics.py set-state ISSUE_ID... CLOSED|OPEN|MUTED
@@ -131,7 +131,7 @@ def print_frames(frames, limit):
 
 
 def cmd_events(c, args):
-    params = {"filter.issue.id": args.issue, "pageSize": args.count}
+    params = {"filter.issue.id": args.issue, "pageSize": args.count, **interval(args)}
     if args.version:
         params["filter.version.displayNames"] = args.version
     for e in c.call("GET", "/events", params).get("events", [])[: args.count]:
@@ -185,6 +185,8 @@ def main():
     s.add_argument("--version")
     s.add_argument("--count", type=int, default=1)
     s.add_argument("--threads", choices=["interesting", "all"], default="interesting")
+    s.add_argument("--hours", type=int)
+    s.add_argument("--days", type=int)
     s = sub.add_parser("note")
     s.add_argument("issue")
     s.add_argument("text")
