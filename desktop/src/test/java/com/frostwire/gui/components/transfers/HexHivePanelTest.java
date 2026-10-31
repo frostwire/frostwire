@@ -37,6 +37,8 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import javax.swing.JPanel;
 import javax.swing.JViewport;
@@ -214,6 +216,73 @@ class HexHivePanelTest {
         }
       }
     }
+  }
+
+  /**
+   * Resizing the window re-wraps the rows and starts a new backing bitmap, which is rendered in the
+   * background. Until it is, painting showed the new, empty bitmap: the hive flashed white on every
+   * resize. It must keep showing what was painted until the new rows arrive.
+   */
+  @Test
+  void resizingKeepsThePaintedHiveUntilTheNewLayoutIsRendered() throws Exception {
+    HexHivePanel panel = newPanel();
+    panel.setSize(400, 300);
+    panel.updateData(adapter(120));
+    awaitRender(panel);
+    int painted = nonBackground(paint(panel, 400, 300));
+    assertTrue(painted > 1000, "the first layout must have been painted");
+
+    CountDownLatch release = new CountDownLatch(1);
+    ((ExecutorService) get(panel, "threadPool"))
+        .submit(
+            () -> {
+              release.await();
+              return null;
+            });
+    try {
+      panel.setSize(480, 300);
+      panel.updateData(adapter(120));
+      BufferedImage duringRender = paint(panel, 480, 300);
+      assertTrue(
+          nonBackground(duringRender) > painted / 2,
+          "the hive went blank while the new layout was rendering");
+    } finally {
+      release.countDown();
+    }
+    awaitRender(panel);
+    settle(panel);
+
+    HexHivePanel fresh = newPanel();
+    fresh.setSize(480, 300);
+    fresh.updateData(adapter(120));
+    awaitRender(fresh);
+    settle(fresh);
+    BufferedImage expected = paint(fresh, 480, 300), actual = paint(panel, 480, 300);
+    for (int y = 0; y < expected.getHeight(); y++) {
+      for (int x = 0; x < expected.getWidth(); x++) {
+        if (expected.getRGB(x, y) != actual.getRGB(x, y)) {
+          throw new AssertionError("pixel of the old layout left at " + x + "," + y);
+        }
+      }
+    }
+  }
+
+  private static BufferedImage paint(HexHivePanel panel, int w, int h) {
+    BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+    Graphics2D g = image.createGraphics();
+    panel.paint(g);
+    g.dispose();
+    return image;
+  }
+
+  private static int nonBackground(BufferedImage image) {
+    int n = 0;
+    for (int y = 0; y < image.getHeight(); y++) {
+      for (int x = 0; x < image.getWidth(); x++) {
+        if ((image.getRGB(x, y) & 0xffffff) != BACKGROUND) n++;
+      }
+    }
+    return n;
   }
 
   @Test
