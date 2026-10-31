@@ -25,7 +25,9 @@ import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.dnd.DNDUtils;
 import com.limegroup.gnutella.gui.options.OptionsConstructor;
 import com.limegroup.gnutella.settings.LibrarySettings;
+import java.awt.datatransfer.DataFlavor;
 import java.io.File;
+import java.util.concurrent.Callable;
 import javax.swing.*;
 import javax.swing.tree.TreePath;
 
@@ -73,21 +75,40 @@ final class LibraryFilesTransferHandler extends TransferHandler {
 
   private boolean droppingFoldersToAddToLibrary(
       TransferSupport support, DirectoryHolder dirHolder, boolean invokingFromCanImport) {
+    return droppingFolders(
+        isSharedFolderReceiver(dirHolder),
+        support.getDataFlavors(),
+        () -> DNDUtils.getFiles(support.getTransferable()),
+        invokingFromCanImport,
+        OSUtils.isMacOSX());
+  }
+
+  /**
+   * Whether a drop adds folders to the library: the target is a media-type or Finished Downloads
+   * node, the drag carries files, and every dragged file is a folder. {@code files} reads the
+   * dragged data from the drag source.
+   */
+  static boolean droppingFolders(
+      boolean sharedFolderReceiver,
+      DataFlavor[] flavors,
+      Callable<File[]> files,
+      boolean invokingFromCanImport,
+      boolean mac) {
     try {
       // Mac doesn't have the data flavors until importData() is invoked.
-      if (invokingFromCanImport && OSUtils.isMacOSX()) {
+      if (invokingFromCanImport && mac) {
         return true;
       }
-      return isSharedFolderReceiver(dirHolder)
-          && DNDUtils.containsFileFlavors(support.getDataFlavors())
-          && areAllFilesDirectories(DNDUtils.getFiles(support.getTransferable()));
+      return sharedFolderReceiver
+          && DNDUtils.containsFileFlavors(flavors)
+          && areAllFilesDirectories(files.call());
     } catch (Exception e) {
       e.printStackTrace();
       return false;
     }
   }
 
-  private boolean areAllFilesDirectories(File[] files) {
+  private static boolean areAllFilesDirectories(File[] files) {
     boolean result = true;
     for (File f : files) {
       if (!f.isDirectory()) {
