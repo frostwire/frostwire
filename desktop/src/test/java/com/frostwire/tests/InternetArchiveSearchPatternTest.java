@@ -31,6 +31,7 @@ import com.frostwire.search.internetarchive.InternetArchiveSearchPattern;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.UrlUtils;
+import com.limegroup.gnutella.gui.search.SearchEngine;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -59,7 +60,7 @@ public final class InternetArchiveSearchPatternTest {
             searchTerm,
             new InternetArchiveSearchPattern(),
             new InternetArchiveCrawlingStrategy(),
-            5000 // 5 second timeout per request
+            SearchEngine.INTERNET_ARCHIVE_TIMEOUT // the app's timeout for archive.org
             );
 
     InternetArchiveSearchListener listener = new InternetArchiveSearchListener();

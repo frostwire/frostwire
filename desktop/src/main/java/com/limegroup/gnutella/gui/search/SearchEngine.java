@@ -62,6 +62,12 @@ public abstract class SearchEngine {
   // private static final Logger LOG = Logger.getLogger(SearchEngine.class);
   private static final int DEFAULT_TIMEOUT = 5000;
 
+  /**
+   * archive.org's search API takes 4-8 seconds to answer at busy times (measured 2026-10-31), so
+   * the default request timeout dropped all its results then.
+   */
+  public static final int INTERNET_ARCHIVE_TIMEOUT = 15000;
+
   public enum SearchEngineID {
     TPB_ID,
     SOUNDCLOUD_ID,
@@ -170,7 +176,7 @@ public abstract class SearchEngine {
               keywords,
               new InternetArchiveSearchPattern(),
               new InternetArchiveCrawlingStrategy(),
-              DEFAULT_TIMEOUT);
+              INTERNET_ARCHIVE_TIMEOUT);
         }
       };
   private static final SearchEngine FROSTCLICK =
