@@ -24,6 +24,7 @@ import com.limegroup.gnutella.gui.shell.FrostAssociations;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.settings.InstallSettings;
+import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -91,8 +92,12 @@ public final class SetupManager {
   }
 
   private static Pages decide() {
+    boolean saveDirectory = shouldShowSaveDirectoryWindow() != SaveStatus.NO;
+    if (saveDirectory) {
+      prepareSaveDirectoryPage();
+    }
     return new Pages(
-        shouldShowSaveDirectoryWindow() != SaveStatus.NO,
+        saveDirectory,
         !InstallSettings.START_STARTUP.getValue() && GUIUtils.shouldShowStartOnStartupWindow(),
         shouldShowAssociationsWindow(),
         !IntentWindow.isConfirmedOnDisk(),
@@ -107,6 +112,15 @@ public final class SetupManager {
     }
     // display a window if silent grab failed.
     return !GUIMediator.getAssociationManager().checkAndGrab(false);
+  }
+
+  /**
+   * Loads {@link SharingSettings} before the save directory page is built on the EDT: its static
+   * initializer creates the default Torrents and Torrent Data folders, and on a slow disk that
+   * stalled the EDT when the page loaded the class (Icebase #501881c9eb54).
+   */
+  static void prepareSaveDirectoryPage() {
+    SharingSettings.TORRENT_DATA_DIR_SETTING.getValue();
   }
 
   private static SaveStatus shouldShowSaveDirectoryWindow() {

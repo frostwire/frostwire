@@ -67,4 +67,33 @@ class SetupManagerDecidePagesTest {
     assertTrue(decided >= 0, "the pages must be decided on the startup thread");
     assertTrue(created > decided, "decide first, then build on the EDT");
   }
+
+  /**
+   * The save directory page loads {@link com.limegroup.gnutella.settings.SharingSettings}, whose
+   * static initializer creates the default download folders: a slow disk stalled the EDT building
+   * the page (Icebase #501881c9eb54). The decision, on the startup thread, loads it first.
+   */
+  @Test
+  void theSaveDirectoryPageSettingsAreLoadedWhileDecidingThePages() throws Exception {
+    String source =
+        Files.readString(
+                Path.of(System.getProperty("user.dir"))
+                    .resolve("src/main/java/com/limegroup/gnutella/gui/init/SetupManager.java"),
+                StandardCharsets.UTF_8)
+            .replaceAll("\\s+", "");
+    int start = source.indexOf("privatestaticPagesdecide(){");
+    int end = source.indexOf("}", source.indexOf("returnnewPages(", start));
+    assertTrue(start >= 0 && end > start);
+    String decide = source.substring(start, end);
+    assertTrue(
+        decide.contains("if(saveDirectory){prepareSaveDirectoryPage();}"),
+        "decide() must load the save directory page's settings when it shows that page");
+    int prepare = source.indexOf("staticvoidprepareSaveDirectoryPage(){");
+    assertTrue(prepare >= 0);
+    assertTrue(
+        source.substring(prepare, source.indexOf("}", prepare)).contains("SharingSettings."),
+        "prepareSaveDirectoryPage() must initialize SharingSettings");
+    // and it can run off the EDT without a UI
+    SetupManager.prepareSaveDirectoryPage();
+  }
 }
