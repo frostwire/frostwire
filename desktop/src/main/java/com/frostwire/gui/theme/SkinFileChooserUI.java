@@ -29,151 +29,145 @@
  */
 package com.frostwire.gui.theme;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.filechooser.FileView;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicFileChooserUI;
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
- * UI for file chooser in <b>Substance</b> look and feel. The
- * {@link BasicFileChooserUI} can't be used on its own (creates an empty
- * dialog).
+ * UI for file chooser in <b>Substance</b> look and feel. The {@link BasicFileChooserUI} can't be
+ * used on its own (creates an empty dialog).
  *
  * @author Kirill Grouchnikov
  */
 public class SkinFileChooserUI extends BaseFileChooserUI {
-    /**
-     * Custom file view - for system icons on the files.
-     */
-    private final SubstanceFileView fileView = new SubstanceFileView();
+  /** Custom file view - for system icons on the files. */
+  private final SubstanceFileView fileView = new SubstanceFileView();
 
-    /**
-     * Creates the UI delegate for the specified file chooser.
+  /**
+   * Creates the UI delegate for the specified file chooser.
+   *
+   * @param filechooser File chooser.
+   */
+  public SkinFileChooserUI(JFileChooser filechooser) {
+    super(filechooser);
+  }
+
+  public static ComponentUI createUI(JComponent comp) {
+    ThemeMediator.testComponentCreationThreadingViolation();
+    return new SkinFileChooserUI((JFileChooser) comp);
+  }
+
+  /*
+   * (non-Javadoc)
+   *
+   * @seejavax.swing.plaf.basic.BasicFileChooserUI#getFileView(javax.swing.
+   * JFileChooser)
+   */
+  @Override
+  public FileView getFileView(JFileChooser fc) {
+    return fileView;
+  }
+
+  /**
+   * Custom file view implementation that returns system-specific file icons.
+   *
+   * @author Kirill Grouchnikov
+   */
+  private class SubstanceFileView extends BasicFileView {
+    /** Cache for the file icons. */
+    private final Map<String, Icon> pathIconCache = new HashMap<>();
+
+    /*
+     * (non-Javadoc)
      *
-     * @param filechooser File chooser.
+     * @see
+     * javax.swing.plaf.basic.BasicFileChooserUI$BasicFileView#getCachedIcon
+     * (java.io.File)
      */
-    public SkinFileChooserUI(JFileChooser filechooser) {
-        super(filechooser);
-    }
-
-    public static ComponentUI createUI(JComponent comp) {
-        ThemeMediator.testComponentCreationThreadingViolation();
-        return new SkinFileChooserUI((JFileChooser) comp);
+    @Override
+    public Icon getCachedIcon(File f) {
+      return pathIconCache.get(f.getPath());
     }
 
     /*
      * (non-Javadoc)
      *
-     * @seejavax.swing.plaf.basic.BasicFileChooserUI#getFileView(javax.swing.
-     * JFileChooser)
+     * @see
+     * javax.swing.plaf.basic.BasicFileChooserUI$BasicFileView#getIcon(java
+     * .io.File)
      */
     @Override
-    public FileView getFileView(JFileChooser fc) {
-        return fileView;
+    public Icon getIcon(File f) {
+      Icon icon = getCachedIcon(f);
+      if (icon != null) return icon;
+      try {
+        icon = getDefaultIcon(f);
+      } catch (NullPointerException e) {
+        // ignore, not critical and only under special conditions (OS fragmentation)
+      }
+      // System.out.println("System : " + f.getAbsolutePath() + " --> "
+      // + icon);
+      //            if (icon == null) {
+      //                icon = super.getIcon(f);
+      //                if (icon == null) {
+      //                    icon = new ImageIcon(SubstanceCoreUtilities.getBlankImage(
+      //                            8, 8));
+      //                }
+      //                // System.out.println("Super : " + f.getAbsolutePath() + " --> "
+      //                // + icon);
+      //            }
+      cacheIcon(f, icon);
+      return icon;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * javax.swing.plaf.basic.BasicFileChooserUI$BasicFileView#cacheIcon
+     * (java.io.File, javax.swing.Icon)
+     */
+    @Override
+    public void cacheIcon(File f, Icon icon) {
+      pathIconCache.put(f.getPath(), icon);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * javax.swing.plaf.basic.BasicFileChooserUI$BasicFileView#clearIconCache
+     * ()
+     */
+    @Override
+    public void clearIconCache() {
+      pathIconCache.clear();
     }
 
     /**
-     * Custom file view implementation that returns system-specific file icons.
+     * Returns the default file icon.
      *
-     * @author Kirill Grouchnikov
+     * @param f File.
+     * @return File icon.
      */
-    private class SubstanceFileView extends BasicFileView {
-        /**
-         * Cache for the file icons.
-         */
-        private final Map<String, Icon> pathIconCache = new HashMap<>();
-
-        /*
-         * (non-Javadoc)
-         *
-         * @see
-         * javax.swing.plaf.basic.BasicFileChooserUI$BasicFileView#getCachedIcon
-         * (java.io.File)
-         */
-        @Override
-        public Icon getCachedIcon(File f) {
-            return pathIconCache.get(f.getPath());
+    public Icon getDefaultIcon(File f) {
+      Icon icon = null;
+      JFileChooser fileChooser = getFileChooser();
+      if (fileChooser != null) {
+        FileSystemView fileSystemView = fileChooser.getFileSystemView();
+        if (fileSystemView != null) {
+          icon = fileSystemView.getSystemIcon(f);
+          //                    if (SubstanceCoreUtilities.useThemedDefaultIcon(null)) {
+          //                        icon = SubstanceCoreUtilities.getThemedIcon(fileChooser, icon);
+          //                    }
         }
-
-        /*
-         * (non-Javadoc)
-         *
-         * @see
-         * javax.swing.plaf.basic.BasicFileChooserUI$BasicFileView#getIcon(java
-         * .io.File)
-         */
-        @Override
-        public Icon getIcon(File f) {
-            Icon icon = getCachedIcon(f);
-            if (icon != null)
-                return icon;
-            try {
-                icon = getDefaultIcon(f);
-            } catch (NullPointerException e) {
-                // ignore, not critical and only under special conditions (OS fragmentation)
-            }
-            // System.out.println("System : " + f.getAbsolutePath() + " --> "
-            // + icon);
-//            if (icon == null) {
-//                icon = super.getIcon(f);
-//                if (icon == null) {
-//                    icon = new ImageIcon(SubstanceCoreUtilities.getBlankImage(
-//                            8, 8));
-//                }
-//                // System.out.println("Super : " + f.getAbsolutePath() + " --> "
-//                // + icon);
-//            }
-            cacheIcon(f, icon);
-            return icon;
-        }
-
-        /*
-         * (non-Javadoc)
-         *
-         * @see
-         * javax.swing.plaf.basic.BasicFileChooserUI$BasicFileView#cacheIcon
-         * (java.io.File, javax.swing.Icon)
-         */
-        @Override
-        public void cacheIcon(File f, Icon icon) {
-            pathIconCache.put(f.getPath(), icon);
-        }
-
-        /*
-         * (non-Javadoc)
-         *
-         * @see
-         * javax.swing.plaf.basic.BasicFileChooserUI$BasicFileView#clearIconCache
-         * ()
-         */
-        @Override
-        public void clearIconCache() {
-            pathIconCache.clear();
-        }
-
-        /**
-         * Returns the default file icon.
-         *
-         * @param f File.
-         * @return File icon.
-         */
-        public Icon getDefaultIcon(File f) {
-            Icon icon = null;
-            JFileChooser fileChooser = getFileChooser();
-            if (fileChooser != null) {
-                FileSystemView fileSystemView = fileChooser.getFileSystemView();
-                if (fileSystemView != null) {
-                    icon = fileSystemView.getSystemIcon(f);
-//                    if (SubstanceCoreUtilities.useThemedDefaultIcon(null)) {
-//                        icon = SubstanceCoreUtilities.getThemedIcon(fileChooser, icon);
-//                    }
-                }
-            }
-            return icon;
-        }
+      }
+      return icon;
     }
+  }
 }
