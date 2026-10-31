@@ -1,0 +1,131 @@
+/*
+ *     Created by Angel Leon (@gubatron)
+ *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
+ *
+ *     Licensed under GPL v3. See LICENSE file.
+ */
+
+package com.frostwire.bittorrent;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.frostwire.licenses.Licenses;
+import com.frostwire.util.Bencode;
+import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+
+/**
+ * Reads the license and payment options FrostWire writes into a torrent's info dictionary ({@code
+ * CreateTorrentDialog}) back through libtorrent, as transfers and the library do.
+ */
+class BTInfoAdditionalMetadataHolderTest {
+
+  @Test
+  void readsCreativeCommonsLicenseAndPaymentOptions() {
+    Map<String, Object> info = info();
+    info.put(
+        "license",
+        Map.of(
+            "creative-commons",
+            Map.of(
+                "licenseUrl", Licenses.CC_BY_SA_4.getUrl(),
+                "attributionTitle", "Jazz Collection",
+                "attributionAuthor", "Some Artist",
+                "attributionUrl", "https://example.org/jazz")));
+    info.put(
+        "paymentOptions",
+        Map.of(
+            "paymentOptions",
+            Map.of(
+                "bitcoin", "bitcoin:13hbpRfDT1HKmK4jejHgh7MM9W1NCPFT8v",
+                "paypalUrl", "http://frostwire.com/donate")));
+
+    BTInfoAdditionalMetadataHolder holder = read(info);
+
+    CopyrightLicenseBroker license = holder.getLicenseBroker();
+    assertNotNull(license);
+    assertSame(Licenses.CC_BY_SA_4, license.license);
+    Map<String, String> fields = license.asMap().get("creative-commons");
+    assertEquals("Jazz Collection", fields.get("attributionTitle"));
+    assertEquals("Some Artist", fields.get("attributionAuthor"));
+    assertEquals("https://example.org/jazz", fields.get("attributionUrl"));
+    PaymentOptions payment = holder.getPaymentOptions();
+    assertEquals("bitcoin:13hbpRfDT1HKmK4jejHgh7MM9W1NCPFT8v", payment.bitcoin);
+    assertEquals("http://frostwire.com/donate", payment.paypalUrl);
+    assertEquals("Jazz Collection.flac", payment.getItemName());
+  }
+
+  @Test
+  void readsOpenSourceLicenseWithoutPaymentOptions() {
+    Map<String, Object> info = info();
+    info.put(
+        "license",
+        Map.of(
+            "open-source",
+            Map.of(
+                "licenseUrl", Licenses.GPL3.getUrl(),
+                "attributionTitle", "FrostWire",
+                "attributionAuthor", "FrostWire Team",
+                "attributionUrl", "https://www.frostwire.com")));
+
+    BTInfoAdditionalMetadataHolder holder = read(info);
+
+    assertSame(Licenses.GPL3, holder.getLicenseBroker().license);
+    assertEquals(
+        "FrostWire Team",
+        holder.getLicenseBroker().asMap().get("open-source").get("attributionAuthor"));
+    assertTrue(holder.getPaymentOptions().isEmpty());
+    assertEquals("Jazz Collection.flac", holder.getPaymentOptions().getItemName());
+  }
+
+  @Test
+  void unknownLicenseUrlHasNoLicenseName() {
+    Map<String, Object> info = info();
+    info.put(
+        "license",
+        Map.of(
+            "public-domain",
+            Map.of(
+                "licenseUrl", "http://example.org/unknown",
+                "attributionTitle", "",
+                "attributionAuthor", "",
+                "attributionUrl", "")));
+
+    BTInfoAdditionalMetadataHolder holder = read(info);
+
+    assertNotNull(holder.getLicenseBroker());
+    assertNull(holder.getLicenseBroker().getLicenseName());
+  }
+
+  @Test
+  void torrentWithoutExtraMetadataHasEmptyPaymentOptions() {
+    BTInfoAdditionalMetadataHolder holder = read(info());
+
+    assertNull(holder.getLicenseBroker());
+    assertTrue(holder.getPaymentOptions().isEmpty());
+    assertEquals("Jazz Collection.flac", holder.getPaymentOptions().getItemName());
+  }
+
+  /** A minimal single-file info dictionary libtorrent accepts. */
+  private static Map<String, Object> info() {
+    Map<String, Object> info = new LinkedHashMap<>();
+    info.put("length", 1L);
+    info.put("name", "Jazz Collection.flac");
+    info.put("piece length", 16384L);
+    // Any non-zero SHA-1: libtorrent refuses to write an all-zero piece hash back out.
+    info.put("pieces", "0123456789abcdefghij".getBytes(StandardCharsets.US_ASCII));
+    return info;
+  }
+
+  /** Bencodes the torrent and reads it back through libtorrent, as a transfer does. */
+  private static BTInfoAdditionalMetadataHolder read(Map<String, Object> info) {
+    byte[] torrent = Bencode.encode(Map.of("info", info));
+    return new BTInfoAdditionalMetadataHolder(torrent, "Jazz Collection.flac");
+  }
+}
