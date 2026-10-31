@@ -18,7 +18,7 @@
 
 package com.frostwire.bittorrent;
 
-import com.frostwire.jlibtorrent.Entry;
+import com.frostwire.util.Bencode;
 import com.frostwire.util.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,17 +53,22 @@ public class PaymentOptions implements Mappable<String, Map<String, String>> {
     this.paypalUrl = paypal;
   }
 
-  public PaymentOptions(Map<String, Entry> paymentOptionsMap) {
-    final Entry paymentOptions = paymentOptionsMap.get("paymentOptions");
+  /**
+   * @param paymentOptionsMap a torrent's {@code paymentOptions} dictionary, in the form {@link
+   *     Bencode#decode} returns
+   */
+  public PaymentOptions(Map<String, Object> paymentOptionsMap) {
+    final Object paymentOptions = paymentOptionsMap.get("paymentOptions");
     if (paymentOptions != null) {
-      final Map<String, Entry> dictionary = paymentOptions.dictionary();
+      final Map<String, Object> dictionary =
+          BTInfoAdditionalMetadataHolder.dictionary(paymentOptions);
       if (dictionary.containsKey("bitcoin")) {
-        this.bitcoin = dictionary.get("bitcoin").string();
+        this.bitcoin = BTInfoAdditionalMetadataHolder.string(dictionary.get("bitcoin"));
       } else {
         this.bitcoin = null;
       }
       if (dictionary.containsKey("paypalUrl")) {
-        this.paypalUrl = dictionary.get("paypalUrl").string();
+        this.paypalUrl = BTInfoAdditionalMetadataHolder.string(dictionary.get("paypalUrl"));
       } else {
         this.paypalUrl = null;
       }

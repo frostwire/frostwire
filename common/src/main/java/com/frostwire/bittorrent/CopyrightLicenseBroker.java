@@ -18,9 +18,9 @@
 
 package com.frostwire.bittorrent;
 
-import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.licenses.License;
 import com.frostwire.licenses.Licenses;
+import com.frostwire.util.Bencode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -92,9 +92,9 @@ public class CopyrightLicenseBroker implements Mappable<String, Map<String, Stri
   /**
    * Deserialization constructor
    *
-   * @param map
+   * @param map a torrent's {@code license} dictionary, in the form {@link Bencode#decode} returns
    */
-  public CopyrightLicenseBroker(Map<String, Entry> map) {
+  public CopyrightLicenseBroker(Map<String, Object> map) {
     if (map.containsKey("creative-commons")) {
       licenseCategory = LicenseCategory.CreativeCommons;
     } else if (map.containsKey("open-source")) {
@@ -105,12 +105,15 @@ public class CopyrightLicenseBroker implements Mappable<String, Map<String, Stri
       licenseCategory = LicenseCategory.NoLicense;
     }
     if (licenseCategory != LicenseCategory.NoLicense) {
-      Map<String, Entry> innerMap = map.get(licenseCategory.toString()).dictionary();
-      String licenseUrl = innerMap.get("licenseUrl").string();
+      Map<String, Object> innerMap =
+          BTInfoAdditionalMetadataHolder.dictionary(map.get(licenseCategory.toString()));
+      String licenseUrl = BTInfoAdditionalMetadataHolder.string(innerMap.get("licenseUrl"));
       this.license = urlToLicense.get(licenseUrl);
-      this.attributionTitle = innerMap.get("attributionTitle").string();
-      this.attributionAuthor = innerMap.get("attributionAuthor").string();
-      this.attributionUrl = innerMap.get("attributionUrl").string();
+      this.attributionTitle =
+          BTInfoAdditionalMetadataHolder.string(innerMap.get("attributionTitle"));
+      this.attributionAuthor =
+          BTInfoAdditionalMetadataHolder.string(innerMap.get("attributionAuthor"));
+      this.attributionUrl = BTInfoAdditionalMetadataHolder.string(innerMap.get("attributionUrl"));
     } else {
       this.license = null;
       this.attributionTitle = null;
