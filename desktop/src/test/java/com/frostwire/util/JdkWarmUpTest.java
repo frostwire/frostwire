@@ -303,7 +303,8 @@ class JdkWarmUpTest {
   void formatWarmUpsWorkForAnyLocale() {
     for (Locale locale : List.of(Locale.getDefault(), Locale.ENGLISH, Locale.JAPAN, Locale.ROOT)) {
       assertDoesNotThrow(() -> JdkWarmUp.warmUpNumberFormat(locale), locale::toString);
-      assertDoesNotThrow(() -> JdkWarmUp.warmUpDateFormatAndCollation(locale), locale::toString);
+      assertDoesNotThrow(
+          () -> JdkWarmUp.warmUpDateFormatAndCollation(locale, locale), locale::toString);
     }
   }
 
@@ -810,5 +811,28 @@ class JdkWarmUpTest {
     } catch (ClassNotFoundException e) {
       return false;
     }
+  }
+
+  /**
+   * Formatters made without a locale use the FORMAT category locale, which differs from the default
+   * when region formats differ from the display language; warming the default left the first
+   * transfer menu's DecimalFormat loading number data on the EDT (Icebase #83c5be368599).
+   */
+  @Test
+  void numberAndDateWarmUpsUseTheFormatLocale() throws Exception {
+    Locale previous = Locale.getDefault(Locale.Category.FORMAT);
+    try {
+      Locale.setDefault(Locale.Category.FORMAT, Locale.of("es", "AR"));
+      assertEquals(Locale.of("es", "AR"), JdkWarmUp.formatLocale());
+    } finally {
+      Locale.setDefault(Locale.Category.FORMAT, previous);
+    }
+    String source =
+        java.nio.file.Files.readString(
+                java.nio.file.Path.of("src/main/java/com/frostwire/util/JdkWarmUp.java"))
+            .replaceAll("\\s+", "");
+    assertTrue(source.contains("warmUpNumberFormat(formatLocale());"));
+    assertTrue(
+        source.contains("warmUpDateFormatAndCollation(formatLocale(),Locale.getDefault());"));
   }
 }

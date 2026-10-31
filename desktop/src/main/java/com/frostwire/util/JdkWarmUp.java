@@ -275,7 +275,7 @@ public final class JdkWarmUp {
       LOG.warn("Glyph warm-up failed: " + t.getMessage(), t);
     }
     try {
-      warmUpNumberFormat(Locale.getDefault());
+      warmUpNumberFormat(formatLocale());
     } catch (Throwable t) {
       LOG.warn("Number format warm-up failed: " + t.getMessage(), t);
     }
@@ -341,7 +341,7 @@ public final class JdkWarmUp {
       LOG.warn("Script glyph warm-up failed: " + t.getMessage(), t);
     }
     try {
-      warmUpDateFormatAndCollation(Locale.getDefault());
+      warmUpDateFormatAndCollation(formatLocale(), Locale.getDefault());
     } catch (Throwable t) {
       LOG.warn("Date format and collation warm-up failed: " + t.getMessage(), t);
     }
@@ -542,6 +542,18 @@ public final class JdkWarmUp {
    * The first NumberFormat in the JVM loads the locale provider and its number data. The splash
    * window's progress percentage and GUIUtils' size and speed formats need one right away.
    */
+  /**
+   * The locale of every formatter made without one ({@code new DecimalFormat()}, {@code
+   * NumberFormat.getInstance()}, {@code new SimpleDateFormat(pattern)}): the FORMAT category, which
+   * differs from {@link Locale#getDefault()} when the system's region formats differ from its
+   * display language (English Windows with Spanish number formats, say). Warming the other locale
+   * left the first transfer menu's DecimalFormat loading its number data on the EDT (Icebase
+   * #83c5be368599).
+   */
+  static Locale formatLocale() {
+    return Locale.getDefault(Locale.Category.FORMAT);
+  }
+
   static void warmUpNumberFormat(Locale locale) {
     NumberFormat.getNumberInstance(locale).format(1234.5);
   }
@@ -566,9 +578,9 @@ public final class JdkWarmUp {
    * tables ({@code ComposedCharIter.<clinit>}) before its own rule tables (sorting string columns).
    * Both are built lazily by FrostWire, on the EDT.
    */
-  static void warmUpDateFormatAndCollation(Locale locale) {
-    new SimpleDateFormat("EEE, MMM. d, yyyy h:mm a", locale).format(new Date(0));
-    Collator collator = Collator.getInstance(locale);
+  static void warmUpDateFormatAndCollation(Locale formatLocale, Locale collationLocale) {
+    new SimpleDateFormat("EEE, MMM. d, yyyy h:mm a", formatLocale).format(new Date(0));
+    Collator collator = Collator.getInstance(collationLocale);
     collator.setDecomposition(Collator.FULL_DECOMPOSITION);
     collator.compare("FrostWire", "frostwire");
   }
