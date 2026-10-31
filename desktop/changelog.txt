@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:Adding a transfer no longer freezes the window while FrostWire reads the torrent's license details: they load in the background and show up on the row a moment later (#1423)
    - new:Double-clicking a folder or media type in the Library's left-hand tree refreshes it, like F5 does
    - fix:Archive.org searches no longer come back empty when archive.org is slow: it gets 15 seconds to answer instead of 5
    - fix:Showing a multi-line tooltip in a table no longer builds and throws away a themed text box first, so the first tooltip no longer freezes slow machines (#1422)
