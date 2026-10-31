@@ -82,6 +82,16 @@ public class HexHivePanel extends JPanel implements Scrollable {
   private BufferedImage bitmap;
 
   /**
+   * The bitmap of the previous layout, painted under the current one until that has rendered the
+   * visible rows: a resize re-wraps the rows into a new, empty bitmap that renders in the
+   * background, and painting it alone flashed the hive white. Guarded by {@link #bitmapLock}.
+   */
+  private BufferedImage previousBitmap;
+
+  private int previousOriginY;
+  private double previousScale = 1.0;
+
+  /**
    * Device pixels per logical pixel of the backing bitmap (1.0 on regular screens, 1.25/1.5/2.0 on
    * HiDPI ones). Rendering at device resolution keeps the cubes crisp instead of letting Java2D
    * upscale a logical-size bitmap.
@@ -741,7 +751,14 @@ public class HexHivePanel extends JPanel implements Scrollable {
     synchronized (bitmapLock) {
       int windowHeight = backingWindowHeight(snapshot.height, visibleRect.height);
       if (bitmap == null || bitmapLayout == null || !bitmapLayout.hasSameLayout(snapshot)) {
-        // a fresh bitmap: pixels of the previous layout outside the new rows would linger
+        // a fresh bitmap: pixels of the previous layout outside the new rows would linger. Keep the
+        // previous one to paint under it meanwhile, unless it never got rendered (rapid resizes):
+        // then the older, rendered one is still the better picture.
+        if (bitmap != null && (previousBitmap == null || !renderedArea.isEmpty())) {
+          previousBitmap = bitmap;
+          previousOriginY = bitmapOriginY;
+          previousScale = bitmapScale;
+        }
         int deviceWidth = Math.max(1, toDevice(snapshot.width, snapshot.scale));
         int deviceHeight = deviceWindowHeight(windowHeight, snapshot.scale);
         bitmap = createOpaqueImage(deviceWidth, deviceHeight);
@@ -1247,26 +1264,26 @@ public class HexHivePanel extends JPanel implements Scrollable {
     synchronized (bitmapLock) {
       scaleChanged = Math.abs(deviceScale - bitmapScale) > 0.001;
       if (bitmap != null) {
-        if (!scaleChanged && transform.getShearX() == 0 && transform.getShearY() == 0) {
-          // Blit the device-resolution bitmap 1:1 onto the device pixels, no resampling
-          Graphics2D deviceGraphics = (Graphics2D) g2d.create();
-          deviceGraphics.setTransform(
-              AffineTransform.getTranslateInstance(
-                  Math.round(transform.getTranslateX()),
-                  Math.round(transform.getTranslateY()) + toDevice(bitmapOriginY, bitmapScale)));
-          deviceGraphics.drawImage(bitmap, 0, 0, null);
-          deviceGraphics.dispose();
+        // only what the new bitmap covers: below its last row is plain background
+        Rectangle window = new Rectangle(0, bitmapOriginY, bitmapLayout.width, bitmapWindowHeight);
+        Rectangle visible = getVisibleRect().intersection(window);
+        if (previousBitmap != null
+            && (visible.isEmpty()
+                || renderedArea.contains(visible.x, visible.y, visible.width, visible.height))) {
+          previousBitmap = null;
+        }
+        if (previousBitmap != null) {
+          // the new layout is still rendering: show the last picture, the new rows over it
+          Graphics2D previous = (Graphics2D) g2d.create();
+          previous.clip(window);
+          blit(previous, transform, deviceScale, previousBitmap, previousOriginY, previousScale);
+          previous.dispose();
+          Graphics2D rendered = (Graphics2D) g2d.create();
+          rendered.clip(renderedArea);
+          blit(rendered, transform, deviceScale, bitmap, bitmapOriginY, bitmapScale);
+          rendered.dispose();
         } else {
-          // Screen scale changed (window moved to another monitor), stretch until it re-renders
-          g2d.setRenderingHint(
-              RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-          g2d.drawImage(
-              bitmap,
-              0,
-              bitmapOriginY,
-              (int) Math.round(bitmap.getWidth() / bitmapScale),
-              (int) Math.round(bitmap.getHeight() / bitmapScale),
-              null);
+          blit(g2d, transform, deviceScale, bitmap, bitmapOriginY, bitmapScale);
         }
       }
     }
@@ -1277,6 +1294,41 @@ public class HexHivePanel extends JPanel implements Scrollable {
         final HexDataAdapter adapter = adapterSnapshot;
         SwingUtilities.invokeLater(() -> updateData(adapter));
       }
+    }
+  }
+
+  /** Draws a backing bitmap whose top is content row {@code originY}, rendered at {@code scale}. */
+  private static void blit(
+      Graphics2D g2d,
+      AffineTransform transform,
+      double deviceScale,
+      BufferedImage image,
+      int originY,
+      double scale) {
+    if (Math.abs(deviceScale - scale) <= 0.001
+        && transform.getShearX() == 0
+        && transform.getShearY() == 0) {
+      // Blit the device-resolution bitmap 1:1 onto the device pixels, no resampling
+      Graphics2D deviceGraphics = (Graphics2D) g2d.create();
+      deviceGraphics.setTransform(
+          AffineTransform.getTranslateInstance(
+              Math.round(transform.getTranslateX()),
+              Math.round(transform.getTranslateY()) + toDevice(originY, scale)));
+      deviceGraphics.drawImage(image, 0, 0, null);
+      deviceGraphics.dispose();
+    } else {
+      // Screen scale changed (window moved to another monitor), stretch until it re-renders
+      Graphics2D scaled = (Graphics2D) g2d.create();
+      scaled.setRenderingHint(
+          RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+      scaled.drawImage(
+          image,
+          0,
+          originY,
+          (int) Math.round(image.getWidth() / scale),
+          (int) Math.round(image.getHeight() / scale),
+          null);
+      scaled.dispose();
     }
   }
 
