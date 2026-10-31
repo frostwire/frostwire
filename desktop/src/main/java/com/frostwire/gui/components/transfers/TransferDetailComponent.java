@@ -59,13 +59,10 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
 
   public TransferDetailComponent(MouseAdapter hideDetailsActionListener) {
     super(new MigLayout("fill, insets 0 0 0 0", "", "[top][grow]"));
-    JPanel labelAndLink = new JPanel(new FlowLayout());
     // Create label without HTML content to avoid EDT violation
     JLabel hideLink = new JLabel();
-    hideLink.setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
     hideLink.addMouseListener(hideDetailsActionListener);
-    labelAndLink.add(new JLabel(I18n.tr("Transfer Detail")));
-    labelAndLink.add(hideLink, "left, gapleft 10px, growx");
+    JPanel labelAndLink = header(new JLabel(I18n.tr("Transfer Detail")), hideLink);
     // Defer HTML content and font loading to avoid EDT violation
     // HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
     SwingUtilities.invokeLater(
@@ -77,6 +74,19 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
     add(createDetailSwitcherButtons(), "push, right, wrap");
     add(createDetailComponentHolder(), "hmin 0px, span 2, grow");
     GUIMediator.addRefreshListener(this);
+  }
+
+  /**
+   * "Transfer Detail hide": the title starts at the panel's left edge so that, with the same 10px
+   * gap the detail panels use, it lines up with their first label ("Total Pieces", ...). The
+   * default FlowLayout centered it and put a 5px gap before it.
+   */
+  static JPanel header(JLabel title, JLabel hideLink) {
+    JPanel labelAndLink = new JPanel(new FlowLayout());
+    hideLink.setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
+    labelAndLink.add(title);
+    labelAndLink.add(hideLink);
+    return labelAndLink;
   }
 
   private JPanel createDetailComponentHolder() {
