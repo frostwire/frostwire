@@ -702,16 +702,11 @@ public final class SearchMediator {
               try {
                 SearchFilter filter = getSearchFilterFactory().createFilter();
                 SearchResultDisplayer searchResultDisplayer = getSearchResultDisplayer();
-                int added = 0;
-                NamedMediaType firstMediaType = null;
+                // Results never switch the media type tab: the user's click or the tab the search
+                // opened on (the last one clicked) stays selected.
                 for (UISearchResult sr : uiResults) {
                   if (filter.allow(sr)) {
                     searchResultDisplayer.addQueryResult(token, sr, rp);
-                    added++;
-                    // Track the first media type to auto-select the appropriate tab
-                    if (firstMediaType == null && sr.getExtension() != null) {
-                      firstMediaType = NamedMediaType.getFromExtension(sr.getExtension());
-                    }
                   } else {
                     LOG.info(
                         "Search result filtered out: "
@@ -721,15 +716,6 @@ public final class SearchMediator {
                             + " source="
                             + sr.getSource());
                   }
-                }
-                // Auto-select the appropriate media type tab for the first result
-                if (firstMediaType != null && added > 0) {
-                  LOG.info(
-                      "Auto-selecting media type tab: "
-                          + firstMediaType.getName()
-                          + " for result count="
-                          + added);
-                  rp.selectMediaType(firstMediaType);
                 }
               } catch (Exception e) {
                 LOG.error("Error adding search result to UI", e);

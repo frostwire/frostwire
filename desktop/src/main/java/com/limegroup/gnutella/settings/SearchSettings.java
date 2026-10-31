@@ -45,9 +45,16 @@ public final class SearchSettings extends LimeProps {
   public static final FileSetting SMART_SEARCH_DATABASE_FOLDER =
       FACTORY.createFileSetting(
           "SMART_SEARCH_DATABASE_FOLDER", new File(CommonUtils.getUserSettingsDir(), "crawldb"));
-  public static final StringSetting LAST_MEDIA_TYPE_USED =
+
+  /**
+   * The media type tab the user last clicked in search results; new searches open on it. Only a
+   * click changes it: the old LAST_MEDIA_TYPE_USED was also overwritten each time results switched
+   * the tab by themselves, so it no longer says what users picked and is not read.
+   */
+  public static final StringSetting LAST_MEDIA_TYPE_CLICKED =
       FACTORY.createStringSetting(
-          "LAST_MEDIA_TYPE_USED", MediaType.getAudioMediaType().getMimeType());
+          "LAST_MEDIA_TYPE_CLICKED", MediaType.getTorrentMediaType().getMimeType());
+
   public static final BooleanSetting SMART_SEARCH_ENABLED =
       FACTORY.createBooleanSetting("SMART_SEARCH_ENABLED", true);
   public static final BooleanSetting SHOW_DETAIL_PAGE_AFTER_DOWNLOAD_START =

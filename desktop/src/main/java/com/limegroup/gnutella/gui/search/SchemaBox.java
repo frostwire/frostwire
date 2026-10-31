@@ -77,7 +77,7 @@ public final class SchemaBox extends JPanel {
     // Install the selected media-type filter without rebuilding; the caller rebuilds once.
     for (ActionListener listener : button.getActionListeners()) {
       if (listener instanceof SchemaButtonActionListener schemaListener) {
-        schemaListener.select(false);
+        schemaListener.select(false, false);
       }
     }
   }
@@ -224,33 +224,47 @@ public final class SchemaBox extends JPanel {
   }
 
   /**
-   * Use this if you want to programmatically change the current file type being displayed for a
-   * search.
+   * Shows {@code type}'s results without remembering it as the user's choice: only a click on a tab
+   * does that (see {@link SearchSettings#LAST_MEDIA_TYPE_CLICKED}).
    */
   void selectMediaType(NamedMediaType type) {
     JToggleButton mediaTypeButton = buttonsMap.get(type);
     if (mediaTypeButton != null) {
-      // Defer doClick() to avoid EDT violation when called from background threads
-      // setSelected doesn't fire the proper events, so we need doClick
-      SwingUtilities.invokeLater(mediaTypeButton::doClick);
+      // Deferred: callers may run before the box is shown or from a pending result batch.
+      SwingUtilities.invokeLater(
+          () -> {
+            mediaTypeButton.setSelected(true);
+            for (ActionListener listener : mediaTypeButton.getActionListeners()) {
+              if (listener instanceof SchemaButtonActionListener schemaListener) {
+                schemaListener.select(true, false);
+              }
+            }
+          });
     } else {
       com.frostwire.util.Logger.getLogger(SchemaBox.class)
           .warn("selectMediaType: no button for " + (type != null ? type.getName() : "null"));
     }
   }
 
-  private boolean isMediaTypeSelected(NamedMediaType type) {
-    boolean result = false;
-    if (SearchSettings.LAST_MEDIA_TYPE_USED
-        .getValue()
-        .contains(type.getMediaType().getMimeType())) {
-      result = true;
+  /** The button of {@code type}, for tests. */
+  JToggleButton buttonFor(NamedMediaType type) {
+    return buttonsMap.get(type);
+  }
+
+  /** The mime type new searches open on: the last tab clicked, Torrents until one is clicked. */
+  static String rememberedMimeType() {
+    String clicked = SearchSettings.LAST_MEDIA_TYPE_CLICKED.getValue();
+    for (String schema : SCHEMAS) {
+      String mimeType = NamedMediaType.getFromDescription(schema).getMediaType().getMimeType();
+      if (mimeType.equals(clicked)) {
+        return mimeType;
+      }
     }
-    if (SearchSettings.LAST_MEDIA_TYPE_USED.getValue().isEmpty()
-        && type.getMediaType().equals(MediaType.getAudioMediaType())) {
-      result = true;
-    }
-    return result;
+    return MediaType.getTorrentMediaType().getMimeType();
+  }
+
+  private static boolean isMediaTypeSelected(NamedMediaType type) {
+    return type.getMediaType().getMimeType().equals(rememberedMimeType());
   }
 
   private AbstractButton getSelectedButton() {
@@ -361,14 +375,16 @@ public final class SchemaBox extends JPanel {
       this.filter = new MediaTypeFilter(nmt);
     }
 
+    /** A click on the tab: the user's choice, remembered for the next search. */
     @Override
     public void actionPerformed(ActionEvent e) {
-      select(true);
+      select(true, true);
     }
 
-    void select(boolean refilter) {
-      String mimeType = nmt.getMediaType().getMimeType();
-      SearchSettings.LAST_MEDIA_TYPE_USED.setValue(mimeType);
+    void select(boolean refilter, boolean remember) {
+      if (remember) {
+        SearchSettings.LAST_MEDIA_TYPE_CLICKED.setValue(nmt.getMediaType().getMimeType());
+      }
       if (resultPanel == null) {
         return;
       }
