@@ -164,6 +164,30 @@ Give each finding `path:line`, trigger/preconditions, violated invariant, user i
 - [ ] **Diagnostic integrity** — the change must fix the reported violation, not weaken the detector. Reject `StrictMode.allowThreadDiskReads/Writes()`, relaxed `StrictEdtMode`, disabled lint/compiler warnings, removed assertions, skipped tests, reduced monitoring, or widened exception swallowing when their purpose is to hide application defects. Require the complete diagnostic type and root-cause evidence. A narrow suppression is acceptable only for proven unavoidable third-party/platform behavior with no isolatable fix, minimal scope, documentation, and regression coverage.
 - [ ] **Search input sanitization** — `LocalIndex.search()` is called with keywords from remote peers (via `RelaySearchService`). All search input must be treated as untrusted. FTS5 queries must be sanitized. LIKE queries must escape wildcards.
 
+### Burn-down checklist (mistakes we fixed hundreds of times, 2026-03 → 2026-10)
+
+Each item maps to a `frostwire-engineer` §1 mantra. Grep the diff for the smell; if it's there, ask for the fix or the reason.
+
+- [ ] **Every first call is I/O** — on a UI-reachable path: `new Font(...)` by family name, `NumberFormat`/`DecimalFormat`/`SimpleDateFormat`/`Collator` creation, `UIManager.getUI`, a component type the app hasn't built before, `JEditorPane`/HTML text. Is it warmed up in `JdkWarmUp` with the *same* arguments (FORMAT-category locale, the font the UI uses)?
+- [ ] **The OS on the UI thread** — `JFileChooser`, `FileSystemView`, `getSystemIcon`, `Desktop.open/browse`, `Runtime.exec`/`ProcessBuilder.start`, `Toolkit.sync()`, `Transferable.getTransferData` in `canImport`. These belong on a worker.
+- [ ] **Getters that wait** — `BTEngine.getInstance()` (latch), `th.status()`, `Future.get()`, `CountDownLatch.await()` reachable from the EDT, the main thread, a renderer or a shared serial queue task. Use `getInstanceIfReady()` / cached values.
+- [ ] **Pools fed by UI threads** — `new ThreadPoolExecutor(0, …`, `allowCoreThreadTimeOut(true)`, bounded queues, `newProcessingQueue` used from the EDT. Workers must stay alive and submits must not reject.
+- [ ] **Waiting inside a shared queue** — `await`/`get`/`getInstance`/network calls inside `BackgroundQueuedExecutorService.schedule` or `postToHandler(MISC, …)`; `safeInvokeAndWait` from a pool thread.
+- [ ] **Renderers are stamps** — in `getTableCellRendererComponent`, `getListCellRendererComponent`, `paint*`, `onBindViewHolder`: no `add*Listener`, `setVisible`, `File.*` checks, JNI getters, or new objects per call.
+- [ ] **Refresh scope** — `revalidate()`, `fireTableDataChanged()`, `notifyDataSetChanged()` on a timer or per tick; full-range row events. Holder/row value classes need `equals`/`hashCode` for change detection; DiffUtil must compare snapshots, not objects mutated in place.
+- [ ] **Lock the map, not the work** — inside `synchronized`/locks that UI code also takes: JNI getters (including in log messages), image decode, disk, sorting.
+- [ ] **Freed means gone** — any use of a jlibtorrent SWIG object, stream or handle after `delete()`/`close()`/`release()`, including in a later `finally` or retry path.
+- [ ] **Counts and floats from input** — `new byte[len]`/`new X[count]` straight after a `read*`; range checks on `float`/`double` without `Double.isFinite`; does the parser fix still accept valid edge files (fixture for each)?
+- [ ] **Walks** — recursive `listFiles()`/`Files.walk` without an entry cap, symlink policy and cancellation (`BoundedFileWalker`).
+- [ ] **`common/` on Android** — new JDK API calls (check the API level), `KeyPairGenerator`/`Signature`/`KeyAgreement.getInstance` without an explicit provider, `catch (GeneralSecurityException` around optional algorithms (also needs `LinkageError`).
+- [ ] **Foreground services** — `return` before `startForeground()` in `onStartCommand`; `stopService` while a start may be pending.
+- [ ] **Static initializers and window events** — I/O in `static {}`, `windowClosing`, `componentResized`; settings saved more than once on shutdown.
+- [ ] **Dropped results** — ignored return values of `Handler.post`, `offer`, `File.delete`/`mkdirs`/`renameTo`; HTTP downloads saved without checking the status code.
+- [ ] **Only a click is a choice** — code paths that select a UI state programmatically must not write the user's preference setting.
+- [ ] **Network retries** — idempotent GETs may retry once after a dropped connection; timeouts are never retried.
+- [ ] **Shape, not site** — did the fix search every caller, sibling class and OS branch with the same pattern? Ask for the grep.
+- [ ] **Tests prove behavior** — a test that reads production source text is a last resort; is a behavioral test possible? Does a desktop JVM test claim to cover Android behavior? Live-network tests and `freePort()`-then-bind are flaky by design.
+
 ---
 
 ## 3. Security
