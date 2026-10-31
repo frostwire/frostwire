@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.frostwire.licenses.Licenses;
 import com.frostwire.util.Bencode;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -190,6 +191,22 @@ class BTInfoAdditionalMetadataHolderTest {
     }
   }
 
+  @Test
+  void licenseWithANonUtf8KeyKeepsPaymentOptions() {
+    // libtorrent accepts any byte string as a key; the pure-Java decoder refuses non-UTF-8 keys.
+    Map<String, Object> info = info();
+    info.put("license", Map.of("~", "x"));
+    info.put("paymentOptions", Map.of("paymentOptions", Map.of("bitcoin", "bitcoin:1abc")));
+    byte[] torrent = Bencode.encode(Map.of("info", info));
+    replace(torrent, "1:~".getBytes(StandardCharsets.US_ASCII), new byte[] {'1', ':', (byte) 0xff});
+
+    BTInfoAdditionalMetadataHolder holder =
+        new BTInfoAdditionalMetadataHolder(torrent, "Jazz Collection.flac");
+
+    assertNull(holder.getLicenseBroker());
+    assertEquals("bitcoin:1abc", holder.getPaymentOptions().bitcoin);
+  }
+
   /** A minimal single-file info dictionary libtorrent accepts. */
   private static Map<String, Object> info() {
     Map<String, Object> info = new LinkedHashMap<>();
@@ -205,5 +222,16 @@ class BTInfoAdditionalMetadataHolderTest {
   private static BTInfoAdditionalMetadataHolder read(Map<String, Object> info) {
     byte[] torrent = Bencode.encode(Map.of("info", info));
     return new BTInfoAdditionalMetadataHolder(torrent, "Jazz Collection.flac");
+  }
+
+  /** Overwrites the only occurrence of {@code from} in {@code bytes} with {@code to}. */
+  private static void replace(byte[] bytes, byte[] from, byte[] to) {
+    for (int i = 0; i + from.length <= bytes.length; i++) {
+      if (Arrays.equals(bytes, i, i + from.length, from, 0, from.length)) {
+        System.arraycopy(to, 0, bytes, i, to.length);
+        return;
+      }
+    }
+    throw new IllegalArgumentException("not found");
   }
 }
