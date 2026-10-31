@@ -52,7 +52,7 @@ When in doubt, apply the closest mantra. They are not slogans — each one maps 
 | **"Fail closed, not crashed"** | Native code, deserialization, network calls — guard recoverable failures and fall back; Java catches cannot stop a native process crash |
 | **"Off the EDT / off the main thread"** | JNI, I/O, parsing, heavy computation, network, DB writes |
 | **"Fix the violation, never mute the detector"** | StrictMode, StrictEdtMode, compiler/lint warnings, assertions, tests, authentication checks, timeouts, monitoring |
-| **"jlibtorrent already handles this"** | Before building custom persistence (e.g. `ip_filter`, session state) |
+| **"jlibtorrent already handles this — prove it first"** | Before building custom persistence: check the installed API restores the state across a restart. Counter-example: `ip_filter.db` was deleted because session state "persists ip_filter", then restored six days later because it doesn't (2a5ecbdbd, #1291) |
 | **"Delete code, don't hoard it"** | Refactors, cleanup, removing dead layers — net-negative LoC is good |
 | **"One change, one commit"** | Git history hygiene when authorized — keep tightly-coupled changes together when splitting would break builds or contracts |
 | **"If you can't explain it, simplify it"** | Design review, PR description — explanation friction = design friction |
@@ -71,6 +71,39 @@ When in doubt, apply the closest mantra. They are not slogans — each one maps 
 | **"Change the constant, audit the assertions"** | Public constant or user-visible label changed → grep every test asserting the old value/label BEFORE push (`MAX_FORWARD_TARGETS` 3→30, `"Local"`→`"Local (test)"` both broke CI) |
 | **"Suite width matches change width"** | Narrow changes get narrow suites; `common/` constants or shared helpers get the FULL module suite. The ttl-clamp regression passed the relay package suite and failed CI deterministically elsewhere |
 | **"Same seed, same network"** | Comparative benchmarks/simulations: common random numbers for every candidate, or the ranking is seed luck. Rare-hit swung ±30pp across seeds on identical configs (2026-07) |
+
+
+### Mantras from the 7.0.3 → 7.1.3 bug burn-down
+
+Mined from 2,284 fix commits (Icebase, Crashlytics, fuzzing, reviews; 2026-03 → 2026-10). 166 of 507 desktop changelog fixes were freezes. Each mantra names the mistake we kept making; the commits are in `git log` for anyone who wants the evidence.
+
+| Mantra | The mistake it prevents |
+|--------|------------------------|
+| **"Every first call is I/O"** | ~60 EDT stalls were the JDK setting something up lazily on first use: fonts and glyph fallback, locale number/date data, collators, look-and-feel UI classes, the HTML engine, line-break rules, app classes read from the jar. Warm them up off the EDT at startup — or, better, don't need them on the EDT. |
+| **"Warm exactly what the EDT will ask for"** | A warm-up with different arguments warms nothing: `Locale.getDefault()` instead of `Locale.getDefault(Locale.Category.FORMAT)` (4ee7abe33), the app's `UIManager` keys but not the look and feel's own fonts (76c753978). Use the same call, locale, font and size the UI uses. |
+| **"Ask the OS on a background thread"** | Shell/COM (`JFileChooser`, `FileSystemView.getSystemIcon`), `Desktop.open/browse`, `Runtime.exec`, `Toolkit.sync()`, drag `canImport` (an OLE call per mouse move), native cursors: ~20 stalls. Anything that talks to the OS is I/O. |
+| **"Getters never wait"** | `BTEngine.getInstance()` parked callers on a startup latch with no timeout (4 fixes, 110 call sites remain); `th.status()` blocked the Android UI thread in `pthread_cond_wait`. A call that can park says so in its name; UI code uses `getInstanceIfReady()` or a cached value. |
+| **"A cache with a blocking fallback is not a cache"** | A miss must return a default and schedule the load, never call JNI/disk inline. |
+| **"The EDT enqueues; it never starts threads"** | Pools with core 0 / `allowCoreThreadTimeOut` let workers die, so the next EDT submit started an OS thread (six fixes, one pool at a time). Pools fed by UI threads keep a warm core and never reject (`WarmExecutors`; 22a9af298 made `DesktopParallelExecutor` unbounded after 21 callers ignored `RejectedExecutionException`). |
+| **"Never wait inside a shared serial queue"** | One task parked on a latch or a 10 s network wait stalls every task behind it (`BackgroundQueuedExecutorService`, Android `MISC` handler). |
+| **"Repaint what changed; never revalidate on a timer"** | `revalidate()` every second re-laid out the whole window; full-range row events repainted every cell. Scope events to the changed rows and compare by value first. |
+| **"Renderers are stamps"** | No listeners, `setVisible`, disk access or per-call allocation in `getTableCellRendererComponent` / `onBindViewHolder`. One renderer added a listener per paint: 100 cells, 100 listeners. |
+| **"Diff by value, never a mutated object against itself"** | DiffUtil compared each in-place-mutated Transfer to itself, so "Finished" never showed (four commits to fix). Snapshot immutable row values. |
+| **"Lock the map, not the work"** | Under a lock UI code also takes: no JNI (even a log line calling `getDisplayName()`), no decode, no disk, no sort. |
+| **"Freed means gone"** | After `delete()`/`close()`, never touch the object. `fetchMagnet` freed its `error_code` and called `clear()` on it: every magnet fetch killed the JVM (jlibtorrent 2.0.15.0–2.0.15.2). jlibtorrent 2.0.15.3 throws `IllegalStateException` now; don't rely on it. |
+| **"Count before you allocate; NaN passes every range check"** | Parsers allocated from a declared count (14 MP4 box types, ID3 frames) and `x < 0 \|\| x > MAX` let NaN through (karma energy). Check counts against bytes remaining; use `Double.isFinite`. |
+| **"A parser fix keeps the format"** | A crash fix that rejects valid files is a new bug (MP4 entry-count fix broke DASH `trun`). Add valid edge fixtures next to the crash input. |
+| **"Every walk has a budget"** | Recursive `listFiles()` followed symlinks with no visited set: StackOverflow, OOM on 512 MB heaps. Cap entries, don't follow links, stay cancellable. |
+| **"`common/` runs on API 26 and Conscrypt"** | Desktop tests passed code that threw on Android 8–12 (`Arrays.compareUnsigned`, X25519 three attempts, SunEC-only key handling). Lint NewApi, pass explicit providers, catch `LinkageError` for optional APIs. |
+| **"Promote first, stop last"** | `startForeground()` before any early return; never stop a service whose start is still pending. |
+| **"No I/O in static initializers or window events"** | A settings class saved its file in `static {}`; `windowClosing` saved every settings file on the EDT and shutdown saved them again. Save once, on the shutdown path, off the EDT. |
+| **"Check the return value that means dropped"** | `Handler.post()` returning false after the looper quit silently dropped every later task; an HTTP 403 body was saved as a 0-byte file and reported complete. |
+| **"Only a click is a choice"** | Code that selects something on the user's behalf (a tab, a filter) must not save it as the user's preference: search results switched the tab to Video and the next search remembered it. |
+| **"Retry the drop, not the timeout"** | An idempotent request that lost its connection is worth one retry (archive.org HTTP/2 resets emptied a whole engine); a timeout is not, it only doubles the wait. |
+| **"Fix the shape, not the site"** | The same mistake came back through a new report again and again (six "keep the worker alive" fixes, icon lookups fixed per OS). Grep every caller, platform and sibling class in the same change. |
+| **"Test behavior where it fails"** | ~60 tests read production source text; they prove code shape, not behavior (the wrong-locale warm-up passed them). Desktop JVM tests can't see Android providers or API levels. Prefer a behavioral test; when only a source check is possible, say so. |
+| **"The network and the clock are not fixtures"** | Live-site tests fail CI when the site is slow; `freePort()` releases a port before the server binds it (#1424). Record responses as fixtures; bind port 0 and read it back. |
+| **"Sample the stall while it is happening"** | A freeze sample in a cheap frame (`Container.add`, a constructor) means the time went earlier in the same event, or into a GC pause on a small heap; look there before calling it fixed. |
 
 ---
 
@@ -165,6 +198,7 @@ These are hard-won from multi-hop mesh E2E + adversarial review (MentisDB frostw
 - **Desktop**: All heavy ops (JNI, I/O, network, parsing, DB writes) on a background executor. Use `GUIMediator.safeInvokeLater()` for UI updates; it posts TO the EDT and does not offload work.
 - **Android**: All heavy ops on a background thread. Never network or disk I/O on the main thread. Use `SystemUtils.postToHandler(HandlerThreadName.MISC, runnable)` for non-urgent work, `HandlerThreadName.HIGH_PRIORITY` for short user-tap actions (play button, open file) targeting <100 ms response. Inspect the selected helper: some handlers spawn threads rather than provide a bounded queue; priority is not a latency guarantee.
 - **JNI calls to jlibtorrent must never happen on the EDT.** Always offload to a background executor.
+- **"Heavy" includes work that doesn't look heavy.** The freezes we fixed mostly came from: first use of a JDK facility (fonts, glyphs, locale data, collators, look-and-feel classes, the HTML engine), loading app classes from the jar, the OS shell (file choosers, system icons, `Desktop`, `Runtime.exec`), creating threads, blocking getters (`BTEngine.getInstance()`), `File.exists/isDirectory/listFiles` in renderers or drag handlers, and I/O in static initializers. Warm the unavoidable ones up at startup in `JdkWarmUp` with the exact arguments the EDT will use.
 - **Strict EDT is enabled on desktop**: `StrictEdtMode` installs a timing `EventQueue` at startup and reports any dispatch event exceeding 2 seconds. Treat every report as a defect; never wait on a latch, `Future`, DHT/JNI call, network request, disk operation, or lock with unbounded contention from the EDT.
 
 ### Never Hide Diagnostic Failures
@@ -176,7 +210,8 @@ These are hard-won from multi-hop mesh E2E + adversarial review (MentisDB frostw
 
 ### Desktop Executor Selection
 
-- `DesktopParallelExecutor.execute(...)` is a four-worker bounded executor for independent, reorder-safe work such as file I/O, network fetches, media resolution, and parallel searches. Its bounded queue may reject bursts; callers that cannot drop work must handle `RejectedExecutionException`. Catch and log failures inside submitted `Runnable`s because `execute` exposes no result.
+- `DesktopParallelExecutor.execute(...)` is a four-worker pool for independent, reorder-safe work such as file I/O, network fetches, media resolution, and parallel searches. Its workers stay alive and its queue is unbounded (`WarmExecutors`, 22a9af298), so a submit from the EDT never starts a thread and never throws `RejectedExecutionException`. Catch and log failures inside submitted `Runnable`s because `execute` exposes no result.
+- Any new pool fed from the EDT or the Android main thread follows the same rule: a live core worker and no rejection (see **"The EDT enqueues; it never starts threads"**).
 - `BackgroundQueuedExecutorService.schedule(...)` is a single-worker FIFO queue. Use it only when serialization is required for correctness: shared torrent/UI model state, ordered restore/mutation, or operations that must not overlap. Keep every task short; one slow task delays every queued GUI-background operation.
 - Neither executor may mutate Swing. Snapshot EDT state before dispatching, perform blocking work in the executor, then use `GUIMediator.safeInvokeLater(...)` for the smallest possible UI update. Do not use `safeInvokeAndWait` from background work unless the call chain is proven not to depend on the waiting executor.
 
@@ -280,6 +315,14 @@ These are hard-won from multi-hop mesh E2E + adversarial review (MentisDB frostw
 - ExoPlayer: `.setLooper(handlerThread.getLooper())` is mandatory.
 - OnPreferenceChangeListener callbacks run on the main thread. Calls to BTEngine, TransferManager, or ConfigurationManager that perform JNI, disk, or other blocking work must be dispatched with `postToHandler(MISC, ...)`; `return true` immediately where the existing preference contract allows it. Do not do a synchronous read-back to verify the write. Inspect actual method behavior rather than labeling every accessor a StrictMode violation.
 
+### Lifecycle, Services and Shared Code (learned from Crashlytics/ANR fixes)
+
+- **Foreground services:** call `startForeground()` before any early return in `onStartCommand`, and never `stopService()` a service whose `startForegroundService()` is still pending (`ForegroundServiceDidNotStartInTimeException`, 25 events on Android 12).
+- **Handlers:** `Handler.post()` returns false once the looper has quit, and the task is dropped silently. Check it, or replace the dead handler (`SystemUtils` HandlerFactory does).
+- **Off-main is not off-UI:** work moved off the main thread must not mutate views, and its exceptions must still surface. Moving filter callbacks to a worker mutated views and swallowed errors (b2241d84f).
+- **Lists:** `DiffUtil`/`submitList` over objects mutated in place compares each object to itself and never updates; diff immutable snapshots with value `equals`.
+- **`common/` on old Android:** code in `common/` runs on API 26 with Conscrypt. A desktop test passing proves nothing about `Arrays.compareUnsigned` (API 33), `UnicodeBlock` constants (API 34) or a crypto algorithm Conscrypt doesn't have. Android CI's lint NewApi gate (993d3c0f9) catches the API part; for crypto, pass the provider explicitly and catch `LinkageError`/`NoClassDefFoundError`, not only `GeneralSecurityException`.
+
 ### EditTextPreference
 
 - EditTextPreference ALWAYS reads/writes its value as `String` via `SharedPreferences.putString()`/`getString()`. If a corresponding key is stored as `Integer` anywhere (`ConfigurationDefaults`, etc.), the preference will crash with `ClassCastException` at inflation time.
@@ -315,7 +358,7 @@ These are hard-won from multi-hop mesh E2E + adversarial review (MentisDB frostw
 ### Prefer Library-Native Persistence
 
 - If the underlying library (libtorrent / jlibtorrent) already persists the required state (e.g. `save_state_flags_t.all()`, `ip_filter`, DHT items, session state), **do not build a parallel persistence layer**. Verify the installed API's flags and coverage; do not assume it persists every example.
-- Real example: removed `ip_filter.db` (149 lines) because jlibtorrent persists `ip_filter` via session state. Net-negative LoC, fewer bugs.
+- Prove it before deleting your code: test that the state survives a session restart. Real counter-example: `ip_filter.db` (149 lines) was removed because session state was believed to persist `ip_filter` (281ab14b0), then restored six days later because `save_state_flags_t.all()` does not restore it (2a5ecbdbd, #1291). `ip_filter.db` is still the source of truth.
 
 ### DHT Primitives (Do Not Invent Semantics)
 
@@ -451,7 +494,7 @@ Never batch failed tests into a "fix later" commit. Never commit `desktop/GROK_R
 
 ### Granular, Focused Commits
 
-- **One logical change per commit, only when authorized.** Example: "remove `ip_filter.db` persistence" and "move JNI calls off EDT" were split into two separate commits even though they were done together. Keep tightly-coupled edits in one buildable commit rather than splitting arbitrarily.
+- **One logical change per commit, only when authorized.** Example: "remove `ip_filter.db` persistence" and "move JNI calls off EDT" were split into two separate commits even though they were done together (and because they were split, the persistence removal could later be reverted on its own when it turned out wrong). Keep tightly-coupled edits in one buildable commit rather than splitting arbitrarily.
 - A branch with 35+ granular commits is normal for a major sweep. Squashing cosmetic / WIP commits requires explicit history-rewrite permission; never do it automatically before pushing.
 - Typical mesh security sweep review order: protocol primitive → manager policy → wire version → tests → changelog. This is not a mandate to split dependent changes into broken commits.
 
