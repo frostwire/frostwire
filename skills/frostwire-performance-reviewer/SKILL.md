@@ -383,6 +383,20 @@ Review in this order. Higher-leverage structural changes come before micro-opts.
 ### Desktop Red Flags
 
 - `TorrentHandle.status`, JNI, SQLite/JDBC, filesystem, or HTTP from Swing EDT
+- the first use of a JDK facility on the EDT: font lookup by family name,
+  glyph fallback, `NumberFormat`/`SimpleDateFormat`/`Collator` creation,
+  look-and-feel UI classes, HTML rendering, app classes read from the jar.
+  Warm them in `JdkWarmUp` with the exact arguments the EDT uses (the
+  FORMAT-category locale, not `Locale.getDefault()`)
+- shell/COM and process calls on the EDT: `JFileChooser`, system icons,
+  `Desktop`, `Runtime.exec`, `Toolkit.sync()`, `Transferable` reads in
+  `canImport`
+- `Image.getScaledInstance` (area averaging through an ImageProducer); draw
+  into a `BufferedImage` with interpolation hints instead
+- `revalidate()`/`fireTableDataChanged()` on a timer, or full-range row events
+  per tick; listeners, `setVisible` or disk checks inside renderers
+- thread pools that let their core workers die (`allowCoreThreadTimeOut`,
+  core 0): the next EDT submit pays for thread creation
 - sorting or rendering the entire transfer/index set for every repaint
 - JMX/JDWP or profiler ports enabled in release launchers
 - unmanaged child processes, duplicate IceBridge daemons, or infinite retry
@@ -392,12 +406,31 @@ Review in this order. Higher-leverage structural changes come before micro-opts.
 
 ### Common Red Flags
 
+- recursive file walks without an entry cap, symlink policy or cancellation
+  (heap and stack blow-ups on 512 MB machines)
+- a cache whose miss path calls JNI or disk inline instead of returning a
+  default and scheduling the load
+
 - a shared queue that silently evicts data while reporting success
 - ACKing before ownership acceptance at the documented transport layer, or
   treating a transport ACK as durable/application completion
 - repeated full scans caused by missing indexes or stale-cache policy
 - logging full payloads, URLs, identities, or stack traces on hot paths
 - "optimization" that weakens authentication, delivery guarantees, or cleanup
+
+### Reading Freeze Reports (StrictEdtMode / Icebase)
+
+- The stack is one sample taken when the threshold expired. A cheap top frame
+  (`Container.add`, a constructor, a map lookup, `insertTab`) means the time
+  went earlier in the same event, or into a GC pause on a small heap. Trace the
+  whole event before calling it fixed.
+- An idle EDT in the sample (`stack-missed`) means the stall ended before
+  sampling; there is nothing to fix from that report alone.
+- A warm-up only helps if it performs the same call with the same arguments the
+  EDT will; verify by checking what the reported stack actually loaded.
+- Most freezes cluster on slow machines (2 CPUs, 512 MB heap, Windows 8–10).
+  Measure there, or with an equivalent heap and CPU cap, before declaring a
+  path cheap.
 
 ## 8. Benchmark Design
 
