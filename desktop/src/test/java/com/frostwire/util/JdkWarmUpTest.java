@@ -247,7 +247,10 @@ class JdkWarmUpTest {
             "com.limegroup.gnutella.gui.options.OptionsTreeManager",
             "com.limegroup.gnutella.gui.options.panes.AbstractPaneItem",
             "com.limegroup.gnutella.gui.options.panes.TorrentSaveFolderPaneItem",
-            "com.limegroup.gnutella.gui.options.panes.SharedTorrentsDatabasePaneItem")) {
+            "com.limegroup.gnutella.gui.options.panes.SharedTorrentsDatabasePaneItem",
+            // First drag out of a table (#3315b9f6e6e7).
+            "com.limegroup.gnutella.gui.dnd.FileTransferable",
+            "com.limegroup.gnutella.gui.dnd.LimeTransferHandler")) {
       assertTrue(classNames.contains(className), className);
       assertTrue(isLoadable(className), className);
     }

@@ -193,7 +193,10 @@ public final class JdkWarmUp {
           // Options dialog, built on the first click: OptionsConstructor and the tree manager,
           // and every pane item class the tree names (it reads their label constants).
           "com.limegroup.gnutella.gui.options",
-          "com.limegroup.gnutella.gui.options.panes");
+          "com.limegroup.gnutella.gui.options.panes",
+          // Drag and drop, built on the first drag out of a table: LimeTransferHandler, the drag
+          // gesture listener and FileTransferable (Icebase #3315b9f6e6e7).
+          "com.limegroup.gnutella.gui.dnd");
 
   /** Synth-based looks (Nimbus) map every delegate key to this class, which creates "Synth"+key. */
   private static final String SYNTH_LOOK_AND_FEEL = "javax.swing.plaf.synth.SynthLookAndFeel";
