@@ -39,6 +39,8 @@ public final class Hex {
    *
    * @param data An array of characters containing hexadecimal digits
    * @return A byte array containing binary data decoded from the supplied char array.
+   * @throws IllegalArgumentException if the length is odd or a character isn't an ASCII hex digit
+   *     ({@code 0-9}, {@code a-f}, {@code A-F})
    */
   public static byte[] decode(final char[] data) {
     final int len = data.length;
@@ -118,7 +120,9 @@ public final class Hex {
    * @return An integer
    */
   private static int toDigit(final char ch, final int index) {
-    final int digit = Character.digit(ch, 16);
+    // Character.digit also takes every other Unicode decimal digit and the fullwidth A-F, which
+    // would let a peer spell the same bytes many ways: only ASCII is hex.
+    final int digit = ch < 128 ? Character.digit(ch, 16) : -1;
     if (digit == -1) {
       throw new IllegalArgumentException(
           "Illegal hexadecimal character " + ch + " at index " + index);
