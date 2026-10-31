@@ -146,16 +146,35 @@ public final class HttpBlockHeaderFetcher implements BlockHeaderSource {
     }
   }
 
+  /**
+   * Parses a block-height response of the Esplora API (Blockstream, mempool.space): the block hash
+   * as 64 hex digits. Package-private so the fuzz harness can reach it.
+   *
+   * @return the 32-byte hash, or null if the response isn't one
+   */
+  static byte[] parsePlainHash(String response) {
+    if (response == null) return null;
+    String trimmed = response.trim();
+    if (trimmed.isEmpty() || trimmed.length() != 64) {
+      return null;
+    }
+    try {
+      return Hex.decode(trimmed);
+    } catch (Throwable t) {
+      return null;
+    }
+  }
+
   /** Bitcoin block header HTTP sources, tried in priority order. */
   private enum BitcoinHeaderApi {
     BLOCKSTREAM(
         "https://blockstream.info/api/block-height/{h}",
         "https://blockstream.info/api/blocks/tip/height",
-        (resp) -> parsePlainHash(resp)),
+        HttpBlockHeaderFetcher::parsePlainHash),
     MEMPOOL(
         "https://mempool.space/api/block-height/{h}",
         "https://mempool.space/api/blocks/tip/height",
-        (resp) -> parsePlainHash(resp));
+        HttpBlockHeaderFetcher::parsePlainHash);
 
     final String blockUrlTemplate;
     final String tipUrl;
@@ -173,19 +192,6 @@ public final class HttpBlockHeaderFetcher implements BlockHeaderSource {
 
     byte[] parseBlockHash(String response) {
       return parser.parse(response);
-    }
-
-    private static byte[] parsePlainHash(String response) {
-      if (response == null) return null;
-      String trimmed = response.trim();
-      if (trimmed.isEmpty() || trimmed.length() != 64) {
-        return null;
-      }
-      try {
-        return Hex.decode(trimmed);
-      } catch (Throwable t) {
-        return null;
-      }
     }
 
     @FunctionalInterface
