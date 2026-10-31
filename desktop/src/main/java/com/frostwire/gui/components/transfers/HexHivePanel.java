@@ -58,6 +58,7 @@ import javax.swing.PopupFactory;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.Border;
@@ -122,6 +123,15 @@ public class HexHivePanel extends JPanel implements Scrollable {
 
   private volatile double renderScale = 1.0;
   private final Area renderedArea = new Area();
+
+  /**
+   * How long the width must stay put before the rows re-wrap. Re-wrapping moves every piece, so
+   * doing it on each resize event of a window drag looked like the hive being erased and painted
+   * again; the hive keeps its layout until the drag pauses.
+   */
+  static final int RELAYOUT_DELAY_MS = 150;
+
+  private final Timer relayoutTimer;
   private int lastWidth;
   private int lastHeight;
   private final ExecutorService threadPool =
@@ -192,11 +202,14 @@ public class HexHivePanel extends JPanel implements Scrollable {
         };
     addMouseListener(hoverListener);
     addMouseMotionListener(hoverListener);
+    relayoutTimer = new Timer(RELAYOUT_DELAY_MS, e -> relayoutIfWidthChanged());
+    relayoutTimer.setRepeats(false);
     addComponentListener(
         new ComponentAdapter() {
           @Override
           public void componentResized(ComponentEvent e) {
-            relayoutIfWidthChanged();
+            // during a window drag keep the painted layout, only the right edge changes
+            relayoutTimer.restart();
           }
         });
   }
