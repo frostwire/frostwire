@@ -174,7 +174,9 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
                 OptionsConstructor.SHARED_KEY,
                 I18n.tr("Configure Options"),
                 I18n.tr("You can configure the FrostWire\'s Options."))));
-    tree.addMouseListener(new DefaultMouseListener(new TreeMouseObserver(tree, popup)));
+    // Double-clicking an entry refreshes it, like F5.
+    tree.addMouseListener(
+        new DefaultMouseListener(new TreeMouseObserver(tree, popup, () -> refreshSelection(true))));
     tree.addKeyListener(
         new KeyAdapter() {
           @Override

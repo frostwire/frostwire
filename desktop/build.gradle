@@ -911,6 +911,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.tables.SeedsHolderTest"
         includeTestsMatching "com.frostwire.gui.library.LibraryActionsHolderTest"
         includeTestsMatching "com.frostwire.gui.library.LibraryFolderDropTest"
+        includeTestsMatching "com.frostwire.gui.library.LibraryTreeDoubleClickRefreshTest"
         includeTestsMatching "com.frostwire.gui.library.SavedFilesDirectoryHolderTest"
         includeTestsMatching "com.frostwire.gui.library.LibraryFilesTableRowsOffEdtTest"
         includeTestsMatching "com.frostwire.gui.library.LibraryRowFlagsTest"
