@@ -54,4 +54,27 @@ class ImageManipulatorResizeCacheTest {
   void nullIconStaysNull() {
     assertNull(ImageManipulator.resize(null, 10, 10));
   }
+
+  /**
+   * Even once per size, the first scale ran Image.getScaledInstance(SCALE_SMOOTH): area averaging
+   * pushed through an ImageProducer, which stalled the setup wizard's social page on a 2-CPU
+   * machine (Icebase #c5b25f22926a). The scaled icon must be drawn straight into a BufferedImage.
+   */
+  @Test
+  void scalingDrawsIntoABufferedImageAndKeepsTheColors() {
+    BufferedImage red = new BufferedImage(150, 150, BufferedImage.TYPE_INT_ARGB);
+    java.awt.Graphics2D g = red.createGraphics();
+    g.setColor(java.awt.Color.RED);
+    g.fillRect(0, 0, 150, 150);
+    g.dispose();
+
+    Icon scaled = ImageManipulator.resize(new ImageIcon(red), 100, 100);
+
+    assertEquals(100, scaled.getIconWidth());
+    assertEquals(100, scaled.getIconHeight());
+    java.awt.Image image = ((ImageIcon) scaled).getImage();
+    org.junit.jupiter.api.Assertions.assertTrue(
+        image instanceof BufferedImage, "scaled through an ImageProducer: " + image.getClass());
+    assertEquals(0xFFFF0000, ((BufferedImage) image).getRGB(50, 50));
+  }
 }

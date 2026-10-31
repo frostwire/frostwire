@@ -95,11 +95,49 @@ public class ImageManipulator extends RGBImageFilter {
     return sizes.computeIfAbsent(new Dimension(width, height), d -> scale(icon, width, height));
   }
 
+  /**
+   * Draws {@code icon} into a {@code width} x {@code height} image with bicubic interpolation,
+   * halving it step by step while it shrinks by more than half so the result stays smooth. This
+   * replaces Image.getScaledInstance(SCALE_SMOOTH), whose area averaging through an ImageProducer
+   * stalled the EDT for seconds on slow machines (Icebase #c5b25f22926a).
+   */
   private static Icon scale(Icon icon, int width, int height) {
+    if (width <= 0 || height <= 0) return icon;
     Image image = getImage(icon);
     if (image == null) return icon;
-    image = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-    return new ImageIcon(image);
+    int w = image.getWidth(null);
+    int h = image.getHeight(null);
+    if (w <= 0 || h <= 0) return icon;
+    BufferedImage current = toArgb(image, w, h);
+    do {
+      w = Math.max(width, w / 2 >= width ? w / 2 : width);
+      h = Math.max(height, h / 2 >= height ? h / 2 : height);
+      current = drawScaled(current, w, h);
+    } while (w != width || h != height);
+    return new ImageIcon(current);
+  }
+
+  private static BufferedImage toArgb(Image image, int w, int h) {
+    if (image instanceof BufferedImage buffered
+        && buffered.getType() == BufferedImage.TYPE_INT_ARGB) {
+      return buffered;
+    }
+    BufferedImage copy = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+    Graphics2D g = copy.createGraphics();
+    g.drawImage(image, 0, 0, null);
+    g.dispose();
+    return copy;
+  }
+
+  private static BufferedImage drawScaled(BufferedImage source, int width, int height) {
+    BufferedImage target = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+    Graphics2D g = target.createGraphics();
+    g.setRenderingHint(
+        RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+    g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+    g.drawImage(source, 0, 0, width, height, null);
+    g.dispose();
+    return target;
   }
 
   //    /**
