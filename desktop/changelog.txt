@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:The first drag of a transfer or file out of a table no longer stalls while FrostWire loads its drag-and-drop code: it is loaded at startup (#1426)
    - fix:The first right-click on a transfer no longer freezes on systems whose number and date formats differ from the display language: startup prepares the formats for the right region (#1425)
    - fix:A search engine whose server drops the connection once (archive.org does this now and then) is asked again instead of returning no results
    - maintenance:The Windows installer no longer installs a separate, unused jlibtorrent.dll and removes the one older versions left behind
