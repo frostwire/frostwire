@@ -28,6 +28,7 @@ import com.frostwire.jlibtorrent.swig.*;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
+import com.frostwire.util.StaleJlibtorrentCopies;
 import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
 import java.io.File;
@@ -186,6 +187,8 @@ public final class BTEngine extends SessionManager {
    */
   @Override
   public void start() {
+    // jlibtorrent 2.0.12.9 and older left a copy of the native library per start; see the class.
+    StaleJlibtorrentCopies.deleteInBackground();
     SessionParams params = loadSettings();
     settings_pack sp = params.swig().getSettings();
     sp.set_str(settings_pack.string_types.listen_interfaces.swigValue(), ctx.interfaces);
