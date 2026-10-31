@@ -20,6 +20,7 @@ package com.frostwire.gui.components.transfers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.limegroup.gnutella.gui.CountingRepaintManager;
@@ -216,6 +217,41 @@ class HexHivePanelTest {
         }
       }
     }
+  }
+
+  /**
+   * While the window is being dragged wider or narrower, the hive must keep the layout it has
+   * painted (only the right edge changes) and re-wrap once the resize stops: re-wrapping on every
+   * resize event moved every piece on each step of the drag, which looked like the pieces being
+   * erased and painted again.
+   */
+  @Test
+  void dragResizingRewrapsOnlyOnceTheResizeStops() throws Exception {
+    HexHivePanel panel = newPanel();
+    JViewport viewport = new JViewport();
+    viewport.setView(panel);
+    viewport.setSize(600, 200);
+    viewport.doLayout();
+    panel.updateData(adapter(300));
+    awaitRender(panel);
+    Object painted = get(panel, "drawingProperties");
+    int wideRowCount = (int) get(painted, "evenRowHexCount");
+
+    for (int width = 590; width >= 300; width -= 10) {
+      viewport.setSize(width, 200);
+      viewport.doLayout();
+      panel.dispatchEvent(new ComponentEvent(panel, ComponentEvent.COMPONENT_RESIZED));
+      assertSame(
+          painted, get(panel, "drawingProperties"), "re-wrapped during the drag at " + width);
+    }
+
+    long deadline = System.currentTimeMillis() + 5_000;
+    while (get(panel, "drawingProperties") == painted && System.currentTimeMillis() < deadline) {
+      Thread.sleep(20);
+    }
+    awaitRender(panel);
+    int narrowRowCount = (int) get(get(panel, "drawingProperties"), "evenRowHexCount");
+    assertTrue(narrowRowCount < wideRowCount, "rows must re-wrap once the resize stops");
   }
 
   /**
