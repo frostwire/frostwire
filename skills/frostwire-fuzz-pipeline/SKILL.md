@@ -68,6 +68,7 @@ Conventions:
   - `OutOfMemoryError` from an allocation sized by the input (Jazzer reports `FuzzerSecurityIssueLow: Out of memory`);
   - any Jazzer sanitizer report (`FuzzerSecurityIssue*`: ReDoS, path traversal, deserialization, SSRF, command injection);
   - a broken contract you assert: the result is `null` where the API never returns `null`, a size below `-1` where `-1` means "unparseable". Assert only what the javadoc or every caller relies on.
+  - a NaN or infinite `float`/`double` that reaches a range check: `x < 0 || x > MAX` is false for NaN, so it passes (karma energy, ae247b147). Assert `Double.isFinite` wherever a value from input feeds a budget, a size or a score.
 - **Not findings:** the checked or unchecked exceptions the API documents. Catch exactly those types, nothing broader.
 - **Seeds:** 2–5 small, valid inputs per harness that reach deep code (a real ID3v2.3 tag, a minimal `ftyp`+`moov`+`mdat` file, one row of each HTML layout a search pattern accepts). Generate binary seeds with a short script and commit only the output files. Seeds must pass: they run in `fuzzTest`.
 - **No product code changes in a harness commit.** Harness commits only add tests. Findings are fixed in their own ticket (§6).
@@ -132,6 +133,7 @@ Follow the Icebase pipeline's §3–§5: one ticket at a time on master, root ca
 
 "No longer crashes" alone rewards a patch that just rejects more input, valid input included. In #1401, rejecting ports outside 0–65535 broke existing valid data and was caught only because a compatibility test already existed. Each fix adds:
 
+- **The fix keeps the format's contract.** Rejecting the crash input is not enough if the new check also rejects valid files: the MP4 entry-count fix (5a588afaf) rejected valid DASH `trun` and constant-size `stsz` boxes and needed 222281534. Add a valid edge-case fixture next to the crash input (the largest legal count, an empty table, the variant layout) and assert it still parses.
 - **A deterministic regression test in the normal test suite** (`common/src/test/java/...` or `desktop/src/test/java/...`, in a package already in the `test` task's `includeTestsMatching` list, or add it there). It feeds the minimized input to the target as a byte or string literal and asserts the documented outcome: the documented exception, an empty result, `-1`. Verify it fails with the fix reverted. This test is what CI runs; the fuzz corpus is not.
 - **Compatibility fixtures in the same test class**, from the boundary written down in §4.3:
   - valid inputs right at the boundary, on both sides (the largest valid length and the first invalid one, an empty but valid field), asserting the **decoded values**, not just that nothing threw;
