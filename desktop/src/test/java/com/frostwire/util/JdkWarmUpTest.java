@@ -108,6 +108,15 @@ class JdkWarmUpTest {
     assertTrue(JdkWarmUp.CLASSES_TO_INITIALIZE.contains("net.miginfocom.layout.PlatformDefaults"));
   }
 
+  /**
+   * The first tooltip ran PopupFactory's static initializer on the EDT
+   * (ToolTipManager.showTipWindow, Icebase #5749af9dee1c).
+   */
+  @Test
+  void popupFactoryIsInitializedByTheWarmUp() {
+    assertTrue(JdkWarmUp.CLASSES_TO_INITIALIZE.contains("javax.swing.PopupFactory"));
+  }
+
   @Test
   void everyClassToInitializeExistsAndLoads() {
     for (String className : JdkWarmUp.CLASSES_TO_INITIALIZE) {

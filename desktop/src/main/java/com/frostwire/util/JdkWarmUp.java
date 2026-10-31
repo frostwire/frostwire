@@ -145,7 +145,10 @@ public final class JdkWarmUp {
       List.of(
           "java.awt.dnd.DragSource",
           "sun.awt.SunGraphicsCallback",
-          "net.miginfocom.layout.PlatformDefaults");
+          "net.miginfocom.layout.PlatformDefaults",
+          // ToolTipManager.showTipWindow initialized it on the EDT for the first tooltip (Icebase
+          // #5749af9dee1c).
+          "javax.swing.PopupFactory");
 
   /**
    * FrostWire packages whose classes the splash window paints with, loaded before it shows like the
