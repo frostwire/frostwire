@@ -78,13 +78,24 @@ public class SearchPerformer implements ISearchPerformer {
                        SearchPattern pattern,
                        CrawlingStrategy crawlingStrategy,
                        int timeout) {
+        this(token, keywords, encodedKeywords, pattern, crawlingStrategy, timeout,
+                HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH));
+    }
+
+    SearchPerformer(long token,
+                    String keywords,
+                    String encodedKeywords,
+                    SearchPattern pattern,
+                    CrawlingStrategy crawlingStrategy,
+                    int timeout,
+                    HttpClient httpClient) {
         this.token = token;
         this.keywords = keywords;
         this.encodedKeywords = encodedKeywords;
         this.pattern = pattern;
         this.crawlingStrategy = crawlingStrategy;
         this.timeout = timeout;
-        this.httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
+        this.httpClient = httpClient;
         this.stopped = false;
     }
 
@@ -222,7 +233,27 @@ public class SearchPerformer implements ISearchPerformer {
         return fetch(url, null, null);
     }
 
+    /**
+     * GETs {@code url}, once more if the connection failed for a reason other than a timeout. Sites
+     * occasionally drop a request (archive.org resets HTTP/2 streams with PROTOCOL_ERROR now and
+     * then), and OkHttp doesn't retry that itself, so the whole engine returned nothing. A GET is
+     * safe to repeat; a timeout isn't retried, since that would double the wait.
+     */
     public String fetch(String url, String cookie, Map<String, String> customHeaders) throws IOException {
+        try {
+            return getOnce(url, cookie, customHeaders);
+        } catch (SearchTimeoutException e) {
+            throw e;
+        } catch (IOException e) {
+            if (stopped) {
+                throw e;
+            }
+            LOG.info("Retrying " + url + " once after: " + e.getMessage());
+            return getOnce(url, cookie, customHeaders);
+        }
+    }
+
+    private String getOnce(String url, String cookie, Map<String, String> customHeaders) throws IOException {
         try {
             return httpClient.get(url, timeout, DEFAULT_USER_AGENT, null, cookie, customHeaders);
         } catch (SocketTimeoutException e) {
