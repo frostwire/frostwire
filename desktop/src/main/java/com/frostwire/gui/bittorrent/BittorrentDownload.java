@@ -35,7 +35,10 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 
 /**
  * @author gubatron
@@ -50,9 +53,8 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
   private boolean partial;
   private boolean deleteTorrentWhenRemove;
   private boolean deleteDataWhenRemove;
-  private BTInfoAdditionalMetadataHolder holder;
-  private CopyrightLicenseBroker licenseBroker;
-  private PaymentOptions paymentOptions;
+  private final MetadataLoader metadata =
+      new MetadataLoader(BackgroundQueuedExecutorService::schedule, this::readMetadata);
 
   public BittorrentDownload(BTDownload dl) {
     this.dl = dl;
@@ -258,14 +260,14 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
 
   @Override
   public PaymentOptions getPaymentOptions() {
-    setupMetadataHolder();
-    return paymentOptions;
+    MetadataLoader.Loaded loaded = metadata.get();
+    return loaded == null ? null : loaded.paymentOptions();
   }
 
   @Override
   public CopyrightLicenseBroker getCopyrightLicenseBroker() {
-    setupMetadataHolder();
-    return licenseBroker;
+    MetadataLoader.Loaded loaded = metadata.get();
+    return loaded == null ? null : loaded.licenseBroker();
   }
 
   @Override
@@ -377,25 +379,64 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
     }
   }
 
-  private final MetadataLookupGate metadataLookupGate = new MetadataLookupGate();
+  /**
+   * Loads a transfer's license and payment metadata from its .torrent in the background. The table
+   * asks for it on the EDT when it adds or updates a row, and the lookup goes through jlibtorrent
+   * (torrent_file_ptr), the resume file and a bdecode of the .torrent: on the EDT that stalled
+   * adding a transfer (Icebase #477fa2478cf3). The getters return what has been loaded so far, and
+   * the row shows it on its next update.
+   */
+  static final class MetadataLoader {
+    record Loaded(CopyrightLicenseBroker licenseBroker, PaymentOptions paymentOptions) {}
 
-  private void setupMetadataHolder() {
-    if (holder == null && metadataLookupGate.tryNow(System.nanoTime())) {
-      File torrent;
-      try {
-        torrent = dl.getTorrentFile();
-        if (torrent != null && torrent.exists() && torrent.canRead()) {
-          holder = new BTInfoAdditionalMetadataHolder(torrent, getDisplayName());
-          licenseBroker = holder.getLicenseBroker();
-          paymentOptions = holder.getPaymentOptions();
-          if (paymentOptions != null) {
-            paymentOptions.setItemName(getDisplayName());
-          }
-        }
-      } catch (Throwable e) {
-        LOG.error("Unable to setup licence holder");
-      }
+    private final MetadataLookupGate gate = new MetadataLookupGate();
+    private final Executor executor;
+    private final Supplier<Loaded> lookup;
+    private final AtomicBoolean loading = new AtomicBoolean();
+    private volatile Loaded loaded;
+
+    /**
+     * @param lookup reads the metadata, or returns null while the .torrent can't be read yet
+     */
+    MetadataLoader(Executor executor, Supplier<Loaded> lookup) {
+      this.executor = executor;
+      this.lookup = lookup;
     }
+
+    /** What has been loaded so far; starts a background lookup if none is due or running. */
+    Loaded get() {
+      Loaded current = loaded;
+      if (current == null
+          && !loading.get()
+          && gate.tryNow(System.nanoTime())
+          && loading.compareAndSet(false, true)) {
+        executor.execute(
+            () -> {
+              try {
+                loaded = lookup.get();
+              } catch (Throwable e) {
+                LOG.error("Unable to setup licence holder", e);
+              } finally {
+                loading.set(false);
+              }
+            });
+      }
+      return current;
+    }
+  }
+
+  private MetadataLoader.Loaded readMetadata() {
+    File torrent = dl.getTorrentFile();
+    if (torrent == null || !torrent.exists() || !torrent.canRead()) {
+      return null;
+    }
+    BTInfoAdditionalMetadataHolder holder =
+        new BTInfoAdditionalMetadataHolder(torrent, getDisplayName());
+    PaymentOptions paymentOptions = holder.getPaymentOptions();
+    if (paymentOptions != null) {
+      paymentOptions.setItemName(getDisplayName());
+    }
+    return new MetadataLoader.Loaded(holder.getLicenseBroker(), paymentOptions);
   }
 
   // Deletes incomplete files and empty directories
