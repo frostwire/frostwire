@@ -380,10 +380,9 @@ dependencies {
     implementation 'androidx.media3:media3-ui:1.11.1'
     implementation 'androidx.media3:media3-common:1.11.1'
 
-    def jlibtorrent_version = '2.0.15.1'
-    implementation 'com.frostwire:jlibtorrent:' + jlibtorrent_version
-    implementation 'com.frostwire:jlibtorrent-android-arm64:' + jlibtorrent_version
-    implementation 'com.frostwire:jlibtorrent-android-x86_64:' + jlibtorrent_version
+    // One Android library (AAR): the Java classes, every ABI's native library (abiFilters picks
+    // which go in the APK) and its own R8 keep rules.
+    implementation 'com.frostwire:jlibtorrent-android:2.0.15.2@aar'
 
     // Netty for IceBridge rUDP transport (in-process daemon on Android)
     implementation('io.netty:netty-all:4.2.19.Final') {

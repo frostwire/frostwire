@@ -60,8 +60,7 @@
 # GoogleBillingClient
 -keep class com.android.billingclient.api.BillingClientImpl$* { *; }
 
-# jlibtorrent
--keep class com.frostwire.jlibtorrent.swig.libtorrent_jni {*;}
+# jlibtorrent: its keep rules ship in the jlibtorrent-android AAR (proguard.txt)
 
 -keep class libcore.io.Memory { *; }
 

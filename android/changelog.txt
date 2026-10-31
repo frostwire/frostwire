@@ -1,7 +1,9 @@
 FrostWire 3.2.3 build 779 UNRELEASED
   - jlibtorrent: the copies of the libtorrent library that older versions left in the temp folder on every start (13-30 MB each) are deleted
-  - jlibtorrent: updated to 2.0.15.1 (3.2.2 shipped 2.0.12.9): libtorrent RC_2_0 with the fixes of libtorrent 2.0.13, 2.0.14, 2.0.15 and the unreleased 2.0.16 (123 commits), and OpenSSL 3.6.0 → 4.1.0
+  - jlibtorrent: updated to 2.0.15.2 (3.2.2 shipped 2.0.12.9): libtorrent RC_2_0 with the fixes of libtorrent 2.0.13, 2.0.14, 2.0.15 and the unreleased 2.0.16 (123 commits), and OpenSSL 3.6.0 → 4.1.0
   - jlibtorrent: App start no longer copies the 13.4 MB libtorrent library out of the app into its cache on every start (the copies were never deleted); Android loads it where it is installed (#1382)
+  - jlibtorrent: libtorrent objects FrostWire no longer uses (torrent info, status, entries, lists) are freed automatically instead of leaking native memory for as long as the app runs
+  - jlibtorrent: now built from the single jlibtorrent Android library (AAR), which carries its own R8 rules and native libraries for every ABI (#327)
   - jlibtorrent: BitTorrent memory leaks: every torrent, magnet, resume-data and DHT message it decoded leaked a native copy of its input (100,000 parses of a 13.5 KB torrent leaked 1.7 GB; now flat), and identity secret keys no longer stay behind in leaked native memory
   - jlibtorrent: Fewer JNI calls: data moves between Java and libtorrent in one call instead of one call per byte (1 MB: 6 ms → 0.4 ms into libtorrent, 3-4 ms → 0.1 ms back), so reading torrents, resume data and DHT items is faster and uses less battery
   - jlibtorrent: Torrents whose file names have emoji or other characters outside the basic plane download with the right names, and text that isn't valid UTF-8 no longer aborts the app in libtorrent's JNI layer
