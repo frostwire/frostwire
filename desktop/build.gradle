@@ -185,7 +185,7 @@ dependencies {
     implementation 'io.netty:netty-all:4.2.19.Final'
 
     // Also used by icebridgeCloudNatives / icebridgeJar multi-arch packaging below.
-    ext.jlibtorrent_version = '2.0.15.2'
+    ext.jlibtorrent_version = '2.0.15.3'
     def jlibtorrent_version = ext.jlibtorrent_version
 
     def os = OperatingSystem.current()

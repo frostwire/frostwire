@@ -12,7 +12,8 @@ FrostWire 7.1.3 build 335 UNRELEASED
    - fix:Resizing the window no longer makes the Transfer Detail > Pieces hive flash white or reshuffle on every step of the drag: the pieces stay put while you drag and re-wrap once when you stop
    - fix:Dragging files or folders over the Library no longer freezes the window on Windows: FrostWire no longer asks for the dragged files on every mouse move, only when you drop (#1420)
    - jlibtorrent: the copies of the libtorrent library that older versions left in the temp folder on every start (13-30 MB each) are deleted
-   - jlibtorrent: updated 2.0.12.9 → 2.0.15.2: libtorrent RC_2_0 with the fixes of libtorrent 2.0.13, 2.0.14, 2.0.15 and the unreleased 2.0.16 (123 commits), and OpenSSL 3.6.0 → 4.1.0
+   - jlibtorrent: updated 2.0.12.9 → 2.0.15.3: libtorrent RC_2_0 with the fixes of libtorrent 2.0.13, 2.0.14, 2.0.15 and the unreleased 2.0.16 (123 commits), and OpenSSL 3.6.0 → 4.1.0
+   - jlibtorrent: a programming mistake that uses a libtorrent object after freeing it now shows up as an error instead of closing the app
    - jlibtorrent: libtorrent objects FrostWire no longer uses (torrent info, status, entries, lists) are freed automatically instead of leaking native memory for as long as the app runs
    - jlibtorrent: BitTorrent memory leaks: every torrent, magnet, resume-data and DHT message it decoded leaked a native copy of its input (100,000 parses of a 13.5 KB torrent leaked 1.7 GB; now flat), and identity secret keys no longer stay behind in leaked native memory
    - jlibtorrent: Fewer JNI calls: data moves between Java and libtorrent in one call instead of one call per byte (1 MB: 6 ms → 0.4 ms into libtorrent, 3-4 ms → 0.1 ms back), so reading torrents, resume data and DHT items is faster and lighter
