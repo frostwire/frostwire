@@ -186,7 +186,13 @@ class HexHivePanelTest {
     viewport.doLayout();
     assertEquals(
         250, panel.getWidth(), "panel must shrink with the viewport, no horizontal scroll");
+    Object wide = get(panel, "drawingProperties");
     panel.dispatchEvent(new ComponentEvent(panel, ComponentEvent.COMPONENT_RESIZED));
+    // the re-wrap may wait for the resize to stop
+    long deadline = System.currentTimeMillis() + 5_000;
+    while (get(panel, "drawingProperties") == wide && System.currentTimeMillis() < deadline) {
+      Thread.sleep(20);
+    }
     awaitRender(panel);
     int narrowRowCount = (int) get(get(panel, "drawingProperties"), "evenRowHexCount");
     assertTrue(narrowRowCount < wideRowCount, "rows must re-wrap to the narrower width");
