@@ -85,8 +85,9 @@ final class LibraryFilesTransferHandler extends TransferHandler {
 
   /**
    * Whether a drop adds folders to the library: the target is a media-type or Finished Downloads
-   * node, the drag carries files, and every dragged file is a folder. {@code files} reads the
-   * dragged data from the drag source.
+   * node, the drag carries files, and (on the drop) every dragged file is a folder. {@code files}
+   * reads the dragged data from the drag source; it is only called for the drop, not from
+   * canImport.
    */
   static boolean droppingFolders(
       boolean sharedFolderReceiver,
@@ -98,6 +99,12 @@ final class LibraryFilesTransferHandler extends TransferHandler {
       // Mac doesn't have the data flavors until importData() is invoked.
       if (invokingFromCanImport && mac) {
         return true;
+      }
+      // canImport runs on every drag move: decide from the target and the flavors only. Reading the
+      // files asks the drag source for its data (a native call on Windows), so only the drop does
+      // it.
+      if (invokingFromCanImport) {
+        return sharedFolderReceiver && DNDUtils.containsFileFlavors(flavors);
       }
       return sharedFolderReceiver
           && DNDUtils.containsFileFlavors(flavors)
