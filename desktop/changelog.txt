@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:Showing a multi-line tooltip in a table no longer builds and throws away a themed text box first, so the first tooltip no longer freezes slow machines (#1422)
    - fix:The first-run setup wizard no longer freezes before it appears while it creates the default download folders: they are created during startup instead (#1421)
    - fix:The "Transfer Detail" title lines up on the left with the labels below it (such as "Total Pieces") in the Transfers tab
    - fix:Resizing the window no longer makes the Transfer Detail > Pieces hive flash white or reshuffle on every step of the drag: the pieces stay put while you drag and re-wrap once when you stop
