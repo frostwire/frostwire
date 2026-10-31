@@ -158,7 +158,11 @@ Give each finding `path:line`, trigger/preconditions, violated invariant, user i
 
 ### FrostWire-specific correctness checks
 
-- [ ] **BTEngine off UI thread** — JNI calls to jlibtorrent (`BTEngine`, `SessionManager`, `Ed25519`, `TorrentInfo`) must NEVER happen on the EDT (desktop) or main thread (Android). Use a worker such as `ThreadExecutor` or `SystemUtils.postToHandler(MISC, ...)`. `GUIMediator.safeInvokeLater()` schedules **ON** the EDT and is only for the UI result, not the expensive work.
+- [ ] **BTEngine off UI thread** — JNI calls to jlibtorrent (`BTEngine`, `SessionManager`, `Ed25519`, `TorrentInfo`) must NEVER happen on the EDT (desktop) or main thread (Android). Use a worker such as `ThreadExecutor` or `SystemUtils.postToHandler(MISC, ...)`. `GUIMediator.safeInvokeLater()` schedules **ON** the EDT and is only for the UI result, not the expensive work. It also runs **inline** when the caller is already on the EDT; where deferral matters (renderers, `getValueAt`, mid-event), require `SwingUtilities.invokeLater()`.
+- [ ] **Table models and renderers do no blocking work** — `getValueAt` runs for every row on each periodic refresh, not just visible cells. Flag JNI, native shell/icon lookups, `File.exists()`/disk, or network reached from `getValueAt`/renderers; require cached values with background loading.
+- [ ] **Renderers don't trigger per-cell side effects** — custom `TableCellRenderer`/`ListCellRenderer` components (especially `JPanel`-based) must no-op `invalidate`/`revalidate`/`repaint` and keep `validate()` to layout only; full `Container.validate()` performs a native cursor update per painted cell on macOS.
+- [ ] **Background work pins its inputs** — comparators, filters, and tasks running off the EDT must capture the sort column/filters/config once at creation. Flag code that re-reads EDT-mutated fields per comparison/iteration, and plain collections read by workers while the EDT mutates them.
+- [ ] **No pool thread waits on the EDT** — flag executor tasks whose body is `safeInvokeAndWait`/`invokeAndWait`, and `execute()` on bounded pools (`ExecutorsHelper.newFixedSizeThreadPool`: rejects beyond size+4) from the EDT without rejection handling.
 - [ ] **Android lifecycle** — are Activity/Fragment/Service callbacks guarded against null/destroyed state? Is `getContext()` null-checked?
 - [ ] **SharedPreferences thread safety** — `OnPreferenceChangeListener` callbacks run on the main thread. Any BTEngine/DB call inside must be dispatched to a background thread.
 - [ ] **Diagnostic integrity** — the change must fix the reported violation, not weaken the detector. Reject `StrictMode.allowThreadDiskReads/Writes()`, relaxed `StrictEdtMode`, disabled lint/compiler warnings, removed assertions, skipped tests, reduced monitoring, or widened exception swallowing when their purpose is to hide application defects. Require the complete diagnostic type and root-cause evidence. A narrow suppression is acceptable only for proven unavoidable third-party/platform behavior with no isolatable fix, minimal scope, documentation, and regression coverage.
@@ -434,35 +438,44 @@ These records identify prior external-service failures, not proof that a fresh f
 When completing a review, produce a structured report with findings first, ordered by severity. Retain context, summary, verification, and recommendation, but do not bury defects beneath an overview. Each finding includes trigger, evidence, impact, minimal fix, defensive validation, and open/fixed/verified/blocked status. If none, say so and list residual risks.
 
 ```markdown
+
 ## Code Review: [commit/PR description]
 
 ### Findings
 
 #### BLOCK
+
 - [file:line] Trigger/preconditions, violated invariant, evidence, impact, minimal fix, defensive validation, status.
 
 #### HIGH
+
 - [file:line] Description of the high-severity issue with the same evidence fields.
 
 #### MEDIUM
+
 - [file:line] Description of the medium issue.
 
 #### LOW
+
 - [file:line] Style nit or minor suggestion.
 
 #### INFO
+
 - Positive observations, accepted costs, or qualified follow-ups; no defect claim.
 
 ### Context
+
 - Module(s): [desktop / android / common]
 - Threat model: [trusted input / remote peer / user input / file]
 - Blast radius: [desktop-only / android-only / both via common]
 - Revision, scope, assumptions, and non-findings: [...]
 
 ### Summary
+
 [1-2 sentence summary of what the change does and whether it's ready]
 
 ### Verification
+
 - [ ] Compiles on [desktop/android/both]: exact command, revision, environment
 - [ ] Tests pass on [desktop/android/both]: exact suites/counts, failures/skips, missing gates
 - [ ] Spotless check passes (`./gradlew spotlessCheck`)
@@ -473,6 +486,7 @@ When completing a review, produce a structured report with findings first, order
 - Residual risks and unverified claims: [...]
 
 ### Recommendation
+
 [APPROVE / REQUEST CHANGES / BLOCK] for [explicit scope]
 ```
 

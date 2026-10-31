@@ -72,7 +72,6 @@ When in doubt, apply the closest mantra. They are not slogans — each one maps 
 | **"Suite width matches change width"** | Narrow changes get narrow suites; `common/` constants or shared helpers get the FULL module suite. The ttl-clamp regression passed the relay package suite and failed CI deterministically elsewhere |
 | **"Same seed, same network"** | Comparative benchmarks/simulations: common random numbers for every candidate, or the ranking is seed luck. Rare-hit swung ±30pp across seeds on identical configs (2026-07) |
 
-
 ### Mantras from the 7.0.3 → 7.1.3 bug burn-down
 
 Mined from 2,284 fix commits (Icebase, Crashlytics, fuzzing, reviews; 2026-03 → 2026-10). 166 of 507 desktop changelog fixes were freezes. Each mantra names the mistake we kept making; the commits are in `git log` for anyone who wants the evidence.
@@ -195,11 +194,12 @@ These are hard-won from multi-hop mesh E2E + adversarial review (MentisDB frostw
 
 ### Never Block the UI Thread
 
-- **Desktop**: All heavy ops (JNI, I/O, network, parsing, DB writes) on a background executor. Use `GUIMediator.safeInvokeLater()` for UI updates; it posts TO the EDT and does not offload work.
+- **Desktop**: All heavy ops (JNI, I/O, network, parsing, DB writes) on a background executor. Use `GUIMediator.safeInvokeLater()` for UI updates from background threads; it does not offload work. Note it runs the code **inline** when already on the EDT — when work must be deferred (e.g. requested from a renderer, `getValueAt`, or mid-event), use `SwingUtilities.invokeLater()`.
 - **Android**: All heavy ops on a background thread. Never network or disk I/O on the main thread. Use `SystemUtils.postToHandler(HandlerThreadName.MISC, runnable)` for non-urgent work, `HandlerThreadName.HIGH_PRIORITY` for short user-tap actions (play button, open file) targeting <100 ms response. Inspect the selected helper: some handlers spawn threads rather than provide a bounded queue; priority is not a latency guarantee.
 - **JNI calls to jlibtorrent must never happen on the EDT.** Always offload to a background executor.
 - **"Heavy" includes work that doesn't look heavy.** The freezes we fixed mostly came from: first use of a JDK facility (fonts, glyphs, locale data, collators, look-and-feel classes, the HTML engine), loading app classes from the jar, the OS shell (file choosers, system icons, `Desktop`, `Runtime.exec`), creating threads, blocking getters (`BTEngine.getInstance()`), `File.exists/isDirectory/listFiles` in renderers or drag handlers, and I/O in static initializers. Warm the unavoidable ones up at startup in `JdkWarmUp` with the exact arguments the EDT will use.
-- **Strict EDT is enabled on desktop**: `StrictEdtMode` installs a timing `EventQueue` at startup and reports any dispatch event exceeding 2 seconds. Treat every report as a defect; never wait on a latch, `Future`, DHT/JNI call, network request, disk operation, or lock with unbounded contention from the EDT.
+- **Strict EDT is enabled on desktop**: `StrictEdtMode` installs a timing `EventQueue` at startup and reports any dispatch event exceeding its threshold (2 s and halt in dev, 5 s and an Icebase report in production). Treat every report as a defect; never wait on a latch, `Future`, DHT/JNI call, network request, disk operation, or lock with unbounded contention from the EDT.
+- **Read a StrictEdtMode stack as one sample, not a verdict.** It shows where the EDT was when the timer fired. A cheap top frame (an allocation, `new JMenu`, class loading, a map put) means the time went earlier in the same event or into a JVM pause: trace everything the event did before that frame (listeners fired by the action, synchronous getters, repeated model rebuilds). JDK one-time costs (class init, first text shaping, native linkers) can be paid early on a background thread at startup.
 
 ### Never Hide Diagnostic Failures
 
@@ -210,10 +210,27 @@ These are hard-won from multi-hop mesh E2E + adversarial review (MentisDB frostw
 
 ### Desktop Executor Selection
 
-- `DesktopParallelExecutor.execute(...)` is a four-worker pool for independent, reorder-safe work such as file I/O, network fetches, media resolution, and parallel searches. Its workers stay alive and its queue is unbounded (`WarmExecutors`, 22a9af298), so a submit from the EDT never starts a thread and never throws `RejectedExecutionException`. Catch and log failures inside submitted `Runnable`s because `execute` exposes no result.
+- `DesktopParallelExecutor.execute(...)` is a four-worker executor with an unbounded queue for independent, reorder-safe work such as file I/O, network fetches, media resolution, and parallel searches; busy periods queue instead of rejecting. Coalesce periodic submitters (one outstanding scan per tick source) so the queue cannot grow without bound. Catch and log failures inside submitted `Runnable`s because `execute` exposes no result.
+- `ExecutorsHelper.newFixedSizeThreadPool(n, name)` holds only 4 waiting tasks and throws `RejectedExecutionException` beyond `n + 4`. Never call `execute` on such a pool from the EDT without handling rejection; prefer `newFixedSizeUnboundedThreadPool` when callers cannot drop work.
+- Never park a pool thread on `safeInvokeAndWait` (or any wait on the EDT) just to run EDT work: it occupies a worker while doing nothing and starves the pool. Post the EDT work directly with `SwingUtilities.invokeLater`.
 - Any new pool fed from the EDT or the Android main thread follows the same rule: a live core worker and no rejection (see **"The EDT enqueues; it never starts threads"**).
 - `BackgroundQueuedExecutorService.schedule(...)` is a single-worker FIFO queue. Use it only when serialization is required for correctness: shared torrent/UI model state, ordered restore/mutation, or operations that must not overlap. Keep every task short; one slow task delays every queued GUI-background operation.
 - Neither executor may mutate Swing. Snapshot EDT state before dispatching, perform blocking work in the executor, then use `GUIMediator.safeInvokeLater(...)` for the smallest possible UI update. Do not use `safeInvokeAndWait` from background work unless the call chain is proven not to depend on the waiting executor.
+
+### Shared State Read Off the EDT
+
+- **Swing table models are hot paths.** `getValueAt` runs for every row on each periodic refresh (change detection snapshots all rows), not only for visible cells. No JNI, native shell, disk, or network work in `getValueAt` or renderers: read cached values, and load missing ones on a worker so the next refresh picks them up.
+- **Cell renderers are stamps, not live components.** Like `DefaultTableCellRenderer`, a renderer must make `invalidate`/`revalidate`/`repaint`/property-change notifications no-ops, and a composite (panel) renderer's `validate()` should only lay out its children (`validateTree()`): `Container.validate()` also updates the cursor, which on macOS is a synchronous AppKit round-trip, and it runs for every painted cell.
+- **No HTML strings as list, table or combo items.** Default renderers call `setText` per cell on every size pass and repaint, and each `<html>` text builds a full HTML document view. Style with a custom renderer (e.g. paint an `AttributedString`) and keep the model plain text.
+- **`revalidate()` is not free.** Every layout pass ends in a native cursor update (cross-thread on Windows and macOS). Update frequently changing indicators in place, rebuild containers (`removeAll`/`add`) only on real state changes, and for per-second text use a label that revalidates only when its preferred size changes.
+- **Never add listeners from render, update or refresh paths.** Install them once (constructor or setup) or guard with a flag; a guard that checks a different listener type than the one it adds never trips, and the chain grows on every call until AWTEventMulticaster operations dominate the EDT.
+- **Debounce event storms.** Resize, drag and scroll events arrive in bursts; do expensive rebuilds once after the burst (a restartable one-shot Swing timer) and only when the relevant dimension changed.
+- **Tree models are queried per visible row.** `isLeaf`/`getChildCount` must not hit the disk; lazy file trees report directories as non-leaves and list children only on expand.
+- **No thread per periodic task.** Recurring refreshes (per transfer, per row, per tick) go to a shared, coalesced executor; creating an OS thread each time is expensive under load and can be triggered from UI getters.
+- **Per-event instrumentation must cost O(1) and clean up.** A watchdog or timer armed per event must be cancelled when the event completes (use `ScheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true)`), or every event leaves work queued.
+- **Pin parameters for background computations.** A comparator, filter, or task that runs off the EDT must capture the configuration it needs (sort column, direction, filter set) once when created, never re-read fields the EDT can change mid-run.
+- **Publish snapshots, don't share mutable collections.** For caches read by workers and changed by the EDT, replace an immutable collection wholesale through a `volatile` field (or use a concurrent/synchronized collection). Iterating or `toArray()` on a plain `HashSet` while another thread changes it throws, not just misreads.
+- **When a fix lands in one class, grep its siblings** (same base class, same pattern) for the identical bug before closing the issue.
 
 ### Thread-Safe Singletons
 
@@ -513,6 +530,11 @@ Never batch failed tests into a "fix later" commit. Never commit `desktop/GROK_R
 - **Append the exact LLM model identifier used to author the commit** at the
   end of every commit message, for example `openai/gpt-5.6-luna`.
 - First line ≤ 72 chars. Body wraps at 72. Use a blank line between summary and body.
+
+### One Source of Truth for the Version
+
+- `FrostWireUtils.FROSTWIRE_VERSION` and `BUILD_NUMBER` are the only places the desktop version lives. `build.gradle` derives `version` from it and the MCP server receives it at construction; do not add another literal copy. A version bump touches `FrostWireUtils` and the `changelog.txt` header only.
+- Fixes committed after a release tag go under the `UNRELEASED` changelog section, never into an already-tagged dated section; check `git tag --contains <commit>` before deciding where an entry belongs.
 
 ### Clean History
 
