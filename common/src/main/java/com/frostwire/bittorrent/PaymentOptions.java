@@ -58,20 +58,12 @@ public class PaymentOptions implements Mappable<String, Map<String, String>> {
    *     Bencode#decode} returns
    */
   public PaymentOptions(Map<String, Object> paymentOptionsMap) {
-    final Object paymentOptions = paymentOptionsMap.get("paymentOptions");
-    if (paymentOptions != null) {
-      final Map<String, Object> dictionary =
-          BTInfoAdditionalMetadataHolder.dictionary(paymentOptions);
-      if (dictionary.containsKey("bitcoin")) {
-        this.bitcoin = BTInfoAdditionalMetadataHolder.string(dictionary.get("bitcoin"));
-      } else {
-        this.bitcoin = null;
-      }
-      if (dictionary.containsKey("paypalUrl")) {
-        this.paypalUrl = BTInfoAdditionalMetadataHolder.string(dictionary.get("paypalUrl"));
-      } else {
-        this.paypalUrl = null;
-      }
+    // Inner options that aren't a dictionary read as none; a non-string field as null.
+    final Map<String, Object> dictionary =
+        Bencode.asDictionary(paymentOptionsMap.get("paymentOptions"));
+    if (dictionary != null) {
+      this.bitcoin = Bencode.asString(dictionary.get("bitcoin"));
+      this.paypalUrl = Bencode.asString(dictionary.get("paypalUrl"));
     } else {
       this.bitcoin = null;
       this.paypalUrl = null;

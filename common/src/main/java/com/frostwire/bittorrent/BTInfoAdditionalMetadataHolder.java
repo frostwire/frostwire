@@ -26,7 +26,6 @@ import com.frostwire.util.Bencode;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Here to factor out the initialization of additional metadata objects found inside the info map of
@@ -58,17 +57,20 @@ public class BTInfoAdditionalMetadataHolder {
    */
   public BTInfoAdditionalMetadataHolder(
       Map<String, Object> info, String paymentOptionsDisplayName) {
-    final Object licenseEntry = info.get("license");
-    final Object paymentOptionsEntry = info.get("paymentOptions");
+    // Both sections are optional and written by whoever made the torrent: one that isn't a
+    // dictionary reads as absent, and doesn't cost the other one.
+    final Map<String, Object> licenseEntry = Bencode.asDictionary(info.get("license"));
+    final Map<String, Object> paymentOptionsEntry =
+        Bencode.asDictionary(info.get("paymentOptions"));
     boolean hasLicense = licenseEntry != null;
     boolean hasPaymentOptions = paymentOptionsEntry != null;
     if (hasLicense) {
-      license = new CopyrightLicenseBroker(dictionary(licenseEntry));
+      license = new CopyrightLicenseBroker(licenseEntry);
     } else {
       license = null;
     }
     if (hasPaymentOptions) {
-      paymentOptions = new PaymentOptions(dictionary(paymentOptionsEntry));
+      paymentOptions = new PaymentOptions(paymentOptionsEntry);
     } else {
       paymentOptions = new PaymentOptions(null, null);
     }
@@ -85,35 +87,17 @@ public class BTInfoAdditionalMetadataHolder {
     final Map<String, Object> additional = new HashMap<>();
     for (String key : new String[] {"license", "paymentOptions"}) {
       final Entry value = info.get(key);
-      if (value != null) {
+      if (value == null) {
+        continue;
+      }
+      try {
         additional.put(key, Bencode.decode(value.bencode()));
+      } catch (IllegalArgumentException notCanonical) {
+        // libtorrent takes what Bencode refuses (a non-UTF-8 key, an over-limit string): a
+        // section we can't read is as good as absent.
       }
     }
     return additional;
-  }
-
-  /**
-   * The value as a dictionary, failing as jlibtorrent's {@code Entry.dictionary()} does: a missing
-   * value throws {@link NullPointerException}, any other type {@link IllegalArgumentException}.
-   */
-  static Map<String, Object> dictionary(Object value) {
-    Map<String, Object> dict = Bencode.asDictionary(Objects.requireNonNull(value));
-    if (dict == null) {
-      throw new IllegalArgumentException("not a dictionary");
-    }
-    return dict;
-  }
-
-  /**
-   * A byte string's text, failing as jlibtorrent's {@code Entry.string()} does: a missing value
-   * throws {@link NullPointerException}, any other type {@link IllegalArgumentException}.
-   */
-  static String string(Object value) {
-    String s = Bencode.asString(Objects.requireNonNull(value));
-    if (s == null) {
-      throw new IllegalArgumentException("not a byte string");
-    }
-    return s;
   }
 
   private static Map<String, Entry> getInfo(entry e) {

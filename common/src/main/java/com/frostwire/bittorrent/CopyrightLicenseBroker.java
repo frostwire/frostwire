@@ -22,6 +22,7 @@ import com.frostwire.licenses.License;
 import com.frostwire.licenses.Licenses;
 import com.frostwire.util.Bencode;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,15 +106,16 @@ public class CopyrightLicenseBroker implements Mappable<String, Map<String, Stri
       licenseCategory = LicenseCategory.NoLicense;
     }
     if (licenseCategory != LicenseCategory.NoLicense) {
-      Map<String, Object> innerMap =
-          BTInfoAdditionalMetadataHolder.dictionary(map.get(licenseCategory.toString()));
-      String licenseUrl = BTInfoAdditionalMetadataHolder.string(innerMap.get("licenseUrl"));
+      // A category that isn't a dictionary has no fields; a missing or non-string field is null.
+      Map<String, Object> innerMap = Bencode.asDictionary(map.get(licenseCategory.toString()));
+      if (innerMap == null) {
+        innerMap = Collections.emptyMap();
+      }
+      String licenseUrl = Bencode.asString(innerMap.get("licenseUrl"));
       this.license = urlToLicense.get(licenseUrl);
-      this.attributionTitle =
-          BTInfoAdditionalMetadataHolder.string(innerMap.get("attributionTitle"));
-      this.attributionAuthor =
-          BTInfoAdditionalMetadataHolder.string(innerMap.get("attributionAuthor"));
-      this.attributionUrl = BTInfoAdditionalMetadataHolder.string(innerMap.get("attributionUrl"));
+      this.attributionTitle = Bencode.asString(innerMap.get("attributionTitle"));
+      this.attributionAuthor = Bencode.asString(innerMap.get("attributionAuthor"));
+      this.attributionUrl = Bencode.asString(innerMap.get("attributionUrl"));
     } else {
       this.license = null;
       this.attributionTitle = null;
