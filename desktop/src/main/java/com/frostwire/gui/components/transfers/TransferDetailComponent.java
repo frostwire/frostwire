@@ -82,8 +82,8 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
    * default FlowLayout centered it and put a 5px gap before it.
    */
   static JPanel header(JLabel title, JLabel hideLink) {
-    JPanel labelAndLink = new JPanel(new FlowLayout());
-    hideLink.setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
+    JPanel labelAndLink = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 5));
+    hideLink.setBorder(BorderFactory.createEmptyBorder(2, 8, 0, 0));
     labelAndLink.add(title);
     labelAndLink.add(hideLink);
     return labelAndLink;
