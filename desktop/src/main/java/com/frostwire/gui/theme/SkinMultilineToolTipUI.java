@@ -38,13 +38,21 @@ public final class SkinMultilineToolTipUI extends SynthToolTipUI {
   private final CellRendererPane rendererPane;
 
   public SkinMultilineToolTipUI() {
-    this.textArea = new JTextArea();
+    // Install the plain text area UI from the start: a default JTextArea installs the look and
+    // feel's UI in its constructor, and replacing it uninstalled that again on the EDT for every
+    // tooltip (Icebase #02958c8a5b5c).
+    this.textArea =
+        new JTextArea() {
+          @Override
+          public void updateUI() {
+            setUI(new BasicTextAreaUI());
+          }
+        };
     this.rendererPane = new CellRendererPane();
     textArea.setLineWrap(true);
     textArea.setWrapStyleWord(true);
     textArea.setEditable(false);
     textArea.setOpaque(false);
-    textArea.setUI(new BasicTextAreaUI());
   }
 
   public static ComponentUI createUI(JComponent comp) {

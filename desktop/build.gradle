@@ -922,6 +922,7 @@ test {
         includeTestsMatching "com.frostwire.gui.theme.BaseFileChooserUIDirectoryComboTest"
         includeTestsMatching "com.frostwire.gui.theme.IconRepainterCacheTest"
         includeTestsMatching "com.frostwire.gui.theme.ThemeSwitchClassInitOffEdtTest"
+        includeTestsMatching "com.frostwire.gui.theme.SkinMultilineToolTipUITextAreaTest"
         includeTestsMatching "com.limegroup.gnutella.gui.init.*"
         includeTestsMatching "com.limegroup.gnutella.gui.ImageManipulatorResizeCacheTest"
         includeTestsMatching "com.limegroup.gnutella.gui.LanguageUtilsDisplayableLocalesTest"
