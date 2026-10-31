@@ -23,6 +23,12 @@ import org.junit.jupiter.api.Test;
 /**
  * Reads the license and payment options FrostWire writes into a torrent's info dictionary ({@code
  * CreateTorrentDialog}) back through libtorrent, as transfers and the library do.
+ *
+ * <p>The malformed cases were found by BTInfoAdditionalMetadataHolderFuzzTest: a license or payment
+ * section of the wrong shape (not a dictionary, a missing or non-string field) threw, so the holder
+ * lost both the license and the payment options and desktop logged an error on every retry. Both
+ * sections are optional: a malformed one reads as absent, a missing or non-string field as null,
+ * and the other section is still read.
  */
 class BTInfoAdditionalMetadataHolderTest {
 
@@ -110,6 +116,78 @@ class BTInfoAdditionalMetadataHolderTest {
     assertNull(holder.getLicenseBroker());
     assertTrue(holder.getPaymentOptions().isEmpty());
     assertEquals("Jazz Collection.flac", holder.getPaymentOptions().getItemName());
+  }
+
+  @Test
+  void licenseCategoryWithoutFieldsHasNoLicense() {
+    // Minimized from the fuzzer's input: info = {license: {public-domain: {}}}.
+    Map<String, Object> info =
+        Bencode.decodeDictionary(
+            "d7:licensed13:public-domaindeee".getBytes(StandardCharsets.US_ASCII));
+
+    BTInfoAdditionalMetadataHolder holder = new BTInfoAdditionalMetadataHolder(info, "name");
+
+    assertNull(holder.getLicenseBroker().getLicenseName());
+    assertTrue(holder.getPaymentOptions().isEmpty());
+  }
+
+  @Test
+  void licenseWithoutAttributionStillReadsItsLicense() {
+    Map<String, Object> info = info();
+    info.put(
+        "license", Map.of("creative-commons", Map.of("licenseUrl", Licenses.CC_BY_4.getUrl())));
+    info.put("paymentOptions", Map.of("paymentOptions", Map.of("paypalUrl", "http://pay.example")));
+
+    BTInfoAdditionalMetadataHolder holder = read(info);
+
+    assertSame(Licenses.CC_BY_4, holder.getLicenseBroker().license);
+    assertNull(holder.getLicenseBroker().asMap().get("creative-commons").get("attributionTitle"));
+    assertEquals("http://pay.example", holder.getPaymentOptions().paypalUrl);
+  }
+
+  @Test
+  void malformedLicenseKeepsPaymentOptions() {
+    for (Object license :
+        new Object[] {
+          0L, "cc", Map.of("open-source", 1L), Map.of("creative-commons", Map.of("licenseUrl", 7L))
+        }) {
+      Map<String, Object> info = info();
+      info.put("license", license);
+      info.put("paymentOptions", Map.of("paymentOptions", Map.of("bitcoin", "bitcoin:1abc")));
+
+      BTInfoAdditionalMetadataHolder holder = read(info);
+
+      if (holder.getLicenseBroker() != null) {
+        assertNull(holder.getLicenseBroker().getLicenseName(), String.valueOf(license));
+      }
+      assertEquals("bitcoin:1abc", holder.getPaymentOptions().bitcoin, String.valueOf(license));
+    }
+  }
+
+  @Test
+  void malformedPaymentOptionsKeepTheLicense() {
+    for (Object payment :
+        new Object[] {
+          "paypal", Map.of("paymentOptions", 5L), Map.of("paymentOptions", Map.of("bitcoin", 1L))
+        }) {
+      Map<String, Object> info = info();
+      info.put(
+          "license",
+          Map.of(
+              "public-domain",
+              Map.of(
+                  "licenseUrl", Licenses.PUBLIC_DOMAIN_CC0.getUrl(),
+                  "attributionTitle", "t",
+                  "attributionAuthor", "a",
+                  "attributionUrl", "u")));
+      info.put("paymentOptions", payment);
+
+      BTInfoAdditionalMetadataHolder holder = read(info);
+
+      assertSame(Licenses.PUBLIC_DOMAIN_CC0, holder.getLicenseBroker().license);
+      assertTrue(holder.getPaymentOptions().isEmpty(), String.valueOf(payment));
+      assertEquals("Jazz Collection.flac", holder.getPaymentOptions().getItemName());
+    }
   }
 
   /** A minimal single-file info dictionary libtorrent accepts. */
