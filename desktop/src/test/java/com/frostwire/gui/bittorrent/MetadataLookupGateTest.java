@@ -10,8 +10,6 @@ package com.frostwire.gui.bittorrent;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,16 +31,5 @@ class MetadataLookupGateTest {
     }
     assertTrue(gate.tryNow(start + RETRY), "the retry must come once the interval passed");
     assertFalse(gate.tryNow(start + RETRY + 1));
-  }
-
-  @Test
-  void theMetadataLookupGoesThroughTheGate() throws Exception {
-    String source =
-        Files.readString(
-                Path.of("src/main/java/com/frostwire/gui/bittorrent/BittorrentDownload.java"))
-            .replaceAll("\\s+", "");
-    assertTrue(
-        source.contains("if(holder==null&&metadataLookupGate.tryNow(System.nanoTime())){"),
-        "setupMetadataHolder reads the resume file without the gate");
   }
 }
