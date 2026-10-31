@@ -29,9 +29,9 @@
  */
 package com.frostwire.gui.theme;
 
+import com.limegroup.gnutella.gui.util.WarmExecutors;
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ExecutorService;
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.filechooser.FileView;
@@ -78,96 +78,48 @@ public class SkinFileChooserUI extends BaseFileChooserUI {
    *
    * @author Kirill Grouchnikov
    */
-  private class SubstanceFileView extends BasicFileView {
-    /** Cache for the file icons. */
-    private final Map<String, Icon> pathIconCache = new HashMap<>();
+  /** One worker for every chooser's icon lookups: a big folder must not flood a shared pool. */
+  private static final ExecutorService ICON_LOOKUPS = WarmExecutors.serialQueue("FileChooserIcons");
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * javax.swing.plaf.basic.BasicFileChooserUI$BasicFileView#getCachedIcon
-     * (java.io.File)
-     */
+  /**
+   * System file icons, looked up off the EDT (Icebase #e51928be4469): the list renderer asks for
+   * one per row, and on Windows each lookup waits for the shell over COM.
+   */
+  private class SubstanceFileView extends BasicFileView {
+    /** The chooser's FileSystemView, read on the EDT for the lookups that run on the worker. */
+    private volatile FileSystemView lookupView;
+
+    private final AsyncFileIconCache icons =
+        new AsyncFileIconCache(
+            ICON_LOOKUPS,
+            f -> {
+              FileSystemView view = lookupView;
+              return view != null ? view.getSystemIcon(f) : null;
+            });
+
     @Override
     public Icon getCachedIcon(File f) {
-      return pathIconCache.get(f.getPath());
+      return icons.cached(f);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * javax.swing.plaf.basic.BasicFileChooserUI$BasicFileView#getIcon(java
-     * .io.File)
-     */
     @Override
     public Icon getIcon(File f) {
-      Icon icon = getCachedIcon(f);
-      if (icon != null) return icon;
-      try {
-        icon = getDefaultIcon(f);
-      } catch (NullPointerException e) {
-        // ignore, not critical and only under special conditions (OS fragmentation)
+      JFileChooser fileChooser = getFileChooser();
+      if (fileChooser == null) {
+        return null;
       }
-      // System.out.println("System : " + f.getAbsolutePath() + " --> "
-      // + icon);
-      //            if (icon == null) {
-      //                icon = super.getIcon(f);
-      //                if (icon == null) {
-      //                    icon = new ImageIcon(SubstanceCoreUtilities.getBlankImage(
-      //                            8, 8));
-      //                }
-      //                // System.out.println("Super : " + f.getAbsolutePath() + " --> "
-      //                // + icon);
-      //            }
-      cacheIcon(f, icon);
-      return icon;
+      lookupView = fileChooser.getFileSystemView();
+      return icons.get(f, fileChooser::repaint);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * javax.swing.plaf.basic.BasicFileChooserUI$BasicFileView#cacheIcon
-     * (java.io.File, javax.swing.Icon)
-     */
     @Override
     public void cacheIcon(File f, Icon icon) {
-      pathIconCache.put(f.getPath(), icon);
+      icons.put(f, icon);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * javax.swing.plaf.basic.BasicFileChooserUI$BasicFileView#clearIconCache
-     * ()
-     */
     @Override
     public void clearIconCache() {
-      pathIconCache.clear();
-    }
-
-    /**
-     * Returns the default file icon.
-     *
-     * @param f File.
-     * @return File icon.
-     */
-    public Icon getDefaultIcon(File f) {
-      Icon icon = null;
-      JFileChooser fileChooser = getFileChooser();
-      if (fileChooser != null) {
-        FileSystemView fileSystemView = fileChooser.getFileSystemView();
-        if (fileSystemView != null) {
-          icon = fileSystemView.getSystemIcon(f);
-          //                    if (SubstanceCoreUtilities.useThemedDefaultIcon(null)) {
-          //                        icon = SubstanceCoreUtilities.getThemedIcon(fileChooser, icon);
-          //                    }
-        }
-      }
-      return icon;
+      icons.clear();
     }
   }
 }
