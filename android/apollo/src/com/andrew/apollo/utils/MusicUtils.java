@@ -134,27 +134,22 @@ public final class MusicUtils {
   private static final class PendingTrackDelete {
     private final Context context;
     private final long[] trackIds;
-    private final ArrayList<String> filePaths;
     private final boolean showNotification;
+    private final Runnable onConfirmed;
     private final Runnable onDeleted;
 
     private PendingTrackDelete(
         Context context,
         long[] trackIds,
-        ArrayList<String> filePaths,
         boolean showNotification,
+        Runnable onConfirmed,
         Runnable onDeleted) {
       this.context = getStableAppContext(context);
       this.trackIds = trackIds;
-      this.filePaths = filePaths;
       this.showNotification = showNotification;
+      this.onConfirmed = onConfirmed;
       this.onDeleted = onDeleted;
     }
-  }
-
-  private static final class TrackDeleteRequest {
-    private final ArrayList<Uri> uris = new ArrayList<>();
-    private final ArrayList<String> filePaths = new ArrayList<>();
   }
 
   static {
@@ -2396,18 +2391,38 @@ public final class MusicUtils {
   /**
    * Permanently deletes item(s) from the user's device.
    *
-   * @param context The {@link Context} to use.
+   * @param activity The {@link Activity} that shows Android's delete confirmation and receives its
+   *     result in {@link #handleDeleteTracksActivityResult}.
    * @param list The item(s) to delete.
    */
   public static void deleteTracks(
       final Activity activity, final long[] list, final Runnable onDeleted) {
-    deleteTracks(activity, list, false, onDeleted);
+    deleteTracks(activity, list, false, null, onDeleted);
   }
 
   public static void deleteTracks(
       final Activity activity,
       final long[] list,
       boolean showNotification,
+      final Runnable onDeleted) {
+    deleteTracks(activity, list, showNotification, null, onDeleted);
+  }
+
+  /**
+   * Deletes {@code list} from the device. On Android 11 and later Android asks the user first; the
+   * tracks are looked up off the main thread, then its dialog is launched from {@code activity}.
+   *
+   * @param onConfirmed runs on the main thread once the delete is certain to happen (right away
+   *     before Android 11, when the user allows it after), so the caller can drop the rows. It
+   *     never runs when the user cancels.
+   * @param onDeleted runs on the main thread after the tracks and their queue, playlist, recent and
+   *     favorite entries are gone.
+   */
+  public static void deleteTracks(
+      final Activity activity,
+      final long[] list,
+      boolean showNotification,
+      final Runnable onConfirmed,
       final Runnable onDeleted) {
     if (activity == null || list == null || list.length == 0) {
       return;
@@ -2416,44 +2431,61 @@ public final class MusicUtils {
     if (appContext == null) {
       return;
     }
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-      final TrackDeleteRequest deleteRequest = buildTrackDeleteRequest(appContext, list);
-      if (!deleteRequest.uris.isEmpty()) {
-        try {
-          synchronized (pendingTrackDeleteLock) {
-            pendingTrackDelete =
-                new PendingTrackDelete(
-                    appContext,
-                    Arrays.copyOf(list, list.length),
-                    deleteRequest.filePaths,
-                    showNotification,
-                    onDeleted);
-          }
-          activity.startIntentSenderForResult(
-              MediaStore.createDeleteRequest(activity.getContentResolver(), deleteRequest.uris)
-                  .getIntentSender(),
-              DELETE_TRACKS_REQUEST_CODE,
-              null,
-              0,
-              0,
-              0);
-          return;
-        } catch (Throwable t) {
-          synchronized (pendingTrackDeleteLock) {
-            pendingTrackDelete = null;
-          }
-          LOG.error("deleteTracks: failed to launch MediaStore delete request", t);
-        }
-      }
-    }
+    final long[] trackIds = Arrays.copyOf(list, list.length);
     SystemUtils.postToHandler(
         SystemUtils.HandlerThreadName.MISC,
         () -> {
-          deleteTracks(appContext, list, showNotification);
-          if (onDeleted != null) {
-            SystemUtils.postToUIThread(onDeleted);
+          final ArrayList<Uri> uris =
+              Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+                  ? trackUris(appContext, trackIds)
+                  : new ArrayList<>();
+          if (uris.isEmpty()) {
+            if (onConfirmed != null) {
+              SystemUtils.postToUIThread(onConfirmed);
+            }
+            deleteTracks(appContext, trackIds, showNotification);
+            if (onDeleted != null) {
+              SystemUtils.postToUIThread(onDeleted);
+            }
+            return;
           }
+          SystemUtils.postToUIThread(
+              () ->
+                  requestTrackDelete(
+                      activity, uris, trackIds, showNotification, onConfirmed, onDeleted));
         });
+  }
+
+  /** Launches Android's delete confirmation for {@code uris}; runs on the main thread. */
+  private static void requestTrackDelete(
+      final Activity activity,
+      final ArrayList<Uri> uris,
+      final long[] trackIds,
+      boolean showNotification,
+      final Runnable onConfirmed,
+      final Runnable onDeleted) {
+    if (activity.isFinishing() || activity.isDestroyed()) {
+      LOG.info("deleteTracks: activity gone before the delete request could be shown");
+      return;
+    }
+    try {
+      synchronized (pendingTrackDeleteLock) {
+        pendingTrackDelete =
+            new PendingTrackDelete(activity, trackIds, showNotification, onConfirmed, onDeleted);
+      }
+      activity.startIntentSenderForResult(
+          MediaStore.createDeleteRequest(activity.getContentResolver(), uris).getIntentSender(),
+          DELETE_TRACKS_REQUEST_CODE,
+          null,
+          0,
+          0,
+          0);
+    } catch (Throwable t) {
+      synchronized (pendingTrackDeleteLock) {
+        pendingTrackDelete = null;
+      }
+      LOG.error("deleteTracks: failed to launch MediaStore delete request", t);
+    }
   }
 
   public static boolean handleDeleteTracksActivityResult(
@@ -2473,10 +2505,12 @@ public final class MusicUtils {
       LOG.info("deleteTracks: MediaStore delete request cancelled");
       return true;
     }
+    if (pendingDelete.onConfirmed != null) {
+      pendingDelete.onConfirmed.run();
+    }
     SystemUtils.postToHandler(
         SystemUtils.HandlerThreadName.MISC,
         () -> {
-          deleteRemainingTrackFiles(pendingDelete.filePaths);
           cleanupDeletedTracks(
               pendingDelete.context, pendingDelete.trackIds, pendingDelete.showNotification);
           if (pendingDelete.onDeleted != null) {
@@ -2531,60 +2565,29 @@ public final class MusicUtils {
     cleanupDeletedTracks(appContext, list, showNotification);
   }
 
-  private static TrackDeleteRequest buildTrackDeleteRequest(
-      final Context context, final long[] list) {
-    final TrackDeleteRequest deleteRequest = new TrackDeleteRequest();
-    Cursor cursor = null;
-    try {
-      cursor =
-          context
-              .getContentResolver()
-              .query(
-                  MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                  new String[] {BaseColumns._ID, MediaColumns.DATA},
-                  buildTrackIdSelection(list),
-                  null,
-                  null);
+  /** The MediaStore uris of the tracks in {@code list} that still exist. */
+  private static ArrayList<Uri> trackUris(final Context context, final long[] list) {
+    final ArrayList<Uri> uris = new ArrayList<>();
+    try (Cursor cursor =
+        context
+            .getContentResolver()
+            .query(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                new String[] {BaseColumns._ID},
+                buildTrackIdSelection(list),
+                null,
+                null)) {
       if (cursor != null && cursor.moveToFirst()) {
         do {
-          deleteRequest.uris.add(
+          uris.add(
               ContentUris.withAppendedId(
                   MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, cursor.getLong(0)));
-          String filePath = cursor.getString(1);
-          if (filePath != null) {
-            deleteRequest.filePaths.add(filePath);
-          }
         } while (cursor.moveToNext());
       }
     } catch (Throwable t) {
       LOG.error("deleteTracks: failed to query track URIs", t);
-    } finally {
-      if (cursor != null) {
-        cursor.close();
-      }
     }
-    return deleteRequest;
-  }
-
-  private static void deleteRemainingTrackFiles(final ArrayList<String> filePaths) {
-    if (filePaths == null || filePaths.isEmpty()) {
-      return;
-    }
-    FileSystem fs = Platforms.fileSystem();
-    for (String filePath : filePaths) {
-      if (filePath == null) {
-        continue;
-      }
-      try {
-        File file = new File(filePath);
-        if (file.exists() && !fs.delete(file)) {
-          LOG.debug("deleteTracks: remaining file delete failed for " + filePath);
-        }
-      } catch (Throwable t) {
-        LOG.debug(
-            "deleteTracks: remaining file delete failed for " + filePath + ": " + t.getMessage());
-      }
-    }
+    return uris;
   }
 
   private static String buildTrackIdSelection(final long[] list) {

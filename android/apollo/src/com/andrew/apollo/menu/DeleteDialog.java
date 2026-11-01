@@ -45,8 +45,9 @@ public final class DeleteDialog extends DialogFragment {
   }
 
   /**
-   * Callback that runs immediately when the user confirms deletion, before the actual file deletion
-   * begins. Useful for optimistic UI updates.
+   * Callback that runs on the main thread once the deletion is certain (on Android 11 and later,
+   * after the user allows Android's own delete request), before the files and their playlist,
+   * recent and favorite entries are cleaned up. Lets the caller drop the rows right away.
    */
   public interface DeleteDialogPreDeleteCallback {
     void onDeleteConfirmed(long[] id);
@@ -144,25 +145,25 @@ public final class DeleteDialog extends DialogFragment {
       if (mFetcher != null) {
         mFetcher.removeFromCache(key);
       }
-      final Activity activity = getActivity();
-      final Activity activityRef = activity;
+      final Activity activityRef = getActivity();
       final long[] deletedIds = mItemList;
-      // Optimistic UI update: notify caller immediately so adapter can remove items
-      // before the background deletion completes.
-      if (preDeleteCallback != null) {
-        preDeleteCallback.onDeleteConfirmed(deletedIds);
-      }
+      final DeleteDialogPreDeleteCallback confirmedCallback = preDeleteCallback;
+      // Runs once the delete is certain, after Android's own confirmation on 11+, so a cancelled
+      // delete leaves the rows in place.
+      final Runnable onConfirmed =
+          confirmedCallback != null ? () -> confirmedCallback.onDeleteConfirmed(deletedIds) : null;
+      final DeleteDialogCallback deletedCallback = onDeleteCallback;
       final Runnable onDeleted =
           () -> {
             if (activityRef instanceof DeleteDialogCallback) {
               ((DeleteDialogCallback) activityRef).onDelete(deletedIds);
             }
-            if (onDeleteCallback != null) {
-              onDeleteCallback.onDelete(deletedIds);
+            if (deletedCallback != null) {
+              deletedCallback.onDelete(deletedIds);
             }
           };
       if (activityRef != null) {
-        MusicUtils.deleteTracks(activityRef, deletedIds, onDeleted);
+        MusicUtils.deleteTracks(activityRef, deletedIds, false, onConfirmed, onDeleted);
       } else {
         MusicUtils.deleteTracks(getContext(), deletedIds);
       }
