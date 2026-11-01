@@ -1,0 +1,1 @@
+{"_type":"playlist","title":"Sanitized playlist","extractor":"youtube:tab","entries":[{"id":"abc","title":"First","url":"https://www.youtube.com/watch?v=abc","duration":120,"view_count":10,"upload_date":"20231231"},{"id":"def","title":"Second","webpage_url":"https://www.youtube.com/watch?v=def","thumbnail":"https://i.ytimg.com/vi/def/hq720.jpg","duration":61}]}1
