@@ -122,6 +122,11 @@ public class SoundcloudDownload extends HttpBTDownload {
         && sr.getHash().equals(((SoundcloudDownload) obj).sr.getHash());
   }
 
+  @Override
+  public int hashCode() {
+    return sr.getHash().hashCode();
+  }
+
   private boolean setAlbumArt(String mp3Filename, String mp3outputFilename) {
     if (sr.isHls()) {
       return false; // AAC/M4A cannot be tagged by the MP3 ID3 writer.

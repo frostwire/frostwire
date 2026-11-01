@@ -1,5 +1,7 @@
 package org.limewire.util;
 
+import java.util.Objects;
+
 /**
  * Compares versions using major, minor, service and revision values. You must include a major
  * version in the string, however you may omit the other fields. When applicable, the string version
@@ -62,6 +64,12 @@ class Version implements Comparable<Version> {
   /** Equality. */
   public boolean equals(Object o) {
     return o instanceof Version && compareTo((Version) o) == 0;
+  }
+
+  @Override
+  public int hashCode() {
+    // Same fields compareTo, and so equals, compares; the version string is not one of them.
+    return Objects.hash(major, minor, service, revision);
   }
 
   /**

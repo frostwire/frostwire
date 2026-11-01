@@ -3,6 +3,7 @@ package com.limegroup.gnutella;
 import com.limegroup.gnutella.gui.I18n;
 import java.io.Serializable;
 import java.util.*;
+import java.util.Objects;
 import org.limewire.collection.Comparators;
 import org.limewire.util.FileUtils;
 
@@ -273,5 +274,10 @@ public class MediaType implements Serializable {
       return schema.equals(type.schema) && exts.equals(type.exts);
     }
     return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(schema, exts);
   }
 }

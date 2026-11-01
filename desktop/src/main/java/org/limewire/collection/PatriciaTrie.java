@@ -1290,6 +1290,12 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
       }
     }
 
+    /** The hash Map.Entry specifies, consistent with equals above. */
+    @Override
+    public int hashCode() {
+      return Objects.hashCode(getKey()) ^ Objects.hashCode(getValue());
+    }
+
     /**
      * Whether or not the entry is storing a key. Only the root can potentially be empty, all other
      * nodes must have a key.

@@ -38,4 +38,10 @@ class AllowFilter implements TableLineFilter<SearchResultDataLine> {
   public boolean equals(Object o) {
     return (o instanceof AllowFilter);
   }
+
+  @Override
+  public int hashCode() {
+    // Every AllowFilter equals every other one.
+    return AllowFilter.class.hashCode();
+  }
 }
