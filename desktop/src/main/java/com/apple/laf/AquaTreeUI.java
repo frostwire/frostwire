@@ -5,7 +5,7 @@ import javax.swing.plaf.ComponentUI;
 
 @SuppressWarnings("unused")
 public class AquaTreeUI {
-    public static ComponentUI createUI(@SuppressWarnings("unused") JComponent comp) {
-        return null;
-    }
+  public static ComponentUI createUI(@SuppressWarnings("unused") JComponent comp) {
+    return null;
+  }
 }

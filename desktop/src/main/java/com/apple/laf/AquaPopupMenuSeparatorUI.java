@@ -5,7 +5,7 @@ import javax.swing.plaf.ComponentUI;
 
 @SuppressWarnings("unused")
 public class AquaPopupMenuSeparatorUI {
-    public static ComponentUI createUI(JComponent comp) {
-        return null;
-    }
+  public static ComponentUI createUI(JComponent comp) {
+    return null;
+  }
 }
