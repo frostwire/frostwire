@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:Opening a search tab, the transfer menu's Scrape Tracker and Check Local Data, and sharing a file from a transfer's Files tab no longer freeze the window while a new thread starts: they use background workers that are already running (#1457)
    - fix:Torrents that use only the new BitTorrent v2 format no longer disappear from Transfers after a restart: their saved copy now keeps the v2 piece hashes (#1383)
    - fix:Freeze reports no longer include stalls inside Windows' own touch-keyboard check on mouse clicks, which FrostWire can't change (#1438)
    - fix:FrostWire with thousands of transfers no longer crashes with a stack overflow, and every transfer update does far less work: torrent events reach their transfer through one lookup instead of every transfer checking each one (#1441)
