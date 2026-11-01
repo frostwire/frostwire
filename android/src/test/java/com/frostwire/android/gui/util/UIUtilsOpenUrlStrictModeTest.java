@@ -21,14 +21,14 @@ public class UIUtilsOpenUrlStrictModeTest {
   @Test
   public void openUrlLaunchesOffMainThreadWithoutRelaxingStrictMode() throws Exception {
     String source = readProjectFile("src/main/java/com/frostwire/android/gui/util/UIUtils.java");
-    String openUrl = blockStartingAt(source, "public static void openURL");
+    String openUrl = code(blockStartingAt(source, "public static void openURL"));
 
     assertTrue(
         openUrl.contains(
-            "SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () ->"));
-    assertTrue(openUrl.contains("launchContext.startActivity(intent);"));
-    assertTrue(openUrl.contains("SystemUtils.postToUIThread("));
-    assertFalse(openUrl.contains("StrictMode"));
+            code("SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () ->")));
+    assertTrue(openUrl.contains(code("launchContext.startActivity(intent);")));
+    assertTrue(openUrl.contains(code("SystemUtils.postToUIThread(")));
+    assertFalse(openUrl.contains(code("StrictMode")));
   }
 
   private static String blockStartingAt(String source, String marker) {
@@ -56,5 +56,13 @@ public class UIUtilsOpenUrlStrictModeTest {
       file = root.resolve("android").resolve(relativePath);
     }
     return new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
+  }
+
+  /**
+   * The text without whitespace, so the checks don't depend on how google-java-format wraps a
+   * statement.
+   */
+  private static String code(String s) {
+    return s.replaceAll("\\s+", "");
   }
 }
