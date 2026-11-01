@@ -33,6 +33,8 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -340,7 +342,12 @@ public final class OptionsConstructor {
       Class<? extends AbstractPaneItem>... clazzes) {
     OptionsTreeNode node =
         TREE_MANAGER.addNode(parentKey, childKey, label, label + " " + extractLabels(clazzes));
-    node.setClasses(List.of(clazzes));
+    // Copied element by element: handing the varargs array itself on is unchecked.
+    List<Class<? extends AbstractPaneItem>> classes = new ArrayList<>(clazzes.length);
+    for (Class<? extends AbstractPaneItem> clazz : clazzes) {
+      classes.add(clazz);
+    }
+    node.setClasses(Collections.unmodifiableList(classes));
     keysToNodes.put(childKey, node);
     return node;
   }
