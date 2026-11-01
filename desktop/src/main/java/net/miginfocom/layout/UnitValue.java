@@ -294,6 +294,8 @@ public final class UnitValue implements Serializable {
    *     value is not connected to any component.
    * @return The size in pixels.
    */
+  // LOOKUP falls through to LABEL_ALIGN when the lookup is UNABLE, as in upstream MigLayout.
+  @SuppressWarnings("fallthrough")
   private float getPixelsExact(float refValue, ContainerWrapper parent, ComponentWrapper comp) {
     if (parent == null) return 1;
     if (oper == STATIC) {
@@ -367,6 +369,7 @@ public final class UnitValue implements Serializable {
         case LOOKUP:
           float res = lookup(refValue, parent, comp);
           if (res != UnitConverter.UNABLE) return res;
+        // fall through: an unresolved lookup uses the label alignment
         case LABEL_ALIGN:
           return PlatformDefaults.getLabelAlignPercentage() * refValue;
         case IDENTITY:

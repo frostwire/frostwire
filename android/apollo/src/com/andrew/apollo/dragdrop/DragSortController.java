@@ -201,6 +201,7 @@ public class DragSortController extends SimpleFloatViewManager
 
   /** {@inheritDoc} */
   @Override
+  @SuppressWarnings("fallthrough") // ACTION_UP also does ACTION_CANCEL's reset
   public boolean onTouch(View v, MotionEvent ev) {
     mDetector.onTouchEvent(ev);
     if (mRemoveEnabled
@@ -226,6 +227,7 @@ public class DragSortController extends SimpleFloatViewManager
             mDslv.stopDrag(true);
           }
         }
+      // fall through: lifting the finger ends the drag like a cancel does
       case MotionEvent.ACTION_CANCEL:
         mDragging = false;
         break;

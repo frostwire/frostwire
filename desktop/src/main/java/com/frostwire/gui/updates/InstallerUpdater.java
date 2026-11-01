@@ -255,6 +255,7 @@ class InstallerUpdater implements Runnable {
           }
 
           @Override
+          @SuppressWarnings("fallthrough") // a resumed update is checked like a finished piece
           public void alert(Alert<?> alert) {
             try {
               if (checkIfDownloaded()) {
@@ -299,6 +300,7 @@ class InstallerUpdater implements Runnable {
               switch (type) {
                 case TORRENT_RESUMED:
                   printTorrentHandleStatus(th);
+                // fall through: a resumed update may already be complete
                 case FILE_ERROR:
                 case PIECE_FINISHED:
                   printTorrentHandleStatus(th);
