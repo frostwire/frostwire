@@ -55,6 +55,7 @@ public class EngineParticipationTest {
   }
 
   @Test
+  @SuppressWarnings("try") // courier only scopes the static mock
   public void networkPauseCanResumeButNeverReusesRetiredService() throws Exception {
     Engine engine = engine();
     EngineForegroundService old = mock(EngineForegroundService.class);
