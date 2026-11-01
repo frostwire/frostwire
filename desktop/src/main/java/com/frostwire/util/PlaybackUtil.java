@@ -18,56 +18,51 @@
 
 package com.frostwire.util;
 
+import java.io.File;
 import org.limewire.util.FileUtils;
 
-import java.io.File;
-
 /**
- * Utility class for audio/media playback support
- * Replaced custom MediaPlayer with OS default player
+ * Utility class for audio/media playback support Replaced custom MediaPlayer with OS default player
  */
 public class PlaybackUtil {
 
-    private static final String[] PLAYABLE_EXTENSIONS = new String[]{
-        "mp3", "ogg", "wav", "wma", "wmv", "m4a", "aac", "flac", "mp4", "flv",
-        "avi", "mov", "mkv", "mpg", "mpeg", "3gp", "m4v", "webm"
-    };
+  private static final String[] PLAYABLE_EXTENSIONS =
+      new String[] {
+        "mp3", "ogg", "wav", "wma", "wmv", "m4a", "aac", "flac", "mp4", "flv", "avi", "mov", "mkv",
+        "mpg", "mpeg", "3gp", "m4v", "webm"
+      };
 
-    /**
-     * Get list of playable file extensions
-     */
-    public static String[] getPlayableExtensions() {
-        return PLAYABLE_EXTENSIONS;
-    }
+  /** Get list of playable file extensions */
+  public static String[] getPlayableExtensions() {
+    return PLAYABLE_EXTENSIONS;
+  }
 
-    /**
-     * Check if a file is playable
-     */
-    public static boolean isPlayableFile(File file) {
-        return file != null && file.exists() && !file.isDirectory() &&
-               FileUtils.hasExtension(file.getAbsolutePath(), PLAYABLE_EXTENSIONS);
-    }
+  /** Check if a file is playable */
+  public static boolean isPlayableFile(File file) {
+    return file != null
+        && file.exists()
+        && !file.isDirectory()
+        && FileUtils.hasExtension(file.getAbsolutePath(), PLAYABLE_EXTENSIONS);
+  }
 
-    /**
-     * Check if a file path is playable
-     */
-    public static boolean isPlayableFile(String filename) {
-        return filename != null && FileUtils.hasExtension(filename, PLAYABLE_EXTENSIONS);
-    }
+  /** Check if a file path is playable */
+  public static boolean isPlayableFile(String filename) {
+    return filename != null && FileUtils.hasExtension(filename, PLAYABLE_EXTENSIONS);
+  }
 
-    /**
-     * Check if a file is currently being played
-     * With OS default player, we cannot track this accurately
-     */
-    public static boolean isThisBeingPlayed(String filename) {
-        return false; // Cannot track playback with OS default player
-    }
+  /**
+   * Check if a file is currently being played With OS default player, we cannot track this
+   * accurately
+   */
+  public static boolean isThisBeingPlayed(String filename) {
+    return false; // Cannot track playback with OS default player
+  }
 
-    /**
-     * Check if a file is currently being played
-     * With OS default player, we cannot track this accurately
-     */
-    public static boolean isThisBeingPlayed(File file) {
-        return false; // Cannot track playback with OS default player
-    }
+  /**
+   * Check if a file is currently being played With OS default player, we cannot track this
+   * accurately
+   */
+  public static boolean isThisBeingPlayed(File file) {
+    return false; // Cannot track playback with OS default player
+  }
 }

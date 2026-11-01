@@ -20,28 +20,26 @@ package com.frostwire.util;
 
 import java.io.File;
 
-/**
- * Simple wrapper for files or URLs to be played/opened
- */
+/** Simple wrapper for files or URLs to be played/opened */
 public class MediaSource {
-    private final File file;
-    private final String url;
+  private final File file;
+  private final String url;
 
-    public MediaSource(File file) {
-        this.file = file;
-        this.url = null;
-    }
+  public MediaSource(File file) {
+    this.file = file;
+    this.url = null;
+  }
 
-    public MediaSource(String url) {
-        this.file = null;
-        this.url = url;
-    }
+  public MediaSource(String url) {
+    this.file = null;
+    this.url = url;
+  }
 
-    public File getFile() {
-        return file;
-    }
+  public File getFile() {
+    return file;
+  }
 
-    public String getURL() {
-        return url;
-    }
+  public String getURL() {
+    return url;
+  }
 }

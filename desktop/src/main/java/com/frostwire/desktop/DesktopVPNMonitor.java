@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -21,202 +21,209 @@ package com.frostwire.desktop;
 import com.frostwire.platform.VPNMonitor;
 import com.frostwire.regex.Pattern;
 import com.frostwire.util.Logger;
-import org.apache.commons.io.IOUtils;
 import com.frostwire.util.OSUtils;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
+import org.apache.commons.io.IOUtils;
 
 /**
  * @author gubatron
  * @author aldenml
  */
 final class DesktopVPNMonitor implements VPNMonitor {
-    private static final Logger LOG = Logger.getLogger(DesktopVPNMonitor.class);
-    // PIA with kill switch after a restart adds 0.0.0.0 0.0.0.0 10.x.x.x.x 10.x.x.x.x NN as the first route
-    // when VPN is active
-    private static final Pattern PIA_KILL_SWITCH_ROUTE_PATTERN =
-            Pattern.compile(".*?(0\\.0\\.0\\.0).*?(0\\.0\\.0\\.0).*?(10\\.\\d*\\.\\d*\\.\\d*).*(10\\.\\d*\\.\\d*\\.\\d*).*?(\\d\\d)");
-    private boolean active;
+  private static final Logger LOG = Logger.getLogger(DesktopVPNMonitor.class);
+  // PIA with kill switch after a restart adds 0.0.0.0 0.0.0.0 10.x.x.x.x 10.x.x.x.x NN as the first
+  // route
+  // when VPN is active
+  private static final Pattern PIA_KILL_SWITCH_ROUTE_PATTERN =
+      Pattern.compile(
+          ".*?(0\\.0\\.0\\.0).*?(0\\.0\\.0\\.0).*?(10\\.\\d*\\.\\d*\\.\\d*).*(10\\.\\d*\\.\\d*\\.\\d*).*?(\\d\\d)");
+  private boolean active;
 
-    DesktopVPNMonitor() {
-        this.active = false;
-    }
+  DesktopVPNMonitor() {
+    this.active = false;
+  }
 
-    private static boolean isWindowsVPNActive() {
-        try {
-            String[] output = readProcessOutput("netstat", "-nr").split("\r\n");
-            for (String line : output) {
-                if (line.contains("128.0.0.0") || piaVPNWithKillSwitchOn(line)) {
-                    return true;
-                }
-            }
-        } catch (Throwable e) {
-            LOG.error("Error detecting VPN", e);
+  private static boolean isWindowsVPNActive() {
+    try {
+      String[] output = readProcessOutput("netstat", "-nr").split("\r\n");
+      for (String line : output) {
+        if (line.contains("128.0.0.0") || piaVPNWithKillSwitchOn(line)) {
+          return true;
         }
-        return false;
+      }
+    } catch (Throwable e) {
+      LOG.error("Error detecting VPN", e);
     }
+    return false;
+  }
 
-    private static String readProcessOutput(String command, String arguments) {
-        return readProcessOutput(command, arguments, true);
-    }
+  private static String readProcessOutput(String command, String arguments) {
+    return readProcessOutput(command, arguments, true);
+  }
 
-    private static String readProcessOutput(String command, String arguments, boolean logErrors) {
-        String result = "";
-        ProcessBuilder pb = new ProcessBuilder(command, arguments);
-        pb.redirectErrorStream(true);
-        try {
-            Process process = pb.start();
-            InputStream stdout = process.getInputStream();
-            final BufferedReader brstdout = new BufferedReader(new InputStreamReader(stdout));
-            String line;
-            try {
-                StringBuilder sb = new StringBuilder();
-                while ((line = brstdout.readLine()) != null) {
-                    sb.append(line).append("\r\n");
-                }
-                result = sb.toString();
-            } catch (Throwable e) {
-                if (logErrors) {
-                    LOG.error("Error reading routing table command output", e);
-                }
-            } finally {
-                IOUtils.closeQuietly(brstdout);
-                IOUtils.closeQuietly(stdout);
-            }
-        } catch (Throwable e) {
-            if (logErrors) {
-                LOG.error("Error executing routing table command", e);
-            }
+  private static String readProcessOutput(String command, String arguments, boolean logErrors) {
+    String result = "";
+    ProcessBuilder pb = new ProcessBuilder(command, arguments);
+    pb.redirectErrorStream(true);
+    try {
+      Process process = pb.start();
+      InputStream stdout = process.getInputStream();
+      final BufferedReader brstdout = new BufferedReader(new InputStreamReader(stdout));
+      String line;
+      try {
+        StringBuilder sb = new StringBuilder();
+        while ((line = brstdout.readLine()) != null) {
+          sb.append(line).append("\r\n");
         }
-        return result;
-    }
-
-    private static boolean piaVPNWithKillSwitchOn(String line) {
-        return PIA_KILL_SWITCH_ROUTE_PATTERN.matcher(line).matches();
-    }
-
-    private static String netstatCmd() {
-        String cmd = "netstat";
-        if (OSUtils.isMacOSX() && new File("/usr/sbin/netstat").exists()) {
-            cmd = "/usr/sbin/netstat";
+        result = sb.toString();
+      } catch (Throwable e) {
+        if (logErrors) {
+          LOG.error("Error reading routing table command output", e);
         }
-        return cmd;
+      } finally {
+        IOUtils.closeQuietly(brstdout);
+        IOUtils.closeQuietly(stdout);
+      }
+    } catch (Throwable e) {
+      if (logErrors) {
+        LOG.error("Error executing routing table command", e);
+      }
+    }
+    return result;
+  }
+
+  private static boolean piaVPNWithKillSwitchOn(String line) {
+    return PIA_KILL_SWITCH_ROUTE_PATTERN.matcher(line).matches();
+  }
+
+  private static String netstatCmd() {
+    String cmd = "netstat";
+    if (OSUtils.isMacOSX() && new File("/usr/sbin/netstat").exists()) {
+      cmd = "/usr/sbin/netstat";
+    }
+    return cmd;
+  }
+
+  @Override
+  public boolean active() {
+    return active;
+  }
+
+  @Override
+  public void refresh() {
+    if (OSUtils.isMacOSX() || OSUtils.isLinux()) {
+      active = isPosixVPNActive();
+    } else if (OSUtils.isWindows()) {
+      active = isWindowsVPNActive();
+    }
+  }
+
+  /**
+   * <strong>VPN ON (Mac)</strong>
+   *
+   * <pre>Internet:
+   * Destination        Gateway            Flags        Refs      Use   Netif Expire
+   * 0/1                10.81.10.5         UGSc            5        0   utun1
+   * ...</pre>
+   *
+   * <p><strong>VPN ON (Linux)</strong>
+   *
+   * <pre>Kernel IP routing table
+   * Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+   * 0.0.0.0         10.31.10.5      128.0.0.0       UG        0 0          0 tun0
+   * ...</pre>
+   *
+   * @return true if it finds a line that starts with "0" and contains "tun" in the output of
+   *     "netstat -nr"
+   */
+  private boolean isPosixVPNActive() {
+    // First try pure Java network interface enumeration (works without external commands)
+    if (isVPNActiveViaNetworkInterfaces()) {
+      return true;
     }
 
-    @Override
-    public boolean active() {
-        return active;
-    }
-
-    @Override
-    public void refresh() {
-        if (OSUtils.isMacOSX() || OSUtils.isLinux()) {
-            active = isPosixVPNActive();
-        } else if (OSUtils.isWindows()) {
-            active = isWindowsVPNActive();
-        }
-    }
-
-    /**
-     * <strong>VPN ON (Mac)</strong>
-     * <pre>Internet:
-     * Destination        Gateway            Flags        Refs      Use   Netif Expire
-     * 0/1                10.81.10.5         UGSc            5        0   utun1
-     * ...</pre>
-     * <p>
-     * <strong>VPN ON (Linux)</strong>
-     * <pre>Kernel IP routing table
-     * Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
-     * 0.0.0.0         10.31.10.5      128.0.0.0       UG        0 0          0 tun0
-     * ...</pre>
-     *
-     * @return true if it finds a line that starts with "0" and contains "tun" in the output of "netstat -nr"
-     */
-    private boolean isPosixVPNActive() {
-        // First try pure Java network interface enumeration (works without external commands)
-        if (isVPNActiveViaNetworkInterfaces()) {
+    // On Linux, try modern 'ip route' command before falling back to netstat
+    if (OSUtils.isLinux()) {
+      try {
+        String[] output = readProcessOutput("ip", "route", false).split("\r\n");
+        for (String line : output) {
+          if (line.contains("default")
+              && (line.contains("tun") || line.contains("tap") || line.contains("wg"))) {
             return true;
+          }
         }
-
-        // On Linux, try modern 'ip route' command before falling back to netstat
-        if (OSUtils.isLinux()) {
-            try {
-                String[] output = readProcessOutput("ip", "route", false).split("\r\n");
-                for (String line : output) {
-                    if (line.contains("default") &&
-                            (line.contains("tun") || line.contains("tap") || line.contains("wg"))) {
-                        return true;
-                    }
-                }
-            } catch (Throwable ignored) {
-            }
-        }
-
-        // Fallback to netstat for macOS and legacy Linux
-        String netstat = netstatCmd();
-        if (netstat.contains(File.separator) && !new File(netstat).exists()) {
-            return false;
-        }
-
-        try {
-            String[] output = readProcessOutput(netstat, "-nr", false).split("\r\n");
-            for (String line : output) {
-                boolean _0_0_0_0_tunnel_check = line.startsWith("0") && line.contains("tun");
-                boolean default_ipsec0_check = line.startsWith("default") && line.contains("ipsec");
-                if (_0_0_0_0_tunnel_check || default_ipsec0_check) {
-                    return true;
-                }
-            }
-        } catch (Throwable e) {
-            LOG.error("Error detecting VPN via netstat", e);
-        }
-        return false;
+      } catch (Throwable ignored) {
+      }
     }
 
-    private static boolean isVPNActiveViaNetworkInterfaces() {
-        try {
-            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-            if (interfaces != null) {
-                while (interfaces.hasMoreElements()) {
-                    NetworkInterface ni = interfaces.nextElement();
-                    String name = ni.getName();
-                    if (name != null && ni.isUp() && !ni.isLoopback()) {
-                        String lower = name.toLowerCase();
-                        if (lower.contains("tun") || lower.contains("tap") ||
-                                lower.contains("wg") || lower.contains("utun") ||
-                                lower.contains("ppp") || lower.contains("ipsec") ||
-                                lower.contains("vpn")) {
-                            // On macOS, utun* interfaces are used for both VPNs and system
-                            // services (iCloud, Back to My Mac). Verify the interface has
-                            // a real IPv4 address (not just fe80:: link-local) to avoid
-                            // false positives from dormant system tunnels.
-                            if (lower.contains("utun")) {
-                                boolean hasRealAddress = false;
-                                Enumeration<java.net.InetAddress> addrs = ni.getInetAddresses();
-                                while (addrs.hasMoreElements()) {
-                                    java.net.InetAddress addr = addrs.nextElement();
-                                    if (addr instanceof java.net.Inet4Address && !addr.isLinkLocalAddress()) {
-                                        hasRealAddress = true;
-                                        break;
-                                    }
-                                }
-                                if (!hasRealAddress) {
-                                    continue; // skip system utun interfaces with only link-local addresses
-                                }
-                            }
-                            return true;
-                        }
-                    }
-                }
-            }
-        } catch (Throwable e) {
-            // ignore - important, but no need to crash
-        }
-        return false;
+    // Fallback to netstat for macOS and legacy Linux
+    String netstat = netstatCmd();
+    if (netstat.contains(File.separator) && !new File(netstat).exists()) {
+      return false;
     }
+
+    try {
+      String[] output = readProcessOutput(netstat, "-nr", false).split("\r\n");
+      for (String line : output) {
+        boolean _0_0_0_0_tunnel_check = line.startsWith("0") && line.contains("tun");
+        boolean default_ipsec0_check = line.startsWith("default") && line.contains("ipsec");
+        if (_0_0_0_0_tunnel_check || default_ipsec0_check) {
+          return true;
+        }
+      }
+    } catch (Throwable e) {
+      LOG.error("Error detecting VPN via netstat", e);
+    }
+    return false;
+  }
+
+  private static boolean isVPNActiveViaNetworkInterfaces() {
+    try {
+      Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+      if (interfaces != null) {
+        while (interfaces.hasMoreElements()) {
+          NetworkInterface ni = interfaces.nextElement();
+          String name = ni.getName();
+          if (name != null && ni.isUp() && !ni.isLoopback()) {
+            String lower = name.toLowerCase();
+            if (lower.contains("tun")
+                || lower.contains("tap")
+                || lower.contains("wg")
+                || lower.contains("utun")
+                || lower.contains("ppp")
+                || lower.contains("ipsec")
+                || lower.contains("vpn")) {
+              // On macOS, utun* interfaces are used for both VPNs and system
+              // services (iCloud, Back to My Mac). Verify the interface has
+              // a real IPv4 address (not just fe80:: link-local) to avoid
+              // false positives from dormant system tunnels.
+              if (lower.contains("utun")) {
+                boolean hasRealAddress = false;
+                Enumeration<java.net.InetAddress> addrs = ni.getInetAddresses();
+                while (addrs.hasMoreElements()) {
+                  java.net.InetAddress addr = addrs.nextElement();
+                  if (addr instanceof java.net.Inet4Address && !addr.isLinkLocalAddress()) {
+                    hasRealAddress = true;
+                    break;
+                  }
+                }
+                if (!hasRealAddress) {
+                  continue; // skip system utun interfaces with only link-local addresses
+                }
+              }
+              return true;
+            }
+          }
+        }
+      }
+    } catch (Throwable e) {
+      // ignore - important, but no need to crash
+    }
+    return false;
+  }
 }
