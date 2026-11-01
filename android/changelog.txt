@@ -1,4 +1,5 @@
 FrostWire 3.2.3 build 779 UNRELEASED
+  - fix:FrostWire with thousands of transfers no longer crashes with a stack overflow, and every transfer update does far less work: torrent events reach their transfer through one lookup instead of every transfer checking each one (#1441)
   - fix:Pasting a SoundCloud link whose answer holds an empty track now downloads the other tracks instead of doing nothing (#1433)
   - fix:Cloud video links whose details come back empty no longer crash the app (#1434)
   - fix:Cloud video and playlist results without an upload date no longer crash or show another result's date (#1435)
