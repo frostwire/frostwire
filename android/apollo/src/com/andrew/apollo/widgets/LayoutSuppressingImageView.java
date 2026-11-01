@@ -17,28 +17,23 @@ import android.util.AttributeSet;
 import android.widget.ImageView;
 
 /**
- * A custom {@link ImageView} that improves the performance by not passing
- * requestLayout() to its parent, taking advantage of knowing that image size
- * won't change once set.
+ * A custom {@link ImageView} that improves the performance by not passing requestLayout() to its
+ * parent, taking advantage of knowing that image size won't change once set.
  */
 public class LayoutSuppressingImageView extends androidx.appcompat.widget.AppCompatImageView {
 
-    /**
-     * @param context The {@link Context} to use
-     * @param attrs The attributes of the XML tag that is inflating the view
-     */
-    public LayoutSuppressingImageView(final Context context, final AttributeSet attrs) {
-        super(context, attrs);
+  /**
+   * @param context The {@link Context} to use
+   * @param attrs The attributes of the XML tag that is inflating the view
+   */
+  public LayoutSuppressingImageView(final Context context, final AttributeSet attrs) {
+    super(context, attrs);
+  }
 
-    }
-
-    /**
-     * We're not calling super.requestLayout() on purpose
-     */
-    @SuppressLint("MissingSuperCall")
-    @Override
-    public void requestLayout() {
-        forceLayout();
-    }
-
+  /** We're not calling super.requestLayout() on purpose */
+  @SuppressLint("MissingSuperCall")
+  @Override
+  public void requestLayout() {
+    forceLayout();
+  }
 }

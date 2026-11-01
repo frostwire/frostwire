@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -27,13 +27,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
-
 import com.andrew.apollo.adapters.PagerAdapter;
 import com.andrew.apollo.adapters.PagerAdapter.MusicFragments;
 import com.andrew.apollo.ui.fragments.AlbumFragment;
@@ -46,286 +44,281 @@ import com.andrew.apollo.utils.PreferenceUtils;
 import com.andrew.apollo.utils.SortOrder;
 import com.frostwire.android.R;
 
-import java.util.Objects;
-
 /**
- * This class is used to hold the {@link ViewPager} used for swiping between the
- * playlists, recent, artists, albums, songs, and genre {@link Fragment}
- * s for phones.
- * <p>
- * NOTE: The reason the sort orders are taken care of in this fragment rather
- * than the individual fragments is to keep from showing all of the menu
- * items on tablet interfaces. That being said, I have a tablet interface
- * worked out, but I'm going to keep it in the Play Store version of
- * Apollo for a couple of weeks or so before merging it with CM.
+ * This class is used to hold the {@link ViewPager} used for swiping between the playlists, recent,
+ * artists, albums, songs, and genre {@link Fragment} s for phones.
+ *
+ * <p>NOTE: The reason the sort orders are taken care of in this fragment rather than the individual
+ * fragments is to keep from showing all of the menu items on tablet interfaces. That being said, I
+ * have a tablet interface worked out, but I'm going to keep it in the Play Store version of Apollo
+ * for a couple of weeks or so before merging it with CM.
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public final class MusicBrowserPhoneFragment extends Fragment {
 
-    /**
-     * Pager
-     */
-    private ViewPager mViewPager;
+  /** Pager */
+  private ViewPager mViewPager;
 
-    /**
-     * VP's adapter
-     */
-    private PagerAdapter mPagerAdapter;
+  /** VP's adapter */
+  private PagerAdapter mPagerAdapter;
 
-    private PreferenceUtils mPreferences;
+  private PreferenceUtils mPreferences;
 
-    /**
-     * Empty constructor as per the {@link Fragment} documentation
-     */
-    public MusicBrowserPhoneFragment() {
+  /** Empty constructor as per the {@link Fragment} documentation */
+  public MusicBrowserPhoneFragment() {}
+
+  @Override
+  public void onCreate(final Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    // Get the preferences
+    mPreferences = PreferenceUtils.getInstance();
+  }
+
+  @Override
+  public View onCreateView(
+      final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
+    // The View for the fragment's UI
+    final ViewGroup rootView =
+        (ViewGroup) inflater.inflate(R.layout.fragment_music_browser_phone, container, false);
+
+    // Initialize the adapter
+    mPagerAdapter = new PagerAdapter((AppCompatActivity) requireActivity());
+    final MusicFragments[] mFragments = MusicFragments.values();
+    for (final MusicFragments mFragment : mFragments) {
+      mPagerAdapter.add(mFragment.getFragmentClass(), null);
     }
 
-    @Override
-    public void onCreate(final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // Get the preferences
-        mPreferences = PreferenceUtils.getInstance();
-    }
+    // Initialize the ViewPager
+    mViewPager = rootView.findViewById(R.id.fragment_home_phone_pager);
+    // Attach the adapter
+    mViewPager.setAdapter(mPagerAdapter);
+    // Offscreen pager loading limit
+    mViewPager.setOffscreenPageLimit(mPagerAdapter.getCount() - 1);
+    // Start on the last page the user was on
+    mViewPager.setCurrentItem(mPreferences.getStartPage());
+    mViewPager.setClickable(true);
 
-    @Override
-    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
-                             final Bundle savedInstanceState) {
-        // The View for the fragment's UI
-        final ViewGroup rootView = (ViewGroup) inflater.inflate(
-                R.layout.fragment_music_browser_phone, container, false);
+    return rootView;
+  }
 
-        // Initialize the adapter
-        mPagerAdapter = new PagerAdapter((AppCompatActivity) requireActivity());
-        final MusicFragments[] mFragments = MusicFragments.values();
-        for (final MusicFragments mFragment : mFragments) {
-            mPagerAdapter.add(mFragment.getFragmentClass(), null);
-        }
-
-        // Initialize the ViewPager
-        mViewPager = rootView.findViewById(R.id.fragment_home_phone_pager);
-        // Attach the adapter
-        mViewPager.setAdapter(mPagerAdapter);
-        // Offscreen pager loading limit
-        mViewPager.setOffscreenPageLimit(mPagerAdapter.getCount() - 1);
-        // Start on the last page the user was on
-        mViewPager.setCurrentItem(mPreferences.getStartPage());
-        mViewPager.setClickable(true);
-
-
-        return rootView;
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        requireActivity().addMenuProvider(new MenuProvider() {
-            @Override
-            public void onPrepareMenu(@NonNull Menu menu) {
+  @Override
+  public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+    super.onViewCreated(view, savedInstanceState);
+    requireActivity()
+        .addMenuProvider(
+            new MenuProvider() {
+              @Override
+              public void onPrepareMenu(@NonNull Menu menu) {
                 updateFavoriteMenuItemIcon(menu);
-            }
+              }
 
-            @Override
-            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+              @Override
+              public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
                 if (isPlaylistPage()) {
-                    menuInflater.inflate(R.menu.player_new_playlist, menu);
+                  menuInflater.inflate(R.menu.player_new_playlist, menu);
                 }
 
                 // Favorite action
                 if (isSongPage()) {
-                    menuInflater.inflate(R.menu.player_favorite, menu);
+                  menuInflater.inflate(R.menu.player_favorite, menu);
                 }
                 // Shuffle all
                 menuInflater.inflate(R.menu.player_shuffle, menu);
                 // Sort orders
                 if (isArtistPage()) {
-                    menuInflater.inflate(R.menu.player_artist_sort_by, menu);
-                    menuInflater.inflate(R.menu.player_view_as, menu);
+                  menuInflater.inflate(R.menu.player_artist_sort_by, menu);
+                  menuInflater.inflate(R.menu.player_view_as, menu);
                 } else if (isAlbumPage()) {
-                    menuInflater.inflate(R.menu.player_album_sort_by, menu);
-                    menuInflater.inflate(R.menu.player_view_as, menu);
+                  menuInflater.inflate(R.menu.player_album_sort_by, menu);
+                  menuInflater.inflate(R.menu.player_view_as, menu);
                 } else if (isSongPage()) {
-                    menuInflater.inflate(R.menu.player_song_sort_by, menu);
+                  menuInflater.inflate(R.menu.player_song_sort_by, menu);
                 }
-            }
+              }
 
-            @Override
-            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+              @Override
+              public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
                 int itemId = menuItem.getItemId();
                 if (itemId == R.id.menu_player_shuffle) {
-                    Context context = getStableAppContext();
-                    if (context != null) {
-                        MusicUtils.shuffleAll(context);
-                    }
-                    return true;
+                  Context context = getStableAppContext();
+                  if (context != null) {
+                    MusicUtils.shuffleAll(context);
+                  }
+                  return true;
                 } else if (itemId == R.id.menu_player_favorite) {
-                    MusicUtils.toggleFavorite();
-                    requireActivity().invalidateOptionsMenu();
-                    return true;
+                  MusicUtils.toggleFavorite();
+                  requireActivity().invalidateOptionsMenu();
+                  return true;
                 } else if (itemId == R.id.menu_player_sort_by_az) {
-                    if (isArtistPage()) {
-                        mPreferences.setArtistSortOrder(SortOrder.ArtistSortOrder.ARTIST_A_Z);
-                        getArtistFragment().refresh();
-                    } else if (isAlbumPage()) {
-                        mPreferences.setAlbumSortOrder(SortOrder.AlbumSortOrder.ALBUM_A_Z);
-                        getAlbumFragment().refresh();
-                    } else if (isSongPage()) {
-                        mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_A_Z);
-                        getSongFragment().refresh();
-                    }
-                    return true;
+                  if (isArtistPage()) {
+                    mPreferences.setArtistSortOrder(SortOrder.ArtistSortOrder.ARTIST_A_Z);
+                    getArtistFragment().refresh();
+                  } else if (isAlbumPage()) {
+                    mPreferences.setAlbumSortOrder(SortOrder.AlbumSortOrder.ALBUM_A_Z);
+                    getAlbumFragment().refresh();
+                  } else if (isSongPage()) {
+                    mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_A_Z);
+                    getSongFragment().refresh();
+                  }
+                  return true;
                 } else if (itemId == R.id.menu_player_sort_by_za) {
-                    if (isArtistPage()) {
-                        mPreferences.setArtistSortOrder(SortOrder.ArtistSortOrder.ARTIST_Z_A);
-                        getArtistFragment().refresh();
-                    } else if (isAlbumPage()) {
-                        mPreferences.setAlbumSortOrder(SortOrder.AlbumSortOrder.ALBUM_Z_A);
-                        getAlbumFragment().refresh();
-                    } else if (isSongPage()) {
-                        mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_Z_A);
-                        getSongFragment().refresh();
-                    }
-                    return true;
+                  if (isArtistPage()) {
+                    mPreferences.setArtistSortOrder(SortOrder.ArtistSortOrder.ARTIST_Z_A);
+                    getArtistFragment().refresh();
+                  } else if (isAlbumPage()) {
+                    mPreferences.setAlbumSortOrder(SortOrder.AlbumSortOrder.ALBUM_Z_A);
+                    getAlbumFragment().refresh();
+                  } else if (isSongPage()) {
+                    mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_Z_A);
+                    getSongFragment().refresh();
+                  }
+                  return true;
                 } else if (itemId == R.id.menu_player_sort_by_artist) {
-                    if (isAlbumPage()) {
-                        mPreferences.setAlbumSortOrder(SortOrder.AlbumSortOrder.ALBUM_ARTIST);
-                        getAlbumFragment().refresh();
-                    } else if (isSongPage()) {
-                        mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_ARTIST);
-                        getSongFragment().refresh();
-                    }
-                    return true;
+                  if (isAlbumPage()) {
+                    mPreferences.setAlbumSortOrder(SortOrder.AlbumSortOrder.ALBUM_ARTIST);
+                    getAlbumFragment().refresh();
+                  } else if (isSongPage()) {
+                    mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_ARTIST);
+                    getSongFragment().refresh();
+                  }
+                  return true;
                 } else if (itemId == R.id.menu_player_sort_by_album) {
-                    if (isSongPage()) {
-                        mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_ALBUM);
-                        getSongFragment().refresh();
-                    }
-                    return true;
+                  if (isSongPage()) {
+                    mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_ALBUM);
+                    getSongFragment().refresh();
+                  }
+                  return true;
                 } else if (itemId == R.id.menu_player_sort_by_year) {
-                    if (isAlbumPage()) {
-                        mPreferences.setAlbumSortOrder(SortOrder.AlbumSortOrder.ALBUM_YEAR);
-                        getAlbumFragment().refresh();
-                    } else if (isSongPage()) {
-                        mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_YEAR);
-                        getSongFragment().refresh();
-                    }
-                    return true;
+                  if (isAlbumPage()) {
+                    mPreferences.setAlbumSortOrder(SortOrder.AlbumSortOrder.ALBUM_YEAR);
+                    getAlbumFragment().refresh();
+                  } else if (isSongPage()) {
+                    mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_YEAR);
+                    getSongFragment().refresh();
+                  }
+                  return true;
                 } else if (itemId == R.id.menu_player_sort_by_duration) {
-                    if (isSongPage()) {
-                        mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_DURATION);
-                        getSongFragment().refresh();
-                    }
-                    return true;
+                  if (isSongPage()) {
+                    mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_DURATION);
+                    getSongFragment().refresh();
+                  }
+                  return true;
                 } else if (itemId == R.id.menu_player_sort_by_number_of_songs) {
-                    if (isArtistPage()) {
-                        mPreferences.setArtistSortOrder(SortOrder.ArtistSortOrder.ARTIST_NUMBER_OF_SONGS);
-                        getArtistFragment().refresh();
-                    } else if (isAlbumPage()) {
-                        mPreferences.setAlbumSortOrder(SortOrder.AlbumSortOrder.ALBUM_NUMBER_OF_SONGS);
-                        getAlbumFragment().refresh();
-                    }
-                    return true;
+                  if (isArtistPage()) {
+                    mPreferences.setArtistSortOrder(
+                        SortOrder.ArtistSortOrder.ARTIST_NUMBER_OF_SONGS);
+                    getArtistFragment().refresh();
+                  } else if (isAlbumPage()) {
+                    mPreferences.setAlbumSortOrder(SortOrder.AlbumSortOrder.ALBUM_NUMBER_OF_SONGS);
+                    getAlbumFragment().refresh();
+                  }
+                  return true;
                 } else if (itemId == R.id.menu_player_sort_by_number_of_albums) {
-                    if (isArtistPage()) {
-                        mPreferences.setArtistSortOrder(SortOrder.ArtistSortOrder.ARTIST_NUMBER_OF_ALBUMS);
-                        getArtistFragment().refresh();
-                    }
-                    return true;
+                  if (isArtistPage()) {
+                    mPreferences.setArtistSortOrder(
+                        SortOrder.ArtistSortOrder.ARTIST_NUMBER_OF_ALBUMS);
+                    getArtistFragment().refresh();
+                  }
+                  return true;
                 } else if (itemId == R.id.menu_player_sort_by_filename) {
-                    if (isSongPage()) {
-                        mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_FILENAME);
-                        getSongFragment().refresh();
-                    }
-                    return true;
+                  if (isSongPage()) {
+                    mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_FILENAME);
+                    getSongFragment().refresh();
+                  }
+                  return true;
                 } else if (itemId == R.id.menu_player_view_as_simple) {
-                    if (isRecentPage()) {
-                        mPreferences.setRecentLayout("simple");
-                    } else if (isArtistPage()) {
-                        mPreferences.setArtistLayout("simple");
-                    } else if (isAlbumPage()) {
-                        mPreferences.setAlbumLayout("simple");
-                    }
-                    NavUtils.goHome(getActivity());
-                    return true;
+                  if (isRecentPage()) {
+                    mPreferences.setRecentLayout("simple");
+                  } else if (isArtistPage()) {
+                    mPreferences.setArtistLayout("simple");
+                  } else if (isAlbumPage()) {
+                    mPreferences.setAlbumLayout("simple");
+                  }
+                  NavUtils.goHome(getActivity());
+                  return true;
                 } else if (itemId == R.id.menu_player_view_as_detailed) {
-                    if (isRecentPage()) {
-                        mPreferences.setRecentLayout("detailed");
-                    } else if (isArtistPage()) {
-                        mPreferences.setArtistLayout("detailed");
-                    } else if (isAlbumPage()) {
-                        mPreferences.setAlbumLayout("detailed");
-                    }
-                    NavUtils.goHome(getActivity());
-                    return true;
+                  if (isRecentPage()) {
+                    mPreferences.setRecentLayout("detailed");
+                  } else if (isArtistPage()) {
+                    mPreferences.setArtistLayout("detailed");
+                  } else if (isAlbumPage()) {
+                    mPreferences.setAlbumLayout("detailed");
+                  }
+                  NavUtils.goHome(getActivity());
+                  return true;
                 } else if (itemId == R.id.menu_player_view_as_grid) {
-                    if (isRecentPage()) {
-                        mPreferences.setRecentLayout("grid");
-                    } else if (isArtistPage()) {
-                        mPreferences.setArtistLayout("grid");
-                    } else if (isAlbumPage()) {
-                        mPreferences.setAlbumLayout("grid");
-                    }
-                    NavUtils.goHome(getActivity());
-                    return true;
+                  if (isRecentPage()) {
+                    mPreferences.setRecentLayout("grid");
+                  } else if (isArtistPage()) {
+                    mPreferences.setArtistLayout("grid");
+                  } else if (isAlbumPage()) {
+                    mPreferences.setAlbumLayout("grid");
+                  }
+                  NavUtils.goHome(getActivity());
+                  return true;
                 }
                 return false;
-            }
-        }, getViewLifecycleOwner());
-    }
+              }
+            },
+            getViewLifecycleOwner());
+  }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        // Save the last page the use was on
-        mPreferences.setStartPage(mViewPager.getCurrentItem());
-    }
+  @Override
+  public void onPause() {
+    super.onPause();
+    // Save the last page the use was on
+    mPreferences.setStartPage(mViewPager.getCurrentItem());
+  }
 
-    private void updateFavoriteMenuItemIcon(Menu menu) {
-        MenuItem favMenuItem = menu.findItem(R.id.menu_player_favorite);
-        if (favMenuItem != null) {
-            favMenuItem.setIcon(MusicUtils.isFavorite() ?
-                    R.drawable.ic_action_favorite_selected : R.drawable.ic_action_favorite);
-        }
+  private void updateFavoriteMenuItemIcon(Menu menu) {
+    MenuItem favMenuItem = menu.findItem(R.id.menu_player_favorite);
+    if (favMenuItem != null) {
+      favMenuItem.setIcon(
+          MusicUtils.isFavorite()
+              ? R.drawable.ic_action_favorite_selected
+              : R.drawable.ic_action_favorite);
     }
+  }
 
-    private boolean isArtistPage() {
-        return mViewPager.getCurrentItem() == TabFragmentOrder.ARTISTS_POSITION;
-    }
+  private boolean isArtistPage() {
+    return mViewPager.getCurrentItem() == TabFragmentOrder.ARTISTS_POSITION;
+  }
 
-    private ArtistFragment getArtistFragment() {
-        return (ArtistFragment) mPagerAdapter.getFragment(TabFragmentOrder.ARTISTS_POSITION);
-    }
+  private ArtistFragment getArtistFragment() {
+    return (ArtistFragment) mPagerAdapter.getFragment(TabFragmentOrder.ARTISTS_POSITION);
+  }
 
-    private boolean isAlbumPage() {
-        return mViewPager.getCurrentItem() == TabFragmentOrder.ALBUMS_POSITION;
-    }
+  private boolean isAlbumPage() {
+    return mViewPager.getCurrentItem() == TabFragmentOrder.ALBUMS_POSITION;
+  }
 
-    private AlbumFragment getAlbumFragment() {
-        return (AlbumFragment) mPagerAdapter.getFragment(TabFragmentOrder.ALBUMS_POSITION);
-    }
+  private AlbumFragment getAlbumFragment() {
+    return (AlbumFragment) mPagerAdapter.getFragment(TabFragmentOrder.ALBUMS_POSITION);
+  }
 
-    private boolean isSongPage() {
-        return mViewPager.getCurrentItem() == TabFragmentOrder.SONGS_POSITION;
-    }
+  private boolean isSongPage() {
+    return mViewPager.getCurrentItem() == TabFragmentOrder.SONGS_POSITION;
+  }
 
-    private SongFragment getSongFragment() {
-        return (SongFragment) mPagerAdapter.getFragment(TabFragmentOrder.SONGS_POSITION);
-    }
+  private SongFragment getSongFragment() {
+    return (SongFragment) mPagerAdapter.getFragment(TabFragmentOrder.SONGS_POSITION);
+  }
 
-    private boolean isRecentPage() {
-        return mViewPager.getCurrentItem() == TabFragmentOrder.RECENT_POSITION;
-    }
+  private boolean isRecentPage() {
+    return mViewPager.getCurrentItem() == TabFragmentOrder.RECENT_POSITION;
+  }
 
-    private boolean isPlaylistPage() {
-        return mViewPager.getCurrentItem() == TabFragmentOrder.PLAYLISTS_POSITION;
-    }
+  private boolean isPlaylistPage() {
+    return mViewPager.getCurrentItem() == TabFragmentOrder.PLAYLISTS_POSITION;
+  }
 
-    private Context getStableAppContext() {
-        Activity activity = getActivity();
-        if (activity == null || activity.isFinishing() || activity.isDestroyed()) {
-            return null;
-        }
-        Context appContext = activity.getApplicationContext();
-        return appContext != null ? appContext : activity;
+  private Context getStableAppContext() {
+    Activity activity = getActivity();
+    if (activity == null || activity.isFinishing() || activity.isDestroyed()) {
+      return null;
     }
+    Context appContext = activity.getApplicationContext();
+    return appContext != null ? appContext : activity;
+  }
 }

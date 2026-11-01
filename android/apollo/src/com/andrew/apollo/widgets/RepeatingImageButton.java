@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -19,7 +19,6 @@
 package com.andrew.apollo.widgets;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
@@ -27,173 +26,170 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
-
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 
 /**
- * A {@link ImageButton} that will repeatedly call a 'listener' method as long
- * as the button is pressed, otherwise functions like a typecal
- * {@link ImageButton}
+ * A {@link ImageButton} that will repeatedly call a 'listener' method as long as the button is
+ * pressed, otherwise functions like a typecal {@link ImageButton}
  */
 public final class RepeatingImageButton extends androidx.appcompat.widget.AppCompatImageButton
-        implements OnClickListener {
+    implements OnClickListener {
 
-    private static final long sInterval = 400;
+  private static final long sInterval = 400;
 
-    private long mStartTime;
+  private long mStartTime;
 
-    private int mRepeatCount;
+  private int mRepeatCount;
 
-    private RepeatListener mListener;
+  private RepeatListener mListener;
 
-    private int previousDrawable;
-    private int nextDrawable;
+  private int previousDrawable;
+  private int nextDrawable;
 
-    /**
-     * @param context The {@link Context} to use
-     * @param attrs   The attributes of the XML tag that is inflating the view.
-     */
-    public RepeatingImageButton(final Context context, final AttributeSet attrs) {
-        super(context, attrs);
-        setBackgroundResource(R.drawable.holo_background_selector);
-        setFocusable(true);
-        setLongClickable(true);
-        setOnClickListener(this);
+  /**
+   * @param context The {@link Context} to use
+   * @param attrs The attributes of the XML tag that is inflating the view.
+   */
+  public RepeatingImageButton(final Context context, final AttributeSet attrs) {
+    super(context, attrs);
+    setBackgroundResource(R.drawable.holo_background_selector);
+    setFocusable(true);
+    setLongClickable(true);
+    setOnClickListener(this);
 
-        previousDrawable = R.drawable.btn_playback_previous;
-        nextDrawable = R.drawable.btn_playback_next;
-        updateState();
+    previousDrawable = R.drawable.btn_playback_previous;
+    nextDrawable = R.drawable.btn_playback_next;
+    updateState();
+  }
+
+  @Override
+  public void onClick(final View view) {
+    int id = view.getId();
+    if (id == R.id.action_button_previous) {
+      MusicUtils.previous();
+    } else if (id == R.id.action_button_next) {
+      MusicUtils.next();
     }
+  }
 
-    @Override
-    public void onClick(final View view) {
-        int id = view.getId();
-        if (id == R.id.action_button_previous) {
-            MusicUtils.previous();
-        } else if (id == R.id.action_button_next) {
-            MusicUtils.next();
-        }
+  /**
+   * Sets the listener to be called while the button is pressed and the interval in milliseconds
+   * with which it will be called.
+   *
+   * @param l The listener that will be called
+   */
+  public void setRepeatListener(final RepeatListener l) {
+    mListener = l;
+  }
+
+  @Override
+  public boolean performLongClick() {
+    if (mListener == null) {
+      ApolloUtils.showCheatSheet(this);
     }
+    mStartTime = SystemClock.elapsedRealtime();
+    mRepeatCount = 0;
+    post(mRepeater);
+    return true;
+  }
 
-    /**
-     * Sets the listener to be called while the button is pressed and the
-     * interval in milliseconds with which it will be called.
-     *
-     * @param l The listener that will be called
-     */
-    public void setRepeatListener(final RepeatListener l) {
-        mListener = l;
+  @Override
+  public boolean onTouchEvent(final MotionEvent event) {
+    if (event.getAction() == MotionEvent.ACTION_UP) {
+      /* Remove the repeater, but call the hook one more time */
+      removeCallbacks(mRepeater);
+      if (mStartTime != 0) {
+        doRepeat(true);
+        mStartTime = 0;
+      }
     }
+    return super.onTouchEvent(event);
+  }
 
-    @Override
-    public boolean performLongClick() {
-        if (mListener == null) {
-            ApolloUtils.showCheatSheet(this);
-        }
-        mStartTime = SystemClock.elapsedRealtime();
-        mRepeatCount = 0;
-        post(mRepeater);
+  @Override
+  public boolean onKeyDown(final int keyCode, final KeyEvent event) {
+    switch (keyCode) {
+      case KeyEvent.KEYCODE_DPAD_CENTER:
+      case KeyEvent.KEYCODE_ENTER:
+        /*
+         * Need to call super to make long press work, but return true
+         * so that the application doesn't get the down event
+         */
+        super.onKeyDown(keyCode, event);
         return true;
     }
+    return super.onKeyDown(keyCode, event);
+  }
 
-    @Override
-    public boolean onTouchEvent(final MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_UP) {
-            /* Remove the repeater, but call the hook one more time */
-            removeCallbacks(mRepeater);
-            if (mStartTime != 0) {
-                doRepeat(true);
-                mStartTime = 0;
-            }
+  @Override
+  public boolean onKeyUp(final int keyCode, final KeyEvent event) {
+    switch (keyCode) {
+      case KeyEvent.KEYCODE_DPAD_CENTER:
+      case KeyEvent.KEYCODE_ENTER:
+        /* Remove the repeater, but call the hook one more time */
+        removeCallbacks(mRepeater);
+        if (mStartTime != 0) {
+          doRepeat(true);
+          mStartTime = 0;
         }
-        return super.onTouchEvent(event);
     }
+    return super.onKeyUp(keyCode, event);
+  }
 
-    @Override
-    public boolean onKeyDown(final int keyCode, final KeyEvent event) {
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_DPAD_CENTER:
-            case KeyEvent.KEYCODE_ENTER:
-                /*
-                 * Need to call super to make long press work, but return true
-                 * so that the application doesn't get the down event
-                 */
-                super.onKeyDown(keyCode, event);
-                return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-
-    @Override
-    public boolean onKeyUp(final int keyCode, final KeyEvent event) {
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_DPAD_CENTER:
-            case KeyEvent.KEYCODE_ENTER:
-                /* Remove the repeater, but call the hook one more time */
-                removeCallbacks(mRepeater);
-                if (mStartTime != 0) {
-                    doRepeat(true);
-                    mStartTime = 0;
-                }
-        }
-        return super.onKeyUp(keyCode, event);
-    }
-
-    private final Runnable mRepeater = new Runnable() {
+  private final Runnable mRepeater =
+      new Runnable() {
         @Override
         public void run() {
-            doRepeat(false);
-            if (isPressed()) {
-                postDelayed(this, sInterval);
-            }
+          doRepeat(false);
+          if (isPressed()) {
+            postDelayed(this, sInterval);
+          }
         }
-    };
+      };
+
+  /**
+   * @param shouldRepeat If True the repeat count stops at -1, false if to add incrementally add the
+   *     repeat count
+   */
+  private void doRepeat(final boolean shouldRepeat) {
+    final long now = SystemClock.elapsedRealtime();
+    if (mListener != null) {
+      mListener.onRepeat(this, now - mStartTime, shouldRepeat ? -1 : mRepeatCount++);
+    }
+  }
+
+  /** Sets the correct drawable for playback. */
+  public void updateState() {
+    if (isInEditMode()) {
+      return;
+    }
+    int id = getId();
+    if (id == R.id.action_button_next) {
+      setImageResource(nextDrawable);
+    } else if (id == R.id.action_button_previous) {
+      setImageResource(previousDrawable);
+    }
+  }
+
+  public void setPreviousDrawable(int resId) {
+    this.previousDrawable = resId;
+    updateState();
+  }
+
+  public void setNextDrawable(int resId) {
+    this.nextDrawable = resId;
+    updateState();
+  }
+
+  public interface RepeatListener {
 
     /**
-     * @param shouldRepeat If True the repeat count stops at -1, false if to add
-     *                     incrementally add the repeat count
+     * @param v View to be set
+     * @param duration Duration of the long press
+     * @param repeatcount The number of repeat counts
      */
-    private void doRepeat(final boolean shouldRepeat) {
-        final long now = SystemClock.elapsedRealtime();
-        if (mListener != null) {
-            mListener.onRepeat(this, now - mStartTime, shouldRepeat ? -1 : mRepeatCount++);
-        }
-    }
-
-    /**
-     * Sets the correct drawable for playback.
-     */
-    public void updateState() {
-        if (isInEditMode()) {
-            return;
-        }
-        int id = getId();
-        if (id == R.id.action_button_next) {
-            setImageResource(nextDrawable);
-        } else if (id == R.id.action_button_previous) {
-            setImageResource(previousDrawable);
-        }
-    }
-
-    public void setPreviousDrawable(int resId) {
-        this.previousDrawable = resId;
-        updateState();
-    }
-
-    public void setNextDrawable(int resId) {
-        this.nextDrawable = resId;
-        updateState();
-    }
-
-    public interface RepeatListener {
-
-        /**
-         * @param v           View to be set
-         * @param duration    Duration of the long press
-         * @param repeatcount The number of repeat counts
-         */
-        void onRepeat(View v, long duration, int repeatcount);
-    }
+    void onRepeat(View v, long duration, int repeatcount);
+  }
 }

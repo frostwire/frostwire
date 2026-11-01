@@ -1,31 +1,30 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.andrew.apollo.ui.fragments.profile;
 
-import androidx.loader.content.Loader;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-
+import androidx.loader.content.Loader;
 import com.andrew.apollo.Config;
 import com.andrew.apollo.adapters.ArtistAlbumAdapter;
 import com.andrew.apollo.loaders.ArtistAlbumLoader;
@@ -36,7 +35,6 @@ import com.andrew.apollo.utils.NavUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.andrew.apollo.widgets.VerticalScrollListener;
 import com.frostwire.android.R;
-
 import java.util.List;
 
 /**
@@ -48,65 +46,67 @@ import java.util.List;
  */
 public final class ArtistAlbumFragment extends ApolloFragment<ArtistAlbumAdapter, Album> {
 
-    public ArtistAlbumFragment() {
-        super(Fragments.ARTIST_ALBUM_PROFILE_FRAGMENT_GROUP_ID, Fragments.ARTIST_ALBUM_PROFILE_FRAGMENT_LOADER_ID);
+  public ArtistAlbumFragment() {
+    super(
+        Fragments.ARTIST_ALBUM_PROFILE_FRAGMENT_GROUP_ID,
+        Fragments.ARTIST_ALBUM_PROFILE_FRAGMENT_LOADER_ID);
+  }
+
+  /**
+   * We override because the old implementation would put the VerticalScrollListener on column 1
+   * this might go away after tests.
+   */
+  @Override
+  public View onCreateView(
+      final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
+    View rootView = super.onCreateView(inflater, container, savedInstanceState);
+
+    if (mListView != null && mProfileTabCarousel != null) {
+      // To help make scrolling smooth
+      mListView.setOnScrollListener(
+          new VerticalScrollListener(mScrollableHeader, mProfileTabCarousel, 1));
     }
 
-    /**
-     * We override because the old implementation would put the VerticalScrollListener on column 1
-     * this might go away after tests.
-     */
-    @Override
-    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
-                             final Bundle savedInstanceState) {
-        View rootView = super.onCreateView(inflater, container, savedInstanceState);
+    return rootView;
+  }
 
-        if (mListView != null && mProfileTabCarousel != null) {
-            // To help make scrolling smooth
-            mListView.setOnScrollListener(new VerticalScrollListener(mScrollableHeader,
-                    mProfileTabCarousel, 1));
-        }
+  @Override
+  protected ArtistAlbumAdapter createAdapter() {
+    return new ArtistAlbumAdapter(getActivity(), R.layout.list_item_detailed_no_background);
+  }
 
-        return rootView;
-    }
+  @Override
+  protected String getLayoutTypeName() {
+    return PreferenceUtils.SIMPLE_LAYOUT;
+  }
 
-    @Override
-    protected ArtistAlbumAdapter createAdapter() {
-        return new ArtistAlbumAdapter(getActivity(), R.layout.list_item_detailed_no_background);
-    }
+  @Override
+  public Loader<List<Album>> onCreateLoader(final int id, final Bundle args) {
+    return new ArtistAlbumLoader(getActivity(), args.getLong(Config.ID));
+  }
 
-    @Override
-    protected String getLayoutTypeName() {
-        return PreferenceUtils.SIMPLE_LAYOUT;
-    }
-
-    @Override
-    public Loader<List<Album>> onCreateLoader(final int id, final Bundle args) {
-        return new ArtistAlbumLoader(getActivity(), args.getLong(Config.ID));
-    }
-
-    @Override
-    public void onItemClick(final AdapterView<?> parent,
-                            final View view,
-                            final int position,
-                            final long id) {
-        mItem = mAdapter.getItem(position - mAdapter.getOffset());
-        final Activity activity = getActivity();
-        if (mItem != null && activity != null && !activity.isFinishing() && !activity.isDestroyed()) {
-            com.frostwire.android.util.SystemUtils.postToHandler(
-                com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
+  @Override
+  public void onItemClick(
+      final AdapterView<?> parent, final View view, final int position, final long id) {
+    mItem = mAdapter.getItem(position - mAdapter.getOffset());
+    final Activity activity = getActivity();
+    if (mItem != null && activity != null && !activity.isFinishing() && !activity.isDestroyed()) {
+      com.frostwire.android.util.SystemUtils.postToHandler(
+          com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
+          () -> {
+            NavUtils.openAlbumProfile(
+                activity,
+                mItem.mAlbumName,
+                mItem.mArtistName,
+                mItem.mAlbumId,
+                MusicUtils.getSongListForAlbum(activity, mItem.mAlbumId));
+            com.frostwire.android.util.SystemUtils.postToUIThread(
                 () -> {
-                    NavUtils.openAlbumProfile(activity,
-                        mItem.mAlbumName,
-                        mItem.mArtistName,
-                        mItem.mAlbumId,
-                        MusicUtils.getSongListForAlbum(activity, mItem.mAlbumId));
-                    com.frostwire.android.util.SystemUtils.postToUIThread(() -> {
-                        if (!activity.isFinishing() && !activity.isDestroyed()) {
-                            activity.finish();
-                        }
-                    });
+                  if (!activity.isFinishing() && !activity.isDestroyed()) {
+                    activity.finish();
+                  }
                 });
-        }
+          });
     }
+  }
 }
