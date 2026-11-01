@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -27,42 +27,42 @@ import java.util.List;
  * @author aldenml
  */
 public interface Transfer {
-    String getName();
+  String getName();
 
-    String getDisplayName();
+  String getDisplayName();
 
-    File getSavePath();
+  File getSavePath();
 
-    File previewFile();
+  File previewFile();
 
-    long getSize();
+  long getSize();
 
-    Date getCreated();
+  Date getCreated();
 
-    TransferState getState();
+  TransferState getState();
 
-    long getBytesReceived();
+  long getBytesReceived();
 
-    long getBytesSent();
+  long getBytesSent();
 
-    long getDownloadSpeed();
+  long getDownloadSpeed();
 
-    long getUploadSpeed();
+  long getUploadSpeed();
 
-    boolean isDownloading();
+  boolean isDownloading();
 
-    long getETA();
+  long getETA();
 
-    /**
-     * [0..100]
-     *
-     * @return
-     */
-    int getProgress();
+  /**
+   * [0..100]
+   *
+   * @return
+   */
+  int getProgress();
 
-    boolean isComplete();
+  boolean isComplete();
 
-    List<TransferItem> getItems();
+  List<TransferItem> getItems();
 
-    void remove(boolean deleteData);
+  void remove(boolean deleteData);
 }

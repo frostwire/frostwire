@@ -65,6 +65,7 @@ public final class BTDownload implements BittorrentDownload {
     AlertType.PIECE_FINISHED.swig(),
     AlertType.STORAGE_MOVED.swig()
   };
+
   private static final String EXTRA_DATA_KEY = "extra_data";
   private static final String WAS_PAUSED_EXTRA_KEY = "was_paused";
   private final BTEngine engine;

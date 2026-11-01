@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -21,7 +21,6 @@ package com.frostwire.util;
 import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
 import com.frostwire.util.http.HttpClient;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -42,281 +41,306 @@ import java.util.concurrent.ExecutorService;
  */
 public final class UrlUtils {
 
-    private static final Logger LOG = Logger.getLogger(UrlUtils.class);
-    private final static Pattern infoHashPattern = Pattern.compile("([0-9A-Fa-f]{40})");
-    private final static Pattern hexInfoHashPattern = Pattern.compile("[0-9A-Fa-f]{40}");
-    private final static Pattern base32InfoHashPattern = Pattern.compile("[A-Za-z2-7]{32}");
+  private static final Logger LOG = Logger.getLogger(UrlUtils.class);
+  private static final Pattern infoHashPattern = Pattern.compile("([0-9A-Fa-f]{40})");
+  private static final Pattern hexInfoHashPattern = Pattern.compile("[0-9A-Fa-f]{40}");
+  private static final Pattern base32InfoHashPattern = Pattern.compile("[A-Za-z2-7]{32}");
 
-    private UrlUtils() {
+  private UrlUtils() {}
+
+  /**
+   * Hot-path method: URL-encodes a string and converts spaces to %20. Optimized to use
+   * String.replace instead of replaceAll for literal plus-sign replacement, avoiding regex
+   * compilation overhead.
+   *
+   * @param s the string to encode, may be null
+   * @return the URL-encoded string with spaces as %20, or empty string if input is null
+   */
+  public static String encode(String s) {
+    if (s == null) {
+      return "";
     }
 
-    /**
-     * Hot-path method: URL-encodes a string and converts spaces to %20.
-     * Optimized to use String.replace instead of replaceAll for literal plus-sign replacement,
-     * avoiding regex compilation overhead.
-     * 
-     * @param s the string to encode, may be null
-     * @return the URL-encoded string with spaces as %20, or empty string if input is null
-     */
-    public static String encode(String s) {
-        if (s == null) {
-            return "";
-        }
+    try {
+      // gotta keep using the deprecated method because we need android min sdk to be 33, a long way
+      // to go
+      // Using replace() instead of replaceAll() - it's a literal replacement, no regex needed
+      return URLEncoder.encode(s, StandardCharsets.UTF_8.name()).replace("+", "%20");
+    } catch (UnsupportedEncodingException e) {
+      LOG.error("UrlUtils.encode() -> " + e.getMessage(), e);
+      return "";
+    }
+  }
 
-        try {
-            // gotta keep using the deprecated method because we need android min sdk to be 33, a long way to go
-            // Using replace() instead of replaceAll() - it's a literal replacement, no regex needed
-            return URLEncoder.encode(s, StandardCharsets.UTF_8.name()).replace("+", "%20");
-        } catch (UnsupportedEncodingException e) {
-            LOG.error("UrlUtils.encode() -> " + e.getMessage(), e);
-            return "";
-        }
+  /**
+   * Decodes {@code s} as UTF-8, leniently: a {@code %} not followed by two hex digits is kept as a
+   * literal {@code %}, as browsers do, instead of failing the whole string. The input comes from
+   * magnet links, the clipboard and other apps ("50% off", hand-edited links), and callers expect
+   * this never to throw.
+   */
+  public static String decode(String s) {
+    if (s == null) {
+      return "";
     }
 
-    /**
-     * Decodes {@code s} as UTF-8, leniently: a {@code %} not followed by two hex digits is kept as a
-     * literal {@code %}, as browsers do, instead of failing the whole string. The input comes from
-     * magnet links, the clipboard and other apps ("50% off", hand-edited links), and callers expect
-     * this never to throw.
-     */
-    public static String decode(String s) {
-        if (s == null) {
-            return "";
-        }
+    try {
+      // gotta keep using the deprecated method because we need android min sdk to be 33, a long way
+      // to go
+      return URLDecoder.decode(escapeStrayPercents(s), StandardCharsets.UTF_8.name());
+    } catch (UnsupportedEncodingException e) {
+      LOG.error("UrlUtils.decode() -> " + e.getMessage(), e);
+      return "";
+    }
+  }
 
-        try {
-            // gotta keep using the deprecated method because we need android min sdk to be 33, a long way to go
-            return URLDecoder.decode(escapeStrayPercents(s), StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
-            LOG.error("UrlUtils.decode() -> " + e.getMessage(), e);
-            return "";
-        }
+  /** Escapes each {@code %} that doesn't start a {@code %XX} escape as {@code %25}. */
+  static String escapeStrayPercents(String s) {
+    if (s.indexOf('%') < 0) {
+      return s;
+    }
+    StringBuilder sb = new StringBuilder(s.length() + 8);
+    for (int i = 0; i < s.length(); i++) {
+      char c = s.charAt(i);
+      boolean escape =
+          i + 2 < s.length() && isHexDigit(s.charAt(i + 1)) && isHexDigit(s.charAt(i + 2));
+      sb.append(c == '%' && !escape ? "%25" : String.valueOf(c));
+    }
+    return sb.toString();
+  }
+
+  private static boolean isHexDigit(char c) {
+    return Character.digit(c, 16) >= 0 && c < 128;
+  }
+
+  public static String buildMagnetUrl(
+      String infoHash, String displayFilename, String trackerParameters) {
+    return "magnet:?xt=urn:btih:"
+        + infoHash
+        + "&dn="
+        + UrlUtils.encode(displayFilename)
+        + "&"
+        + trackerParameters;
+  }
+
+  /** Request address for diagnostics, excluding query, fragment, and user credentials. */
+  public static String logAddress(String url) {
+    try {
+      URI uri = new URI(url);
+      if (uri.getScheme() == null || uri.getHost() == null) {
+        return "<invalid-url>";
+      }
+      return uri.getScheme()
+          + "://"
+          + uri.getHost()
+          + (uri.getPort() == -1 ? "" : ":" + uri.getPort())
+          + (uri.getRawPath() == null ? "" : uri.getRawPath());
+    } catch (URISyntaxException | NullPointerException e) {
+      return "<invalid-url>";
+    }
+  }
+
+  /**
+   * Magnet with explicit peer endpoints ({@code &x.pe=host:port}, BEP 9 peer-address parameter) so
+   * the torrent can be fetched directly from known seeders — used for Distributed search results,
+   * whose content is often trackerless and unknown to the public swarm. At most 4 endpoints are
+   * appended; blank entries are skipped.
+   */
+  public static String buildMagnetUrl(
+      String infoHash,
+      String displayFilename,
+      String trackerParameters,
+      java.util.List<String> peerEndpoints) {
+    String base = buildMagnetUrl(infoHash, displayFilename, trackerParameters);
+    if (peerEndpoints == null || peerEndpoints.isEmpty()) {
+      return base;
+    }
+    StringBuilder sb = new StringBuilder(base);
+    int added = 0;
+    for (String ep : peerEndpoints) {
+      if (ep == null || ep.isEmpty() || ep.length() > 256 || added >= 4) {
+        continue;
+      }
+      sb.append("&x.pe=").append(ep);
+      added++;
+    }
+    return sb.toString();
+  }
+
+  // can't use java records yet because of android 11 being the max compatible version
+  private static class MirrorHeadDuration {
+    private final String mirror;
+    private final long duration;
+
+    public MirrorHeadDuration(String mirror, long duration) {
+      this.mirror = mirror;
+      this.duration = duration;
     }
 
-    /** Escapes each {@code %} that doesn't start a {@code %XX} escape as {@code %25}. */
-    static String escapeStrayPercents(String s) {
-        if (s.indexOf('%') < 0) {
-            return s;
-        }
-        StringBuilder sb = new StringBuilder(s.length() + 8);
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            boolean escape = i + 2 < s.length() && isHexDigit(s.charAt(i + 1)) && isHexDigit(s.charAt(i + 2));
-            sb.append(c == '%' && !escape ? "%25" : String.valueOf(c));
-        }
-        return sb.toString();
+    public String mirror() {
+      return mirror;
     }
 
-    private static boolean isHexDigit(char c) {
-        return Character.digit(c, 16) >= 0 && c < 128;
+    public long duration() {
+      return duration;
     }
+  }
 
-    public static String buildMagnetUrl(String infoHash, String displayFilename, String trackerParameters) {
-        return "magnet:?xt=urn:btih:" + infoHash + "&dn=" + UrlUtils.encode(displayFilename) + "&" + trackerParameters;
+  public static long testHeadRequestDurationInMs(
+      final HttpClient httpClient, String url, final int maxWaitInMs) {
+    long t_a = System.currentTimeMillis();
+    try {
+      int httpCode = httpClient.head("https://" + url, maxWaitInMs, null);
+      boolean validHttpCode = 100 <= httpCode && httpCode < 400;
+      if (!validHttpCode) {
+        LOG.error(
+            "UrlUtils.testHeadRequestDurationInMs() -> "
+                + url
+                + " errored HTTP "
+                + httpCode
+                + " in "
+                + (System.currentTimeMillis() - t_a)
+                + "ms");
+        return maxWaitInMs * 10L; // return a big number as to never consider it
+      }
+    } catch (Throwable t) {
+      LOG.error("UrlUtils.testHeadRequestDurationInMs() -> " + url + " errored " + t.getMessage());
     }
+    return System.currentTimeMillis() - t_a;
+  }
 
-    /** Request address for diagnostics, excluding query, fragment, and user credentials. */
-    public static String logAddress(String url) {
-        try {
-            URI uri = new URI(url);
-            if (uri.getScheme() == null || uri.getHost() == null) {
-                return "<invalid-url>";
+  public static String getFastestMirrorDomain(
+      final HttpClient httpClient,
+      final String[] mirrors,
+      final int minResponseTimeInMs,
+      int maxNumberOfMirrorsToTest) {
+    String fastestMirror;
+    ArrayList<String> mirrorList = new ArrayList<>(Arrays.asList(mirrors));
+    Collections.shuffle(mirrorList);
+    if (maxNumberOfMirrorsToTest > 0 && mirrorList.size() > maxNumberOfMirrorsToTest) {
+      mirrorList = new ArrayList<>(mirrorList.subList(0, maxNumberOfMirrorsToTest));
+    }
+    final CountDownLatch latch = new CountDownLatch(mirrorList.size());
+    ExecutorService executor = ThreadPool.newThreadPool("UrlUtils-MirrorFinder", 4, true);
+    final java.util.List<MirrorHeadDuration> synchronizedMirrorDurations =
+        Collections.synchronizedList(new ArrayList<>());
+    for (String randomMirror : mirrorList) {
+      executor.submit(
+          () -> {
+            try {
+              long duration =
+                  testHeadRequestDurationInMs(httpClient, randomMirror, minResponseTimeInMs);
+              synchronizedMirrorDurations.add(new MirrorHeadDuration(randomMirror, duration));
+            } finally {
+              latch.countDown();
             }
-            return uri.getScheme() + "://" + uri.getHost()
-                    + (uri.getPort() == -1 ? "" : ":" + uri.getPort())
-                    + (uri.getRawPath() == null ? "" : uri.getRawPath());
-        } catch (URISyntaxException | NullPointerException e) {
-            return "<invalid-url>";
-        }
+          });
     }
 
-    /**
-     * Magnet with explicit peer endpoints ({@code &x.pe=host:port}, BEP 9
-     * peer-address parameter) so the torrent can be fetched directly from
-     * known seeders — used for Distributed search results, whose content is
-     * often trackerless and unknown to the public swarm. At most 4 endpoints
-     * are appended; blank entries are skipped.
-     */
-    public static String buildMagnetUrl(String infoHash, String displayFilename,
-                                        String trackerParameters,
-                                        java.util.List<String> peerEndpoints) {
-        String base = buildMagnetUrl(infoHash, displayFilename, trackerParameters);
-        if (peerEndpoints == null || peerEndpoints.isEmpty()) {
-            return base;
-        }
-        StringBuilder sb = new StringBuilder(base);
-        int added = 0;
-        for (String ep : peerEndpoints) {
-            if (ep == null || ep.isEmpty() || ep.length() > 256 || added >= 4) {
-                continue;
+    try {
+      latch.await();
+    } catch (InterruptedException e) {
+      executor.shutdown();
+      return mirrors[0];
+    } finally {
+      executor.shutdown();
+    }
+    // filter out all null elements from mirrorDurations
+    synchronizedMirrorDurations.removeIf(Objects::isNull);
+    if (synchronizedMirrorDurations.isEmpty()) {
+      return mirrors[0];
+    }
+    if (synchronizedMirrorDurations.size() > 1) {
+      synchronizedMirrorDurations.sort(
+          (o1, o2) -> {
+            if (o1.duration() < o2.duration()) {
+              return -1;
+            } else if (o1.duration() > o2.duration()) {
+              return 1;
             }
-            sb.append("&x.pe=").append(ep);
-            added++;
-        }
-        return sb.toString();
+            return 0;
+          });
     }
 
+    fastestMirror = synchronizedMirrorDurations.get(0).mirror();
+    LOG.info(
+        "UrlUtils.getFastestMirrorDomain() -> fastest mirror is "
+            + fastestMirror
+            + " in "
+            + synchronizedMirrorDurations.get(0).duration()
+            + "ms");
+    return fastestMirror;
+  }
 
-    // can't use java records yet because of android 11 being the max compatible version
-    private static class
-    MirrorHeadDuration {
-        private final String mirror;
-        private final long duration;
-
-        public MirrorHeadDuration(String mirror, long duration) {
-            this.mirror = mirror;
-            this.duration = duration;
-        }
-
-        public String mirror() {
-            return mirror;
-        }
-
-        public long duration() {
-            return duration;
-        }
+  public static String extractDomainName(String url) {
+    URI uri;
+    try {
+      uri = new URI(url);
+    } catch (URISyntaxException e) {
+      return null;
     }
+    return uri.getHost();
+  }
 
-    public static long testHeadRequestDurationInMs(final HttpClient httpClient, String url, final int maxWaitInMs) {
-        long t_a = System.currentTimeMillis();
-        try {
-            int httpCode = httpClient.head("https://" + url, maxWaitInMs, null);
-            boolean validHttpCode = 100 <= httpCode && httpCode < 400;
-            if (!validHttpCode) {
-                LOG.error("UrlUtils.testHeadRequestDurationInMs() -> " + url + " errored HTTP " + httpCode + " in " + (System.currentTimeMillis() - t_a) + "ms");
-                return maxWaitInMs * 10L; // return a big number as to never consider it
-            }
-        } catch (Throwable t) {
-            LOG.error("UrlUtils.testHeadRequestDurationInMs() -> " + url + " errored " + t.getMessage());
-        }
-        return System.currentTimeMillis() - t_a;
+  /**
+   * The v1 info hash of a magnet link, as 40 lowercase hex digits, from its first {@code
+   * xt=urn:btih:} parameter: 40 hex digits, or 32 base32 digits converted to hex (BEP 9). The
+   * scheme, the parameter name and the urn are matched in any case and {@code xt} may come after
+   * other parameters (frostwire/frostwire#1408). Null for anything else, including v2-only ({@code
+   * urn:btmh:}) magnets and links cut short. Never throws: the link comes from users, web pages and
+   * other apps. Unlike {@link #extractInfoHash(String)}, it doesn't pick up 40 hex digits found
+   * elsewhere in the link.
+   */
+  public static String magnetHexInfoHash(String magnet) {
+    if (magnet == null || !magnet.regionMatches(true, 0, "magnet:?", 0, 8)) {
+      return null;
     }
-
-    public static String getFastestMirrorDomain(final HttpClient httpClient, final String[] mirrors, final int minResponseTimeInMs, int maxNumberOfMirrorsToTest) {
-        String fastestMirror;
-        ArrayList<String> mirrorList = new ArrayList<>(Arrays.asList(mirrors));
-        Collections.shuffle(mirrorList);
-        if (maxNumberOfMirrorsToTest > 0 && mirrorList.size() > maxNumberOfMirrorsToTest) {
-            mirrorList = new ArrayList<>(mirrorList.subList(0, maxNumberOfMirrorsToTest));
-        }
-        final CountDownLatch latch = new CountDownLatch(mirrorList.size());
-        ExecutorService executor = ThreadPool.newThreadPool("UrlUtils-MirrorFinder", 4, true);
-        final java.util.List<MirrorHeadDuration> synchronizedMirrorDurations = Collections.synchronizedList(new ArrayList<>());
-        for (String randomMirror : mirrorList) {
-            executor.submit(() -> {
-                try {
-                    long duration = testHeadRequestDurationInMs(httpClient, randomMirror, minResponseTimeInMs);
-                    synchronizedMirrorDurations.add(
-                            new MirrorHeadDuration(
-                                    randomMirror,
-                                    duration
-                            )
-                    );
-                } finally {
-                    latch.countDown();
-                }
-            });
-        }
-
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            executor.shutdown();
-            return mirrors[0];
-        } finally {
-            executor.shutdown();
-        }
-        //filter out all null elements from mirrorDurations
-        synchronizedMirrorDurations.removeIf(Objects::isNull);
-        if (synchronizedMirrorDurations.isEmpty()) {
-            return mirrors[0];
-        }
-        if (synchronizedMirrorDurations.size() > 1) {
-            synchronizedMirrorDurations.sort((o1, o2) -> {
-                if (o1.duration() < o2.duration()) {
-                    return -1;
-                } else if (o1.duration() > o2.duration()) {
-                    return 1;
-                }
-                return 0;
-            });
-        }
-
-        fastestMirror = synchronizedMirrorDurations.get(0).mirror();
-        LOG.info("UrlUtils.getFastestMirrorDomain() -> fastest mirror is " + fastestMirror + " in " + synchronizedMirrorDurations.get(0).duration() + "ms");
-        return fastestMirror;
+    for (String param : magnet.substring(8).split("&")) {
+      int eq = param.indexOf('=');
+      if (eq < 0 || !param.substring(0, eq).equalsIgnoreCase("xt")) {
+        continue;
+      }
+      String urn = param.substring(eq + 1);
+      if (urn.indexOf('%') >= 0) {
+        urn = decode(urn);
+      }
+      if (!urn.regionMatches(true, 0, "urn:btih:", 0, 9)) {
+        continue;
+      }
+      String hash = urn.substring(9);
+      if (hexInfoHashPattern.matcher(hash).matches()) {
+        return hash.toLowerCase(Locale.ROOT);
+      }
+      if (base32InfoHashPattern.matcher(hash).matches()) {
+        return base32ToHex(hash);
+      }
+      return null;
     }
+    return null;
+  }
 
-    public static String extractDomainName(String url) {
-        URI uri;
-        try {
-            uri = new URI(url);
-        } catch (URISyntaxException e) {
-            return null;
-        }
-        return uri.getHost();
+  /** RFC 4648 base32 (no padding) to lowercase hex: 32 digits are exactly 20 bytes. */
+  private static String base32ToHex(String base32) {
+    StringBuilder hex = new StringBuilder(40);
+    long buffer = 0;
+    int bits = 0;
+    for (int i = 0; i < base32.length(); i++) {
+      char c = Character.toUpperCase(base32.charAt(i));
+      int value = c >= 'A' && c <= 'Z' ? c - 'A' : c - '2' + 26;
+      buffer = (buffer << 5) | value;
+      bits += 5;
+      while (bits >= 4) {
+        bits -= 4;
+        hex.append(Character.forDigit((int) ((buffer >> bits) & 0xF), 16));
+      }
     }
+    return hex.toString();
+  }
 
-    /**
-     * The v1 info hash of a magnet link, as 40 lowercase hex digits, from its first
-     * {@code xt=urn:btih:} parameter: 40 hex digits, or 32 base32 digits converted to hex (BEP 9).
-     * The scheme, the parameter name and the urn are matched in any case and {@code xt} may come
-     * after other parameters (frostwire/frostwire#1408). Null for anything else, including v2-only
-     * ({@code urn:btmh:}) magnets and links cut short. Never throws: the link comes from users, web
-     * pages and other apps. Unlike {@link #extractInfoHash(String)}, it doesn't pick up 40 hex
-     * digits found elsewhere in the link.
-     */
-    public static String magnetHexInfoHash(String magnet) {
-        if (magnet == null || !magnet.regionMatches(true, 0, "magnet:?", 0, 8)) {
-            return null;
-        }
-        for (String param : magnet.substring(8).split("&")) {
-            int eq = param.indexOf('=');
-            if (eq < 0 || !param.substring(0, eq).equalsIgnoreCase("xt")) {
-                continue;
-            }
-            String urn = param.substring(eq + 1);
-            if (urn.indexOf('%') >= 0) {
-                urn = decode(urn);
-            }
-            if (!urn.regionMatches(true, 0, "urn:btih:", 0, 9)) {
-                continue;
-            }
-            String hash = urn.substring(9);
-            if (hexInfoHashPattern.matcher(hash).matches()) {
-                return hash.toLowerCase(Locale.ROOT);
-            }
-            if (base32InfoHashPattern.matcher(hash).matches()) {
-                return base32ToHex(hash);
-            }
-            return null;
-        }
-        return null;
+  public static String extractInfoHash(String url) {
+    Matcher matcher = infoHashPattern.matcher(url);
+    if (matcher.find()) {
+      return matcher.group(1);
     }
-
-    /** RFC 4648 base32 (no padding) to lowercase hex: 32 digits are exactly 20 bytes. */
-    private static String base32ToHex(String base32) {
-        StringBuilder hex = new StringBuilder(40);
-        long buffer = 0;
-        int bits = 0;
-        for (int i = 0; i < base32.length(); i++) {
-            char c = Character.toUpperCase(base32.charAt(i));
-            int value = c >= 'A' && c <= 'Z' ? c - 'A' : c - '2' + 26;
-            buffer = (buffer << 5) | value;
-            bits += 5;
-            while (bits >= 4) {
-                bits -= 4;
-                hex.append(Character.forDigit((int) ((buffer >> bits) & 0xF), 16));
-            }
-        }
-        return hex.toString();
-    }
-
-    public static String extractInfoHash(String url) {
-        Matcher matcher = infoHashPattern.matcher(url);
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-        return null;
-    }
+    return null;
+  }
 }

@@ -19,8 +19,8 @@ import java.util.regex.Pattern;
  * every start and relied on {@code deleteOnExit()}, which Android never runs (the system kills the
  * process) and which can't delete a loaded DLL on Windows. Each start left a 13 MB (Android) to 30
  * MB copy behind. From 2.0.15.0 jlibtorrent loads the installed library on Android and keeps one
- * copy per version under its own cache folder on desktop, so nothing it uses now has these names.
- * A copy made in the last hour is kept: the desktop temp folder is shared with other Java apps, and
+ * copy per version under its own cache folder on desktop, so nothing it uses now has these names. A
+ * copy made in the last hour is kept: the desktop temp folder is shared with other Java apps, and
  * one still on old jlibtorrent may be loading it right now.
  */
 public final class StaleJlibtorrentCopies {
@@ -62,9 +62,7 @@ public final class StaleJlibtorrentCopies {
             ? null
             : dir.listFiles(
                 f ->
-                    f.isFile()
-                        && NAME.matcher(f.getName()).matches()
-                        && f.lastModified() < cutoff);
+                    f.isFile() && NAME.matcher(f.getName()).matches() && f.lastModified() < cutoff);
     if (copies == null) {
       return 0;
     }

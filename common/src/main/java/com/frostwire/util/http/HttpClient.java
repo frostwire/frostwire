@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -30,129 +30,155 @@ import java.util.Map;
  * @author aldenml
  */
 public interface HttpClient {
-    HttpClientListener getListener();
+  HttpClientListener getListener();
 
-    void setListener(HttpClientListener listener);
+  void setListener(HttpClientListener listener);
 
-    void onCancel();
+  void onCancel();
 
-    void onData(byte[] b, int i, int n);
+  void onData(byte[] b, int i, int n);
 
-    void onError(Exception e);
+  void onError(Exception e);
 
-    void onComplete();
+  void onComplete();
 
-    /**
-     * Returns the HTTP response code
-     */
-    int head(String url, int connectTimeoutInMillis, Map<String, List<String>> outputHeaders) throws IOException;
+  /** Returns the HTTP response code */
+  int head(String url, int connectTimeoutInMillis, Map<String, List<String>> outputHeaders)
+      throws IOException;
 
-    String get(String url) throws IOException;
+  String get(String url) throws IOException;
 
-    String get(String url, int timeout) throws IOException;
+  String get(String url, int timeout) throws IOException;
 
-    String get(String url, int timeout, String userAgent) throws IOException;
+  String get(String url, int timeout, String userAgent) throws IOException;
 
-    String get(String url, int timeout, String userAgent, String referrer, String cookie) throws IOException;
+  String get(String url, int timeout, String userAgent, String referrer, String cookie)
+      throws IOException;
 
-    String get(String url, int timeoutMillis, String userAgent, String referrer, String cookie, Map<String, String> customHeaders) throws IOException;
+  String get(
+      String url,
+      int timeoutMillis,
+      String userAgent,
+      String referrer,
+      String cookie,
+      Map<String, String> customHeaders)
+      throws IOException;
 
-    byte[] getBytes(String url);
+  byte[] getBytes(String url);
 
-    byte[] getBytes(String url, int timeout);
+  byte[] getBytes(String url, int timeout);
 
-    byte[] getBytes(String url, int timeout, String referrer);
+  byte[] getBytes(String url, int timeout, String referrer);
 
-    byte[] getBytes(String url, int timeout, String userAgent, String referrer);
+  byte[] getBytes(String url, int timeout, String userAgent, String referrer);
 
-    byte[] getBytes(String url, int timeout, String userAgent, String referrer, String cookies);
+  byte[] getBytes(String url, int timeout, String userAgent, String referrer, String cookies);
 
-    void save(String url, File file) throws IOException;
+  void save(String url, File file) throws IOException;
 
-    void save(String url, File file, boolean resume) throws IOException;
+  void save(String url, File file, boolean resume) throws IOException;
 
-    void save(String url, File file, boolean resume, Map<String, String> extraHeaders) throws IOException;
+  void save(String url, File file, boolean resume, Map<String, String> extraHeaders)
+      throws IOException;
 
-    void save(String url, File file, boolean resume, int timeout, String userAgent) throws IOException;
+  void save(String url, File file, boolean resume, int timeout, String userAgent)
+      throws IOException;
 
-    void save(String url, File file, boolean resume, int timeout, String userAgent, String referrer) throws IOException;
+  void save(String url, File file, boolean resume, int timeout, String userAgent, String referrer)
+      throws IOException;
 
-    void save(String url, File file, boolean resume, int timeout, String userAgent, String referrer, Map<String, String> extraHeaders) throws IOException;
+  void save(
+      String url,
+      File file,
+      boolean resume,
+      int timeout,
+      String userAgent,
+      String referrer,
+      Map<String, String> extraHeaders)
+      throws IOException;
 
-    String post(String url, int timeout, String userAgent, Map<String, String> formData) throws IOException;
+  String post(String url, int timeout, String userAgent, Map<String, String> formData)
+      throws IOException;
 
-    String post(String url, int timeout, String userAgent, String content, boolean gzip) throws IOException;
+  String post(String url, int timeout, String userAgent, String content, boolean gzip)
+      throws IOException;
 
-    String post(String url, int timeout, String userAgent, String content, String postContentType, boolean gzip) throws IOException;
+  String post(
+      String url,
+      int timeout,
+      String userAgent,
+      String content,
+      String postContentType,
+      boolean gzip)
+      throws IOException;
 
-    /** Posts content without adding a User-Agent or other request metadata. */
-    String post(String url, int timeout, String content, String postContentType) throws IOException;
+  /** Posts content without adding a User-Agent or other request metadata. */
+  String post(String url, int timeout, String content, String postContentType) throws IOException;
 
-    void cancel();
+  void cancel();
 
-    void resetCancellation();
+  void resetCancellation();
 
-    boolean isCanceled();
+  boolean isCanceled();
 
-    interface HttpClientListener {
-        void onError(HttpClient client, Throwable e);
+  interface HttpClientListener {
+    void onError(HttpClient client, Throwable e);
 
-        void onData(HttpClient client, byte[] buffer, int offset, int length);
+    void onData(HttpClient client, byte[] buffer, int offset, int length);
 
-        void onComplete(HttpClient client);
+    void onComplete(HttpClient client);
 
-        void onCancel(HttpClient client);
+    void onCancel(HttpClient client);
 
-        void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields);
+    void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields);
+  }
+
+  abstract class HttpClientListenerAdapter implements HttpClientListener {
+    public void onError(HttpClient client, Throwable e) {}
+
+    public void onData(HttpClient client, byte[] buffer, int offset, int length) {}
+
+    public void onComplete(HttpClient client) {}
+
+    public void onCancel(HttpClient client) {}
+
+    public void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields) {}
+  }
+
+  class HttpRangeException extends IOException {
+
+    HttpRangeException(String message) {
+      super(message);
+    }
+  }
+
+  final class RangeNotSupportedException extends HttpRangeException {
+
+    RangeNotSupportedException(String message) {
+      super(message);
+    }
+  }
+
+  final class HttpRangeOutOfBoundsException extends HttpRangeException {
+
+    HttpRangeOutOfBoundsException(long rangeStart, long expectedRangeStart) {
+      super(
+          "HttpRange Out of Bounds error: start="
+              + rangeStart
+              + " expected start="
+              + expectedRangeStart);
+    }
+  }
+
+  final class ResponseCodeNotSupportedException extends IOException {
+    private final int responseCode;
+
+    ResponseCodeNotSupportedException(int code) {
+      responseCode = code;
     }
 
-    abstract class HttpClientListenerAdapter implements HttpClientListener {
-        public void onError(HttpClient client, Throwable e) {
-        }
-
-        public void onData(HttpClient client, byte[] buffer, int offset, int length) {
-        }
-
-        public void onComplete(HttpClient client) {
-        }
-
-        public void onCancel(HttpClient client) {
-        }
-
-        public void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields) {
-        }
+    int getResponseCode() {
+      return responseCode;
     }
-
-    class HttpRangeException extends IOException {
-
-        HttpRangeException(String message) {
-            super(message);
-        }
-    }
-
-    final class RangeNotSupportedException extends HttpRangeException {
-
-        RangeNotSupportedException(String message) {
-            super(message);
-        }
-    }
-
-    final class HttpRangeOutOfBoundsException extends HttpRangeException {
-
-        HttpRangeOutOfBoundsException(long rangeStart, long expectedRangeStart) {
-            super("HttpRange Out of Bounds error: start=" + rangeStart + " expected start=" + expectedRangeStart);
-        }
-    }
-
-    final class ResponseCodeNotSupportedException extends IOException {
-        private final int responseCode;
-
-        ResponseCodeNotSupportedException(int code) {
-            responseCode = code;
-        }
-
-        int getResponseCode() {
-            return responseCode;
-        }
-    }
+  }
 }

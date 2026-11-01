@@ -3,77 +3,62 @@ package com.frostwire.service;
 import java.io.PrintStream;
 
 /**
- * Forwards errors to an {@link ErrorCallback}. <code>ErrorService</code>
- * includes static methods to set and get the <code>ErrorCallback</code> class.
+ * Forwards errors to an {@link ErrorCallback}. <code>ErrorService</code> includes static methods to
+ * set and get the <code>ErrorCallback</code> class.
  */
 public final class ErrorService {
-    /**
-     * The `ErrorCallback` instance that callbacks are sent to.
-     * As a default the `PrintStreamErrorCallback` is set,
-     * which prints to {@link System#out}.
-     */
-    private volatile static ErrorCallback _errorCallback =
-            new PrintStreamErrorCallback(System.out);
+  /**
+   * The `ErrorCallback` instance that callbacks are sent to. As a default the
+   * `PrintStreamErrorCallback` is set, which prints to {@link System#out}.
+   */
+  private static volatile ErrorCallback _errorCallback = new PrintStreamErrorCallback(System.out);
 
-    /**
-     * Private constructor to ensure this class cannot be instantiated.
-     */
-    private ErrorService() {
+  /** Private constructor to ensure this class cannot be instantiated. */
+  private ErrorService() {}
+
+  /** Sets the `ErrorCallback` class to use. */
+  public static void setErrorCallback(ErrorCallback callback) {
+    _errorCallback = callback;
+  }
+
+  /** Displays the error to the user. */
+  public static void error(Throwable problem) {
+    _errorCallback.error(problem);
+  }
+
+  /** Displays the error to the user with a specific detail information. */
+  public static void error(Throwable problem, String detail) {
+    _errorCallback.error(problem, detail);
+  }
+
+  /**
+   * Helper class that outputs the stack trace and the exception message to a {@link PrintStream}
+   * and rethrows the exception as a {@link RuntimeException}.
+   */
+  private static class PrintStreamErrorCallback implements ErrorCallback {
+    private final PrintStream out;
+
+    /** Takes a {@link PrintStream} which is used for error output. */
+    PrintStreamErrorCallback(PrintStream out) {
+      this.out = out;
     }
 
     /**
-     * Sets the `ErrorCallback` class to use.
+     * Implements the <code>ErrorCallback</code> interface. Prints the stack trace for the given
+     * <code>Throwable</code> and rethrows the exception as a {@link RuntimeException}.
+     *
+     * @param t the <code>Throwable</code> to display
      */
-    public static void setErrorCallback(ErrorCallback callback) {
-        _errorCallback = callback;
+    public void error(Throwable t) {
+      t.printStackTrace(out);
+      throw new RuntimeException(t.getMessage());
     }
 
-    /**
-     * Displays the error to the user.
-     */
-    public static void error(Throwable problem) {
-        _errorCallback.error(problem);
+    // inherit doc comment
+    public void error(Throwable t, String msg) {
+      t.printStackTrace(out);
+      out.println(msg);
+      throw new RuntimeException(t.getMessage());
     }
-
-    /**
-     * Displays the error to the user with a specific detail information.
-     */
-    public static void error(Throwable problem, String detail) {
-        _errorCallback.error(problem, detail);
-    }
-
-    /**
-     * Helper class that outputs the stack trace and the exception message to
-     * a {@link PrintStream} and rethrows the exception as a {@link
-     * RuntimeException}.
-     */
-    private static class PrintStreamErrorCallback implements ErrorCallback {
-        private final PrintStream out;
-
-        /**
-         * Takes a {@link PrintStream} which is used for error output.
-         */
-        PrintStreamErrorCallback(PrintStream out) {
-            this.out = out;
-        }
-
-        /**
-         * Implements the <code>ErrorCallback</code> interface. Prints
-         * the stack trace for the given <code>Throwable</code> and rethrows
-         * the exception as a {@link RuntimeException}.
-         *
-         * @param t the <code>Throwable</code> to display
-         */
-        public void error(Throwable t) {
-            t.printStackTrace(out);
-            throw new RuntimeException(t.getMessage());
-        }
-
-        //inherit doc comment
-        public void error(Throwable t, String msg) {
-            t.printStackTrace(out);
-            out.println(msg);
-            throw new RuntimeException(t.getMessage());
-        }
-    }
+  }
 }

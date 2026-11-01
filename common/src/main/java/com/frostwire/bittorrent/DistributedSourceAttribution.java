@@ -46,9 +46,7 @@ public final class DistributedSourceAttribution {
       if (current != null) {
         return java.util.Arrays.equals(current, sourcePeerPub);
       }
-      extra.put(
-          EXTRA_KEY,
-          Base64.getUrlEncoder().withoutPadding().encodeToString(sourcePeerPub));
+      extra.put(EXTRA_KEY, Base64.getUrlEncoder().withoutPadding().encodeToString(sourcePeerPub));
       return true;
     }
   }

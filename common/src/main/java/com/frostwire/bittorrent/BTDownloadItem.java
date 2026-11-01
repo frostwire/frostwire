@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -22,7 +22,6 @@ import com.frostwire.jlibtorrent.PiecesTracker;
 import com.frostwire.jlibtorrent.Priority;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.transfers.TransferItem;
-
 import java.io.File;
 
 /**
@@ -30,110 +29,116 @@ import java.io.File;
  * @author aldenml
  */
 public class BTDownloadItem implements TransferItem {
-    private final TorrentHandle th;
-    private final int index;
-    private final File file;
-    private final String name;
-    private final long size;
-    private PiecesTracker piecesTracker;
+  private final TorrentHandle th;
+  private final int index;
+  private final File file;
+  private final String name;
+  private final long size;
+  private PiecesTracker piecesTracker;
 
-    public BTDownloadItem(TorrentHandle th, int index, String filePath, long fileSize, PiecesTracker piecesTracker, File savePath) {
-        this.th = th;
-        this.index = index;
-        this.file = new File(savePath, filePath);
-        this.name = file.getName();
-        this.size = fileSize;
-        this.piecesTracker = piecesTracker;
-    }
+  public BTDownloadItem(
+      TorrentHandle th,
+      int index,
+      String filePath,
+      long fileSize,
+      PiecesTracker piecesTracker,
+      File savePath) {
+    this.th = th;
+    this.index = index;
+    this.file = new File(savePath, filePath);
+    this.name = file.getName();
+    this.size = fileSize;
+    this.piecesTracker = piecesTracker;
+  }
 
-    @Override
-    public String getName() {
-        return name;
-    }
+  @Override
+  public String getName() {
+    return name;
+  }
 
-    @Override
-    public String getDisplayName() {
-        return name;
-    }
+  @Override
+  public String getDisplayName() {
+    return name;
+  }
 
-    @Override
-    public boolean isSkipped() {
-        if (th == null || !th.isValid()) {
-            return true;
-        }
-        try {
-            return th.filePriority(index) == Priority.IGNORE;
-        } catch (Throwable e) {
-            return true;
-        }
+  @Override
+  public boolean isSkipped() {
+    if (th == null || !th.isValid()) {
+      return true;
     }
+    try {
+      return th.filePriority(index) == Priority.IGNORE;
+    } catch (Throwable e) {
+      return true;
+    }
+  }
 
-    @Override
-    public File getFile() {
-        return file;
-    }
+  @Override
+  public File getFile() {
+    return file;
+  }
 
-    @Override
-    public long getSize() {
-        return size;
-    }
+  @Override
+  public long getSize() {
+    return size;
+  }
 
-    @Override
-    public long getDownloaded() {
-        if (!th.isValid()) {
-            return 0;
-        }
-        try {
-            long[] progress = th.fileProgress(TorrentHandle.PIECE_GRANULARITY);
-            return progress[index];
-        } catch (Throwable e) {
-            // Handle memory allocation errors (std::bad_alloc) or other exceptions
-            // from native jlibtorrent code
-            return 0;
-        }
+  @Override
+  public long getDownloaded() {
+    if (!th.isValid()) {
+      return 0;
     }
+    try {
+      long[] progress = th.fileProgress(TorrentHandle.PIECE_GRANULARITY);
+      return progress[index];
+    } catch (Throwable e) {
+      // Handle memory allocation errors (std::bad_alloc) or other exceptions
+      // from native jlibtorrent code
+      return 0;
+    }
+  }
 
-    @Override
-    public int getProgress() {
-        if (!th.isValid() || size == 0) { // edge cases
-            return 0;
-        }
-        long downloaded = getDownloaded();
-        if (downloaded == size) {
-            return 100;
-        }
-        return (int) ((float) (downloaded * 100) / (float) size);
+  @Override
+  public int getProgress() {
+    if (!th.isValid() || size == 0) { // edge cases
+      return 0;
     }
+    long downloaded = getDownloaded();
+    if (downloaded == size) {
+      return 100;
+    }
+    return (int) ((float) (downloaded * 100) / (float) size);
+  }
 
-    @Override
-    public boolean isComplete() {
-        return getDownloaded() == size;
-    }
+  @Override
+  public boolean isComplete() {
+    return getDownloaded() == size;
+  }
 
-    /**
-     * @return
-     */
-    public long getSequentialDownloaded() {
-        return piecesTracker != null ? piecesTracker.getSequentialDownloadedBytes(index) : 0;
-    }
+  /**
+   * @return
+   */
+  public long getSequentialDownloaded() {
+    return piecesTracker != null ? piecesTracker.getSequentialDownloadedBytes(index) : 0;
+  }
 
-    public void setPriority(Priority priority) {
-        try {
-            if (th != null && th.isValid()) {
-                th.filePriority(index, priority);
-            }
-        } catch (Throwable ignored) {
-        }
+  public void setPriority(Priority priority) {
+    try {
+      if (th != null && th.isValid()) {
+        th.filePriority(index, priority);
+      }
+    } catch (Throwable ignored) {
     }
+  }
 
-    @Override
-    public int getPriority() {
-        try {
-            if (th != null && th.isValid()) {
-                return th.filePriority(index).swig();
-            }
-        } catch (Throwable ignored) {
-        }
-        return Priority.IGNORE.swig();
+  @Override
+  public int getPriority() {
+    try {
+      if (th != null && th.isValid()) {
+        return th.filePriority(index).swig();
+      }
+    } catch (Throwable ignored) {
     }
+    return Priority.IGNORE.swig();
+  }
 }

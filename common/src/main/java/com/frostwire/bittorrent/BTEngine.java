@@ -28,9 +28,9 @@ import com.frostwire.jlibtorrent.swig.*;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
-import com.frostwire.util.StaleJlibtorrentCopies;
 import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
+import com.frostwire.util.StaleJlibtorrentCopies;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -69,6 +69,7 @@ public final class BTEngine extends SessionManager {
   /** Routes torrent alerts to their download, through one session listener (GitHub #1441). */
   private final TorrentAlertRouter<torrent_handle> downloadAlerts =
       new TorrentAlertRouter<>(TorrentAlertRouter.NATIVE_HANDLES);
+
   private final Queue<RestoreDownloadTask> restoreDownloadsQueue;
   private volatile BTEngineListener listener;
 
@@ -714,8 +715,8 @@ public final class BTEngine extends SessionManager {
    *
    * <p>Read with torrentFileWithHashes(): torrentFile() drops the v2 piece layers, and re-encoding
    * a v2-only torrent without them throws, so its copy was never written and the transfer vanished
-   * after a restart (GitHub #1383). For a v2 magnet download whose piece layers haven't arrived
-   * yet this still throws; the next resume save calls {@link #ensureResumeTorrentFile} again.
+   * after a restart (GitHub #1383). For a v2 magnet download whose piece layers haven't arrived yet
+   * this still throws; the next resume save calls {@link #ensureResumeTorrentFile} again.
    */
   static byte[] sessionTorrentBytes(TorrentHandle th) {
     TorrentInfo ti = th.torrentFileWithHashes();

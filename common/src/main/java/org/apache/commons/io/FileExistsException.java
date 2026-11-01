@@ -27,28 +27,26 @@ import java.io.IOException;
  */
 public class FileExistsException extends IOException {
 
-    /**
-     * Default Constructor.
-     */
-    public FileExistsException() {
-        super();
-    }
+  /** Default Constructor. */
+  public FileExistsException() {
+    super();
+  }
 
-    /**
-     * Construct an instance with the specified message.
-     *
-     * @param message The error message
-     */
-    public FileExistsException(String message) {
-        super(message);
-    }
+  /**
+   * Construct an instance with the specified message.
+   *
+   * @param message The error message
+   */
+  public FileExistsException(String message) {
+    super(message);
+  }
 
-    /**
-     * Construct an instance with the specified file.
-     *
-     * @param file The file that exists
-     */
-    public FileExistsException(File file) {
-        super("File " + file + " exists");
-    }
+  /**
+   * Construct an instance with the specified file.
+   *
+   * @param file The file that exists
+   */
+  public FileExistsException(File file) {
+    super("File " + file + " exists");
+  }
 }

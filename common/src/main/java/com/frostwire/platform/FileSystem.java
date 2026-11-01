@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -25,33 +25,33 @@ import java.io.File;
  * @author aldenml
  */
 public interface FileSystem {
-    boolean isDirectory(File file);
+  boolean isDirectory(File file);
 
-    boolean isFile(File file);
+  boolean isFile(File file);
 
-    boolean canRead(File file);
+  boolean canRead(File file);
 
-    boolean canWrite(File file);
+  boolean canWrite(File file);
 
-    long length(File file);
+  long length(File file);
 
-    long lastModified(File file);
+  long lastModified(File file);
 
-    boolean exists(File file);
+  boolean exists(File file);
 
-    boolean mkdirs(File file);
+  boolean mkdirs(File file);
 
-    boolean delete(File file);
+  boolean delete(File file);
 
-    File[] listFiles(File file, FileFilter filter);
+  File[] listFiles(File file, FileFilter filter);
 
-    boolean copy(File src, File dest);
+  boolean copy(File src, File dest);
 
-    default Throwable lastCopyError() {
-        return null;
-    }
+  default Throwable lastCopyError() {
+    return null;
+  }
 
-    boolean write(File file, byte[] data);
+  boolean write(File file, byte[] data);
 
-    void walk(File file, FileFilter filter);
+  void walk(File file, FileFilter filter);
 }

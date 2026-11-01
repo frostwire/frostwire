@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -19,12 +19,6 @@
 package com.frostwire.util.http;
 
 import com.frostwire.util.*;
-import okhttp3.*;
-import okio.Buffer;
-import okio.BufferedSink;
-import okio.GzipSink;
-import okio.Okio;
-
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,472 +33,555 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import okhttp3.*;
+import okio.Buffer;
+import okio.BufferedSink;
+import okio.GzipSink;
+import okio.Okio;
 
 /**
- * COMMON
- * An OkHttpClient based AbstractHttpClient.
+ * COMMON An OkHttpClient based AbstractHttpClient.
  *
- * <p>SECURITY AUDIT NOTE (C24): Crawl URLs and fetchBytes URLs are taken
- * from search-result HTML/JSON with no host validation at the HTTP client
- * layer. The Ssl.FWHostnameVerifier domain whitelist is enforced at TLS
- * handshake time but not at the HTTP request layer. An allowlist check
- * rejecting loopback/internal IPs (127.0.0.0/8, 10.0.0.0/8, 169.254.0.0/16)
- * was considered but intentionally left as-is — FrostWire only crawls
- * known torrent sites and the hostname verifier already restricts TLS
- * connections to whitelisted domains. Do NOT add IP-range blocking
- * without verifying it doesn't break legitimate CDN/cloud-fronted sites.
+ * <p>SECURITY AUDIT NOTE (C24): Crawl URLs and fetchBytes URLs are taken from search-result
+ * HTML/JSON with no host validation at the HTTP client layer. The Ssl.FWHostnameVerifier domain
+ * whitelist is enforced at TLS handshake time but not at the HTTP request layer. An allowlist check
+ * rejecting loopback/internal IPs (127.0.0.0/8, 10.0.0.0/8, 169.254.0.0/16) was considered but
+ * intentionally left as-is — FrostWire only crawls known torrent sites and the hostname verifier
+ * already restricts TLS connections to whitelisted domains. Do NOT add IP-range blocking without
+ * verifying it doesn't break legitimate CDN/cloud-fronted sites.
  *
  * @author gubatron
  * @author aldenml
  */
 public class OkHttpClientWrapper extends AbstractHttpClient {
-    public static final ConnectionPool CONNECTION_POOL = new ConnectionPool(8, 30, TimeUnit.SECONDS);
-    private static final Logger LOG = Logger.getLogger(OkHttpClientWrapper.class);
+  public static final ConnectionPool CONNECTION_POOL = new ConnectionPool(8, 30, TimeUnit.SECONDS);
+  private static final Logger LOG = Logger.getLogger(OkHttpClientWrapper.class);
 
-    /** Maximum response body size for get() (16 MB). Prevents OOM from malicious servers. */
-    private static final long MAX_STRING_RESPONSE_BYTES = 16L * 1024 * 1024;
-    /** Maximum response body size for getBytes() (32 MB — allows large .torrent files). */
-    private static final long MAX_BYTES_RESPONSE_BYTES = 32L * 1024 * 1024;
-    private static final Pattern CONTENT_RANGE_PATTERN =
-            Pattern.compile("^bytes (\\d+)-\\d+/(?:\\d+|\\*)$", Pattern.CASE_INSENSITIVE);
+  /** Maximum response body size for get() (16 MB). Prevents OOM from malicious servers. */
+  private static final long MAX_STRING_RESPONSE_BYTES = 16L * 1024 * 1024;
 
-    private final ThreadPool pool;
-    private final OkHttpClient sharedClient;
+  /** Maximum response body size for getBytes() (32 MB — allows large .torrent files). */
+  private static final long MAX_BYTES_RESPONSE_BYTES = 32L * 1024 * 1024;
 
-    public OkHttpClientWrapper(final ThreadPool pool) {
-        this(pool, false);
+  private static final Pattern CONTENT_RANGE_PATTERN =
+      Pattern.compile("^bytes (\\d+)-\\d+/(?:\\d+|\\*)$", Pattern.CASE_INSENSITIVE);
+
+  private final ThreadPool pool;
+  private final OkHttpClient sharedClient;
+
+  public OkHttpClientWrapper(final ThreadPool pool) {
+    this(pool, false);
+  }
+
+  public OkHttpClientWrapper(final ThreadPool pool, boolean http1Only) {
+    this.pool = pool;
+    OkHttpClient.Builder builder = newOkHttpClient(pool);
+    if (http1Only) {
+      builder.protocols(Collections.singletonList(Protocol.HTTP_1_1));
     }
+    this.sharedClient = builder.build();
+  }
 
-    public OkHttpClientWrapper(final ThreadPool pool, boolean http1Only) {
-        this.pool = pool;
-        OkHttpClient.Builder builder = newOkHttpClient(pool);
-        if (http1Only) {
-            builder.protocols(Collections.singletonList(Protocol.HTTP_1_1));
-        }
-        this.sharedClient = builder.build();
-    }
-
-    public static void cancelAllRequests() {
-        try {
-            // We're in common so we'll just fire off this one thread here.
-            // This occurs when we cancel searches and when we shutdown the app.
-            new Thread("OkHttpClientWrapper::cancelAllRequests") {
-                @Override
-                public void run() {
-                    try {
-                        CONNECTION_POOL.evictAll();
-                    } catch (Throwable t) {
-                        LOG.error(t.getMessage(), t);
-                    }
-                }
-            }.start();
-        } catch (Throwable ignored) {
-        }
-    }
-
-    public static OkHttpClient.Builder newOkHttpClient(ThreadPool pool) {
-        OkHttpClient.Builder searchClient = new OkHttpClient.Builder();
-        searchClient.dispatcher(new Dispatcher(pool));
-        searchClient.connectionPool(CONNECTION_POOL);
-        searchClient.followRedirects(true);
-        searchClient.connectTimeout(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS);
-        searchClient.pingInterval(5, TimeUnit.SECONDS);
-        searchClient = configNullSsl(searchClient);
-        return searchClient;
-    }
-
-    public static OkHttpClient.Builder configNullSsl(OkHttpClient.Builder b) {
-        b.followSslRedirects(true);
-        b.hostnameVerifier(Ssl.fwHostnameVerifier());
-        b.sslSocketFactory(Ssl.nullSocketFactory(), Ssl.nullTrustManager());
-        ConnectionSpec spec0 = cipherSpec(ConnectionSpec.CLEARTEXT);
-        ConnectionSpec spec1 = cipherSpec(ConnectionSpec.COMPATIBLE_TLS);
-        ConnectionSpec spec2 = cipherSpec(ConnectionSpec.MODERN_TLS);
-        ConnectionSpec spec3 = cipherSpec(ConnectionSpec.RESTRICTED_TLS);
-        b.connectionSpecs(Arrays.asList(spec0, spec1, spec2, spec3));
-        return b;
-    }
-
-    private static ConnectionSpec cipherSpec(ConnectionSpec spec) {
-        ConnectionSpec.Builder b = new ConnectionSpec.Builder(spec);
-        if (spec.isTls()) {
-            b = b.allEnabledCipherSuites();
-            b = b.allEnabledTlsVersions();
-        }
-        return b.build();
-    }
-
-    @Override
-    public int head(String url, int connectTimeoutInMillis, Map<String, List<String>> outputHeaders) throws IOException {
-        OkHttpClient client = sharedClient.newBuilder()
-                .connectTimeout(connectTimeoutInMillis, TimeUnit.MILLISECONDS)
-                .followRedirects(false)
-                .build();
-        Request req = new Request.Builder().
-                url(url).
-                header("User-Agent", DEFAULT_USER_AGENT).
-                head().
-                build();
-        Response resp = client.newCall(req).execute();
-        closeQuietly(resp.body());
-        copyMultiMap(resp.headers().toMultimap(), outputHeaders);
-        return resp.code();
-    }
-
-    @Override
-    public byte[] getBytes(String url, int timeout, String userAgent, String referrer, String cookies) {
-        byte[] result = null;
-        OkHttpClient client = sharedClient.newBuilder()
-                .connectTimeout(timeout, TimeUnit.MILLISECONDS)
-                .readTimeout(timeout, TimeUnit.MILLISECONDS)
-                .writeTimeout(timeout, TimeUnit.MILLISECONDS)
-                .build();
-        final Request.Builder builder = prepareRequestBuilder(url, userAgent, referrer, cookies);
-        ResponseBody responseBody = null;
-        try {
-            Response response = getSyncResponse(client, builder);
-            int code = response.code();
-            if (code < 200 || code >= 300) {
-                LOG.warn("OkHttpClientWrapper::getBytes - HTTP " + code + " for " + UrlUtils.logAddress(url));
-                closeQuietly(response.body());
-                return null;
-            }
-            responseBody = response.body();
-            if (responseBody != null) {
-                long contentLength = responseBody.contentLength();
-                if (contentLength > MAX_BYTES_RESPONSE_BYTES) {
-                    LOG.warn("OkHttpClientWrapper::getBytes - response too large (" + contentLength + " bytes) for " + UrlUtils.logAddress(url));
-                    closeQuietly(responseBody);
-                    return null;
-                }
-                result = responseBody.bytes();
-            }
-        } catch (Throwable e) {
-            LOG.error("Error getting bytes from http body response: " + e.getMessage());
-        } finally {
-            if (responseBody != null) {
-                closeQuietly(responseBody);
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public String get(String url, int timeoutMillis, String userAgent, String referrer, String cookie, Map<String, String> customHeaders) throws IOException {
-        String result = null;
-        OkHttpClient client = sharedClient.newBuilder()
-                .connectTimeout(timeoutMillis, TimeUnit.MILLISECONDS)
-                .readTimeout(timeoutMillis, TimeUnit.MILLISECONDS)
-                .writeTimeout(timeoutMillis, TimeUnit.MILLISECONDS)
-                .build();
-        final Request.Builder builder = prepareRequestBuilder(url, userAgent, referrer, cookie);
-        addCustomHeaders(customHeaders, builder);
-        ResponseBody responseBody = null;
-        try {
-            Response response = getSyncResponse(client, builder);
-            int code = response.code();
-            if (code < 200 || code >= 300) {
-                LOG.warn("OkHttpClientWrapper::get - HTTP " + code + " for " + UrlUtils.logAddress(url));
-                closeQuietly(response.body());
-                return null;
-            }
-            responseBody = response.body();
-            if (responseBody != null) {
-                long contentLength = responseBody.contentLength();
-                if (contentLength > MAX_STRING_RESPONSE_BYTES) {
-                    LOG.warn("OkHttpClientWrapper::get - response too large (" + contentLength + " bytes) for " + UrlUtils.logAddress(url));
-                    closeQuietly(responseBody);
-                    return null;
-                }
-                result = responseBody.string();
-            }
-        } catch (IOException ioe) {
-            throw ioe;
-        } catch (Throwable e) {
-            LOG.error(e.getMessage(), e);
-        } finally {
-            if (responseBody != null) {
-                closeQuietly(responseBody);
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public void save(String url, File file, boolean resume, int timeout, String userAgent, String referrer, Map<String, String> extraHeaders) throws IOException {
-        FileOutputStream fos;
-        BufferedOutputStream bos = null;
-        long rangeStart;
-        if (resume && file.exists()) {
-            fos = new FileOutputStream(file, true);
-            rangeStart = file.length();
-        } else {
-            fos = new FileOutputStream(file, false);
-            rangeStart = -1;
-        }
-        bos = new BufferedOutputStream(fos, 32768); // 32 KiB buffer
-        OkHttpClient client = sharedClient.newBuilder()
-                .connectTimeout(timeout, TimeUnit.MILLISECONDS)
-                .readTimeout(timeout, TimeUnit.MILLISECONDS)
-                .writeTimeout(timeout, TimeUnit.MILLISECONDS)
-                .build();
-        final Request.Builder builder = prepareRequestBuilder(url, userAgent, referrer, null);
-        addCustomHeaders(extraHeaders, builder);
-        addRangeHeader(rangeStart, -1, builder);
-        Response response = null;
-        long totalBytesWritten = 0;
-        try {
-            response = getSyncResponse(client, builder);
-            LOG.info("OkHttpClientWrapper::save - HTTP " + response.code() + " " + response.message() + " url=" + UrlUtils.logAddress(url));
-            if (!response.isSuccessful()) {
-                if (!resume) {
-                    closeQuietly(bos);
-                    closeQuietly(fos);
-                    file.delete(); // remove the 0-byte file created by FileOutputStream before the request
-                }
-                throw new IOException("HTTP " + response.code() + " " + response.message() + " url=" + UrlUtils.logAddress(url));
-            }
-            if (rangeStart >= 0 && response.code() != HttpURLConnection.HTTP_PARTIAL) {
-                throw new RangeNotSupportedException(
-                        "Server ignored bytes range request for " + UrlUtils.logAddress(url));
-            }
-            if (rangeStart >= 0) {
-                long responseRangeStart = contentRangeStart(response.header("Content-Range"));
-                if (responseRangeStart != rangeStart) {
-                    throw new HttpRangeOutOfBoundsException(responseRangeStart, rangeStart);
-                }
-            }
-            final Headers headers = response.headers();
-            onHeaders(headers);
-            ResponseBody responseBody = response.body();
-            if (responseBody == null) {
-                throw new IOException("Empty HTTP response body for " + UrlUtils.logAddress(url));
-            }
-            final InputStream in = responseBody.byteStream();
-            byte[] b = new byte[32768]; // 32 KiB buffer
-            int n;
-            while (!canceled && (n = in.read(b, 0, b.length)) != -1) {
-                if (!canceled) {
-                    bos.write(b, 0, n);
-                    totalBytesWritten += n;
-                    onData(b, 0, n);
-                }
-            }
-        } finally {
-            closeQuietly(bos);
-            closeQuietly(fos);
-            if (response != null) {
-                closeQuietly(response.body());
-            }
-        }
-        LOG.info("OkHttpClientWrapper::save - finished, totalBytesWritten=" + totalBytesWritten + " file=" + file.getAbsolutePath());
-        if (canceled) {
-            onCancel();
-        } else {
-            onComplete();
-        }
-    }
-
-    private void onHeaders(Headers headers) {
-        if (getListener() != null) {
-            try {
-                getListener().onHeaders(this, headers.toMultimap());
-            } catch (Exception e) {
-                LOG.warn(e.getMessage(), e);
-            }
-        }
-    }
-
-    @Override
-    public String post(String url, int timeout, String userAgent, Map<String, String> formData) throws IOException {
-        return post(url, timeout, userAgent, "application/x-www-form-urlencoded; charset=utf-8", getFormDataBytes(formData), false);
-    }
-
-    @Override
-    public String post(String url, int timeout, String userAgent, String content, String postContentType, boolean gzip) throws IOException {
-        return post(url, timeout, userAgent, postContentType, content.getBytes(StandardCharsets.UTF_8), gzip);
-    }
-
-    @Override
-    public String post(String url, int timeout, String content, String postContentType) throws IOException {
-        canceled = false;
-        OkHttpClient client = sharedClient.newBuilder()
-                .connectTimeout(timeout, TimeUnit.MILLISECONDS)
-                .readTimeout(timeout, TimeUnit.MILLISECONDS)
-                .writeTimeout(timeout, TimeUnit.MILLISECONDS)
-                .followRedirects(false)
-                .build();
-        Request.Builder request = new Request.Builder()
-                .url(url)
-                .post(RequestBody.create(content.getBytes(StandardCharsets.UTF_8), MediaType.parse(postContentType)));
-        return getPostSyncResponse(client, request);
-    }
-
-    private String post(String url, int timeout, String userAgent, String postContentType, byte[] postData, boolean gzip) throws IOException {
-        canceled = false;
-        OkHttpClient.Builder clientBuilder = sharedClient.newBuilder()
-                .connectTimeout(timeout, TimeUnit.MILLISECONDS)
-                .readTimeout(timeout, TimeUnit.MILLISECONDS)
-                .writeTimeout(timeout, TimeUnit.MILLISECONDS)
-                .followRedirects(false);
-        if (gzip) {
-            clientBuilder.addInterceptor(new GzipRequestInterceptor());
-        }
-        OkHttpClient client = clientBuilder.build();
-        final Request.Builder builder = prepareRequestBuilder(url, userAgent, null, null);
-        final RequestBody requestBody = RequestBody.create(postData, MediaType.parse(postContentType));
-        builder.post(requestBody);
-        return getPostSyncResponse(client, builder);
-    }
-
-    private String getPostSyncResponse(OkHttpClient client, Request.Builder builder) throws IOException {
-        String result = null;
-        final Response response = this.getSyncResponse(client, builder);
-        try {
-            int httpResponseCode = response.code();
-            if (httpResponseCode < 200 || httpResponseCode >= 300) {
-                throw new ResponseCodeNotSupportedException(httpResponseCode);
-            }
-            if (canceled) {
-                onCancel();
-            } else {
-                result = response.body().string();
-                onComplete();
-            }
-        } finally {
-            closeQuietly(response.body());
-        }
-        return result;
-    }
-
-    private void addRangeHeader(long rangeStart, long rangeEnd, Request.Builder builderRef) {
-        if (rangeStart < 0) {
-            return;
-        }
-        StringBuilder sb = new StringBuilder();
-        sb.append("bytes=");
-        sb.append(rangeStart);
-        sb.append('-');
-        if (rangeEnd > 0 && rangeEnd > rangeStart) {
-            sb.append(rangeEnd);
-        }
-        builderRef.header("Range", sb.toString());
-    }
-
-    private long contentRangeStart(String contentRange) {
-        if (contentRange == null) {
-            return -1;
-        }
-        Matcher matcher = CONTENT_RANGE_PATTERN.matcher(contentRange);
-        if (!matcher.matches()) {
-            return -1;
-        }
-        try {
-            return Long.parseLong(matcher.group(1));
-        } catch (NumberFormatException ignored) {
-            return -1;
-        }
-    }
-
-    private Request.Builder prepareRequestBuilder(String url, String userAgent, String referrer, String cookie) {
-        Request.Builder builder = new Request.Builder();
-        builder.url(url);
-        if (!StringUtils.isNullOrEmpty(userAgent)) {
-            builder.header("User-Agent", userAgent);
-        }
-        builder.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-        builder.header("Accept-Language", "en-us,en;q=0.5");
-        if (!StringUtils.isNullOrEmpty(referrer)) {
-            try {
-                builder.header("Referer", referrer); // [sic - typo in HTTP protocol]
-            } catch (IllegalArgumentException illegalEx) {
-                LOG.info("Referer value: " + referrer);
-                LOG.warn(illegalEx.getMessage(), illegalEx);
-            }
-        }
-        if (!StringUtils.isNullOrEmpty(cookie)) {
-            builder.header("Cookie", cookie);
-        }
-        return builder;
-    }
-
-    private void addCustomHeaders(Map<String, String> customHeaders, Request.Builder builder) {
-        if (customHeaders != null && customHeaders.size() > 0) {
-            for (Map.Entry<String, String> header : customHeaders.entrySet()) {
-                try {
-                    builder.header(header.getKey(), header.getValue());
-                } catch (Throwable e) {
-                    LOG.warn("addCustomHeaders: skipping header '" + header.getKey() + "': " + e.getMessage(), e);
-                }
-            }
-        }
-    }
-
-    private Response getSyncResponse(OkHttpClient client, Request.Builder builder) throws IOException {
-        final Request request = builder.build();
-        return client.newCall(request).execute();
-    }
-
-    /**
-     * This interceptor compresses the HTTP request body. Many web servers can't handle this!
-     */
-    class GzipRequestInterceptor implements Interceptor {
+  public static void cancelAllRequests() {
+    try {
+      // We're in common so we'll just fire off this one thread here.
+      // This occurs when we cancel searches and when we shutdown the app.
+      new Thread("OkHttpClientWrapper::cancelAllRequests") {
         @Override
-        public Response intercept(Chain chain) throws IOException {
-            Request originalRequest = chain.request();
-            if (originalRequest.body() == null || originalRequest.header("Content-Encoding") != null) {
-                return chain.proceed(originalRequest);
-            }
-            Request compressedRequest = originalRequest.newBuilder()
-                    .header("Content-Encoding", "gzip")
-                    .method(originalRequest.method(), forceContentLength(gzip(originalRequest.body())))
-                    .build();
-            return chain.proceed(compressedRequest);
+        public void run() {
+          try {
+            CONNECTION_POOL.evictAll();
+          } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
+          }
         }
-
-        /**
-         * https://github.com/square/okhttp/issues/350
-         */
-        private RequestBody forceContentLength(final RequestBody requestBody) throws IOException {
-            final Buffer buffer = new Buffer();
-            requestBody.writeTo(buffer);
-            return new RequestBody() {
-                @Override
-                public MediaType contentType() {
-                    return requestBody.contentType();
-                }
-
-                @Override
-                public long contentLength() {
-                    return buffer.size();
-                }
-
-                @Override
-                public void writeTo(BufferedSink sink) throws IOException {
-                    sink.write(buffer.snapshot());
-                }
-            };
-        }
-
-        private RequestBody gzip(final RequestBody body) {
-            return new RequestBody() {
-                @Override
-                public MediaType contentType() {
-                    return body.contentType();
-                }
-
-                @Override
-                public long contentLength() {
-                    return -1; // We don't know the compressed length in advance!
-                }
-
-                @Override
-                public void writeTo(BufferedSink sink) throws IOException {
-                    BufferedSink gzipSink = Okio.buffer(new GzipSink(sink));
-                    body.writeTo(gzipSink);
-                    gzipSink.close();
-                }
-            };
-        }
+      }.start();
+    } catch (Throwable ignored) {
     }
+  }
+
+  public static OkHttpClient.Builder newOkHttpClient(ThreadPool pool) {
+    OkHttpClient.Builder searchClient = new OkHttpClient.Builder();
+    searchClient.dispatcher(new Dispatcher(pool));
+    searchClient.connectionPool(CONNECTION_POOL);
+    searchClient.followRedirects(true);
+    searchClient.connectTimeout(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS);
+    searchClient.pingInterval(5, TimeUnit.SECONDS);
+    searchClient = configNullSsl(searchClient);
+    return searchClient;
+  }
+
+  public static OkHttpClient.Builder configNullSsl(OkHttpClient.Builder b) {
+    b.followSslRedirects(true);
+    b.hostnameVerifier(Ssl.fwHostnameVerifier());
+    b.sslSocketFactory(Ssl.nullSocketFactory(), Ssl.nullTrustManager());
+    ConnectionSpec spec0 = cipherSpec(ConnectionSpec.CLEARTEXT);
+    ConnectionSpec spec1 = cipherSpec(ConnectionSpec.COMPATIBLE_TLS);
+    ConnectionSpec spec2 = cipherSpec(ConnectionSpec.MODERN_TLS);
+    ConnectionSpec spec3 = cipherSpec(ConnectionSpec.RESTRICTED_TLS);
+    b.connectionSpecs(Arrays.asList(spec0, spec1, spec2, spec3));
+    return b;
+  }
+
+  private static ConnectionSpec cipherSpec(ConnectionSpec spec) {
+    ConnectionSpec.Builder b = new ConnectionSpec.Builder(spec);
+    if (spec.isTls()) {
+      b = b.allEnabledCipherSuites();
+      b = b.allEnabledTlsVersions();
+    }
+    return b.build();
+  }
+
+  @Override
+  public int head(String url, int connectTimeoutInMillis, Map<String, List<String>> outputHeaders)
+      throws IOException {
+    OkHttpClient client =
+        sharedClient
+            .newBuilder()
+            .connectTimeout(connectTimeoutInMillis, TimeUnit.MILLISECONDS)
+            .followRedirects(false)
+            .build();
+    Request req =
+        new Request.Builder().url(url).header("User-Agent", DEFAULT_USER_AGENT).head().build();
+    Response resp = client.newCall(req).execute();
+    closeQuietly(resp.body());
+    copyMultiMap(resp.headers().toMultimap(), outputHeaders);
+    return resp.code();
+  }
+
+  @Override
+  public byte[] getBytes(
+      String url, int timeout, String userAgent, String referrer, String cookies) {
+    byte[] result = null;
+    OkHttpClient client =
+        sharedClient
+            .newBuilder()
+            .connectTimeout(timeout, TimeUnit.MILLISECONDS)
+            .readTimeout(timeout, TimeUnit.MILLISECONDS)
+            .writeTimeout(timeout, TimeUnit.MILLISECONDS)
+            .build();
+    final Request.Builder builder = prepareRequestBuilder(url, userAgent, referrer, cookies);
+    ResponseBody responseBody = null;
+    try {
+      Response response = getSyncResponse(client, builder);
+      int code = response.code();
+      if (code < 200 || code >= 300) {
+        LOG.warn(
+            "OkHttpClientWrapper::getBytes - HTTP " + code + " for " + UrlUtils.logAddress(url));
+        closeQuietly(response.body());
+        return null;
+      }
+      responseBody = response.body();
+      if (responseBody != null) {
+        long contentLength = responseBody.contentLength();
+        if (contentLength > MAX_BYTES_RESPONSE_BYTES) {
+          LOG.warn(
+              "OkHttpClientWrapper::getBytes - response too large ("
+                  + contentLength
+                  + " bytes) for "
+                  + UrlUtils.logAddress(url));
+          closeQuietly(responseBody);
+          return null;
+        }
+        result = responseBody.bytes();
+      }
+    } catch (Throwable e) {
+      LOG.error("Error getting bytes from http body response: " + e.getMessage());
+    } finally {
+      if (responseBody != null) {
+        closeQuietly(responseBody);
+      }
+    }
+    return result;
+  }
+
+  @Override
+  public String get(
+      String url,
+      int timeoutMillis,
+      String userAgent,
+      String referrer,
+      String cookie,
+      Map<String, String> customHeaders)
+      throws IOException {
+    String result = null;
+    OkHttpClient client =
+        sharedClient
+            .newBuilder()
+            .connectTimeout(timeoutMillis, TimeUnit.MILLISECONDS)
+            .readTimeout(timeoutMillis, TimeUnit.MILLISECONDS)
+            .writeTimeout(timeoutMillis, TimeUnit.MILLISECONDS)
+            .build();
+    final Request.Builder builder = prepareRequestBuilder(url, userAgent, referrer, cookie);
+    addCustomHeaders(customHeaders, builder);
+    ResponseBody responseBody = null;
+    try {
+      Response response = getSyncResponse(client, builder);
+      int code = response.code();
+      if (code < 200 || code >= 300) {
+        LOG.warn("OkHttpClientWrapper::get - HTTP " + code + " for " + UrlUtils.logAddress(url));
+        closeQuietly(response.body());
+        return null;
+      }
+      responseBody = response.body();
+      if (responseBody != null) {
+        long contentLength = responseBody.contentLength();
+        if (contentLength > MAX_STRING_RESPONSE_BYTES) {
+          LOG.warn(
+              "OkHttpClientWrapper::get - response too large ("
+                  + contentLength
+                  + " bytes) for "
+                  + UrlUtils.logAddress(url));
+          closeQuietly(responseBody);
+          return null;
+        }
+        result = responseBody.string();
+      }
+    } catch (IOException ioe) {
+      throw ioe;
+    } catch (Throwable e) {
+      LOG.error(e.getMessage(), e);
+    } finally {
+      if (responseBody != null) {
+        closeQuietly(responseBody);
+      }
+    }
+    return result;
+  }
+
+  @Override
+  public void save(
+      String url,
+      File file,
+      boolean resume,
+      int timeout,
+      String userAgent,
+      String referrer,
+      Map<String, String> extraHeaders)
+      throws IOException {
+    FileOutputStream fos;
+    BufferedOutputStream bos = null;
+    long rangeStart;
+    if (resume && file.exists()) {
+      fos = new FileOutputStream(file, true);
+      rangeStart = file.length();
+    } else {
+      fos = new FileOutputStream(file, false);
+      rangeStart = -1;
+    }
+    bos = new BufferedOutputStream(fos, 32768); // 32 KiB buffer
+    OkHttpClient client =
+        sharedClient
+            .newBuilder()
+            .connectTimeout(timeout, TimeUnit.MILLISECONDS)
+            .readTimeout(timeout, TimeUnit.MILLISECONDS)
+            .writeTimeout(timeout, TimeUnit.MILLISECONDS)
+            .build();
+    final Request.Builder builder = prepareRequestBuilder(url, userAgent, referrer, null);
+    addCustomHeaders(extraHeaders, builder);
+    addRangeHeader(rangeStart, -1, builder);
+    Response response = null;
+    long totalBytesWritten = 0;
+    try {
+      response = getSyncResponse(client, builder);
+      LOG.info(
+          "OkHttpClientWrapper::save - HTTP "
+              + response.code()
+              + " "
+              + response.message()
+              + " url="
+              + UrlUtils.logAddress(url));
+      if (!response.isSuccessful()) {
+        if (!resume) {
+          closeQuietly(bos);
+          closeQuietly(fos);
+          file.delete(); // remove the 0-byte file created by FileOutputStream before the request
+        }
+        throw new IOException(
+            "HTTP "
+                + response.code()
+                + " "
+                + response.message()
+                + " url="
+                + UrlUtils.logAddress(url));
+      }
+      if (rangeStart >= 0 && response.code() != HttpURLConnection.HTTP_PARTIAL) {
+        throw new RangeNotSupportedException(
+            "Server ignored bytes range request for " + UrlUtils.logAddress(url));
+      }
+      if (rangeStart >= 0) {
+        long responseRangeStart = contentRangeStart(response.header("Content-Range"));
+        if (responseRangeStart != rangeStart) {
+          throw new HttpRangeOutOfBoundsException(responseRangeStart, rangeStart);
+        }
+      }
+      final Headers headers = response.headers();
+      onHeaders(headers);
+      ResponseBody responseBody = response.body();
+      if (responseBody == null) {
+        throw new IOException("Empty HTTP response body for " + UrlUtils.logAddress(url));
+      }
+      final InputStream in = responseBody.byteStream();
+      byte[] b = new byte[32768]; // 32 KiB buffer
+      int n;
+      while (!canceled && (n = in.read(b, 0, b.length)) != -1) {
+        if (!canceled) {
+          bos.write(b, 0, n);
+          totalBytesWritten += n;
+          onData(b, 0, n);
+        }
+      }
+    } finally {
+      closeQuietly(bos);
+      closeQuietly(fos);
+      if (response != null) {
+        closeQuietly(response.body());
+      }
+    }
+    LOG.info(
+        "OkHttpClientWrapper::save - finished, totalBytesWritten="
+            + totalBytesWritten
+            + " file="
+            + file.getAbsolutePath());
+    if (canceled) {
+      onCancel();
+    } else {
+      onComplete();
+    }
+  }
+
+  private void onHeaders(Headers headers) {
+    if (getListener() != null) {
+      try {
+        getListener().onHeaders(this, headers.toMultimap());
+      } catch (Exception e) {
+        LOG.warn(e.getMessage(), e);
+      }
+    }
+  }
+
+  @Override
+  public String post(String url, int timeout, String userAgent, Map<String, String> formData)
+      throws IOException {
+    return post(
+        url,
+        timeout,
+        userAgent,
+        "application/x-www-form-urlencoded; charset=utf-8",
+        getFormDataBytes(formData),
+        false);
+  }
+
+  @Override
+  public String post(
+      String url,
+      int timeout,
+      String userAgent,
+      String content,
+      String postContentType,
+      boolean gzip)
+      throws IOException {
+    return post(
+        url, timeout, userAgent, postContentType, content.getBytes(StandardCharsets.UTF_8), gzip);
+  }
+
+  @Override
+  public String post(String url, int timeout, String content, String postContentType)
+      throws IOException {
+    canceled = false;
+    OkHttpClient client =
+        sharedClient
+            .newBuilder()
+            .connectTimeout(timeout, TimeUnit.MILLISECONDS)
+            .readTimeout(timeout, TimeUnit.MILLISECONDS)
+            .writeTimeout(timeout, TimeUnit.MILLISECONDS)
+            .followRedirects(false)
+            .build();
+    Request.Builder request =
+        new Request.Builder()
+            .url(url)
+            .post(
+                RequestBody.create(
+                    content.getBytes(StandardCharsets.UTF_8), MediaType.parse(postContentType)));
+    return getPostSyncResponse(client, request);
+  }
+
+  private String post(
+      String url,
+      int timeout,
+      String userAgent,
+      String postContentType,
+      byte[] postData,
+      boolean gzip)
+      throws IOException {
+    canceled = false;
+    OkHttpClient.Builder clientBuilder =
+        sharedClient
+            .newBuilder()
+            .connectTimeout(timeout, TimeUnit.MILLISECONDS)
+            .readTimeout(timeout, TimeUnit.MILLISECONDS)
+            .writeTimeout(timeout, TimeUnit.MILLISECONDS)
+            .followRedirects(false);
+    if (gzip) {
+      clientBuilder.addInterceptor(new GzipRequestInterceptor());
+    }
+    OkHttpClient client = clientBuilder.build();
+    final Request.Builder builder = prepareRequestBuilder(url, userAgent, null, null);
+    final RequestBody requestBody = RequestBody.create(postData, MediaType.parse(postContentType));
+    builder.post(requestBody);
+    return getPostSyncResponse(client, builder);
+  }
+
+  private String getPostSyncResponse(OkHttpClient client, Request.Builder builder)
+      throws IOException {
+    String result = null;
+    final Response response = this.getSyncResponse(client, builder);
+    try {
+      int httpResponseCode = response.code();
+      if (httpResponseCode < 200 || httpResponseCode >= 300) {
+        throw new ResponseCodeNotSupportedException(httpResponseCode);
+      }
+      if (canceled) {
+        onCancel();
+      } else {
+        result = response.body().string();
+        onComplete();
+      }
+    } finally {
+      closeQuietly(response.body());
+    }
+    return result;
+  }
+
+  private void addRangeHeader(long rangeStart, long rangeEnd, Request.Builder builderRef) {
+    if (rangeStart < 0) {
+      return;
+    }
+    StringBuilder sb = new StringBuilder();
+    sb.append("bytes=");
+    sb.append(rangeStart);
+    sb.append('-');
+    if (rangeEnd > 0 && rangeEnd > rangeStart) {
+      sb.append(rangeEnd);
+    }
+    builderRef.header("Range", sb.toString());
+  }
+
+  private long contentRangeStart(String contentRange) {
+    if (contentRange == null) {
+      return -1;
+    }
+    Matcher matcher = CONTENT_RANGE_PATTERN.matcher(contentRange);
+    if (!matcher.matches()) {
+      return -1;
+    }
+    try {
+      return Long.parseLong(matcher.group(1));
+    } catch (NumberFormatException ignored) {
+      return -1;
+    }
+  }
+
+  private Request.Builder prepareRequestBuilder(
+      String url, String userAgent, String referrer, String cookie) {
+    Request.Builder builder = new Request.Builder();
+    builder.url(url);
+    if (!StringUtils.isNullOrEmpty(userAgent)) {
+      builder.header("User-Agent", userAgent);
+    }
+    builder.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+    builder.header("Accept-Language", "en-us,en;q=0.5");
+    if (!StringUtils.isNullOrEmpty(referrer)) {
+      try {
+        builder.header("Referer", referrer); // [sic - typo in HTTP protocol]
+      } catch (IllegalArgumentException illegalEx) {
+        LOG.info("Referer value: " + referrer);
+        LOG.warn(illegalEx.getMessage(), illegalEx);
+      }
+    }
+    if (!StringUtils.isNullOrEmpty(cookie)) {
+      builder.header("Cookie", cookie);
+    }
+    return builder;
+  }
+
+  private void addCustomHeaders(Map<String, String> customHeaders, Request.Builder builder) {
+    if (customHeaders != null && customHeaders.size() > 0) {
+      for (Map.Entry<String, String> header : customHeaders.entrySet()) {
+        try {
+          builder.header(header.getKey(), header.getValue());
+        } catch (Throwable e) {
+          LOG.warn(
+              "addCustomHeaders: skipping header '" + header.getKey() + "': " + e.getMessage(), e);
+        }
+      }
+    }
+  }
+
+  private Response getSyncResponse(OkHttpClient client, Request.Builder builder)
+      throws IOException {
+    final Request request = builder.build();
+    return client.newCall(request).execute();
+  }
+
+  /** This interceptor compresses the HTTP request body. Many web servers can't handle this! */
+  class GzipRequestInterceptor implements Interceptor {
+    @Override
+    public Response intercept(Chain chain) throws IOException {
+      Request originalRequest = chain.request();
+      if (originalRequest.body() == null || originalRequest.header("Content-Encoding") != null) {
+        return chain.proceed(originalRequest);
+      }
+      Request compressedRequest =
+          originalRequest
+              .newBuilder()
+              .header("Content-Encoding", "gzip")
+              .method(originalRequest.method(), forceContentLength(gzip(originalRequest.body())))
+              .build();
+      return chain.proceed(compressedRequest);
+    }
+
+    /** https://github.com/square/okhttp/issues/350 */
+    private RequestBody forceContentLength(final RequestBody requestBody) throws IOException {
+      final Buffer buffer = new Buffer();
+      requestBody.writeTo(buffer);
+      return new RequestBody() {
+        @Override
+        public MediaType contentType() {
+          return requestBody.contentType();
+        }
+
+        @Override
+        public long contentLength() {
+          return buffer.size();
+        }
+
+        @Override
+        public void writeTo(BufferedSink sink) throws IOException {
+          sink.write(buffer.snapshot());
+        }
+      };
+    }
+
+    private RequestBody gzip(final RequestBody body) {
+      return new RequestBody() {
+        @Override
+        public MediaType contentType() {
+          return body.contentType();
+        }
+
+        @Override
+        public long contentLength() {
+          return -1; // We don't know the compressed length in advance!
+        }
+
+        @Override
+        public void writeTo(BufferedSink sink) throws IOException {
+          BufferedSink gzipSink = Okio.buffer(new GzipSink(sink));
+          body.writeTo(gzipSink);
+          gzipSink.close();
+        }
+      };
+    }
+  }
 }
