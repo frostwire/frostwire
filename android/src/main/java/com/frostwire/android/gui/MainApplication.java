@@ -111,7 +111,7 @@ public class MainApplication extends Application {
     StaleWorkManagerJobs.remove(this);
 
     // Initialize DataStore + ConfigurationRepository (reads preferences from DataStore)
-    DataStoreManager.INSTANCE.initialize(this);
+    DataStoreManager.initialize(this);
     ConfigurationManager.create(this);
 
     // CRITICAL: Wait for ConfigurationManager to be fully initialized before using it

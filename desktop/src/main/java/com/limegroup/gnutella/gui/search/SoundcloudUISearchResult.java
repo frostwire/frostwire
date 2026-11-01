@@ -42,13 +42,12 @@ public final class SoundcloudUISearchResult extends AbstractUISearchResult {
     DesktopParallelExecutor.execute(
         () -> {
           sr.getDownloadUrl();
-          GUIMediator.instance()
-              .safeInvokeLater(
-                  () -> {
-                    GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
-                    GUIMediator.instance().openSoundcloudTrackUrl(sr.getDetailsUrl(), sr, false);
-                    showSearchResultWebPage(false);
-                  });
+          GUIMediator.safeInvokeLater(
+              () -> {
+                GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
+                GUIMediator.instance().openSoundcloudTrackUrl(sr.getDetailsUrl(), sr, false);
+                showSearchResultWebPage(false);
+              });
         });
   }
 
