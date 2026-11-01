@@ -1,4 +1,5 @@
 FrostWire 3.2.3 build 779 UNRELEASED
+  - fix:The music player's Recent list is no longer wiped when the media library can't be read yet, and freshly downloaded songs no longer drop out of it (#1443)
   - fix:Delete, Play, Add to queue and the playlist actions on an album, artist, genre or playlist in the music player now act on that item's songs. Picking the action right after long-pressing could use the previous item's songs, or delete a song you never chose (#1442)
   - fix:The search mesh no longer fails to start now and then because another app took its local port first (#1424)
   - fix:Torrents that use only the new BitTorrent v2 format no longer disappear from Transfers after a restart: their saved copy now keeps the v2 piece hashes (#1383)
