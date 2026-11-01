@@ -26,6 +26,13 @@ FrostWire 7.1.3 build 335 UNRELEASED
    - jlibtorrent: Torrents whose file names have emoji or other characters outside the basic plane download with the right names, and text that isn't valid UTF-8 can no longer corrupt libtorrent's JNI layer
    - jlibtorrent: libtorrent fixes: a data corruption bug in memory-mapped storage, short disk reads on Windows, trackers stuck after a pause, DNS leaks of peer and tracker host names, web seeds for single-file torrents, wrong seeding/active/finished times, external IP not reported with UPnP/NAT-PMP, a race removing an auto-managed torrent, and move-storage rollback
    - jlibtorrent: the native library is extracted once and reused instead of copied out on every start (#1382)
+   - windows-launcher: FrostWire no longer starts if it can't open its own folder, instead of loading Java and its files from wherever it was started, and Reinstall runs the installer from FrostWire's folder only
+   - windows-launcher: DLLs in the folder FrostWire is started from are no longer loaded: the current folder is out of the DLL search order and Java's jvm.dll is loaded by its full path
+   - windows-launcher: built with Control Flow Guard, CET shadow stack and Spectre mitigations
+   - windows-launcher: the "download FrostWire again" link in the startup error dialog reports your installed version (it always said "unknown") and can no longer crash the dialog when the version is long or unusual
+   - windows-launcher: FrostWire.exe --debug shows its log in the console it was started from (or a new one)
+   - windows-launcher: Java can use IPv6 again, so peers and servers on IPv6-only networks are reachable (IPv4 is still preferred where both exist)
+   - windows-launcher: fixed a crash when Windows runs out of memory while reading the command line, and other memory-handling mistakes
    - fix:Karma: a download that finishes from a distributed-search peer now endorses that peer automatically, once per peer and torrent (#1414)
    - fix:Karma: Options shows your karma and endorsements from the right database instead of "missing" or 0 (#1412)
    - fix:Karma: your karma chain can no longer be lost: each entry is saved before it is used, never signed at an older Bitcoin block, and a chain that fails verification is kept aside instead of overwritten (#1413)
