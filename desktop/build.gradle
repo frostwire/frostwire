@@ -91,8 +91,16 @@ java {
 compileJava {
     options.encoding = '8859_1'
     options.fork = true
-    options.compilerArgs += ['-Xlint:deprecation']
-    options.compilerArgs += ['-Xlint:unchecked']
+}
+
+// Every javac lint check, and warnings fail the build so new ones can't creep back in. Three
+// checks are off on purpose:
+// - serial: Swing classes are Serializable but never serialized; serialVersionUIDs were removed
+//   on purpose (a53e2adf7).
+// - this-escape: Swing constructors that wire listeners to `this`, the usual Swing pattern.
+// - restricted: System.loadLibrary for the native libraries the app needs.
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += ['-Xlint:all,-serial,-this-escape,-restricted', '-Werror']
 }
 
 application {

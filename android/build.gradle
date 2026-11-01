@@ -172,9 +172,13 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
+    // Every javac lint check, and warnings fail the build so new ones can't creep back in. Off on
+    // purpose: serial (views are Serializable but never serialized) and classfile (Robolectric's
+    // jars reference android.annotation classes that aren't on the test classpath). The JDK 17
+    // javac used here has no this-escape or restricted checks (desktop turns those off too).
     tasks.withType(JavaCompile).configureEach {
-        options.compilerArgs << "-Xlint:deprecation"
-        options.compilerArgs << "-Xlint:unchecked"
+        options.compilerArgs << "-Xlint:all,-serial,-classfile"
+        options.compilerArgs << "-Werror"
     }
 
     kotlin {
