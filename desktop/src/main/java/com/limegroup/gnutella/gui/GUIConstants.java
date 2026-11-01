@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -19,42 +19,36 @@
 package com.limegroup.gnutella.gui;
 
 import com.limegroup.gnutella.util.FrostWireUtils;
-
 import java.io.File;
 
-/**
- * Constants used by gui classes.
- */
+/** Constants used by gui classes. */
 public final class GUIConstants {
-    /**
-     * Standard number of pixels that should separate many
-     * different types of gui components.
-     */
-    public static final int SEPARATOR = 6;
-    public static final String TWITTER_FROSTWIRE_URL = "https://twitter.com/frostwire";
-    public static final String FACEBOOK_FROSTWIRE_URL = "https://www.facebook.com/FrostwireOfficial";
-    public static final String REDDIT_FROSTWIRE_URL = "https://www.reddit.com/r/frostwire";
-    public static final String FROSTWIRE_CHAT_URL = "https://www.frostwire.com/chat";
+  /** Standard number of pixels that should separate many different types of gui components. */
+  public static final int SEPARATOR = 6;
 
-    static final String FROSTWIRE_64x64_ICON = "frostwire64x64";
-    /**
-     * Constant for the path to the LimeWire Windows launcher.
-     */
-    static final File FROSTWIRE_EXE_FILE = new File("FrostWire.exe").getAbsoluteFile();
-    /**
-     * The number of pixels in the margin of a padded panel.
-     */
-    static final int OUTER_MARGIN = 6;
-    static final String INSTAGRAM_FROSTWIRE_URL = "https://instagram.com/frostwire";
+  public static final String TWITTER_FROSTWIRE_URL = "https://twitter.com/frostwire";
+  public static final String FACEBOOK_FROSTWIRE_URL = "https://www.facebook.com/FrostwireOfficial";
+  public static final String REDDIT_FROSTWIRE_URL = "https://www.reddit.com/r/frostwire";
+  public static final String FROSTWIRE_CHAT_URL = "https://www.frostwire.com/chat";
 
-    public enum Feature {
-        VPN_DROP_GUARD;
+  static final String FROSTWIRE_64x64_ICON = "frostwire64x64";
 
-        public boolean enabled() {
-            // All features are enabled if running from source.
-            boolean enabled = FrostWireUtils.isIsRunningFromSource();
-            System.out.println("INFO: Feature." + this.name() + " enabled: " + enabled);
-            return enabled;
-        }
+  /** Constant for the path to the LimeWire Windows launcher. */
+  static final File FROSTWIRE_EXE_FILE = new File("FrostWire.exe").getAbsoluteFile();
+
+  /** The number of pixels in the margin of a padded panel. */
+  static final int OUTER_MARGIN = 6;
+
+  static final String INSTAGRAM_FROSTWIRE_URL = "https://instagram.com/frostwire";
+
+  public enum Feature {
+    VPN_DROP_GUARD;
+
+    public boolean enabled() {
+      // All features are enabled if running from source.
+      boolean enabled = FrostWireUtils.isIsRunningFromSource();
+      System.out.println("INFO: Feature." + this.name() + " enabled: " + enabled);
+      return enabled;
     }
+  }
 }

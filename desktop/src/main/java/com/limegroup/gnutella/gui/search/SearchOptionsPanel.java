@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -20,10 +20,6 @@ package com.limegroup.gnutella.gui.search;
 
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.LabeledTextField;
-import net.miginfocom.swing.MigLayout;
-import org.limewire.setting.BooleanSetting;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
@@ -32,166 +28,174 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.swing.*;
+import net.miginfocom.swing.MigLayout;
+import org.limewire.setting.BooleanSetting;
 
 /**
  * @author gubatron
  * @author aldenml
  */
 final class SearchOptionsPanel extends JPanel {
-    private final SearchResultMediator resultPanel;
-    private final LabeledTextField textFieldKeywords;
-    private final LabeledRangeSlider sliderSize;
-    private final LabeledRangeSlider sliderSeeds;
-    private final Map<SearchEngine, JCheckBox> engineCheckboxes;
-    private GeneralResultFilter generalFilter;
+  private final SearchResultMediator resultPanel;
+  private final LabeledTextField textFieldKeywords;
+  private final LabeledRangeSlider sliderSize;
+  private final LabeledRangeSlider sliderSeeds;
+  private final Map<SearchEngine, JCheckBox> engineCheckboxes;
+  private GeneralResultFilter generalFilter;
 
-    public SearchOptionsPanel(SearchResultMediator resultPanel) {
-        this.resultPanel = resultPanel;
-        engineCheckboxes = new HashMap<>();
-        setLayout(new MigLayout("insets 0, fillx"));
-        this.textFieldKeywords = createNameFilter();
-        add(textFieldKeywords, "gapx 3, gaptop 4px, wrap");
-        add(new JSeparator(SwingConstants.HORIZONTAL), "growx, wrap");
-        add(createSearchEnginesFilter(), "wrap");
-        add(new JSeparator(SwingConstants.HORIZONTAL), "growx, wrap");
-        this.sliderSize = createSizeFilter();
-        add(sliderSize, "gapx 3, wrap");
-        add(new JSeparator(SwingConstants.HORIZONTAL), "growx, wrap");
-        this.sliderSeeds = createSeedsFilter();
-        add(sliderSeeds, "gapx 3, wrap");
-        add(new JSeparator(SwingConstants.HORIZONTAL), "growx, wrap");
-        resetFilters();
+  public SearchOptionsPanel(SearchResultMediator resultPanel) {
+    this.resultPanel = resultPanel;
+    engineCheckboxes = new HashMap<>();
+    setLayout(new MigLayout("insets 0, fillx"));
+    this.textFieldKeywords = createNameFilter();
+    add(textFieldKeywords, "gapx 3, gaptop 4px, wrap");
+    add(new JSeparator(SwingConstants.HORIZONTAL), "growx, wrap");
+    add(createSearchEnginesFilter(), "wrap");
+    add(new JSeparator(SwingConstants.HORIZONTAL), "growx, wrap");
+    this.sliderSize = createSizeFilter();
+    add(sliderSize, "gapx 3, wrap");
+    add(new JSeparator(SwingConstants.HORIZONTAL), "growx, wrap");
+    this.sliderSeeds = createSeedsFilter();
+    add(sliderSeeds, "gapx 3, wrap");
+    add(new JSeparator(SwingConstants.HORIZONTAL), "growx, wrap");
+    resetFilters();
+  }
+
+  void onOptionsPanelShown() {
+    textFieldKeywords.requestFocus();
+  }
+
+  /** Installs the engine and general filters; the caller rebuilds the table. */
+  void updateFilters() {
+    if (generalFilter == null) {
+      generalFilter = new GeneralResultFilter(resultPanel, sliderSeeds, sliderSize);
     }
+    updateCheckboxes(SearchEngine.getEngines());
+    resultPanel.setFilterQuietly(new SearchEngineFilter(engineCheckboxes), 0);
+    resultPanel.setFilterQuietly(generalFilter, 1);
+  }
 
-    void onOptionsPanelShown() {
-        textFieldKeywords.requestFocus();
-    }
-
-    /** Installs the engine and general filters; the caller rebuilds the table. */
-    void updateFilters() {
-        if (generalFilter == null) {
-            generalFilter = new GeneralResultFilter(resultPanel, sliderSeeds, sliderSize);
+  private void updateCheckboxes(List<SearchEngine> engines) {
+    for (SearchEngine se : engines) {
+      JCheckBox cBox = engineCheckboxes.get(se);
+      if (cBox != null) {
+        if (cBox.isEnabled() && !cBox.isSelected() && se.isEnabled()) {
+          continue;
         }
-        updateCheckboxes(SearchEngine.getEngines());
-        resultPanel.setFilterQuietly(new SearchEngineFilter(engineCheckboxes), 0);
-        resultPanel.setFilterQuietly(generalFilter, 1);
+        cBox.setSelected(se.isEnabled());
+        cBox.setEnabled(se.isEnabled());
+      }
     }
+  }
 
-    private void updateCheckboxes(List<SearchEngine> engines) {
-        for (SearchEngine se : engines) {
-            JCheckBox cBox = engineCheckboxes.get(se);
-            if (cBox != null) {
-                if (cBox.isEnabled() && !cBox.isSelected() && se.isEnabled()) {
-                    continue;
-                }
-                cBox.setSelected(se.isEnabled());
-                cBox.setEnabled(se.isEnabled());
-            }
-        }
-    }
+  void resetFilters() {
+    generalFilter = null;
+    sliderSeeds.setMinimum(0);
+    sliderSeeds.setMaximum(1000);
+    sliderSeeds.setLowerValue(0);
+    sliderSeeds.setUpperValue(1000);
+    sliderSize.setMinimum(0);
+    sliderSize.setMaximum(1000);
+    sliderSize.setLowerValue(0);
+    sliderSize.setUpperValue(1000);
+    sliderSeeds.getMinimumValueLabel().setText("0");
+    sliderSeeds.getMaximumValueLabel().setText(I18n.tr("Max"));
+    sliderSize.getMinimumValueLabel().setText("0");
+    sliderSize.getMaximumValueLabel().setText(I18n.tr("Max"));
+    textFieldKeywords.setText("");
+    generalFilter = new GeneralResultFilter(resultPanel, sliderSeeds, sliderSize);
+  }
 
-    void resetFilters() {
-        generalFilter = null;
-        sliderSeeds.setMinimum(0);
-        sliderSeeds.setMaximum(1000);
-        sliderSeeds.setLowerValue(0);
-        sliderSeeds.setUpperValue(1000);
-        sliderSize.setMinimum(0);
-        sliderSize.setMaximum(1000);
-        sliderSize.setLowerValue(0);
-        sliderSize.setUpperValue(1000);
-        sliderSeeds.getMinimumValueLabel().setText("0");
-        sliderSeeds.getMaximumValueLabel().setText(I18n.tr("Max"));
-        sliderSize.getMinimumValueLabel().setText("0");
-        sliderSize.getMaximumValueLabel().setText(I18n.tr("Max"));
-        textFieldKeywords.setText("");
-        generalFilter = new GeneralResultFilter(resultPanel, sliderSeeds, sliderSize);
-    }
+  private JComponent createSearchEnginesFilter() {
+    JPanel panel = new JPanel();
+    panel.setLayout(new MigLayout("insets 3, wrap 2"));
+    List<SearchEngine> searchEngines = SearchEngine.getEngines();
+    setupCheckboxes(searchEngines, panel);
+    return panel;
+  }
 
-    private JComponent createSearchEnginesFilter() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new MigLayout("insets 3, wrap 2"));
-        List<SearchEngine> searchEngines = SearchEngine.getEngines();
-        setupCheckboxes(searchEngines, panel);
-        return panel;
-    }
-
-    private LabeledTextField createNameFilter() {
-        LabeledTextField textField = new LabeledTextField(I18n.tr("Name|Source|Ext."), 80, -1, 240);
-        textField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                textFieldKeywords_keyReleased();
-            }
+  private LabeledTextField createNameFilter() {
+    LabeledTextField textField = new LabeledTextField(I18n.tr("Name|Source|Ext."), 80, -1, 240);
+    textField.addKeyListener(
+        new KeyAdapter() {
+          @Override
+          public void keyReleased(KeyEvent e) {
+            textFieldKeywords_keyReleased();
+          }
         });
-        return textField;
-    }
+    return textField;
+  }
 
-    private LabeledRangeSlider createSizeFilter() {
-        LabeledRangeSlider slider = new LabeledRangeSlider(I18n.tr("Size"), null, 0, 1000);
-        slider.setPreferredSize(new Dimension(240, (int) slider.getPreferredSize().getHeight()));
-        slider.addChangeListener(e -> sliderSize_stateChanged());
-        return slider;
-    }
+  private LabeledRangeSlider createSizeFilter() {
+    LabeledRangeSlider slider = new LabeledRangeSlider(I18n.tr("Size"), null, 0, 1000);
+    slider.setPreferredSize(new Dimension(240, (int) slider.getPreferredSize().getHeight()));
+    slider.addChangeListener(e -> sliderSize_stateChanged());
+    return slider;
+  }
 
-    private LabeledRangeSlider createSeedsFilter() {
-        LabeledRangeSlider slider = new LabeledRangeSlider(I18n.tr("Seeds"), null, 0, 1000);
-        slider.setPreferredSize(new Dimension(240, (int) slider.getPreferredSize().getHeight()));
-        slider.addChangeListener(e -> sliderSeeds_stateChanged());
-        return slider;
-    }
+  private LabeledRangeSlider createSeedsFilter() {
+    LabeledRangeSlider slider = new LabeledRangeSlider(I18n.tr("Seeds"), null, 0, 1000);
+    slider.setPreferredSize(new Dimension(240, (int) slider.getPreferredSize().getHeight()));
+    slider.addChangeListener(e -> sliderSeeds_stateChanged());
+    return slider;
+  }
 
-    private void setupCheckboxes(List<SearchEngine> searchEngines, JPanel parent) {
-        final Map<JCheckBox, BooleanSetting> cBoxes = new HashMap<>();
-        ItemListener listener = e -> {
-            if (areAll(false)) {
-                ((JCheckBox) e.getItemSelectable()).setSelected(true);
-            }
-            if (resultPanel != null) {
-                resultPanel.filterChanged(new SearchEngineFilter(engineCheckboxes), 0);
-            }
+  private void setupCheckboxes(List<SearchEngine> searchEngines, JPanel parent) {
+    final Map<JCheckBox, BooleanSetting> cBoxes = new HashMap<>();
+    ItemListener listener =
+        e -> {
+          if (areAll(false)) {
+            ((JCheckBox) e.getItemSelectable()).setSelected(true);
+          }
+          if (resultPanel != null) {
+            resultPanel.filterChanged(new SearchEngineFilter(engineCheckboxes), 0);
+          }
         };
-        for (SearchEngine se : searchEngines) {
-            JCheckBox cBox = new JCheckBox(se.getName());
-            cBox.setSelected(se.isEnabled());
-            cBox.setEnabled(se.isEnabled());
-            if (!cBox.isEnabled()) {
-                cBox.setToolTipText(se.getName() + " " + I18n.tr("has been disabled on your FrostWire Search Options. (Go to Tools > Options > Search to enable)"));
-            }
-            parent.add(cBox);
-            cBoxes.put(cBox, se.getEnabledSetting());
-            cBox.addItemListener(listener);
-            engineCheckboxes.put(se, cBox);
-        }
+    for (SearchEngine se : searchEngines) {
+      JCheckBox cBox = new JCheckBox(se.getName());
+      cBox.setSelected(se.isEnabled());
+      cBox.setEnabled(se.isEnabled());
+      if (!cBox.isEnabled()) {
+        cBox.setToolTipText(
+            se.getName()
+                + " "
+                + I18n.tr(
+                    "has been disabled on your FrostWire Search Options. (Go to Tools > Options > Search to enable)"));
+      }
+      parent.add(cBox);
+      cBoxes.put(cBox, se.getEnabledSetting());
+      cBox.addItemListener(listener);
+      engineCheckboxes.put(se, cBox);
     }
+  }
 
-    private boolean areAll(boolean selected) {
-        final Set<Map.Entry<SearchEngine, JCheckBox>> entries = engineCheckboxes.entrySet();
-        for (Map.Entry<SearchEngine, JCheckBox> entry : entries) {
-            final JCheckBox cBox = entry.getValue();
-            if (selected && !cBox.isSelected() ||
-                    !selected && cBox.isSelected()) {
-                return false;
-            }
-        }
-        return true;
+  private boolean areAll(boolean selected) {
+    final Set<Map.Entry<SearchEngine, JCheckBox>> entries = engineCheckboxes.entrySet();
+    for (Map.Entry<SearchEngine, JCheckBox> entry : entries) {
+      final JCheckBox cBox = entry.getValue();
+      if (selected && !cBox.isSelected() || !selected && cBox.isSelected()) {
+        return false;
+      }
     }
+    return true;
+  }
 
-    private void textFieldKeywords_keyReleased() {
-        if (generalFilter != null) {
-            generalFilter.updateKeywordFiltering(textFieldKeywords.getText());
-        }
+  private void textFieldKeywords_keyReleased() {
+    if (generalFilter != null) {
+      generalFilter.updateKeywordFiltering(textFieldKeywords.getText());
     }
+  }
 
-    private void sliderSize_stateChanged() {
-        if (generalFilter != null) {
-            generalFilter.setRangeSize(sliderSize.getLowerValue(), sliderSize.getUpperValue());
-        }
+  private void sliderSize_stateChanged() {
+    if (generalFilter != null) {
+      generalFilter.setRangeSize(sliderSize.getLowerValue(), sliderSize.getUpperValue());
     }
+  }
 
-    private void sliderSeeds_stateChanged() {
-        if (generalFilter != null) {
-            generalFilter.setRangeSeeds(sliderSeeds.getLowerValue(), sliderSeeds.getUpperValue());
-        }
+  private void sliderSeeds_stateChanged() {
+    if (generalFilter != null) {
+      generalFilter.setRangeSeeds(sliderSeeds.getLowerValue(), sliderSeeds.getUpperValue());
     }
+  }
 }

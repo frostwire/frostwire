@@ -27,88 +27,86 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 /**
- * AbstractTreeModel provides a base class for tree models that is not based on
- * TreeNode objects.
+ * AbstractTreeModel provides a base class for tree models that is not based on TreeNode objects.
  *
  * @author Steffen Pingel
  */
 public abstract class AbstractTreeModel implements TreeModel {
-    private transient EventListenerList listenerList = new EventListenerList();
-    StringBuilder root;
+  private transient EventListenerList listenerList = new EventListenerList();
+  StringBuilder root;
 
-    AbstractTreeModel(String root) {
-        this.root = new StringBuilder(root);
+  AbstractTreeModel(String root) {
+    this.root = new StringBuilder(root);
+  }
+
+  public void changeRootText(String newText) {
+    root.setLength(0);
+    root.append(newText);
+  }
+
+  public void addTreeModelListener(TreeModelListener l) {
+    listenerList.add(TreeModelListener.class, l);
+  }
+
+  void fireTreeNodesInserted(TreeModelEvent e) {
+    // Guaranteed to return a non-null array
+    Object[] listeners = listenerList.getListenerList();
+    // Process the listeners last to first, notifying
+    // those that are interested in this event
+    for (int i = listeners.length - 2; i >= 0; i -= 2) {
+      if (listeners[i] == TreeModelListener.class)
+        ((TreeModelListener) listeners[i + 1]).treeNodesInserted(e);
     }
+  }
 
-    public void changeRootText(String newText) {
-        root.setLength(0);
-        root.append(newText);
+  void fireTreeNodesRemoved(TreeModelEvent e) {
+    // Guaranteed to return a non-null array
+    Object[] listeners = listenerList.getListenerList();
+    // Process the listeners last to first, notifying
+    // those that are interested in this event
+    for (int i = listeners.length - 2; i >= 0; i -= 2) {
+      if (listeners[i] == TreeModelListener.class)
+        ((TreeModelListener) listeners[i + 1]).treeNodesRemoved(e);
     }
+  }
 
-    public void addTreeModelListener(TreeModelListener l) {
-        listenerList.add(TreeModelListener.class, l);
+  void fireTreeStructureChanged(TreeModelEvent e) {
+    // Guaranteed to return a non-null array
+    Object[] listeners = listenerList.getListenerList();
+    // Process the listeners last to first, notifying
+    // those that are interested in this event
+    for (int i = listeners.length - 2; i >= 0; i -= 2) {
+      if (listeners[i] == TreeModelListener.class)
+        ((TreeModelListener) listeners[i + 1]).treeStructureChanged(e);
     }
+  }
 
-    void fireTreeNodesInserted(TreeModelEvent e) {
-        // Guaranteed to return a non-null array
-        Object[] listeners = listenerList.getListenerList();
-        // Process the listeners last to first, notifying
-        // those that are interested in this event
-        for (int i = listeners.length - 2; i >= 0; i -= 2) {
-            if (listeners[i] == TreeModelListener.class)
-                ((TreeModelListener) listeners[i + 1]).treeNodesInserted(e);
-        }
+  void fireTreeNodesChanged(TreeModelEvent e) {
+    // Guaranteed to return a non-null array
+    Object[] listeners = listenerList.getListenerList();
+    // Process the listeners last to first, notifying
+    // those that are interested in this event
+    for (int i = listeners.length - 2; i >= 0; i -= 2) {
+      if (listeners[i] == TreeModelListener.class)
+        ((TreeModelListener) listeners[i + 1]).treeNodesChanged(e);
     }
+  }
 
-    void fireTreeNodesRemoved(TreeModelEvent e) {
-        // Guaranteed to return a non-null array
-        Object[] listeners = listenerList.getListenerList();
-        // Process the listeners last to first, notifying
-        // those that are interested in this event
-        for (int i = listeners.length - 2; i >= 0; i -= 2) {
-            if (listeners[i] == TreeModelListener.class)
-                ((TreeModelListener) listeners[i + 1]).treeNodesRemoved(e);
-        }
-    }
+  public abstract Object getChild(Object parent, int index);
 
-    void fireTreeStructureChanged(TreeModelEvent e) {
-        // Guaranteed to return a non-null array
-        Object[] listeners = listenerList.getListenerList();
-        // Process the listeners last to first, notifying
-        // those that are interested in this event
-        for (int i = listeners.length - 2; i >= 0; i -= 2) {
-            if (listeners[i] == TreeModelListener.class)
-                ((TreeModelListener) listeners[i + 1]).treeStructureChanged(e);
-        }
-    }
+  public abstract int getChildCount(Object node);
 
-    void fireTreeNodesChanged(TreeModelEvent e) {
-        // Guaranteed to return a non-null array
-        Object[] listeners = listenerList.getListenerList();
-        // Process the listeners last to first, notifying
-        // those that are interested in this event
-        for (int i = listeners.length - 2; i >= 0; i -= 2) {
-            if (listeners[i] == TreeModelListener.class)
-                ((TreeModelListener) listeners[i + 1]).treeNodesChanged(e);
-        }
-    }
+  public abstract int getIndexOfChild(Object parent, Object child);
 
-    public abstract Object getChild(Object parent, int index);
+  public Object getRoot() {
+    return root;
+  }
 
-    public abstract int getChildCount(Object node);
+  public abstract boolean isLeaf(Object node);
 
-    public abstract int getIndexOfChild(Object parent, Object child);
+  public void removeTreeModelListener(TreeModelListener l) {
+    listenerList.remove(TreeModelListener.class, l);
+  }
 
-    public Object getRoot() {
-        return root;
-    }
-
-    public abstract boolean isLeaf(Object node);
-
-    public void removeTreeModelListener(TreeModelListener l) {
-        listenerList.remove(TreeModelListener.class, l);
-    }
-
-    public void valueForPathChanged(TreePath path, Object value) {
-    }
+  public void valueForPathChanged(TreePath path, Object value) {}
 }

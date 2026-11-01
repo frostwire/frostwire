@@ -20,92 +20,93 @@ package com.limegroup.gnutella.gui;
 
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.ConnectionSettings;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.*;
 
 /**
- * A compact checkbox component for the status bar that toggles VPN-Drop protection.
- * When enabled, BitTorrent transfers will be paused if the VPN is disconnected.
- * Features clickable VPN link that opens VPN info page.
+ * A compact checkbox component for the status bar that toggles VPN-Drop protection. When enabled,
+ * BitTorrent transfers will be paused if the VPN is disconnected. Features clickable VPN link that
+ * opens VPN info page.
  */
 public class VPNDropProtectionCheckbox extends JPanel {
-    private final JCheckBox checkbox;
+  private final JCheckBox checkbox;
 
-    public VPNDropProtectionCheckbox() {
-        super(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        setOpaque(false);
+  public VPNDropProtectionCheckbox() {
+    super(new FlowLayout(FlowLayout.LEFT, 0, 0));
+    setOpaque(false);
 
-        // Create checkbox with minimal text
-        checkbox = new JCheckBox();
-        checkbox.setOpaque(false);
-        checkbox.setFont(new Font(checkbox.getFont().getName(), Font.PLAIN, 9));
+    // Create checkbox with minimal text
+    checkbox = new JCheckBox();
+    checkbox.setOpaque(false);
+    checkbox.setFont(new Font(checkbox.getFont().getName(), Font.PLAIN, 9));
 
-        // Set initial state
-        updateCheckboxState();
+    // Set initial state
+    updateCheckboxState();
 
-        // Add listener for checkbox changes
-        checkbox.addActionListener(e -> {
-            // Disable the checkbox while we process the change
-            checkbox.setEnabled(false);
+    // Add listener for checkbox changes
+    checkbox.addActionListener(
+        e -> {
+          // Disable the checkbox while we process the change
+          checkbox.setEnabled(false);
 
-            // Use BackgroundQueuedExecutor to avoid blocking the EDT
-            BackgroundQueuedExecutorService.schedule(() -> {
+          // Use BackgroundQueuedExecutor to avoid blocking the EDT
+          BackgroundQueuedExecutorService.schedule(
+              () -> {
                 try {
-                    boolean newValue = checkbox.isSelected();
-                    ConnectionSettings.VPN_DROP_PROTECTION.setValue(newValue);
+                  boolean newValue = checkbox.isSelected();
+                  ConnectionSettings.VPN_DROP_PROTECTION.setValue(newValue);
 
-                    // Apply the protection logic (defined in VPNDropGuard to avoid duplication)
-                    VPNDropGuard.applyVPNDropProtection();
+                  // Apply the protection logic (defined in VPNDropGuard to avoid duplication)
+                  VPNDropGuard.applyVPNDropProtection();
                 } finally {
-                    // Re-enable the checkbox on the EDT
-                    GUIMediator.safeInvokeLater(() -> checkbox.setEnabled(true));
+                  // Re-enable the checkbox on the EDT
+                  GUIMediator.safeInvokeLater(() -> checkbox.setEnabled(true));
                 }
-            });
+              });
         });
 
-        // Add checkbox to panel
-        add(checkbox);
+    // Add checkbox to panel
+    add(checkbox);
 
-        // Create clickable VPN link label
-        JLabel vpnLink = new JLabel(I18n.tr("VPN"));
-        vpnLink.setFont(new Font(vpnLink.getFont().getName(), Font.PLAIN, 9));
-        vpnLink.setForeground(new Color(0, 0, 200)); // Blue color for link
-        vpnLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    // Create clickable VPN link label
+    JLabel vpnLink = new JLabel(I18n.tr("VPN"));
+    vpnLink.setFont(new Font(vpnLink.getFont().getName(), Font.PLAIN, 9));
+    vpnLink.setForeground(new Color(0, 0, 200)); // Blue color for link
+    vpnLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        // Add underline and hover effects
-        vpnLink.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                vpnLink.setText("<html><u>VPN</u></html>");
-            }
+    // Add underline and hover effects
+    vpnLink.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseEntered(MouseEvent e) {
+            vpnLink.setText("<html><u>VPN</u></html>");
+          }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-                vpnLink.setText(I18n.tr("VPN"));
-            }
+          @Override
+          public void mouseExited(MouseEvent e) {
+            vpnLink.setText(I18n.tr("VPN"));
+          }
 
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                GUIMediator.openURL(VPNStatusButton.VPN_URL);
-            }
+          @Override
+          public void mouseClicked(MouseEvent e) {
+            GUIMediator.openURL(VPNStatusButton.VPN_URL);
+          }
         });
 
-        add(vpnLink);
-        JLabel dropProtectionLabel = new JLabel(I18n.tr("-Drop protection"));
-        dropProtectionLabel.setFont(new Font(dropProtectionLabel.getFont().getName(), Font.PLAIN, 9));
-        add(dropProtectionLabel);
+    add(vpnLink);
+    JLabel dropProtectionLabel = new JLabel(I18n.tr("-Drop protection"));
+    dropProtectionLabel.setFont(new Font(dropProtectionLabel.getFont().getName(), Font.PLAIN, 9));
+    add(dropProtectionLabel);
 
-        setToolTipText(I18n.tr("When enabled, BitTorrent transfers will pause if your VPN is disconnected"));
-        setPreferredSize(new Dimension(130, 20));
-    }
+    setToolTipText(
+        I18n.tr("When enabled, BitTorrent transfers will pause if your VPN is disconnected"));
+    setPreferredSize(new Dimension(130, 20));
+  }
 
-    /**
-     * Updates the checkbox state to reflect the current setting value.
-     */
-    public void updateCheckboxState() {
-        checkbox.setSelected(ConnectionSettings.VPN_DROP_PROTECTION.getValue());
-    }
+  /** Updates the checkbox state to reflect the current setting value. */
+  public void updateCheckboxState() {
+    checkbox.setSelected(ConnectionSettings.VPN_DROP_PROTECTION.getValue());
+  }
 }

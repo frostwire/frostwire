@@ -47,8 +47,7 @@ public final class LivePresenceHeartbeat {
       }
       try {
         HttpClient client = HttpClientFactory.newInstance(HttpClientFactory.HttpContext.MISC);
-        SCHEDULER.scheduleAtFixedRate(
-            () -> send(client), 0, INTERVAL_SECONDS, TimeUnit.SECONDS);
+        SCHEDULER.scheduleAtFixedRate(() -> send(client), 0, INTERVAL_SECONDS, TimeUnit.SECONDS);
         started = true;
         LOG.info("Anonymous live presence heartbeat started");
       } catch (Throwable ignored) {

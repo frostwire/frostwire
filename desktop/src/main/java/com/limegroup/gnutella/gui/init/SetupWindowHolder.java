@@ -1,60 +1,55 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.limegroup.gnutella.gui.init;
 
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
 /**
- * This class serves two purposes.  First, it is a JPanel that
- * contains the body of a LimeWire setup window.  Second, it
- * serves as a proxy for the underlying SetupWindow object that
- * that handles the actual drawing.
+ * This class serves two purposes. First, it is a JPanel that contains the body of a LimeWire setup
+ * window. Second, it serves as a proxy for the underlying SetupWindow object that that handles the
+ * actual drawing.
  */
 final class SetupWindowHolder extends JPanel {
-    /**
-     * The `CardLayout` instance for the setup windows.
-     */
-    private final CardLayout CARD_LAYOUT = new CardLayout();
+  /** The `CardLayout` instance for the setup windows. */
+  private final CardLayout CARD_LAYOUT = new CardLayout();
 
-    /**
-     * Sets the `CardLayout` for the setup windows.
-     */
-    SetupWindowHolder() {
-        setLayout(CARD_LAYOUT);
-    }
+  /** Sets the `CardLayout` for the setup windows. */
+  SetupWindowHolder() {
+    setLayout(CARD_LAYOUT);
+  }
 
-    /**
-     * Adds the specified window to the CardLayout based on its title.
-     *
-     * @param window the `SetupWindow` to add
-     */
-    void add(SetupWindow window) {
-        add(window, window.getKey());
-    }
+  /**
+   * Adds the specified window to the CardLayout based on its title.
+   *
+   * @param window the `SetupWindow` to add
+   */
+  void add(SetupWindow window) {
+    add(window, window.getKey());
+  }
 
-    /**
-     * Shows the window specified by its title.
-     *
-     * @param key the unique key of the `Component` to show
-     */
-    void show(String key) {
-        CARD_LAYOUT.show(this, key);
-    }
+  /**
+   * Shows the window specified by its title.
+   *
+   * @param key the unique key of the `Component` to show
+   */
+  void show(String key) {
+    CARD_LAYOUT.show(this, key);
+  }
 }

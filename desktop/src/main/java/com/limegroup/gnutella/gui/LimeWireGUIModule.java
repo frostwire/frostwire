@@ -1,19 +1,18 @@
 package com.limegroup.gnutella.gui;
 
 public class LimeWireGUIModule {
-    private static LimeWireGUIModule INSTANCE;
+  private static LimeWireGUIModule INSTANCE;
 
-    private LimeWireGUIModule() {
-    }
+  private LimeWireGUIModule() {}
 
-    public static LimeWireGUIModule instance() {
-        if (INSTANCE == null) {
-            INSTANCE = new LimeWireGUIModule();
-        }
-        return INSTANCE;
+  public static LimeWireGUIModule instance() {
+    if (INSTANCE == null) {
+      INSTANCE = new LimeWireGUIModule();
     }
+    return INSTANCE;
+  }
 
-    public LimeWireGUI getLimeWireGUI() {
-        return LimeWireGUI.instance();
-    }
+  public LimeWireGUI getLimeWireGUI() {
+    return LimeWireGUI.instance();
+  }
 }

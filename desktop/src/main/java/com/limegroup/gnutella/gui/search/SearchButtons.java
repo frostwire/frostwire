@@ -2,66 +2,48 @@ package com.limegroup.gnutella.gui.search;
 
 import com.limegroup.gnutella.gui.ButtonRow;
 import com.limegroup.gnutella.gui.I18n;
-
 import java.util.EventListener;
 
 /**
- * This class contains the buttons in the download window, allowing
- * classes in this package to enable or disable buttons at specific
- * indices in the row.
+ * This class contains the buttons in the download window, allowing classes in this package to
+ * enable or disable buttons at specific indices in the row.
  */
 final class SearchButtons {
-    /**
-     * The index of the WishList / Download Button.
-     */
-    static final int DOWNLOAD_BUTTON_INDEX = 0;
-    /**
-     * The index of the torrent details button in the button row.
-     */
-    static final int TORRENT_DETAILS_BUTTON_INDEX = 1;
-    /**
-     * The index of the Stop Current Search button in the button row.
-     */
-    static final int STOP_SEARCH_BUTTON_INDEX = 2;
-    /**
-     * The row of buttons for the donwload window.
-     */
-    private final ButtonRow BUTTONS;
+  /** The index of the WishList / Download Button. */
+  static final int DOWNLOAD_BUTTON_INDEX = 0;
 
-    /**
-     * The constructor creates the row of buttons with their associated
-     * listeners.
-     */
-    SearchButtons(SearchResultMediator rp) {
-        String[] buttonLabelKeys = {
-                I18n.tr("Download"),
-                I18n.tr("Details"),
-                I18n.tr("Stop"),
-        };
-        String[] buttonTipKeys = {
-                I18n.tr("Download All Selected Files"),
-                I18n.tr("See detail web page about the selected torrent (Contents, Comments, Seeds)"),
-                I18n.tr("Stop current search")
-        };
-        EventListener[] buttonListeners = {
-                rp.DOWNLOAD_LISTENER,
-                rp.TORRENT_DETAILS_LISTENER,
-                rp.STOP_SEARCH_LISTENER
-        };
-        String[] iconNames = {
-                "SEARCH_DOWNLOAD",
-                "TORRENT_DETAILS",
-                "SEARCH_STOP"
-        };
-        BUTTONS = new ButtonRow(buttonLabelKeys, buttonTipKeys, buttonListeners, iconNames);
-    }
+  /** The index of the torrent details button in the button row. */
+  static final int TORRENT_DETAILS_BUTTON_INDEX = 1;
 
-    /**
-     * Returns the `Component` instance containing all of the buttons.
-     *
-     * @return the `Component` instance containing all of the buttons
-     */
-    ButtonRow getComponent() {
-        return BUTTONS;
-    }
+  /** The index of the Stop Current Search button in the button row. */
+  static final int STOP_SEARCH_BUTTON_INDEX = 2;
+
+  /** The row of buttons for the donwload window. */
+  private final ButtonRow BUTTONS;
+
+  /** The constructor creates the row of buttons with their associated listeners. */
+  SearchButtons(SearchResultMediator rp) {
+    String[] buttonLabelKeys = {
+      I18n.tr("Download"), I18n.tr("Details"), I18n.tr("Stop"),
+    };
+    String[] buttonTipKeys = {
+      I18n.tr("Download All Selected Files"),
+      I18n.tr("See detail web page about the selected torrent (Contents, Comments, Seeds)"),
+      I18n.tr("Stop current search")
+    };
+    EventListener[] buttonListeners = {
+      rp.DOWNLOAD_LISTENER, rp.TORRENT_DETAILS_LISTENER, rp.STOP_SEARCH_LISTENER
+    };
+    String[] iconNames = {"SEARCH_DOWNLOAD", "TORRENT_DETAILS", "SEARCH_STOP"};
+    BUTTONS = new ButtonRow(buttonLabelKeys, buttonTipKeys, buttonListeners, iconNames);
+  }
+
+  /**
+   * Returns the `Component` instance containing all of the buttons.
+   *
+   * @return the `Component` instance containing all of the buttons
+   */
+  ButtonRow getComponent() {
+    return BUTTONS;
+  }
 }

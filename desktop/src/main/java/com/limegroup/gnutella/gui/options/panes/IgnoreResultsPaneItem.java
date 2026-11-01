@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -21,77 +21,68 @@ package com.limegroup.gnutella.gui.options.panes;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.ListEditor;
 import com.limegroup.gnutella.settings.FilterSettings;
-
-import javax.swing.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
+import javax.swing.*;
 
 /**
- * This class defines the panel in the options window that allows the user
- * set add and remove words from a list of words to ignore when they
- * appear in search results.
+ * This class defines the panel in the options window that allows the user set add and remove words
+ * from a list of words to ignore when they appear in search results.
  */
 public final class IgnoreResultsPaneItem extends AbstractPaneItem {
-    private final static String TITLE = I18n.tr("Filter Results");
-    private final static String LABEL = I18n.tr("You can filter out search results containing specific words.");
-    /**
-     * Constant handle to the `ListEditor` that adds and removes
-     * word to ignore.
-     */
-    private final ListEditor RESULTS_LIST = new ListEditor();
-    /**
-     * Handle to the check box for ignoring adult content.
-     */
-    private final JCheckBox IGNORE_ADULT_CHECK_BOX = new JCheckBox();
+  private static final String TITLE = I18n.tr("Filter Results");
+  private static final String LABEL =
+      I18n.tr("You can filter out search results containing specific words.");
 
-    /**
-     * The constructor constructs all of the elements of this
-     * `AbstractPaneItem`.
-     *
-     */
-    public IgnoreResultsPaneItem() {
-        super(TITLE, LABEL);
-        /*
-          Key for the locale-specifics string for the adult content check box
-          label.
-         */
-        String ADULT_BOX_LABEL = I18n.tr("Ignore Adult Content");
-        IGNORE_ADULT_CHECK_BOX.setText(I18n.tr(ADULT_BOX_LABEL));
-        add(RESULTS_LIST);
-        add(IGNORE_ADULT_CHECK_BOX);
-    }
+  /** Constant handle to the `ListEditor` that adds and removes word to ignore. */
+  private final ListEditor RESULTS_LIST = new ListEditor();
 
-    /**
-     * Defines the abstract method in `AbstractPaneItem`.
-     * <p>
-     * Sets the options for the fields in this `PaneItem` when the
-     * window is shown.
-     */
-    public void initOptions() {
-        String[] bannedWords = FilterSettings.BANNED_WORDS.getValue();
-        RESULTS_LIST.setModel(new Vector<>(Arrays.asList(bannedWords)));
-        IGNORE_ADULT_CHECK_BOX.setSelected(FilterSettings.FILTER_ADULT.getValue());
-    }
+  /** Handle to the check box for ignoring adult content. */
+  private final JCheckBox IGNORE_ADULT_CHECK_BOX = new JCheckBox();
 
-    /**
-     * Defines the abstract method in `AbstractPaneItem`.
-     * <p>
-     * Applies the options currently set in this window, displaying an
-     * error message to the user if a setting could not be applied.
-     *
-     */
-    public boolean applyOptions() {
-        Vector<?> model = RESULTS_LIST.getModel();
-        String[] bannedResults = new String[model.size()];
-        model.copyInto(bannedResults);
-        FilterSettings.BANNED_WORDS.setValue(bannedResults);
-        FilterSettings.FILTER_ADULT.setValue(IGNORE_ADULT_CHECK_BOX.isSelected());
-        return false;
-    }
+  /** The constructor constructs all of the elements of this `AbstractPaneItem`. */
+  public IgnoreResultsPaneItem() {
+    super(TITLE, LABEL);
+    /*
+     Key for the locale-specifics string for the adult content check box
+     label.
+    */
+    String ADULT_BOX_LABEL = I18n.tr("Ignore Adult Content");
+    IGNORE_ADULT_CHECK_BOX.setText(I18n.tr(ADULT_BOX_LABEL));
+    add(RESULTS_LIST);
+    add(IGNORE_ADULT_CHECK_BOX);
+  }
 
-    public boolean isDirty() {
-        List<?> model = Arrays.asList(FilterSettings.BANNED_WORDS.getValue());
-        return !model.equals(RESULTS_LIST.getModel()) || FilterSettings.FILTER_ADULT.getValue() != IGNORE_ADULT_CHECK_BOX.isSelected();
-    }
+  /**
+   * Defines the abstract method in `AbstractPaneItem`.
+   *
+   * <p>Sets the options for the fields in this `PaneItem` when the window is shown.
+   */
+  public void initOptions() {
+    String[] bannedWords = FilterSettings.BANNED_WORDS.getValue();
+    RESULTS_LIST.setModel(new Vector<>(Arrays.asList(bannedWords)));
+    IGNORE_ADULT_CHECK_BOX.setSelected(FilterSettings.FILTER_ADULT.getValue());
+  }
+
+  /**
+   * Defines the abstract method in `AbstractPaneItem`.
+   *
+   * <p>Applies the options currently set in this window, displaying an error message to the user if
+   * a setting could not be applied.
+   */
+  public boolean applyOptions() {
+    Vector<?> model = RESULTS_LIST.getModel();
+    String[] bannedResults = new String[model.size()];
+    model.copyInto(bannedResults);
+    FilterSettings.BANNED_WORDS.setValue(bannedResults);
+    FilterSettings.FILTER_ADULT.setValue(IGNORE_ADULT_CHECK_BOX.isSelected());
+    return false;
+  }
+
+  public boolean isDirty() {
+    List<?> model = Arrays.asList(FilterSettings.BANNED_WORDS.getValue());
+    return !model.equals(RESULTS_LIST.getModel())
+        || FilterSettings.FILTER_ADULT.getValue() != IGNORE_ADULT_CHECK_BOX.isSelected();
+  }
 }
