@@ -138,7 +138,6 @@ class DesktopRelayLifecycleTest {
   }
 
   @Test
-  @SuppressWarnings("try") // the index only has to stay open for the block
   void oneDrainDeadlineCoversAllWorkers() throws Exception {
     AtomicLong firstBudget = new AtomicLong();
     AtomicLong secondBudget = new AtomicLong();
@@ -165,6 +164,7 @@ class DesktopRelayLifecycleTest {
   }
 
   @Test
+  @SuppressWarnings("try") // the store only has to stay open for the block
   void actualKarmaOwnersStopBeforeDrainAndDoNotRunLaterStagesOrCloseAnInUseStore()
       throws Exception {
     IdentityKeys identity = IdentityKeys.generate(0);
