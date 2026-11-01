@@ -28,8 +28,15 @@ import com.frostwire.util.Logger;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Searches the live YouTube site. It fails whenever YouTube is slow or answers a CI runner
+ * differently, so it runs only with {@code ./gradlew test -Plive}. CI tests the parser against a
+ * recorded page: {@code com.frostwire.search.yt.YTSearchPatternRecordedPageTest} (GitHub #1440).
+ */
+@Tag("live")
 public class YTSearchPatternTest {
   private static final Logger LOG = Logger.getLogger(YTSearchPatternTest.class);
 

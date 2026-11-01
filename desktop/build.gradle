@@ -832,7 +832,13 @@ test {
     systemProperty 'fw.test.packagedJar', tasks.named('jar').get().archiveFile.get().asFile.absolutePath
     failFast = false
     enabled = gradle.startParameter.taskNames.contains("test")
-    useJUnitPlatform()
+    useJUnitPlatform {
+        // Tests against live sites fail whenever the site is slow or answers a CI runner
+        // differently; run them with -Plive (GitHub #1440).
+        if (!project.hasProperty('live')) {
+            excludeTags 'live'
+        }
+    }
 
     // Match CI (ubuntu, no display). Avoids flaky AWT init that can poison
     // SettingsFactory keys (e.g. DOWNLOAD_TABLE_SORT) for the rest of the JVM.
