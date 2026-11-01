@@ -1,6 +1,7 @@
 package com.andrew.apollo.loaders;
 
 import android.content.Context;
+import android.provider.MediaStore;
 import androidx.loader.content.AsyncTaskLoader;
 
 /**
@@ -34,11 +35,32 @@ abstract class WrappedAsyncTaskLoader<D> extends AsyncTaskLoader<D> {
     // else { An asynchronous query came in while the loader is stopped }
   }
 
+  /**
+   * Reloads the list when MediaStore's audio changes, e.g. when a finished download is scanned. The
+   * loader only ever delivered its cached list, so new songs didn't show in Songs, Albums, Artists
+   * or Last added until the screen was recreated (GitHub #1445).
+   */
+  private ForceLoadContentObserver mediaObserver;
+
   @Override
   protected void onStartLoading() {
+    if (mediaObserver == null) {
+      mediaObserver = new ForceLoadContentObserver();
+      try {
+        getContext()
+            .getContentResolver()
+            .registerContentObserver(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, true, mediaObserver);
+      } catch (Throwable t) {
+        // No MediaStore access (permission not granted yet): reload when started instead.
+        mediaObserver = null;
+      }
+    }
     if (this.mData != null) {
       deliverResult(this.mData);
-    } else if (takeContentChanged() || this.mData == null) {
+    }
+    // A change while the screen was stopped is reloaded now that it shows again.
+    if (takeContentChanged() || this.mData == null) {
       forceLoad();
     }
   }
@@ -55,5 +77,9 @@ abstract class WrappedAsyncTaskLoader<D> extends AsyncTaskLoader<D> {
     // Ensure the loader is stopped
     onStopLoading();
     this.mData = null;
+    if (mediaObserver != null) {
+      getContext().getContentResolver().unregisterContentObserver(mediaObserver);
+      mediaObserver = null;
+    }
   }
 }
