@@ -21,7 +21,8 @@ public class TorrentUrlInfoTest {
   @Test
   public void hexMagnetsHaveTheirHash() {
     String hash = "0123456789abcdef0123456789abcdef01234567";
-    assertEquals(hash, new TorrentUrlInfo("magnet:?xt=urn:btih:" + hash.toUpperCase() + "&dn=x").getHash());
+    assertEquals(
+        hash, new TorrentUrlInfo("magnet:?xt=urn:btih:" + hash.toUpperCase() + "&dn=x").getHash());
   }
 
   @Test

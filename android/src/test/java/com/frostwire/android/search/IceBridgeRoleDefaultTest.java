@@ -17,8 +17,8 @@ import java.nio.file.Path;
 import org.junit.Test;
 
 /**
- * Android should participate as a full IceBridge peer (BOTH) by default: originate searches,
- * answer from its own index, and relay for others. It must not silently default to a CLIENT leaf.
+ * Android should participate as a full IceBridge peer (BOTH) by default: originate searches, answer
+ * from its own index, and relay for others. It must not silently default to a CLIENT leaf.
  */
 public class IceBridgeRoleDefaultTest {
 
@@ -48,7 +48,8 @@ public class IceBridgeRoleDefaultTest {
     String xml = readProjectFile("res/xml/settings_distributed_search.xml");
     assertTrue(xml.contains("android:key=\"frostwire.prefs.icebridge.role\""));
     assertTrue(
-        "the settings screen must default the role to BOTH", xml.contains("android:defaultValue=\"BOTH\""));
+        "the settings screen must default the role to BOTH",
+        xml.contains("android:defaultValue=\"BOTH\""));
     assertFalse(xml.contains("android:defaultValue=\"CLIENT\""));
   }
 
@@ -56,7 +57,8 @@ public class IceBridgeRoleDefaultTest {
   public void relayStackFallbackIsBoth() throws Exception {
     String stack =
         readProjectFile("src/main/java/com/frostwire/android/search/AndroidRelayStack.java");
-    String method = blockStartingAt(stack, "private static IceBridgeConfig.Role readConfiguredRole()");
+    String method =
+        blockStartingAt(stack, "private static IceBridgeConfig.Role readConfiguredRole()");
     assertTrue(
         "when the role preference is missing or unparseable, fall back to BOTH",
         method.contains("IceBridgeConfig.Role.BOTH"));

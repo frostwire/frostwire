@@ -21,16 +21,18 @@ public class UIUtilsAudioClassificationTest {
 
   @Test
   public void realAudioExtensionsAreAudio() {
-    for (String ext : new String[] {
-        "mp3", "m4a", "aac", "ogg", "oga", "opus", "wav", "wma", "flac", "mka", "amr", "m4b"
-    }) {
+    for (String ext :
+        new String[] {
+          "mp3", "m4a", "aac", "ogg", "oga", "opus", "wav", "wma", "flac", "mka", "amr", "m4b"
+        }) {
       assertTrue(ext + " must be audio", UIUtils.isAudioFile("movie." + ext));
     }
   }
 
   @Test
   public void videoContainersAreNotAudio() {
-    for (String ext : new String[] {"webm", "mp4", "3gp", "3gpp", "mkv", "avi", "mov", "m4v", "ts"}) {
+    for (String ext :
+        new String[] {"webm", "mp4", "3gp", "3gpp", "mkv", "avi", "mov", "m4v", "ts"}) {
       assertFalse(ext + " must not open in the audio player", UIUtils.isAudioFile("movie." + ext));
     }
   }

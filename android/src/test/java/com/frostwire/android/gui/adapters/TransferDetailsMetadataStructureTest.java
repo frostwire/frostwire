@@ -25,12 +25,14 @@ public class TransferDetailsMetadataStructureTest {
         readProjectFile("src/main/java/com/frostwire/android/gui/transfers/TransferManager.java")
             .replaceAll("\\s+", "");
     String activity =
-        readProjectFile("src/main/java/com/frostwire/android/gui/activities/TransferDetailActivity.java")
+        readProjectFile(
+                "src/main/java/com/frostwire/android/gui/activities/TransferDetailActivity.java")
             .replaceAll("\\s+", "");
 
     assertTrue(adapter.contains("state==TransferState.DOWNLOADING_METADATA"));
     assertTrue(adapter.contains("canOpenTorrentDetails(download)"));
-    assertTrue(activity.contains("TransferListAdapter.canOpenTorrentDetails(uiBittorrentDownload)"));
+    assertTrue(
+        activity.contains("TransferListAdapter.canOpenTorrentDetails(uiBittorrentDownload)"));
     assertTrue(manager.contains("for(BittorrentDownloadd:bittorrentDownloadsList)"));
     assertTrue(manager.contains("uriLower.contains(hash.toLowerCase())"));
   }

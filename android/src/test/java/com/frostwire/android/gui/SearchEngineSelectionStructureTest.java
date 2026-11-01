@@ -29,8 +29,7 @@ public class SearchEngineSelectionStructureTest {
   }
 
   @Test
-  public void deselectAll_coversEnginesBelowDistributedAndForcesNothingBackOn()
-      throws Exception {
+  public void deselectAll_coversEnginesBelowDistributedAndForcesNothingBackOn() throws Exception {
     String fragmentSource =
         readProjectFile(
             "src/main/java/com/frostwire/android/gui/fragments/preference/SearchEnginesPreferenceFragment.java");
@@ -44,7 +43,8 @@ public class SearchEngineSelectionStructureTest {
 
   @Test
   public void releaseBuild_hidesAndDisablesDiagnosticLocalSearch() throws Exception {
-    String engineSource = readProjectFile("src/main/java/com/frostwire/android/gui/SearchEngine.java");
+    String engineSource =
+        readProjectFile("src/main/java/com/frostwire/android/gui/SearchEngine.java");
     String repositorySource =
         readProjectFile("src/main/java/com/frostwire/android/core/ConfigurationRepository.kt");
 
@@ -56,7 +56,8 @@ public class SearchEngineSelectionStructureTest {
   }
 
   @Test
-  public void searchSettings_putDistributedFirstAndSeparateIceBridgeParticipation() throws Exception {
+  public void searchSettings_putDistributedFirstAndSeparateIceBridgeParticipation()
+      throws Exception {
     String searchSettings = readProjectFile("res/xml/settings_search_engines.xml");
     String distributedSettings = readProjectFile("res/xml/settings_distributed_search.xml");
     String constants = readProjectFile("src/main/java/com/frostwire/android/core/Constants.java");
@@ -68,8 +69,7 @@ public class SearchEngineSelectionStructureTest {
     assertTrue(distributed >= 0 && distributed < selectAll);
     assertTrue(distributedSettings.contains("frostwire.prefs.icebridge.enabled"));
     assertTrue(constants.contains("PREF_KEY_ICEBRIDGE_ENABLED"));
-    assertTrue(
-        repositorySource.contains("m[Constants.PREF_KEY_ICEBRIDGE_ENABLED] = true"));
+    assertTrue(repositorySource.contains("m[Constants.PREF_KEY_ICEBRIDGE_ENABLED] = true"));
     assertTrue(repositorySource.contains("migrateDistributedParticipationPreference()"));
   }
 

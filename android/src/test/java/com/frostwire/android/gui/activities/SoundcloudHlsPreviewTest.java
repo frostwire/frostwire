@@ -7,8 +7,8 @@ package com.frostwire.android.gui.activities;
 import static org.junit.Assert.assertTrue;
 
 import androidx.media3.common.MediaItem;
-import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
 import androidx.media3.exoplayer.hls.HlsMediaSource;
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -21,7 +21,9 @@ public class SoundcloudHlsPreviewTest {
   @Test
   public void previewPlayersDefaultFactorySelectsAnHlsSourceForSoundcloud() {
     var factory = new DefaultMediaSourceFactory(RuntimeEnvironment.getApplication());
-    var media = MediaItem.fromUri("https://playback.media-streaming.soundcloud.cloud/audio/playlist.m3u8?signature=fake");
+    var media =
+        MediaItem.fromUri(
+            "https://playback.media-streaming.soundcloud.cloud/audio/playlist.m3u8?signature=fake");
     assertTrue(factory.createMediaSource(media) instanceof HlsMediaSource);
   }
 }

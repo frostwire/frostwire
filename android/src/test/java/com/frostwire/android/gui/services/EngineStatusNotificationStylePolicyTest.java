@@ -7,30 +7,30 @@
 
 package com.frostwire.android.gui.services;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 public class EngineStatusNotificationStylePolicyTest {
 
-    @Test
-    public void android13_usesCustomRemoteViews() {
-        assertEquals(
-                EngineStatusNotificationStylePolicy.Style.CUSTOM_REMOTE_VIEWS,
-                EngineStatusNotificationStylePolicy.resolve(33));
-    }
+  @Test
+  public void android13_usesCustomRemoteViews() {
+    assertEquals(
+        EngineStatusNotificationStylePolicy.Style.CUSTOM_REMOTE_VIEWS,
+        EngineStatusNotificationStylePolicy.resolve(33));
+  }
 
-    @Test
-    public void android14_usesSimpleNotification() {
-        assertEquals(
-                EngineStatusNotificationStylePolicy.Style.SIMPLE_NOTIFICATION,
-                EngineStatusNotificationStylePolicy.resolve(34));
-    }
+  @Test
+  public void android14_usesSimpleNotification() {
+    assertEquals(
+        EngineStatusNotificationStylePolicy.Style.SIMPLE_NOTIFICATION,
+        EngineStatusNotificationStylePolicy.resolve(34));
+  }
 
-    @Test
-    public void android16_usesSimpleNotification() {
-        assertEquals(
-                EngineStatusNotificationStylePolicy.Style.SIMPLE_NOTIFICATION,
-                EngineStatusNotificationStylePolicy.resolve(36));
-    }
+  @Test
+  public void android16_usesSimpleNotification() {
+    assertEquals(
+        EngineStatusNotificationStylePolicy.Style.SIMPLE_NOTIFICATION,
+        EngineStatusNotificationStylePolicy.resolve(36));
+  }
 }

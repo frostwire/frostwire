@@ -6,51 +6,50 @@
 
 package com.frostwire.android.gui.dialogs;
 
-import android.os.Bundle;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
+import android.os.Bundle;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 @RunWith(RobolectricTestRunner.class)
 public class SoftwareUpdaterDialogUpdateMessagesTest {
 
-    @Test
-    public void newInstanceStoresUpdateMessagesAsBundle() {
-        Map<String, String> updateMessages = new HashMap<>();
-        updateMessages.put("en", "Update available");
-        updateMessages.put("es", "Actualizacion disponible");
+  @Test
+  public void newInstanceStoresUpdateMessagesAsBundle() {
+    Map<String, String> updateMessages = new HashMap<>();
+    updateMessages.put("en", "Update available");
+    updateMessages.put("es", "Actualizacion disponible");
 
-        SoftwareUpdaterDialog dialog = SoftwareUpdaterDialog.newInstance(
-                "https://example.com/frostwire.apk",
-                updateMessages,
-                Arrays.asList("Fixed update dialog", "Improved downloads"));
+    SoftwareUpdaterDialog dialog =
+        SoftwareUpdaterDialog.newInstance(
+            "https://example.com/frostwire.apk",
+            updateMessages,
+            Arrays.asList("Fixed update dialog", "Improved downloads"));
 
-        Bundle args = dialog.getArguments();
-        Bundle storedMessages = args.getBundle("updateMessages");
+    Bundle args = dialog.getArguments();
+    Bundle storedMessages = args.getBundle("updateMessages");
 
-        assertNotNull(storedMessages);
-        assertEquals(updateMessages, SoftwareUpdaterDialog.fromBundle(storedMessages));
-        assertEquals(
-                Arrays.asList("Fixed update dialog", "Improved downloads"),
-                args.getStringArrayList("changelog"));
-    }
+    assertNotNull(storedMessages);
+    assertEquals(updateMessages, SoftwareUpdaterDialog.fromBundle(storedMessages));
+    assertEquals(
+        Arrays.asList("Fixed update dialog", "Improved downloads"),
+        args.getStringArrayList("changelog"));
+  }
 
-    @Test
-    public void updateMessagesBundleRoundTripsNullValues() {
-        Map<String, String> updateMessages = new HashMap<>();
-        updateMessages.put("en", "Update available");
-        updateMessages.put("pt", null);
+  @Test
+  public void updateMessagesBundleRoundTripsNullValues() {
+    Map<String, String> updateMessages = new HashMap<>();
+    updateMessages.put("en", "Update available");
+    updateMessages.put("pt", null);
 
-        Bundle bundle = SoftwareUpdaterDialog.toBundle(updateMessages);
+    Bundle bundle = SoftwareUpdaterDialog.toBundle(updateMessages);
 
-        assertEquals(updateMessages, SoftwareUpdaterDialog.fromBundle(bundle));
-    }
+    assertEquals(updateMessages, SoftwareUpdaterDialog.fromBundle(bundle));
+  }
 }

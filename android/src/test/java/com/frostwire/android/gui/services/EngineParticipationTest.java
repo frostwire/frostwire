@@ -6,19 +6,6 @@
  */
 package com.frostwire.android.gui.services;
 
-import android.app.Application;
-import com.frostwire.android.core.TellurideCourier;
-import com.frostwire.android.gui.SearchEngine;
-import com.frostwire.android.search.AndroidRelayStack;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.MockedStatic;
-import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
-
-import java.lang.reflect.Constructor;
-import java.util.concurrent.TimeUnit;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -31,101 +18,117 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import android.app.Application;
+import com.frostwire.android.core.TellurideCourier;
+import com.frostwire.android.gui.SearchEngine;
+import com.frostwire.android.search.AndroidRelayStack;
+import java.lang.reflect.Constructor;
+import java.util.concurrent.TimeUnit;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
+
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 28, application = Application.class)
 public class EngineParticipationTest {
-    @Test
-    public void networkRecoveryDoesNotUndoExplicitStop() throws Exception {
-        Engine engine = engine();
-        EngineForegroundService service = mock(EngineForegroundService.class);
-        when(service.acceptsStarts()).thenReturn(true);
-        try (MockedStatic<EngineForegroundService> services = mockStatic(EngineForegroundService.class);
-             MockedStatic<AndroidRelayStack> relay = mockStatic(AndroidRelayStack.class)) {
-            services.when(EngineForegroundService::getInstance).thenReturn(service);
-            relay.when(AndroidRelayStack::isNetworkAllowed).thenReturn(true);
-            engine.shutdown();
-            engine.stopServices(true);
-            engine.resumeServicesIfDisconnected();
-            engine.ensureDistributedSearchReady(1);
-            assertTrue(engine.wasShutdown());
-            assertFalse(engine.isDisconnected());
-            verify(service).stopServices(false);
-            verify(service, never()).startServices(anyBoolean());
-        }
+  @Test
+  public void networkRecoveryDoesNotUndoExplicitStop() throws Exception {
+    Engine engine = engine();
+    EngineForegroundService service = mock(EngineForegroundService.class);
+    when(service.acceptsStarts()).thenReturn(true);
+    try (MockedStatic<EngineForegroundService> services =
+            mockStatic(EngineForegroundService.class);
+        MockedStatic<AndroidRelayStack> relay = mockStatic(AndroidRelayStack.class)) {
+      services.when(EngineForegroundService::getInstance).thenReturn(service);
+      relay.when(AndroidRelayStack::isNetworkAllowed).thenReturn(true);
+      engine.shutdown();
+      engine.stopServices(true);
+      engine.resumeServicesIfDisconnected();
+      engine.ensureDistributedSearchReady(1);
+      assertTrue(engine.wasShutdown());
+      assertFalse(engine.isDisconnected());
+      verify(service).stopServices(false);
+      verify(service, never()).startServices(anyBoolean());
     }
+  }
 
-    @Test
-    public void networkPauseCanResumeButNeverReusesRetiredService() throws Exception {
-        Engine engine = engine();
-        EngineForegroundService old = mock(EngineForegroundService.class);
-        EngineForegroundService replacement = mock(EngineForegroundService.class);
-        when(replacement.acceptsStarts()).thenReturn(true);
-        when(old.acceptsStarts()).thenReturn(true);
-        try (MockedStatic<EngineForegroundService> services = mockStatic(EngineForegroundService.class);
-             MockedStatic<AndroidRelayStack> relay = mockStatic(AndroidRelayStack.class);
-             MockedStatic<TellurideCourier> courier = mockStatic(TellurideCourier.class)) {
-            services.when(EngineForegroundService::getInstance).thenReturn(old);
-            relay.when(AndroidRelayStack::isNetworkAllowed).thenReturn(true);
-            engine.stopServices(true);
-            assertTrue(engine.isDisconnected());
-            when(old.acceptsStarts()).thenReturn(false);
-            when(old.isStarted()).thenReturn(true);
-            assertFalse(engine.isStarted());
-            engine.resumeServicesIfDisconnected();
-            verify(old, never()).startServices(anyBoolean());
-            engine.onForegroundServiceCreated(replacement);
-            verify(replacement).startServices(true);
-            assertFalse(engine.wasShutdown());
-        }
+  @Test
+  public void networkPauseCanResumeButNeverReusesRetiredService() throws Exception {
+    Engine engine = engine();
+    EngineForegroundService old = mock(EngineForegroundService.class);
+    EngineForegroundService replacement = mock(EngineForegroundService.class);
+    when(replacement.acceptsStarts()).thenReturn(true);
+    when(old.acceptsStarts()).thenReturn(true);
+    try (MockedStatic<EngineForegroundService> services =
+            mockStatic(EngineForegroundService.class);
+        MockedStatic<AndroidRelayStack> relay = mockStatic(AndroidRelayStack.class);
+        MockedStatic<TellurideCourier> courier = mockStatic(TellurideCourier.class)) {
+      services.when(EngineForegroundService::getInstance).thenReturn(old);
+      relay.when(AndroidRelayStack::isNetworkAllowed).thenReturn(true);
+      engine.stopServices(true);
+      assertTrue(engine.isDisconnected());
+      when(old.acceptsStarts()).thenReturn(false);
+      when(old.isStarted()).thenReturn(true);
+      assertFalse(engine.isStarted());
+      engine.resumeServicesIfDisconnected();
+      verify(old, never()).startServices(anyBoolean());
+      engine.onForegroundServiceCreated(replacement);
+      verify(replacement).startServices(true);
+      assertFalse(engine.wasShutdown());
     }
+  }
 
-    @Test
-    public void disallowedNetworkPreventsStartBeforeServiceWork() throws Exception {
-        Engine engine = engine();
-        EngineForegroundService service = mock(EngineForegroundService.class);
-        try (MockedStatic<EngineForegroundService> services = mockStatic(EngineForegroundService.class);
-             MockedStatic<AndroidRelayStack> relay = mockStatic(AndroidRelayStack.class)) {
-            services.when(EngineForegroundService::getInstance).thenReturn(service);
-            relay.when(AndroidRelayStack::isNetworkAllowed).thenReturn(false);
-            engine.startServices();
-            assertTrue(engine.isDisconnected());
-            verify(service, never()).startServices(anyBoolean());
-        }
+  @Test
+  public void disallowedNetworkPreventsStartBeforeServiceWork() throws Exception {
+    Engine engine = engine();
+    EngineForegroundService service = mock(EngineForegroundService.class);
+    try (MockedStatic<EngineForegroundService> services =
+            mockStatic(EngineForegroundService.class);
+        MockedStatic<AndroidRelayStack> relay = mockStatic(AndroidRelayStack.class)) {
+      services.when(EngineForegroundService::getInstance).thenReturn(service);
+      relay.when(AndroidRelayStack::isNetworkAllowed).thenReturn(false);
+      engine.startServices();
+      assertTrue(engine.isDisconnected());
+      verify(service, never()).startServices(anyBoolean());
     }
+  }
 
-    @Test
-    public void readinessRestartUsesOneTimeoutBudget() throws Exception {
-        Engine engine = engine();
-        EngineForegroundService service = mock(EngineForegroundService.class);
-        when(service.acceptsStarts()).thenReturn(true);
-        when(service.isRelayStackRunning()).thenReturn(false);
-        SearchEngine.DISTRIBUTED_WIRING
-                .localIndex(null)
-                .peerDirectory(null)
-                .identity(null)
-                .searchTransport(null);
-        assertFalse(SearchEngine.DISTRIBUTED.isReady());
-        try (MockedStatic<EngineForegroundService> services = mockStatic(EngineForegroundService.class);
-             MockedStatic<AndroidRelayStack> relay = mockStatic(AndroidRelayStack.class)) {
-            services.when(EngineForegroundService::getInstance).thenReturn(service);
-            relay.when(AndroidRelayStack::isNetworkAllowed).thenReturn(true);
-            relay.when(AndroidRelayStack::isParticipationEnabled).thenReturn(true);
+  @Test
+  public void readinessRestartUsesOneTimeoutBudget() throws Exception {
+    Engine engine = engine();
+    EngineForegroundService service = mock(EngineForegroundService.class);
+    when(service.acceptsStarts()).thenReturn(true);
+    when(service.isRelayStackRunning()).thenReturn(false);
+    SearchEngine.DISTRIBUTED_WIRING
+        .localIndex(null)
+        .peerDirectory(null)
+        .identity(null)
+        .searchTransport(null);
+    assertFalse(SearchEngine.DISTRIBUTED.isReady());
+    try (MockedStatic<EngineForegroundService> services =
+            mockStatic(EngineForegroundService.class);
+        MockedStatic<AndroidRelayStack> relay = mockStatic(AndroidRelayStack.class)) {
+      services.when(EngineForegroundService::getInstance).thenReturn(service);
+      relay.when(AndroidRelayStack::isNetworkAllowed).thenReturn(true);
+      relay.when(AndroidRelayStack::isParticipationEnabled).thenReturn(true);
 
-            long startedAt = System.nanoTime();
-            engine.ensureDistributedSearchReady(50);
-            long elapsedMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt);
+      long startedAt = System.nanoTime();
+      engine.ensureDistributedSearchReady(50);
+      long elapsedMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt);
 
-            assertTrue("one 50ms budget must not become the legacy 1s+ wait: " + elapsedMs,
-                    elapsedMs < 500);
-            verify(service).ensureRelayStack(anyBoolean(), any(Runnable.class));
-        }
+      assertTrue(
+          "one 50ms budget must not become the legacy 1s+ wait: " + elapsedMs, elapsedMs < 500);
+      verify(service).ensureRelayStack(anyBoolean(), any(Runnable.class));
     }
+  }
 
-    private static Engine engine() throws Exception {
-        Constructor<Engine> constructor = Engine.class.getDeclaredConstructor();
-        constructor.setAccessible(true);
-        Engine engine = spy(constructor.newInstance());
-        doReturn(mock(Application.class)).when(engine).getApplication();
-        return engine;
-    }
+  private static Engine engine() throws Exception {
+    Constructor<Engine> constructor = Engine.class.getDeclaredConstructor();
+    constructor.setAccessible(true);
+    Engine engine = spy(constructor.newInstance());
+    doReturn(mock(Application.class)).when(engine).getApplication();
+    return engine;
+  }
 }

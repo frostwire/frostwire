@@ -21,11 +21,13 @@ public class SearchIceBridgeStatusHintTest {
     assertTrue(layout.contains("view_search_progress_text_icebridge"));
     assertTrue(layout.contains("@string/search_icebridge_starting"));
 
-    String view = projectFile("src/main/java/com/frostwire/android/gui/views/SearchProgressView.java");
+    String view =
+        projectFile("src/main/java/com/frostwire/android/gui/views/SearchProgressView.java");
     assertTrue(view.contains("setIceBridgeHint("));
     assertTrue(view.contains("textIceBridge"));
 
-    String fragment = projectFile("src/main/java/com/frostwire/android/gui/fragments/SearchFragment.java");
+    String fragment =
+        projectFile("src/main/java/com/frostwire/android/gui/fragments/SearchFragment.java");
     assertTrue(fragment.contains("refreshIceBridgeHint()"));
     assertTrue(fragment.contains("search_icebridge_starting"));
     assertTrue(fragment.contains("search_icebridge_not_running"));
@@ -36,7 +38,8 @@ public class SearchIceBridgeStatusHintTest {
   @Test
   public void distributedSearchCountsContactedPeers() throws Exception {
     String performer =
-        projectFile("../common/src/main/java/com/frostwire/search/relay/DistributedSearchPerformer.java");
+        projectFile(
+            "../common/src/main/java/com/frostwire/search/relay/DistributedSearchPerformer.java");
     assertTrue(performer.contains("getPeersContacted()"));
     assertTrue(performer.contains("peersContacted.incrementAndGet()"));
 

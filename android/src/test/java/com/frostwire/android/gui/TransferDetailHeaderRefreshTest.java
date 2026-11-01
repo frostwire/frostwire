@@ -16,11 +16,10 @@ import java.nio.file.Paths;
 import org.junit.Test;
 
 /**
- * Structural regression test: the transfer detail header (progress bar, speeds)
- * renders from a fragment-level cache fed by {@code UIBittorrentDownload}'s own
- * cache. While the detail screen is foreground the transfers list is paused, so
- * nothing else refreshes the wrapper cache — the detail tick must refresh it
- * itself, on a background thread, or the header freezes while tab content
+ * Structural regression test: the transfer detail header (progress bar, speeds) renders from a
+ * fragment-level cache fed by {@code UIBittorrentDownload}'s own cache. While the detail screen is
+ * foreground the transfers list is paused, so nothing else refreshes the wrapper cache — the detail
+ * tick must refresh it itself, on a background thread, or the header freezes while tab content
  * (which reads the live torrent handle) keeps moving.
  */
 public class TransferDetailHeaderRefreshTest {

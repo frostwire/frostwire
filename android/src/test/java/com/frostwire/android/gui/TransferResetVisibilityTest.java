@@ -19,7 +19,8 @@ public class TransferResetVisibilityTest {
 
   @Test
   public void engineResetDoesNotEmptyTransfersBeforeRestore() throws Exception {
-    String manager = projectFile("src/main/java/com/frostwire/android/gui/transfers/TransferManager.java");
+    String manager =
+        projectFile("src/main/java/com/frostwire/android/gui/transfers/TransferManager.java");
     String reset = blockStartingAt(manager, "public void reset()");
 
     assertFalse(reset.contains("clearTransfers();"));
@@ -29,7 +30,8 @@ public class TransferResetVisibilityTest {
 
   @Test
   public void explicitShutdownStillClearsTransfers() throws Exception {
-    String manager = projectFile("src/main/java/com/frostwire/android/gui/transfers/TransferManager.java");
+    String manager =
+        projectFile("src/main/java/com/frostwire/android/gui/transfers/TransferManager.java");
     String shutdown = blockStartingAt(manager, "public void onShutdown(boolean disconnected)");
 
     assertTrue(shutdown.contains("if (!disconnected)"));
