@@ -39,10 +39,24 @@ jobs:
         run: |
           cd desktop
           if [ "${{ github.event.inputs.test_suite }}" = "all" ] || [ -z "${{ github.event.inputs.test_suite }}" ]; then
-            ./gradlew test
+            ./gradlew test jacocoTestReport jacocoTestCoverageVerification
           else
             ./gradlew test --tests "com.frostwire.${{ github.event.inputs.test_suite }}.*"
           fi
+
+      - name: Coverage summary
+        if: always() && hashFiles('desktop/build/reports/jacoco/test/jacocoTestReport.xml') != ''
+        run: |
+          python3 -I .github/scripts/coverage_summary.py "Desktop + common coverage" \
+            desktop/build/reports/jacoco/test/jacocoTestReport.xml >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload coverage report
+        if: always() && hashFiles('desktop/build/reports/jacoco/test/jacocoTestReport.xml') != ''
+        uses: actions/upload-artifact@v5
+        with:
+          name: desktop-coverage-report
+          path: desktop/build/reports/jacoco/test/html
+          retention-days: 14
 
       # Replays every committed fuzz seed and fixed-crash input as plain JUnit (no fuzzing),
       # so a parser fix can't silently regress (skills/frostwire-fuzz-pipeline). Crash inputs

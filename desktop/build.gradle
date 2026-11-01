@@ -12,6 +12,7 @@
 plugins {
     id 'java'
     id 'application'
+    id 'jacoco'
     id 'com.diffplug.spotless' version '8.10.4'
 }
 
@@ -71,6 +72,38 @@ tasks.register('formatCommon', JavaExec) {
 }
 tasks.named('spotlessCheck') { dependsOn 'checkCommonFormat' }
 tasks.named('spotlessApply') { finalizedBy 'formatCommon' }
+
+// Test coverage of desktop and common/ (compiled into this project's main source set):
+// ./gradlew test jacocoTestReport writes build/reports/jacoco/test/html/index.html and the XML CI
+// summarizes. The fuzz and live-site tasks don't count.
+jacoco {
+    toolVersion = '0.8.13'
+}
+tasks.named('jacocoTestReport') {
+    dependsOn tasks.named('test')
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+}
+// Coverage may only go up. CI runs this after the tests. Raise the minimums as coverage grows; the
+// goal is 100%. Baseline 2026-11-01: 30.9% of lines, 26.2% of branches.
+tasks.named('jacocoTestCoverageVerification') {
+    dependsOn tasks.named('test')
+    violationRules {
+        rule {
+            limit {
+                counter = 'LINE'
+                minimum = 0.30
+            }
+            limit {
+                counter = 'BRANCH'
+                minimum = 0.25
+            }
+        }
+    }
+}
 
 tasks.register('lint') {
     group = 'verification'
