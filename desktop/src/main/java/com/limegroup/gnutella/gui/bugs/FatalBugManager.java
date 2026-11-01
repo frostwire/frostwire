@@ -1,6 +1,7 @@
 package com.limegroup.gnutella.gui.bugs;
 
 import com.limegroup.gnutella.gui.CrashReportSpooler;
+import com.limegroup.gnutella.gui.Finalizer;
 import com.limegroup.gnutella.gui.LimeWireModule;
 import com.limegroup.gnutella.gui.LocalClientInfoFactory;
 import com.limegroup.gnutella.gui.MultiLineLabel;
@@ -64,7 +65,7 @@ public final class FatalBugManager {
           // The anonymous report was already spooled by recordSync on entry;
           // there is no legacy servlet to contact anymore.
           DIALOG.dispose();
-          System.exit(1);
+          Finalizer.exitOffEdt(1);
         });
     JButton reviewButton = new JButton("Review");
     reviewButton.addActionListener(
@@ -84,7 +85,7 @@ public final class FatalBugManager {
     discardButton.addActionListener(
         e -> {
           DIALOG.dispose();
-          System.exit(1);
+          Finalizer.exitOffEdt(1);
         });
     buttonPanel.add(sendButton);
     buttonPanel.add(reviewButton);

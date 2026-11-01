@@ -12,6 +12,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
@@ -117,5 +120,17 @@ class FinalizerShutdownThreadTest {
     assertEquals("Exit Thread", exiter.get().getName());
     hooksDone.countDown();
     started.get().join(10_000);
+  }
+
+  @Test
+  void dialogsThatQuitDoNotCallSystemExitOnTheEdt() throws Exception {
+    Path gui =
+        Path.of(System.getProperty("user.dir")).resolve("src/main/java/com/limegroup/gnutella/gui");
+    for (String file : List.of("init/SetupManager.java", "bugs/FatalBugManager.java")) {
+      String source = Files.readString(gui.resolve(file), StandardCharsets.UTF_8);
+      assertFalse(
+          source.replaceAll("\\s+", "").contains("System.exit("),
+          file + " must quit through Finalizer.exitOffEdt");
+    }
   }
 }
