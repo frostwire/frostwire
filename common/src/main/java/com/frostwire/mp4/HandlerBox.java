@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -26,55 +26,55 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class HandlerBox extends FullBox {
-    protected final int[] reserved;
-    protected int pre_defined;
-    protected int handler_type;
-    protected byte[] name;
+  protected final int[] reserved;
+  protected int pre_defined;
+  protected int handler_type;
+  protected byte[] name;
 
-    HandlerBox() {
-        super(hdlr);
-        reserved = new int[3];
-        name = new byte[0];
-    }
+  HandlerBox() {
+    super(hdlr);
+    reserved = new int[3];
+    name = new byte[0];
+  }
 
-    public String name() {
-        return Utf8.convert(name);
-    }
+  public String name() {
+    return Utf8.convert(name);
+  }
 
-    public void name(String value) {
-        name = value != null ? Utf8.convert(value) : new byte[0];
-    }
+  public void name(String value) {
+    name = value != null ? Utf8.convert(value) : new byte[0];
+  }
 
-    @Override
-    void read(InputChannel ch, ByteBuffer buf) throws IOException {
-        super.read(ch, buf);
-        int len = payloadLength(4);
-        IO.read(ch, len, buf);
-        pre_defined = buf.getInt();
-        handler_type = buf.getInt();
-        IO.get(buf, reserved);
-        if (buf.remaining() > 0) {
-            name = IO.str(buf);
-        }
+  @Override
+  void read(InputChannel ch, ByteBuffer buf) throws IOException {
+    super.read(ch, buf);
+    int len = payloadLength(4);
+    IO.read(ch, len, buf);
+    pre_defined = buf.getInt();
+    handler_type = buf.getInt();
+    IO.get(buf, reserved);
+    if (buf.remaining() > 0) {
+      name = IO.str(buf);
     }
+  }
 
-    @Override
-    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
-        super.write(ch, buf);
-        buf.putInt(pre_defined);
-        buf.putInt(handler_type);
-        IO.put(buf, reserved);
-        buf.put(name);
-        buf.put((byte) 0);
-        IO.write(ch, buf.position(), buf);
-    }
+  @Override
+  void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+    super.write(ch, buf);
+    buf.putInt(pre_defined);
+    buf.putInt(handler_type);
+    IO.put(buf, reserved);
+    buf.put(name);
+    buf.put((byte) 0);
+    IO.write(ch, buf.position(), buf);
+  }
 
-    @Override
-    void update() {
-        long s = 0;
-        s += 4; // full box
-        s += 20;
-        s += name.length + 1;
-        length(s);
-    }
+  @Override
+  void update() {
+    long s = 0;
+    s += 4; // full box
+    s += 20;
+    s += name.length + 1;
+    length(s);
+  }
 }

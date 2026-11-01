@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -26,40 +26,40 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class HintSampleEntry extends SampleEntry {
-    protected byte[] data;
+  protected byte[] data;
 
-    HintSampleEntry(int protocol) {
-        super(protocol);
-    }
+  HintSampleEntry(int protocol) {
+    super(protocol);
+  }
 
-    @Override
-    void read(InputChannel ch, ByteBuffer buf) throws IOException {
-        super.read(ch, buf);
-        int len = payloadLength(8);
-        if (len != 0) {
-            IO.read(ch, len, buf);
-            data = new byte[len];
-            buf.get(data);
-        }
+  @Override
+  void read(InputChannel ch, ByteBuffer buf) throws IOException {
+    super.read(ch, buf);
+    int len = payloadLength(8);
+    if (len != 0) {
+      IO.read(ch, len, buf);
+      data = new byte[len];
+      buf.get(data);
     }
+  }
 
-    @Override
-    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
-        super.write(ch, buf);
-        if (data != null) {
-            buf.put(data);
-            IO.write(ch, data.length, buf);
-        }
+  @Override
+  void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+    super.write(ch, buf);
+    if (data != null) {
+      buf.put(data);
+      IO.write(ch, data.length, buf);
     }
+  }
 
-    @Override
-    void update() {
-        long s = 0;
-        s += 8; // sample entry
-        if (data != null) {
-            s += data.length;
-        }
-        s += ContainerBox.length(boxes);
-        length(s);
+  @Override
+  void update() {
+    long s = 0;
+    s += 8; // sample entry
+    if (data != null) {
+      s += data.length;
     }
+    s += ContainerBox.length(boxes);
+    length(s);
+  }
 }

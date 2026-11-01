@@ -1,37 +1,37 @@
 package com.frostwire.mp3;
 
 public interface ID3v1 {
-    String getVersion();
+  String getVersion();
 
-    String getTrack();
+  String getTrack();
 
-    void setTrack(String track);
+  void setTrack(String track);
 
-    String getArtist();
+  String getArtist();
 
-    void setArtist(String artist);
+  void setArtist(String artist);
 
-    String getTitle();
+  String getTitle();
 
-    void setTitle(String title);
+  void setTitle(String title);
 
-    String getAlbum();
+  String getAlbum();
 
-    void setAlbum(String album);
+  void setAlbum(String album);
 
-    String getYear();
+  String getYear();
 
-    void setYear(String year);
+  void setYear(String year);
 
-    int getGenre();
+  int getGenre();
 
-    void setGenre(int genre);
+  void setGenre(int genre);
 
-    String getGenreDescription();
+  String getGenreDescription();
 
-    String getComment();
+  String getComment();
 
-    void setComment(String comment);
+  void setComment(String comment);
 
-    byte[] toBytes() throws NotSupportedException;
+  byte[] toBytes() throws NotSupportedException;
 }

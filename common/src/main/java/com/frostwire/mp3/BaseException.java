@@ -2,36 +2,36 @@ package com.frostwire.mp3;
 
 public class BaseException extends Exception {
 
-    public BaseException() {
-        super();
-    }
+  public BaseException() {
+    super();
+  }
 
-    public BaseException(String message) {
-        super(message);
-    }
+  public BaseException(String message) {
+    super(message);
+  }
 
-    public BaseException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public BaseException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-    public String getDetailedMessage() {
-        Throwable t = this;
-        StringBuilder s = new StringBuilder();
-        while (true) {
-            s.append('[');
-            s.append(t.getClass().getName());
-            if (t.getMessage() != null && t.getMessage().length() > 0) {
-                s.append(": ");
-                s.append(t.getMessage());
-            }
-            s.append(']');
-            t = t.getCause();
-            if (t != null) {
-                s.append(" caused by ");
-            } else {
-                break;
-            }
-        }
-        return s.toString();
+  public String getDetailedMessage() {
+    Throwable t = this;
+    StringBuilder s = new StringBuilder();
+    while (true) {
+      s.append('[');
+      s.append(t.getClass().getName());
+      if (t.getMessage() != null && t.getMessage().length() > 0) {
+        s.append(": ");
+        s.append(t.getMessage());
+      }
+      s.append(']');
+      t = t.getCause();
+      if (t != null) {
+        s.append(" caused by ");
+      } else {
+        break;
+      }
     }
+    return s.toString();
+  }
 }

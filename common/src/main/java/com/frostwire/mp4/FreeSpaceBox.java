@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -26,56 +26,56 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class FreeSpaceBox extends Box {
-    private static final int MAX_DATA_SIZE = 1024 * 1024; // 1MB
-    protected byte[] data;
+  private static final int MAX_DATA_SIZE = 1024 * 1024; // 1MB
+  protected byte[] data;
 
-    FreeSpaceBox(int type) {
-        super(type);
-    }
+  FreeSpaceBox(int type) {
+    super(type);
+  }
 
-    FreeSpaceBox(int type, long length) {
-        super(type);
-        data = new byte[(int) length];
-        update();
-    }
+  FreeSpaceBox(int type, long length) {
+    super(type);
+    data = new byte[(int) length];
+    update();
+  }
 
-    public static FreeSpaceBox free(long length) {
-        return new FreeSpaceBox(free, length);
-    }
+  public static FreeSpaceBox free(long length) {
+    return new FreeSpaceBox(free, length);
+  }
 
-    public static FreeSpaceBox skip(long length) {
-        return new FreeSpaceBox(skip, length);
-    }
+  public static FreeSpaceBox skip(long length) {
+    return new FreeSpaceBox(skip, length);
+  }
 
-    @Override
-    void read(InputChannel ch, ByteBuffer buf) throws IOException {
-        long len = length();
-        if (len < 0) {
-            // The box runs to the end of the file.
-            IO.skip(ch, buf);
-        } else if (len > 0 && len <= MAX_DATA_SIZE) {
-            data = new byte[(int) len];
-            buf = ByteBuffer.wrap(data);
-            IO.read(ch, (int) len, buf);
-        } else if (len > 0) {
-            IO.skip(ch, len, buf);
-        }
+  @Override
+  void read(InputChannel ch, ByteBuffer buf) throws IOException {
+    long len = length();
+    if (len < 0) {
+      // The box runs to the end of the file.
+      IO.skip(ch, buf);
+    } else if (len > 0 && len <= MAX_DATA_SIZE) {
+      data = new byte[(int) len];
+      buf = ByteBuffer.wrap(data);
+      IO.read(ch, (int) len, buf);
+    } else if (len > 0) {
+      IO.skip(ch, len, buf);
     }
+  }
 
-    @Override
-    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
-        if (data != null) {
-            buf = ByteBuffer.wrap(data);
-            IO.write(ch, data.length, buf);
-        }
+  @Override
+  void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+    if (data != null) {
+      buf = ByteBuffer.wrap(data);
+      IO.write(ch, data.length, buf);
     }
+  }
 
-    @Override
-    void update() {
-        long s = 0;
-        if (data != null) {
-            s += data.length;
-        }
-        length(s);
+  @Override
+  void update() {
+    long s = 0;
+    if (data != null) {
+      s += data.length;
     }
+    length(s);
+  }
 }

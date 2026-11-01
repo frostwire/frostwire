@@ -3,55 +3,55 @@ package com.frostwire.mp3;
 import java.util.Map;
 
 public interface ID3v2 extends ID3v1 {
-    boolean getPadding();
+  boolean getPadding();
 
-    void setPadding(boolean padding);
+  void setPadding(boolean padding);
 
-    boolean hasFooter();
+  boolean hasFooter();
 
-    void setFooter(boolean footer);
+  void setFooter(boolean footer);
 
-    boolean hasUnsynchronisation();
+  boolean hasUnsynchronisation();
 
-    void setUnsynchronisation(boolean unsynchronisation);
+  void setUnsynchronisation(boolean unsynchronisation);
 
-    String getComposer();
+  String getComposer();
 
-    void setComposer(String composer);
+  void setComposer(String composer);
 
-    String getOriginalArtist();
+  String getOriginalArtist();
 
-    void setOriginalArtist(String originalArtist);
+  void setOriginalArtist(String originalArtist);
 
-    String getCopyright();
+  String getCopyright();
 
-    void setCopyright(String copyright);
+  void setCopyright(String copyright);
 
-    String getUrl();
+  String getUrl();
 
-    void setUrl(String url);
+  void setUrl(String url);
 
-    String getEncoder();
+  String getEncoder();
 
-    void setEncoder(String encoder);
+  void setEncoder(String encoder);
 
-    byte[] getAlbumImage();
+  byte[] getAlbumImage();
 
-    void setAlbumImage(byte[] albumImage, String mimeType);
+  void setAlbumImage(byte[] albumImage, String mimeType);
 
-    String getAlbumImageMimeType();
+  String getAlbumImageMimeType();
 
-    String getItunesComment();
+  String getItunesComment();
 
-    void setItunesComment(String itunesComment);
+  void setItunesComment(String itunesComment);
 
-    int getDataLength();
+  int getDataLength();
 
-    int getLength();
+  int getLength();
 
-    boolean getObseleteFormat();
+  boolean getObseleteFormat();
 
-    Map<String, ID3v2FrameSet> getFrameSets();
+  Map<String, ID3v2FrameSet> getFrameSets();
 
-    void clearFrameSet(String id);
+  void clearFrameSet(String id);
 }

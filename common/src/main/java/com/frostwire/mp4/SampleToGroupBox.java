@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -26,61 +26,61 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class SampleToGroupBox extends FullBox {
-    protected int grouping_type;
-    protected int entry_count;
-    protected Entry[] entries;
+  protected int grouping_type;
+  protected int entry_count;
+  protected Entry[] entries;
 
-    SampleToGroupBox() {
-        super(sbgp);
+  SampleToGroupBox() {
+    super(sbgp);
+  }
+
+  @Override
+  void read(InputChannel ch, ByteBuffer buf) throws IOException {
+    super.read(ch, buf);
+    IO.read(ch, 8, buf);
+    grouping_type = buf.getInt();
+    entry_count = entryCount(ch, buf.getInt(), 8);
+    entries = new Entry[entry_count];
+    for (int i = 0; i < entry_count; i++) {
+      Entry e = new Entry();
+      IO.read(ch, 8, buf);
+      e.get(buf);
+      entries[i] = e;
+    }
+  }
+
+  @Override
+  void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+    super.write(ch, buf);
+    buf.putInt(grouping_type);
+    buf.putInt(entry_count);
+    IO.write(ch, 8, buf);
+    IsoMedia.write(ch, entry_count, 8, entries, buf);
+  }
+
+  @Override
+  void update() {
+    long s = 0;
+    s += 4; // full box
+    s += 8;
+    s += entry_count * 8;
+    length(s);
+  }
+
+  public static final class Entry extends BoxEntry {
+    public int sample_count;
+    public int group_description_index;
+
+    @Override
+    void get(ByteBuffer buf) {
+      sample_count = buf.getInt();
+      group_description_index = buf.getInt();
     }
 
     @Override
-    void read(InputChannel ch, ByteBuffer buf) throws IOException {
-        super.read(ch, buf);
-        IO.read(ch, 8, buf);
-        grouping_type = buf.getInt();
-        entry_count = entryCount(ch, buf.getInt(), 8);
-        entries = new Entry[entry_count];
-        for (int i = 0; i < entry_count; i++) {
-            Entry e = new Entry();
-            IO.read(ch, 8, buf);
-            e.get(buf);
-            entries[i] = e;
-        }
+    void put(ByteBuffer buf) {
+      buf.putInt(sample_count);
+      buf.putInt(group_description_index);
     }
-
-    @Override
-    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
-        super.write(ch, buf);
-        buf.putInt(grouping_type);
-        buf.putInt(entry_count);
-        IO.write(ch, 8, buf);
-        IsoMedia.write(ch, entry_count, 8, entries, buf);
-    }
-
-    @Override
-    void update() {
-        long s = 0;
-        s += 4; // full box
-        s += 8;
-        s += entry_count * 8;
-        length(s);
-    }
-
-    public static final class Entry extends BoxEntry {
-        public int sample_count;
-        public int group_description_index;
-
-        @Override
-        void get(ByteBuffer buf) {
-            sample_count = buf.getInt();
-            group_description_index = buf.getInt();
-        }
-
-        @Override
-        void put(ByteBuffer buf) {
-            buf.putInt(sample_count);
-            buf.putInt(group_description_index);
-        }
-    }
+  }
 }

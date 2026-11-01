@@ -1,261 +1,279 @@
 package com.frostwire.mp3;
 
 public class BufferTools {
-    public static String byteBufferToString(byte[] bytes, int offset, int length) {
-        if (length < 1) return "";
-        StringBuilder stringBuffer = new StringBuilder();
-        for (int i = 0; i < length; i++) {
-            char ch;
-            if (bytes[offset + i] >= 0) ch = (char) bytes[offset + i];
-            else ch = (char) (bytes[offset + i] + 256);
-            stringBuffer.append(ch);
-        }
-        return stringBuffer.toString();
+  public static String byteBufferToString(byte[] bytes, int offset, int length) {
+    if (length < 1) return "";
+    StringBuilder stringBuffer = new StringBuilder();
+    for (int i = 0; i < length; i++) {
+      char ch;
+      if (bytes[offset + i] >= 0) ch = (char) bytes[offset + i];
+      else ch = (char) (bytes[offset + i] + 256);
+      stringBuffer.append(ch);
     }
+    return stringBuffer.toString();
+  }
 
-    public static byte[] stringToByteBuffer(String s, int offset, int length) {
-        String stringToCopy = s.substring(offset, offset + length);
-        return stringToCopy.getBytes();
-    }
+  public static byte[] stringToByteBuffer(String s, int offset, int length) {
+    String stringToCopy = s.substring(offset, offset + length);
+    return stringToCopy.getBytes();
+  }
 
-    public static void stringIntoByteBuffer(String s, int offset, int length, byte[] bytes, int destOffset) {
-        for (int i = 0; i < length; i++) {
-            char ch = s.charAt(offset + i);
-            byte by;
-            if (ch < 128) by = (byte) ch;
-            else by = (byte) (ch - 256);
-            bytes[destOffset + i] = by;
-        }
+  public static void stringIntoByteBuffer(
+      String s, int offset, int length, byte[] bytes, int destOffset) {
+    for (int i = 0; i < length; i++) {
+      char ch = s.charAt(offset + i);
+      byte by;
+      if (ch < 128) by = (byte) ch;
+      else by = (byte) (ch - 256);
+      bytes[destOffset + i] = by;
     }
+  }
 
-    public static String trimStringRight(String s) {
-        int endPosition = s.length() - 1;
-        char endChar;
-        while (endPosition >= 0) {
-            endChar = s.charAt(endPosition);
-            if (endChar > 32) {
-                break;
-            }
-            endPosition--;
-        }
-        if (endPosition == s.length() - 1) return s;
-        else if (endPosition < 0) return "";
-        return s.substring(0, endPosition + 1);
+  public static String trimStringRight(String s) {
+    int endPosition = s.length() - 1;
+    char endChar;
+    while (endPosition >= 0) {
+      endChar = s.charAt(endPosition);
+      if (endChar > 32) {
+        break;
+      }
+      endPosition--;
     }
+    if (endPosition == s.length() - 1) return s;
+    else if (endPosition < 0) return "";
+    return s.substring(0, endPosition + 1);
+  }
 
-    public static String padStringRight(String s, int length, char padWith) {
-        if (s.length() >= length) return s;
-        StringBuilder stringBuffer = new StringBuilder(s);
-        while (stringBuffer.length() < length) {
-            stringBuffer.append(padWith);
-        }
-        return stringBuffer.toString();
+  public static String padStringRight(String s, int length, char padWith) {
+    if (s.length() >= length) return s;
+    StringBuilder stringBuffer = new StringBuilder(s);
+    while (stringBuffer.length() < length) {
+      stringBuffer.append(padWith);
     }
+    return stringBuffer.toString();
+  }
 
-    public static boolean checkBit(byte b, int bitPosition) {
-        return ((b & (0x01 << bitPosition)) != 0);
-    }
+  public static boolean checkBit(byte b, int bitPosition) {
+    return ((b & (0x01 << bitPosition)) != 0);
+  }
 
-    public static byte setBit(byte b, int bitPosition, boolean value) {
-        byte newByte;
-        if (value) {
-            newByte = (byte) (b | ((byte) 0x01 << bitPosition));
-        } else {
-            newByte = (byte) (b & (~((byte) 0x01 << bitPosition)));
-        }
-        return newByte;
+  public static byte setBit(byte b, int bitPosition, boolean value) {
+    byte newByte;
+    if (value) {
+      newByte = (byte) (b | ((byte) 0x01 << bitPosition));
+    } else {
+      newByte = (byte) (b & (~((byte) 0x01 << bitPosition)));
     }
+    return newByte;
+  }
 
-    public static int shiftByte(byte c, int places) {
-        int i = c & 0xFF;
-        if (places < 0) {
-            return i << -places;
-        } else if (places > 0) {
-            return i >> places;
-        }
-        return i;
+  public static int shiftByte(byte c, int places) {
+    int i = c & 0xFF;
+    if (places < 0) {
+      return i << -places;
+    } else if (places > 0) {
+      return i >> places;
     }
+    return i;
+  }
 
-    public static int unpackInteger(byte b1, byte b2, byte b3, byte b4) {
-        int value = b4 & 0xFF;
-        value += BufferTools.shiftByte(b3, -8);
-        value += BufferTools.shiftByte(b2, -16);
-        value += BufferTools.shiftByte(b1, -24);
-        return value;
-    }
+  public static int unpackInteger(byte b1, byte b2, byte b3, byte b4) {
+    int value = b4 & 0xFF;
+    value += BufferTools.shiftByte(b3, -8);
+    value += BufferTools.shiftByte(b2, -16);
+    value += BufferTools.shiftByte(b1, -24);
+    return value;
+  }
 
-    public static byte[] packInteger(int i) {
-        byte[] bytes = new byte[4];
-        bytes[3] = (byte) (i & 0xFF);
-        bytes[2] = (byte) ((i >> 8) & 0xFF);
-        bytes[1] = (byte) ((i >> 16) & 0xFF);
-        bytes[0] = (byte) ((i >> 24) & 0xFF);
-        return bytes;
-    }
+  public static byte[] packInteger(int i) {
+    byte[] bytes = new byte[4];
+    bytes[3] = (byte) (i & 0xFF);
+    bytes[2] = (byte) ((i >> 8) & 0xFF);
+    bytes[1] = (byte) ((i >> 16) & 0xFF);
+    bytes[0] = (byte) ((i >> 24) & 0xFF);
+    return bytes;
+  }
 
-    public static int unpackSynchsafeInteger(byte b1, byte b2, byte b3, byte b4) {
-        int value = ((byte) (b4 & 0x7F));
-        value += shiftByte((byte) (b3 & 0x7F), -7);
-        value += shiftByte((byte) (b2 & 0x7F), -14);
-        value += shiftByte((byte) (b1 & 0x7F), -21);
-        return value;
-    }
+  public static int unpackSynchsafeInteger(byte b1, byte b2, byte b3, byte b4) {
+    int value = ((byte) (b4 & 0x7F));
+    value += shiftByte((byte) (b3 & 0x7F), -7);
+    value += shiftByte((byte) (b2 & 0x7F), -14);
+    value += shiftByte((byte) (b1 & 0x7F), -21);
+    return value;
+  }
 
-    public static byte[] packSynchsafeInteger(int i) {
-        byte[] bytes = new byte[4];
-        packSynchsafeInteger(i, bytes, 0);
-        return bytes;
-    }
+  public static byte[] packSynchsafeInteger(int i) {
+    byte[] bytes = new byte[4];
+    packSynchsafeInteger(i, bytes, 0);
+    return bytes;
+  }
 
-    public static void packSynchsafeInteger(int i, byte[] bytes, int offset) {
-        bytes[offset + 3] = (byte) (i & 0x7F);
-        bytes[offset + 2] = (byte) ((i >> 7) & 0x7F);
-        bytes[offset + 1] = (byte) ((i >> 14) & 0x7F);
-        bytes[offset + 0] = (byte) ((i >> 21) & 0x7F);
-    }
+  public static void packSynchsafeInteger(int i, byte[] bytes, int offset) {
+    bytes[offset + 3] = (byte) (i & 0x7F);
+    bytes[offset + 2] = (byte) ((i >> 7) & 0x7F);
+    bytes[offset + 1] = (byte) ((i >> 14) & 0x7F);
+    bytes[offset + 0] = (byte) ((i >> 21) & 0x7F);
+  }
 
-    /**
-     * Copies {@code length} bytes from {@code offset}. The bounds are checked before the copy is
-     * allocated: lengths come from tag data, and a bad one must not allocate gigabytes first.
-     */
-    public static byte[] copyBuffer(byte[] bytes, int offset, int length) {
-        if (offset < 0 || length < 0 || offset > bytes.length - length) {
-            throw new ArrayIndexOutOfBoundsException("Copy of " + length + " bytes at " + offset + " runs past a " + bytes.length + "-byte buffer");
-        }
-        byte[] copy = new byte[length];
-        System.arraycopy(bytes, offset + 0, copy, 0, length);
-        return copy;
+  /**
+   * Copies {@code length} bytes from {@code offset}. The bounds are checked before the copy is
+   * allocated: lengths come from tag data, and a bad one must not allocate gigabytes first.
+   */
+  public static byte[] copyBuffer(byte[] bytes, int offset, int length) {
+    if (offset < 0 || length < 0 || offset > bytes.length - length) {
+      throw new ArrayIndexOutOfBoundsException(
+          "Copy of "
+              + length
+              + " bytes at "
+              + offset
+              + " runs past a "
+              + bytes.length
+              + "-byte buffer");
     }
+    byte[] copy = new byte[length];
+    System.arraycopy(bytes, offset + 0, copy, 0, length);
+    return copy;
+  }
 
-    public static void copyIntoByteBuffer(byte[] bytes, int offset, int length, byte[] destBuffer, int destOffset) {
-        System.arraycopy(bytes, offset, destBuffer, destOffset + offset, length - offset);
-    }
+  public static void copyIntoByteBuffer(
+      byte[] bytes, int offset, int length, byte[] destBuffer, int destOffset) {
+    System.arraycopy(bytes, offset, destBuffer, destOffset + offset, length - offset);
+  }
 
-    public static int sizeUnsynchronisationWouldAdd(byte[] bytes) {
-        int count = 0;
-        for (int i = 0; i < bytes.length - 1; i++) {
-            if (bytes[i] == -0x01 && ((bytes[i + 1] & -0x20) == -0x20 || bytes[i + 1] == 0)) {
-                count++;
-            }
-        }
-        if (bytes.length > 0 && bytes[bytes.length - 1] == -0x01) count++;
-        return count;
+  public static int sizeUnsynchronisationWouldAdd(byte[] bytes) {
+    int count = 0;
+    for (int i = 0; i < bytes.length - 1; i++) {
+      if (bytes[i] == -0x01 && ((bytes[i + 1] & -0x20) == -0x20 || bytes[i + 1] == 0)) {
+        count++;
+      }
     }
+    if (bytes.length > 0 && bytes[bytes.length - 1] == -0x01) count++;
+    return count;
+  }
 
-    public static byte[] unsynchroniseBuffer(byte[] bytes) {
-        int count = sizeUnsynchronisationWouldAdd(bytes);
-        if (count == 0) return bytes;
-        byte[] newBuffer = new byte[bytes.length + count];
-        int j = 0;
-        for (int i = 0; i < bytes.length - 1; i++) {
-            newBuffer[j++] = bytes[i];
-            if (bytes[i] == -0x01 && ((bytes[i + 1] & -0x20) == -0x20 || bytes[i + 1] == 0)) {
-                newBuffer[j++] = 0;
-            }
-        }
-        newBuffer[j++] = bytes[bytes.length - 1];
-        if (bytes[bytes.length - 1] == -0x01) {
-            newBuffer[j++] = 0;
-        }
-        return newBuffer;
+  public static byte[] unsynchroniseBuffer(byte[] bytes) {
+    int count = sizeUnsynchronisationWouldAdd(bytes);
+    if (count == 0) return bytes;
+    byte[] newBuffer = new byte[bytes.length + count];
+    int j = 0;
+    for (int i = 0; i < bytes.length - 1; i++) {
+      newBuffer[j++] = bytes[i];
+      if (bytes[i] == -0x01 && ((bytes[i + 1] & -0x20) == -0x20 || bytes[i + 1] == 0)) {
+        newBuffer[j++] = 0;
+      }
     }
+    newBuffer[j++] = bytes[bytes.length - 1];
+    if (bytes[bytes.length - 1] == -0x01) {
+      newBuffer[j++] = 0;
+    }
+    return newBuffer;
+  }
 
-    public static int sizeSynchronisationWouldSubtract(byte[] bytes) {
-        int count = 0;
-        for (int i = 0; i < bytes.length - 2; i++) {
-            if (bytes[i] == -0x01 && bytes[i + 1] == 0 && ((bytes[i + 2] & -0x20) == -0x20 || bytes[i + 2] == 0)) {
-                count++;
-            }
-        }
-        if (bytes.length > 1 && bytes[bytes.length - 2] == -0x01 && bytes[bytes.length - 1] == 0) count++;
-        return count;
+  public static int sizeSynchronisationWouldSubtract(byte[] bytes) {
+    int count = 0;
+    for (int i = 0; i < bytes.length - 2; i++) {
+      if (bytes[i] == -0x01
+          && bytes[i + 1] == 0
+          && ((bytes[i + 2] & -0x20) == -0x20 || bytes[i + 2] == 0)) {
+        count++;
+      }
     }
+    if (bytes.length > 1 && bytes[bytes.length - 2] == -0x01 && bytes[bytes.length - 1] == 0)
+      count++;
+    return count;
+  }
 
-    public static byte[] synchroniseBuffer(byte[] bytes) {
-        int count = sizeSynchronisationWouldSubtract(bytes);
-        if (count == 0) return bytes;
-        byte[] newBuffer = new byte[bytes.length - count];
-        int i = 0;
-        for (int j = 0; j < newBuffer.length - 1; j++) {
-            newBuffer[j] = bytes[i];
-            if (bytes[i] == -0x01 && bytes[i + 1] == 0 && ((bytes[i + 2] & -0x20) == -0x20 || bytes[i + 2] == 0)) {
-                i++;
-            }
-            i++;
-        }
-        newBuffer[newBuffer.length - 1] = bytes[i];
-        return newBuffer;
+  public static byte[] synchroniseBuffer(byte[] bytes) {
+    int count = sizeSynchronisationWouldSubtract(bytes);
+    if (count == 0) return bytes;
+    byte[] newBuffer = new byte[bytes.length - count];
+    int i = 0;
+    for (int j = 0; j < newBuffer.length - 1; j++) {
+      newBuffer[j] = bytes[i];
+      if (bytes[i] == -0x01
+          && bytes[i + 1] == 0
+          && ((bytes[i + 2] & -0x20) == -0x20 || bytes[i + 2] == 0)) {
+        i++;
+      }
+      i++;
     }
+    newBuffer[newBuffer.length - 1] = bytes[i];
+    return newBuffer;
+  }
 
-    public static String substitute(String s, String replaceThis, String withThis) {
-        if (replaceThis.length() < 1 || !s.contains(replaceThis)) {
-            return s;
-        }
-        StringBuilder newString = new StringBuilder();
-        int lastPosition = 0;
-        int position = 0;
-        while ((position = s.indexOf(replaceThis, position)) >= 0) {
-            if (position > lastPosition) {
-                newString.append(s.substring(lastPosition, position));
-            }
-            if (withThis != null) {
-                newString.append(withThis);
-            }
-            lastPosition = position + replaceThis.length();
-            position++;
-        }
-        if (lastPosition < s.length()) {
-            newString.append(s.substring(lastPosition));
-        }
-        return newString.toString();
+  public static String substitute(String s, String replaceThis, String withThis) {
+    if (replaceThis.length() < 1 || !s.contains(replaceThis)) {
+      return s;
     }
+    StringBuilder newString = new StringBuilder();
+    int lastPosition = 0;
+    int position = 0;
+    while ((position = s.indexOf(replaceThis, position)) >= 0) {
+      if (position > lastPosition) {
+        newString.append(s.substring(lastPosition, position));
+      }
+      if (withThis != null) {
+        newString.append(withThis);
+      }
+      lastPosition = position + replaceThis.length();
+      position++;
+    }
+    if (lastPosition < s.length()) {
+      newString.append(s.substring(lastPosition));
+    }
+    return newString.toString();
+  }
 
-    public static String asciiOnly(String s) {
-        StringBuilder newString = new StringBuilder();
-        for (int i = 0; i < s.length(); i++) {
-            char ch = s.charAt(i);
-            if (ch < 32 || ch > 126) {
-                newString.append('?');
-            } else {
-                newString.append(ch);
-            }
-        }
-        return newString.toString();
+  public static String asciiOnly(String s) {
+    StringBuilder newString = new StringBuilder();
+    for (int i = 0; i < s.length(); i++) {
+      char ch = s.charAt(i);
+      if (ch < 32 || ch > 126) {
+        newString.append('?');
+      } else {
+        newString.append(ch);
+      }
     }
+    return newString.toString();
+  }
 
-    /**
-     * Where the text starting at {@code from} ends, for an ID3v2 text {@code encoding}: the next zero
-     * byte, or for UTF-16 (encodings 1 and 2) the next zero code unit, two zero bytes an even number
-     * of bytes after {@code from}. A UTF-16 character often has a zero byte of its own ('A' is 00 41),
-     * so ending at the first zero byte cut UTF-16 text short (frostwire/frostwire#1409).
-     * {@code bytes.length} when there is no terminator.
-     */
-    public static int indexOfTerminator(byte[] bytes, int from, byte encoding) {
-        if (terminatorLength(encoding) == 2) {
-            for (int i = from; i + 1 < bytes.length; i += 2) {
-                if (bytes[i] == 0 && bytes[i + 1] == 0) return i;
-            }
-            return bytes.length;
-        }
-        for (int i = from; i < bytes.length; i++) {
-            if (bytes[i] == 0) return i;
-        }
-        return bytes.length;
+  /**
+   * Where the text starting at {@code from} ends, for an ID3v2 text {@code encoding}: the next zero
+   * byte, or for UTF-16 (encodings 1 and 2) the next zero code unit, two zero bytes an even number
+   * of bytes after {@code from}. A UTF-16 character often has a zero byte of its own ('A' is 00
+   * 41), so ending at the first zero byte cut UTF-16 text short (frostwire/frostwire#1409). {@code
+   * bytes.length} when there is no terminator.
+   */
+  public static int indexOfTerminator(byte[] bytes, int from, byte encoding) {
+    if (terminatorLength(encoding) == 2) {
+      for (int i = from; i + 1 < bytes.length; i += 2) {
+        if (bytes[i] == 0 && bytes[i + 1] == 0) return i;
+      }
+      return bytes.length;
     }
+    for (int i = from; i < bytes.length; i++) {
+      if (bytes[i] == 0) return i;
+    }
+    return bytes.length;
+  }
 
-    /**
-     * {@link #indexOfTerminator}, for a field the frame must end with a terminator (a description
-     * followed by more fields): an {@link InvalidDataException} when there is none, as for any other
-     * field the frame is too short to hold (frostwire/frostwire#1357).
-     */
-    public static int indexOfRequiredTerminator(byte[] bytes, int from, byte encoding) throws InvalidDataException {
-        int end = indexOfTerminator(bytes, from, encoding);
-        if (end == bytes.length) throw new InvalidDataException("No terminator after the text field");
-        return end;
-    }
+  /**
+   * {@link #indexOfTerminator}, for a field the frame must end with a terminator (a description
+   * followed by more fields): an {@link InvalidDataException} when there is none, as for any other
+   * field the frame is too short to hold (frostwire/frostwire#1357).
+   */
+  public static int indexOfRequiredTerminator(byte[] bytes, int from, byte encoding)
+      throws InvalidDataException {
+    int end = indexOfTerminator(bytes, from, encoding);
+    if (end == bytes.length) throw new InvalidDataException("No terminator after the text field");
+    return end;
+  }
 
-    /** Bytes in the text terminator of an ID3v2 text encoding: two for UTF-16, one otherwise. */
-    public static int terminatorLength(byte encoding) {
-        return encoding == EncodedText.TEXT_ENCODING_UTF_16 || encoding == EncodedText.TEXT_ENCODING_UTF_16BE ? 2 : 1;
-    }
+  /** Bytes in the text terminator of an ID3v2 text encoding: two for UTF-16, one otherwise. */
+  public static int terminatorLength(byte encoding) {
+    return encoding == EncodedText.TEXT_ENCODING_UTF_16
+            || encoding == EncodedText.TEXT_ENCODING_UTF_16BE
+        ? 2
+        : 1;
+  }
 }
