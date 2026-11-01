@@ -70,7 +70,8 @@ class TorrentUrlInfo implements TorrentDownloadInfo {
 
   @Override
   public String getHash() {
-    // Only a 40-digit hex hash: TorrentFetcherDownload decodes it as hex. Links cut short and base32
+    // Only a 40-digit hex hash: TorrentFetcherDownload decodes it as hex. Links cut short and
+    // base32
     // hashes used to throw StringIndexOutOfBoundsException here or yield a non-hex "hash".
     return UrlUtils.magnetHexInfoHash(url);
   }

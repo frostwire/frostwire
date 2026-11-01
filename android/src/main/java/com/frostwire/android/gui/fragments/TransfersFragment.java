@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -35,7 +35,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -43,7 +42,6 @@ import androidx.core.view.MenuProvider;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -82,7 +80,6 @@ import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.TaskThrottle;
 import com.google.android.material.tabs.TabLayout;
-
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -93,1096 +90,1203 @@ import java.util.List;
  * @author aldenml
  */
 public class TransfersFragment extends AbstractFragment implements TimerObserver, MainFragment {
-    private static final Logger LOG = Logger.getLogger(TransfersFragment.class);
-    private static final String SELECTED_STATUS_STATE_KEY = "selected_status";
-    private static final int TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS = 2;
-    private final Comparator<Transfer> transferComparator;
-    private final TransferStatus[] tabPositionToTransferStatus;
-    private TabLayout tabLayout;
-    private RecyclerView list;
-    private TransferListAdapter adapter;
-    private RecyclerView.LayoutManager recyclerViewLayoutManager;
+  private static final Logger LOG = Logger.getLogger(TransfersFragment.class);
+  private static final String SELECTED_STATUS_STATE_KEY = "selected_status";
+  private static final int TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS = 2;
+  private final Comparator<Transfer> transferComparator;
+  private final TransferStatus[] tabPositionToTransferStatus;
+  private TabLayout tabLayout;
+  private RecyclerView list;
+  private TransferListAdapter adapter;
+  private RecyclerView.LayoutManager recyclerViewLayoutManager;
 
-    private TextView textDHTPeers;
-    private TextView textDownloads;
-    private TextView textUploads;
-    private ImageView vpnStatusIcon;
-    private TextView vpnRichToast;
-    private ClearableEditTextView addTransferUrlTextView;
-    private TransferStatus selectedStatus;
-    private static TimerSubscription subscription;
-    private boolean isVPNactive;
-    private static boolean firstTimeShown = true;
-    private final Handler vpnRichToastHandler;
-    private TransferUpdateExecutor transferUpdateExecutor;
-    private boolean showTorrentSettingsOnClick;
-    private TransfersNoSeedsView transfersNoSeedsView;
-    private HeaderBanner headerBanner;
-    private FWBannerView supportBanner;
-    // Cached menu visibility states to avoid blocking JNI calls in onPrepareOptionsMenu()
-    private volatile boolean cachedHasCompleteOrErrored;
-    private volatile boolean cachedHasActive;
-    private volatile boolean cachedHasInactive;
-    private volatile boolean cachedHasSeeding;
-    private volatile boolean cachedHasComplete;
-    // Cached DHT state to avoid blocking JNI calls in onCheckDHT()
-    private volatile boolean cachedDhtEnabled;
-    private volatile long cachedDhtPeers;
+  private TextView textDHTPeers;
+  private TextView textDownloads;
+  private TextView textUploads;
+  private ImageView vpnStatusIcon;
+  private TextView vpnRichToast;
+  private ClearableEditTextView addTransferUrlTextView;
+  private TransferStatus selectedStatus;
+  private static TimerSubscription subscription;
+  private boolean isVPNactive;
+  private static boolean firstTimeShown = true;
+  private final Handler vpnRichToastHandler;
+  private TransferUpdateExecutor transferUpdateExecutor;
+  private boolean showTorrentSettingsOnClick;
+  private TransfersNoSeedsView transfersNoSeedsView;
+  private HeaderBanner headerBanner;
+  private FWBannerView supportBanner;
+  // Cached menu visibility states to avoid blocking JNI calls in onPrepareOptionsMenu()
+  private volatile boolean cachedHasCompleteOrErrored;
+  private volatile boolean cachedHasActive;
+  private volatile boolean cachedHasInactive;
+  private volatile boolean cachedHasSeeding;
+  private volatile boolean cachedHasComplete;
+  // Cached DHT state to avoid blocking JNI calls in onCheckDHT()
+  private volatile boolean cachedDhtEnabled;
+  private volatile long cachedDhtPeers;
 
-    public TransfersFragment() {
-        super(R.layout.fragment_transfers);
-        this.transferComparator = new TransferComparator();
-        selectedStatus = TransferStatus.ALL;
-        vpnRichToastHandler = new Handler(android.os.Looper.getMainLooper());
-        tabPositionToTransferStatus = new TransferStatus[]{TransferStatus.ALL, TransferStatus.DOWNLOADING, TransferStatus.SEEDING, TransferStatus.COMPLETED};
+  public TransfersFragment() {
+    super(R.layout.fragment_transfers);
+    this.transferComparator = new TransferComparator();
+    selectedStatus = TransferStatus.ALL;
+    vpnRichToastHandler = new Handler(android.os.Looper.getMainLooper());
+    tabPositionToTransferStatus =
+        new TransferStatus[] {
+          TransferStatus.ALL,
+          TransferStatus.DOWNLOADING,
+          TransferStatus.SEEDING,
+          TransferStatus.COMPLETED
+        };
+  }
+
+  @Override
+  public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+    super.onViewStateRestored(savedInstanceState);
+    if (savedInstanceState != null) {
+      selectedStatus =
+          TransferStatus.valueOf(
+              savedInstanceState.getString(SELECTED_STATUS_STATE_KEY, TransferStatus.ALL.name()));
     }
+    addTransferUrlTextView = findView(getView(), R.id.fragment_transfers_add_transfer_text_input);
+    addTransferUrlTextView.replaceSearchIconDrawable(R.drawable.clearable_edittext_add_icon);
+    addTransferUrlTextView.setFocusable(true);
+    addTransferUrlTextView.setFocusableInTouchMode(true);
+    addTransferUrlTextView.setOnKeyListener(new AddTransferTextListener(this));
+  }
 
-    @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-        if (savedInstanceState != null) {
-            selectedStatus = TransferStatus.valueOf(savedInstanceState.getString(SELECTED_STATUS_STATE_KEY, TransferStatus.ALL.name()));
-        }
-        addTransferUrlTextView = findView(getView(), R.id.fragment_transfers_add_transfer_text_input);
-        addTransferUrlTextView.replaceSearchIconDrawable(R.drawable.clearable_edittext_add_icon);
-        addTransferUrlTextView.setFocusable(true);
-        addTransferUrlTextView.setFocusableInTouchMode(true);
-        addTransferUrlTextView.setOnKeyListener(new AddTransferTextListener(this));
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        transferUpdateExecutor = new TransferUpdateExecutor();
-        transferUpdateExecutor.initialize();
-        initTimerServiceSubscription();
-        requireActivity().addMenuProvider(new MenuProvider() {
-            @Override
-            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+  @Override
+  public void onViewCreated(View view, Bundle savedInstanceState) {
+    super.onViewCreated(view, savedInstanceState);
+    transferUpdateExecutor = new TransferUpdateExecutor();
+    transferUpdateExecutor.initialize();
+    initTimerServiceSubscription();
+    requireActivity()
+        .addMenuProvider(
+            new MenuProvider() {
+              @Override
+              public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
                 menuInflater.inflate(R.menu.fragment_transfers_menu, menu);
-            }
+              }
 
-            @Override
-            public void onPrepareMenu(@NonNull Menu menu) {
+              @Override
+              public void onPrepareMenu(@NonNull Menu menu) {
                 menu.findItem(R.id.fragment_transfers_menu_pause_stop_all).setVisible(false);
                 menu.findItem(R.id.fragment_transfers_menu_clear_all).setVisible(false);
                 menu.findItem(R.id.fragment_transfers_menu_resume_all).setVisible(false);
                 menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(false);
                 menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(false);
                 updateMenuItemVisibilityFromCache(menu);
-            }
+              }
 
-            @Override
-            public boolean onMenuItemSelected(@NonNull MenuItem item) {
-                boolean bittorrentDisconnected = TransferManager.instance().isBittorrentDisconnected();
+              @Override
+              public boolean onMenuItemSelected(@NonNull MenuItem item) {
+                boolean bittorrentDisconnected =
+                    TransferManager.instance().isBittorrentDisconnected();
                 setupAdapter(getActivity());
                 int itemId = item.getItemId();
                 if (itemId == R.id.fragment_transfers_menu_add_transfer) {
-                    toggleAddTransferControls();
-                    getActivity().invalidateOptionsMenu();
-                    return true;
+                  toggleAddTransferControls();
+                  getActivity().invalidateOptionsMenu();
+                  return true;
                 } else if (itemId == R.id.fragment_transfers_menu_clear_all) {
-                    TransferManager.instance().clearComplete();
-                    getActivity().invalidateOptionsMenu();
-                    onTime(true);
-                    return true;
+                  TransferManager.instance().clearComplete();
+                  getActivity().invalidateOptionsMenu();
+                  onTime(true);
+                  return true;
                 } else if (itemId == R.id.fragment_transfers_menu_pause_stop_all) {
-                    TransferManager.instance().stopHttpTransfers();
-                    TransferManager.instance().pauseTorrents();
-                    onTime(true);
-                    return true;
+                  TransferManager.instance().stopHttpTransfers();
+                  TransferManager.instance().pauseTorrents();
+                  onTime(true);
+                  return true;
                 } else if (itemId == R.id.fragment_transfers_menu_resume_all) {
-                    if (bittorrentDisconnected) {
-                        UIUtils.showLongMessage(getActivity(), R.string.cant_resume_torrent_transfers);
+                  if (bittorrentDisconnected) {
+                    UIUtils.showLongMessage(getActivity(), R.string.cant_resume_torrent_transfers);
+                  } else {
+                    if (NetworkManager.instance().isInternetDataConnectionUp()) {
+                      TransferManager.instance().resumeResumableTransfers();
+                      onTime(true);
                     } else {
-                        if (NetworkManager.instance().isInternetDataConnectionUp()) {
-                            TransferManager.instance().resumeResumableTransfers();
-                            onTime(true);
-                        } else {
-                            UIUtils.showShortMessage(getActivity(), R.string.please_check_connection_status_before_resuming_download);
-                        }
+                      UIUtils.showShortMessage(
+                          getActivity(),
+                          R.string.please_check_connection_status_before_resuming_download);
                     }
-                    return true;
+                  }
+                  return true;
                 } else if (itemId == R.id.fragment_transfers_menu_seed_all) {
-                    new SeedAction(getActivity()).onClick();
-                    onTime(true);
-                    return true;
+                  new SeedAction(getActivity()).onClick();
+                  onTime(true);
+                  return true;
                 } else if (itemId == R.id.fragment_transfers_menu_stop_seeding_all) {
-                    TransferManager.instance().stopSeedingTorrents();
-                    onTime(true);
-                    return true;
+                  TransferManager.instance().stopSeedingTorrents();
+                  onTime(true);
+                  return true;
                 }
                 return false;
-            }
-        }, getViewLifecycleOwner());
+              }
+            },
+            getViewLifecycleOwner());
+  }
+
+  private void tryTimerServiceUnsubscribe() {
+    if (subscription != null && subscription.isSubscribed()) {
+      subscription.unsubscribe();
     }
+  }
 
-    private void tryTimerServiceUnsubscribe() {
-        if (subscription != null && subscription.isSubscribed()) {
-            subscription.unsubscribe();
-        }
+  private void initTimerServiceSubscription() {
+    tryTimerServiceUnsubscribe();
+    if (subscription != null) {
+      TimerService.reSubscribe(
+          this, subscription, TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS);
+    } else {
+      subscription = TimerService.subscribe(this, TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS);
     }
+  }
 
-    private void initTimerServiceSubscription() {
-        tryTimerServiceUnsubscribe();
-        if (subscription != null) {
-            TimerService.reSubscribe(this, subscription, TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS);
-        } else {
-            subscription = TimerService.subscribe(this, TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS);
-        }
+  private void updateMenuItemVisibilityFromCache(Menu menu) {
+    TransferManager tm = TransferManager.instance();
+    boolean bittorrentDisconnected = tm.isBittorrentDisconnected();
+    if (cachedHasCompleteOrErrored) {
+      menu.findItem(R.id.fragment_transfers_menu_clear_all).setVisible(true);
     }
-
-    private void updateMenuItemVisibilityFromCache(Menu menu) {
-        TransferManager tm = TransferManager.instance();
-        boolean bittorrentDisconnected = tm.isBittorrentDisconnected();
-        if (cachedHasCompleteOrErrored) {
-            menu.findItem(R.id.fragment_transfers_menu_clear_all).setVisible(true);
-        }
-        if (!bittorrentDisconnected && cachedHasActive) {
-            menu.findItem(R.id.fragment_transfers_menu_pause_stop_all).setVisible(true);
-        }
-        if (cachedHasInactive) {
-            menu.findItem(R.id.fragment_transfers_menu_resume_all).setVisible(true);
-        }
-        if (!cachedHasSeeding && cachedHasComplete) {
-            menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(true);
-        }
-        if (cachedHasSeeding && cachedHasComplete) {
-            menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(true);
-            menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(true);
-        }
-        if (cachedHasSeeding) {
-            menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(true);
-        }
+    if (!bittorrentDisconnected && cachedHasActive) {
+      menu.findItem(R.id.fragment_transfers_menu_pause_stop_all).setVisible(true);
     }
-
-    private void updateMenuItemVisibilityCache(final List<Transfer> transfers) {
-        if (!transfers.isEmpty()) {
-            cachedHasCompleteOrErrored = someTransfersComplete(transfers) || someTransfersErrored(transfers);
-            cachedHasActive = someTransfersActive(transfers);
-            cachedHasInactive = someTransfersInactive(transfers);
-            cachedHasSeeding = someTransfersSeeding(transfers);
-            cachedHasComplete = someTransfersComplete(transfers);
-        } else {
-            cachedHasCompleteOrErrored = false;
-            cachedHasActive = false;
-            cachedHasInactive = false;
-            cachedHasSeeding = false;
-            cachedHasComplete = false;
-        }
+    if (cachedHasInactive) {
+      menu.findItem(R.id.fragment_transfers_menu_resume_all).setVisible(true);
     }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        HeaderBanner.onResumeHideOrUpdate(headerBanner);
-        if (supportBanner != null) {
-            supportBanner.setCompactMode(true);
-            if (!supportBanner.isLoaded()) {
-                supportBanner.loadMaxBanner();
-            } else {
-                supportBanner.setVisibility(View.VISIBLE);
-            }
-        }
-        initTimerServiceSubscription();
-        // Detail screens stop the list timer while they refresh the shared torrent state cache.
-        // Force a list snapshot on return instead of waiting for the throttle's next tick.
-        onTime(true);
+    if (!cachedHasSeeding && cachedHasComplete) {
+      menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(true);
     }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (subscription != null) {
-            subscription.unsubscribe();
-        }
-        if (transferUpdateExecutor != null) {
-            transferUpdateExecutor.shutdown();
-        }
-        adapter = null;
-        HeaderBanner.destroy(headerBanner);
-        if (supportBanner != null) {
-            supportBanner.destroy();
-            supportBanner = null;
-        }
+    if (cachedHasSeeding && cachedHasComplete) {
+      menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(true);
+      menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(true);
     }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString(SELECTED_STATUS_STATE_KEY, selectedStatus.name());
+    if (cachedHasSeeding) {
+      menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(true);
     }
+  }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (adapter != null) {
-            adapter.dismissDialogs();
-        }
-        tryTimerServiceUnsubscribe();
+  private void updateMenuItemVisibilityCache(final List<Transfer> transfers) {
+    if (!transfers.isEmpty()) {
+      cachedHasCompleteOrErrored =
+          someTransfersComplete(transfers) || someTransfersErrored(transfers);
+      cachedHasActive = someTransfersActive(transfers);
+      cachedHasInactive = someTransfersInactive(transfers);
+      cachedHasSeeding = someTransfersSeeding(transfers);
+      cachedHasComplete = someTransfersComplete(transfers);
+    } else {
+      cachedHasCompleteOrErrored = false;
+      cachedHasActive = false;
+      cachedHasInactive = false;
+      cachedHasSeeding = false;
+      cachedHasComplete = false;
     }
+  }
 
-    private static class TransfersHolder {
-        final List<Transfer> allTransfers;
-        final List<Transfer> sortedSelectedStatusTransfers;
-
-        public TransfersHolder(List<Transfer> allTransfers, List<Transfer> selectedStatusTransfers) {
-            this.allTransfers = allTransfers;
-            this.sortedSelectedStatusTransfers = selectedStatusTransfers;
-        }
+  @Override
+  public void onResume() {
+    super.onResume();
+    HeaderBanner.onResumeHideOrUpdate(headerBanner);
+    if (supportBanner != null) {
+      supportBanner.setCompactMode(true);
+      if (!supportBanner.isLoaded()) {
+        supportBanner.loadMaxBanner();
+      } else {
+        supportBanner.setVisibility(View.VISIBLE);
+      }
     }
+    initTimerServiceSubscription();
+    // Detail screens stop the list timer while they refresh the shared torrent state cache.
+    // Force a list snapshot on return instead of waiting for the throttle's next tick.
+    onTime(true);
+  }
 
-    private TransfersHolder sortSelectedStatusTransfersInBackground() {
-        List<Transfer> allTransfers = TransferManager.instance().getTransfers();
-        for (Transfer t : allTransfers) {
-            if (t instanceof UIBittorrentDownload) {
-                ((UIBittorrentDownload) t).updateCachedState();
-            }
-        }
-        final List<Transfer> selectedStatusTransfers = filter(allTransfers, selectedStatus);
-        selectedStatusTransfers.sort(transferComparator);
-        return new TransfersHolder(allTransfers, selectedStatusTransfers);
+  @Override
+  public void onDestroyView() {
+    super.onDestroyView();
+    if (subscription != null) {
+      subscription.unsubscribe();
     }
-
-    public void updateTransferList(TransfersHolder transfersHolder) {
-        updateTransferList(transfersHolder, false);
+    if (transferUpdateExecutor != null) {
+      transferUpdateExecutor.shutdown();
     }
-
-    public void updateTransferList(TransfersHolder transfersHolder, boolean forceUpdate) {
-        if (isVisible() && isAdded()) {
-            if (adapter != null) {
-                adapter.updateList(transfersHolder.sortedSelectedStatusTransfers);
-                android.util.Log.d("TransfersFragment.updateTransferList", "updateList called");
-            }
-            if (selectedStatus == TransferStatus.SEEDING) {
-                TransfersNoSeedsView.Mode mode = handlePossibleSeedingSuggestions(transfersHolder.allTransfers);
-                transfersNoSeedsView.setMode(mode);
-            }
-        }
+    adapter = null;
+    HeaderBanner.destroy(headerBanner);
+    if (supportBanner != null) {
+      supportBanner.destroy();
+      supportBanner = null;
     }
+  }
 
-    @Override
-    public void onTime() {
-        onTime(false);
+  @Override
+  public void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    outState.putString(SELECTED_STATUS_STATE_KEY, selectedStatus.name());
+  }
+
+  @Override
+  public void onPause() {
+    super.onPause();
+    if (adapter != null) {
+      adapter.dismissDialogs();
     }
+    tryTimerServiceUnsubscribe();
+  }
 
-    /**
-     * Refreshes the transfers list. If forceUpdate is true, bypasses the TaskThrottle check
-     * to provide immediate feedback for user actions like cancel/remove.
-     *
-     * @param forceUpdate if true, refresh immediately without throttle (for manual user actions)
-     */
-    public void onTime(boolean forceUpdate) {
-        long onTimeStart = System.currentTimeMillis();
-        if (!isVisible()) {
-            return;
-        }
-        if (adapter != null) {
-            if (forceUpdate || TaskThrottle.isReadyToSubmitTask("TransfersFragment::sortSelectedStatusTransfersInBackground", (TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000) - 100)) {
-                android.util.Log.d("TransfersFragment.onTime", "Starting background work, forceUpdate=" + forceUpdate);
-                WeakReference<TransfersFragment> contextRef = Ref.weak(this);
-                if (transferUpdateExecutor != null && transferUpdateExecutor.isAvailable()) {
-                    transferUpdateExecutor.execute(
-                        () -> {
-                            long bgStart = System.currentTimeMillis();
-                            android.util.Log.d("TransfersFragment.onTime", "Background thread started");
-                            if (!Ref.alive(contextRef)) {
-                                Ref.free(contextRef);
-                                return;
-                            }
-                             TransfersHolder transfersHolder;
-                            try {
-                                long sortStart = System.currentTimeMillis();
-                                transfersHolder = contextRef.get().sortSelectedStatusTransfersInBackground();
-                                long sortEnd = System.currentTimeMillis();
-                                android.util.Log.d("TransfersFragment.onTime", "sortSelectedStatusTransfersInBackground took " + (sortEnd - sortStart) + "ms");
-                            } catch (Throwable t) {
-                                LOG.error("onTime() " + t.getMessage(), t);
-                                Ref.free(contextRef);
-                                return;
-                            }
+  private static class TransfersHolder {
+    final List<Transfer> allTransfers;
+    final List<Transfer> sortedSelectedStatusTransfers;
 
-                            if (!Ref.alive(contextRef)) {
-                                Ref.free(contextRef);
-                                return;
-                            }
-                            final TransfersHolder tfCopy = transfersHolder;
+    public TransfersHolder(List<Transfer> allTransfers, List<Transfer> selectedStatusTransfers) {
+      this.allTransfers = allTransfers;
+      this.sortedSelectedStatusTransfers = selectedStatusTransfers;
+    }
+  }
 
-                            if (contextRef.get().getActivity() == null) {
-                                return;
-                            }
+  private TransfersHolder sortSelectedStatusTransfersInBackground() {
+    List<Transfer> allTransfers = TransferManager.instance().getTransfers();
+    for (Transfer t : allTransfers) {
+      if (t instanceof UIBittorrentDownload) {
+        ((UIBittorrentDownload) t).updateCachedState();
+      }
+    }
+    final List<Transfer> selectedStatusTransfers = filter(allTransfers, selectedStatus);
+    selectedStatusTransfers.sort(transferComparator);
+    return new TransfersHolder(allTransfers, selectedStatusTransfers);
+  }
 
-                            // Update menu visibility cache from background thread to avoid blocking JNI calls in onPrepareOptionsMenu()
-                            try {
-                                long menuStart = System.currentTimeMillis();
-                                contextRef.get().updateMenuItemVisibilityCache(tfCopy.allTransfers);
-                                long menuEnd = System.currentTimeMillis();
-                                android.util.Log.d("TransfersFragment.onTime", "updateMenuItemVisibilityCache took " + (menuEnd - menuStart) + "ms");
-                            } catch (Throwable t) {
-                                LOG.error("onTime() failed to update menu cache " + t.getMessage(), t);
-                            }
+  public void updateTransferList(TransfersHolder transfersHolder) {
+    updateTransferList(transfersHolder, false);
+  }
 
-                            FragmentActivity activity = contextRef.get().getActivity();
-                            if (activity != null) {
-                                android.util.Log.d("TransfersFragment.onTime", "Posting UI update to main thread, forceUpdate=" + forceUpdate);
-                                activity.runOnUiThread(() -> {
-                                    long uiStart = System.currentTimeMillis();
-                                    android.util.Log.d("TransfersFragment.onTime", "UI thread executing updateTransferList, elapsed=" + (uiStart - onTimeStart) + "ms");
-                                    if (!Ref.alive(contextRef)) {
-                                        Ref.free(contextRef);
-                                        return;
-                                    }
-                                    try {
-                                        long updateStart = System.currentTimeMillis();
-                                        contextRef.get().updateTransferList(tfCopy, forceUpdate);  // Pass forceUpdate flag!
-                                        long updateEnd = System.currentTimeMillis();
-                                        android.util.Log.d("TransfersFragment.onTime", "updateTransferList completed in " + (updateEnd - updateStart) + "ms, total=" + (updateEnd - onTimeStart) + "ms");
-                                    } catch (Throwable t) {
-                                        LOG.error("onTime() " + t.getMessage(), t);
-                                        Ref.free(contextRef);
-                                    }
-                                });
-                            }
+  public void updateTransferList(TransfersHolder transfersHolder, boolean forceUpdate) {
+    if (isVisible() && isAdded()) {
+      if (adapter != null) {
+        adapter.updateList(transfersHolder.sortedSelectedStatusTransfers);
+        android.util.Log.d("TransfersFragment.updateTransferList", "updateList called");
+      }
+      if (selectedStatus == TransferStatus.SEEDING) {
+        TransfersNoSeedsView.Mode mode =
+            handlePossibleSeedingSuggestions(transfersHolder.allTransfers);
+        transfersNoSeedsView.setMode(mode);
+      }
+    }
+  }
 
-                        });
-                } else {
-                    LOG.warn("Transfer executor not available, using fallback postToHandler");
-                    postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER,
-                        () -> {
-                            long bgStart = System.currentTimeMillis();
-                            android.util.Log.d("TransfersFragment.onTime", "Background thread started");
-                            if (!Ref.alive(contextRef)) {
-                                Ref.free(contextRef);
-                                return;
-                            }
-                            TransfersHolder transfersHolder;
-                            try {
-                                long sortStart = System.currentTimeMillis();
-                                transfersHolder = contextRef.get().sortSelectedStatusTransfersInBackground();
-                                long sortEnd = System.currentTimeMillis();
-                                android.util.Log.d("TransfersFragment.onTime", "sortSelectedStatusTransfersInBackground took " + (sortEnd - sortStart) + "ms");
-                            } catch (Throwable t) {
-                                LOG.error("onTime() " + t.getMessage(), t);
-                                Ref.free(contextRef);
-                                return;
-                            }
+  @Override
+  public void onTime() {
+    onTime(false);
+  }
 
-                            if (!Ref.alive(contextRef)) {
-                                Ref.free(contextRef);
-                                return;
-                            }
-                            final TransfersHolder tfCopy = transfersHolder;
-
-                            if (contextRef.get().getActivity() == null) {
-                                return;
-                            }
-
-                            try {
-                                long menuStart = System.currentTimeMillis();
-                                contextRef.get().updateMenuItemVisibilityCache(tfCopy.allTransfers);
-                                long menuEnd = System.currentTimeMillis();
-                                android.util.Log.d("TransfersFragment.onTime", "updateMenuItemVisibilityCache took " + (menuEnd - menuStart) + "ms");
-                            } catch (Throwable t) {
-                                LOG.error("onTime() failed to update menu cache " + t.getMessage(), t);
-                            }
-
-                            FragmentActivity activity = contextRef.get().getActivity();
-                            if (activity != null) {
-                                android.util.Log.d("TransfersFragment.onTime", "Posting UI update to main thread, forceUpdate=" + forceUpdate);
-                                activity.runOnUiThread(() -> {
-                                    long uiStart = System.currentTimeMillis();
-                                    android.util.Log.d("TransfersFragment.onTime", "UI thread executing updateTransferList, elapsed=" + (uiStart - onTimeStart) + "ms");
-                                    if (!Ref.alive(contextRef)) {
-                                        Ref.free(contextRef);
-                                        return;
-                                    }
-                                    try {
-                                        long updateStart = System.currentTimeMillis();
-                                        contextRef.get().updateTransferList(tfCopy, forceUpdate);
-                                        long updateEnd = System.currentTimeMillis();
-                                        android.util.Log.d("TransfersFragment.onTime", "updateTransferList completed in " + (updateEnd - updateStart) + "ms, total=" + (updateEnd - onTimeStart) + "ms");
-                                    } catch (Throwable t) {
-                                        LOG.error("onTime() " + t.getMessage(), t);
-                                        Ref.free(contextRef);
-                                    }
-                                });
-                            }
-                        });
+  /**
+   * Refreshes the transfers list. If forceUpdate is true, bypasses the TaskThrottle check to
+   * provide immediate feedback for user actions like cancel/remove.
+   *
+   * @param forceUpdate if true, refresh immediately without throttle (for manual user actions)
+   */
+  public void onTime(boolean forceUpdate) {
+    long onTimeStart = System.currentTimeMillis();
+    if (!isVisible()) {
+      return;
+    }
+    if (adapter != null) {
+      if (forceUpdate
+          || TaskThrottle.isReadyToSubmitTask(
+              "TransfersFragment::sortSelectedStatusTransfersInBackground",
+              (TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000) - 100)) {
+        android.util.Log.d(
+            "TransfersFragment.onTime", "Starting background work, forceUpdate=" + forceUpdate);
+        WeakReference<TransfersFragment> contextRef = Ref.weak(this);
+        if (transferUpdateExecutor != null && transferUpdateExecutor.isAvailable()) {
+          transferUpdateExecutor.execute(
+              () -> {
+                long bgStart = System.currentTimeMillis();
+                android.util.Log.d("TransfersFragment.onTime", "Background thread started");
+                if (!Ref.alive(contextRef)) {
+                  Ref.free(contextRef);
+                  return;
                 }
-            } else {
-                LOG.warn("onTime(): check your logic, TransfersFragment::sortSelectedStatusTransfersInBackground was not submitted, interval of " + TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000 + " ms not enough");
-            }
-        } else if (this.getActivity() != null) {
-            // Initialize adapter on background thread to avoid blocking JNI calls in captureUiStates()
-            WeakReference<TransfersFragment> contextRef = Ref.weak(this);
-            if (transferUpdateExecutor != null && transferUpdateExecutor.isAvailable()) {
-                transferUpdateExecutor.execute(
-                    () -> {
+                TransfersHolder transfersHolder;
+                try {
+                  long sortStart = System.currentTimeMillis();
+                  transfersHolder = contextRef.get().sortSelectedStatusTransfersInBackground();
+                  long sortEnd = System.currentTimeMillis();
+                  android.util.Log.d(
+                      "TransfersFragment.onTime",
+                      "sortSelectedStatusTransfersInBackground took "
+                          + (sortEnd - sortStart)
+                          + "ms");
+                } catch (Throwable t) {
+                  LOG.error("onTime() " + t.getMessage(), t);
+                  Ref.free(contextRef);
+                  return;
+                }
+
+                if (!Ref.alive(contextRef)) {
+                  Ref.free(contextRef);
+                  return;
+                }
+                final TransfersHolder tfCopy = transfersHolder;
+
+                if (contextRef.get().getActivity() == null) {
+                  return;
+                }
+
+                // Update menu visibility cache from background thread to avoid blocking JNI calls
+                // in onPrepareOptionsMenu()
+                try {
+                  long menuStart = System.currentTimeMillis();
+                  contextRef.get().updateMenuItemVisibilityCache(tfCopy.allTransfers);
+                  long menuEnd = System.currentTimeMillis();
+                  android.util.Log.d(
+                      "TransfersFragment.onTime",
+                      "updateMenuItemVisibilityCache took " + (menuEnd - menuStart) + "ms");
+                } catch (Throwable t) {
+                  LOG.error("onTime() failed to update menu cache " + t.getMessage(), t);
+                }
+
+                FragmentActivity activity = contextRef.get().getActivity();
+                if (activity != null) {
+                  android.util.Log.d(
+                      "TransfersFragment.onTime",
+                      "Posting UI update to main thread, forceUpdate=" + forceUpdate);
+                  activity.runOnUiThread(
+                      () -> {
+                        long uiStart = System.currentTimeMillis();
+                        android.util.Log.d(
+                            "TransfersFragment.onTime",
+                            "UI thread executing updateTransferList, elapsed="
+                                + (uiStart - onTimeStart)
+                                + "ms");
                         if (!Ref.alive(contextRef)) {
-                            Ref.free(contextRef);
-                            return;
-                        }
-                        TransfersFragment fragment = contextRef.get();
-                        if (fragment == null || fragment.getActivity() == null) {
-                            Ref.free(contextRef);
-                            return;
+                          Ref.free(contextRef);
+                          return;
                         }
                         try {
-                            // Prepare transfers list and adapter on background thread
-                            List<Transfer> transfers = filter(TransferManager.instance().getTransfers(), fragment.selectedStatus);
-                            transfers.sort(fragment.transferComparator);
-
-                            // Create adapter on background thread to avoid blocking captureUiStates() on main thread
-                            FragmentActivity adapterActivity = fragment.getActivity();
-                            if (adapterActivity == null) {
-                                Ref.free(contextRef);
-                                return;
-                            }
-                            TransferListAdapter newAdapter = new TransferListAdapter(adapterActivity, transfers);
-
-                            adapterActivity.runOnUiThread(() -> {
-                                if (!Ref.alive(contextRef)) {
-                                    Ref.free(contextRef);
-                                    return;
-                                }
-                                try {
-                                    if (contextRef.get().adapter == null && contextRef.get().list != null) {
-                                        contextRef.get().list.setLayoutManager(contextRef.get().recyclerViewLayoutManager);
-                                        contextRef.get().list.setAdapter(newAdapter);
-                                        contextRef.get().adapter = newAdapter;
-                                    }
-                                } catch (Throwable t) {
-                                    LOG.error("Failed to setup adapter: " + t.getMessage(), t);
-                                    Ref.free(contextRef);
-                                }
-                            });
+                          long updateStart = System.currentTimeMillis();
+                          contextRef
+                              .get()
+                              .updateTransferList(tfCopy, forceUpdate); // Pass forceUpdate flag!
+                          long updateEnd = System.currentTimeMillis();
+                          android.util.Log.d(
+                              "TransfersFragment.onTime",
+                              "updateTransferList completed in "
+                                  + (updateEnd - updateStart)
+                                  + "ms, total="
+                                  + (updateEnd - onTimeStart)
+                                  + "ms");
                         } catch (Throwable t) {
-                            LOG.error("Failed to prepare adapter data: " + t.getMessage(), t);
-                            Ref.free(contextRef);
+                          LOG.error("onTime() " + t.getMessage(), t);
+                          Ref.free(contextRef);
                         }
-                    });
-            } else {
-                LOG.warn("Transfer executor not available for adapter init, using fallback postToHandler");
-                postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER,
-                    () -> {
+                      });
+                }
+              });
+        } else {
+          LOG.warn("Transfer executor not available, using fallback postToHandler");
+          postToHandler(
+              SystemUtils.HandlerThreadName.DOWNLOADER,
+              () -> {
+                long bgStart = System.currentTimeMillis();
+                android.util.Log.d("TransfersFragment.onTime", "Background thread started");
+                if (!Ref.alive(contextRef)) {
+                  Ref.free(contextRef);
+                  return;
+                }
+                TransfersHolder transfersHolder;
+                try {
+                  long sortStart = System.currentTimeMillis();
+                  transfersHolder = contextRef.get().sortSelectedStatusTransfersInBackground();
+                  long sortEnd = System.currentTimeMillis();
+                  android.util.Log.d(
+                      "TransfersFragment.onTime",
+                      "sortSelectedStatusTransfersInBackground took "
+                          + (sortEnd - sortStart)
+                          + "ms");
+                } catch (Throwable t) {
+                  LOG.error("onTime() " + t.getMessage(), t);
+                  Ref.free(contextRef);
+                  return;
+                }
+
+                if (!Ref.alive(contextRef)) {
+                  Ref.free(contextRef);
+                  return;
+                }
+                final TransfersHolder tfCopy = transfersHolder;
+
+                if (contextRef.get().getActivity() == null) {
+                  return;
+                }
+
+                try {
+                  long menuStart = System.currentTimeMillis();
+                  contextRef.get().updateMenuItemVisibilityCache(tfCopy.allTransfers);
+                  long menuEnd = System.currentTimeMillis();
+                  android.util.Log.d(
+                      "TransfersFragment.onTime",
+                      "updateMenuItemVisibilityCache took " + (menuEnd - menuStart) + "ms");
+                } catch (Throwable t) {
+                  LOG.error("onTime() failed to update menu cache " + t.getMessage(), t);
+                }
+
+                FragmentActivity activity = contextRef.get().getActivity();
+                if (activity != null) {
+                  android.util.Log.d(
+                      "TransfersFragment.onTime",
+                      "Posting UI update to main thread, forceUpdate=" + forceUpdate);
+                  activity.runOnUiThread(
+                      () -> {
+                        long uiStart = System.currentTimeMillis();
+                        android.util.Log.d(
+                            "TransfersFragment.onTime",
+                            "UI thread executing updateTransferList, elapsed="
+                                + (uiStart - onTimeStart)
+                                + "ms");
                         if (!Ref.alive(contextRef)) {
-                            Ref.free(contextRef);
-                            return;
-                        }
-                        TransfersFragment fragment = contextRef.get();
-                        if (fragment == null || fragment.getActivity() == null) {
-                            Ref.free(contextRef);
-                            return;
+                          Ref.free(contextRef);
+                          return;
                         }
                         try {
-                            List<Transfer> transfers = filter(TransferManager.instance().getTransfers(), fragment.selectedStatus);
-                            transfers.sort(fragment.transferComparator);
-
-                            FragmentActivity adapterActivity = fragment.getActivity();
-                            if (adapterActivity == null) {
-                                Ref.free(contextRef);
-                                return;
-                            }
-                            TransferListAdapter newAdapter = new TransferListAdapter(adapterActivity, transfers);
-
-                            adapterActivity.runOnUiThread(() -> {
-                                if (!Ref.alive(contextRef)) {
-                                    Ref.free(contextRef);
-                                    return;
-                                }
-                                try {
-                                    if (contextRef.get().adapter == null && contextRef.get().list != null) {
-                                        contextRef.get().list.setLayoutManager(contextRef.get().recyclerViewLayoutManager);
-                                        contextRef.get().list.setAdapter(newAdapter);
-                                        contextRef.get().adapter = newAdapter;
-                                    }
-                                } catch (Throwable t) {
-                                    LOG.error("Failed to setup adapter: " + t.getMessage(), t);
-                                    Ref.free(contextRef);
-                                }
-                            });
+                          long updateStart = System.currentTimeMillis();
+                          contextRef.get().updateTransferList(tfCopy, forceUpdate);
+                          long updateEnd = System.currentTimeMillis();
+                          android.util.Log.d(
+                              "TransfersFragment.onTime",
+                              "updateTransferList completed in "
+                                  + (updateEnd - updateStart)
+                                  + "ms, total="
+                                  + (updateEnd - onTimeStart)
+                                  + "ms");
                         } catch (Throwable t) {
-                            LOG.error("Failed to prepare adapter data: " + t.getMessage(), t);
-                            Ref.free(contextRef);
+                          LOG.error("onTime() " + t.getMessage(), t);
+                          Ref.free(contextRef);
                         }
-                    });
-            }
-        }
-        // mark the selected tab
-        int i = 0;
-        for (TransferStatus transferStatus : tabPositionToTransferStatus) {
-            if (transferStatus == selectedStatus) {
-                TabLayout.Tab tab = tabLayout.getTabAt(i);
-                if (tab != null && !tab.isSelected()) {
-                    if (SystemUtils.isUIThread()) {
-                        tab.select();
-                    } else {
-                        try {
-                            FragmentActivity activity = getActivity();
-                            if (activity != null) {
-                                activity.runOnUiThread(() -> {
-                                    try {
-                                        tab.select();
-                                    } catch (Throwable t) {
-                                        if (BuildConfig.DEBUG) {
-                                            throw t;
-                                        }
-                                        LOG.error("onTime() " + t.getMessage(), t);
-                                    }
-                                });
-                            }
-                        } catch (Throwable ignored) {
-                        }
-                    }
+                      });
                 }
-                break;
-            }
-            i++;
+              });
         }
-        if (selectedStatus != TransferStatus.SEEDING) {
-            transfersNoSeedsView.setMode(TransfersNoSeedsView.Mode.INACTIVE);
-        }
-        if (getActivity() != null && isVisible()) {
-            getActivity().invalidateOptionsMenu();
-        }
-        if (BTEngine.ctx != null) {
-            if (TaskThrottle.isReadyToSubmitTask("TransfersFragment::getStatusBarDataBackground", TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000)) {
-                if (transferUpdateExecutor != null && transferUpdateExecutor.isAvailable()) {
-                    transferUpdateExecutor.execute(() -> {
-                        StatusBarData statusBarData = getStatusBarDataBackground();
-                        SystemUtils.postToUIThread(() -> updateStatusBar(statusBarData));
-                    });
-                } else {
-                    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> {
-                        StatusBarData statusBarData = getStatusBarDataBackground();
-                        SystemUtils.postToUIThread(() -> updateStatusBar(statusBarData));
-                    });
-                }
-            }
-            // Refresh network state on background thread to detect VPN/WiFi protection violations
-            // Only refresh if protections are enabled to avoid expensive network interface enumeration
-            ConfigurationManager CM = ConfigurationManager.instance();
-            boolean vpnGuardEnabled = CM.getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY);
-            boolean wifiOnlyEnabled = CM.getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
-            if (vpnGuardEnabled || wifiOnlyEnabled) {
-                postToHandler(SystemUtils.HandlerThreadName.MISC,
-                        () -> NetworkManager.instance().refreshNetworkState());
-            }
-            // Update DHT cache on background thread to avoid blocking JNI calls
-            if (TaskThrottle.isReadyToSubmitTask("TransfersFragment::checkDHTBackground", TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000)) {
-                if (transferUpdateExecutor != null && transferUpdateExecutor.isAvailable()) {
-                    transferUpdateExecutor.execute(() -> updateDHTCache());
-                } else {
-                    postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER,
-                            () -> updateDHTCache());
-                }
-            }
-            // Update UI with cached DHT state
-            onCheckDHT();
-        }
-    }
-
-    private static class StatusBarData {
-        final String sDown;
-        final String sUp;
-        final int downloads;
-        final int uploads;
-
-        StatusBarData(String sDown, String sUp, int downloads, int uploads) {
-            this.sDown = sDown;
-            this.sUp = sUp;
-            this.downloads = downloads;
-            this.uploads = uploads;
-        }
-    }
-
-    private StatusBarData getStatusBarDataBackground() {
-        //  format strings
-        return new StatusBarData(UIUtils.rate2speed(TransferManager.instance().getDownloadsBandwidth() >> 10),
-                UIUtils.rate2speed(TransferManager.instance().getUploadsBandwidth() / 1024),
-                // number of uploads (seeding) and downloads
-                TransferManager.instance().getActiveDownloads(),
-                TransferManager.instance().getActiveUploads());
-    }
-
-    private void updateStatusBar(StatusBarData statusBarData) {
-        textDownloads.setText(statusBarData.downloads + " @ " + statusBarData.sDown);
-        textUploads.setText(statusBarData.uploads + " @ " + statusBarData.sUp);
-        // isTunnelUp is pre-calculated on some other thread, instant call
-        updateVPNButtonIfStatusChanged(NetworkManager.instance().isTunnelUp());
-    }
-
-    private void updateVPNButtonIfStatusChanged(boolean vpnActive) {
-        boolean wasActiveBefore = isVPNactive && !vpnActive;
-        isVPNactive = vpnActive;
-        if (vpnStatusIcon != null) {
-            vpnStatusIcon.setImageResource(vpnActive ? R.drawable.notification_vpn_on : R.drawable.notification_vpn_off);
-        }
-        if (wasActiveBefore) {
-            showVPNRichToast();
-        }
-    }
-
-    /**
-     * Updates DHT cache on background thread to avoid blocking JNI calls.
-     * Must be called from background thread.
-     */
-    private void updateDHTCache() {
-        try {
-            if (BTEngine.ctx == null) {
-                cachedDhtEnabled = false;
-                cachedDhtPeers = 0;
+      } else {
+        LOG.warn(
+            "onTime(): check your logic, TransfersFragment::sortSelectedStatusTransfersInBackground was not submitted, interval of "
+                + TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000
+                + " ms not enough");
+      }
+    } else if (this.getActivity() != null) {
+      // Initialize adapter on background thread to avoid blocking JNI calls in captureUiStates()
+      WeakReference<TransfersFragment> contextRef = Ref.weak(this);
+      if (transferUpdateExecutor != null && transferUpdateExecutor.isAvailable()) {
+        transferUpdateExecutor.execute(
+            () -> {
+              if (!Ref.alive(contextRef)) {
+                Ref.free(contextRef);
                 return;
-            }
-            BTEngine btEngine = BTEngine.getInstance();
-            cachedDhtEnabled = btEngine.isDhtRunning();
-            cachedDhtPeers = btEngine.stats().dhtNodes();
-        } catch (Throwable e) {
-            LOG.error("Failed to update DHT cache", e);
-            cachedDhtEnabled = false;
-            cachedDhtPeers = 0;
-        }
-    }
+              }
+              TransfersFragment fragment = contextRef.get();
+              if (fragment == null || fragment.getActivity() == null) {
+                Ref.free(contextRef);
+                return;
+              }
+              try {
+                // Prepare transfers list and adapter on background thread
+                List<Transfer> transfers =
+                    filter(TransferManager.instance().getTransfers(), fragment.selectedStatus);
+                transfers.sort(fragment.transferComparator);
 
-    private void onCheckDHT() {
-        if (textDHTPeers == null || !TransfersFragment.this.isAdded() || BTEngine.ctx == null) {
-            return;
-        }
-        textDHTPeers.setVisibility(View.VISIBLE);
-        showTorrentSettingsOnClick = true;
-        // No Internet
-        if (!NetworkManager.instance().isInternetDataConnectionUp()) {
-            textDHTPeers.setText(R.string.check_internet_connection);
-            return;
-        }
-        // Saving Data on Mobile
-        if (TransferManager.instance().isMobileAndDataSavingsOn()) {
-            textDHTPeers.setText(R.string.bittorrent_off_data_saver_on);
-            return;
-        }
-        // VPN Guard Active
-        ConfigurationManager CM = ConfigurationManager.instance();
-        boolean vpnGuardEnabled = CM.getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY);
-        NetworkManager nm = NetworkManager.instance();
-        boolean hasVpn = nm.isTunnelUp() || nm.isVpnConnected();
-        if (vpnGuardEnabled && !hasVpn) {
-            textDHTPeers.setText(R.string.bittorrent_off_vpn_required);
-            return;
-        }
-        // BitTorrent Turned off
-        if (Engine.instance().isStopped() || Engine.instance().isDisconnected()) {
-            // takes you to main settings screen so you can turn it back on.
-            showTorrentSettingsOnClick = false;
-            textDHTPeers.setText(R.string.bittorrent_off);
-            return;
-        }
-        // Use cached DHT state to avoid blocking JNI calls on main thread
-        // No DHT
-        if (!cachedDhtEnabled) {
-            textDHTPeers.setVisibility(View.INVISIBLE);
-            return;
-        }
-        // DHT On.
-        textDHTPeers.setText(cachedDhtPeers + " " + TransfersFragment.this.getString(R.string.dht_contacts));
-    }
-
-    @Override
-    public View getHeader(FragmentActivity activity) {
-        LayoutInflater inflater = LayoutInflater.from(activity);
-        View header = inflater.inflate(R.layout.view_transfers_header, null, false);
-        TextView text = findView(header, R.id.view_transfers_header_text_title);
-        text.setText(R.string.transfers);
-        return header;
-    }
-
-    public void selectStatusTabToThe(boolean right) {
-        int currentTabPosition = tabLayout.getSelectedTabPosition();
-        int nextTabPosition = (right ? ++currentTabPosition : --currentTabPosition) % tabPositionToTransferStatus.length;
-        if (nextTabPosition == -1) {
-            nextTabPosition = tabPositionToTransferStatus.length - 1;
-        }
-        TabLayout.Tab tab = tabLayout.getTabAt(nextTabPosition);
-        if (tab != null) {
-            tab.select();
-        }
-    }
-
-    public void selectStatusTab(TransferStatus status) {
-        selectedStatus = status;
-        // Provide instant visual feedback by filtering the current list immediately on main thread
-        // Then trigger background refresh for proper sorting and state capture
-        if (adapter != null) {
-            List<Transfer> currentList = adapter.getList();
-            if (!currentList.isEmpty()) {
-                List<Transfer> filtered = filter(currentList, status);
-                adapter.updateList(filtered);
-            }
-        }
-        // Trigger background refresh to ensure proper sorting and complete state
-        onTime();
-    }
-
-    private TransfersNoSeedsView.Mode handlePossibleSeedingSuggestions(List<Transfer> transfers) {
-        if (transfers.isEmpty()) {
-            return TransfersNoSeedsView.Mode.INACTIVE;
-        }
-        boolean isNotSeeding = !ConfigurationManager.instance().isSeedFinishedTorrents();
-        if (isNotSeeding) {
-            return TransfersNoSeedsView.Mode.SEEDING_DISABLED;
-        } else if (someTransfersFinished(transfers) && noTransfersSeeding(transfers)) {
-            return TransfersNoSeedsView.Mode.SEED_ALL_FINISHED;
-        } else {
-            return TransfersNoSeedsView.Mode.INACTIVE;
-        }
-    }
-
-    /**
-     * NOTE: (Fragment) isVisible() will return false at this point in time. Use onHiddenChange(hidden)
-     */
-    @Override
-    public void onShow() {
-        if (firstTimeShown) {
-            firstTimeShown = false;
-            if (!NetworkManager.instance().isTunnelUp()) {
-                showVPNRichToast();
-            }
-        }
-    }
-
-    /**
-     * When onShown() is called the fragment is still not returning isVisible()==true
-     */
-    @Override
-    public void onHiddenChanged(boolean hidden) {
-        super.onHiddenChanged(hidden);
-    }
-
-    private void showVPNRichToast() {
-        vpnRichToast.setVisibility(View.VISIBLE);
-        long VPN_NOTIFICATION_DURATION = 10000;
-        vpnRichToastHandler.postDelayed(() -> vpnRichToast.setVisibility(View.GONE), VPN_NOTIFICATION_DURATION);
-    }
-
-    @Override
-    protected void initComponents(View v, Bundle savedInstanceState) {
-        tabLayout = findView(v, R.id.fragment_transfers_layout_tab_layout);
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                selectStatusTab(tabPositionToTransferStatus[tab.getPosition()]);
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-                selectStatusTab(tabPositionToTransferStatus[tab.getPosition()]);
-            }
-        });
-        list = findView(v, R.id.fragment_transfers_list);
-        recyclerViewLayoutManager = new LinearLayoutManager(this.getActivity());
-        // TODO: had to comment this out when I switched to RecyclerView
-        //list.setOnScrollListener(new ScrollListeners.FastScrollDisabledWhenIdleOnScrollListener());
-        SwipeLayout swipe = findView(v, R.id.fragment_transfers_swipe);
-        swipe.setOnSwipeListener(new SwipeLayout.OnSwipeListener() {
-            @Override
-            public void onSwipeLeft() {
-                selectStatusTabToThe(true);
-            }
-
-            @Override
-            public void onSwipeRight() {
-                selectStatusTabToThe(false);
-            }
-        });
-        textDHTPeers = findView(v, R.id.fragment_transfers_dht_peers);
-        textDHTPeers.setVisibility(View.INVISIBLE);
-        textDHTPeers.setOnClickListener(v12 -> {
-            Context ctx = v12.getContext();
-            Intent i = new Intent(ctx, SettingsActivity.class);
-            if (showTorrentSettingsOnClick) {
-                i.putExtra(SettingsActivity.EXTRA_SHOW_FRAGMENT, TorrentPreferenceFragment.class.getName());
-                i.putExtra(SettingsActivity.EXTRA_SHOW_FRAGMENT_TITLE, getString(R.string.torrent_preferences_header));
-            }
-            ctx.startActivity(i);
-        });
-        textDownloads = findView(v, R.id.fragment_transfers_text_downloads);
-        textUploads = findView(v, R.id.fragment_transfers_text_uploads);
-        vpnRichToast = findView(v, R.id.fragment_transfers_vpn_notification);
-        vpnRichToast.setVisibility(View.GONE);
-        vpnRichToast.setOnClickListener(v1 -> vpnRichToast.setVisibility(View.GONE));
-        initVPNStatusButton(v);
-        transfersNoSeedsView = findView(v, R.id.fragment_transfers_no_seeds_view);
-        supportBanner = findView(v, R.id.fragment_transfers_support_banner);
-        if (supportBanner != null) {
-            supportBanner.setCompactMode(true);
-            supportBanner.loadMaxBanner();
-        }
-        headerBanner = findView(v, R.id.fragment_header_banner);
-    }
-
-    private void initVPNStatusButton(View v) {
-        vpnStatusIcon = findView(v, R.id.fragment_transfers_status_vpn_icon);
-        vpnStatusIcon.setOnClickListener(v1 -> {
-            Context ctx = v1.getContext();
-            Intent i = new Intent(ctx, VPNStatusDetailActivity.class);
-            i.setAction(isVPNactive ?
-                            Constants.ACTION_SHOW_VPN_STATUS_PROTECTED :
-                            Constants.ACTION_SHOW_VPN_STATUS_UNPROTECTED).
-                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            i.putExtra("from", "transfers");
-            ctx.startActivity(i);
-        });
-    }
-
-    private void setupAdapter(Context context) {
-        if (context == null) {
-            return;
-        }
-        List<Transfer> transfers = filter(TransferManager.instance().getTransfers(), selectedStatus);
-        transfers.sort(transferComparator);
-        adapter = new TransferListAdapter(context, transfers);
-        list.setLayoutManager(recyclerViewLayoutManager);
-        list.setAdapter(adapter);
-    }
-
-    private List<Transfer> filter(List<Transfer> transfers, TransferStatus status) {
-        if (status == TransferStatus.ALL) {
-            return transfers;
-        }
-        ArrayList<Transfer> filtered = new ArrayList<>(0);
-        for (Transfer transfer : transfers) {
-            if ((status == TransferStatus.DOWNLOADING && isDownloading(transfer)) ||
-                    (status == TransferStatus.SEEDING && isSeeding(transfer) ||
-                            (status == TransferStatus.COMPLETED && isCompleted(transfer)))) {
-                filtered.add(transfer);
-            }
-        }
-        return filtered;
-    }
-
-    private boolean isDownloading(Transfer transfer) {
-        TransferState state = transfer.getState();
-        return state == TransferState.CHECKING ||
-                state == TransferState.DOWNLOADING ||
-                state == TransferState.DEMUXING ||
-                state == TransferState.DOWNLOADING_METADATA ||
-                state == TransferState.DOWNLOADING_TORRENT ||
-                state == TransferState.FINISHING ||
-                state == TransferState.PAUSING ||
-                state == TransferState.PAUSED;
-    }
-
-    private boolean isSeeding(Transfer transfer) {
-        return transfer.getState() == TransferState.SEEDING;
-    }
-
-    private boolean isCompleted(Transfer transfer) {
-        TransferState state = transfer.getState();
-        return state == TransferState.FINISHED ||
-                state == TransferState.COMPLETE;
-    }
-
-    private boolean someTransfersFinished(final List<Transfer> transfers) {
-        if (transfers == null || transfers.isEmpty()) {
-            return false;
-        }
-        for (Transfer t : transfers) {
-            if (t.getState() == TransferState.FINISHED) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean noTransfersSeeding(final List<Transfer> transfers) {
-        if (transfers == null || transfers.isEmpty()) {
-            return true;
-        }
-        for (Transfer t : transfers) {
-            if (t.getState() == TransferState.SEEDING) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
-    private boolean someTransfersInactive(final List<Transfer> transfers) {
-        for (Transfer t : transfers) {
-            TransferState state = t.getState();
-            switch (state) {
-                case PAUSED:
-                case FINISHED:
-                case ERROR:
-                case CANCELED:
-                case STOPPED:
-                    return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean someTransfersComplete(final List<Transfer> transfers) {
-        for (Transfer t : transfers) {
-            if (t == null) {
-                continue;
-            }
-            if (t.isComplete()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean someTransfersSeeding(final List<Transfer> transfers) {
-        for (Transfer t : transfers) {
-            if (t == null) {
-                continue;
-            }
-            if (t.getState() == TransferState.SEEDING) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean someTransfersActive(List<Transfer> transfers) {
-        for (Transfer t : transfers) {
-            if (t == null) {
-                continue;
-            }
-            TransferState state = t.getState();
-            if (state == TransferState.DOWNLOADING) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean someTransfersErrored(List<Transfer> transfers) {
-        for (Transfer t : transfers) {
-            if (t == null) {
-                continue;
-            }
-            if (TransferState.isErrored(t.getState())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void startTransferFromURL() {
-        //magnets and urls
-        // are automatically started if found on the clipboard by autoPasteMagnetOrURL
-        String url = addTransferUrlTextView.getText();
-        if (!StringUtils.isNullOrEmpty(url) && (url.startsWith("magnet") || url.startsWith("http"))) {
-            toggleAddTransferControls();
-            if (url.startsWith("http") && (url.contains("soundcloud.com/"))) {
-                startCloudTransfer(url);
-            } else if (url.startsWith("magnet:?xt=urn:btih:") ||
-                    (url.startsWith("http") && url.endsWith(".torrent"))) {
-                TransferManager.instance().downloadTorrent(url.trim(),
-                        new HandpickedTorrentDownloadDialogOnFetch((AppCompatActivity) getActivity(), true));
-                UIUtils.showLongMessage(getActivity(), R.string.torrent_url_added);
-            } else if (url.startsWith("http") && !url.endsWith(".torrent")) {
-                if (MainActivity.instance() != null && SearchFragment.instance() != null) {
-                    MainActivity.instance().switchContent(SearchFragment.instance());
-                    SearchFragment.instance().performTellurideSearch(url);
+                // Create adapter on background thread to avoid blocking captureUiStates() on main
+                // thread
+                FragmentActivity adapterActivity = fragment.getActivity();
+                if (adapterActivity == null) {
+                  Ref.free(contextRef);
+                  return;
                 }
-            }
-            addTransferUrlTextView.setText("");
-        } else {
-            UIUtils.showLongMessage(getActivity(), R.string.please_enter_valid_url);
-        }
+                TransferListAdapter newAdapter =
+                    new TransferListAdapter(adapterActivity, transfers);
+
+                adapterActivity.runOnUiThread(
+                    () -> {
+                      if (!Ref.alive(contextRef)) {
+                        Ref.free(contextRef);
+                        return;
+                      }
+                      try {
+                        if (contextRef.get().adapter == null && contextRef.get().list != null) {
+                          contextRef
+                              .get()
+                              .list
+                              .setLayoutManager(contextRef.get().recyclerViewLayoutManager);
+                          contextRef.get().list.setAdapter(newAdapter);
+                          contextRef.get().adapter = newAdapter;
+                        }
+                      } catch (Throwable t) {
+                        LOG.error("Failed to setup adapter: " + t.getMessage(), t);
+                        Ref.free(contextRef);
+                      }
+                    });
+              } catch (Throwable t) {
+                LOG.error("Failed to prepare adapter data: " + t.getMessage(), t);
+                Ref.free(contextRef);
+              }
+            });
+      } else {
+        LOG.warn("Transfer executor not available for adapter init, using fallback postToHandler");
+        postToHandler(
+            SystemUtils.HandlerThreadName.DOWNLOADER,
+            () -> {
+              if (!Ref.alive(contextRef)) {
+                Ref.free(contextRef);
+                return;
+              }
+              TransfersFragment fragment = contextRef.get();
+              if (fragment == null || fragment.getActivity() == null) {
+                Ref.free(contextRef);
+                return;
+              }
+              try {
+                List<Transfer> transfers =
+                    filter(TransferManager.instance().getTransfers(), fragment.selectedStatus);
+                transfers.sort(fragment.transferComparator);
+
+                FragmentActivity adapterActivity = fragment.getActivity();
+                if (adapterActivity == null) {
+                  Ref.free(contextRef);
+                  return;
+                }
+                TransferListAdapter newAdapter =
+                    new TransferListAdapter(adapterActivity, transfers);
+
+                adapterActivity.runOnUiThread(
+                    () -> {
+                      if (!Ref.alive(contextRef)) {
+                        Ref.free(contextRef);
+                        return;
+                      }
+                      try {
+                        if (contextRef.get().adapter == null && contextRef.get().list != null) {
+                          contextRef
+                              .get()
+                              .list
+                              .setLayoutManager(contextRef.get().recyclerViewLayoutManager);
+                          contextRef.get().list.setAdapter(newAdapter);
+                          contextRef.get().adapter = newAdapter;
+                        }
+                      } catch (Throwable t) {
+                        LOG.error("Failed to setup adapter: " + t.getMessage(), t);
+                        Ref.free(contextRef);
+                      }
+                    });
+              } catch (Throwable t) {
+                LOG.error("Failed to prepare adapter data: " + t.getMessage(), t);
+                Ref.free(contextRef);
+              }
+            });
+      }
     }
-
-    private void startCloudTransfer(String text) {
-        if (text.contains("soundcloud.com/")) {
-            new AsyncDownloadSoundcloudFromUrl(getActivity(), text.trim());
-        } else {
-            UIUtils.showLongMessage(getActivity(), R.string.cloud_downloads_coming);
-        }
-    }
-
-
-
-    private void toggleAddTransferControls() {
-        if (addTransferUrlTextView.getVisibility() == View.GONE) {
-            addTransferUrlTextView.setVisibility(View.VISIBLE);
-            UIUtils.autoPasteMagnetOrURL(getContext(), addTransferUrlTextView);
-            showAddTransfersKeyboard();
-        } else {
-            addTransferUrlTextView.setVisibility(View.GONE);
-            addTransferUrlTextView.setText("");
-            hideAddTransfersKeyboard();
-        }
-    }
-
-    private void showAddTransfersKeyboard() {
-        if (addTransferUrlTextView.getVisibility() == View.VISIBLE && (addTransferUrlTextView.getText().startsWith("http") || addTransferUrlTextView.getText().isEmpty())) {
-            UIUtils.showKeyboard(addTransferUrlTextView.getAutoCompleteTextView().getContext(), addTransferUrlTextView.getAutoCompleteTextView());
-        }
-    }
-
-    private void hideAddTransfersKeyboard() {
-        InputMethodManager imm = (InputMethodManager) addTransferUrlTextView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm != null) {
-            imm.hideSoftInputFromWindow(addTransferUrlTextView.getWindowToken(), 0);
-        }
-    }
-
-    private static final class TransferComparator implements Comparator<Transfer> {
-        public int compare(Transfer lhs, Transfer rhs) {
+    // mark the selected tab
+    int i = 0;
+    for (TransferStatus transferStatus : tabPositionToTransferStatus) {
+      if (transferStatus == selectedStatus) {
+        TabLayout.Tab tab = tabLayout.getTabAt(i);
+        if (tab != null && !tab.isSelected()) {
+          if (SystemUtils.isUIThread()) {
+            tab.select();
+          } else {
             try {
-                return -lhs.getCreated().compareTo(rhs.getCreated());
-            } catch (Throwable e) {
-                // ignore, not really super important
+              FragmentActivity activity = getActivity();
+              if (activity != null) {
+                activity.runOnUiThread(
+                    () -> {
+                      try {
+                        tab.select();
+                      } catch (Throwable t) {
+                        if (BuildConfig.DEBUG) {
+                          throw t;
+                        }
+                        LOG.error("onTime() " + t.getMessage(), t);
+                      }
+                    });
+              }
+            } catch (Throwable ignored) {
             }
-            return 0;
+          }
         }
+        break;
+      }
+      i++;
+    }
+    if (selectedStatus != TransferStatus.SEEDING) {
+      transfersNoSeedsView.setMode(TransfersNoSeedsView.Mode.INACTIVE);
+    }
+    if (getActivity() != null && isVisible()) {
+      getActivity().invalidateOptionsMenu();
+    }
+    if (BTEngine.ctx != null) {
+      if (TaskThrottle.isReadyToSubmitTask(
+          "TransfersFragment::getStatusBarDataBackground",
+          TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000)) {
+        if (transferUpdateExecutor != null && transferUpdateExecutor.isAvailable()) {
+          transferUpdateExecutor.execute(
+              () -> {
+                StatusBarData statusBarData = getStatusBarDataBackground();
+                SystemUtils.postToUIThread(() -> updateStatusBar(statusBarData));
+              });
+        } else {
+          SystemUtils.postToHandler(
+              SystemUtils.HandlerThreadName.DOWNLOADER,
+              () -> {
+                StatusBarData statusBarData = getStatusBarDataBackground();
+                SystemUtils.postToUIThread(() -> updateStatusBar(statusBarData));
+              });
+        }
+      }
+      // Refresh network state on background thread to detect VPN/WiFi protection violations
+      // Only refresh if protections are enabled to avoid expensive network interface enumeration
+      ConfigurationManager CM = ConfigurationManager.instance();
+      boolean vpnGuardEnabled = CM.getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY);
+      boolean wifiOnlyEnabled = CM.getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
+      if (vpnGuardEnabled || wifiOnlyEnabled) {
+        postToHandler(
+            SystemUtils.HandlerThreadName.MISC,
+            () -> NetworkManager.instance().refreshNetworkState());
+      }
+      // Update DHT cache on background thread to avoid blocking JNI calls
+      if (TaskThrottle.isReadyToSubmitTask(
+          "TransfersFragment::checkDHTBackground",
+          TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000)) {
+        if (transferUpdateExecutor != null && transferUpdateExecutor.isAvailable()) {
+          transferUpdateExecutor.execute(() -> updateDHTCache());
+        } else {
+          postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> updateDHTCache());
+        }
+      }
+      // Update UI with cached DHT state
+      onCheckDHT();
+    }
+  }
+
+  private static class StatusBarData {
+    final String sDown;
+    final String sUp;
+    final int downloads;
+    final int uploads;
+
+    StatusBarData(String sDown, String sUp, int downloads, int uploads) {
+      this.sDown = sDown;
+      this.sUp = sUp;
+      this.downloads = downloads;
+      this.uploads = uploads;
+    }
+  }
+
+  private StatusBarData getStatusBarDataBackground() {
+    //  format strings
+    return new StatusBarData(
+        UIUtils.rate2speed(TransferManager.instance().getDownloadsBandwidth() >> 10),
+        UIUtils.rate2speed(TransferManager.instance().getUploadsBandwidth() / 1024),
+        // number of uploads (seeding) and downloads
+        TransferManager.instance().getActiveDownloads(),
+        TransferManager.instance().getActiveUploads());
+  }
+
+  private void updateStatusBar(StatusBarData statusBarData) {
+    textDownloads.setText(statusBarData.downloads + " @ " + statusBarData.sDown);
+    textUploads.setText(statusBarData.uploads + " @ " + statusBarData.sUp);
+    // isTunnelUp is pre-calculated on some other thread, instant call
+    updateVPNButtonIfStatusChanged(NetworkManager.instance().isTunnelUp());
+  }
+
+  private void updateVPNButtonIfStatusChanged(boolean vpnActive) {
+    boolean wasActiveBefore = isVPNactive && !vpnActive;
+    isVPNactive = vpnActive;
+    if (vpnStatusIcon != null) {
+      vpnStatusIcon.setImageResource(
+          vpnActive ? R.drawable.notification_vpn_on : R.drawable.notification_vpn_off);
+    }
+    if (wasActiveBefore) {
+      showVPNRichToast();
+    }
+  }
+
+  /**
+   * Updates DHT cache on background thread to avoid blocking JNI calls. Must be called from
+   * background thread.
+   */
+  private void updateDHTCache() {
+    try {
+      if (BTEngine.ctx == null) {
+        cachedDhtEnabled = false;
+        cachedDhtPeers = 0;
+        return;
+      }
+      BTEngine btEngine = BTEngine.getInstance();
+      cachedDhtEnabled = btEngine.isDhtRunning();
+      cachedDhtPeers = btEngine.stats().dhtNodes();
+    } catch (Throwable e) {
+      LOG.error("Failed to update DHT cache", e);
+      cachedDhtEnabled = false;
+      cachedDhtPeers = 0;
+    }
+  }
+
+  private void onCheckDHT() {
+    if (textDHTPeers == null || !TransfersFragment.this.isAdded() || BTEngine.ctx == null) {
+      return;
+    }
+    textDHTPeers.setVisibility(View.VISIBLE);
+    showTorrentSettingsOnClick = true;
+    // No Internet
+    if (!NetworkManager.instance().isInternetDataConnectionUp()) {
+      textDHTPeers.setText(R.string.check_internet_connection);
+      return;
+    }
+    // Saving Data on Mobile
+    if (TransferManager.instance().isMobileAndDataSavingsOn()) {
+      textDHTPeers.setText(R.string.bittorrent_off_data_saver_on);
+      return;
+    }
+    // VPN Guard Active
+    ConfigurationManager CM = ConfigurationManager.instance();
+    boolean vpnGuardEnabled = CM.getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY);
+    NetworkManager nm = NetworkManager.instance();
+    boolean hasVpn = nm.isTunnelUp() || nm.isVpnConnected();
+    if (vpnGuardEnabled && !hasVpn) {
+      textDHTPeers.setText(R.string.bittorrent_off_vpn_required);
+      return;
+    }
+    // BitTorrent Turned off
+    if (Engine.instance().isStopped() || Engine.instance().isDisconnected()) {
+      // takes you to main settings screen so you can turn it back on.
+      showTorrentSettingsOnClick = false;
+      textDHTPeers.setText(R.string.bittorrent_off);
+      return;
+    }
+    // Use cached DHT state to avoid blocking JNI calls on main thread
+    // No DHT
+    if (!cachedDhtEnabled) {
+      textDHTPeers.setVisibility(View.INVISIBLE);
+      return;
+    }
+    // DHT On.
+    textDHTPeers.setText(
+        cachedDhtPeers + " " + TransfersFragment.this.getString(R.string.dht_contacts));
+  }
+
+  @Override
+  public View getHeader(FragmentActivity activity) {
+    LayoutInflater inflater = LayoutInflater.from(activity);
+    View header = inflater.inflate(R.layout.view_transfers_header, null, false);
+    TextView text = findView(header, R.id.view_transfers_header_text_title);
+    text.setText(R.string.transfers);
+    return header;
+  }
+
+  public void selectStatusTabToThe(boolean right) {
+    int currentTabPosition = tabLayout.getSelectedTabPosition();
+    int nextTabPosition =
+        (right ? ++currentTabPosition : --currentTabPosition) % tabPositionToTransferStatus.length;
+    if (nextTabPosition == -1) {
+      nextTabPosition = tabPositionToTransferStatus.length - 1;
+    }
+    TabLayout.Tab tab = tabLayout.getTabAt(nextTabPosition);
+    if (tab != null) {
+      tab.select();
+    }
+  }
+
+  public void selectStatusTab(TransferStatus status) {
+    selectedStatus = status;
+    // Provide instant visual feedback by filtering the current list immediately on main thread
+    // Then trigger background refresh for proper sorting and state capture
+    if (adapter != null) {
+      List<Transfer> currentList = adapter.getList();
+      if (!currentList.isEmpty()) {
+        List<Transfer> filtered = filter(currentList, status);
+        adapter.updateList(filtered);
+      }
+    }
+    // Trigger background refresh to ensure proper sorting and complete state
+    onTime();
+  }
+
+  private TransfersNoSeedsView.Mode handlePossibleSeedingSuggestions(List<Transfer> transfers) {
+    if (transfers.isEmpty()) {
+      return TransfersNoSeedsView.Mode.INACTIVE;
+    }
+    boolean isNotSeeding = !ConfigurationManager.instance().isSeedFinishedTorrents();
+    if (isNotSeeding) {
+      return TransfersNoSeedsView.Mode.SEEDING_DISABLED;
+    } else if (someTransfersFinished(transfers) && noTransfersSeeding(transfers)) {
+      return TransfersNoSeedsView.Mode.SEED_ALL_FINISHED;
+    } else {
+      return TransfersNoSeedsView.Mode.INACTIVE;
+    }
+  }
+
+  /**
+   * NOTE: (Fragment) isVisible() will return false at this point in time. Use
+   * onHiddenChange(hidden)
+   */
+  @Override
+  public void onShow() {
+    if (firstTimeShown) {
+      firstTimeShown = false;
+      if (!NetworkManager.instance().isTunnelUp()) {
+        showVPNRichToast();
+      }
+    }
+  }
+
+  /** When onShown() is called the fragment is still not returning isVisible()==true */
+  @Override
+  public void onHiddenChanged(boolean hidden) {
+    super.onHiddenChanged(hidden);
+  }
+
+  private void showVPNRichToast() {
+    vpnRichToast.setVisibility(View.VISIBLE);
+    long VPN_NOTIFICATION_DURATION = 10000;
+    vpnRichToastHandler.postDelayed(
+        () -> vpnRichToast.setVisibility(View.GONE), VPN_NOTIFICATION_DURATION);
+  }
+
+  @Override
+  protected void initComponents(View v, Bundle savedInstanceState) {
+    tabLayout = findView(v, R.id.fragment_transfers_layout_tab_layout);
+    tabLayout.addOnTabSelectedListener(
+        new TabLayout.OnTabSelectedListener() {
+          @Override
+          public void onTabSelected(TabLayout.Tab tab) {
+            selectStatusTab(tabPositionToTransferStatus[tab.getPosition()]);
+          }
+
+          @Override
+          public void onTabUnselected(TabLayout.Tab tab) {}
+
+          @Override
+          public void onTabReselected(TabLayout.Tab tab) {
+            selectStatusTab(tabPositionToTransferStatus[tab.getPosition()]);
+          }
+        });
+    list = findView(v, R.id.fragment_transfers_list);
+    recyclerViewLayoutManager = new LinearLayoutManager(this.getActivity());
+    // TODO: had to comment this out when I switched to RecyclerView
+    // list.setOnScrollListener(new ScrollListeners.FastScrollDisabledWhenIdleOnScrollListener());
+    SwipeLayout swipe = findView(v, R.id.fragment_transfers_swipe);
+    swipe.setOnSwipeListener(
+        new SwipeLayout.OnSwipeListener() {
+          @Override
+          public void onSwipeLeft() {
+            selectStatusTabToThe(true);
+          }
+
+          @Override
+          public void onSwipeRight() {
+            selectStatusTabToThe(false);
+          }
+        });
+    textDHTPeers = findView(v, R.id.fragment_transfers_dht_peers);
+    textDHTPeers.setVisibility(View.INVISIBLE);
+    textDHTPeers.setOnClickListener(
+        v12 -> {
+          Context ctx = v12.getContext();
+          Intent i = new Intent(ctx, SettingsActivity.class);
+          if (showTorrentSettingsOnClick) {
+            i.putExtra(
+                SettingsActivity.EXTRA_SHOW_FRAGMENT, TorrentPreferenceFragment.class.getName());
+            i.putExtra(
+                SettingsActivity.EXTRA_SHOW_FRAGMENT_TITLE,
+                getString(R.string.torrent_preferences_header));
+          }
+          ctx.startActivity(i);
+        });
+    textDownloads = findView(v, R.id.fragment_transfers_text_downloads);
+    textUploads = findView(v, R.id.fragment_transfers_text_uploads);
+    vpnRichToast = findView(v, R.id.fragment_transfers_vpn_notification);
+    vpnRichToast.setVisibility(View.GONE);
+    vpnRichToast.setOnClickListener(v1 -> vpnRichToast.setVisibility(View.GONE));
+    initVPNStatusButton(v);
+    transfersNoSeedsView = findView(v, R.id.fragment_transfers_no_seeds_view);
+    supportBanner = findView(v, R.id.fragment_transfers_support_banner);
+    if (supportBanner != null) {
+      supportBanner.setCompactMode(true);
+      supportBanner.loadMaxBanner();
+    }
+    headerBanner = findView(v, R.id.fragment_header_banner);
+  }
+
+  private void initVPNStatusButton(View v) {
+    vpnStatusIcon = findView(v, R.id.fragment_transfers_status_vpn_icon);
+    vpnStatusIcon.setOnClickListener(
+        v1 -> {
+          Context ctx = v1.getContext();
+          Intent i = new Intent(ctx, VPNStatusDetailActivity.class);
+          i.setAction(
+                  isVPNactive
+                      ? Constants.ACTION_SHOW_VPN_STATUS_PROTECTED
+                      : Constants.ACTION_SHOW_VPN_STATUS_UNPROTECTED)
+              .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+          i.putExtra("from", "transfers");
+          ctx.startActivity(i);
+        });
+  }
+
+  private void setupAdapter(Context context) {
+    if (context == null) {
+      return;
+    }
+    List<Transfer> transfers = filter(TransferManager.instance().getTransfers(), selectedStatus);
+    transfers.sort(transferComparator);
+    adapter = new TransferListAdapter(context, transfers);
+    list.setLayoutManager(recyclerViewLayoutManager);
+    list.setAdapter(adapter);
+  }
+
+  private List<Transfer> filter(List<Transfer> transfers, TransferStatus status) {
+    if (status == TransferStatus.ALL) {
+      return transfers;
+    }
+    ArrayList<Transfer> filtered = new ArrayList<>(0);
+    for (Transfer transfer : transfers) {
+      if ((status == TransferStatus.DOWNLOADING && isDownloading(transfer))
+          || (status == TransferStatus.SEEDING && isSeeding(transfer)
+              || (status == TransferStatus.COMPLETED && isCompleted(transfer)))) {
+        filtered.add(transfer);
+      }
+    }
+    return filtered;
+  }
+
+  private boolean isDownloading(Transfer transfer) {
+    TransferState state = transfer.getState();
+    return state == TransferState.CHECKING
+        || state == TransferState.DOWNLOADING
+        || state == TransferState.DEMUXING
+        || state == TransferState.DOWNLOADING_METADATA
+        || state == TransferState.DOWNLOADING_TORRENT
+        || state == TransferState.FINISHING
+        || state == TransferState.PAUSING
+        || state == TransferState.PAUSED;
+  }
+
+  private boolean isSeeding(Transfer transfer) {
+    return transfer.getState() == TransferState.SEEDING;
+  }
+
+  private boolean isCompleted(Transfer transfer) {
+    TransferState state = transfer.getState();
+    return state == TransferState.FINISHED || state == TransferState.COMPLETE;
+  }
+
+  private boolean someTransfersFinished(final List<Transfer> transfers) {
+    if (transfers == null || transfers.isEmpty()) {
+      return false;
+    }
+    for (Transfer t : transfers) {
+      if (t.getState() == TransferState.FINISHED) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean noTransfersSeeding(final List<Transfer> transfers) {
+    if (transfers == null || transfers.isEmpty()) {
+      return true;
+    }
+    for (Transfer t : transfers) {
+      if (t.getState() == TransferState.SEEDING) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private boolean someTransfersInactive(final List<Transfer> transfers) {
+    for (Transfer t : transfers) {
+      TransferState state = t.getState();
+      switch (state) {
+        case PAUSED:
+        case FINISHED:
+        case ERROR:
+        case CANCELED:
+        case STOPPED:
+          return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean someTransfersComplete(final List<Transfer> transfers) {
+    for (Transfer t : transfers) {
+      if (t == null) {
+        continue;
+      }
+      if (t.isComplete()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean someTransfersSeeding(final List<Transfer> transfers) {
+    for (Transfer t : transfers) {
+      if (t == null) {
+        continue;
+      }
+      if (t.getState() == TransferState.SEEDING) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean someTransfersActive(List<Transfer> transfers) {
+    for (Transfer t : transfers) {
+      if (t == null) {
+        continue;
+      }
+      TransferState state = t.getState();
+      if (state == TransferState.DOWNLOADING) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean someTransfersErrored(List<Transfer> transfers) {
+    for (Transfer t : transfers) {
+      if (t == null) {
+        continue;
+      }
+      if (TransferState.isErrored(t.getState())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private void startTransferFromURL() {
+    // magnets and urls
+    // are automatically started if found on the clipboard by autoPasteMagnetOrURL
+    String url = addTransferUrlTextView.getText();
+    if (!StringUtils.isNullOrEmpty(url) && (url.startsWith("magnet") || url.startsWith("http"))) {
+      toggleAddTransferControls();
+      if (url.startsWith("http") && (url.contains("soundcloud.com/"))) {
+        startCloudTransfer(url);
+      } else if (url.startsWith("magnet:?xt=urn:btih:")
+          || (url.startsWith("http") && url.endsWith(".torrent"))) {
+        TransferManager.instance()
+            .downloadTorrent(
+                url.trim(),
+                new HandpickedTorrentDownloadDialogOnFetch(
+                    (AppCompatActivity) getActivity(), true));
+        UIUtils.showLongMessage(getActivity(), R.string.torrent_url_added);
+      } else if (url.startsWith("http") && !url.endsWith(".torrent")) {
+        if (MainActivity.instance() != null && SearchFragment.instance() != null) {
+          MainActivity.instance().switchContent(SearchFragment.instance());
+          SearchFragment.instance().performTellurideSearch(url);
+        }
+      }
+      addTransferUrlTextView.setText("");
+    } else {
+      UIUtils.showLongMessage(getActivity(), R.string.please_enter_valid_url);
+    }
+  }
+
+  private void startCloudTransfer(String text) {
+    if (text.contains("soundcloud.com/")) {
+      new AsyncDownloadSoundcloudFromUrl(getActivity(), text.trim());
+    } else {
+      UIUtils.showLongMessage(getActivity(), R.string.cloud_downloads_coming);
+    }
+  }
+
+  private void toggleAddTransferControls() {
+    if (addTransferUrlTextView.getVisibility() == View.GONE) {
+      addTransferUrlTextView.setVisibility(View.VISIBLE);
+      UIUtils.autoPasteMagnetOrURL(getContext(), addTransferUrlTextView);
+      showAddTransfersKeyboard();
+    } else {
+      addTransferUrlTextView.setVisibility(View.GONE);
+      addTransferUrlTextView.setText("");
+      hideAddTransfersKeyboard();
+    }
+  }
+
+  private void showAddTransfersKeyboard() {
+    if (addTransferUrlTextView.getVisibility() == View.VISIBLE
+        && (addTransferUrlTextView.getText().startsWith("http")
+            || addTransferUrlTextView.getText().isEmpty())) {
+      UIUtils.showKeyboard(
+          addTransferUrlTextView.getAutoCompleteTextView().getContext(),
+          addTransferUrlTextView.getAutoCompleteTextView());
+    }
+  }
+
+  private void hideAddTransfersKeyboard() {
+    InputMethodManager imm =
+        (InputMethodManager)
+            addTransferUrlTextView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+    if (imm != null) {
+      imm.hideSoftInputFromWindow(addTransferUrlTextView.getWindowToken(), 0);
+    }
+  }
+
+  private static final class TransferComparator implements Comparator<Transfer> {
+    public int compare(Transfer lhs, Transfer rhs) {
+      try {
+        return -lhs.getCreated().compareTo(rhs.getCreated());
+      } catch (Throwable e) {
+        // ignore, not really super important
+      }
+      return 0;
+    }
+  }
+
+  public enum TransferStatus {
+    ALL,
+    DOWNLOADING,
+    COMPLETED,
+    SEEDING
+  }
+
+  public void onClick(TransfersFragment f) {
+    f.toggleAddTransferControls();
+  }
+
+  private static final class AddTransferTextListener extends ClickAdapter<TransfersFragment>
+      implements OnItemClickListener, OnActionListener {
+
+    AddTransferTextListener(TransfersFragment owner) {
+      super(owner);
     }
 
-    public enum TransferStatus {
-        ALL, DOWNLOADING, COMPLETED, SEEDING
+    @Override
+    public boolean onKey(TransfersFragment owner, View v, int keyCode, KeyEvent event) {
+      if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_UP) {
+        owner.startTransferFromURL();
+        return true;
+      }
+      return false;
     }
 
-    public void onClick(TransfersFragment f) {
-        f.toggleAddTransferControls();
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+      if (Ref.alive(ownerRef)) {
+        TransfersFragment owner = ownerRef.get();
+        owner.startTransferFromURL();
+      }
     }
 
-    private static final class AddTransferTextListener extends ClickAdapter<TransfersFragment> implements OnItemClickListener, OnActionListener {
-
-        AddTransferTextListener(TransfersFragment owner) {
-            super(owner);
-        }
-
-        @Override
-        public boolean onKey(TransfersFragment owner, View v, int keyCode, KeyEvent event) {
-            if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_UP) {
-                owner.startTransferFromURL();
-                return true;
-            }
-            return false;
-        }
-
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            if (Ref.alive(ownerRef)) {
-                TransfersFragment owner = ownerRef.get();
-                owner.startTransferFromURL();
-            }
-        }
-
-        @Override
-        public void onClear(View v) {
-            if (Ref.alive(ownerRef)) {
-                //TransfersFragment owner = ownerRef.get();
-                //might clear.
-                LOG.debug("onClear");
-            }
-        }
+    @Override
+    public void onClear(View v) {
+      if (Ref.alive(ownerRef)) {
+        // TransfersFragment owner = ownerRef.get();
+        // might clear.
+        LOG.debug("onClear");
+      }
     }
+  }
 }

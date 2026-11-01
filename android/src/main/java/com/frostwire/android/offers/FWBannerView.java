@@ -28,239 +28,240 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import androidx.annotation.Nullable;
-
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
 
 /**
- * Simple in-house banner view used to display FrostWire support promotions.
- * This replaces the previous MAX/third-party integration while keeping a
- * compatible public API for the rest of the application.
+ * Simple in-house banner view used to display FrostWire support promotions. This replaces the
+ * previous MAX/third-party integration while keeping a compatible public API for the rest of the
+ * application.
  */
 public class FWBannerView extends LinearLayout {
 
-    public static final String UNIT_ID_AUDIO_PLAYER = "support_audio_player";
+  public static final String UNIT_ID_AUDIO_PLAYER = "support_audio_player";
 
-    public enum Layers {
-        APPLOVIN,
-        FALLBACK,
-        ALL
+  public enum Layers {
+    APPLOVIN,
+    FALLBACK,
+    ALL
+  }
+
+  public interface OnBannerDismissedListener {
+    void dispatch();
+  }
+
+  public interface OnBannerLoadedListener {
+    void dispatch();
+  }
+
+  private static final Logger LOG = Logger.getLogger(FWBannerView.class);
+
+  private LinearLayout supportContainer;
+  private ImageView supportIcon;
+  private TextView supportTitle;
+  private TextView supportMessage;
+  private Button supportAction;
+  private ImageButton dismissButton;
+  private ImageButton compactCloseButton;
+
+  private OnBannerDismissedListener onBannerDismissedListener;
+  private OnBannerLoadedListener onBannerLoadedListener;
+
+  private SupportOffer currentOffer;
+  private boolean compactMode;
+  private int defaultPaddingStart;
+  private int defaultPaddingTop;
+  private int defaultPaddingEnd;
+  private int defaultPaddingBottom;
+
+  public FWBannerView(Context context, @Nullable AttributeSet attrs) {
+    super(context, attrs);
+    init(context);
+  }
+
+  public FWBannerView(
+      Context context,
+      @Nullable AttributeSet attrs,
+      boolean showFallbackBannerOnDismiss,
+      boolean showDismissButton,
+      boolean showRemoveAdsTextView,
+      String adId) {
+    super(context, attrs);
+    init(context);
+    setShowDismissButton(showDismissButton);
+  }
+
+  private void init(Context context) {
+    LayoutInflater inflater = LayoutInflater.from(context);
+    inflater.inflate(R.layout.view_frostwire_banner, this, true);
+
+    supportContainer = findViewById(R.id.fwbanner_support_container);
+    supportIcon = findViewById(R.id.fwbanner_support_icon);
+    supportTitle = findViewById(R.id.fwbanner_support_title);
+    supportMessage = findViewById(R.id.fwbanner_support_message);
+    supportAction = findViewById(R.id.fwbanner_support_action);
+    dismissButton = findViewById(R.id.fwbanner_dismiss_button);
+    compactCloseButton = findViewById(R.id.fwbanner_support_compact_close);
+
+    if (supportContainer != null) {
+      defaultPaddingStart = supportContainer.getPaddingStart();
+      defaultPaddingTop = supportContainer.getPaddingTop();
+      defaultPaddingEnd = supportContainer.getPaddingEnd();
+      defaultPaddingBottom = supportContainer.getPaddingBottom();
     }
 
-    public interface OnBannerDismissedListener {
-        void dispatch();
+    dismissButton.setOnClickListener(v -> dismissBanner());
+    if (compactCloseButton != null) {
+      compactCloseButton.setOnClickListener(v -> dismissBanner());
+    }
+    setVisibility(GONE);
+  }
+
+  public void setOnBannerLoadedListener(OnBannerLoadedListener listener) {
+    this.onBannerLoadedListener = listener;
+  }
+
+  public void setOnBannerDismissedListener(OnBannerDismissedListener listener) {
+    this.onBannerDismissedListener = listener;
+  }
+
+  public void setCompactMode(boolean compactMode) {
+    this.compactMode = compactMode;
+    applyCompactMode();
+  }
+
+  public void setShowDismissButton(boolean showDismissButton) {
+    if (dismissButton != null) {
+      dismissButton.setVisibility(showDismissButton ? VISIBLE : GONE);
+    }
+  }
+
+  public void loadMaxBanner() {
+    if (Offers.disabledAds()) {
+      setVisibility(GONE);
+      return;
+    }
+    bindOffer(SupportOffer.random());
+  }
+
+  public void loadFallbackBanner(String ignoredAdUnitId) {
+    loadMaxBanner();
+  }
+
+  public void destroy() {
+    onBannerDismissedListener = null;
+    onBannerLoadedListener = null;
+    currentOffer = null;
+    setVisibility(GONE);
+  }
+
+  public void setLayersVisibility(Layers layer, boolean visible) {
+    int visibility = visible ? VISIBLE : GONE;
+    if (layer == Layers.ALL) {
+      setVisibility(visibility);
+      return;
+    }
+    if (supportContainer != null) {
+      supportContainer.setVisibility(visibility);
+    }
+    if (visible) {
+      setVisibility(VISIBLE);
+    } else if (supportContainer == null || supportContainer.getVisibility() != VISIBLE) {
+      setVisibility(GONE);
+    }
+  }
+
+  public boolean isLoaded() {
+    return getVisibility() == VISIBLE && currentOffer != null;
+  }
+
+  private void bindOffer(SupportOffer offer) {
+    currentOffer = offer;
+
+    if (supportContainer == null) {
+      return;
     }
 
-    public interface OnBannerLoadedListener {
-        void dispatch();
+    try {
+      if (offer.iconRes != 0) {
+        supportIcon.setImageResource(offer.iconRes);
+        supportIcon.setVisibility(VISIBLE);
+      } else {
+        supportIcon.setVisibility(GONE);
+      }
+
+      supportTitle.setText(offer.titleRes);
+      supportMessage.setText(offer.messageRes);
+      supportAction.setText(offer.actionTextRes);
+
+      UIUtils.setupClickUrl(supportContainer, offer.getUrl());
+      UIUtils.setupClickUrl(supportAction, offer.getUrl());
+      UIUtils.setupClickUrl(this, offer.getUrl());
+
+      applyCompactMode();
+
+      // Post to handler to ensure visibility changes happen after layout pass completes.
+      // This prevents ArrayIndexOutOfBoundsException in View$AttachInfo that can occur
+      // when content capture events race with view visibility transitions.
+      post(
+          () -> {
+            safeSetVisibility(this, VISIBLE);
+            safeSetVisibility(supportContainer, VISIBLE);
+          });
+
+      if (onBannerLoadedListener != null) {
+        onBannerLoadedListener.dispatch();
+      }
+    } catch (Exception e) {
+      LOG.error("Error binding offer to banner view", e);
+    }
+  }
+
+  /**
+   * Safely set view visibility, catching any framework-level exceptions that may occur during
+   * content capture event recording or other visibility-triggered callbacks. This prevents
+   * ArrayIndexOutOfBoundsException that can occur in View$AttachInfo.
+   */
+  private void safeSetVisibility(View view, int visibility) {
+    try {
+      view.setVisibility(visibility);
+    } catch (ArrayIndexOutOfBoundsException e) {
+      LOG.warn("ArrayIndexOutOfBoundsException while setting visibility", e);
+      // Log but don't crash - the view will be visible anyway or the operation
+      // will be retried on the next frame
+    } catch (Exception e) {
+      LOG.error("Error setting view visibility", e);
+    }
+  }
+
+  private void dismissBanner() {
+    setVisibility(GONE);
+    if (onBannerDismissedListener != null) {
+      onBannerDismissedListener.dispatch();
+    }
+  }
+
+  private void applyCompactMode() {
+    if (supportContainer == null) {
+      return;
     }
 
-    private static final Logger LOG = Logger.getLogger(FWBannerView.class);
+    supportContainer.setPaddingRelative(
+        defaultPaddingStart, defaultPaddingTop, defaultPaddingEnd, defaultPaddingBottom);
 
-    private LinearLayout supportContainer;
-    private ImageView supportIcon;
-    private TextView supportTitle;
-    private TextView supportMessage;
-    private Button supportAction;
-    private ImageButton dismissButton;
-    private ImageButton compactCloseButton;
-
-    private OnBannerDismissedListener onBannerDismissedListener;
-    private OnBannerLoadedListener onBannerLoadedListener;
-
-    private SupportOffer currentOffer;
-    private boolean compactMode;
-    private int defaultPaddingStart;
-    private int defaultPaddingTop;
-    private int defaultPaddingEnd;
-    private int defaultPaddingBottom;
-
-    public FWBannerView(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-        init(context);
+    if (supportMessage != null) {
+      if (compactMode) {
+        supportMessage.setVisibility(GONE);
+      } else {
+        CharSequence text = supportMessage.getText();
+        supportMessage.setVisibility(TextUtils.isEmpty(text) ? GONE : VISIBLE);
+      }
     }
 
-    public FWBannerView(Context context,
-                        @Nullable AttributeSet attrs,
-                        boolean showFallbackBannerOnDismiss,
-                        boolean showDismissButton,
-                        boolean showRemoveAdsTextView,
-                        String adId) {
-        super(context, attrs);
-        init(context);
-        setShowDismissButton(showDismissButton);
+    if (compactCloseButton != null) {
+      compactCloseButton.setVisibility(compactMode ? VISIBLE : GONE);
     }
-
-    private void init(Context context) {
-        LayoutInflater inflater = LayoutInflater.from(context);
-        inflater.inflate(R.layout.view_frostwire_banner, this, true);
-
-        supportContainer = findViewById(R.id.fwbanner_support_container);
-        supportIcon = findViewById(R.id.fwbanner_support_icon);
-        supportTitle = findViewById(R.id.fwbanner_support_title);
-        supportMessage = findViewById(R.id.fwbanner_support_message);
-        supportAction = findViewById(R.id.fwbanner_support_action);
-        dismissButton = findViewById(R.id.fwbanner_dismiss_button);
-        compactCloseButton = findViewById(R.id.fwbanner_support_compact_close);
-
-        if (supportContainer != null) {
-            defaultPaddingStart = supportContainer.getPaddingStart();
-            defaultPaddingTop = supportContainer.getPaddingTop();
-            defaultPaddingEnd = supportContainer.getPaddingEnd();
-            defaultPaddingBottom = supportContainer.getPaddingBottom();
-        }
-
-        dismissButton.setOnClickListener(v -> dismissBanner());
-        if (compactCloseButton != null) {
-            compactCloseButton.setOnClickListener(v -> dismissBanner());
-        }
-        setVisibility(GONE);
-    }
-
-    public void setOnBannerLoadedListener(OnBannerLoadedListener listener) {
-        this.onBannerLoadedListener = listener;
-    }
-
-    public void setOnBannerDismissedListener(OnBannerDismissedListener listener) {
-        this.onBannerDismissedListener = listener;
-    }
-
-    public void setCompactMode(boolean compactMode) {
-        this.compactMode = compactMode;
-        applyCompactMode();
-    }
-
-    public void setShowDismissButton(boolean showDismissButton) {
-        if (dismissButton != null) {
-            dismissButton.setVisibility(showDismissButton ? VISIBLE : GONE);
-        }
-    }
-
-    public void loadMaxBanner() {
-        if (Offers.disabledAds()) {
-            setVisibility(GONE);
-            return;
-        }
-        bindOffer(SupportOffer.random());
-    }
-
-    public void loadFallbackBanner(String ignoredAdUnitId) {
-        loadMaxBanner();
-    }
-
-    public void destroy() {
-        onBannerDismissedListener = null;
-        onBannerLoadedListener = null;
-        currentOffer = null;
-        setVisibility(GONE);
-    }
-
-    public void setLayersVisibility(Layers layer, boolean visible) {
-        int visibility = visible ? VISIBLE : GONE;
-        if (layer == Layers.ALL) {
-            setVisibility(visibility);
-            return;
-        }
-        if (supportContainer != null) {
-            supportContainer.setVisibility(visibility);
-        }
-        if (visible) {
-            setVisibility(VISIBLE);
-        } else if (supportContainer == null || supportContainer.getVisibility() != VISIBLE) {
-            setVisibility(GONE);
-        }
-    }
-
-    public boolean isLoaded() {
-        return getVisibility() == VISIBLE && currentOffer != null;
-    }
-
-    private void bindOffer(SupportOffer offer) {
-        currentOffer = offer;
-
-        if (supportContainer == null) {
-            return;
-        }
-
-        try {
-            if (offer.iconRes != 0) {
-                supportIcon.setImageResource(offer.iconRes);
-                supportIcon.setVisibility(VISIBLE);
-            } else {
-                supportIcon.setVisibility(GONE);
-            }
-
-            supportTitle.setText(offer.titleRes);
-            supportMessage.setText(offer.messageRes);
-            supportAction.setText(offer.actionTextRes);
-
-            UIUtils.setupClickUrl(supportContainer, offer.getUrl());
-            UIUtils.setupClickUrl(supportAction, offer.getUrl());
-            UIUtils.setupClickUrl(this, offer.getUrl());
-
-            applyCompactMode();
-
-            // Post to handler to ensure visibility changes happen after layout pass completes.
-            // This prevents ArrayIndexOutOfBoundsException in View$AttachInfo that can occur
-            // when content capture events race with view visibility transitions.
-            post(() -> {
-                safeSetVisibility(this, VISIBLE);
-                safeSetVisibility(supportContainer, VISIBLE);
-            });
-
-            if (onBannerLoadedListener != null) {
-                onBannerLoadedListener.dispatch();
-            }
-        } catch (Exception e) {
-            LOG.error("Error binding offer to banner view", e);
-        }
-    }
-
-    /**
-     * Safely set view visibility, catching any framework-level exceptions that may occur
-     * during content capture event recording or other visibility-triggered callbacks.
-     * This prevents ArrayIndexOutOfBoundsException that can occur in View$AttachInfo.
-     */
-    private void safeSetVisibility(View view, int visibility) {
-        try {
-            view.setVisibility(visibility);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            LOG.warn("ArrayIndexOutOfBoundsException while setting visibility", e);
-            // Log but don't crash - the view will be visible anyway or the operation
-            // will be retried on the next frame
-        } catch (Exception e) {
-            LOG.error("Error setting view visibility", e);
-        }
-    }
-
-    private void dismissBanner() {
-        setVisibility(GONE);
-        if (onBannerDismissedListener != null) {
-            onBannerDismissedListener.dispatch();
-        }
-    }
-
-    private void applyCompactMode() {
-        if (supportContainer == null) {
-            return;
-        }
-
-        supportContainer.setPaddingRelative(defaultPaddingStart, defaultPaddingTop, defaultPaddingEnd, defaultPaddingBottom);
-
-        if (supportMessage != null) {
-            if (compactMode) {
-                supportMessage.setVisibility(GONE);
-            } else {
-                CharSequence text = supportMessage.getText();
-                supportMessage.setVisibility(TextUtils.isEmpty(text) ? GONE : VISIBLE);
-            }
-        }
-
-        if (compactCloseButton != null) {
-            compactCloseButton.setVisibility(compactMode ? VISIBLE : GONE);
-        }
-    }
+  }
 }

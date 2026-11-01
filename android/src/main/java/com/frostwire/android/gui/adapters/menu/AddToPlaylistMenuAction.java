@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -19,26 +19,24 @@
 package com.frostwire.android.gui.adapters.menu;
 
 import android.content.Context;
-
 import com.andrew.apollo.model.Playlist;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
-import com.frostwire.android.util.SystemUtils;
 import com.frostwire.android.gui.views.MenuAdapter;
 import com.frostwire.android.gui.views.MenuBuilder;
-
+import com.frostwire.android.util.SystemUtils;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The first action towards adding a song(s) to a playlist.
- * Populates a menu with an action to add the song(s) to a new Playlist
- * and then for each existing playlist it creates further actions for a next step.
- * <p>
- * Created on 12/18/14.
+ * The first action towards adding a song(s) to a playlist. Populates a menu with an action to add
+ * the song(s) to a new Playlist and then for each existing playlist it creates further actions for
+ * a next step.
+ *
+ * <p>Created on 12/18/14.
  *
  * @author gubatron
  * @author aldenml
@@ -46,52 +44,65 @@ import java.util.List;
  */
 public final class AddToPlaylistMenuAction extends MenuAction {
 
-    private long[] fds;
+  private long[] fds;
 
-    public AddToPlaylistMenuAction(Context context, List<FWFileDescriptor> fds) {
-        super(context, R.drawable.contextmenu_icon_playlist_add_dark, R.string.add_to_playlist, UIUtils.getAppIconPrimaryColor(context));
-        setFileIdList(fds);
-    }
+  public AddToPlaylistMenuAction(Context context, List<FWFileDescriptor> fds) {
+    super(
+        context,
+        R.drawable.contextmenu_icon_playlist_add_dark,
+        R.string.add_to_playlist,
+        UIUtils.getAppIconPrimaryColor(context));
+    setFileIdList(fds);
+  }
 
-    public AddToPlaylistMenuAction(Context context, long[] fds) {
-        super(context, R.drawable.contextmenu_icon_playlist_add_dark, R.string.add_to_playlist, UIUtils.getAppIconPrimaryColor(context));
-        this.fds = fds;
-    }
+  public AddToPlaylistMenuAction(Context context, long[] fds) {
+    super(
+        context,
+        R.drawable.contextmenu_icon_playlist_add_dark,
+        R.string.add_to_playlist,
+        UIUtils.getAppIconPrimaryColor(context));
+    this.fds = fds;
+  }
 
-    @Override
-    public void onClick(Context context) {
-        final Context actionContext = context;
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-            List<MenuAction> actions = getMenuActions(actionContext);
-            SystemUtils.postToUIThread(() -> {
-                MenuBuilder menuBuilder = new MenuBuilder(new MenuAdapter(actionContext,
-                        R.string.add_to_playlist,
-                        actions));
+  @Override
+  public void onClick(Context context) {
+    final Context actionContext = context;
+    SystemUtils.postToHandler(
+        SystemUtils.HandlerThreadName.MISC,
+        () -> {
+          List<MenuAction> actions = getMenuActions(actionContext);
+          SystemUtils.postToUIThread(
+              () -> {
+                MenuBuilder menuBuilder =
+                    new MenuBuilder(
+                        new MenuAdapter(actionContext, R.string.add_to_playlist, actions));
                 menuBuilder.show();
-            });
+              });
         });
+  }
+
+  private void setFileIdList(List<FWFileDescriptor> fdList) {
+    fds = new long[fdList.size()];
+    for (int i = 0; i < fdList.size(); i++) {
+      fds[i] = fdList.get(i).id;
+    }
+  }
+
+  private List<MenuAction> getMenuActions(Context context) {
+    List<MenuAction> actions = new ArrayList<>();
+
+    // Create new Playlist
+    actions.add(new CreateNewPlaylistMenuAction(context, fds));
+
+    // Add to Playlist[s] available
+    List<Playlist> playlists = MusicUtils.getPlaylists(context);
+    for (int i = 0; i < playlists.size(); i++) {
+      final Playlist playlist = playlists.get(i);
+      actions.add(
+          new AddToThisPlaylistMenuAction(
+              context, playlist.mPlaylistId, playlist.mPlaylistName, fds));
     }
 
-    private void setFileIdList(List<FWFileDescriptor> fdList) {
-        fds = new long[fdList.size()];
-        for (int i = 0; i < fdList.size(); i++) {
-            fds[i] = fdList.get(i).id;
-        }
-    }
-
-    private List<MenuAction> getMenuActions(Context context) {
-        List<MenuAction> actions = new ArrayList<>();
-
-        // Create new Playlist
-        actions.add(new CreateNewPlaylistMenuAction(context, fds));
-
-        // Add to Playlist[s] available
-        List<Playlist> playlists = MusicUtils.getPlaylists(context);
-        for (int i = 0; i < playlists.size(); i++) {
-            final Playlist playlist = playlists.get(i);
-            actions.add(new AddToThisPlaylistMenuAction(context, playlist.mPlaylistId, playlist.mPlaylistName, fds));
-        }
-
-        return actions;
-    }
+    return actions;
+  }
 }

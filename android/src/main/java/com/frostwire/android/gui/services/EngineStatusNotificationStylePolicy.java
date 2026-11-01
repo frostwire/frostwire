@@ -9,20 +9,19 @@ package com.frostwire.android.gui.services;
 
 public final class EngineStatusNotificationStylePolicy {
 
-    public enum Style {
-        CUSTOM_REMOTE_VIEWS,
-        SIMPLE_NOTIFICATION
-    }
+  public enum Style {
+    CUSTOM_REMOTE_VIEWS,
+    SIMPLE_NOTIFICATION
+  }
 
-    private static final int ANDROID_14_API_LEVEL = 34;
+  private static final int ANDROID_14_API_LEVEL = 34;
 
-    private EngineStatusNotificationStylePolicy() {
-    }
+  private EngineStatusNotificationStylePolicy() {}
 
-    public static Style resolve(int sdkInt) {
-        if (sdkInt >= ANDROID_14_API_LEVEL) {
-            return Style.SIMPLE_NOTIFICATION;
-        }
-        return Style.CUSTOM_REMOTE_VIEWS;
+  public static Style resolve(int sdkInt) {
+    if (sdkInt >= ANDROID_14_API_LEVEL) {
+      return Style.SIMPLE_NOTIFICATION;
     }
+    return Style.CUSTOM_REMOTE_VIEWS;
+  }
 }

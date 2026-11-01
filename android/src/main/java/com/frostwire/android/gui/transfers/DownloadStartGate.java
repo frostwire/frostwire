@@ -10,13 +10,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /** Linearizes cancellation against committing a fetched torrent to the engine. */
 final class DownloadStartGate {
-    private final AtomicInteger state = new AtomicInteger();
+  private final AtomicInteger state = new AtomicInteger();
 
-    boolean tryStart() {
-        return state.compareAndSet(0, 1);
-    }
+  boolean tryStart() {
+    return state.compareAndSet(0, 1);
+  }
 
-    boolean cancel() {
-        return state.compareAndSet(0, 2);
-    }
+  boolean cancel() {
+    return state.compareAndSet(0, 2);
+  }
 }

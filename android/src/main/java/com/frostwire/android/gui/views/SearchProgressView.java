@@ -2,17 +2,17 @@
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *  *            Marcelina Knitter (@marcelinkaaa)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -27,7 +27,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
@@ -38,172 +37,175 @@ import com.frostwire.android.gui.util.UIUtils;
  */
 public class SearchProgressView extends LinearLayout {
 
-    private ProgressBar progressbar;
-    private Button buttonCancel;
-    private TextView textNoResults;
-    private TextView textSearching;
-    private TextView textIceBridge;
-    private TextView textTryOtherKeywordsOrFilters;
-    private TextView textTryFrostWirePlus;
-    private TextView textNoDataConnection;
+  private ProgressBar progressbar;
+  private Button buttonCancel;
+  private TextView textNoResults;
+  private TextView textSearching;
+  private TextView textIceBridge;
+  private TextView textTryOtherKeywordsOrFilters;
+  private TextView textTryFrostWirePlus;
+  private TextView textNoDataConnection;
 
-    private boolean progressEnabled;
-    private CurrentQueryReporter currentQueryReporter;
-    private boolean isDataUp = true;
+  private boolean progressEnabled;
+  private CurrentQueryReporter currentQueryReporter;
+  private boolean isDataUp = true;
 
-    public SearchProgressView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        // Start "off" so the first setProgressEnabled(true) always runs startProgress()
-        // and shows the spinner (previously defaulted true and no-op'd the first call).
-        this.progressEnabled = false;
+  public SearchProgressView(Context context, AttributeSet attrs) {
+    super(context, attrs);
+    // Start "off" so the first setProgressEnabled(true) always runs startProgress()
+    // and shows the spinner (previously defaulted true and no-op'd the first call).
+    this.progressEnabled = false;
+  }
+
+  public void setDataUp(boolean value) {
+    isDataUp = value;
+  }
+
+  public void setProgressEnabled(boolean enabled) {
+    // Always re-apply UI when enabling so a second search after Retry/Cancel
+    // reliably shows the spinner even if the flag was already true.
+    if (enabled) {
+      this.progressEnabled = true;
+      startProgress();
+    } else if (this.progressEnabled) {
+      this.progressEnabled = false;
+      stopProgress();
+    } else {
+      // Already stopped — still refresh no-results labels if inflated.
+      stopProgress();
+    }
+  }
+
+  public void setCancelOnClickListener(OnClickListener l) {
+    buttonCancel.setOnClickListener(l);
+  }
+
+  private void showRetryViews() {
+    if (textTryOtherKeywordsOrFilters != null && isDataUp) {
+      textTryOtherKeywordsOrFilters.setVisibility(View.VISIBLE);
+    }
+    if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && textTryFrostWirePlus != null && isDataUp) {
+      textTryFrostWirePlus.setVisibility(View.VISIBLE);
+    }
+    if (!isDataUp) {
+      textNoDataConnection.setVisibility(VISIBLE);
+    }
+  }
+
+  private void hideRetryViews() {
+    if (textTryOtherKeywordsOrFilters != null) {
+      textTryOtherKeywordsOrFilters.setVisibility(View.GONE);
+    }
+    if (textTryFrostWirePlus != null) {
+      textTryFrostWirePlus.setVisibility(View.GONE);
+    }
+    if (isDataUp && textNoDataConnection != null) {
+      textNoDataConnection.setVisibility(GONE);
+    }
+  }
+
+  @Override
+  protected void onFinishInflate() {
+    super.onFinishInflate();
+
+    View.inflate(getContext(), R.layout.view_search_progress, this);
+
+    if (isInEditMode()) {
+      return;
     }
 
-    public void setDataUp(boolean value) {
-        isDataUp = value;
+    progressbar = findViewById(R.id.view_search_progress_progressbar);
+    buttonCancel = findViewById(R.id.view_search_progress_button_cancel);
+    textNoResults = findViewById(R.id.view_search_progress_text_no_results_feedback);
+    textSearching = findViewById(R.id.view_search_progress_text_searching);
+    textIceBridge = findViewById(R.id.view_search_progress_text_icebridge);
+    textTryOtherKeywordsOrFilters =
+        findViewById(R.id.view_search_progress_try_other_keywords_or_filters);
+    textNoDataConnection = findViewById(R.id.view_search_progress_no_data_connection);
+    textTryFrostWirePlus = findViewById(R.id.view_search_progress_try_frostwire_plus);
+    textTryFrostWirePlus.setPaintFlags(
+        textTryFrostWirePlus.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+
+    if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && textTryFrostWirePlus != null) {
+      initTryFrostWirePlusListener();
+    }
+    // Hidden idle state until a search starts.
+    if (progressbar != null) {
+      progressbar.setVisibility(View.GONE);
+    }
+    if (textSearching != null) {
+      textSearching.setVisibility(View.GONE);
+    }
+    setIceBridgeHint(null);
+  }
+
+  public void setIceBridgeHint(CharSequence hint) {
+    if (textIceBridge == null) {
+      return;
+    }
+    if (hint == null || hint.length() == 0) {
+      textIceBridge.setVisibility(View.GONE);
+    } else {
+      textIceBridge.setText(hint);
+      textIceBridge.setVisibility(View.VISIBLE);
+    }
+  }
+
+  private void initTryFrostWirePlusListener() {
+    textTryFrostWirePlus.setOnClickListener(
+        v -> UIUtils.openURL(getContext(), Constants.FROSTWIRE_MORE_RESULTS));
+  }
+
+  private void startProgress() {
+    if (progressbar == null) {
+      return;
+    }
+    progressbar.setVisibility(View.VISIBLE);
+    buttonCancel.setText(android.R.string.cancel);
+    if (textNoResults != null) {
+      textNoResults.setVisibility(View.GONE);
+    }
+    if (textSearching != null) {
+      textSearching.setVisibility(View.VISIBLE);
+    }
+    hideRetryViews();
+  }
+
+  private void stopProgress() {
+    if (progressbar == null) {
+      return;
+    }
+    progressbar.setVisibility(View.GONE);
+    buttonCancel.setText(R.string.retry);
+    if (textSearching != null) {
+      textSearching.setVisibility(View.GONE);
+    }
+    setIceBridgeHint(null);
+    if (textNoResults != null) {
+      textNoResults.setVisibility(View.VISIBLE);
     }
 
-    public void setProgressEnabled(boolean enabled) {
-        // Always re-apply UI when enabling so a second search after Retry/Cancel
-        // reliably shows the spinner even if the flag was already true.
-        if (enabled) {
-            this.progressEnabled = true;
-            startProgress();
-        } else if (this.progressEnabled) {
-            this.progressEnabled = false;
-            stopProgress();
-        } else {
-            // Already stopped — still refresh no-results labels if inflated.
-            stopProgress();
-        }
+    if (currentQueryReporter != null && currentQueryReporter.getCurrentQuery() != null) {
+      showRetryViews();
+    } else {
+      hideRetryViews();
     }
+  }
 
-    public void setCancelOnClickListener(OnClickListener l) {
-        buttonCancel.setOnClickListener(l);
+  @Override
+  public void setOnTouchListener(OnTouchListener l) {
+    final int childCount = getChildCount();
+    for (int i = 0; i < childCount; i++) {
+      getChildAt(i).setOnTouchListener(l);
     }
+    super.setOnTouchListener(l);
+  }
 
-    private void showRetryViews() {
-        if (textTryOtherKeywordsOrFilters != null && isDataUp) {
-            textTryOtherKeywordsOrFilters.setVisibility(View.VISIBLE);
-        }
-        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && textTryFrostWirePlus != null && isDataUp) {
-            textTryFrostWirePlus.setVisibility(View.VISIBLE);
-        }
-        if (!isDataUp) {
-            textNoDataConnection.setVisibility(VISIBLE);
-        }
-    }
+  public void setCurrentQueryReporter(CurrentQueryReporter currentQueryReporter) {
+    this.currentQueryReporter = currentQueryReporter;
+  }
 
-    private void hideRetryViews() {
-        if (textTryOtherKeywordsOrFilters != null) {
-            textTryOtherKeywordsOrFilters.setVisibility(View.GONE);
-        }
-        if (textTryFrostWirePlus != null) {
-            textTryFrostWirePlus.setVisibility(View.GONE);
-        }
-        if (isDataUp && textNoDataConnection != null) {
-            textNoDataConnection.setVisibility(GONE);
-        }
-    }
-
-    @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
-
-        View.inflate(getContext(), R.layout.view_search_progress, this);
-
-        if (isInEditMode()) {
-            return;
-        }
-
-        progressbar = findViewById(R.id.view_search_progress_progressbar);
-        buttonCancel = findViewById(R.id.view_search_progress_button_cancel);
-        textNoResults = findViewById(R.id.view_search_progress_text_no_results_feedback);
-        textSearching = findViewById(R.id.view_search_progress_text_searching);
-        textIceBridge = findViewById(R.id.view_search_progress_text_icebridge);
-        textTryOtherKeywordsOrFilters = findViewById(R.id.view_search_progress_try_other_keywords_or_filters);
-        textNoDataConnection = findViewById(R.id.view_search_progress_no_data_connection);
-        textTryFrostWirePlus = findViewById(R.id.view_search_progress_try_frostwire_plus);
-        textTryFrostWirePlus.setPaintFlags(textTryFrostWirePlus.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-
-        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && textTryFrostWirePlus != null) {
-            initTryFrostWirePlusListener();
-        }
-        // Hidden idle state until a search starts.
-        if (progressbar != null) {
-            progressbar.setVisibility(View.GONE);
-        }
-        if (textSearching != null) {
-            textSearching.setVisibility(View.GONE);
-        }
-        setIceBridgeHint(null);
-    }
-
-    public void setIceBridgeHint(CharSequence hint) {
-        if (textIceBridge == null) {
-            return;
-        }
-        if (hint == null || hint.length() == 0) {
-            textIceBridge.setVisibility(View.GONE);
-        } else {
-            textIceBridge.setText(hint);
-            textIceBridge.setVisibility(View.VISIBLE);
-        }
-    }
-
-    private void initTryFrostWirePlusListener() {
-        textTryFrostWirePlus.setOnClickListener(v -> UIUtils.openURL(getContext(), Constants.FROSTWIRE_MORE_RESULTS));
-    }
-
-    private void startProgress() {
-        if (progressbar == null) {
-            return;
-        }
-        progressbar.setVisibility(View.VISIBLE);
-        buttonCancel.setText(android.R.string.cancel);
-        if (textNoResults != null) {
-            textNoResults.setVisibility(View.GONE);
-        }
-        if (textSearching != null) {
-            textSearching.setVisibility(View.VISIBLE);
-        }
-        hideRetryViews();
-    }
-
-    private void stopProgress() {
-        if (progressbar == null) {
-            return;
-        }
-        progressbar.setVisibility(View.GONE);
-        buttonCancel.setText(R.string.retry);
-        if (textSearching != null) {
-            textSearching.setVisibility(View.GONE);
-        }
-        setIceBridgeHint(null);
-        if (textNoResults != null) {
-            textNoResults.setVisibility(View.VISIBLE);
-        }
-
-        if (currentQueryReporter != null && currentQueryReporter.getCurrentQuery() != null) {
-            showRetryViews();
-        } else {
-            hideRetryViews();
-        }
-    }
-
-    @Override
-    public void setOnTouchListener(OnTouchListener l) {
-        final int childCount = getChildCount();
-        for (int i = 0; i < childCount; i++) {
-            getChildAt(i).setOnTouchListener(l);
-        }
-        super.setOnTouchListener(l);
-    }
-
-    public void setCurrentQueryReporter(CurrentQueryReporter currentQueryReporter) {
-        this.currentQueryReporter = currentQueryReporter;
-    }
-
-    public interface CurrentQueryReporter {
-        String getCurrentQuery();
-    }
+  public interface CurrentQueryReporter {
+    String getCurrentQuery();
+  }
 }

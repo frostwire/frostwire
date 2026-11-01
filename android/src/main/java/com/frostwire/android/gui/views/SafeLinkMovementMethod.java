@@ -24,26 +24,26 @@ import android.view.MotionEvent;
 import android.widget.TextView;
 
 /**
- * Guards against IndexOutOfBoundsException from ArrowKeyMovementMethod when
- * getOffsetForPosition() returns -1 (touch outside text area or layout not ready).
+ * Guards against IndexOutOfBoundsException from ArrowKeyMovementMethod when getOffsetForPosition()
+ * returns -1 (touch outside text area or layout not ready).
  */
 public class SafeLinkMovementMethod extends LinkMovementMethod {
 
-    private static SafeLinkMovementMethod instance;
+  private static SafeLinkMovementMethod instance;
 
-    public static SafeLinkMovementMethod getInstance() {
-        if (instance == null) {
-            instance = new SafeLinkMovementMethod();
-        }
-        return instance;
+  public static SafeLinkMovementMethod getInstance() {
+    if (instance == null) {
+      instance = new SafeLinkMovementMethod();
     }
+    return instance;
+  }
 
-    @Override
-    public boolean onTouchEvent(TextView widget, Spannable buffer, MotionEvent event) {
-        try {
-            return super.onTouchEvent(widget, buffer, event);
-        } catch (IndexOutOfBoundsException ignored) {
-            return false;
-        }
+  @Override
+  public boolean onTouchEvent(TextView widget, Spannable buffer, MotionEvent event) {
+    try {
+      return super.onTouchEvent(widget, buffer, event);
+    } catch (IndexOutOfBoundsException ignored) {
+      return false;
     }
+  }
 }

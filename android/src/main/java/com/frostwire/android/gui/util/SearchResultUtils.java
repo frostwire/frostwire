@@ -20,30 +20,28 @@ package com.frostwire.android.gui.util;
 
 import com.frostwire.search.SearchResult;
 
-/**
- * Utility methods for working with SearchResult objects.
- */
+/** Utility methods for working with SearchResult objects. */
 public final class SearchResultUtils {
 
-    private SearchResultUtils() {
-        // Utility class, not instantiable
-    }
+  private SearchResultUtils() {
+    // Utility class, not instantiable
+  }
 
-    /**
-     * Checks if a search result is from YouTube (Telluride Preliminary Search Result).
-     * YouTube results have details URLs containing www.youtube.com.
-     * These results need format/quality selection via the Telluride dialog.
-     *
-     * Example URL: https://www.youtube.com/watch?v=videoId
-     *
-     * @param sr The SearchResult to check
-     * @return true if this is a YouTube search result, false otherwise
-     */
-    public static boolean isYouTubeSearchResult(SearchResult sr) {
-        if (sr == null) {
-            return false;
-        }
-        String detailsUrl = sr.getDetailsUrl();
-        return detailsUrl != null && detailsUrl.contains("youtube.com");
+  /**
+   * Checks if a search result is from YouTube (Telluride Preliminary Search Result). YouTube
+   * results have details URLs containing www.youtube.com. These results need format/quality
+   * selection via the Telluride dialog.
+   *
+   * <p>Example URL: https://www.youtube.com/watch?v=videoId
+   *
+   * @param sr The SearchResult to check
+   * @return true if this is a YouTube search result, false otherwise
+   */
+  public static boolean isYouTubeSearchResult(SearchResult sr) {
+    if (sr == null) {
+      return false;
     }
+    String detailsUrl = sr.getDetailsUrl();
+    return detailsUrl != null && detailsUrl.contains("youtube.com");
+  }
 }

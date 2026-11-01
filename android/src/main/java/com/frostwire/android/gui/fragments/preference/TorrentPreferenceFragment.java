@@ -2,17 +2,17 @@
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *  *            Grzesiek Rzaca (grzesiekrzaca)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -20,15 +20,12 @@
 package com.frostwire.android.gui.fragments.preference;
 
 import androidx.fragment.app.DialogFragment;
-
-import androidx.preference.EditTextPreference;
-import androidx.preference.SwitchPreference;
 import androidx.preference.CheckBoxPreference;
+import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
-
+import androidx.preference.SwitchPreference;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
-import com.frostwire.jlibtorrent.SettingsPack;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
@@ -39,202 +36,231 @@ import com.frostwire.android.gui.views.preference.CustomSeekBarPreference.Custom
 import com.frostwire.android.gui.views.preference.PortRangePreference;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.jlibtorrent.SettingsPack;
 
 public final class TorrentPreferenceFragment extends AbstractPreferenceFragment {
 
-    public TorrentPreferenceFragment() {
-        super(R.xml.settings_torrent);
+  public TorrentPreferenceFragment() {
+    super(R.xml.settings_torrent);
+  }
+
+  @Override
+  protected void initComponents() {
+    setupTorrentOptions();
+    setupAdvancedJlibtorrentOptions();
+    setupSeedingOptions();
+  }
+
+  private void setupSeedingOptions() {
+    final CheckBoxPreference preferenceSeeding =
+        findPreference(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS);
+    final CheckBoxPreference preferenceSeedingWifiOnly =
+        findPreference(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
+
+    if (preferenceSeeding != null) {
+      preferenceSeeding.setOnPreferenceChangeListener(
+          (preference, newValue) -> {
+            boolean newVal = (Boolean) newValue;
+            if (!newVal) { // not seeding at all
+              SystemUtils.postToHandler(
+                  SystemUtils.HandlerThreadName.MISC,
+                  () -> TransferManager.instance().suspendSeedingTorrents());
+              UIUtils.showShortMessage(getView(), R.string.seeding_has_been_turned_off);
+            } else {
+              SystemUtils.postToHandler(
+                  SystemUtils.HandlerThreadName.MISC,
+                  () -> TransferManager.instance().resumePolicySuspendedSeeding());
+            }
+            if (preferenceSeedingWifiOnly != null) {
+              preferenceSeedingWifiOnly.setEnabled(newVal);
+            }
+            return true;
+          });
     }
 
-    @Override
-    protected void initComponents() {
-        setupTorrentOptions();
-        setupAdvancedJlibtorrentOptions();
-        setupSeedingOptions();
+    if (preferenceSeedingWifiOnly != null) {
+      preferenceSeedingWifiOnly.setOnPreferenceChangeListener(
+          (preference, newValue) -> {
+            boolean newVal = (Boolean) newValue;
+            if (newVal && !NetworkManager.instance().isDataWIFIUp()) { // not seeding on mobile data
+              SystemUtils.postToHandler(
+                  SystemUtils.HandlerThreadName.MISC,
+                  () -> TransferManager.instance().suspendSeedingTorrents());
+              UIUtils.showShortMessage(getView(), R.string.wifi_seeding_has_been_turned_off);
+            } else {
+              SystemUtils.postToHandler(
+                  SystemUtils.HandlerThreadName.MISC,
+                  () -> TransferManager.instance().resumePolicySuspendedSeeding());
+            }
+            return true;
+          });
     }
 
-    private void setupSeedingOptions() {
-        final CheckBoxPreference preferenceSeeding = findPreference(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS);
-        final CheckBoxPreference preferenceSeedingWifiOnly = findPreference(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
-
-        if (preferenceSeeding != null) {
-            preferenceSeeding.setOnPreferenceChangeListener((preference, newValue) -> {
-                boolean newVal = (Boolean) newValue;
-                if (!newVal) { // not seeding at all
-                    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
-                            () -> TransferManager.instance().suspendSeedingTorrents());
-                    UIUtils.showShortMessage(getView(), R.string.seeding_has_been_turned_off);
-                } else {
-                    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
-                            () -> TransferManager.instance().resumePolicySuspendedSeeding());
-                }
-                if (preferenceSeedingWifiOnly != null) {
-                    preferenceSeedingWifiOnly.setEnabled(newVal);
-                }
-                return true;
-            });
-        }
-
-        if (preferenceSeedingWifiOnly != null) {
-            preferenceSeedingWifiOnly.setOnPreferenceChangeListener((preference, newValue) -> {
-                boolean newVal = (Boolean) newValue;
-                if (newVal && !NetworkManager.instance().isDataWIFIUp()) { // not seeding on mobile data
-                    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
-                            () -> TransferManager.instance().suspendSeedingTorrents());
-                    UIUtils.showShortMessage(getView(), R.string.wifi_seeding_has_been_turned_off);
-                } else {
-                    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
-                            () -> TransferManager.instance().resumePolicySuspendedSeeding());
-                }
-                return true;
-            });
-        }
-
-        if (preferenceSeeding != null && preferenceSeedingWifiOnly != null) {
-            preferenceSeedingWifiOnly.setEnabled(preferenceSeeding.isChecked());
-        }
+    if (preferenceSeeding != null && preferenceSeedingWifiOnly != null) {
+      preferenceSeedingWifiOnly.setEnabled(preferenceSeeding.isChecked());
     }
+  }
 
-    private void setupTorrentOptions() {
-        SwitchPreference prefEnableDHT = findPreference(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
-        if (prefEnableDHT != null) {
-            prefEnableDHT.setOnPreferenceChangeListener((preference, newValue) -> {
-                boolean newStatus = (boolean) newValue;
-                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-                    if (newStatus) {
-                        BTEngine.getInstance().startDht();
-                    } else {
-                        BTEngine.getInstance().stopDht();
-                    }
+  private void setupTorrentOptions() {
+    SwitchPreference prefEnableDHT = findPreference(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
+    if (prefEnableDHT != null) {
+      prefEnableDHT.setOnPreferenceChangeListener(
+          (preference, newValue) -> {
+            boolean newStatus = (boolean) newValue;
+            SystemUtils.postToHandler(
+                SystemUtils.HandlerThreadName.MISC,
+                () -> {
+                  if (newStatus) {
+                    BTEngine.getInstance().startDht();
+                  } else {
+                    BTEngine.getInstance().stopDht();
+                  }
                 });
-                return true;
-            });
-        }
-
-        SwitchPreference prefSequentialTransfers = findPreference(Constants.PREF_KEY_TORRENT_SEQUENTIAL_TRANSFERS_ENABLED);
-        if (prefSequentialTransfers != null) {
-            prefSequentialTransfers.setOnPreferenceChangeListener((preference, newValue) -> {
-                UIBittorrentDownload.SEQUENTIAL_DOWNLOADS = (boolean) newValue;
-                return true;
-            });
-        }
-
-        final BTEngine e = BTEngine.getInstance();
-        setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED, e);
-        setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED, e);
-        setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS, e);
-        setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_UPLOADS, e);
-        setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS, e);
-        setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_PEERS, e);
+            return true;
+          });
     }
 
-    private void setupAdvancedJlibtorrentOptions() {
-        SwitchPreference allowMultipleConnections = findPreference(Constants.PREF_KEY_NETWORK_ALLOW_MULTIPLE_CONNECTIONS_PER_PID);
-        if (allowMultipleConnections != null) {
-            allowMultipleConnections.setOnPreferenceChangeListener((preference, newValue) -> {
-                boolean allow = (boolean) newValue;
-                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-                    SettingsPack settings = new SettingsPack();
-                    settings.allowMultipleConnectionsPerPid(allow);
-                    BTEngine.getInstance().applySettings(settings);
+    SwitchPreference prefSequentialTransfers =
+        findPreference(Constants.PREF_KEY_TORRENT_SEQUENTIAL_TRANSFERS_ENABLED);
+    if (prefSequentialTransfers != null) {
+      prefSequentialTransfers.setOnPreferenceChangeListener(
+          (preference, newValue) -> {
+            UIBittorrentDownload.SEQUENTIAL_DOWNLOADS = (boolean) newValue;
+            return true;
+          });
+    }
+
+    final BTEngine e = BTEngine.getInstance();
+    setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED, e);
+    setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED, e);
+    setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS, e);
+    setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_UPLOADS, e);
+    setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS, e);
+    setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_PEERS, e);
+  }
+
+  private void setupAdvancedJlibtorrentOptions() {
+    SwitchPreference allowMultipleConnections =
+        findPreference(Constants.PREF_KEY_NETWORK_ALLOW_MULTIPLE_CONNECTIONS_PER_PID);
+    if (allowMultipleConnections != null) {
+      allowMultipleConnections.setOnPreferenceChangeListener(
+          (preference, newValue) -> {
+            boolean allow = (boolean) newValue;
+            SystemUtils.postToHandler(
+                SystemUtils.HandlerThreadName.MISC,
+                () -> {
+                  SettingsPack settings = new SettingsPack();
+                  settings.allowMultipleConnectionsPerPid(allow);
+                  BTEngine.getInstance().applySettings(settings);
                 });
-                return true;
-            });
-        }
+            return true;
+          });
+    }
 
-        EditTextPreference natpmpGateway = findPreference(Constants.PREF_KEY_NETWORK_NATPMP_GATEWAY);
-        if (natpmpGateway != null) {
-            natpmpGateway.setOnPreferenceChangeListener((preference, newValue) -> {
-                String gateway = newValue != null ? newValue.toString().trim() : "";
-                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-                    SettingsPack settings = new SettingsPack();
-                    settings.natpmpGateway(gateway);
-                    BTEngine.getInstance().applySettings(settings);
+    EditTextPreference natpmpGateway = findPreference(Constants.PREF_KEY_NETWORK_NATPMP_GATEWAY);
+    if (natpmpGateway != null) {
+      natpmpGateway.setOnPreferenceChangeListener(
+          (preference, newValue) -> {
+            String gateway = newValue != null ? newValue.toString().trim() : "";
+            SystemUtils.postToHandler(
+                SystemUtils.HandlerThreadName.MISC,
+                () -> {
+                  SettingsPack settings = new SettingsPack();
+                  settings.natpmpGateway(gateway);
+                  BTEngine.getInstance().applySettings(settings);
                 });
-                return true;
-            });
-        }
+            return true;
+          });
+    }
 
-        EditTextPreference natpmpLeaseDuration = findPreference(Constants.PREF_KEY_NETWORK_NATPMP_LEASE_DURATION);
-        if (natpmpLeaseDuration != null) {
-            natpmpLeaseDuration.setOnPreferenceChangeListener((preference, newValue) -> {
-                int leaseDuration = parsePositiveInt(newValue);
-                if (leaseDuration <= 0) {
-                    UIUtils.showShortMessage(getView(), R.string.natpmp_lease_duration_invalid);
-                    return false;
-                }
-                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-                    SettingsPack settings = new SettingsPack();
-                    settings.natpmpLeaseDuration(leaseDuration);
-                    BTEngine.getInstance().applySettings(settings);
+    EditTextPreference natpmpLeaseDuration =
+        findPreference(Constants.PREF_KEY_NETWORK_NATPMP_LEASE_DURATION);
+    if (natpmpLeaseDuration != null) {
+      natpmpLeaseDuration.setOnPreferenceChangeListener(
+          (preference, newValue) -> {
+            int leaseDuration = parsePositiveInt(newValue);
+            if (leaseDuration <= 0) {
+              UIUtils.showShortMessage(getView(), R.string.natpmp_lease_duration_invalid);
+              return false;
+            }
+            SystemUtils.postToHandler(
+                SystemUtils.HandlerThreadName.MISC,
+                () -> {
+                  SettingsPack settings = new SettingsPack();
+                  settings.natpmpLeaseDuration(leaseDuration);
+                  BTEngine.getInstance().applySettings(settings);
                 });
-                return true;
-            });
-        }
+            return true;
+          });
     }
+  }
 
-    @Override
-    public void onDisplayPreferenceDialog(Preference preference) {
-        if (preference instanceof CustomSeekBarPreference) {
-            DialogFragment fragment = CustomSeekBarPreferenceDialog.newInstance((CustomSeekBarPreference) preference);
-            showPreferenceDialog(fragment);
-        } else if (preference instanceof PortRangePreference) {
-            DialogFragment fragment = PortRangePreference.PortRangePreferenceDialog.newInstance(preference.getKey());
-            showPreferenceDialog(fragment);
-        } else {
-            super.onDisplayPreferenceDialog(preference);
-        }
+  @Override
+  public void onDisplayPreferenceDialog(Preference preference) {
+    if (preference instanceof CustomSeekBarPreference) {
+      DialogFragment fragment =
+          CustomSeekBarPreferenceDialog.newInstance((CustomSeekBarPreference) preference);
+      showPreferenceDialog(fragment);
+    } else if (preference instanceof PortRangePreference) {
+      DialogFragment fragment =
+          PortRangePreference.PortRangePreferenceDialog.newInstance(preference.getKey());
+      showPreferenceDialog(fragment);
+    } else {
+      super.onDisplayPreferenceDialog(preference);
     }
+  }
 
-    private void setupFWSeekbarPreference(final String key, final BTEngine btEngine) {
-        final CustomSeekBarPreference pickerPreference = findPreference(key);
-        if (pickerPreference != null) {
-            pickerPreference.setOnPreferenceChangeListener((preference, newValue) -> {
-                if (btEngine != null) {
-                    int newVal = (int) newValue;
-                    // BTEngine calls go to libtorrent via JNI — off the main thread.
-                    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
-                            () -> executeBTEngineAction(key, btEngine, newVal));
-                }
-                // Always return true: the preference value is valid (constrained by the
-                // seekbar) and we want the framework to persist it regardless of whether
-                // the async BTEngine call has run yet.
-                return true;
-            });
-        }
+  private void setupFWSeekbarPreference(final String key, final BTEngine btEngine) {
+    final CustomSeekBarPreference pickerPreference = findPreference(key);
+    if (pickerPreference != null) {
+      pickerPreference.setOnPreferenceChangeListener(
+          (preference, newValue) -> {
+            if (btEngine != null) {
+              int newVal = (int) newValue;
+              // BTEngine calls go to libtorrent via JNI — off the main thread.
+              SystemUtils.postToHandler(
+                  SystemUtils.HandlerThreadName.MISC,
+                  () -> executeBTEngineAction(key, btEngine, newVal));
+            }
+            // Always return true: the preference value is valid (constrained by the
+            // seekbar) and we want the framework to persist it regardless of whether
+            // the async BTEngine call has run yet.
+            return true;
+          });
     }
+  }
 
-    private void executeBTEngineAction(final String key, final BTEngine btEngine, final int value) {
-        switch (key) {
-            case Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED:
-                btEngine.downloadRateLimit(value);
-                break;
-            case Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED:
-                btEngine.uploadRateLimit(value);
-                break;
-            case Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS:
-                btEngine.maxActiveDownloads(value);
-                break;
-            case Constants.PREF_KEY_TORRENT_MAX_UPLOADS:
-                btEngine.maxActiveSeeds(value);
-                break;
-            case Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS:
-                btEngine.maxConnections(value);
-                break;
-            case Constants.PREF_KEY_TORRENT_MAX_PEERS:
-                btEngine.maxPeers(value);
-                break;
-        }
+  private void executeBTEngineAction(final String key, final BTEngine btEngine, final int value) {
+    switch (key) {
+      case Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED:
+        btEngine.downloadRateLimit(value);
+        break;
+      case Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED:
+        btEngine.uploadRateLimit(value);
+        break;
+      case Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS:
+        btEngine.maxActiveDownloads(value);
+        break;
+      case Constants.PREF_KEY_TORRENT_MAX_UPLOADS:
+        btEngine.maxActiveSeeds(value);
+        break;
+      case Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS:
+        btEngine.maxConnections(value);
+        break;
+      case Constants.PREF_KEY_TORRENT_MAX_PEERS:
+        btEngine.maxPeers(value);
+        break;
     }
+  }
 
-    private static int parsePositiveInt(Object value) {
-        if (value == null) {
-            return -1;
-        }
-        try {
-            return Integer.parseInt(value.toString());
-        } catch (NumberFormatException ignored) {
-            return -1;
-        }
+  private static int parsePositiveInt(Object value) {
+    if (value == null) {
+      return -1;
     }
+    try {
+      return Integer.parseInt(value.toString());
+    } catch (NumberFormatException ignored) {
+      return -1;
+    }
+  }
 }

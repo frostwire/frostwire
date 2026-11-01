@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -24,16 +24,15 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.CrawlCacheManager;
 import com.frostwire.search.CrawledSearchResult;
+import com.frostwire.search.ISearchPerformer;
 import com.frostwire.search.PerformersHelper;
 import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchManager;
-import com.frostwire.search.ISearchPerformer;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.relay.DistributedSearchPerformer;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.util.StringUtils;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -47,216 +46,222 @@ import java.util.stream.Collectors;
  */
 public final class SearchMediator {
 
-    private final SearchManager manager;
-    private SearchListener searchListener;
+  private final SearchManager manager;
+  private SearchListener searchListener;
 
-    private final HashSet<Integer> opened = new HashSet<>();
-    private long currentSearchToken;
-    private List<String> currentSearchTokens;
-    private boolean searchFinished;
-    private TellurideCourier.SearchPerformer lastTellurideCourier;
-    private volatile DistributedSearchPerformer distributedPerformer;
+  private final HashSet<Integer> opened = new HashSet<>();
+  private long currentSearchToken;
+  private List<String> currentSearchTokens;
+  private boolean searchFinished;
+  private TellurideCourier.SearchPerformer lastTellurideCourier;
+  private volatile DistributedSearchPerformer distributedPerformer;
 
-    private static final class InstanceHolder {
-        private static final SearchMediator instance = new SearchMediator();
-    }
+  private static final class InstanceHolder {
+    private static final SearchMediator instance = new SearchMediator();
+  }
 
-    public static SearchMediator instance() {
-        return InstanceHolder.instance;
-    }
+  public static SearchMediator instance() {
+    return InstanceHolder.instance;
+  }
 
+  private SearchMediator() {
+    this.manager = SearchManager.getInstance();
+    this.manager.setListener(
+        new SearchListener() {
+          @Override
+          public void onResults(long token, List<? extends SearchResult> results) {
+            if (token == currentSearchToken) { // one more additional protection
+              List<SearchResult> filtered = filter(results);
 
-    private SearchMediator() {
-        this.manager = SearchManager.getInstance();
-        this.manager.setListener(new SearchListener() {
-            @Override
-            public void onResults(long token, List<? extends SearchResult> results) {
-                if (token == currentSearchToken) { // one more additional protection
-                    List<SearchResult> filtered = filter(results);
-
-                    if (!filtered.isEmpty()) {
-                        if (searchListener != null) {
-                            searchListener.onResults(token, filtered);
-                            filtered.clear();
-                        }
-                    }
+              if (!filtered.isEmpty()) {
+                if (searchListener != null) {
+                  searchListener.onResults(token, filtered);
+                  filtered.clear();
                 }
+              }
             }
+          }
 
-            @Override
-            public void onStopped(long token) {
-                if (token == currentSearchToken) {
-                    searchFinished = true;
-                    if (searchListener != null) {
-                        searchListener.onStopped(token);
-                    }
-                }
+          @Override
+          public void onStopped(long token) {
+            if (token == currentSearchToken) {
+              searchFinished = true;
+              if (searchListener != null) {
+                searchListener.onStopped(token);
+              }
             }
+          }
 
-            @Override
-            public void onError(long token, SearchError error) {
-
-            }
+          @Override
+          public void onError(long token, SearchError error) {}
         });
-    }
+  }
 
-    public SearchListener getListener() {
-        return searchListener;
-    }
+  public SearchListener getListener() {
+    return searchListener;
+  }
 
-    public void setSearchListener(SearchListener searchListener) {
-        this.searchListener = searchListener;
-    }
+  public void setSearchListener(SearchListener searchListener) {
+    this.searchListener = searchListener;
+  }
 
-    public void performSearch(String query) {
-        SystemUtils.ensureBackgroundThreadOrCrash("LocalSearchEngine::performSearch(query=" + query + ")");
-        if (StringUtils.isNullOrEmpty(query, true)) {
-            return;
+  public void performSearch(String query) {
+    SystemUtils.ensureBackgroundThreadOrCrash(
+        "LocalSearchEngine::performSearch(query=" + query + ")");
+    if (StringUtils.isNullOrEmpty(query, true)) {
+      return;
+    }
+    // Core feature: never skip distributed search because IceBridge died
+    // overnight. Restart the stack before starting engines.
+    Engine.instance().ensureDistributedSearchReady(15_000);
+    manager.stop();
+    currentSearchToken = nextSearchToken();
+    currentSearchTokens = PerformersHelper.tokenizeSearchKeywords(query);
+    searchFinished = false;
+    distributedPerformer = null;
+    ArrayList<SearchEngine> shuffledEngines = new ArrayList<>(SearchEngine.getEngines(true));
+    Collections.shuffle(shuffledEngines);
+    int started = 0;
+    for (SearchEngine se : shuffledEngines) {
+      if (se.isEnabled() && se.isReady()) {
+        ISearchPerformer p = se.getPerformer(currentSearchToken, query);
+        if (p instanceof DistributedSearchPerformer) {
+          distributedPerformer = (DistributedSearchPerformer) p;
         }
-        // Core feature: never skip distributed search because IceBridge died
-        // overnight. Restart the stack before starting engines.
-        Engine.instance().ensureDistributedSearchReady(15_000);
-        manager.stop();
-        currentSearchToken = nextSearchToken();
-        currentSearchTokens = PerformersHelper.tokenizeSearchKeywords(query);
-        searchFinished = false;
-        distributedPerformer = null;
-        ArrayList<SearchEngine> shuffledEngines = new ArrayList<>(SearchEngine.getEngines(true));
-        Collections.shuffle(shuffledEngines);
-        int started = 0;
-        for (SearchEngine se : shuffledEngines) {
-            if (se.isEnabled() && se.isReady()) {
-                ISearchPerformer p = se.getPerformer(currentSearchToken, query);
-                if (p instanceof DistributedSearchPerformer) {
-                    distributedPerformer = (DistributedSearchPerformer) p;
-                }
-                manager.perform(p);
-                started++;
-            }
-        }
-        if (started == 0) {
-            // No engines ran — finish immediately so UI can leave the spinner.
-            searchFinished = true;
-            if (searchListener != null) {
-                searchListener.onStopped(currentSearchToken);
-            }
-        }
+        manager.perform(p);
+        started++;
+      }
+    }
+    if (started == 0) {
+      // No engines ran — finish immediately so UI can leave the spinner.
+      searchFinished = true;
+      if (searchListener != null) {
+        searchListener.onStopped(currentSearchToken);
+      }
+    }
+  }
+
+  public void performTellurideSearch(String pageUrl, SearchResultListAdapter adapter) {
+    SystemUtils.ensureBackgroundThreadOrCrash(
+        "LocalSearchEngine::performTellurideSearch(pageUrl=" + pageUrl + ")");
+    if (StringUtils.isNullOrEmpty(pageUrl, true)) {
+      return;
+    }
+    manager.stop();
+    currentSearchToken = nextSearchToken();
+    currentSearchTokens = new ArrayList<>();
+    currentSearchTokens.add(pageUrl);
+    searchFinished = false;
+    lastTellurideCourier =
+        SearchEngine.TELLURIDE_COURIER.getTelluridePerformer(currentSearchToken, pageUrl, adapter);
+    manager.perform(lastTellurideCourier);
+    manager.perform(SearchEngine.FROSTCLICK.getPerformer(1, pageUrl));
+  }
+
+  public void cancelSearch() {
+    currentSearchToken = 0;
+    currentSearchTokens = null;
+    searchFinished = true;
+    distributedPerformer = null;
+    manager.stop();
+    if (lastTellurideCourier != null) {
+      lastTellurideCourier.stop();
+    }
+  }
+
+  public boolean isSearchStopped() {
+    return currentSearchToken == 0;
+  }
+
+  public boolean isSearchFinished() {
+    return searchFinished;
+  }
+
+  public int distributedPeersContacted() {
+    DistributedSearchPerformer performer = distributedPerformer;
+    return performer == null ? 0 : performer.getPeersContacted();
+  }
+
+  /** Active search token, or 0 when cancelled / never started. */
+  public long getCurrentSearchToken() {
+    return currentSearchToken;
+  }
+
+  /**
+   * Positive token for SearchManager (rejects token &lt; 0). Avoids {@code
+   * Math.abs(Long.MIN_VALUE)} which stays negative.
+   */
+  private static long nextSearchToken() {
+    long t = System.nanoTime();
+    if (t == Long.MIN_VALUE) {
+      t = 1L;
+    }
+    long abs = t >= 0 ? t : -t;
+    return abs == 0 ? 1L : abs;
+  }
+
+  public void clearCache() {
+    CrawlCacheManager.clearCache();
+  }
+
+  public long getCacheSize() {
+    return CrawlCacheManager.getCacheNumEntries();
+  }
+
+  public void markOpened(SearchResult sr, SearchResultListAdapter adapter) {
+    opened.add(getSearchResultUID(sr));
+    if (adapter != null) {
+      adapter.safeNotifyDataSetChanged();
+    }
+  }
+
+  public boolean hasBeenOpened(SearchResult sr) {
+    return sr != null && opened.contains(getSearchResultUID(sr));
+  }
+
+  private List<SearchResult> filter(List<? extends SearchResult> results) {
+    List<SearchResult> list;
+
+    if (currentSearchTokens == null || currentSearchTokens.isEmpty()) {
+      return Collections.emptyList();
     }
 
-    public void performTellurideSearch(String pageUrl, SearchResultListAdapter adapter) {
-        SystemUtils.ensureBackgroundThreadOrCrash("LocalSearchEngine::performTellurideSearch(pageUrl=" + pageUrl + ")");
-        if (StringUtils.isNullOrEmpty(pageUrl, true)) {
-            return;
-        }
-        manager.stop();
-        currentSearchToken = nextSearchToken();
-        currentSearchTokens = new ArrayList<>();
-        currentSearchTokens.add(pageUrl);
-        searchFinished = false;
-        lastTellurideCourier = SearchEngine.TELLURIDE_COURIER.getTelluridePerformer(currentSearchToken, pageUrl, adapter);
-        manager.perform(lastTellurideCourier);
-        manager.perform(SearchEngine.FROSTCLICK.getPerformer(1, pageUrl));
+    try {
+      list =
+          results.stream()
+              .parallel()
+              .filter(
+                  sr -> {
+                    if (sr instanceof CrawledSearchResult
+                        && PerformersHelper.oneKeywordMatchedOrFuzzyMatchedFilter(
+                            new LinkedList<>(currentSearchTokens), sr)) {
+                      return true;
+                    }
+                    return !(sr instanceof CrawledSearchResult);
+                  })
+              .collect(Collectors.toList());
+
+    } catch (Throwable t) {
+      list = new LinkedList<>();
     }
 
+    return list;
+  }
 
-    public void cancelSearch() {
-        currentSearchToken = 0;
-        currentSearchTokens = null;
-        searchFinished = true;
-        distributedPerformer = null;
-        manager.stop();
-        if (lastTellurideCourier != null) {
-            lastTellurideCourier.stop();
-        }
+  private int getSearchResultUID(SearchResult sr) {
+    StringBuilder seed = new StringBuilder();
+    if (sr.getDisplayName() != null) {
+      seed.append(sr.getDisplayName());
     }
-
-    public boolean isSearchStopped() {
-        return currentSearchToken == 0;
+    if (sr.getDetailsUrl() != null) {
+      seed.append(sr.getDetailsUrl());
     }
-
-    public boolean isSearchFinished() {
-        return searchFinished;
+    if (sr.getSource() != null) {
+      seed.append(sr.getSource());
     }
-
-    public int distributedPeersContacted() {
-        DistributedSearchPerformer performer = distributedPerformer;
-        return performer == null ? 0 : performer.getPeersContacted();
+    if (sr instanceof TorrentSearchResult && ((TorrentSearchResult) sr).getHash() != null) {
+      seed.append(((TorrentSearchResult) sr).getHash());
     }
-
-    /** Active search token, or 0 when cancelled / never started. */
-    public long getCurrentSearchToken() {
-        return currentSearchToken;
-    }
-
-    /**
-     * Positive token for SearchManager (rejects token &lt; 0). Avoids
-     * {@code Math.abs(Long.MIN_VALUE)} which stays negative.
-     */
-    private static long nextSearchToken() {
-        long t = System.nanoTime();
-        if (t == Long.MIN_VALUE) {
-            t = 1L;
-        }
-        long abs = t >= 0 ? t : -t;
-        return abs == 0 ? 1L : abs;
-    }
-
-    public void clearCache() {
-        CrawlCacheManager.clearCache();
-    }
-
-    public long getCacheSize() {
-        return CrawlCacheManager.getCacheNumEntries();
-    }
-
-    public void markOpened(SearchResult sr, SearchResultListAdapter adapter) {
-        opened.add(getSearchResultUID(sr));
-        if (adapter != null) {
-            adapter.safeNotifyDataSetChanged();
-        }
-    }
-
-    public boolean hasBeenOpened(SearchResult sr) {
-        return sr != null && opened.contains(getSearchResultUID(sr));
-    }
-
-    private List<SearchResult> filter(List<? extends SearchResult> results) {
-        List<SearchResult> list;
-
-        if (currentSearchTokens == null || currentSearchTokens.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        try {
-            list = results.stream().parallel().filter(sr -> {
-                if (sr instanceof CrawledSearchResult && PerformersHelper.oneKeywordMatchedOrFuzzyMatchedFilter(new LinkedList<>(currentSearchTokens), sr)) {
-                    return true;
-                }
-                return !(sr instanceof CrawledSearchResult);
-            }).collect(Collectors.toList());
-
-
-        } catch (Throwable t) {
-            list = new LinkedList<>();
-        }
-
-        return list;
-    }
-
-    private int getSearchResultUID(SearchResult sr) {
-        StringBuilder seed = new StringBuilder();
-        if (sr.getDisplayName() != null) {
-            seed.append(sr.getDisplayName());
-        }
-        if (sr.getDetailsUrl() != null) {
-            seed.append(sr.getDetailsUrl());
-        }
-        if (sr.getSource() != null) {
-            seed.append(sr.getSource());
-        }
-        if (sr instanceof TorrentSearchResult && ((TorrentSearchResult) sr).getHash() != null) {
-            seed.append(((TorrentSearchResult) sr).getHash());
-        }
-        return StringUtils.quickHash(seed.toString());
-    }
+    return StringUtils.quickHash(seed.toString());
+  }
 }

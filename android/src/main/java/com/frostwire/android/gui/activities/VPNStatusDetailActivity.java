@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -29,9 +29,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.activity.OnBackPressedCallback;
-
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
@@ -43,95 +41,100 @@ import com.frostwire.android.gui.views.AbstractActivity;
  */
 public final class VPNStatusDetailActivity extends AbstractActivity {
 
-    public VPNStatusDetailActivity() {
-        super(R.layout.view_vpn_status_detail);
+  public VPNStatusDetailActivity() {
+    super(R.layout.view_vpn_status_detail);
+  }
+
+  @Override
+  protected void initComponents(Bundle savedInstanceState) {
+    final ImageView headerIcon = findView(R.id.view_vpn_status_header_icon);
+    final TextView headerStatus = findView(R.id.view_vpn_status_header);
+    final TextView vpnText = findView(R.id.view_vpn_status_vpn_text);
+    final TextView vpnBullet = findView(R.id.view_vpn_status_bullet_textview);
+    vpnBullet.setText(fromHtml(R.string.you_dont_need_a_vpn_to_use_frostwire_bullet_html));
+    final TextView learnVPNText = findView(R.id.view_vpn_status_learn_more_textview);
+    final Button piaVPNButton = findView(R.id.view_vpn_status_pia);
+
+    boolean isProtectedConnection = isProtectedConnection();
+    // By default the layout has icon and title set to unprotected.
+    if (isProtectedConnection) {
+      // Current Status Icon
+      headerIcon.setImageResource(R.drawable.vpn_icon_on_info);
+      // Current Status Title, color is set in layout
+      headerStatus.setText(R.string.protected_connection);
+      // Current Status Text
+      vpnText.setText(fromHtml(R.string.protected_connections_visibility_bullet_html));
+      // learnVPNText
+      learnVPNText.setText(R.string.vpn_find_out_more);
+    } else {
+      // Current Status Icon
+      headerIcon.setImageResource(R.drawable.vpn_icon_off_info);
+      // Current Status Title
+      headerStatus.setText(R.string.unprotected_connection);
+      headerStatus.setTextColor(Color.RED);
+      // Current Status Text
+      vpnText.setText(fromHtml(R.string.unprotected_connections_visibility_bullet_html));
+      // learnVPNText
+      learnVPNText.setText(R.string.vpn_find_out_more);
     }
 
-    @Override
-    protected void initComponents(Bundle savedInstanceState) {
-        final ImageView headerIcon = findView(R.id.view_vpn_status_header_icon);
-        final TextView headerStatus = findView(R.id.view_vpn_status_header);
-        final TextView vpnText = findView(R.id.view_vpn_status_vpn_text);
-        final TextView vpnBullet = findView(R.id.view_vpn_status_bullet_textview);
-        vpnBullet.setText(fromHtml(R.string.you_dont_need_a_vpn_to_use_frostwire_bullet_html));
-        final TextView learnVPNText = findView(R.id.view_vpn_status_learn_more_textview);
-        final Button piaVPNButton = findView(R.id.view_vpn_status_pia);
+    learnVPNText.setPaintFlags(learnVPNText.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+    piaVPNButton.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.PIA_VPN_URL));
 
-        boolean isProtectedConnection = isProtectedConnection();
-        // By default the layout has icon and title set to unprotected.
-        if (isProtectedConnection) {
-            // Current Status Icon
-            headerIcon.setImageResource(R.drawable.vpn_icon_on_info);
-            // Current Status Title, color is set in layout
-            headerStatus.setText(R.string.protected_connection);
-            // Current Status Text
-            vpnText.setText(fromHtml(R.string.protected_connections_visibility_bullet_html));
-            // learnVPNText
-            learnVPNText.setText(R.string.vpn_find_out_more);
-        } else {
-            // Current Status Icon
-            headerIcon.setImageResource(R.drawable.vpn_icon_off_info);
-            // Current Status Title
-            headerStatus.setText(R.string.unprotected_connection);
-            headerStatus.setTextColor(Color.RED);
-            // Current Status Text
-            vpnText.setText(fromHtml(R.string.unprotected_connections_visibility_bullet_html));
-            // learnVPNText
-            learnVPNText.setText(R.string.vpn_find_out_more);
-        }
+    headerIcon.setOnClickListener(new LearnVPNLink());
+    headerStatus.setOnClickListener(new LearnVPNLink());
+    learnVPNText.setOnClickListener(new LearnVPNLink());
 
-        learnVPNText.setPaintFlags(learnVPNText.getPaintFlags() |   Paint.UNDERLINE_TEXT_FLAG);
-        piaVPNButton.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.PIA_VPN_URL));
-
-        headerIcon.setOnClickListener(new LearnVPNLink());
-        headerStatus.setOnClickListener(new LearnVPNLink());
-        learnVPNText.setOnClickListener(new LearnVPNLink());
-
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                Intent newIntent = new Intent(VPNStatusDetailActivity.this, MainActivity.class)
+    getOnBackPressedDispatcher()
+        .addCallback(
+            this,
+            new OnBackPressedCallback(true) {
+              @Override
+              public void handleOnBackPressed() {
+                Intent newIntent =
+                    new Intent(VPNStatusDetailActivity.this, MainActivity.class)
                         .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 // if we came from Transfers, have MainActivity show the transfer fragment
                 Intent i = getIntent();
-                if (i != null && i.getExtras() != null &&
-                        i.getExtras().getString("from", "").equals("transfers")) {
-                    newIntent.setAction(Constants.ACTION_SHOW_TRANSFERS);
+                if (i != null
+                    && i.getExtras() != null
+                    && i.getExtras().getString("from", "").equals("transfers")) {
+                  newIntent.setAction(Constants.ACTION_SHOW_TRANSFERS);
                 }
                 startActivity(newIntent);
                 finish();
-            }
-        });
-    }
+              }
+            });
+  }
 
-    private final class LearnVPNLink implements View.OnClickListener {
-        public void onClick(View v) {
-            UIUtils.openURL(v.getContext(), Constants.FROSTWIRE_VPN_URL);
-        }
+  private final class LearnVPNLink implements View.OnClickListener {
+    public void onClick(View v) {
+      UIUtils.openURL(v.getContext(), Constants.FROSTWIRE_VPN_URL);
     }
+  }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                getOnBackPressedDispatcher().onBackPressed();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        getOnBackPressedDispatcher().onBackPressed();
+        return true;
+      default:
+        return super.onOptionsItemSelected(item);
     }
+  }
 
-    private boolean isProtectedConnection() {
-        Intent intent = getIntent();
-        String action = intent != null ? intent.getAction() : null;
-        return action != null && action.equals(Constants.ACTION_SHOW_VPN_STATUS_PROTECTED);
-    }
+  private boolean isProtectedConnection() {
+    Intent intent = getIntent();
+    String action = intent != null ? intent.getAction() : null;
+    return action != null && action.equals(Constants.ACTION_SHOW_VPN_STATUS_PROTECTED);
+  }
 
-    private Spanned fromHtml(int resId) {
-        return fromHtml(getString(resId));
-    }
+  private Spanned fromHtml(int resId) {
+    return fromHtml(getString(resId));
+  }
 
-    private static Spanned fromHtml(String html) {
-        return Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
-    }
+  private static Spanned fromHtml(String html) {
+    return Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
+  }
 }

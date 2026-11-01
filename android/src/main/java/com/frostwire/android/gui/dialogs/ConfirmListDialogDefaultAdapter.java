@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -28,24 +28,21 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import com.frostwire.android.R;
 import com.frostwire.android.gui.dialogs.AbstractConfirmListDialog.SelectionMode;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.android.util.FWImageLoader;
-import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.util.Logger;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Depending on the selection mode of your AbstractConfirmListDialog, you can give it this
- * default adapter implementation to use the out of the box list view items for
- * single selection mode (with radio buttons), multiple selection mode (with checkboxes),
- * or no selection mode which would by default accept all the presented items.
+ * Depending on the selection mode of your AbstractConfirmListDialog, you can give it this default
+ * adapter implementation to use the out of the box list view items for single selection mode (with
+ * radio buttons), multiple selection mode (with checkboxes), or no selection mode which would by
+ * default accept all the presented items.
  *
  * @author gubatron
  * @author aldenml
@@ -53,129 +50,159 @@ import java.util.Map;
  */
 @SuppressWarnings("ConstantConditions")
 public abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAdapter<T> {
-    private static final Logger LOGGER = Logger.getLogger(ConfirmListDialogDefaultAdapter.class);
-    private static final int ITEM_TITLE = 0;
-    private static final int ITEM_SIZE = 1;
-    private static final int ITEM_ART = 2;
+  private static final Logger LOGGER = Logger.getLogger(ConfirmListDialogDefaultAdapter.class);
+  private static final int ITEM_TITLE = 0;
+  private static final int ITEM_SIZE = 1;
+  private static final int ITEM_ART = 2;
 
-    private static final Map<SelectionMode, Integer> selectionModeToLayoutId = new HashMap<>();
-    private static final Map<SelectionMode, SparseIntArray> layoutMapping = new HashMap<>();
-    private final SelectionMode selectionMode;
+  private static final Map<SelectionMode, Integer> selectionModeToLayoutId = new HashMap<>();
+  private static final Map<SelectionMode, SparseIntArray> layoutMapping = new HashMap<>();
+  private final SelectionMode selectionMode;
 
-    static {
-        selectionModeToLayoutId.put(SelectionMode.NO_SELECTION, R.layout.confirmation_dialog_no_selection_list_item);
-        selectionModeToLayoutId.put(SelectionMode.SINGLE_SELECTION, R.layout.confirmation_dialog_single_selection_list_item);
-        selectionModeToLayoutId.put(SelectionMode.MULTIPLE_SELECTION, R.layout.confirmation_dialog_multiple_selection_list_item);
+  static {
+    selectionModeToLayoutId.put(
+        SelectionMode.NO_SELECTION, R.layout.confirmation_dialog_no_selection_list_item);
+    selectionModeToLayoutId.put(
+        SelectionMode.SINGLE_SELECTION, R.layout.confirmation_dialog_single_selection_list_item);
+    selectionModeToLayoutId.put(
+        SelectionMode.MULTIPLE_SELECTION,
+        R.layout.confirmation_dialog_multiple_selection_list_item);
 
-        layoutMapping.put(SelectionMode.NO_SELECTION, new SparseIntArray());
-        layoutMapping.get(SelectionMode.NO_SELECTION).put(ITEM_TITLE, R.id.confirmation_dialog_no_selection_list_item_title);
-        layoutMapping.get(SelectionMode.NO_SELECTION).put(ITEM_SIZE, R.id.confirmation_dialog_no_selection_list_item_size);
-        layoutMapping.get(SelectionMode.NO_SELECTION).put(ITEM_ART, R.id.confirmation_dialog_no_selection_list_item_art);
+    layoutMapping.put(SelectionMode.NO_SELECTION, new SparseIntArray());
+    layoutMapping
+        .get(SelectionMode.NO_SELECTION)
+        .put(ITEM_TITLE, R.id.confirmation_dialog_no_selection_list_item_title);
+    layoutMapping
+        .get(SelectionMode.NO_SELECTION)
+        .put(ITEM_SIZE, R.id.confirmation_dialog_no_selection_list_item_size);
+    layoutMapping
+        .get(SelectionMode.NO_SELECTION)
+        .put(ITEM_ART, R.id.confirmation_dialog_no_selection_list_item_art);
 
-        layoutMapping.put(SelectionMode.SINGLE_SELECTION, new SparseIntArray());
-        layoutMapping.get(SelectionMode.SINGLE_SELECTION).put(ITEM_TITLE, R.id.confirmation_dialog_single_selection_list_item_title);
-        layoutMapping.get(SelectionMode.SINGLE_SELECTION).put(ITEM_SIZE, R.id.confirmation_dialog_single_selection_list_item_size);
-        layoutMapping.get(SelectionMode.SINGLE_SELECTION).put(ITEM_ART, R.id.confirmation_dialog_single_selection_list_item_art);
+    layoutMapping.put(SelectionMode.SINGLE_SELECTION, new SparseIntArray());
+    layoutMapping
+        .get(SelectionMode.SINGLE_SELECTION)
+        .put(ITEM_TITLE, R.id.confirmation_dialog_single_selection_list_item_title);
+    layoutMapping
+        .get(SelectionMode.SINGLE_SELECTION)
+        .put(ITEM_SIZE, R.id.confirmation_dialog_single_selection_list_item_size);
+    layoutMapping
+        .get(SelectionMode.SINGLE_SELECTION)
+        .put(ITEM_ART, R.id.confirmation_dialog_single_selection_list_item_art);
 
-        layoutMapping.put(SelectionMode.MULTIPLE_SELECTION, new SparseIntArray());
-        layoutMapping.get(SelectionMode.MULTIPLE_SELECTION).put(ITEM_TITLE, R.id.confirmation_dialog_multiple_selection_list_item_title);
-        layoutMapping.get(SelectionMode.MULTIPLE_SELECTION).put(ITEM_SIZE, R.id.confirmation_dialog_multiple_selection_list_item_size);
-        layoutMapping.get(SelectionMode.MULTIPLE_SELECTION).put(ITEM_ART, R.id.confirmation_dialog_multiple_selection_list_item_art);
+    layoutMapping.put(SelectionMode.MULTIPLE_SELECTION, new SparseIntArray());
+    layoutMapping
+        .get(SelectionMode.MULTIPLE_SELECTION)
+        .put(ITEM_TITLE, R.id.confirmation_dialog_multiple_selection_list_item_title);
+    layoutMapping
+        .get(SelectionMode.MULTIPLE_SELECTION)
+        .put(ITEM_SIZE, R.id.confirmation_dialog_multiple_selection_list_item_size);
+    layoutMapping
+        .get(SelectionMode.MULTIPLE_SELECTION)
+        .put(ITEM_ART, R.id.confirmation_dialog_multiple_selection_list_item_art);
+  }
+
+  protected ConfirmListDialogDefaultAdapter(
+      Context context, List<T> list, SelectionMode selectionMode) {
+    //noinspection ConstantConditions
+    super(context, selectionModeToLayoutId.get(selectionMode), list);
+    this.selectionMode = selectionMode;
+    setCheckboxesVisibility(selectionMode != SelectionMode.NO_SELECTION);
+  }
+
+  @Override
+  public View getView(int position, View view, ViewGroup parent) {
+    T item = (T) getItem(position);
+    Context ctx = getContext();
+
+    if (view == null && ctx != null) {
+      //noinspection ConstantConditions
+      int layoutId = selectionModeToLayoutId.get(selectionMode);
+      view = View.inflate(ctx, layoutId, null);
     }
 
-    protected ConfirmListDialogDefaultAdapter(Context context, List<T> list, SelectionMode selectionMode) {
-        //noinspection ConstantConditions
-        super(context, selectionModeToLayoutId.get(selectionMode), list);
-        this.selectionMode = selectionMode;
-        setCheckboxesVisibility(selectionMode != SelectionMode.NO_SELECTION);
+    try {
+      initTouchFeedback(view, item);
+      if (selectionMode == SelectionMode.MULTIPLE_SELECTION) {
+        initCheckBox(view, item);
+        setCheckboxesVisibility(true);
+      } else if (selectionMode == SelectionMode.SINGLE_SELECTION) {
+        initRadioButton(view, item, position);
+      }
+      populateView(view, item);
+    } catch (Throwable e) {
+      LOGGER.error("Fatal error getting view: " + e.getMessage(), e);
     }
 
-    @Override
-    public View getView(int position, View view, ViewGroup parent) {
-        T item = (T) getItem(position);
-        Context ctx = getContext();
+    return view;
+  }
 
-        if (view == null && ctx != null) {
-            //noinspection ConstantConditions
-            int layoutId = selectionModeToLayoutId.get(selectionMode);
-            view = View.inflate(ctx, layoutId, null);
-        }
+  public abstract CharSequence getItemTitle(T data);
 
-        try {
-            initTouchFeedback(view, item);
-            if (selectionMode == SelectionMode.MULTIPLE_SELECTION) {
-                initCheckBox(view, item);
-                setCheckboxesVisibility(true);
-            } else if (selectionMode == SelectionMode.SINGLE_SELECTION) {
-                initRadioButton(view, item, position);
-            }
-            populateView(view, item);
-        } catch (Throwable e) {
-            LOGGER.error("Fatal error getting view: " + e.getMessage(), e);
-        }
+  public abstract long getItemSize(T data);
 
-        return view;
+  public abstract CharSequence getItemThumbnailUrl(T data);
+
+  public abstract int getItemThumbnailResourceId(T data);
+
+  @Override
+  @SuppressWarnings("unchecked")
+  protected void populateView(View view, Object data) {
+    T item = (T) data;
+    //noinspection ConstantConditions
+    TextView trackTitle =
+        (TextView) findView(view, layoutMapping.get(selectionMode).get(ITEM_TITLE));
+    trackTitle.setText(getItemTitle(item));
+
+    final double itemSize = getItemSize(item);
+    //noinspection ConstantConditions
+    TextView trackSizeInHuman =
+        (TextView) findView(view, layoutMapping.get(selectionMode).get(ITEM_SIZE));
+    if (itemSize != -1) {
+      trackSizeInHuman.setText(UIUtils.getBytesInHuman(itemSize));
+      trackSizeInHuman.setVisibility(View.VISIBLE);
+    } else {
+      trackSizeInHuman.setVisibility(View.GONE);
+    }
+    //noinspection ConstantConditions
+    ImageView imageView =
+        (ImageView) findView(view, layoutMapping.get(selectionMode).get(ITEM_ART));
+    final CharSequence itemThumbnailUrl = getItemThumbnailUrl(item);
+    if (itemThumbnailUrl != null && itemThumbnailUrl.length() != 0) {
+      FWImageLoader.getInstance(getContext())
+          .load(Uri.parse((String) itemThumbnailUrl), imageView, R.drawable.default_artwork);
     }
 
-    public abstract CharSequence getItemTitle(T data);
-
-    public abstract long getItemSize(T data);
-
-    public abstract CharSequence getItemThumbnailUrl(T data);
-
-    public abstract int getItemThumbnailResourceId(T data);
-
-    @Override
-    @SuppressWarnings("unchecked")
-    protected void populateView(View view, Object data) {
-        T item = (T) data;
-        //noinspection ConstantConditions
-        TextView trackTitle = (TextView) findView(view, layoutMapping.get(selectionMode).get(ITEM_TITLE));
-        trackTitle.setText(getItemTitle(item));
-
-        final double itemSize = getItemSize(item);
-        //noinspection ConstantConditions
-        TextView trackSizeInHuman = (TextView) findView(view, layoutMapping.get(selectionMode).get(ITEM_SIZE));
-        if (itemSize != -1) {
-            trackSizeInHuman.setText(UIUtils.getBytesInHuman(itemSize));
-            trackSizeInHuman.setVisibility(View.VISIBLE);
-        } else {
-            trackSizeInHuman.setVisibility(View.GONE);
-        }
-        //noinspection ConstantConditions
-        ImageView imageView = (ImageView) findView(view, layoutMapping.get(selectionMode).get(ITEM_ART));
-        final CharSequence itemThumbnailUrl = getItemThumbnailUrl(item);
-        if (itemThumbnailUrl != null && itemThumbnailUrl.length() != 0) {
-            FWImageLoader.getInstance(getContext()).load(Uri.parse((String) itemThumbnailUrl), imageView, R.drawable.default_artwork);
-        }
-
-        final int itemThumbnailResourceId = getItemThumbnailResourceId(item);
-        if (itemThumbnailResourceId != -1) {
-            Drawable thumbnail = getContext().getResources().getDrawable(itemThumbnailResourceId, null);
-            if (thumbnail != null) {
-                imageView.setImageDrawable(thumbnail);
-            }
-        }
+    final int itemThumbnailResourceId = getItemThumbnailResourceId(item);
+    if (itemThumbnailResourceId != -1) {
+      Drawable thumbnail = getContext().getResources().getDrawable(itemThumbnailResourceId, null);
+      if (thumbnail != null) {
+        imageView.setImageDrawable(thumbnail);
+      }
     }
+  }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    protected void onItemClicked(View v) {
-        if (selectionMode != SelectionMode.NO_SELECTION) {
-            final T tag = (T) v.getTag();
-            int i = fullList.indexOf(tag);
-            if (i != -1 && v.getParent() instanceof LinearLayout) {
-                final LinearLayout parent = (LinearLayout) v.getParent();
-                if (parent != null) {
-                    CompoundButton compoundButton = (CompoundButton) findView(parent,
-                            selectionMode == SelectionMode.SINGLE_SELECTION ?
-                                    R.id.view_selectable_list_item_radiobutton :
-                                    R.id.view_selectable_list_item_checkbox);
-                    if (compoundButton != null) {
-                        onItemChecked(compoundButton, true);
-                    }
-                }
-            }
+  @Override
+  @SuppressWarnings("unchecked")
+  protected void onItemClicked(View v) {
+    if (selectionMode != SelectionMode.NO_SELECTION) {
+      final T tag = (T) v.getTag();
+      int i = fullList.indexOf(tag);
+      if (i != -1 && v.getParent() instanceof LinearLayout) {
+        final LinearLayout parent = (LinearLayout) v.getParent();
+        if (parent != null) {
+          CompoundButton compoundButton =
+              (CompoundButton)
+                  findView(
+                      parent,
+                      selectionMode == SelectionMode.SINGLE_SELECTION
+                          ? R.id.view_selectable_list_item_radiobutton
+                          : R.id.view_selectable_list_item_checkbox);
+          if (compoundButton != null) {
+            onItemChecked(compoundButton, true);
+          }
         }
+      }
     }
+  }
 }

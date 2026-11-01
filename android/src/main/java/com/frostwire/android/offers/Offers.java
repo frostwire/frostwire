@@ -21,85 +21,82 @@ package com.frostwire.android.offers;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
 
 /**
- * Minimal offer manager used to coordinate the display of in-house support banners.
- * Third-party ad networks have been removed, so the class now acts as a central toggle
- * for enabling/disabling support promotions and for honoring legacy shutdown behaviour.
+ * Minimal offer manager used to coordinate the display of in-house support banners. Third-party ad
+ * networks have been removed, so the class now acts as a central toggle for enabling/disabling
+ * support promotions and for honoring legacy shutdown behaviour.
  */
 public final class Offers {
 
-    private static final Logger LOG = Logger.getLogger(Offers.class);
+  private static final Logger LOG = Logger.getLogger(Offers.class);
 
-    /**
-     * Maintained for backwards compatibility with existing debug tooling.
-     */
-    public static final boolean DEBUG_MODE = false;
-    public static final String PLACEMENT_INTERSTITIAL_MAIN = "interstitial_main";
+  /** Maintained for backwards compatibility with existing debug tooling. */
+  public static final boolean DEBUG_MODE = false;
 
-    private static boolean forcedDisabled = false;
+  public static final String PLACEMENT_INTERSTITIAL_MAIN = "interstitial_main";
 
-    private Offers() {
-    }
+  private static boolean forcedDisabled = false;
 
-    public static void initAdNetworks(Activity activity) {
-        LOG.info("Support offers initialized");
-    }
+  private Offers() {}
 
-    public static void stopAdNetworks(Context context) {
-        LOG.info("Support offers stopped");
-    }
+  public static void initAdNetworks(Activity activity) {
+    LOG.info("Support offers initialized");
+  }
 
-    public static void showInterstitial(Activity activity,
-                                        String placement,
-                                        boolean shutdownAfterward,
-                                        boolean dismissAfterward) {
-        LOG.info("showInterstitial(placement=" + placement + ") invoked with in-house offers disabled");
-        handlePostInterstitialFlow(activity, shutdownAfterward, dismissAfterward, null);
-    }
+  public static void stopAdNetworks(Context context) {
+    LOG.info("Support offers stopped");
+  }
 
-    public static void showInterstitialOfferIfNecessary(Activity activity,
-                                                        String placement,
-                                                        boolean shutdownAfterwards,
-                                                        boolean dismissAfterwards,
-                                                        boolean ignoreStartedTransfers) {
-        showInterstitial(activity, placement, shutdownAfterwards, dismissAfterwards);
-    }
+  public static void showInterstitial(
+      Activity activity, String placement, boolean shutdownAfterward, boolean dismissAfterward) {
+    LOG.info("showInterstitial(placement=" + placement + ") invoked with in-house offers disabled");
+    handlePostInterstitialFlow(activity, shutdownAfterward, dismissAfterward, null);
+  }
 
-    public static boolean disabledAds() {
-        return forcedDisabled;
-    }
+  public static void showInterstitialOfferIfNecessary(
+      Activity activity,
+      String placement,
+      boolean shutdownAfterwards,
+      boolean dismissAfterwards,
+      boolean ignoreStartedTransfers) {
+    showInterstitial(activity, placement, shutdownAfterwards, dismissAfterwards);
+  }
 
-    public static void forceDisabledAds(Context context) {
-        forcedDisabled = true;
-        stopAdNetworks(context);
-    }
+  public static boolean disabledAds() {
+    return forcedDisabled;
+  }
 
-    public static boolean removeAdsOffersEnabled() {
-        return false;
-    }
+  public static void forceDisabledAds(Context context) {
+    forcedDisabled = true;
+    stopAdNetworks(context);
+  }
 
-    private static void handlePostInterstitialFlow(Activity activity,
-                                                   boolean shutdownAfterward,
-                                                   boolean dismissAfterward,
-                                                   Application fallbackContext) {
-        if (activity != null) {
-            if (dismissAfterward) {
-                activity.finish();
-            }
-            if (shutdownAfterward) {
-                if (activity instanceof MainActivity) {
-                    ((MainActivity) activity).shutdown();
-                } else {
-                    UIUtils.sendShutdownIntent(activity);
-                }
-            }
-        } else if (shutdownAfterward && fallbackContext != null) {
-            UIUtils.sendShutdownIntent(fallbackContext);
+  public static boolean removeAdsOffersEnabled() {
+    return false;
+  }
+
+  private static void handlePostInterstitialFlow(
+      Activity activity,
+      boolean shutdownAfterward,
+      boolean dismissAfterward,
+      Application fallbackContext) {
+    if (activity != null) {
+      if (dismissAfterward) {
+        activity.finish();
+      }
+      if (shutdownAfterward) {
+        if (activity instanceof MainActivity) {
+          ((MainActivity) activity).shutdown();
+        } else {
+          UIUtils.sendShutdownIntent(activity);
         }
+      }
+    } else if (shutdownAfterward && fallbackContext != null) {
+      UIUtils.sendShutdownIntent(fallbackContext);
     }
+  }
 }

@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -25,12 +25,10 @@ import androidx.preference.PreferenceGroupAdapter;
 import androidx.preference.PreferenceScreen;
 import androidx.preference.PreferenceViewHolder;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
-
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -38,158 +36,164 @@ import java.util.Map;
 
 /**
  * NOTE: If you want a search engine to not appear on the list for the basic/google play version see
- * SoftwareUpdater.checkUpdateAsyncPost(), there such engines are de-activated when Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !Constants.IS_BASIC_AND_DEBUG
+ * SoftwareUpdater.checkUpdateAsyncPost(), there such engines are de-activated when
+ * Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !Constants.IS_BASIC_AND_DEBUG
  *
- * <p>Select-all ("Deselect All") toggles every engine checkbox below it and
- * never touches Distributed Search. Zero enabled engines is a valid state:
- * a keyword search then finishes immediately with no results.
+ * <p>Select-all ("Deselect All") toggles every engine checkbox below it and never touches
+ * Distributed Search. Zero enabled engines is a valid state: a keyword search then finishes
+ * immediately with no results.
  *
  * @author gubatron
  * @author aldenml
  */
 public final class SearchEnginesPreferenceFragment extends AbstractPreferenceFragment {
 
-    public static final String PREF_KEY_SEARCH_SELECT_ALL = "frostwire.prefs.search.preference_category.select_all";
+  public static final String PREF_KEY_SEARCH_SELECT_ALL =
+      "frostwire.prefs.search.preference_category.select_all";
 
-    private final Map<CheckBoxPreference, SearchEngine> activeSearchEnginePreferences;
-    private final Map<String, CheckBoxPreference> visibleSearchEnginePreferences;
+  private final Map<CheckBoxPreference, SearchEngine> activeSearchEnginePreferences;
+  private final Map<String, CheckBoxPreference> visibleSearchEnginePreferences;
 
-    public SearchEnginesPreferenceFragment() {
-        // See settings_search_engines.xml if you're looking for the layout that has all the checkboxes
-        super(R.xml.settings_search_engines);
-        activeSearchEnginePreferences = new HashMap<>();
-        visibleSearchEnginePreferences = new LinkedHashMap<>();
-    }
+  public SearchEnginesPreferenceFragment() {
+    // See settings_search_engines.xml if you're looking for the layout that has all the checkboxes
+    super(R.xml.settings_search_engines);
+    activeSearchEnginePreferences = new HashMap<>();
+    visibleSearchEnginePreferences = new LinkedHashMap<>();
+  }
 
-    @Override
-    protected void initComponents() {
-        setupSearchEngines();
-    }
+  @Override
+  protected void initComponents() {
+    setupSearchEngines();
+  }
 
-    private void setupSearchEngines() {
-        final CheckBoxPreference selectAllCheckbox = findPreference(PREF_KEY_SEARCH_SELECT_ALL);
+  private void setupSearchEngines() {
+    final CheckBoxPreference selectAllCheckbox = findPreference(PREF_KEY_SEARCH_SELECT_ALL);
 
-        Map<CheckBoxPreference, SearchEngine> inactiveSearchPreferences = new HashMap<>();
-        fillSearchEnginePreferences(activeSearchEnginePreferences, inactiveSearchPreferences);
+    Map<CheckBoxPreference, SearchEngine> inactiveSearchPreferences = new HashMap<>();
+    fillSearchEnginePreferences(activeSearchEnginePreferences, inactiveSearchPreferences);
 
-        // click listener for the search engines. Checks or unchecks the SelectAll checkbox
-        Preference.OnPreferenceClickListener searchEngineClickListener = preference -> {
-            CheckBoxPreference cb = (CheckBoxPreference) preference;
+    // click listener for the search engines. Checks or unchecks the SelectAll checkbox
+    Preference.OnPreferenceClickListener searchEngineClickListener =
+        preference -> {
+          CheckBoxPreference cb = (CheckBoxPreference) preference;
 
-            if (!cb.isChecked()) {
-                setChecked(selectAllCheckbox, false, false);
-                selectAllCheckbox.setTitle(R.string.select_all);
-            } else {
-                updateSelectAllCheckBox();
-            }
-            return true;
+          if (!cb.isChecked()) {
+            setChecked(selectAllCheckbox, false, false);
+            selectAllCheckbox.setTitle(R.string.select_all);
+          } else {
+            updateSelectAllCheckBox();
+          }
+          return true;
         };
 
-        // hide inactive search engines and setup click listeners to interact with Select All.
-        for (CheckBoxPreference preference : inactiveSearchPreferences.keySet()) {
-            getPreferenceScreen().removePreference(preference);
-        }
+    // hide inactive search engines and setup click listeners to interact with Select All.
+    for (CheckBoxPreference preference : inactiveSearchPreferences.keySet()) {
+      getPreferenceScreen().removePreference(preference);
+    }
 
-        collectVisibleSearchEnginePreferences();
+    collectVisibleSearchEnginePreferences();
 
-        for (CheckBoxPreference preference : visibleSearchEnginePreferences.values()) {
-            preference.setOnPreferenceClickListener(searchEngineClickListener);
-        }
+    for (CheckBoxPreference preference : visibleSearchEnginePreferences.values()) {
+      preference.setOnPreferenceClickListener(searchEngineClickListener);
+    }
 
-        selectAllCheckbox.setOnPreferenceClickListener(preference -> {
-            CheckBoxPreference selectAll1 = (CheckBoxPreference) preference;
-            checkAllEngines(selectAll1.isChecked());
-            selectAll1.setTitle(selectAll1.isChecked() ? R.string.deselect_all : R.string.select_all);
-            return true;
+    selectAllCheckbox.setOnPreferenceClickListener(
+        preference -> {
+          CheckBoxPreference selectAll1 = (CheckBoxPreference) preference;
+          checkAllEngines(selectAll1.isChecked());
+          selectAll1.setTitle(selectAll1.isChecked() ? R.string.deselect_all : R.string.select_all);
+          return true;
         });
-        updateSelectAllCheckBox();
+    updateSelectAllCheckBox();
+  }
+
+  private void updateSelectAllCheckBox() {
+    CheckBoxPreference cb = findPreference(PREF_KEY_SEARCH_SELECT_ALL);
+    boolean allChecked = areAllEnginesChecked(true);
+    setChecked(cb, allChecked, false);
+    cb.setTitle(allChecked ? R.string.deselect_all : R.string.select_all);
+  }
+
+  private void fillSearchEnginePreferences(
+      Map<CheckBoxPreference, SearchEngine> active,
+      Map<CheckBoxPreference, SearchEngine> inactive) {
+    // make sure we start empty
+    inactive.clear();
+    active.clear();
+
+    List<SearchEngine> engines = SearchEngine.getEngines(false);
+    for (SearchEngine engine : engines) {
+      CheckBoxPreference preference = findPreference(engine.getPreferenceKey());
+      if (preference != null) { // it could already have been removed due to remote config value.
+        if (engine.isActive()) {
+          active.put(preference, engine);
+        } else {
+          inactive.put(preference, engine);
+        }
+      }
+    }
+  }
+
+  private boolean areAllEnginesChecked(boolean checked) {
+    for (CheckBoxPreference preference : visibleSearchEnginePreferences.values()) {
+      if (checked != preference.isChecked()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private void checkAllEngines(boolean checked) {
+    for (CheckBoxPreference preference : visibleSearchEnginePreferences.values()) {
+      setChecked(preference, checked, false);
+    }
+  }
+
+  private void collectVisibleSearchEnginePreferences() {
+    visibleSearchEnginePreferences.clear();
+    PreferenceScreen preferenceScreen = getPreferenceScreen();
+    if (preferenceScreen == null) {
+      return;
     }
 
-    private void updateSelectAllCheckBox() {
-        CheckBoxPreference cb = findPreference(PREF_KEY_SEARCH_SELECT_ALL);
-        boolean allChecked = areAllEnginesChecked(true);
-        setChecked(cb, allChecked, false);
-        cb.setTitle(allChecked ? R.string.deselect_all : R.string.select_all);
+    for (int i = 0; i < preferenceScreen.getPreferenceCount(); i++) {
+      Preference preference = preferenceScreen.getPreference(i);
+      if (!(preference instanceof CheckBoxPreference)) {
+        continue;
+      }
+      if (PREF_KEY_SEARCH_SELECT_ALL.equals(preference.getKey())
+          || Constants.PREF_KEY_SEARCH_USE_DISTRIBUTED.equals(preference.getKey())) {
+        // Select-all scope is the engine checkboxes below it; Distributed
+        // Search sits above and is never toggled by select-all.
+        continue;
+      }
+      visibleSearchEnginePreferences.put(preference.getKey(), (CheckBoxPreference) preference);
     }
+  }
 
-    private void fillSearchEnginePreferences(Map<CheckBoxPreference, SearchEngine> active, Map<CheckBoxPreference, SearchEngine> inactive) {
-        // make sure we start empty
-        inactive.clear();
-        active.clear();
+  @Override
+  protected RecyclerView.Adapter onCreateAdapter(PreferenceScreen preferenceScreen) {
+    return new CheckedAwarePreferenceGroupAdapter(preferenceScreen);
+  }
 
-        List<SearchEngine> engines = SearchEngine.getEngines(false);
-        for (SearchEngine engine : engines) {
-            CheckBoxPreference preference = findPreference(engine.getPreferenceKey());
-            if (preference != null) { //it could already have been removed due to remote config value.
-                if (engine.isActive()) {
-                    active.put(preference, engine);
-                } else {
-                    inactive.put(preference, engine);
-                }
-            }
-        }
-    }
+  private static class CheckedAwarePreferenceGroupAdapter extends PreferenceGroupAdapter {
+    final int checkedDrawableId;
+    final int unCheckedDrawableId;
 
-    private boolean areAllEnginesChecked(boolean checked) {
-        for (CheckBoxPreference preference : visibleSearchEnginePreferences.values()) {
-            if (checked != preference.isChecked()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private void checkAllEngines(boolean checked) {
-        for (CheckBoxPreference preference : visibleSearchEnginePreferences.values()) {
-            setChecked(preference, checked, false);
-        }
-    }
-
-    private void collectVisibleSearchEnginePreferences() {
-        visibleSearchEnginePreferences.clear();
-        PreferenceScreen preferenceScreen = getPreferenceScreen();
-        if (preferenceScreen == null) {
-            return;
-        }
-
-        for (int i = 0; i < preferenceScreen.getPreferenceCount(); i++) {
-            Preference preference = preferenceScreen.getPreference(i);
-            if (!(preference instanceof CheckBoxPreference)) {
-                continue;
-            }
-            if (PREF_KEY_SEARCH_SELECT_ALL.equals(preference.getKey())
-                    || Constants.PREF_KEY_SEARCH_USE_DISTRIBUTED.equals(preference.getKey())) {
-                // Select-all scope is the engine checkboxes below it; Distributed
-                // Search sits above and is never toggled by select-all.
-                continue;
-            }
-            visibleSearchEnginePreferences.put(preference.getKey(), (CheckBoxPreference) preference);
-        }
+    CheckedAwarePreferenceGroupAdapter(PreferenceGroup preferenceGroup) {
+      super(preferenceGroup);
+      this.checkedDrawableId = R.color.app_selection_background;
+      this.unCheckedDrawableId = R.color.basic_background;
     }
 
     @Override
-    protected RecyclerView.Adapter onCreateAdapter(PreferenceScreen preferenceScreen) {
-        return new CheckedAwarePreferenceGroupAdapter(preferenceScreen);
+    public void onBindViewHolder(PreferenceViewHolder holder, int position) {
+      final CheckBoxPreference preference = (CheckBoxPreference) getItem(position);
+      preference.onBindViewHolder(holder);
+      if (!preference.getKey().equals(PREF_KEY_SEARCH_SELECT_ALL)) {
+        int drawableId = preference.isChecked() ? checkedDrawableId : unCheckedDrawableId;
+        holder.itemView.setBackgroundResource(drawableId);
+      }
     }
-
-    private static class CheckedAwarePreferenceGroupAdapter extends PreferenceGroupAdapter {
-        final int checkedDrawableId;
-        final int unCheckedDrawableId;
-
-        CheckedAwarePreferenceGroupAdapter(PreferenceGroup preferenceGroup) {
-            super(preferenceGroup);
-            this.checkedDrawableId = R.color.app_selection_background;
-            this.unCheckedDrawableId = R.color.basic_background;
-        }
-
-        @Override
-        public void onBindViewHolder(PreferenceViewHolder holder, int position) {
-            final CheckBoxPreference preference = (CheckBoxPreference) getItem(position);
-            preference.onBindViewHolder(holder);
-            if (!preference.getKey().equals(PREF_KEY_SEARCH_SELECT_ALL)) {
-                int drawableId = preference.isChecked() ? checkedDrawableId : unCheckedDrawableId;
-                holder.itemView.setBackgroundResource(drawableId);
-            }
-        }
-    }
+  }
 }

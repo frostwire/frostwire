@@ -2,25 +2,23 @@
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *  *            Marcelina Knitter (@marcelinkaaa)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.frostwire.android.gui.activities.internal;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.view.MenuItem;
@@ -28,11 +26,11 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
-
+import androidx.fragment.app.Fragment;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
@@ -53,220 +51,232 @@ import com.google.android.material.navigation.NavigationView;
  * @author aldenml
  * @author gubatron
  * @author marcelinkaaa
- * <p>
- * Created on 02/23/2017
+ *     <p>Created on 02/23/2017
  */
-
 public final class NavigationMenu {
-    private final static Logger LOG = Logger.getLogger(NavigationMenu.class);
-    private final MainController controller;
-    private final NavigationView navView;
-    private final DrawerLayout drawerLayout;
-    private final ActionBarDrawerToggle drawerToggle;
-    private final AdMenuItemView menuRemoveAdsItem;
-    private int checkedNavViewMenuItemId = -1;
+  private static final Logger LOG = Logger.getLogger(NavigationMenu.class);
+  private final MainController controller;
+  private final NavigationView navView;
+  private final DrawerLayout drawerLayout;
+  private final ActionBarDrawerToggle drawerToggle;
+  private final AdMenuItemView menuRemoveAdsItem;
+  private int checkedNavViewMenuItemId = -1;
 
-    public NavigationMenu(MainController controller, DrawerLayout drawerLayout, Toolbar toolbar) {
-        this.controller = controller;
-        this.drawerLayout = drawerLayout;
-        MainActivity mainActivity = controller.getActivity();
-        drawerToggle = new MenuDrawerToggle(controller, drawerLayout, toolbar);
-        this.drawerLayout.addDrawerListener(drawerToggle);
-        navView = initNavigationView(mainActivity);
-        menuRemoveAdsItem = initAdRemovalMenuItemListener(mainActivity);
-        refreshMenuRemoveAdsItem();
+  public NavigationMenu(MainController controller, DrawerLayout drawerLayout, Toolbar toolbar) {
+    this.controller = controller;
+    this.drawerLayout = drawerLayout;
+    MainActivity mainActivity = controller.getActivity();
+    drawerToggle = new MenuDrawerToggle(controller, drawerLayout, toolbar);
+    this.drawerLayout.addDrawerListener(drawerToggle);
+    navView = initNavigationView(mainActivity);
+    menuRemoveAdsItem = initAdRemovalMenuItemListener(mainActivity);
+    refreshMenuRemoveAdsItem();
+  }
+
+  public boolean isOpen() {
+    SystemUtils.ensureUIThreadOrCrash("NavigationMenu::isOpen");
+    return drawerLayout.isDrawerOpen(navView);
+  }
+
+  public void show() {
+    SystemUtils.ensureUIThreadOrCrash("NavigationMenu::show");
+    drawerLayout.openDrawer(navView);
+  }
+
+  public void hide() {
+    SystemUtils.ensureUIThreadOrCrash("NavigationMenu::hide");
+    drawerLayout.closeDrawer(navView);
+  }
+
+  public void onConfigurationChanged(Configuration newConfig) {
+    SystemUtils.ensureUIThreadOrCrash("NavigationMenu::onConfigurationChanged");
+    drawerToggle.onConfigurationChanged(newConfig);
+  }
+
+  public void syncState() {
+    SystemUtils.ensureUIThreadOrCrash("NavigationMenu::syncState");
+    drawerToggle.syncState();
+  }
+
+  public void updateCheckedItem(int menuItemId) {
+    SystemUtils.ensureUIThreadOrCrash("NavigationMenu::updateCheckedItem");
+    navView.setCheckedItem(menuItemId);
+  }
+
+  private NavigationView initNavigationView(final MainActivity activity) {
+    SystemUtils.ensureUIThreadOrCrash("NavigationMenu::initNavigationView");
+    NavigationView resultNavView = navView;
+    if (navView == null) {
+      resultNavView = activity.findViewById(R.id.activity_main_nav_view);
+      NavigationViewSafety.installInsetListenerGuard(resultNavView);
+      resultNavView.setNavigationItemSelectedListener(
+          menuItem -> {
+            onMenuItemSelected(menuItem);
+            return true;
+          });
+      View navViewHeader = resultNavView.getHeaderView(0);
+      // Logo
+      ImageView navLogo = navViewHeader.findViewById(R.id.nav_view_header_main_app_logo);
+      navLogo.setOnClickListener(
+          v -> UIUtils.openURL(v.getContext(), Constants.FROSTWIRE_GIVE_URL));
+
+      // Prep title and version
+      TextView title = navViewHeader.findViewById(R.id.nav_view_header_main_title);
+      TextView version = navViewHeader.findViewById(R.id.nav_view_header_main_version);
+      String basicOrPlus =
+          (String)
+              activity.getText(
+                  Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? R.string.basic : R.string.plus);
+      boolean isDevelopment = Constants.IS_BASIC_AND_DEBUG;
+      if (isDevelopment) {
+        basicOrPlus = "Developer";
+      }
+      title.setText("FrostWire " + basicOrPlus);
+      version.setText(" v" + Constants.FROSTWIRE_VERSION_STRING);
+      TextView build = navViewHeader.findViewById(R.id.nav_view_header_main_build);
+      build.setText(activity.getText(R.string.build) + " " + BuildConfig.VERSION_CODE);
+      View.OnClickListener aboutActivityLauncher =
+          v -> {
+            Intent intent = new Intent(v.getContext(), AboutActivity.class);
+            v.getContext().startActivity(intent);
+          };
+      title.setOnClickListener(aboutActivityLauncher);
+      version.setOnClickListener(aboutActivityLauncher);
+      build.setOnClickListener(aboutActivityLauncher);
+
+      // Prep update button
+      ImageView updateButton = navViewHeader.findViewById(R.id.nav_view_header_main_update);
+      updateButton.setVisibility(View.GONE);
+      updateButton.setOnClickListener(v -> onUpdateButtonClicked(activity));
+    }
+    return resultNavView;
+  }
+
+  private void onMenuItemSelected(MenuItem menuItem) {
+    SystemUtils.ensureUIThreadOrCrash("NavigationMenu::onMenuItemSelected");
+    if (controller.getActivity() == null) {
+      return;
+    }
+    checkedNavViewMenuItemId = menuItem.getItemId();
+    controller.syncNavigationMenu();
+    menuItem.setChecked(true);
+    controller.setTitle(menuItem.getTitle());
+    int menuActionId = menuItem.getItemId();
+
+    Fragment fragment = controller.getFragmentByNavMenuId(menuItem.getItemId());
+    if (fragment != null) {
+      controller.switchContent(fragment);
+    } else {
+      if (menuActionId == R.id.menu_main_my_music) {
+        controller.launchMyMusic();
+      } else if (menuActionId == R.id.menu_downloads) {
+        controller.openOSFileExplorer();
+      } else if (menuActionId == R.id.menu_main_transfers) {
+        controller.showTransfers(TransfersFragment.TransferStatus.ALL);
+      } else if (menuActionId == R.id.menu_main_support) {
+        UIUtils.openURL(controller.getActivity(), Constants.SUPPORT_URL);
+      } else if (menuActionId == R.id.menu_main_settings) {
+        controller.showPreferences();
+      } else if (menuActionId == R.id.menu_main_shutdown) {
+        controller.showShutdownDialog();
+      }
     }
 
-    public boolean isOpen() {
-        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::isOpen");
-        return drawerLayout.isDrawerOpen(navView);
-    }
+    hide();
+  }
 
-    public void show() {
-        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::show");
-        drawerLayout.openDrawer(navView);
-    }
+  private void onUpdateButtonClicked(MainActivity mainActivity) {
+    SystemUtils.ensureUIThreadOrCrash("NavigationMenu::onUpdateButtonClicked");
+    hide();
+    SoftwareUpdater.getInstance().notifyUserAboutUpdate(mainActivity);
+  }
 
-    public void hide() {
-        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::hide");
-        drawerLayout.closeDrawer(navView);
-    }
+  private AdMenuItemView initAdRemovalMenuItemListener(final AppCompatActivity activity) {
+    SystemUtils.ensureUIThreadOrCrash("NavigationMenu::initAdRemovalMenuItemListener");
+    AdMenuItemView adMenuItemView = activity.findViewById(R.id.slidermenu_ad_menuitem);
+    RelativeLayout menuAd = activity.findViewById(R.id.view_ad_menu_item_ad);
+    SupportOffer offer = SupportOffer.random();
+    adMenuItemView.bind(offer);
+    UIUtils.setupClickUrl(menuAd, offer.getUrl());
+    UIUtils.setupClickUrl(adMenuItemView, offer.getUrl());
+    return adMenuItemView;
+  }
 
-    public void onConfigurationChanged(Configuration newConfig) {
-        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::onConfigurationChanged");
-        drawerToggle.onConfigurationChanged(newConfig);
-    }
+  private void refreshMenuRemoveAdsItem() {
+    SystemUtils.ensureUIThreadOrCrash("NavigationMenu::refreshMenuRemoveAdsItem");
+    // only visible for basic or debug build and if ads have not been disabled.
 
-    public void syncState() {
-        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::syncState");
-        drawerToggle.syncState();
-    }
-
-    public void updateCheckedItem(int menuItemId) {
-        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::updateCheckedItem");
-        navView.setCheckedItem(menuItemId);
-    }
-
-    private NavigationView initNavigationView(final MainActivity activity) {
-        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::initNavigationView");
-        NavigationView resultNavView = navView;
-        if (navView == null) {
-            resultNavView = activity.findViewById(R.id.activity_main_nav_view);
-            NavigationViewSafety.installInsetListenerGuard(resultNavView);
-            resultNavView.setNavigationItemSelectedListener(
-                    menuItem -> {
-                        onMenuItemSelected(menuItem);
-                        return true;
-                    });
-            View navViewHeader = resultNavView.getHeaderView(0);
-            // Logo
-            ImageView navLogo = navViewHeader.findViewById(R.id.nav_view_header_main_app_logo);
-            navLogo.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.FROSTWIRE_GIVE_URL));
-
-            // Prep title and version
-            TextView title = navViewHeader.findViewById(R.id.nav_view_header_main_title);
-            TextView version = navViewHeader.findViewById(R.id.nav_view_header_main_version);
-            String basicOrPlus = (String) activity.getText(Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? R.string.basic : R.string.plus);
-            boolean isDevelopment = Constants.IS_BASIC_AND_DEBUG;
-            if (isDevelopment) {
-                basicOrPlus = "Developer";
+    // visible if ads are not paused
+    int visibility = Offers.disabledAds() ? View.GONE : View.VISIBLE;
+    SystemUtils.postToUIThread(
+        () -> {
+          try {
+            menuRemoveAdsItem.setVisibility(visibility);
+          } catch (Throwable t) {
+            if (BuildConfig.DEBUG) {
+              throw t;
             }
-            title.setText("FrostWire " + basicOrPlus);
-            version.setText(" v" + Constants.FROSTWIRE_VERSION_STRING);
-            TextView build = navViewHeader.findViewById(R.id.nav_view_header_main_build);
-            build.setText(activity.getText(R.string.build) + " " + BuildConfig.VERSION_CODE);
-            View.OnClickListener aboutActivityLauncher = v -> {
-                Intent intent = new Intent(v.getContext(), AboutActivity.class);
-                v.getContext().startActivity(intent);
-            };
-            title.setOnClickListener(aboutActivityLauncher);
-            version.setOnClickListener(aboutActivityLauncher);
-            build.setOnClickListener(aboutActivityLauncher);
-
-            // Prep update button
-            ImageView updateButton = navViewHeader.findViewById(R.id.nav_view_header_main_update);
-            updateButton.setVisibility(View.GONE);
-            updateButton.setOnClickListener(v -> onUpdateButtonClicked(activity));
-        }
-        return resultNavView;
-    }
-
-    private void onMenuItemSelected(MenuItem menuItem) {
-        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::onMenuItemSelected");
-        if (controller.getActivity() == null) {
-            return;
-        }
-        checkedNavViewMenuItemId = menuItem.getItemId();
-        controller.syncNavigationMenu();
-        menuItem.setChecked(true);
-        controller.setTitle(menuItem.getTitle());
-        int menuActionId = menuItem.getItemId();
-
-        Fragment fragment = controller.getFragmentByNavMenuId(menuItem.getItemId());
-        if (fragment != null) {
-            controller.switchContent(fragment);
-        } else {
-            if (menuActionId == R.id.menu_main_my_music) {
-                controller.launchMyMusic();
-            } else if (menuActionId == R.id.menu_downloads) {
-                controller.openOSFileExplorer();
-            } else if (menuActionId == R.id.menu_main_transfers) {
-                controller.showTransfers(TransfersFragment.TransferStatus.ALL);
-            } else if (menuActionId == R.id.menu_main_support) {
-                UIUtils.openURL(controller.getActivity(), Constants.SUPPORT_URL);
-            } else if (menuActionId == R.id.menu_main_settings) {
-                controller.showPreferences();
-            } else if (menuActionId == R.id.menu_main_shutdown) {
-                controller.showShutdownDialog();
-            }
-        }
-
-        hide();
-    }
-
-    private void onUpdateButtonClicked(MainActivity mainActivity) {
-        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::onUpdateButtonClicked");
-        hide();
-        SoftwareUpdater.getInstance().notifyUserAboutUpdate(mainActivity);
-    }
-
-    private AdMenuItemView initAdRemovalMenuItemListener(final AppCompatActivity activity) {
-        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::initAdRemovalMenuItemListener");
-        AdMenuItemView adMenuItemView = activity.findViewById(R.id.slidermenu_ad_menuitem);
-        RelativeLayout menuAd = activity.findViewById(R.id.view_ad_menu_item_ad);
-        SupportOffer offer = SupportOffer.random();
-        adMenuItemView.bind(offer);
-        UIUtils.setupClickUrl(menuAd, offer.getUrl());
-        UIUtils.setupClickUrl(adMenuItemView, offer.getUrl());
-        return adMenuItemView;
-    }
-
-    private void refreshMenuRemoveAdsItem() {
-        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::refreshMenuRemoveAdsItem");
-        // only visible for basic or debug build and if ads have not been disabled.
-
-        // visible if ads are not paused
-        int visibility = Offers.disabledAds() ? View.GONE : View.VISIBLE;
-        SystemUtils.postToUIThread(() -> {
-            try {
-                menuRemoveAdsItem.setVisibility(visibility);
-            } catch (Throwable t) {
-                if (BuildConfig.DEBUG) {
-                    throw t;
-                }
-                LOG.error("NavigationMenu::refreshMenuRemoveAdsItem() error posting menuRemoveAdsItem.setVisibility(...) to main looper: " + t.getMessage(), t);
-            }
+            LOG.error(
+                "NavigationMenu::refreshMenuRemoveAdsItem() error posting menuRemoveAdsItem.setVisibility(...) to main looper: "
+                    + t.getMessage(),
+                t);
+          }
         });
+  }
+
+  public void onUpdateAvailable() {
+    SystemUtils.ensureUIThreadOrCrash("NavigationMenu::onUpdateAvailable");
+    View navViewHeader = navView.getHeaderView(0);
+    ImageView updateButton = navViewHeader.findViewById(R.id.nav_view_header_main_update);
+    updateButton.setVisibility(View.VISIBLE);
+  }
+
+  public MenuItem getCheckedItem() {
+    SystemUtils.ensureUIThreadOrCrash("NavigationMenu::getCheckedItem");
+    return navView
+        .getMenu()
+        .findItem(
+            checkedNavViewMenuItemId != -1 ? checkedNavViewMenuItemId : R.id.menu_main_search);
+  }
+
+  public void onOptionsItemSelected(MenuItem item) {
+    SystemUtils.ensureUIThreadOrCrash("NavigationMenu::onOptionsItemSelected");
+    drawerToggle.onOptionsItemSelected(item);
+  }
+
+  private final class MenuDrawerToggle extends ActionBarDrawerToggle {
+    private final MainController controller;
+
+    MenuDrawerToggle(MainController controller, DrawerLayout drawerLayout, Toolbar toolbar) {
+      super(
+          controller.getActivity(),
+          drawerLayout,
+          toolbar,
+          R.string.drawer_open,
+          R.string.drawer_close);
+      this.controller = controller;
     }
 
-    public void onUpdateAvailable() {
-        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::onUpdateAvailable");
-        View navViewHeader = navView.getHeaderView(0);
-        ImageView updateButton = navViewHeader.findViewById(R.id.nav_view_header_main_update);
-        updateButton.setVisibility(View.VISIBLE);
+    @Override
+    public void onDrawerClosed(View view) {
+      controller.syncNavigationMenu();
     }
 
-    public MenuItem getCheckedItem() {
-        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::getCheckedItem");
-        return navView.getMenu().findItem(
-                checkedNavViewMenuItemId != -1 ?
-                        checkedNavViewMenuItemId :
-                        R.id.menu_main_search);
+    @Override
+    public void onDrawerOpened(View drawerView) {
+      SystemUtils.ensureUIThreadOrCrash("NavigationMenu::MenuDrawerToggle::onDrawerOpened");
+      refreshMenuRemoveAdsItem();
+      if (controller.getActivity() != null) {
+        UIUtils.hideKeyboardFromActivity(controller.getActivity());
+      }
+      controller.syncNavigationMenu();
     }
 
-    public void onOptionsItemSelected(MenuItem item) {
-        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::onOptionsItemSelected");
-        drawerToggle.onOptionsItemSelected(item);
+    @Override
+    public void onDrawerStateChanged(int newState) {
+      SystemUtils.ensureUIThreadOrCrash("NavigationMenu::MenuDrawerToggle::onDrawerStateChanged");
+      refreshMenuRemoveAdsItem();
+      controller.syncNavigationMenu();
     }
-
-    private final class MenuDrawerToggle extends ActionBarDrawerToggle {
-        private final MainController controller;
-
-        MenuDrawerToggle(MainController controller, DrawerLayout drawerLayout, Toolbar toolbar) {
-            super(controller.getActivity(), drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
-            this.controller = controller;
-        }
-
-        @Override
-        public void onDrawerClosed(View view) {
-            controller.syncNavigationMenu();
-        }
-
-        @Override
-        public void onDrawerOpened(View drawerView) {
-            SystemUtils.ensureUIThreadOrCrash("NavigationMenu::MenuDrawerToggle::onDrawerOpened");
-            refreshMenuRemoveAdsItem();
-            if (controller.getActivity() != null) {
-                UIUtils.hideKeyboardFromActivity(controller.getActivity());
-            }
-            controller.syncNavigationMenu();
-        }
-
-        @Override
-        public void onDrawerStateChanged(int newState) {
-            SystemUtils.ensureUIThreadOrCrash("NavigationMenu::MenuDrawerToggle::onDrawerStateChanged");
-            refreshMenuRemoveAdsItem();
-            controller.syncNavigationMenu();
-        }
-    }
+  }
 }

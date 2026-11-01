@@ -8,23 +8,23 @@ package com.frostwire.android.gui.services;
 
 /** Revocation is synchronous; cleanup and startup may finish in any order. */
 final class RelayServiceGeneration {
-    private long generation;
-    private boolean retired;
+  private long generation;
+  private boolean retired;
 
-    synchronized long current() {
-        return generation;
-    }
+  synchronized long current() {
+    return generation;
+  }
 
-    synchronized boolean isCurrent(long token) {
-        return !retired && generation == token;
-    }
+  synchronized boolean isCurrent(long token) {
+    return !retired && generation == token;
+  }
 
-    synchronized void invalidate() {
-        generation++;
-    }
+  synchronized void invalidate() {
+    generation++;
+  }
 
-    synchronized void retire() {
-        retired = true;
-        generation++;
-    }
+  synchronized void retire() {
+    retired = true;
+    generation++;
+  }
 }

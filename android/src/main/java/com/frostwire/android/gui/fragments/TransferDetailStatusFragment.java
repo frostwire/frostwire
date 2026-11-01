@@ -2,106 +2,116 @@
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *  *            Marcelina Knitter (@marcelinkaaa)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.frostwire.android.gui.fragments;
 
+import static com.frostwire.android.gui.util.UIUtils.getBytesInHuman;
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
-
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 import com.frostwire.transfers.TransferState;
-
-import static com.frostwire.android.gui.util.UIUtils.getBytesInHuman;
 
 /**
  * @author gubatron
  * @author aldenml
  * @author marcelinkaaa
  */
-
 public class TransferDetailStatusFragment extends AbstractTransferDetailFragment {
 
-    private TextView completedTextView;
-    private TextView timeLeftTextView;
-    private TextView downloadedTextView;
-    private TextView uploadedTextView;
-    private TextView shareRatioTextView;
-    private TextView peersTextView;
-    private TextView seedsTextView;
-    private TextView activeTimeTextView;
-    private TextView seedingTimeTextView;
+  private TextView completedTextView;
+  private TextView timeLeftTextView;
+  private TextView downloadedTextView;
+  private TextView uploadedTextView;
+  private TextView shareRatioTextView;
+  private TextView peersTextView;
+  private TextView seedsTextView;
+  private TextView activeTimeTextView;
+  private TextView seedingTimeTextView;
 
-    public TransferDetailStatusFragment() {
-        super(R.layout.fragment_transfer_detail_status);
-    }
+  public TransferDetailStatusFragment() {
+    super(R.layout.fragment_transfer_detail_status);
+  }
 
-    @Override
-    protected void initComponents(View v, Bundle savedInstanceState) {
-        super.initComponents(v, savedInstanceState);
-        completedTextView.setText("");
-        timeLeftTextView.setText("");
-        downloadedTextView.setText("");
-        uploadedTextView.setText("");
-        shareRatioTextView.setText("");
-        peersTextView.setText("");
-        seedsTextView.setText("");
-        activeTimeTextView.setText("");
-        seedingTimeTextView.setText("");
-    }
+  @Override
+  protected void initComponents(View v, Bundle savedInstanceState) {
+    super.initComponents(v, savedInstanceState);
+    completedTextView.setText("");
+    timeLeftTextView.setText("");
+    downloadedTextView.setText("");
+    uploadedTextView.setText("");
+    shareRatioTextView.setText("");
+    peersTextView.setText("");
+    seedsTextView.setText("");
+    activeTimeTextView.setText("");
+    seedingTimeTextView.setText("");
+  }
 
-    @Override
-    protected int getTabTitleStringId() {
-        return R.string.status;
-    }
+  @Override
+  protected int getTabTitleStringId() {
+    return R.string.status;
+  }
 
-    @Override
-    public void ensureComponentsReferenced(View rootView) {
-        completedTextView = findView(rootView, R.id.fragment_transfer_detail_status_completion);
-        timeLeftTextView = findView(rootView, R.id.fragment_transfer_detail_status_time_left);
-        downloadedTextView = findView(rootView, R.id.fragment_transfer_detail_status_downloaded);
-        uploadedTextView = findView(rootView, R.id.fragment_transfer_detail_status_uploaded);
-        shareRatioTextView = findView(rootView, R.id.fragment_transfer_detail_status_share_ratio);
-        peersTextView = findView(rootView, R.id.fragment_transfer_detail_status_peers);
-        seedsTextView = findView(rootView, R.id.fragment_transfer_detail_status_seeds);
-        activeTimeTextView = findView(rootView, R.id.fragment_transfer_detail_status_active_time);
-        seedingTimeTextView = findView(rootView, R.id.fragment_transfer_detail_status_seeding_time);
-    }
+  @Override
+  public void ensureComponentsReferenced(View rootView) {
+    completedTextView = findView(rootView, R.id.fragment_transfer_detail_status_completion);
+    timeLeftTextView = findView(rootView, R.id.fragment_transfer_detail_status_time_left);
+    downloadedTextView = findView(rootView, R.id.fragment_transfer_detail_status_downloaded);
+    uploadedTextView = findView(rootView, R.id.fragment_transfer_detail_status_uploaded);
+    shareRatioTextView = findView(rootView, R.id.fragment_transfer_detail_status_share_ratio);
+    peersTextView = findView(rootView, R.id.fragment_transfer_detail_status_peers);
+    seedsTextView = findView(rootView, R.id.fragment_transfer_detail_status_seeds);
+    activeTimeTextView = findView(rootView, R.id.fragment_transfer_detail_status_active_time);
+    seedingTimeTextView = findView(rootView, R.id.fragment_transfer_detail_status_seeding_time);
+  }
 
-    @Override
-    protected void updateComponents() {
-        if (uiBittorrentDownload == null) {
-            return;
-        }
-        completedTextView.setText(uiBittorrentDownload.getProgress() + "%");
-        if (uiBittorrentDownload.getState() == TransferState.DOWNLOADING) {
-            timeLeftTextView.setText(seconds2time(uiBittorrentDownload.getETA()));
-        } else {
-            timeLeftTextView.setText("0");
-        }
-        downloadedTextView.setText(getString(R.string.m_of_n_strings,
-                getBytesInHuman(uiBittorrentDownload.getDl().getTotalBytesReceived()),
-                getBytesInHuman(uiBittorrentDownload.getSize())));
-        uploadedTextView.setText(getBytesInHuman(uiBittorrentDownload.getBytesSent()));
-        shareRatioTextView.setText(getShareRatio(uiBittorrentDownload));
-        peersTextView.setText(getString(R.string.m_of_n_decimals, uiBittorrentDownload.getConnectedPeers(), uiBittorrentDownload.getTotalPeers()));
-        seedsTextView.setText(getString(R.string.m_of_n_decimals, uiBittorrentDownload.getConnectedSeeds(), uiBittorrentDownload.getTotalSeeds()));
-        activeTimeTextView.setText(seconds2time(uiBittorrentDownload.getDl().getActiveDuration()/1000));
-        seedingTimeTextView.setText(seconds2time(uiBittorrentDownload.getDl().getSeedingDuration()/1000));
+  @Override
+  protected void updateComponents() {
+    if (uiBittorrentDownload == null) {
+      return;
     }
+    completedTextView.setText(uiBittorrentDownload.getProgress() + "%");
+    if (uiBittorrentDownload.getState() == TransferState.DOWNLOADING) {
+      timeLeftTextView.setText(seconds2time(uiBittorrentDownload.getETA()));
+    } else {
+      timeLeftTextView.setText("0");
+    }
+    downloadedTextView.setText(
+        getString(
+            R.string.m_of_n_strings,
+            getBytesInHuman(uiBittorrentDownload.getDl().getTotalBytesReceived()),
+            getBytesInHuman(uiBittorrentDownload.getSize())));
+    uploadedTextView.setText(getBytesInHuman(uiBittorrentDownload.getBytesSent()));
+    shareRatioTextView.setText(getShareRatio(uiBittorrentDownload));
+    peersTextView.setText(
+        getString(
+            R.string.m_of_n_decimals,
+            uiBittorrentDownload.getConnectedPeers(),
+            uiBittorrentDownload.getTotalPeers()));
+    seedsTextView.setText(
+        getString(
+            R.string.m_of_n_decimals,
+            uiBittorrentDownload.getConnectedSeeds(),
+            uiBittorrentDownload.getTotalSeeds()));
+    activeTimeTextView.setText(
+        seconds2time(uiBittorrentDownload.getDl().getActiveDuration() / 1000));
+    seedingTimeTextView.setText(
+        seconds2time(uiBittorrentDownload.getDl().getSeedingDuration() / 1000));
+  }
 }

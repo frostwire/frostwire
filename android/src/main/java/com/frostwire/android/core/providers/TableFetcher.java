@@ -1,30 +1,26 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.frostwire.android.core.providers;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-
 import com.frostwire.android.core.FWFileDescriptor;
-
-import java.util.List;
 
 /**
  * @author gubatron
@@ -32,21 +28,21 @@ import java.util.List;
  */
 public interface TableFetcher {
 
-    String[] getColumns();
+  String[] getColumns();
 
-    String getSortByExpression();
+  String getSortByExpression();
 
-    Uri getExternalContentUri();
+  Uri getExternalContentUri();
 
-    void prepareColumnIds(Cursor cur);
+  void prepareColumnIds(Cursor cur);
 
-    FWFileDescriptor fetchFWFileDescriptor(Cursor cur);
+  FWFileDescriptor fetchFWFileDescriptor(Cursor cur);
 
-    byte getFileType();
+  byte getFileType();
 
-    String where();
+  String where();
 
-    String[] whereArgs();
+  String[] whereArgs();
 
-    int getType();
+  int getType();
 }

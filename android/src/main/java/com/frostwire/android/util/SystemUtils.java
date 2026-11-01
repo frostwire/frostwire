@@ -25,14 +25,11 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
-
 import androidx.annotation.NonNull;
-
 import com.frostwire.android.gui.MainApplication;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -43,293 +40,299 @@ import java.util.List;
  */
 public final class SystemUtils {
 
-    private static final Logger LOG = Logger.getLogger(SystemUtils.class);
+  private static final Logger LOG = Logger.getLogger(SystemUtils.class);
 
-    // TIP: https://apilevels.com/
-    private static final int VERSION_SDK_NOUGAT_7_0_N = 24;
-    private static final int VERSION_SDK_ANDROID_10_Q = 29;
-    private static final int VERSION_SDK_ANDROID_11_R = 30;
-    private static final int VERSION_SDK_ANDROID_12_S = 31;
-    private static final int VERSION_SDK_ANDROID_13_TIRAMISU = 33;
+  // TIP: https://apilevels.com/
+  private static final int VERSION_SDK_NOUGAT_7_0_N = 24;
+  private static final int VERSION_SDK_ANDROID_10_Q = 29;
+  private static final int VERSION_SDK_ANDROID_11_R = 30;
+  private static final int VERSION_SDK_ANDROID_12_S = 31;
+  private static final int VERSION_SDK_ANDROID_13_TIRAMISU = 33;
 
-    private SystemUtils() {
+  private SystemUtils() {}
+
+  public static Context getApplicationContext() {
+    Context context;
+    try {
+      context = Engine.instance().getApplication().getApplicationContext();
+      if (context == null) {
+        context = MainApplication.context();
+      }
+    } catch (Throwable ignored) {
+      context = MainApplication.context();
     }
+    return context;
+  }
 
-    public static Context getApplicationContext() {
-        Context context;
+  public static File getCacheDir(Context context, String directory) {
+    return new File(context.getExternalFilesDir(null), "cache" + File.separator + directory);
+  }
+
+  /**
+   * returns true if the media is present and mounted at its mount point with read/write access.
+   *
+   * @see android.os.Environment#MEDIA_MOUNTED
+   */
+  public static boolean isPrimaryExternalStorageMounted() {
+    return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState());
+  }
+
+  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+  public static boolean isPrimaryExternalPath(File path) {
+    String primary = Environment.getExternalStorageDirectory().getAbsolutePath();
+    return path != null && path.getAbsolutePath().startsWith(primary);
+  }
+
+  private static boolean hasSdkOrNewer(int versionCode) {
+    return Build.VERSION.SDK_INT >= versionCode;
+  }
+
+  @SuppressWarnings("SameParameterValue")
+  private static boolean hasSdk(int versionCode) {
+    return Build.VERSION.SDK_INT == versionCode;
+  }
+
+  /**
+   * Used to determine if the device is running Nougat (Android 7.0) or greater.
+   *
+   * @return {@code true} if the device is running KitKat or greater, {@code false} otherwise
+   */
+  public static boolean hasNougatOrNewer() {
+    return hasSdkOrNewer(VERSION_SDK_NOUGAT_7_0_N);
+  }
+
+  /** Used to determine if the device is running Android10 or greater */
+  public static boolean hasAndroid10OrNewer() {
+    return hasSdkOrNewer(VERSION_SDK_ANDROID_10_Q);
+  }
+
+  public static boolean hasAndroid10() {
+    return hasSdk(VERSION_SDK_ANDROID_10_Q);
+  }
+
+  /** Used to determine if the device is running Android11 or greater */
+  public static boolean hasAndroid11OrNewer() {
+    return hasSdkOrNewer(VERSION_SDK_ANDROID_11_R);
+  }
+
+  /**
+   * Used to determine if the device is running Android12 or greater
+   *
+   * @noinspection unused
+   */
+  public static boolean hasAndroid12OrNewer() {
+    return hasSdkOrNewer(VERSION_SDK_ANDROID_12_S);
+  }
+
+  public static boolean hasAndroid13OrNewer() {
+    return hasSdkOrNewer(VERSION_SDK_ANDROID_13_TIRAMISU);
+  }
+
+  /**
+   * We call it "safe" because if any exceptions are thrown, they are caught in order to not crash
+   * the handler thread.
+   */
+  public static void exceptionSafePost(Handler handler, Runnable r) {
+    if (handler != null) {
+      // We are already in the Handler thread, just go!
+      if (Thread.currentThread() == handler.getLooper().getThread()) {
         try {
-            context = Engine.instance().getApplication().getApplicationContext();
-            if (context == null) {
-                context = MainApplication.context();
-            }
-        } catch (Throwable ignored) {
-            context = MainApplication.context();
-        }
-        return context;
-    }
-
-    public static File getCacheDir(Context context, String directory) {
-        return new File(context.getExternalFilesDir(null),
-                "cache" + File.separator + directory);
-    }
-
-    /**
-     * returns true if the media is present
-     * and mounted at its mount point with read/write access.
-     *
-     * @see android.os.Environment#MEDIA_MOUNTED
-     */
-    public static boolean isPrimaryExternalStorageMounted() {
-        return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState());
-    }
-
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public static boolean isPrimaryExternalPath(File path) {
-        String primary = Environment.getExternalStorageDirectory().getAbsolutePath();
-        return path != null && path.getAbsolutePath().startsWith(primary);
-    }
-
-    private static boolean hasSdkOrNewer(int versionCode) {
-        return Build.VERSION.SDK_INT >= versionCode;
-    }
-
-    @SuppressWarnings("SameParameterValue")
-    private static boolean hasSdk(int versionCode) {
-        return Build.VERSION.SDK_INT == versionCode;
-    }
-
-    /**
-     * Used to determine if the device is running
-     * Nougat (Android 7.0) or greater.
-     *
-     * @return {@code true} if the device is running KitKat or greater,
-     * {@code false} otherwise
-     */
-    public static boolean hasNougatOrNewer() {
-        return hasSdkOrNewer(VERSION_SDK_NOUGAT_7_0_N);
-    }
-
-    /**
-     * Used to determine if the device is running Android10 or greater
-     */
-    public static boolean hasAndroid10OrNewer() {
-        return hasSdkOrNewer(VERSION_SDK_ANDROID_10_Q);
-    }
-
-    public static boolean hasAndroid10() {
-        return hasSdk(VERSION_SDK_ANDROID_10_Q);
-    }
-
-    /**
-     * Used to determine if the device is running Android11 or greater
-     */
-    public static boolean hasAndroid11OrNewer() {
-        return hasSdkOrNewer(VERSION_SDK_ANDROID_11_R);
-    }
-
-    /**
-     * Used to determine if the device is running Android12 or greater
-     *
-     * @noinspection unused
-     */
-    public static boolean hasAndroid12OrNewer() {
-        return hasSdkOrNewer(VERSION_SDK_ANDROID_12_S);
-    }
-
-    public static boolean hasAndroid13OrNewer() {
-        return hasSdkOrNewer(VERSION_SDK_ANDROID_13_TIRAMISU);
-    }
-
-    /**
-     * We call it "safe" because if any exceptions are thrown,
-     * they are caught in order to not crash the handler thread.
-     */
-    public static void exceptionSafePost(Handler handler, Runnable r) {
-        if (handler != null) {
-            // We are already in the Handler thread, just go!
-            if (Thread.currentThread() == handler.getLooper().getThread()) {
-                try {
-                    r.run();
-                } catch (Throwable t) {
-                    LOG.error("safePost() " + t.getMessage(), t);
-                }
-            } else {
-                handler.post(() -> exceptionSafePost(handler, r));
-            }
-        }
-    }
-
-    public static void ensureBackgroundThreadOrCrash(String classAndMethodNames) {
-        if (isUIThread()) {
-            throw new RuntimeException("ensureBackgroundThreadOrCrash: " + classAndMethodNames + " should not be on main thread.");
-        }
-    }
-
-    @SuppressWarnings("deprecation")
-    public static void ensureUIThreadOrCrash(String classAndMethodNames) {
-        if (!isUIThread()) {
-            Thread t = Thread.currentThread();
-            //noinspection deprecation — Thread.getId() deprecated in Java 19 but always works on Android
-            throw new RuntimeException("ensureUIThreadOrCrash: " + classAndMethodNames + " should be on main thread. Invoked from tid=" + t.getId() + ":" + t.getName());
-        }
-    }
-
-    public static void postToUIThread(Runnable runnable) {
-        try {
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(runnable);
+          r.run();
         } catch (Throwable t) {
-            LOG.error("UIUtils.postToUIThread error: " + t.getMessage());
+          LOG.error("safePost() " + t.getMessage(), t);
         }
+      } else {
+        handler.post(() -> exceptionSafePost(handler, r));
+      }
     }
+  }
 
-    public static void postToUIThreadDelayed(Runnable runnable, long delayMillis) {
-        try {
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.postDelayed(runnable, delayMillis);
-        } catch (Throwable t) {
-            LOG.error("UIUtils.postToUIThreadDelayed error: " + t.getMessage());
-        }
+  public static void ensureBackgroundThreadOrCrash(String classAndMethodNames) {
+    if (isUIThread()) {
+      throw new RuntimeException(
+          "ensureBackgroundThreadOrCrash: "
+              + classAndMethodNames
+              + " should not be on main thread.");
     }
+  }
 
-    public static void postToUIThreadAtFront(Runnable runnable) {
-        try {
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.postAtFrontOfQueue(runnable);
-        } catch (Throwable t) {
-            LOG.error("UIUtils.postToUIThreadAtFront error: " + t.getMessage());
-        }
+  @SuppressWarnings("deprecation")
+  public static void ensureUIThreadOrCrash(String classAndMethodNames) {
+    if (!isUIThread()) {
+      Thread t = Thread.currentThread();
+      //noinspection deprecation — Thread.getId() deprecated in Java 19 but always works on Android
+      throw new RuntimeException(
+          "ensureUIThreadOrCrash: "
+              + classAndMethodNames
+              + " should be on main thread. Invoked from tid="
+              + t.getId()
+              + ":"
+              + t.getName());
     }
+  }
 
-    public static boolean isUIThread() {
-        return Platforms.get().isUIThread();
+  public static void postToUIThread(Runnable runnable) {
+    try {
+      Handler handler = new Handler(Looper.getMainLooper());
+      handler.post(runnable);
+    } catch (Throwable t) {
+      LOG.error("UIUtils.postToUIThread error: " + t.getMessage());
     }
+  }
 
-    public static boolean isAppInForeground(Context context) {
-        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
-            if (appProcesses == null) {
-                return false;
-            }
-            for (ActivityManager.RunningAppProcessInfo appProcess : activityManager.getRunningAppProcesses()) {
-                if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND &&
-                        appProcess.processName.equals(context.getPackageName())) {
-                    return true;
-                }
-            }
-        }
+  public static void postToUIThreadDelayed(Runnable runnable, long delayMillis) {
+    try {
+      Handler handler = new Handler(Looper.getMainLooper());
+      handler.postDelayed(runnable, delayMillis);
+    } catch (Throwable t) {
+      LOG.error("UIUtils.postToUIThreadDelayed error: " + t.getMessage());
+    }
+  }
+
+  public static void postToUIThreadAtFront(Runnable runnable) {
+    try {
+      Handler handler = new Handler(Looper.getMainLooper());
+      handler.postAtFrontOfQueue(runnable);
+    } catch (Throwable t) {
+      LOG.error("UIUtils.postToUIThreadAtFront error: " + t.getMessage());
+    }
+  }
+
+  public static boolean isUIThread() {
+    return Platforms.get().isUIThread();
+  }
+
+  public static boolean isAppInForeground(Context context) {
+    ActivityManager activityManager =
+        (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      List<ActivityManager.RunningAppProcessInfo> appProcesses =
+          activityManager.getRunningAppProcesses();
+      if (appProcesses == null) {
         return false;
+      }
+      for (ActivityManager.RunningAppProcessInfo appProcess :
+          activityManager.getRunningAppProcesses()) {
+        if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
+            && appProcess.processName.equals(context.getPackageName())) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * HandlerThreadName enum for background task execution strategies.
+   *
+   * <p>HISTORY: In early 2020s refactor, many `new Thread()` calls were replaced with
+   * `postToHandler(MISC, ...)` for code uniformity. However, this introduced UI lag because
+   * interactive user actions (play button, open file) were queued behind slow background tasks on
+   * the MISC pool.
+   *
+   * <p>Thread pools (SEARCH_PERFORMER, DOWNLOADER, CONFIG_MANAGER, MISC): - Tasks are QUEUED and
+   * executed sequentially per pool (single-threaded) - Good for background work where order matters
+   * or high concurrency isn't critical - Can introduce 3-5+ second delays if pool is backed up with
+   * slow tasks - Use for: search indexing, configuration saves, cleanup tasks, non-urgent I/O
+   *
+   * <p>HIGH_PRIORITY: - Spawns a DEDICATED thread per task (not queued, immediate execution) - Use
+   * ONLY for interactive user-facing actions that need instant response (<100ms) - Examples:
+   * playing media on tap, opening files, responding to user button clicks - Never use for bulk
+   * operations, loops, or anything that can be delayed - Trade-off: More threads = more memory, but
+   * acceptable for infrequent user actions
+   *
+   * <p>CRITICAL: Do not refactor HIGH_PRIORITY back to queued execution - it will reintroduce the
+   * 3-5 second UI lag that users perceive as ANR or "app is frozen".
+   */
+  public enum HandlerThreadName {
+    SEARCH_PERFORMER,
+    DOWNLOADER,
+    CONFIG_MANAGER,
+    MISC,
+    /** User-facing interactive actions - spawns dedicated thread, never queued */
+    HIGH_PRIORITY
+  }
+
+  public static void postToHandler(final HandlerThreadName threadName, final Runnable r) {
+    if (threadName == HandlerThreadName.HIGH_PRIORITY) {
+      // HIGH_PRIORITY spawns dedicated thread instead of using queue
+      // This ensures interactive user actions (play, open file) get immediate execution
+      // and don't wait behind slow tasks in MISC/other pools
+      new Thread(r, "HIGH_PRIORITY-" + System.currentTimeMillis()).start();
+    } else {
+      HandlerFactory.postTo(threadName, r);
+    }
+  }
+
+  @SuppressWarnings("unused")
+  public static void postToHandlerDelayed(
+      final HandlerThreadName threadName, final Runnable r, long delayMillis) {
+    HandlerFactory.postDelayedTo(threadName, r, delayMillis);
+  }
+
+  public static void stopAllHandlerThreads() {
+    HandlerFactory.stopAll();
+  }
+
+  private static class HandlerFactory {
+    private static final HashMap<String, Handler> handlers = new HashMap<>();
+
+    public static void postTo(final HandlerThreadName threadName, final Runnable r) {
+      try {
+        // post returns false when the looper has quit: the task would be dropped.
+        Handler handler = get(threadName.name());
+        if (!handler.post(r)) {
+          replace(threadName.name(), handler).post(r);
+        }
+      } catch (Throwable t) {
+        LOG.error(t.getMessage(), t);
+      }
+    }
+
+    public static void postDelayedTo(
+        final HandlerThreadName threadName, final Runnable r, long delayMillis) {
+      try {
+        Handler handler = get(threadName.name());
+        if (!handler.postDelayed(r, delayMillis)) {
+          replace(threadName.name(), handler).postDelayed(r, delayMillis);
+        }
+      } catch (Throwable t) {
+        LOG.error(t.getMessage(), t);
+      }
+    }
+
+    private static synchronized Handler get(@NonNull final String threadName) {
+      Handler handler = handlers.get(threadName);
+      if (handler == null) {
+        HandlerThread handlerThread =
+            new HandlerThread("SystemUtils::HandlerThread - " + threadName);
+        handlerThread.start();
+        handler = new Handler(handlerThread.getLooper());
+        handlers.put(threadName, handler);
+      }
+      return handler;
     }
 
     /**
-     * HandlerThreadName enum for background task execution strategies.
-     * 
-     * HISTORY: In early 2020s refactor, many `new Thread()` calls were replaced with
-     * `postToHandler(MISC, ...)` for code uniformity. However, this introduced UI lag
-     * because interactive user actions (play button, open file) were queued behind
-     * slow background tasks on the MISC pool.
-     * 
-     * Thread pools (SEARCH_PERFORMER, DOWNLOADER, CONFIG_MANAGER, MISC):
-     * - Tasks are QUEUED and executed sequentially per pool (single-threaded)
-     * - Good for background work where order matters or high concurrency isn't critical
-     * - Can introduce 3-5+ second delays if pool is backed up with slow tasks
-     * - Use for: search indexing, configuration saves, cleanup tasks, non-urgent I/O
-     * 
-     * HIGH_PRIORITY:
-     * - Spawns a DEDICATED thread per task (not queued, immediate execution)
-     * - Use ONLY for interactive user-facing actions that need instant response (<100ms)
-     * - Examples: playing media on tap, opening files, responding to user button clicks
-     * - Never use for bulk operations, loops, or anything that can be delayed
-     * - Trade-off: More threads = more memory, but acceptable for infrequent user actions
-     * 
-     * CRITICAL: Do not refactor HIGH_PRIORITY back to queued execution - it will reintroduce
-     * the 3-5 second UI lag that users perceive as ANR or "app is frozen".
+     * Replaces {@code dead}, a Handler whose looper has quit, with one on a new thread, unless
+     * another caller already replaced it.
      */
-    public enum HandlerThreadName {
-        SEARCH_PERFORMER,
-        DOWNLOADER,
-        CONFIG_MANAGER,
-        MISC,
-        /** User-facing interactive actions - spawns dedicated thread, never queued */
-        HIGH_PRIORITY
+    private static synchronized Handler replace(@NonNull final String threadName, Handler dead) {
+      if (handlers.get(threadName) == dead) {
+        handlers.remove(threadName);
+      }
+      return get(threadName);
     }
 
-    public static void postToHandler(final HandlerThreadName threadName, final Runnable r) {
-        if (threadName == HandlerThreadName.HIGH_PRIORITY) {
-            // HIGH_PRIORITY spawns dedicated thread instead of using queue
-            // This ensures interactive user actions (play, open file) get immediate execution
-            // and don't wait behind slow tasks in MISC/other pools
-            new Thread(r, "HIGH_PRIORITY-" + System.currentTimeMillis()).start();
-        } else {
-            HandlerFactory.postTo(threadName, r);
-        }
+    public static synchronized void stopAll() {
+      try {
+        handlers
+            .values()
+            .forEach(handler -> ((HandlerThread) handler.getLooper().getThread()).quitSafely());
+        handlers.clear();
+      } catch (Throwable t) {
+        LOG.error("HandlerFactory.stopAll() error " + t.getMessage(), t);
+      }
     }
-
-    @SuppressWarnings("unused")
-    public static void postToHandlerDelayed(final HandlerThreadName threadName, final Runnable r, long delayMillis) {
-        HandlerFactory.postDelayedTo(threadName, r, delayMillis);
-    }
-
-    public static void stopAllHandlerThreads() {
-        HandlerFactory.stopAll();
-    }
-
-    private static class HandlerFactory {
-        private static final HashMap<String, Handler> handlers = new HashMap<>();
-
-        public static void postTo(final HandlerThreadName threadName, final Runnable r) {
-            try {
-                // post returns false when the looper has quit: the task would be dropped.
-                Handler handler = get(threadName.name());
-                if (!handler.post(r)) {
-                    replace(threadName.name(), handler).post(r);
-                }
-            } catch (Throwable t) {
-                LOG.error(t.getMessage(), t);
-            }
-        }
-
-        public static void postDelayedTo(final HandlerThreadName threadName, final Runnable r, long delayMillis) {
-            try {
-                Handler handler = get(threadName.name());
-                if (!handler.postDelayed(r, delayMillis)) {
-                    replace(threadName.name(), handler).postDelayed(r, delayMillis);
-                }
-            } catch (Throwable t) {
-                LOG.error(t.getMessage(), t);
-            }
-        }
-
-        private static synchronized Handler get(@NonNull final String threadName) {
-            Handler handler = handlers.get(threadName);
-            if (handler == null) {
-                HandlerThread handlerThread = new HandlerThread("SystemUtils::HandlerThread - " + threadName);
-                handlerThread.start();
-                handler = new Handler(handlerThread.getLooper());
-                handlers.put(threadName, handler);
-            }
-            return handler;
-        }
-
-        /**
-         * Replaces {@code dead}, a Handler whose looper has quit, with one on a new thread, unless
-         * another caller already replaced it.
-         */
-        private static synchronized Handler replace(@NonNull final String threadName, Handler dead) {
-            if (handlers.get(threadName) == dead) {
-                handlers.remove(threadName);
-            }
-            return get(threadName);
-        }
-
-        public static synchronized void stopAll() {
-            try {
-                handlers.values().forEach(handler -> ((HandlerThread) handler.getLooper().getThread()).quitSafely());
-                handlers.clear();
-            } catch (Throwable t) {
-                LOG.error("HandlerFactory.stopAll() error " + t.getMessage(), t);
-            }
-        }
-    }
+  }
 }
