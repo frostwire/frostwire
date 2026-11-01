@@ -129,7 +129,7 @@ public final class Bip39Mnemonic {
                 int bytePos = bitPos / 8;
                 int bitInByte = 7 - (bitPos % 8);
                 int bit = (value >> (10 - j)) & 1;
-                combined[bytePos] |= (bit << bitInByte);
+                combined[bytePos] |= (byte) (bit << bitInByte);
             }
         }
 
