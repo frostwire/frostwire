@@ -246,6 +246,21 @@ public final class RecentStore extends SQLiteOpenHelper {
         TABLE_NAME, BaseColumns._ID + " = ?", new String[] {String.valueOf(albumId)});
   }
 
+  /** Removes {@code ids} in one statement. */
+  public void removeItems(final java.util.Collection<Long> ids) {
+    if (ids.isEmpty()) {
+      return;
+    }
+    StringBuilder in = new StringBuilder();
+    for (Long id : ids) {
+      if (in.length() > 0) {
+        in.append(',');
+      }
+      in.append(id.longValue());
+    }
+    writableDatabase.delete(TABLE_NAME, BaseColumns._ID + " IN (" + in + ")", null);
+  }
+
   public interface RecentStoreColumns {
     /* Time played column */
     String LAST_TIME_PLAYED = "lasttimeplayed";

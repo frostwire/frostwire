@@ -134,7 +134,7 @@ public class RecentLoader extends SongLoader {
       }
       selection.append(")");
 
-      Set<Long> validIds = new HashSet<>();
+      Set<Long> validIds = null;
       Cursor mediaCursor = null;
       try {
         mediaCursor =
@@ -142,17 +142,14 @@ public class RecentLoader extends SongLoader {
                 .getContentResolver()
                 .query(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    new String[] {BaseColumns._ID, AudioColumns.DURATION},
+                    new String[] {BaseColumns._ID},
                     selection.toString(),
                     null,
                     null);
         if (mediaCursor != null) {
+          validIds = new HashSet<>();
           while (mediaCursor.moveToNext()) {
-            long id = mediaCursor.getLong(0);
-            long duration = mediaCursor.isNull(1) ? 0 : mediaCursor.getLong(1);
-            if (duration > 0) {
-              validIds.add(id);
-            }
+            validIds.add(mediaCursor.getLong(0));
           }
         }
       } catch (Throwable t) {
@@ -163,16 +160,13 @@ public class RecentLoader extends SongLoader {
         }
       }
 
-      int removed = 0;
-      for (Long id : recentIds) {
-        if (!validIds.contains(id)) {
-          recentStore.removeItem(id);
-          removed++;
-        }
-      }
-      if (removed > 0) {
+      List<Long> orphans = orphans(recentIds, validIds);
+      if (!orphans.isEmpty()) {
+        recentStore.removeItems(orphans);
         LOG.info(
-            "removeOrphanedEntries: removed " + removed + " orphaned entries from RecentStore");
+            "removeOrphanedEntries: removed "
+                + orphans.size()
+                + " orphaned entries from RecentStore");
       }
     } catch (Throwable t) {
       LOG.error("removeOrphanedEntries: failed", t);
@@ -181,5 +175,24 @@ public class RecentLoader extends SongLoader {
         cursor.close();
       }
     }
+  }
+
+  /**
+   * The Recent entries to remove: those MediaStore no longer has. {@code inMediaStore} is null when
+   * the MediaStore query failed or returned no cursor (provider not ready, permission revoked);
+   * then nothing is removed. A song MediaStore has but hasn't read a duration for yet (a fresh
+   * download) stays. Both used to wipe entries that were fine (GitHub #1443).
+   */
+  static List<Long> orphans(List<Long> recentIds, Set<Long> inMediaStore) {
+    List<Long> orphans = new ArrayList<>();
+    if (inMediaStore == null) {
+      return orphans;
+    }
+    for (Long id : recentIds) {
+      if (!inMediaStore.contains(id)) {
+        orphans.add(id);
+      }
+    }
+    return orphans;
   }
 }
