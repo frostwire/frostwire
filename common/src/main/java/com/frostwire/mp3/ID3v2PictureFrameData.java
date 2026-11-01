@@ -1,5 +1,7 @@
 package com.frostwire.mp3;
 
+import java.util.Objects;
+
 import java.util.Arrays;
 
 public class ID3v2PictureFrameData extends AbstractID3v2FrameData {
@@ -122,5 +124,11 @@ public class ID3v2PictureFrameData extends AbstractID3v2FrameData {
         } else if (other.imageData == null) return false;
         else if (!Arrays.equals(imageData, other.imageData)) return false;
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+      int result = Objects.hash(super.hashCode(), pictureType, mimeType, description);
+      return 31 * result + Arrays.hashCode(imageData);
     }
 }

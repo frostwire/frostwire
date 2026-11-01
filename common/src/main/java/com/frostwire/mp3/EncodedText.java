@@ -110,4 +110,9 @@ public class EncodedText {
         if (textEncoding != other.textEncoding) return false;
         return Arrays.equals(value, other.value);
     }
+
+    @Override
+    public int hashCode() {
+      return 31 * textEncoding + Arrays.hashCode(value);
+    }
 }

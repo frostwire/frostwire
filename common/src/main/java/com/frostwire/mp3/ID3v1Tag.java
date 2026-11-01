@@ -1,5 +1,7 @@
 package com.frostwire.mp3;
 
+import java.util.Objects;
+
 import java.util.Arrays;
 
 public class ID3v1Tag implements ID3v1 {
@@ -228,5 +230,10 @@ public class ID3v1Tag implements ID3v1 {
         } else if (other.comment == null) return false;
         else if (!comment.equals(other.comment)) return false;
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(genre, track, artist, title, album, year, comment);
     }
 }

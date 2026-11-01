@@ -1,5 +1,7 @@
 package com.frostwire.mp3;
 
+import java.util.Objects;
+
 import java.util.Arrays;
 
 public class ID3v2Frame {
@@ -200,5 +202,22 @@ public class ID3v2Frame {
         } else if (other.data == null) return false;
         else if (!Arrays.equals(data, other.data)) return false;
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+      int result =
+          Objects.hash(
+              dataLength,
+              preserveTag,
+              preserveFile,
+              readOnly,
+              group,
+              compression,
+              encryption,
+              unsynchronisation,
+              dataLengthIndicator,
+              id);
+      return 31 * result + Arrays.hashCode(data);
     }
 }

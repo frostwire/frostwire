@@ -7,6 +7,7 @@
 
 package com.frostwire.mp3;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.junit.jupiter.api.Test;
@@ -30,5 +31,12 @@ class ID3v2FrameEqualsTest {
 
     assertNotEquals(plain, unsynchronised);
     assertNotEquals(unsynchronised, plain);
+  }
+
+  @Test
+  void identicalFramesAreEqualAndHashAlike() throws Exception {
+    assertEquals(frame(0x02), frame(0x02));
+    assertEquals(frame(0x02).hashCode(), frame(0x02).hashCode());
+    assertNotEquals(frame(0x00), frame(0x04)); // ENCRYPTION_BIT
   }
 }

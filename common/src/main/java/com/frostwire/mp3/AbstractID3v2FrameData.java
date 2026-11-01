@@ -40,6 +40,11 @@ public abstract class AbstractID3v2FrameData {
         return unsynchronisation == other.unsynchronisation;
     }
 
+    @Override
+    public int hashCode() {
+      return Boolean.hashCode(unsynchronisation);
+    }
+
     protected abstract void unpackFrameData(byte[] bytes) throws InvalidDataException;
 
     protected abstract byte[] packFrameData();

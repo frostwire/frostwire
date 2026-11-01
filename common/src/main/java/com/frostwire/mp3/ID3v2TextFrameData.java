@@ -1,5 +1,7 @@
 package com.frostwire.mp3;
 
+import java.util.Objects;
+
 public class ID3v2TextFrameData extends AbstractID3v2FrameData {
     protected EncodedText text;
 
@@ -54,5 +56,10 @@ public class ID3v2TextFrameData extends AbstractID3v2FrameData {
         } else if (other.text == null) return false;
         else if (!text.equals(other.text)) return false;
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 31 * super.hashCode() + Objects.hashCode(text);
     }
 }

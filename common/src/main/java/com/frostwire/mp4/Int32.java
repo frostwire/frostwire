@@ -53,4 +53,9 @@ final class Int32 {
         Int32 o = (Int32) obj;
         return value == o.value;
     }
+
+    @Override
+    public int hashCode() {
+      return Integer.hashCode(value);
+    }
 }

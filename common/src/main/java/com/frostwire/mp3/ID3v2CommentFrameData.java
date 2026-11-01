@@ -1,5 +1,7 @@
 package com.frostwire.mp3;
 
+import java.util.Objects;
+
 public class ID3v2CommentFrameData extends AbstractID3v2FrameData {
     private static final String DEFAULT_LANGUAGE = "eng";
     private String language;
@@ -106,5 +108,10 @@ public class ID3v2CommentFrameData extends AbstractID3v2FrameData {
         } else if (other.comment == null) return false;
         else if (!comment.equals(other.comment)) return false;
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 31 * super.hashCode() + Objects.hash(language, description, comment);
     }
 }

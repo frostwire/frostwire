@@ -25,4 +25,9 @@ public class MutableInteger {
         MutableInteger other = (MutableInteger) obj;
         return value == other.value;
     }
+
+    @Override
+    public int hashCode() {
+      return Integer.hashCode(value);
+    }
 }

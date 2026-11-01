@@ -1,5 +1,7 @@
 package com.frostwire.mp3;
 
+import java.util.Objects;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,5 +48,10 @@ public class ID3v2FrameSet {
         } else if (other.frames == null) return false;
         else if (!frames.equals(other.frames)) return false;
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(id, frames);
     }
 }
