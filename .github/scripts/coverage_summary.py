@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """Prints a Markdown coverage summary from a JaCoCo XML report.
 
-Usage: coverage_summary.py <title> <jacoco.xml> [package-prefix-depth]
+Usage: coverage_summary.py <title> <jacoco.xml> [--depth N] [--fail-under-line PERCENT]
 
 Writes the total line, branch and method coverage, then the same per package group (package
-names cut to the given depth, default 3: com.frostwire.search), largest first. CI appends the
-output to $GITHUB_STEP_SUMMARY.
+names cut to the depth, default 3: com.frostwire.search), largest first. CI appends the output to
+$GITHUB_STEP_SUMMARY. With --fail-under-line, exits 1 when total line coverage is below PERCENT,
+for builds whose plugin has no coverage gate of its own (Android).
 """
+import argparse
 import sys
 import xml.etree.ElementTree as ET
 from collections import defaultdict
@@ -25,11 +27,14 @@ def percent(covered, missed):
 
 
 def main():
-    title, path = sys.argv[1], sys.argv[2]
-    depth = int(sys.argv[3]) if len(sys.argv) > 3 else 3
-    # JaCoCo reports reference a DTD; don't fetch it.
-    parser = ET.XMLParser()
-    root = ET.parse(path, parser=parser).getroot()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("title")
+    parser.add_argument("path")
+    parser.add_argument("--depth", type=int, default=3)
+    parser.add_argument("--fail-under-line", type=float, default=None)
+    args = parser.parse_args()
+    title, path, depth = args.title, args.path, args.depth
+    root = ET.parse(path).getroot()
 
     groups = defaultdict(lambda: defaultdict(lambda: [0, 0]))
     for package in root.findall("package"):
@@ -55,6 +60,11 @@ def main():
         )
     lines = total.get("LINE", (0, 0))
     print(f"\n{lines[0]:,} of {lines[0] + lines[1]:,} lines covered.\n")
+    if args.fail_under_line is not None and lines[0] + lines[1]:
+        line_percent = 100.0 * lines[0] / (lines[0] + lines[1])
+        if line_percent < args.fail_under_line:
+            print(f"Line coverage {line_percent:.1f}% is below the {args.fail_under_line}% minimum.")
+            sys.exit(1)
 
 
 if __name__ == "__main__":

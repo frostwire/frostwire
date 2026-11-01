@@ -54,9 +54,28 @@ jobs:
           ./gradlew lintPlus1Debug -PlintNewApiOnly --no-daemon
           python3 ../.github/scripts/check_android_newapi.py build/reports/lint-results-plus1Debug.xml
 
-      - name: Run non-Robolectric unit tests
+      # The whole unit-test suite, with JaCoCo coverage. build.gradle excludes the few test packages
+      # that boot MainApplication under Robolectric and hang.
+      - name: Run unit tests with coverage
         working-directory: android
-        run: ./gradlew testPlus1DebugUnitTest --tests "com.frostwire.android.gui.RelaySearchWiringTest" --tests "com.frostwire.android.core.*" --tests "com.frostwire.android.gui.transfers.TorrentUrlInfoTest" --tests "com.frostwire.android.gui.transfers.TorrentUrlInfoCompatibilityTest" --tests "com.andrew.apollo.MusicPlaybackServiceForegroundStartTest" --tests "com.devspark.appmsg.MsgManagerThreadingTest" --tests "com.frostwire.android.gui.util.OffMainQueryTest" --tests "com.frostwire.android.gui.fragments.TransferDetailTrackersAdapterTest" --tests "com.andrew.apollo.ui.activities.BaseActivitySearchableInfoTest" --tests "com.frostwire.android.gui.services.EngineThreadPoolTest" --tests "com.frostwire.android.gui.adapters.menu.CancelMenuActionDialogRestoreTest" --tests "com.frostwire.android.gui.adapters.menu.EndorseSourcePeerOffMainStructureTest" --tests "com.frostwire.android.gui.adapters.SearchResultListAdapterFileTypeCallbackTest" --tests "com.frostwire.android.gui.util.DirectionDetectorScrollListenerTest" --tests "com.frostwire.android.gui.transfers.TransferManagerLockScopeStructureTest" --tests "com.frostwire.android.gui.services.EngineStopBeforeForegroundTest" --tests "com.frostwire.android.util.StaleWorkManagerJobsTest" --tests "com.frostwire.android.gui.MainApplicationStructureTest" --tests "com.frostwire.android.util.FWImageLoaderCreationTest" --tests "com.frostwire.android.util.FWImageLoaderBackgroundTest" --tests "com.andrew.apollo.ui.activities.ShortcutActivityLaunchTest" --tests "com.frostwire.android.util.SavedStateSizesTest" --tests "com.frostwire.android.search.AndroidKarmaChainStoreRejectedChainTest" --tests "com.frostwire.android.util.SystemUtilsHandlerRestartTest" --tests "com.frostwire.android.AndroidPathsBusyQueueTest" --tests "com.frostwire.android.search.AndroidKarmaChainStoreTest" --no-daemon --continue
+        run: ./gradlew createPlus1DebugUnitTestCoverageReport --no-daemon --continue
+
+      # Coverage may only go up; raise the minimum as tests are added (goal: 100%). Baseline
+      # 2026-11-01: 9.1% of lines (the report also counts common/, which the desktop suite tests).
+      - name: Coverage summary
+        if: always() && hashFiles('android/build/reports/coverage/test/plus1/debug/report.xml') != ''
+        run: |
+          python3 -I .github/scripts/coverage_summary.py "Android coverage" \
+            android/build/reports/coverage/test/plus1/debug/report.xml \
+            --fail-under-line 9 >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload coverage report
+        if: always() && hashFiles('android/build/reports/coverage/test/plus1/debug/report.xml') != ''
+        uses: actions/upload-artifact@v5
+        with:
+          name: android-coverage-report
+          path: android/build/reports/coverage/test/plus1/debug/
+          retention-days: 14
 
       # Release builds shrink and rename classes with R8, which debug builds and the tests above
       # don't: a missing keep rule (for jlibtorrent, its AAR's consumer rules) only showed up when

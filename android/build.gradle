@@ -249,6 +249,8 @@ android {
             multiDexKeepFile file('multidex-config.txt')
         }
         debug {
+            // JaCoCo coverage of the unit tests: ./gradlew createPlus1DebugUnitTestCoverageReport
+            enableUnitTestCoverage true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
                     'proguard-rules.pro'
@@ -274,10 +276,20 @@ android {
         }
     }
 
+    testCoverage {
+        jacocoVersion = '0.8.13'
+    }
+
     testOptions {
         unitTests {
             includeAndroidResources = true
             all {
+                // Robolectric loads app classes through its own class loader; JaCoCo has to
+                // instrument classes without a source location too, but never the JDK's.
+                jacoco {
+                    includeNoLocationClasses = true
+                    excludes = ['jdk.internal.*']
+                }
                 jvmArgs '-Djava.awt.headless=true'
                 jvmArgs '--add-opens=java.base/java.lang=ALL-UNNAMED'
                 filter {
