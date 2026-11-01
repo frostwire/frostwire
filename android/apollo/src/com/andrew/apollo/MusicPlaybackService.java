@@ -85,6 +85,7 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
@@ -1135,6 +1136,31 @@ public class MusicPlaybackService extends MediaSessionService {
   }
 
   /**
+   * Removes every instance of the tracks in {@code ids} from the queue at once. When the playing
+   * track is among them, playback moves straight to the first track that stays, instead of opening
+   * each removed track on the way, and listeners get one queue change.
+   *
+   * @return how many queue entries were removed
+   */
+  public int removeTracks(final long[] ids) {
+    final int removed;
+    synchronized (this) {
+      final QueueRemoval removal = compactQueue(mPlayList, mPlayListLen, mPlayPos, ids);
+      removed = removal.removed;
+      if (removed == 0) {
+        return 0;
+      }
+      mPlayListLen = removal.length;
+      mPlayPos = removal.position;
+      if (removal.playingRemoved) {
+        playAfterRemovingCurrent();
+      }
+    }
+    notifyChange(QUEUE_CHANGED);
+    return removed;
+  }
+
+  /**
    * Removes the range of tracks specified from the play list. If a file within the range is the
    * file currently being played, playback will move to the next file after the range.
    *
@@ -1168,29 +1194,80 @@ public class MusicPlaybackService extends MediaSessionService {
       mPlayListLen = 0;
     }
 
-    if (gotonext) {
-      if (mPlayListLen == 0) {
-        mPlayPos = -1;
-        stop(true);
-        MusicUtils.requestMusicPlaybackServiceShutdown(this);
-        return 0;
-      } else {
-        if (mShuffleEnabled) {
-          mPlayPos = getNextPosition(true, isShuffleEnabled());
-        } else if (mPlayPos >= mPlayListLen) {
-          mPlayPos = 0;
-        }
-        final boolean wasPlaying = isPlaying();
-        stop(false);
-        if (openCurrentAndNext()) {
-          if (wasPlaying) {
-            play();
-          }
-        }
-      }
-      notifyChange(META_CHANGED);
+    if (gotonext && !playAfterRemovingCurrent()) {
+      return 0;
     }
     return last - first + 1;
+  }
+
+  /**
+   * Opens the track now at {@code mPlayPos} after the playing one left the queue, and keeps playing
+   * if it was. Stops the service when the queue is now empty.
+   *
+   * @return false when the queue is empty and playback stopped
+   */
+  private boolean playAfterRemovingCurrent() {
+    if (mPlayListLen == 0) {
+      mPlayPos = -1;
+      stop(true);
+      MusicUtils.requestMusicPlaybackServiceShutdown(this);
+      return false;
+    }
+    if (mShuffleEnabled) {
+      mPlayPos = getNextPosition(true, isShuffleEnabled());
+    } else if (mPlayPos >= mPlayListLen) {
+      mPlayPos = 0;
+    }
+    final boolean wasPlaying = isPlaying();
+    stop(false);
+    if (openCurrentAndNext()) {
+      if (wasPlaying) {
+        play();
+      }
+    }
+    notifyChange(META_CHANGED);
+    return true;
+  }
+
+  /** What {@link #compactQueue} left: the queue's new length and position. */
+  static final class QueueRemoval {
+    final int removed;
+    final int length;
+    final int position;
+    final boolean playingRemoved;
+
+    QueueRemoval(int removed, int length, int position, boolean playingRemoved) {
+      this.removed = removed;
+      this.length = length;
+      this.position = position;
+      this.playingRemoved = playingRemoved;
+    }
+  }
+
+  /**
+   * Removes every entry of {@code ids} from the first {@code length} entries of {@code queue}, in
+   * place, keeping the order of the rest. When the playing entry is removed, the position moves to
+   * the first entry after it that stays (which may equal the new length).
+   */
+  static QueueRemoval compactQueue(long[] queue, int length, int position, long[] ids) {
+    if (queue == null || length <= 0 || ids == null || ids.length == 0) {
+      return new QueueRemoval(0, Math.max(length, 0), position, false);
+    }
+    final long[] sortedIds = Arrays.copyOf(ids, ids.length);
+    Arrays.sort(sortedIds);
+    int kept = 0;
+    int newPosition = position;
+    boolean playingRemoved = false;
+    for (int i = 0; i < length; i++) {
+      if (Arrays.binarySearch(sortedIds, queue[i]) < 0) {
+        queue[kept++] = queue[i];
+      } else if (i < position) {
+        newPosition--;
+      } else if (i == position) {
+        playingRemoved = true;
+      }
+    }
+    return new QueueRemoval(length - kept, kept, newPosition, playingRemoved);
   }
 
   /**
