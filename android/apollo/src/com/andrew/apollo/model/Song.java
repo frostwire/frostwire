@@ -43,6 +43,13 @@ public class Song {
   public int mDuration;
 
   /**
+   * The playlist member's own id (MediaStore's Playlists.Members._ID) when this song was listed
+   * from a playlist, else -1. One song can be in a playlist more than once; this tells the copies
+   * apart.
+   */
+  public long mPlaylistMemberId = -1;
+
+  /**
    * Constructor of <code>Song</code>
    *
    * @param songId The Id of the song

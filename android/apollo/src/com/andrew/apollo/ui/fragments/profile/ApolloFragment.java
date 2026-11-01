@@ -506,7 +506,11 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I> exte
       SystemUtils.postToHandler(
           SystemUtils.HandlerThreadName.MISC,
           () -> {
-            MusicUtils.removeFromPlaylist(context, song.mSongId, mPlaylistId);
+            if (song.mPlaylistMemberId >= 0) {
+              MusicUtils.removePlaylistMember(context, mPlaylistId, song.mPlaylistMemberId);
+            } else {
+              MusicUtils.removeFromPlaylist(context, song.mSongId, mPlaylistId);
+            }
             SystemUtils.postToUIThread(
                 () -> {
                   if (isAdded()) {
@@ -607,7 +611,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I> exte
     return activity;
   }
 
-  private Context getStableAppContext() {
+  protected Context getStableAppContext() {
     Activity activity = getLiveActivity();
     if (activity == null) {
       return null;

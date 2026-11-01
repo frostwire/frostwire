@@ -110,6 +110,8 @@ public class PlaylistSongLoader extends SongLoader {
         final int durationInSecs = (int) duration / 1000;
         // Create a new song
         final Song song = new Song(id, songName, artist, album, durationInSecs);
+        song.mPlaylistMemberId =
+            mCursor.getLong(mCursor.getColumnIndexOrThrow(MediaStore.Audio.Playlists.Members._ID));
         // Add everything up
         mSongList.add(song);
       } while (mCursor.moveToNext());

@@ -18,10 +18,7 @@
 
 package com.andrew.apollo.ui.fragments.profile;
 
-import android.content.ContentResolver;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -41,6 +38,7 @@ import com.andrew.apollo.loaders.PlaylistSongLoader;
 import com.andrew.apollo.menu.FragmentMenuItems;
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.ui.fragments.Fragments;
+import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
@@ -142,14 +140,15 @@ public final class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapte
 
   @Override
   public void remove(final int which) {
-    mItem = mAdapter.getItem(which - 1);
-    mAdapter.remove(mItem);
+    final Song song = mAdapter.getItem(which - 1);
+    if (song == null) {
+      return;
+    }
+    mItem = song;
+    mAdapter.remove(song);
     mListView.invalidate();
     mAdapter.notifyDataSetChanged();
-    final Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", mPlaylistId);
-    getActivity()
-        .getContentResolver()
-        .delete(uri, MediaStore.Audio.Playlists.Members.AUDIO_ID + "=" + mItem.mSongId, null);
+    MusicUtils.removePlaylistMember(getStableAppContext(), mPlaylistId, song.mPlaylistMemberId);
   }
 
   @Override
@@ -158,21 +157,21 @@ public final class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapte
       mAdapter.notifyDataSetChanged();
       return;
     }
-
-    int realFrom = from - 1;
-    int realTo = to - 1;
-
-    try {
-      mItem = mAdapter.getItem(realFrom);
-      mAdapter.remove(mItem);
-      int count = mAdapter.getCount();
-      int adjustedTo = (realTo >= count) ? count - 1 : realTo;
-      mAdapter.insert(mItem, adjustedTo);
+    final int realFrom = from - 1;
+    final int realTo = Math.min(to - 1, mAdapter.getCount() - 1);
+    final Song moved = mAdapter.getItem(realFrom);
+    final Song target = mAdapter.getItem(realTo);
+    if (moved == null || target == null || realFrom == realTo) {
       mAdapter.notifyDataSetChanged();
-      final ContentResolver resolver = getActivity().getContentResolver();
-      MediaStore.Audio.Playlists.Members.moveItem(resolver, mPlaylistId, realFrom, adjustedTo);
-    } catch (Throwable ignored) {
+      return;
     }
+    mItem = moved;
+    mAdapter.remove(moved);
+    mAdapter.insert(moved, realTo);
+    mAdapter.notifyDataSetChanged();
+    // The screen hides some members, so MediaStore's positions come from the members' own ids.
+    MusicUtils.movePlaylistMember(
+        getStableAppContext(), mPlaylistId, moved.mPlaylistMemberId, target.mPlaylistMemberId);
   }
 
   @Override

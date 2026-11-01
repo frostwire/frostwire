@@ -1935,6 +1935,86 @@ public final class MusicUtils {
   }
 
   /**
+   * Removes one row of a playlist, by its member id, so other copies of the same song stay. Runs
+   * off the main thread.
+   */
+  public static void removePlaylistMember(
+      final Context context, final long playlistId, final long memberId) {
+    if (context == null) {
+      return;
+    }
+    if (SystemUtils.isUIThread()) {
+      SystemUtils.postToHandler(
+          SystemUtils.HandlerThreadName.MISC,
+          () -> removePlaylistMember(context, playlistId, memberId));
+      return;
+    }
+    try {
+      context
+          .getContentResolver()
+          .delete(
+              getPlaylistMembersUri(playlistId),
+              Playlists.Members._ID + "=?",
+              new String[] {Long.toString(memberId)});
+    } catch (Throwable t) {
+      LOG.error("MusicUtils.removePlaylistMember() failed", t);
+    }
+  }
+
+  /**
+   * Moves playlist member {@code fromMemberId} to where {@code toMemberId} is. MediaStore moves by
+   * position among all the playlist's members, which includes members the playlist screen hides
+   * (not music, no title), so the positions are looked up here instead of taken from the screen.
+   * Runs off the main thread.
+   */
+  public static void movePlaylistMember(
+      final Context context,
+      final long playlistId,
+      final long fromMemberId,
+      final long toMemberId) {
+    if (context == null || fromMemberId == toMemberId) {
+      return;
+    }
+    if (SystemUtils.isUIThread()) {
+      SystemUtils.postToHandler(
+          SystemUtils.HandlerThreadName.MISC,
+          () -> movePlaylistMember(context, playlistId, fromMemberId, toMemberId));
+      return;
+    }
+    final ContentResolver resolver = context.getContentResolver();
+    int from = -1;
+    int to = -1;
+    try (Cursor cursor =
+        resolver.query(
+            Playlists.Members.getContentUri("external", playlistId),
+            new String[] {Playlists.Members._ID},
+            null,
+            null,
+            Playlists.Members.DEFAULT_SORT_ORDER)) {
+      for (int position = 0; cursor != null && cursor.moveToNext(); position++) {
+        final long memberId = cursor.getLong(0);
+        if (memberId == fromMemberId) {
+          from = position;
+        } else if (memberId == toMemberId) {
+          to = position;
+        }
+      }
+    } catch (Throwable t) {
+      LOG.error("MusicUtils.movePlaylistMember() query failed", t);
+      return;
+    }
+    if (from < 0 || to < 0) {
+      LOG.warn("MusicUtils.movePlaylistMember(): member gone, nothing moved");
+      return;
+    }
+    try {
+      Playlists.Members.moveItem(resolver, playlistId, from, to);
+    } catch (Throwable t) {
+      LOG.error("MusicUtils.movePlaylistMember() move failed", t);
+    }
+  }
+
+  /**
    * @param context The {@link Context} to use.
    * @param list The list to enqueue.
    */
