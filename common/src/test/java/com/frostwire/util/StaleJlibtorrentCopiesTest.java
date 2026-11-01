@@ -19,11 +19,11 @@ import org.junit.jupiter.api.io.TempDir;
 
 /**
  * jlibtorrent up to 2.0.12.9 copied its native library on every start to {@code
- * Files.createTempFile("jlibtorrent-", suffix)} and only asked for it to be deleted on exit. Android
- * never runs exit hooks and Windows can't delete a loaded DLL, so every start left a 13 MB (Android)
- * to 30 MB copy behind. 2.0.15.x no longer makes them; FrostWire deletes the ones left over. A
- * copy made in the last hour may belong to another app on old jlibtorrent that is loading it now,
- * so it stays.
+ * Files.createTempFile("jlibtorrent-", suffix)} and only asked for it to be deleted on exit.
+ * Android never runs exit hooks and Windows can't delete a loaded DLL, so every start left a 13 MB
+ * (Android) to 30 MB copy behind. 2.0.15.x no longer makes them; FrostWire deletes the ones left
+ * over. A copy made in the last hour may belong to another app on old jlibtorrent that is loading
+ * it now, so it stays.
  */
 class StaleJlibtorrentCopiesTest {
 

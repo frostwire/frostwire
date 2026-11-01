@@ -16,9 +16,9 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 /**
- * CGNAT rebinds the phone's UDP tuple while PeerRegistry still holds the
- * first-seen mapping. Inbound SEARCH is keyed by connectionId so it arrives;
- * RELAY replies must follow the live session by pub, not registry host:port.
+ * CGNAT rebinds the phone's UDP tuple while PeerRegistry still holds the first-seen mapping.
+ * Inbound SEARCH is keyed by connectionId so it arrives; RELAY replies must follow the live session
+ * by pub, not registry host:port.
  */
 class RudpRelayCgnatDeliveryStructureTest {
 

@@ -16,12 +16,11 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 /**
- * Structure regression for the metadata-less zombie rescue: when a full
- * .torrent arrives (e.g. via TORRENT_FETCH over the mesh) but the session
- * already holds a metadata-less handle for the same infohash (added by an
- * earlier unreachable-seeder magnet), the zombie must be removed and the
- * torrent re-added — merging into it never fires torrent_added and the
- * download stays invisible in the UI.
+ * Structure regression for the metadata-less zombie rescue: when a full .torrent arrives (e.g. via
+ * TORRENT_FETCH over the mesh) but the session already holds a metadata-less handle for the same
+ * infohash (added by an earlier unreachable-seeder magnet), the zombie must be removed and the
+ * torrent re-added — merging into it never fires torrent_added and the download stays invisible in
+ * the UI.
  */
 class BTEngineZombieRescueStructureTest {
 
@@ -37,8 +36,7 @@ class BTEngineZombieRescueStructureTest {
         compact.contains("if(existingInfo==null){"),
         "metadata-less handle must take the replacement branch");
     assertTrue(
-        compact.contains("remove(th);"),
-        "the zombie handle must be removed before re-adding");
+        compact.contains("remove(th);"), "the zombie handle must be removed before re-adding");
     assertTrue(
         compact.contains("torrentHandleExists=false;"),
         "replacement must fall through to a fresh add");

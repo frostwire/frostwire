@@ -21,8 +21,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 class IceBridgeHostCacheTest {
 
-  @TempDir
-  File tempDir;
+  @TempDir File tempDir;
 
   private IceBridgeHostCache cache(String name) {
     return new IceBridgeHostCache(new File(tempDir, name));
@@ -63,7 +62,8 @@ class IceBridgeHostCacheTest {
   @Test
   void legacyThreeColumnFilesLoadWithZeroFailures() throws Exception {
     File f = new File(tempDir, "legacy.txt");
-    Files.write(f.toPath(),
+    Files.write(
+        f.toPath(),
         "# comment\n10.9.9.9:6888,BOTH,1712345678900\n".getBytes(StandardCharsets.UTF_8));
     IceBridgeHostCache cache = new IceBridgeHostCache(f);
     List<IceBridgeHostCache.Entry> entries = cache.getAll();
@@ -79,8 +79,7 @@ class IceBridgeHostCacheTest {
     cache.markFailure("10.9.9.9", 6888);
     cache.markFailure("10.9.9.9", 6888);
     cache.flush();
-    IceBridgeHostCache reloaded =
-        new IceBridgeHostCache(new File(tempDir, "roundtrip.txt"));
+    IceBridgeHostCache reloaded = new IceBridgeHostCache(new File(tempDir, "roundtrip.txt"));
     List<IceBridgeHostCache.Entry> entries = reloaded.getAll();
     assertEquals(1, entries.size());
     assertEquals(2, entries.get(0).consecutiveFailures);

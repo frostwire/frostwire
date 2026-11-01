@@ -15,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.SecureRandom;
@@ -27,290 +26,328 @@ import org.junit.jupiter.api.Test;
 
 class TorrentMetadataResponseTest {
 
-    private static KeyPair ed25519() throws Exception {
-        return KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
-    }
+  private static KeyPair ed25519() throws Exception {
+    return KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+  }
 
-    private static byte[] raw32(KeyPair kp) {
-        byte[] encoded = kp.getPublic().getEncoded();
-        byte[] raw = new byte[32];
-        System.arraycopy(encoded, encoded.length - 32, raw, 0, 32);
-        return raw;
-    }
+  private static byte[] raw32(KeyPair kp) {
+    byte[] encoded = kp.getPublic().getEncoded();
+    byte[] raw = new byte[32];
+    System.arraycopy(encoded, encoded.length - 32, raw, 0, 32);
+    return raw;
+  }
 
-    private static byte[] holderPub(KeyPair kp) {
-        return raw32(kp);
-    }
+  private static byte[] holderPub(KeyPair kp) {
+    return raw32(kp);
+  }
 
-    private static TorrentMetadataResponse sign(TorrentMetadataResponse unsigned, KeyPair kp) throws Exception {
-        Signature signer = Signature.getInstance("Ed25519");
-        signer.initSign(kp.getPrivate());
-        signer.update(unsigned.canonicalBytes());
-        return TorrentMetadataResponse.builder()
-                .version(unsigned.version())
-                .nonce(unsigned.nonce())
-                .infoHash(unsigned.infoHash())
-                .payloadDigest(unsigned.payloadDigest())
-                .chunkIndex(unsigned.chunkIndex())
-                .finalChunk(unsigned.isFinalChunk())
-                .timestamp(unsigned.timestamp())
-                .data(unsigned.data())
-                .error(unsigned.error())
-                .signature(signer.sign())
-                .build();
-    }
+  private static TorrentMetadataResponse sign(TorrentMetadataResponse unsigned, KeyPair kp)
+      throws Exception {
+    Signature signer = Signature.getInstance("Ed25519");
+    signer.initSign(kp.getPrivate());
+    signer.update(unsigned.canonicalBytes());
+    return TorrentMetadataResponse.builder()
+        .version(unsigned.version())
+        .nonce(unsigned.nonce())
+        .infoHash(unsigned.infoHash())
+        .payloadDigest(unsigned.payloadDigest())
+        .chunkIndex(unsigned.chunkIndex())
+        .finalChunk(unsigned.isFinalChunk())
+        .timestamp(unsigned.timestamp())
+        .data(unsigned.data())
+        .error(unsigned.error())
+        .signature(signer.sign())
+        .build();
+  }
 
-    private static List<TorrentMetadataResponse> signAll(List<TorrentMetadataResponse> unsigned, KeyPair kp) throws Exception {
-        List<TorrentMetadataResponse> signed = new ArrayList<>();
-        for (TorrentMetadataResponse c : unsigned) {
-            signed.add(sign(c, kp));
-        }
-        return signed;
+  private static List<TorrentMetadataResponse> signAll(
+      List<TorrentMetadataResponse> unsigned, KeyPair kp) throws Exception {
+    List<TorrentMetadataResponse> signed = new ArrayList<>();
+    for (TorrentMetadataResponse c : unsigned) {
+      signed.add(sign(c, kp));
     }
+    return signed;
+  }
 
-    @Test
-    void errorsAreRequestBoundAndCannotBeRestamped() throws Exception {
-        KeyPair holder = ed25519();
-        TorrentMetadataResponse error = sign(TorrentMetadataResponse.buildError(
-                new byte[32], new byte[20], 1000L, TorrentMetadataResponse.ERR_NOT_FOUND), holder);
-        assertThrows(IllegalStateException.class,
-                () -> error.withNonceTimestamp(new byte[32], 2000L));
-        Map<String, Object> changed = error.toBencodeableMap();
-        changed.put("ts", 2000L);
-        assertFalse(TorrentMetadataResponse.fromBencodeableMap(changed).verifySignature(holderPub(holder)));
-        changed = error.toBencodeableMap();
-        changed.put("err", TorrentMetadataResponse.ERR_TOO_LARGE);
-        assertNull(TorrentMetadataResponse.fromBencodeableMap(changed));
-        changed = error.toBencodeableMap();
-        changed.put("v", 2);
-        assertNull(TorrentMetadataResponse.fromBencodeableMap(changed));
-        changed = error.toBencodeableMap();
-        byte[] otherNonce = new byte[32];
-        otherNonce[0] = 1;
-        changed.put("nonce", java.util.Base64.getEncoder().encodeToString(otherNonce));
-        assertFalse(TorrentMetadataResponse.fromBencodeableMap(changed).verifySignature(holderPub(holder)));
-        for (Map.Entry<String, Object> invalid : Map.<String, Object>of(
-                "ci", 1, "fin", false, "err", "UNKNOWN", "data", "AQ==").entrySet()) {
-            changed = error.toBencodeableMap();
-            changed.put(invalid.getKey(), invalid.getValue());
-            assertNull(TorrentMetadataResponse.fromBencodeableMap(changed));
-        }
+  @Test
+  void errorsAreRequestBoundAndCannotBeRestamped() throws Exception {
+    KeyPair holder = ed25519();
+    TorrentMetadataResponse error =
+        sign(
+            TorrentMetadataResponse.buildError(
+                new byte[32], new byte[20], 1000L, TorrentMetadataResponse.ERR_NOT_FOUND),
+            holder);
+    assertThrows(IllegalStateException.class, () -> error.withNonceTimestamp(new byte[32], 2000L));
+    Map<String, Object> changed = error.toBencodeableMap();
+    changed.put("ts", 2000L);
+    assertFalse(
+        TorrentMetadataResponse.fromBencodeableMap(changed).verifySignature(holderPub(holder)));
+    changed = error.toBencodeableMap();
+    changed.put("err", TorrentMetadataResponse.ERR_TOO_LARGE);
+    assertNull(TorrentMetadataResponse.fromBencodeableMap(changed));
+    changed = error.toBencodeableMap();
+    changed.put("v", 2);
+    assertNull(TorrentMetadataResponse.fromBencodeableMap(changed));
+    changed = error.toBencodeableMap();
+    byte[] otherNonce = new byte[32];
+    otherNonce[0] = 1;
+    changed.put("nonce", java.util.Base64.getEncoder().encodeToString(otherNonce));
+    assertFalse(
+        TorrentMetadataResponse.fromBencodeableMap(changed).verifySignature(holderPub(holder)));
+    for (Map.Entry<String, Object> invalid :
+        Map.<String, Object>of("ci", 1, "fin", false, "err", "UNKNOWN", "data", "AQ==")
+            .entrySet()) {
+      changed = error.toBencodeableMap();
+      changed.put(invalid.getKey(), invalid.getValue());
+      assertNull(TorrentMetadataResponse.fromBencodeableMap(changed));
     }
+  }
 
-    @Test
-    void enforcesAggregateAndIndexBounds() {
-        assertThrows(IllegalArgumentException.class, () -> TorrentMetadataResponse.buildChunks(
-                new byte[32], new byte[20], 1L,
+  @Test
+  void enforcesAggregateAndIndexBounds() {
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            TorrentMetadataResponse.buildChunks(
+                new byte[32],
+                new byte[20],
+                1L,
                 new byte[(int) TorrentMetadataResponse.MAX_TORRENT_BYTES + 1]));
-        TorrentMetadataResponse first = TorrentMetadataResponse.buildChunks(
-                new byte[32], new byte[20], 1L, new byte[1]).get(0);
-        Map<String, Object> bad = first.toBencodeableMap();
-        bad.put("ci", -1);
-        assertNull(TorrentMetadataResponse.fromBencodeableMap(bad));
-        bad.put("ci", Integer.MAX_VALUE);
-        assertNull(TorrentMetadataResponse.fromBencodeableMap(bad));
-        bad.put("ci", 0.5);
-        assertNull(TorrentMetadataResponse.fromBencodeableMap(bad));
-        bad.put("ci", 0);
-        bad.put("fin", 2);
-        assertNull(TorrentMetadataResponse.fromBencodeableMap(bad));
+    TorrentMetadataResponse first =
+        TorrentMetadataResponse.buildChunks(new byte[32], new byte[20], 1L, new byte[1]).get(0);
+    Map<String, Object> bad = first.toBencodeableMap();
+    bad.put("ci", -1);
+    assertNull(TorrentMetadataResponse.fromBencodeableMap(bad));
+    bad.put("ci", Integer.MAX_VALUE);
+    assertNull(TorrentMetadataResponse.fromBencodeableMap(bad));
+    bad.put("ci", 0.5);
+    assertNull(TorrentMetadataResponse.fromBencodeableMap(bad));
+    bad.put("ci", 0);
+    bad.put("fin", 2);
+    assertNull(TorrentMetadataResponse.fromBencodeableMap(bad));
+  }
+
+  @Test
+  void chunkSplitAssembleAndVerifyRoundTrip() throws Exception {
+    KeyPair holder = ed25519();
+    byte[] nonce = new byte[32];
+    new SecureRandom().nextBytes(nonce);
+    byte[] infoHash = TestTorrentMetadata.infoHash();
+    byte[] torrent = TestTorrentMetadata.bytes(TorrentMetadataResponse.CHUNK_DATA_BYTES * 3);
+
+    List<TorrentMetadataResponse> chunks =
+        signAll(TorrentMetadataResponse.buildChunks(nonce, infoHash, 1000L, torrent), holder);
+
+    assertEquals(4, chunks.size());
+    assertTrue(chunks.get(3).isFinalChunk());
+    for (TorrentMetadataResponse chunk : chunks) {
+      assertTrue(chunk.verifySignature(holderPub(holder)));
+      assertNotNull(
+          SearchPayloadCodec.decodeTorrentMetadataResponse(
+              SearchPayloadCodec.encodeTorrentMetadataResponse(chunk)));
     }
 
-    @Test
-    void chunkSplitAssembleAndVerifyRoundTrip() throws Exception {
-        KeyPair holder = ed25519();
-        byte[] nonce = new byte[32];
-        new SecureRandom().nextBytes(nonce);
-        byte[] infoHash = TestTorrentMetadata.infoHash();
-        byte[] torrent = TestTorrentMetadata.bytes(TorrentMetadataResponse.CHUNK_DATA_BYTES * 3);
+    byte[] reassembled = TorrentMetadataResponse.assemble(chunks);
+    assertNotNull(reassembled);
+    assertArrayEquals(torrent, reassembled);
+  }
 
-        List<TorrentMetadataResponse> chunks =
-                signAll(TorrentMetadataResponse.buildChunks(nonce, infoHash, 1000L, torrent), holder);
+  @Test
+  void tamperedChunkDataFailsAssembleDigestCheck() throws Exception {
+    KeyPair holder = ed25519();
+    byte[] nonce = new byte[32];
+    byte[] infoHash = TestTorrentMetadata.infoHash();
+    byte[] torrent = TestTorrentMetadata.bytes(TorrentMetadataResponse.CHUNK_DATA_BYTES);
 
-        assertEquals(4, chunks.size());
-        assertTrue(chunks.get(3).isFinalChunk());
-        for (TorrentMetadataResponse chunk : chunks) {
-            assertTrue(chunk.verifySignature(holderPub(holder)));
-            assertNotNull(SearchPayloadCodec.decodeTorrentMetadataResponse(
-                    SearchPayloadCodec.encodeTorrentMetadataResponse(chunk)));
-        }
+    List<TorrentMetadataResponse> chunks =
+        signAll(TorrentMetadataResponse.buildChunks(nonce, infoHash, 1000L, torrent), holder);
 
-        byte[] reassembled = TorrentMetadataResponse.assemble(chunks);
-        assertNotNull(reassembled);
-        assertArrayEquals(torrent, reassembled);
-    }
+    // Swap chunk 0's data for attacker bytes, keep the holder signature:
+    // per-chunk verification still passes (canonical bytes exclude the
+    // data slice), but the whole-payload digest in the signature domain
+    // no longer matches the reassembled bytes — assemble must reject.
+    TorrentMetadataResponse original = chunks.get(0);
+    byte[] evil = new byte[original.data().length];
+    new SecureRandom().nextBytes(evil);
+    TorrentMetadataResponse tampered =
+        TorrentMetadataResponse.builder()
+            .version(original.version())
+            .nonce(original.nonce())
+            .infoHash(original.infoHash())
+            .payloadDigest(original.payloadDigest())
+            .chunkIndex(original.chunkIndex())
+            .finalChunk(original.isFinalChunk())
+            .timestamp(original.timestamp())
+            .data(evil)
+            .signature(original.signature())
+            .build();
+    assertTrue(tampered.verifySignature(holderPub(holder)));
 
-    @Test
-    void tamperedChunkDataFailsAssembleDigestCheck() throws Exception {
-        KeyPair holder = ed25519();
-        byte[] nonce = new byte[32];
-        byte[] infoHash = TestTorrentMetadata.infoHash();
-        byte[] torrent = TestTorrentMetadata.bytes(TorrentMetadataResponse.CHUNK_DATA_BYTES);
+    List<TorrentMetadataResponse> tamperedSet = new ArrayList<>(chunks);
+    tamperedSet.set(0, tampered);
+    assertNull(TorrentMetadataResponse.assemble(tamperedSet));
+  }
 
-        List<TorrentMetadataResponse> chunks =
-                signAll(TorrentMetadataResponse.buildChunks(nonce, infoHash, 1000L, torrent), holder);
+  @Test
+  void assembleRejectsMissingAndReorderedChunks() throws Exception {
+    KeyPair holder = ed25519();
+    byte[] nonce = new byte[32];
+    byte[] infoHash = TestTorrentMetadata.infoHash();
+    byte[] torrent = TestTorrentMetadata.bytes(TorrentMetadataResponse.CHUNK_DATA_BYTES * 2);
 
-        // Swap chunk 0's data for attacker bytes, keep the holder signature:
-        // per-chunk verification still passes (canonical bytes exclude the
-        // data slice), but the whole-payload digest in the signature domain
-        // no longer matches the reassembled bytes — assemble must reject.
-        TorrentMetadataResponse original = chunks.get(0);
-        byte[] evil = new byte[original.data().length];
-        new SecureRandom().nextBytes(evil);
-        TorrentMetadataResponse tampered = TorrentMetadataResponse.builder()
-                .version(original.version())
-                .nonce(original.nonce())
-                .infoHash(original.infoHash())
-                .payloadDigest(original.payloadDigest())
-                .chunkIndex(original.chunkIndex())
-                .finalChunk(original.isFinalChunk())
-                .timestamp(original.timestamp())
-                .data(evil)
-                .signature(original.signature())
-                .build();
-        assertTrue(tampered.verifySignature(holderPub(holder)));
+    List<TorrentMetadataResponse> chunks =
+        signAll(TorrentMetadataResponse.buildChunks(nonce, infoHash, 1000L, torrent), holder);
 
-        List<TorrentMetadataResponse> tamperedSet = new ArrayList<>(chunks);
-        tamperedSet.set(0, tampered);
-        assertNull(TorrentMetadataResponse.assemble(tamperedSet));
-    }
+    List<TorrentMetadataResponse> missing = new ArrayList<>(chunks);
+    missing.remove(1);
+    assertNull(TorrentMetadataResponse.assemble(missing));
 
-    @Test
-    void assembleRejectsMissingAndReorderedChunks() throws Exception {
-        KeyPair holder = ed25519();
-        byte[] nonce = new byte[32];
-        byte[] infoHash = TestTorrentMetadata.infoHash();
-        byte[] torrent = TestTorrentMetadata.bytes(TorrentMetadataResponse.CHUNK_DATA_BYTES * 2);
+    List<TorrentMetadataResponse> reordered = new ArrayList<>(chunks);
+    java.util.Collections.swap(reordered, 0, 1);
+    assertNull(TorrentMetadataResponse.assemble(reordered));
+  }
 
-        List<TorrentMetadataResponse> chunks =
-                signAll(TorrentMetadataResponse.buildChunks(nonce, infoHash, 1000L, torrent), holder);
+  @Test
+  void errorResponseRoundTripAndVerification() throws Exception {
+    KeyPair holder = ed25519();
+    byte[] nonce = new byte[32];
+    byte[] infoHash = new byte[20];
+    TorrentMetadataResponse err =
+        sign(
+            TorrentMetadataResponse.buildError(
+                nonce, infoHash, 1000L, TorrentMetadataResponse.ERR_NOT_FOUND),
+            holder);
 
-        List<TorrentMetadataResponse> missing = new ArrayList<>(chunks);
-        missing.remove(1);
-        assertNull(TorrentMetadataResponse.assemble(missing));
+    assertTrue(err.isError());
+    assertEquals(TorrentMetadataResponse.ERR_NOT_FOUND, err.error());
+    assertTrue(err.verifySignature(holderPub(holder)));
 
-        List<TorrentMetadataResponse> reordered = new ArrayList<>(chunks);
-        java.util.Collections.swap(reordered, 0, 1);
-        assertNull(TorrentMetadataResponse.assemble(reordered));
-    }
+    TorrentMetadataResponse decoded =
+        SearchPayloadCodec.decodeTorrentMetadataResponse(
+            SearchPayloadCodec.encodeTorrentMetadataResponse(err));
+    assertNotNull(decoded);
+    assertTrue(decoded.isError());
+    assertTrue(decoded.verifySignature(holderPub(holder)));
+    assertNull(TorrentMetadataResponse.assemble(java.util.Collections.singletonList(decoded)));
+  }
 
-    @Test
-    void errorResponseRoundTripAndVerification() throws Exception {
-        KeyPair holder = ed25519();
-        byte[] nonce = new byte[32];
-        byte[] infoHash = new byte[20];
-        TorrentMetadataResponse err = sign(
-                TorrentMetadataResponse.buildError(nonce, infoHash, 1000L, TorrentMetadataResponse.ERR_NOT_FOUND),
-                holder);
+  @Test
+  void restampedCopyVerifiesForNewNonce() throws Exception {
+    KeyPair holder = ed25519();
+    byte[] nonceA = new byte[32];
+    byte[] nonceB = new byte[32];
+    new SecureRandom().nextBytes(nonceA);
+    new SecureRandom().nextBytes(nonceB);
+    byte[] infoHash = TestTorrentMetadata.infoHash();
+    byte[] torrent = TestTorrentMetadata.bytes(TorrentMetadataResponse.CHUNK_DATA_BYTES);
 
-        assertTrue(err.isError());
-        assertEquals(TorrentMetadataResponse.ERR_NOT_FOUND, err.error());
-        assertTrue(err.verifySignature(holderPub(holder)));
+    List<TorrentMetadataResponse> chunks =
+        signAll(TorrentMetadataResponse.buildChunks(nonceA, infoHash, 1000L, torrent), holder);
+    TorrentMetadataResponse restamped = chunks.get(0).withNonceTimestamp(nonceB, 2000L);
 
-        TorrentMetadataResponse decoded = SearchPayloadCodec.decodeTorrentMetadataResponse(
-                SearchPayloadCodec.encodeTorrentMetadataResponse(err));
-        assertNotNull(decoded);
-        assertTrue(decoded.isError());
-        assertTrue(decoded.verifySignature(holderPub(holder)));
-        assertNull(TorrentMetadataResponse.assemble(java.util.Collections.singletonList(decoded)));
-    }
+    // Same holder signature, new correlation fields — must verify for request B.
+    assertArrayEquals(nonceB, restamped.nonce());
+    assertEquals(2000L, restamped.timestamp());
+    assertTrue(restamped.verifySignature(holderPub(holder)));
+    // And the restamped frame still round-trips through the wire codec.
+    TorrentMetadataResponse decoded =
+        SearchPayloadCodec.decodeTorrentMetadataResponse(
+            SearchPayloadCodec.encodeTorrentMetadataResponse(restamped));
+    assertNotNull(decoded);
+    assertTrue(decoded.verifySignature(holderPub(holder)));
 
-    @Test
-    void restampedCopyVerifiesForNewNonce() throws Exception {
-        KeyPair holder = ed25519();
-        byte[] nonceA = new byte[32];
-        byte[] nonceB = new byte[32];
-        new SecureRandom().nextBytes(nonceA);
-        new SecureRandom().nextBytes(nonceB);
-        byte[] infoHash = TestTorrentMetadata.infoHash();
-        byte[] torrent = TestTorrentMetadata.bytes(TorrentMetadataResponse.CHUNK_DATA_BYTES);
+    // Same-domain tampering (chunk index) must still fail verification.
+    TorrentMetadataResponse reindexed =
+        TorrentMetadataResponse.builder()
+            .version(restamped.version())
+            .nonce(restamped.nonce())
+            .infoHash(restamped.infoHash())
+            .payloadDigest(restamped.payloadDigest())
+            .chunkIndex(restamped.chunkIndex() + 1)
+            .finalChunk(restamped.isFinalChunk())
+            .timestamp(restamped.timestamp())
+            .data(restamped.data())
+            .signature(restamped.signature())
+            .build();
+    assertFalse(reindexed.verifySignature(holderPub(holder)));
+  }
 
-        List<TorrentMetadataResponse> chunks =
-                signAll(TorrentMetadataResponse.buildChunks(nonceA, infoHash, 1000L, torrent), holder);
-        TorrentMetadataResponse restamped = chunks.get(0).withNonceTimestamp(nonceB, 2000L);
+  @Test
+  void fromMapRejectsStaleV1Frames() throws Exception {
+    KeyPair holder = ed25519();
+    byte[] nonce = new byte[32];
+    byte[] infoHash = new byte[20];
+    TorrentMetadataResponse err =
+        sign(
+            TorrentMetadataResponse.buildError(
+                nonce, infoHash, 1000L, TorrentMetadataResponse.ERR_NOT_FOUND),
+            holder);
+    Map<String, Object> stale = err.toBencodeableMap();
+    stale.put("v", 1);
+    assertNull(
+        TorrentMetadataResponse.fromBencodeableMap(stale),
+        "v1 frames (nonce-bound domain) must fail fast on v2 peers");
+  }
 
-        // Same holder signature, new correlation fields — must verify for request B.
-        assertArrayEquals(nonceB, restamped.nonce());
-        assertEquals(2000L, restamped.timestamp());
-        assertTrue(restamped.verifySignature(holderPub(holder)));
-        // And the restamped frame still round-trips through the wire codec.
-        TorrentMetadataResponse decoded = SearchPayloadCodec.decodeTorrentMetadataResponse(
-                SearchPayloadCodec.encodeTorrentMetadataResponse(restamped));
-        assertNotNull(decoded);
-        assertTrue(decoded.verifySignature(holderPub(holder)));
+  @Test
+  void builderEnforcesExactlyOneOfDataOrError() {
+    byte[] nonce = new byte[32];
+    byte[] infoHash = new byte[20];
+    byte[] digest = new byte[32];
+    assertThrows(
+        IllegalStateException.class,
+        () ->
+            TorrentMetadataResponse.builder()
+                .nonce(nonce)
+                .infoHash(infoHash)
+                .payloadDigest(digest)
+                .signature(new byte[64])
+                .build());
+    assertThrows(
+        IllegalStateException.class,
+        () ->
+            TorrentMetadataResponse.builder()
+                .nonce(nonce)
+                .infoHash(infoHash)
+                .payloadDigest(digest)
+                .data(new byte[10])
+                .error("X")
+                .signature(new byte[64])
+                .build());
+    assertThrows(
+        IllegalStateException.class,
+        () ->
+            TorrentMetadataResponse.builder()
+                .nonce(nonce)
+                .infoHash(infoHash)
+                .payloadDigest(digest)
+                .data(new byte[TorrentMetadataResponse.CHUNK_DATA_BYTES + 1])
+                .signature(new byte[64])
+                .build());
+  }
 
-        // Same-domain tampering (chunk index) must still fail verification.
-        TorrentMetadataResponse reindexed = TorrentMetadataResponse.builder()
-                .version(restamped.version())
-                .nonce(restamped.nonce())
-                .infoHash(restamped.infoHash())
-                .payloadDigest(restamped.payloadDigest())
-                .chunkIndex(restamped.chunkIndex() + 1)
-                .finalChunk(restamped.isFinalChunk())
-                .timestamp(restamped.timestamp())
-                .data(restamped.data())
-                .signature(restamped.signature())
-                .build();
-        assertFalse(reindexed.verifySignature(holderPub(holder)));
-    }
+  @Test
+  void fromMapRejectsBadDigestAndBothFields() {
+    byte[] nonceB64 = java.util.Base64.getEncoder().withoutPadding().encode(new byte[32]);
+    byte[] ih = new byte[20];
+    new SecureRandom().nextBytes(ih);
+    String ihHex = com.frostwire.util.Hex.encode(ih);
+    String sig = java.util.Base64.getEncoder().withoutPadding().encodeToString(new byte[64]);
+    Map<String, Object> badDigest = new java.util.HashMap<>();
+    badDigest.put("v", TorrentMetadataResponse.VERSION);
+    badDigest.put("nonce", nonceB64);
+    badDigest.put("ih", ihHex);
+    badDigest.put("pd", "short");
+    badDigest.put("ci", 0);
+    badDigest.put("fin", true);
+    badDigest.put("ts", 1L);
+    badDigest.put("data", "abcd");
+    badDigest.put("sig", sig);
+    assertNull(TorrentMetadataResponse.fromBencodeableMap(badDigest));
 
-    @Test
-    void fromMapRejectsStaleV1Frames() throws Exception {
-        KeyPair holder = ed25519();
-        byte[] nonce = new byte[32];
-        byte[] infoHash = new byte[20];
-        TorrentMetadataResponse err = sign(
-                TorrentMetadataResponse.buildError(nonce, infoHash, 1000L, TorrentMetadataResponse.ERR_NOT_FOUND),
-                holder);
-        Map<String, Object> stale = err.toBencodeableMap();
-        stale.put("v", 1);
-        assertNull(TorrentMetadataResponse.fromBencodeableMap(stale),
-                "v1 frames (nonce-bound domain) must fail fast on v2 peers");
-    }
-
-    @Test
-    void builderEnforcesExactlyOneOfDataOrError() {
-        byte[] nonce = new byte[32];
-        byte[] infoHash = new byte[20];
-        byte[] digest = new byte[32];
-        assertThrows(IllegalStateException.class, () ->
-                TorrentMetadataResponse.builder()
-                        .nonce(nonce).infoHash(infoHash).payloadDigest(digest)
-                        .signature(new byte[64]).build());
-        assertThrows(IllegalStateException.class, () ->
-                TorrentMetadataResponse.builder()
-                        .nonce(nonce).infoHash(infoHash).payloadDigest(digest)
-                        .data(new byte[10]).error("X")
-                        .signature(new byte[64]).build());
-        assertThrows(IllegalStateException.class, () ->
-                TorrentMetadataResponse.builder()
-                        .nonce(nonce).infoHash(infoHash).payloadDigest(digest)
-                        .data(new byte[TorrentMetadataResponse.CHUNK_DATA_BYTES + 1])
-                        .signature(new byte[64]).build());
-    }
-
-    @Test
-    void fromMapRejectsBadDigestAndBothFields() {
-        byte[] nonceB64 = java.util.Base64.getEncoder().withoutPadding().encode(new byte[32]);
-        byte[] ih = new byte[20];
-        new SecureRandom().nextBytes(ih);
-        String ihHex = com.frostwire.util.Hex.encode(ih);
-        String sig = java.util.Base64.getEncoder().withoutPadding().encodeToString(new byte[64]);
-        Map<String, Object> badDigest = new java.util.HashMap<>();
-        badDigest.put("v", TorrentMetadataResponse.VERSION);
-        badDigest.put("nonce", nonceB64);
-        badDigest.put("ih", ihHex);
-        badDigest.put("pd", "short");
-        badDigest.put("ci", 0);
-        badDigest.put("fin", true);
-        badDigest.put("ts", 1L);
-        badDigest.put("data", "abcd");
-        badDigest.put("sig", sig);
-        assertNull(TorrentMetadataResponse.fromBencodeableMap(badDigest));
-
-        Map<String, Object> both = new java.util.HashMap<>(badDigest);
-        both.put("pd", java.util.Base64.getEncoder().withoutPadding().encodeToString(new byte[32]));
-        both.put("err", "NOT_FOUND");
-        assertNull(TorrentMetadataResponse.fromBencodeableMap(both));
-    }
+    Map<String, Object> both = new java.util.HashMap<>(badDigest);
+    both.put("pd", java.util.Base64.getEncoder().withoutPadding().encodeToString(new byte[32]));
+    both.put("err", "NOT_FOUND");
+    assertNull(TorrentMetadataResponse.fromBencodeableMap(both));
+  }
 }

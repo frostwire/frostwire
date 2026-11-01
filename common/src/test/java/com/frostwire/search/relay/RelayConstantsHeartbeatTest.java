@@ -18,10 +18,12 @@ class RelayConstantsHeartbeatTest {
   @Test
   void bucketIsStableWithinTheHourAndChangesAcrossIt() {
     long base = 1_700_000_000_000L;
-    long startOfBucket = RelayConstants.heartbeatBucketIndex(base) * RelayConstants.HEARTBEAT_BUCKET_MS;
+    long startOfBucket =
+        RelayConstants.heartbeatBucketIndex(base) * RelayConstants.HEARTBEAT_BUCKET_MS;
     assertEquals(
         RelayConstants.heartbeatBucketIndex(startOfBucket),
-        RelayConstants.heartbeatBucketIndex(startOfBucket + RelayConstants.HEARTBEAT_BUCKET_MS - 1));
+        RelayConstants.heartbeatBucketIndex(
+            startOfBucket + RelayConstants.HEARTBEAT_BUCKET_MS - 1));
     assertNotEquals(
         RelayConstants.heartbeatBucketIndex(startOfBucket),
         RelayConstants.heartbeatBucketIndex(startOfBucket + RelayConstants.HEARTBEAT_BUCKET_MS));
@@ -33,7 +35,8 @@ class RelayConstantsHeartbeatTest {
     String topic = RelayConstants.heartbeatTopic(now);
     assertTrue(topic.startsWith(RelayConstants.TOPIC_HEARTBEAT_PREFIX + "-"), topic);
     assertEquals(
-        RelayConstants.TOPIC_HEARTBEAT_PREFIX + "-" + RelayConstants.heartbeatBucketIndex(now), topic);
+        RelayConstants.TOPIC_HEARTBEAT_PREFIX + "-" + RelayConstants.heartbeatBucketIndex(now),
+        topic);
   }
 
   @Test

@@ -52,7 +52,8 @@ class TellurideSearchPerformerBestFormatsTest {
   }
 
   @Test
-  void muxedProgressiveStillOffersAudioRow() {    String json =
+  void muxedProgressiveStillOffersAudioRow() {
+    String json =
         "{"
             + "\"id\":\"abc\","
             + "\"title\":\"LAGOS\","
@@ -128,7 +129,8 @@ class TellurideSearchPerformerBestFormatsTest {
   }
 
   @Test
-  void dashVideoWithoutM4aCarriesNoSibling() {    String json =
+  void dashVideoWithoutM4aCarriesNoSibling() {
+    String json =
         "{"
             + "\"id\":\"abc\","
             + "\"title\":\"Test Video\","
@@ -151,7 +153,8 @@ class TellurideSearchPerformerBestFormatsTest {
   }
 
   @Test
-  void webmVideoCarriesNoSibling() {    String json =
+  void webmVideoCarriesNoSibling() {
+    String json =
         "{"
             + "\"id\":\"abc\","
             + "\"title\":\"Test Video\","

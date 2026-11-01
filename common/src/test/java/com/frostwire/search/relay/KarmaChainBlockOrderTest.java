@@ -71,7 +71,8 @@ class KarmaChainBlockOrderTest {
     chain.endorse(peer(1), infoHash(1), block(144L * 5), keyPair.getPrivate());
 
     assertThrows(
-        IllegalStateException.class, () -> chain.commitEpoch(block(144L * 4), keyPair.getPrivate()));
+        IllegalStateException.class,
+        () -> chain.commitEpoch(block(144L * 4), keyPair.getPrivate()));
 
     assertEquals(2, chain.entries().size());
     assertTrue(KarmaChain.verify(chain.entries()));

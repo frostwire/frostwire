@@ -13,8 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 
 /**
- * frostwire/frostwire#1399 (found by the karma chain and identity record fuzz harnesses): odd-length
- * hex from a peer threw ArrayIndexOutOfBoundsException instead of the documented
+ * frostwire/frostwire#1399 (found by the karma chain and identity record fuzz harnesses):
+ * odd-length hex from a peer threw ArrayIndexOutOfBoundsException instead of the documented
  * IllegalArgumentException.
  */
 class HexTest {

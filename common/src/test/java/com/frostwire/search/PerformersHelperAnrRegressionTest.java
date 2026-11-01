@@ -18,136 +18,141 @@
 
 package com.frostwire.search;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.frostwire.licenses.CreativeCommonsLicense;
 import com.frostwire.licenses.License;
-import org.junit.jupiter.api.Test;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 
 /**
- * Regression test for the SearchResultListAdapter ANR: relevance sort must pre-compute
- * normalized strings once and must not recompile regex patterns per search result.
+ * Regression test for the SearchResultListAdapter ANR: relevance sort must pre-compute normalized
+ * strings once and must not recompile regex patterns per search result.
  */
 class PerformersHelperAnrRegressionTest {
 
-    private static final long ANR_THRESHOLD_MS = 5_000;
+  private static final long ANR_THRESHOLD_MS = 5_000;
 
-    @Test
-    void relevanceSortCompletesUnderAnrThresholdForLargeResultSet() {
-        List<FileSearchResult> searchResults = new ArrayList<>();
-        String[] problematicNames = {
-                "Ubuntu.18.04.desktop.amd64.iso.torrent",
-                "www.example.com_Ultimate.Movie.Collection[2020]",
-                "Linux\\Distribution/Complete&Set*@#$%.torrent",
-                "Software_Package-v2.3;Final(Release).zip",
-                "Music|Album{Best}Of[Artist]_2021.mp3.torrent",
-                "Àlbum_Mùsíc&Sóngs*Collection#2021.torrent",
-                "www.site.net/download/file_name-with.many.dots...",
-                "Complex(Movie)Title[2021]www.tracker.com.mkv.torrent"
-        };
+  @Test
+  void relevanceSortCompletesUnderAnrThresholdForLargeResultSet() {
+    List<FileSearchResult> searchResults = new ArrayList<>();
+    String[] problematicNames = {
+      "Ubuntu.18.04.desktop.amd64.iso.torrent",
+      "www.example.com_Ultimate.Movie.Collection[2020]",
+      "Linux\\Distribution/Complete&Set*@#$%.torrent",
+      "Software_Package-v2.3;Final(Release).zip",
+      "Music|Album{Best}Of[Artist]_2021.mp3.torrent",
+      "Àlbum_Mùsíc&Sóngs*Collection#2021.torrent",
+      "www.site.net/download/file_name-with.many.dots...",
+      "Complex(Movie)Title[2021]www.tracker.com.mkv.torrent"
+    };
 
-        for (int i = 0; i < 1000; i++) {
-            for (String name : problematicNames) {
-                searchResults.add(new MockFileSearchResult(name, name + "_" + i + ".file"));
-            }
-        }
+    for (int i = 0; i < 1000; i++) {
+      for (String name : problematicNames) {
+        searchResults.add(new MockFileSearchResult(name, name + "_" + i + ".file"));
+      }
+    }
 
-        String currentQuery = "ubuntu movie music";
-        List<String> tokens = PerformersHelper.tokenizeSearchKeywords(currentQuery.toLowerCase());
-        tokens.removeIf(PerformersHelper.stopwords::contains);
+    String currentQuery = "ubuntu movie music";
+    List<String> tokens = PerformersHelper.tokenizeSearchKeywords(currentQuery.toLowerCase());
+    tokens.removeIf(PerformersHelper.stopwords::contains);
 
-        Map<SearchResult, String> normalized = new HashMap<>();
-        Map<SearchResult, Integer> levenshtein = new HashMap<>();
+    Map<SearchResult, String> normalized = new HashMap<>();
+    Map<SearchResult, Integer> levenshtein = new HashMap<>();
 
-        long startTime = System.nanoTime();
+    long startTime = System.nanoTime();
 
-        for (SearchResult r : searchResults) {
-            String n = PerformersHelper.searchResultAsNormalizedString(r).toLowerCase();
-            normalized.put(r, n);
-            levenshtein.put(r, PerformersHelper.levenshteinDistance(n, currentQuery));
-        }
+    for (SearchResult r : searchResults) {
+      String n = PerformersHelper.searchResultAsNormalizedString(r).toLowerCase();
+      normalized.put(r, n);
+      levenshtein.put(r, PerformersHelper.levenshteinDistance(n, currentQuery));
+    }
 
-        searchResults.sort((a, b) -> {
-            int m1 = PerformersHelper.countMatchedTokens(normalized.get(a), tokens);
-            int m2 = PerformersHelper.countMatchedTokens(normalized.get(b), tokens);
-            if (m1 != m2) {
-                return Integer.compare(m2, m1);
-            }
-            return Integer.compare(levenshtein.get(a), levenshtein.get(b));
+    searchResults.sort(
+        (a, b) -> {
+          int m1 = PerformersHelper.countMatchedTokens(normalized.get(a), tokens);
+          int m2 = PerformersHelper.countMatchedTokens(normalized.get(b), tokens);
+          if (m1 != m2) {
+            return Integer.compare(m2, m1);
+          }
+          return Integer.compare(levenshtein.get(a), levenshtein.get(b));
         });
 
-        long totalTimeMs = (System.nanoTime() - startTime) / 1_000_000L;
+    long totalTimeMs = (System.nanoTime() - startTime) / 1_000_000L;
 
-        assertTrue(totalTimeMs < ANR_THRESHOLD_MS,
-                "Relevance sort took " + totalTimeMs + " ms, exceeds ANR threshold of " + ANR_THRESHOLD_MS + " ms");
-        assertTrue(PerformersHelper.countMatchedTokens(normalized.get(searchResults.get(0)), tokens) > 0,
-                "Top-ranked result should match at least one query token");
+    assertTrue(
+        totalTimeMs < ANR_THRESHOLD_MS,
+        "Relevance sort took "
+            + totalTimeMs
+            + " ms, exceeds ANR threshold of "
+            + ANR_THRESHOLD_MS
+            + " ms");
+    assertTrue(
+        PerformersHelper.countMatchedTokens(normalized.get(searchResults.get(0)), tokens) > 0,
+        "Top-ranked result should match at least one query token");
+  }
+
+  @Test
+  void sanitizeStripsHtmlAndCombiningMarks() {
+    MockFileSearchResult sr =
+        new MockFileSearchResult("Café <b>www.example.com</b> release", "café_release.mkv");
+    String normalized = PerformersHelper.searchResultAsNormalizedString(sr);
+
+    assertTrue(normalized.contains("cafe"), "Expected ASCII form of accented characters");
+    assertTrue(normalized.contains("example"), "Expected host fragment after www. removal");
+    assertTrue(!normalized.contains("<"), "HTML tags should be stripped");
+  }
+
+  private static final class MockFileSearchResult implements FileSearchResult {
+    private final String displayName;
+    private final String filename;
+
+    MockFileSearchResult(String displayName, String filename) {
+      this.displayName = displayName;
+      this.filename = filename;
     }
 
-    @Test
-    void sanitizeStripsHtmlAndCombiningMarks() {
-        MockFileSearchResult sr = new MockFileSearchResult(
-                "Café <b>www.example.com</b> release",
-                "café_release.mkv");
-        String normalized = PerformersHelper.searchResultAsNormalizedString(sr);
-
-        assertTrue(normalized.contains("cafe"), "Expected ASCII form of accented characters");
-        assertTrue(normalized.contains("example"), "Expected host fragment after www. removal");
-        assertTrue(!normalized.contains("<"), "HTML tags should be stripped");
+    @Override
+    public String getDisplayName() {
+      return displayName;
     }
 
-    private static final class MockFileSearchResult implements FileSearchResult {
-        private final String displayName;
-        private final String filename;
-
-        MockFileSearchResult(String displayName, String filename) {
-            this.displayName = displayName;
-            this.filename = filename;
-        }
-
-        @Override
-        public String getDisplayName() {
-            return displayName;
-        }
-
-        @Override
-        public String getFilename() {
-            return filename;
-        }
-
-        @Override
-        public long getSize() {
-            return 1024;
-        }
-
-        @Override
-        public String getDetailsUrl() {
-            return "http://example.com";
-        }
-
-        @Override
-        public String getSource() {
-            return "test";
-        }
-
-        @Override
-        public long getCreationTime() {
-            return System.currentTimeMillis();
-        }
-
-        @Override
-        public License getLicense() {
-            return CreativeCommonsLicense.standard("Attribution", "BY", "4.0");
-        }
-
-        @Override
-        public String getThumbnailUrl() {
-            return null;
-        }
+    @Override
+    public String getFilename() {
+      return filename;
     }
+
+    @Override
+    public long getSize() {
+      return 1024;
+    }
+
+    @Override
+    public String getDetailsUrl() {
+      return "http://example.com";
+    }
+
+    @Override
+    public String getSource() {
+      return "test";
+    }
+
+    @Override
+    public long getCreationTime() {
+      return System.currentTimeMillis();
+    }
+
+    @Override
+    public License getLicense() {
+      return CreativeCommonsLicense.standard("Attribution", "BY", "4.0");
+    }
+
+    @Override
+    public String getThumbnailUrl() {
+      return null;
+    }
+  }
 }

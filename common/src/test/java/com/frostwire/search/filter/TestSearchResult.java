@@ -27,57 +27,57 @@ import com.frostwire.search.SearchResult;
  */
 class TestSearchResult implements SearchResult, Cloneable {
 
-    private final String id;
+  private final String id;
 
-    private String source;
+  private String source;
 
-    public TestSearchResult(String id) {
-        this.id = id;
+  public TestSearchResult(String id) {
+    this.id = id;
 
-        this.source = "source:" + id;
-    }
+    this.source = "source:" + id;
+  }
 
-    @Override
-    public String getDisplayName() {
-        return "DisplayName:" + id;
-    }
+  @Override
+  public String getDisplayName() {
+    return "DisplayName:" + id;
+  }
 
-    @Override
-    public String getDetailsUrl() {
-        return "https://" + id + ".com/details";
-    }
+  @Override
+  public String getDetailsUrl() {
+    return "https://" + id + ".com/details";
+  }
 
-    @Override
-    public long getCreationTime() {
-        return 0;
-    }
+  @Override
+  public long getCreationTime() {
+    return 0;
+  }
 
-    @Override
-    public String getSource() {
-        return source;
-    }
+  @Override
+  public String getSource() {
+    return source;
+  }
 
-    public TestSearchResult source(String source) {
-        this.source = source;
-        return this;
-    }
+  public TestSearchResult source(String source) {
+    this.source = source;
+    return this;
+  }
 
-    @Override
-    public License getLicense() {
-        return null;
-    }
+  @Override
+  public License getLicense() {
+    return null;
+  }
 
-    @Override
-    public String getThumbnailUrl() {
-        return "http://" + id + ".com/thumbnail";
-    }
+  @Override
+  public String getThumbnailUrl() {
+    return "http://" + id + ".com/thumbnail";
+  }
 
-    @Override
-    public TestSearchResult clone() {
-        TestSearchResult sr = new TestSearchResult(id);
+  @Override
+  public TestSearchResult clone() {
+    TestSearchResult sr = new TestSearchResult(id);
 
-        sr.source = source;
+    sr.source = source;
 
-        return sr;
-    }
+    return sr;
+  }
 }

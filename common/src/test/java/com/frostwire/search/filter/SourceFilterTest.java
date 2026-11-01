@@ -18,11 +18,10 @@
 
 package com.frostwire.search.filter;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author gubatron
@@ -30,44 +29,44 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class SourceFilterTest {
 
-    @Test
-    public void testAddTwoSameSource() {
-        SearchTable t = new SearchTable(0);
+  @Test
+  public void testAddTwoSameSource() {
+    SearchTable t = new SearchTable(0);
 
-        TestSearchResult sr1 = new TestSearchResult("a");
-        sr1 = sr1.clone().source("test");
-        TestSearchResult sr2 = new TestSearchResult("b");
-        sr2 = sr2.clone().source("test");
+    TestSearchResult sr1 = new TestSearchResult("a");
+    sr1 = sr1.clone().source("test");
+    TestSearchResult sr2 = new TestSearchResult("b");
+    sr2 = sr2.clone().source("test");
 
-        SourceKey k = new SourceKey("test", 0);
-        SourceFilter f = new SourceFilter(k);
+    SourceKey k = new SourceKey("test", 0);
+    SourceFilter f = new SourceFilter(k);
 
-        SearchView view = t.view(f);
+    SearchView view = t.view(f);
 
-        t.add(Arrays.asList(sr1, sr2));
+    t.add(Arrays.asList(sr1, sr2));
 
-        assertEquals(t.data().size(), 2);
-        assertEquals(view.groups().size(), 1);
-    }
+    assertEquals(t.data().size(), 2);
+    assertEquals(view.groups().size(), 1);
+  }
 
-    @Test
-    public void testAddTwoSources() {
-        SearchTable t = new SearchTable(0);
+  @Test
+  public void testAddTwoSources() {
+    SearchTable t = new SearchTable(0);
 
-        TestSearchResult sr1 = new TestSearchResult("a");
-        sr1 = sr1.clone().source("test1");
-        TestSearchResult sr2 = new TestSearchResult("b");
-        sr2 = sr2.clone().source("test2");
+    TestSearchResult sr1 = new TestSearchResult("a");
+    sr1 = sr1.clone().source("test1");
+    TestSearchResult sr2 = new TestSearchResult("b");
+    sr2 = sr2.clone().source("test2");
 
-        SourceKey k1 = new SourceKey("test1", 0);
-        SourceKey k2 = new SourceKey("test2", 1);
-        SourceFilter f = new SourceFilter(k1, k2);
+    SourceKey k1 = new SourceKey("test1", 0);
+    SourceKey k2 = new SourceKey("test2", 1);
+    SourceFilter f = new SourceFilter(k1, k2);
 
-        SearchView view = t.view(f);
+    SearchView view = t.view(f);
 
-        t.add(Arrays.asList(sr1, sr2));
+    t.add(Arrays.asList(sr1, sr2));
 
-        assertEquals(t.data().size(), 2);
-        assertEquals(view.groups().size(), 2);
-    }
+    assertEquals(t.data().size(), 2);
+    assertEquals(view.groups().size(), 2);
+  }
 }

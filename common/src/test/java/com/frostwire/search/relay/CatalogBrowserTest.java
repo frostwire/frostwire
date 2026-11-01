@@ -25,17 +25,17 @@ import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 
 /**
- * Exercises {@link CatalogBrowser} against a fake in-process
- * {@link DistributedSearchTransport} that delivers a peer-signed manifest
- * (or a corrupted one) off-thread.
+ * Exercises {@link CatalogBrowser} against a fake in-process {@link DistributedSearchTransport}
+ * that delivers a peer-signed manifest (or a corrupted one) off-thread.
  */
 class CatalogBrowserTest {
 
-  private static final List<RemoteIndexFetcher.RemoteTorrentEntry> CATALOG = List.of(
-      new RemoteIndexFetcher.RemoteTorrentEntry(
-          "a1b2c3d4e5f6", "ubuntu-24.04.iso", 5_000_000_000L, 1),
-      new RemoteIndexFetcher.RemoteTorrentEntry(
-          "f0e1d2c3b4a5", "debian-12.iso", 3_000_000_000L, 3));
+  private static final List<RemoteIndexFetcher.RemoteTorrentEntry> CATALOG =
+      List.of(
+          new RemoteIndexFetcher.RemoteTorrentEntry(
+              "a1b2c3d4e5f6", "ubuntu-24.04.iso", 5_000_000_000L, 1),
+          new RemoteIndexFetcher.RemoteTorrentEntry(
+              "f0e1d2c3b4a5", "debian-12.iso", 3_000_000_000L, 3));
 
   @Test
   void constructorRejectsNulls() throws Exception {
@@ -108,8 +108,8 @@ class CatalogBrowserTest {
     Signature verifier = IdentityKeys.softwareSignature("Ed25519");
     verifier.initVerify(SearchResponseVerifier.rawEd25519ToPublicKey(requester.ed25519PubRaw()));
     verifier.update(request.canonicalBytes());
-    assertTrue(verifier.verify(request.signature()),
-        "request must carry a valid requester signature");
+    assertTrue(
+        verifier.verify(request.signature()), "request must carry a valid requester signature");
   }
 
   @Test
@@ -164,20 +164,24 @@ class CatalogBrowserTest {
     byte[] peerPub = holder.ed25519PubRaw();
     List<RemoteIndexFetcher.RemoteTorrentEntry> big = bigCatalog(30);
     List<byte[]> delivered = new CopyOnWriteArrayList<>();
-    FakeTransport transport = new FakeTransport(peerPub, request -> {
-      List<byte[]> pages = signedPages(holder, big, nonceOf(request));
-      delivered.addAll(pages);
-      List<byte[]> reversed = new java.util.ArrayList<>(pages);
-      java.util.Collections.reverse(reversed); // relays do not preserve order
-      return reversed;
-    });
+    FakeTransport transport =
+        new FakeTransport(
+            peerPub,
+            request -> {
+              List<byte[]> pages = signedPages(holder, big, nonceOf(request));
+              delivered.addAll(pages);
+              List<byte[]> reversed = new java.util.ArrayList<>(pages);
+              java.util.Collections.reverse(reversed); // relays do not preserve order
+              return reversed;
+            });
 
     List<RemoteIndexFetcher.RemoteTorrentEntry> entries =
         new CatalogBrowser(IdentityKeys.generate(0), transport).fetchCatalog(peerPub, 3000);
 
     assertTrue(delivered.size() > 1, "a 30-torrent catalog cannot fit a single relayed frame");
     for (byte[] page : delivered) {
-      assertTrue(page.length + com.frostwire.search.relay.icebridge.MeshEnvelope.HEADER_LENGTH
+      assertTrue(
+          page.length + com.frostwire.search.relay.icebridge.MeshEnvelope.HEADER_LENGTH
               <= com.frostwire.search.relay.icebridge.udp.RelayFrame.MAX_APP_PAYLOAD,
           "page of " + page.length + " bytes would be dropped by the relay");
     }
@@ -193,11 +197,13 @@ class CatalogBrowserTest {
     byte[] peerPub = holder.ed25519PubRaw();
     byte[] otherNonce = new byte[32];
     Arrays.fill(otherNonce, (byte) 7);
-    FakeTransport transport = new FakeTransport(peerPub,
-        request -> signedPages(holder, bigCatalog(30), otherNonce));
+    FakeTransport transport =
+        new FakeTransport(peerPub, request -> signedPages(holder, bigCatalog(30), otherNonce));
 
-    assertTrue(new CatalogBrowser(IdentityKeys.generate(0), transport)
-        .fetchCatalog(peerPub, 500).isEmpty());
+    assertTrue(
+        new CatalogBrowser(IdentityKeys.generate(0), transport)
+            .fetchCatalog(peerPub, 500)
+            .isEmpty());
   }
 
   @Test
@@ -206,44 +212,56 @@ class CatalogBrowserTest {
     byte[] peerPub = holder.ed25519PubRaw();
     List<RemoteIndexFetcher.RemoteTorrentEntry> big = bigCatalog(30);
     int[] total = {0};
-    FakeTransport transport = new FakeTransport(peerPub, request -> {
-      List<byte[]> pages = new java.util.ArrayList<>(signedPages(holder, big, nonceOf(request)));
-      total[0] = pages.size();
-      // A relay relabels the last page as page 0 and drops the real page 0.
-      JsonObject last = JsonParser.parseString(
-          new String(pages.get(pages.size() - 1), StandardCharsets.UTF_8)).getAsJsonObject();
-      last.addProperty("page", 0);
-      pages.set(0, last.toString().getBytes(StandardCharsets.UTF_8));
-      pages.remove(pages.size() - 1);
-      return pages;
-    });
+    FakeTransport transport =
+        new FakeTransport(
+            peerPub,
+            request -> {
+              List<byte[]> pages =
+                  new java.util.ArrayList<>(signedPages(holder, big, nonceOf(request)));
+              total[0] = pages.size();
+              // A relay relabels the last page as page 0 and drops the real page 0.
+              JsonObject last =
+                  JsonParser.parseString(
+                          new String(pages.get(pages.size() - 1), StandardCharsets.UTF_8))
+                      .getAsJsonObject();
+              last.addProperty("page", 0);
+              pages.set(0, last.toString().getBytes(StandardCharsets.UTF_8));
+              pages.remove(pages.size() - 1);
+              return pages;
+            });
 
     List<RemoteIndexFetcher.RemoteTorrentEntry> entries =
         new CatalogBrowser(IdentityKeys.generate(0), transport).fetchCatalog(peerPub, 500);
 
     assertTrue(total[0] > 2);
-    assertTrue(!entries.isEmpty() && entries.size() < big.size(),
+    assertTrue(
+        !entries.isEmpty() && entries.size() < big.size(),
         "verified pages are shown; the relabeled one is not");
-    assertTrue(entries.stream().noneMatch(e -> e.infoHashHex().equals(big.get(0).infoHashHex())),
+    assertTrue(
+        entries.stream().noneMatch(e -> e.infoHashHex().equals(big.get(0).infoHashHex())),
         "page 0 rows were dropped and the forged page 0 must not verify");
   }
 
   // --- helpers ---
 
   /**
-   * Build a manifest signed by {@code signer} over the canonical bytes while
-   * claiming {@code claimedPub}. When {@code tamperSignature} is true the
-   * signature is corrupted; when {@code nonce} is non-null it is injected into
-   * the JSON (the canonical domain excludes the nonce, so the signature stays
-   * valid for a nonce-correlation test).
+   * Build a manifest signed by {@code signer} over the canonical bytes while claiming {@code
+   * claimedPub}. When {@code tamperSignature} is true the signature is corrupted; when {@code
+   * nonce} is non-null it is injected into the JSON (the canonical domain excludes the nonce, so
+   * the signature stays valid for a nonce-correlation test).
    */
-  private static byte[] signedManifest(IdentityKeys signer, byte[] claimedPub,
-                                       List<RemoteIndexFetcher.RemoteTorrentEntry> entries,
-                                       boolean tamperSignature, byte[] nonce) throws Exception {
+  private static byte[] signedManifest(
+      IdentityKeys signer,
+      byte[] claimedPub,
+      List<RemoteIndexFetcher.RemoteTorrentEntry> entries,
+      boolean tamperSignature,
+      byte[] nonce)
+      throws Exception {
     String pubB64 = Base64.getEncoder().withoutPadding().encodeToString(claimedPub);
     long timestamp = System.currentTimeMillis() / 1000L;
-    byte[] canonical = RemoteIndexFetcher.manifestCanonicalBytes(
-        RemoteIndexFetcher.MANIFEST_VERSION, pubB64, timestamp, entries);
+    byte[] canonical =
+        RemoteIndexFetcher.manifestCanonicalBytes(
+            RemoteIndexFetcher.MANIFEST_VERSION, pubB64, timestamp, entries);
     Signature signerSignature = IdentityKeys.softwareSignature("Ed25519");
     signerSignature.initSign(signer.ed25519().getPrivate());
     signerSignature.update(canonical);
@@ -251,13 +269,14 @@ class CatalogBrowserTest {
     if (tamperSignature) {
       signature[0] ^= 0x01;
     }
-    byte[] json = RemoteIndexFetcher.buildManifestJson(
-        RemoteIndexFetcher.MANIFEST_VERSION, pubB64, timestamp, entries, signature);
+    byte[] json =
+        RemoteIndexFetcher.buildManifestJson(
+            RemoteIndexFetcher.MANIFEST_VERSION, pubB64, timestamp, entries, signature);
     if (nonce == null) {
       return json;
     }
-    JsonObject root = JsonParser.parseString(new String(json, StandardCharsets.UTF_8))
-        .getAsJsonObject();
+    JsonObject root =
+        JsonParser.parseString(new String(json, StandardCharsets.UTF_8)).getAsJsonObject();
     root.addProperty("nonce", Base64.getEncoder().withoutPadding().encodeToString(nonce));
     return root.toString().getBytes(StandardCharsets.UTF_8);
   }
@@ -265,11 +284,14 @@ class CatalogBrowserTest {
   private static List<RemoteIndexFetcher.RemoteTorrentEntry> bigCatalog(int n) {
     List<RemoteIndexFetcher.RemoteTorrentEntry> out = new java.util.ArrayList<>();
     for (int i = 0; i < n; i++) {
-      out.add(new RemoteIndexFetcher.RemoteTorrentEntry(
-          String.format("%040x", i + 1),
-          "Chip Stocks Crash, 20B Fund Margin Called, Frontier Labs SLOW DOWN AI #" + i
-              + " (640x360).mp4",
-          193_318_977L + i, 1));
+      out.add(
+          new RemoteIndexFetcher.RemoteTorrentEntry(
+              String.format("%040x", i + 1),
+              "Chip Stocks Crash, 20B Fund Margin Called, Frontier Labs SLOW DOWN AI #"
+                  + i
+                  + " (640x360).mp4",
+              193_318_977L + i,
+              1));
     }
     return out;
   }
@@ -278,8 +300,8 @@ class CatalogBrowserTest {
     return SearchPayloadCodec.decodeCatalogBrowseRequest(requestPayload).nonce();
   }
 
-  private static List<byte[]> signedPages(IdentityKeys signer,
-      List<RemoteIndexFetcher.RemoteTorrentEntry> entries, byte[] nonce) {
+  private static List<byte[]> signedPages(
+      IdentityKeys signer, List<RemoteIndexFetcher.RemoteTorrentEntry> entries, byte[] nonce) {
     try {
       String pubB64 = Base64.getEncoder().withoutPadding().encodeToString(signer.ed25519PubRaw());
       long ts = System.currentTimeMillis() / 1000L;
@@ -289,10 +311,12 @@ class CatalogBrowserTest {
       for (int page = 0; page < split.size(); page++) {
         Signature sig = IdentityKeys.softwareSignature("Ed25519");
         sig.initSign(signer.ed25519().getPrivate());
-        sig.update(CatalogManifestPages.canonicalBytes(
-            pubB64, ts, split.get(page), nonce, page, split.size()));
-        out.add(CatalogManifestPages.buildJson(
-            pubB64, ts, split.get(page), nonce, page, split.size(), sig.sign()));
+        sig.update(
+            CatalogManifestPages.canonicalBytes(
+                pubB64, ts, split.get(page), nonce, page, split.size()));
+        out.add(
+            CatalogManifestPages.buildJson(
+                pubB64, ts, split.get(page), nonce, page, split.size(), sig.sign()));
       }
       return out;
     } catch (Exception e) {
@@ -309,14 +333,17 @@ class CatalogBrowserTest {
 
     FakeTransport(byte[] responderPub, Supplier<byte[]> responder) {
       this.responderPub = responderPub == null ? new byte[32] : responderPub.clone();
-      this.responder = responder == null ? null : request -> {
-        byte[] one = responder.get();
-        return one == null ? null : List.of(one);
-      };
+      this.responder =
+          responder == null
+              ? null
+              : request -> {
+                byte[] one = responder.get();
+                return one == null ? null : List.of(one);
+              };
     }
 
-    FakeTransport(byte[] responderPub,
-        java.util.function.Function<byte[], List<byte[]>> pagedResponder) {
+    FakeTransport(
+        byte[] responderPub, java.util.function.Function<byte[], List<byte[]>> pagedResponder) {
       this.responderPub = responderPub.clone();
       this.responder = pagedResponder;
     }
@@ -331,10 +358,9 @@ class CatalogBrowserTest {
     }
 
     @Override
-    public SendOperation createSend(byte[] targetPub, int protocolId, byte[] payload,
-                                    long deadlineNanos) {
-      SentOperation operation =
-          new SentOperation(targetPub.clone(), protocolId, payload.clone());
+    public SendOperation createSend(
+        byte[] targetPub, int protocolId, byte[] payload, long deadlineNanos) {
+      SentOperation operation = new SentOperation(targetPub.clone(), protocolId, payload.clone());
       sent.add(operation);
       return operation;
     }
@@ -369,14 +395,20 @@ class CatalogBrowserTest {
         if (responses == null) {
           return true;
         }
-        Thread deliver = new Thread(() -> {
-          for (byte[] response : responses) {
-            for (PayloadListener listener : listeners) {
-              listener.onPayload(responderPub, response, System.currentTimeMillis(),
-                  MeshProtocolId.CATALOG);
-            }
-          }
-        }, "catalog-browser-fake-deliver");
+        Thread deliver =
+            new Thread(
+                () -> {
+                  for (byte[] response : responses) {
+                    for (PayloadListener listener : listeners) {
+                      listener.onPayload(
+                          responderPub,
+                          response,
+                          System.currentTimeMillis(),
+                          MeshProtocolId.CATALOG);
+                    }
+                  }
+                },
+                "catalog-browser-fake-deliver");
         deliver.setDaemon(true);
         deliver.start();
         return true;

@@ -29,8 +29,11 @@ class IceBridgeEventLogTest {
   @Test
   void tailReturnsNewestFirst() {
     IceBridgeEventLog log = new IceBridgeEventLog(10);
-    log.record(IceBridgeEvent.of(IceBridgeEvent.Level.INFO, IceBridgeEvent.Category.SEARCH, "a", "first"));
-    log.record(IceBridgeEvent.of(IceBridgeEvent.Level.INFO, IceBridgeEvent.Category.SEARCH, "b", "second"));
+    log.record(
+        IceBridgeEvent.of(IceBridgeEvent.Level.INFO, IceBridgeEvent.Category.SEARCH, "a", "first"));
+    log.record(
+        IceBridgeEvent.of(
+            IceBridgeEvent.Level.INFO, IceBridgeEvent.Category.SEARCH, "b", "second"));
 
     List<IceBridgeEvent> tail = log.tail(2);
     assertEquals(2, tail.size());
@@ -42,7 +45,9 @@ class IceBridgeEventLogTest {
   void ringBufferEvictsOldestAtCapacity() {
     IceBridgeEventLog log = new IceBridgeEventLog(3);
     for (int i = 0; i < 5; i++) {
-      log.record(IceBridgeEvent.of(IceBridgeEvent.Level.INFO, IceBridgeEvent.Category.GENERAL, "", "e" + i));
+      log.record(
+          IceBridgeEvent.of(
+              IceBridgeEvent.Level.INFO, IceBridgeEvent.Category.GENERAL, "", "e" + i));
     }
     assertEquals(3, log.size());
     List<IceBridgeEvent> tail = log.tail(3);
@@ -53,11 +58,17 @@ class IceBridgeEventLogTest {
   @Test
   void queryFiltersByLevelCategoryTextPeerAndLimit() {
     IceBridgeEventLog log = new IceBridgeEventLog(50);
-    log.record(IceBridgeEvent.of(IceBridgeEvent.Level.DEBUG, IceBridgeEvent.Category.FORWARD, "aa", "forward a"));
-    log.record(IceBridgeEvent.of(IceBridgeEvent.Level.INFO, IceBridgeEvent.Category.FORWARD, "bb", "forward b"));
-    log.record(IceBridgeEvent.of(IceBridgeEvent.Level.ERROR, IceBridgeEvent.Category.ERROR, "", "boom"));
+    log.record(
+        IceBridgeEvent.of(
+            IceBridgeEvent.Level.DEBUG, IceBridgeEvent.Category.FORWARD, "aa", "forward a"));
+    log.record(
+        IceBridgeEvent.of(
+            IceBridgeEvent.Level.INFO, IceBridgeEvent.Category.FORWARD, "bb", "forward b"));
+    log.record(
+        IceBridgeEvent.of(IceBridgeEvent.Level.ERROR, IceBridgeEvent.Category.ERROR, "", "boom"));
 
-    assertEquals(2, log.query(null, Set.of(IceBridgeEvent.Category.FORWARD), null, null, 0, 50).size());
+    assertEquals(
+        2, log.query(null, Set.of(IceBridgeEvent.Category.FORWARD), null, null, 0, 50).size());
     assertEquals(
         2,
         log.query(IceBridgeEvent.Level.INFO, null, null, null, 0, 50).size(),
@@ -75,7 +86,8 @@ class IceBridgeEventLogTest {
   void disabledLogIsANoOp() {
     IceBridgeEventLog log = IceBridgeEventLog.instance();
     log.setEnabled(false);
-    log.record(IceBridgeEvent.of(IceBridgeEvent.Level.INFO, IceBridgeEvent.Category.SEARCH, "", "x"));
+    log.record(
+        IceBridgeEvent.of(IceBridgeEvent.Level.INFO, IceBridgeEvent.Category.SEARCH, "", "x"));
     assertEquals(0, log.size());
     assertFalse(IceBridgeEvents.enabled());
   }
@@ -91,11 +103,13 @@ class IceBridgeEventLogTest {
         });
     log.addListener(counting);
 
-    log.record(IceBridgeEvent.of(IceBridgeEvent.Level.INFO, IceBridgeEvent.Category.GENERAL, "", "x"));
+    log.record(
+        IceBridgeEvent.of(IceBridgeEvent.Level.INFO, IceBridgeEvent.Category.GENERAL, "", "x"));
     assertEquals(1, ok.get(), "a throwing listener must not stop the others");
 
     log.removeListener(counting);
-    log.record(IceBridgeEvent.of(IceBridgeEvent.Level.INFO, IceBridgeEvent.Category.GENERAL, "", "y"));
+    log.record(
+        IceBridgeEvent.of(IceBridgeEvent.Level.INFO, IceBridgeEvent.Category.GENERAL, "", "y"));
     assertEquals(1, ok.get());
   }
 
@@ -112,18 +126,23 @@ class IceBridgeEventLogTest {
   @Test
   void matchesPredicateHonorsEveryFilter() {
     IceBridgeEvent e =
-        IceBridgeEvent.of(IceBridgeEvent.Level.WARN, IceBridgeEvent.Category.FORWARD, "aabbcc", "hi miami");
+        IceBridgeEvent.of(
+            IceBridgeEvent.Level.WARN, IceBridgeEvent.Category.FORWARD, "aabbcc", "hi miami");
     assertTrue(IceBridgeEventLog.matches(e, null, null, null, null, 0));
     assertTrue(IceBridgeEventLog.matches(e, IceBridgeEvent.Level.INFO, null, "MIAMI", "AABB", 0));
-    assertTrue(IceBridgeEventLog.matches(e, null, Set.of(IceBridgeEvent.Category.FORWARD), null, null, 0));
+    assertTrue(
+        IceBridgeEventLog.matches(e, null, Set.of(IceBridgeEvent.Category.FORWARD), null, null, 0));
     assertFalse(
-        IceBridgeEventLog.matches(e, IceBridgeEvent.Level.ERROR, null, null, null, 0), "level below min");
+        IceBridgeEventLog.matches(e, IceBridgeEvent.Level.ERROR, null, null, null, 0),
+        "level below min");
     assertFalse(
-        IceBridgeEventLog.matches(e, null, Set.of(IceBridgeEvent.Category.DIGEST), null, null, 0), "category");
+        IceBridgeEventLog.matches(e, null, Set.of(IceBridgeEvent.Category.DIGEST), null, null, 0),
+        "category");
     assertFalse(IceBridgeEventLog.matches(e, null, null, "absent", null, 0), "text");
     assertFalse(IceBridgeEventLog.matches(e, null, null, null, "zz", 0), "peer");
     assertFalse(
-        IceBridgeEventLog.matches(e, null, null, null, null, e.timestampMs() + 1), "since in the future");
+        IceBridgeEventLog.matches(e, null, null, null, null, e.timestampMs() + 1),
+        "since in the future");
   }
 
   @Test

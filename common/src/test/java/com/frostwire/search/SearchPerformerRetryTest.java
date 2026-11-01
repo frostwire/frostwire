@@ -22,8 +22,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
 /**
- * archive.org now and then resets an HTTP/2 stream (PROTOCOL_ERROR); OkHttp doesn't retry that,
- * so the whole engine returned nothing. A search GET that fails to connect is tried once more; a
+ * archive.org now and then resets an HTTP/2 stream (PROTOCOL_ERROR); OkHttp doesn't retry that, so
+ * the whole engine returned nothing. A search GET that fails to connect is tried once more; a
  * timeout is not, since that would double the wait.
  */
 class SearchPerformerRetryTest {
@@ -40,8 +40,7 @@ class SearchPerformerRetryTest {
 
   @Test
   void aRequestThatFailsTwiceFails() {
-    SearchPerformer performer =
-        performer(new IOException("reset"), new IOException("reset again"));
+    SearchPerformer performer = performer(new IOException("reset"), new IOException("reset again"));
     IOException e =
         assertThrows(IOException.class, () -> performer.fetch("https://example.org/search"));
     assertEquals("reset again", e.getMessage());
@@ -51,8 +50,7 @@ class SearchPerformerRetryTest {
   @Test
   void aTimeoutIsNotRetried() {
     SearchPerformer performer = performer(new SocketTimeoutException("timeout"), "results");
-    assertThrows(
-        SearchTimeoutException.class, () -> performer.fetch("https://example.org/search"));
+    assertThrows(SearchTimeoutException.class, () -> performer.fetch("https://example.org/search"));
     assertEquals(1, gets.get());
   }
 
@@ -74,7 +72,6 @@ class SearchPerformerRetryTest {
                   }
                   return answer;
                 });
-    return new SearchPerformer(
-        1, "q", "q", new InternetArchiveSearchPattern(), null, 1000, client);
+    return new SearchPerformer(1, "q", "q", new InternetArchiveSearchPattern(), null, 1000, client);
   }
 }

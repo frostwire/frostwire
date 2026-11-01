@@ -12,9 +12,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.junit.jupiter.api.Test;
 
 /**
  * frostwire/frostwire#1409, three ID3v2 parsing bugs found by the compatibility-fixture sweep, none
@@ -161,7 +161,10 @@ class ID3v2ParsingFixesTest {
 
   private static byte[] synchsafe(int n) {
     return new byte[] {
-      (byte) ((n >> 21) & 0x7f), (byte) ((n >> 14) & 0x7f), (byte) ((n >> 7) & 0x7f), (byte) (n & 0x7f)
+      (byte) ((n >> 21) & 0x7f),
+      (byte) ((n >> 14) & 0x7f),
+      (byte) ((n >> 7) & 0x7f),
+      (byte) (n & 0x7f)
     };
   }
 }

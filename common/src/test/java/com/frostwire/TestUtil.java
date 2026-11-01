@@ -23,11 +23,11 @@ import java.io.IOException;
 import java.net.URL;
 
 public final class TestUtil {
-    public static File getTestResource(String fileName) throws IOException {
-        URL resource = TestUtil.class.getResource(fileName);
-        if (resource == null) {
-            throw new IOException("TestUtil::getTestResource: resource not found: " + fileName);
-        }
-        return new File(resource.getPath());
+  public static File getTestResource(String fileName) throws IOException {
+    URL resource = TestUtil.class.getResource(fileName);
+    if (resource == null) {
+      throw new IOException("TestUtil::getTestResource: resource not found: " + fileName);
     }
+    return new File(resource.getPath());
+  }
 }

@@ -18,19 +18,18 @@
 
 package com.frostwire.platform;
 
-import com.frostwire.desktop.DesktopPlatform;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
+import static org.junit.jupiter.api.Assertions.*;
 
+import com.frostwire.desktop.DesktopPlatform;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
  * @author gubatron
@@ -38,107 +37,114 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class FileSystemWalkTest {
 
-    DefaultFileSystem fs;
+  DefaultFileSystem fs;
 
-    @BeforeEach
-    public void setUp() {
-        Platforms.set(new DesktopPlatform());
-        fs = new DefaultFileSystem();
-    }
+  @BeforeEach
+  public void setUp() {
+    Platforms.set(new DesktopPlatform());
+    fs = new DefaultFileSystem();
+  }
 
+  @Test
+  public void testAnyFile() {
+    final AtomicBoolean b = new AtomicBoolean(false);
 
-    @Test
-    public void testAnyFile() {
-        final AtomicBoolean b = new AtomicBoolean(false);
+    fs.walk(
+        new File("any.txt"),
+        new FileFilter() {
+          @Override
+          public boolean accept(File file) {
+            return true;
+          }
 
-        fs.walk(new File("any.txt"), new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return true;
-            }
-
-            @Override
-            public void file(File file) {
-                b.set(true);
-            }
+          @Override
+          public void file(File file) {
+            b.set(true);
+          }
         });
 
-        assertFalse(b.get());
+    assertFalse(b.get());
 
-        b.set(false);
+    b.set(false);
 
-        fs.walk(new File("any.txt"), new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return !file.isDirectory();
-            }
+    fs.walk(
+        new File("any.txt"),
+        new FileFilter() {
+          @Override
+          public boolean accept(File file) {
+            return !file.isDirectory();
+          }
 
-            @Override
-            public void file(File file) {
-                b.set(true);
-            }
+          @Override
+          public void file(File file) {
+            b.set(true);
+          }
         });
 
-        assertFalse(b.get());
-    }
+    assertFalse(b.get());
+  }
 
-    /**
-     * Walks a directory of its own. It used to create its file in the system temp directory and walk
-     * that, which on a developer machine holds hundreds of thousands of files: the walk collected 1.4
-     * million into a list and ran the test JVM out of heap (frostwire/frostwire#1343).
-     */
-    @Test
-    public void testDir(@TempDir File d1) throws IOException {
-        File f1 = new File(d1, "aaa");
-        assertTrue(f1.createNewFile());
-        final File d2 = new File(d1, "d2");
-        assertTrue(d2.mkdir());
-        File f2 = new File(d2, "bbb");
-        assertTrue(f2.createNewFile());
+  /**
+   * Walks a directory of its own. It used to create its file in the system temp directory and walk
+   * that, which on a developer machine holds hundreds of thousands of files: the walk collected 1.4
+   * million into a list and ran the test JVM out of heap (frostwire/frostwire#1343).
+   */
+  @Test
+  public void testDir(@TempDir File d1) throws IOException {
+    File f1 = new File(d1, "aaa");
+    assertTrue(f1.createNewFile());
+    final File d2 = new File(d1, "d2");
+    assertTrue(d2.mkdir());
+    File f2 = new File(d2, "bbb");
+    assertTrue(f2.createNewFile());
 
-        final LinkedList<File> l = new LinkedList<>();
+    final LinkedList<File> l = new LinkedList<>();
 
-        fs.walk(d1, new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return true;
-            }
+    fs.walk(
+        d1,
+        new FileFilter() {
+          @Override
+          public boolean accept(File file) {
+            return true;
+          }
 
-            @Override
-            public void file(File file) {
-                l.add(file);
-            }
+          @Override
+          public void file(File file) {
+            l.add(file);
+          }
         });
 
-        Set<File> set = new LinkedHashSet<>(l);
-        assertEquals(set.size(), l.size());
-        assertEquals(Set.of(f1, d2, f2), set, "the walk stays inside its directory");
+    Set<File> set = new LinkedHashSet<>(l);
+    assertEquals(set.size(), l.size());
+    assertEquals(Set.of(f1, d2, f2), set, "the walk stays inside its directory");
 
-        assertFalse(l.contains(d1));
-        assertTrue(l.contains(f1));
-        assertTrue(l.contains(d2));
-        assertTrue(l.contains(f2));
+    assertFalse(l.contains(d1));
+    assertTrue(l.contains(f1));
+    assertTrue(l.contains(d2));
+    assertTrue(l.contains(f2));
 
-        l.clear();
-        fs.walk(d1, new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return !file.equals(d2);
-            }
+    l.clear();
+    fs.walk(
+        d1,
+        new FileFilter() {
+          @Override
+          public boolean accept(File file) {
+            return !file.equals(d2);
+          }
 
-            @Override
-            public void file(File file) {
-                l.add(file);
-            }
+          @Override
+          public void file(File file) {
+            l.add(file);
+          }
         });
 
-        assertFalse(l.contains(d1));
-        assertTrue(l.contains(f1));
-        assertFalse(l.contains(d2));
-        assertFalse(l.contains(f2));
+    assertFalse(l.contains(d1));
+    assertTrue(l.contains(f1));
+    assertFalse(l.contains(d2));
+    assertFalse(l.contains(f2));
 
-        assertTrue(f2.delete());
-        assertTrue(d2.delete());
-        assertTrue(f1.delete());
-    }
+    assertTrue(f2.delete());
+    assertTrue(d2.delete());
+    assertTrue(f1.delete());
+  }
 }

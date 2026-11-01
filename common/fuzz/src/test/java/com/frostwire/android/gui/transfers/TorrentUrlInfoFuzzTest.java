@@ -12,10 +12,10 @@ import com.code_intelligence.jazzer.junit.FuzzTest;
 
 /**
  * Fuzzes Android's {@link TorrentUrlInfo}, which wraps the torrent URL or magnet link a user opens
- * (links from web pages, other apps and the clipboard, through TransferManager). Its getters declare
- * no exceptions, and TorrentFetcherDownload's constructor calls {@code getHash()}, so any exception
- * is a finding; a hash that isn't 40 lowercase hex digits is one too, since it is later decoded as
- * hex.
+ * (links from web pages, other apps and the clipboard, through TransferManager). Its getters
+ * declare no exceptions, and TorrentFetcherDownload's constructor calls {@code getHash()}, so any
+ * exception is a finding; a hash that isn't 40 lowercase hex digits is one too, since it is later
+ * decoded as hex.
  */
 class TorrentUrlInfoFuzzTest {
 

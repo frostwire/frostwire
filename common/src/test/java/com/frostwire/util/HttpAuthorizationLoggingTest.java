@@ -27,27 +27,39 @@ class HttpAuthorizationLoggingTest {
     assertDoesNotThrow(
         () -> {
           HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
-          server.createContext("/resolver", exchange -> {
-            exchange.sendResponseHeaders(403, -1);
-            exchange.close();
-          });
+          server.createContext(
+              "/resolver",
+              exchange -> {
+                exchange.sendResponseHeaders(403, -1);
+                exchange.close();
+              });
           StringBuilder messages = new StringBuilder();
-          java.util.logging.Logger logger = java.util.logging.Logger.getLogger("OkHttpClientWrapper");
-          Handler handler = new Handler() {
-            public void publish(LogRecord record) { messages.append(record.getMessage()).append('\n'); }
-            public void flush() {}
-            public void close() {}
-          };
+          java.util.logging.Logger logger =
+              java.util.logging.Logger.getLogger("OkHttpClientWrapper");
+          Handler handler =
+              new Handler() {
+                public void publish(LogRecord record) {
+                  messages.append(record.getMessage()).append('\n');
+                }
+
+                public void flush() {}
+
+                public void close() {}
+              };
           logger.addHandler(handler);
           server.start();
           try {
-            String url = "http://127.0.0.1:" + server.getAddress().getPort()
-                + "/resolver?track_authorization=distinctive-fake-auth&Signature=fake-signature";
+            String url =
+                "http://127.0.0.1:"
+                    + server.getAddress().getPort()
+                    + "/resolver?track_authorization=distinctive-fake-auth&Signature=fake-signature";
             var client = HttpClientFactory.newInstance(HttpClientFactory.HttpContext.DOWNLOAD);
             assertNull(client.get(url, 3000));
             assertNull(client.getBytes(url, 3000));
-            IOException error = assertThrows(IOException.class,
-                () -> client.save(url, directory.resolve("audio.m4a").toFile(), false));
+            IOException error =
+                assertThrows(
+                    IOException.class,
+                    () -> client.save(url, directory.resolve("audio.m4a").toFile(), false));
             assertFalse(error.getMessage().contains("distinctive-fake-auth"));
             assertFalse(error.getMessage().contains("fake-signature"));
             assertTrue(messages.toString().contains("403"));

@@ -21,14 +21,15 @@ import org.junit.jupiter.api.Test;
 /**
  * Parses a recorded YouTube search page, so CI doesn't depend on YouTube answering a GitHub runner
  * (GitHub #1440). The fixture is a real "frostwire" search from 2026-11-01, trimmed to its first
- * four video entries, with its tracking blobs replaced by "fixture". The live check stays in
- * {@code com.frostwire.tests.YTSearchPatternTest}, tagged {@code live}.
+ * four video entries, with its tracking blobs replaced by "fixture". The live check stays in {@code
+ * com.frostwire.tests.YTSearchPatternTest}, tagged {@code live}.
  */
 class YTSearchPatternRecordedPageTest {
 
   private static String recordedPage() throws Exception {
     try (InputStream in =
-        YTSearchPatternRecordedPageTest.class.getResourceAsStream("youtube-search-frostwire.html")) {
+        YTSearchPatternRecordedPageTest.class.getResourceAsStream(
+            "youtube-search-frostwire.html")) {
       assertNotNull(in, "fixture youtube-search-frostwire.html");
       return new String(in.readAllBytes(), StandardCharsets.UTF_8);
     }

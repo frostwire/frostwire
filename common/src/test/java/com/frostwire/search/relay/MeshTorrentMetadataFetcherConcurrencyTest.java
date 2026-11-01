@@ -22,11 +22,10 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 
 /**
- * Deterministic, network-free coverage of the fail-closed admission bounds in
- * {@link MeshTorrentMetadataFetcher}: the global in-flight gate, the
- * per-holder cap, and counter release after completion. Fetches are parked by
- * a fake transport whose {@code createSend(...).execute()} blocks on a latch
- * the test controls.
+ * Deterministic, network-free coverage of the fail-closed admission bounds in {@link
+ * MeshTorrentMetadataFetcher}: the global in-flight gate, the per-holder cap, and counter release
+ * after completion. Fetches are parked by a fake transport whose {@code createSend(...).execute()}
+ * blocks on a latch the test controls.
  */
 class MeshTorrentMetadataFetcherConcurrencyTest {
 
@@ -42,24 +41,28 @@ class MeshTorrentMetadataFetcherConcurrencyTest {
 
     for (int i = 0; i < cap; i++) {
       byte[] holder = randomHolder();
-      Thread worker = new Thread(() -> MeshTorrentMetadataFetcher.fetch(
-          transport, requester, holder, infoHash, PARKED_TIMEOUT_MS));
+      Thread worker =
+          new Thread(
+              () ->
+                  MeshTorrentMetadataFetcher.fetch(
+                      transport, requester, holder, infoHash, PARKED_TIMEOUT_MS));
       worker.start();
       workers.add(worker);
     }
 
     try {
-      assertTrue(transport.awaitCreated(5, TimeUnit.SECONDS),
+      assertTrue(
+          transport.awaitCreated(5, TimeUnit.SECONDS),
           "all " + cap + " gate slots should be reserved");
 
       long start = System.nanoTime();
-      byte[] overflow = MeshTorrentMetadataFetcher.fetch(
-          transport, requester, randomHolder(), infoHash, PARKED_TIMEOUT_MS);
+      byte[] overflow =
+          MeshTorrentMetadataFetcher.fetch(
+              transport, requester, randomHolder(), infoHash, PARKED_TIMEOUT_MS);
       long elapsedMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
 
       assertNull(overflow, "a fetch beyond the global cap must fail closed");
-      assertTrue(elapsedMs < 1_000,
-          "overflow fetch must not block, took " + elapsedMs + " ms");
+      assertTrue(elapsedMs < 1_000, "overflow fetch must not block, took " + elapsedMs + " ms");
     } finally {
       transport.release();
       for (Thread worker : workers) {
@@ -73,7 +76,8 @@ class MeshTorrentMetadataFetcherConcurrencyTest {
 
   @Test
   void thirdConcurrentFetchToSameHolderFailsFast() throws Exception {
-    BlockingTransport transport = new BlockingTransport(MeshTorrentMetadataFetcher.MAX_IN_FLIGHT_PER_HOLDER);
+    BlockingTransport transport =
+        new BlockingTransport(MeshTorrentMetadataFetcher.MAX_IN_FLIGHT_PER_HOLDER);
     IdentityKeys requester = IdentityKeys.generate(0);
     IdentityKeys holder = IdentityKeys.generate(0);
     byte[] holderPub = holder.ed25519PubRaw();
@@ -81,24 +85,29 @@ class MeshTorrentMetadataFetcherConcurrencyTest {
     List<Thread> workers = new ArrayList<>();
 
     for (int i = 0; i < MeshTorrentMetadataFetcher.MAX_IN_FLIGHT_PER_HOLDER; i++) {
-      Thread worker = new Thread(() -> MeshTorrentMetadataFetcher.fetch(
-          transport, requester, holderPub, infoHash, PARKED_TIMEOUT_MS));
+      Thread worker =
+          new Thread(
+              () ->
+                  MeshTorrentMetadataFetcher.fetch(
+                      transport, requester, holderPub, infoHash, PARKED_TIMEOUT_MS));
       worker.start();
       workers.add(worker);
     }
 
     try {
-      assertTrue(transport.awaitCreated(5, TimeUnit.SECONDS),
+      assertTrue(
+          transport.awaitCreated(5, TimeUnit.SECONDS),
           "two fetches to the same holder should be admitted");
 
       long start = System.nanoTime();
-      byte[] third = MeshTorrentMetadataFetcher.fetch(
-          transport, requester, holderPub, infoHash, PARKED_TIMEOUT_MS);
+      byte[] third =
+          MeshTorrentMetadataFetcher.fetch(
+              transport, requester, holderPub, infoHash, PARKED_TIMEOUT_MS);
       long elapsedMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
 
       assertNull(third, "a third fetch to the same holder must fail closed");
-      assertTrue(elapsedMs < 1_000,
-          "per-holder rejection must not block, took " + elapsedMs + " ms");
+      assertTrue(
+          elapsedMs < 1_000, "per-holder rejection must not block, took " + elapsedMs + " ms");
     } finally {
       transport.release();
       for (Thread worker : workers) {
@@ -119,13 +128,15 @@ class MeshTorrentMetadataFetcherConcurrencyTest {
     byte[] infoHash = TestTorrentMetadata.infoHash();
     CompletingTransport transport = new CompletingTransport(holder, torrent);
 
-    int iterations = MeshTorrentMetadataFetcher.MAX_GLOBAL_IN_FLIGHT_FETCHES
-        + MeshTorrentMetadataFetcher.MAX_IN_FLIGHT_PER_HOLDER + 1;
+    int iterations =
+        MeshTorrentMetadataFetcher.MAX_GLOBAL_IN_FLIGHT_FETCHES
+            + MeshTorrentMetadataFetcher.MAX_IN_FLIGHT_PER_HOLDER
+            + 1;
     for (int i = 0; i < iterations; i++) {
-      byte[] fetched = MeshTorrentMetadataFetcher.fetch(
-          transport, requester, holderPub, infoHash, 5_000);
-      assertArrayEquals(torrent, fetched,
-          "sequential fetch #" + i + " must succeed once slots are released");
+      byte[] fetched =
+          MeshTorrentMetadataFetcher.fetch(transport, requester, holderPub, infoHash, 5_000);
+      assertArrayEquals(
+          torrent, fetched, "sequential fetch #" + i + " must succeed once slots are released");
     }
   }
 
@@ -136,11 +147,10 @@ class MeshTorrentMetadataFetcherConcurrencyTest {
   }
 
   /**
-   * Parks every admitted fetch inside {@code execute()} until {@link #release()}
-   * is called, so a test can observe the admission gates while fetches are
-   * genuinely in flight. {@link #created} is counted in {@code createSend},
-   * which runs on the caller thread after the gate is reserved and before the
-   * send is submitted.
+   * Parks every admitted fetch inside {@code execute()} until {@link #release()} is called, so a
+   * test can observe the admission gates while fetches are genuinely in flight. {@link #created} is
+   * counted in {@code createSend}, which runs on the caller thread after the gate is reserved and
+   * before the send is submitted.
    */
   private static final class BlockingTransport implements DistributedSearchTransport {
     private final CountDownLatch created;
@@ -165,7 +175,8 @@ class MeshTorrentMetadataFetcherConcurrencyTest {
     }
 
     @Override
-    public SendOperation createSend(byte[] targetPub, int protocolId, byte[] payload, long deadlineNanos) {
+    public SendOperation createSend(
+        byte[] targetPub, int protocolId, byte[] payload, long deadlineNanos) {
       created.countDown();
       return new SendOperation() {
         @Override
@@ -180,8 +191,7 @@ class MeshTorrentMetadataFetcherConcurrencyTest {
         }
 
         @Override
-        public void cancel() {
-        }
+        public void cancel() {}
       };
     }
 
@@ -197,9 +207,8 @@ class MeshTorrentMetadataFetcherConcurrencyTest {
   }
 
   /**
-   * Serves a valid holder-signed chunk stream synchronously (the default
-   * {@code createSend} delegates to {@link #send}), so a fetch completes and
-   * releases its slots.
+   * Serves a valid holder-signed chunk stream synchronously (the default {@code createSend}
+   * delegates to {@link #send}), so a fetch completes and releases its slots.
    */
   private static final class CompletingTransport implements DistributedSearchTransport {
     private final IdentityKeys holder;
@@ -218,15 +227,19 @@ class MeshTorrentMetadataFetcherConcurrencyTest {
         return false;
       }
       try {
-        List<TorrentMetadataResponse> signed = signAll(
-            TorrentMetadataResponse.buildChunks(
-                request.nonce(), request.infoHash(), System.currentTimeMillis() / 1000L, torrent),
-            holder);
+        List<TorrentMetadataResponse> signed =
+            signAll(
+                TorrentMetadataResponse.buildChunks(
+                    request.nonce(),
+                    request.infoHash(),
+                    System.currentTimeMillis() / 1000L,
+                    torrent),
+                holder);
         for (TorrentMetadataResponse chunk : signed) {
           byte[] wire = SearchPayloadCodec.encodeTorrentMetadataResponse(chunk);
           for (PayloadListener listener : listeners) {
-            listener.onPayload(holder.ed25519PubRaw(), wire, System.currentTimeMillis(),
-                MeshProtocolId.METADATA);
+            listener.onPayload(
+                holder.ed25519PubRaw(), wire, System.currentTimeMillis(), MeshProtocolId.METADATA);
           }
         }
         return true;

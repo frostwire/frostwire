@@ -47,7 +47,8 @@ class FragmentReassemblerFuzzTest {
       if (result.state == FragmentReassembler.State.COMPLETE) {
         byte[] expected = joined(accepted.get(key), total);
         if (!java.util.Arrays.equals(expected, result.payload)) {
-          throw new IllegalStateException("assembled payload differs from its fragments, key " + key);
+          throw new IllegalStateException(
+              "assembled payload differs from its fragments, key " + key);
         }
       }
       if (reassembler.pendingGroupCount() > MAX_PENDING_GROUPS) {

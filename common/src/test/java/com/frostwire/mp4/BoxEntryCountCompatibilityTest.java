@@ -147,9 +147,9 @@ class BoxEntryCountCompatibilityTest {
   }
 
   /**
-   * frostwire/frostwire#1354, still supported: a trun with no per-sample fields (every sample
-   * takes tfhd's defaults, as in DASH audio fragments) is 12 bytes whatever its count. Its samples'
-   * data follows in the mdat, so a real file always has at least one byte per sample after it.
+   * frostwire/frostwire#1354, still supported: a trun with no per-sample fields (every sample takes
+   * tfhd's defaults, as in DASH audio fragments) is 12 bytes whatever its count. Its samples' data
+   * follows in the mdat, so a real file always has at least one byte per sample after it.
    */
   @Test
   void trackRunsWithoutPerSampleFieldsDecodeAnyCountTheFileHoldsMediaFor() throws IOException {
@@ -278,7 +278,8 @@ class BoxEntryCountCompatibilityTest {
   private static byte[] fragmentWithMedia(byte[] box, int mediaBytes) {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     out.writeBytes(box);
-    out.writeBytes(ByteBuffer.allocate(8).putInt(8 + mediaBytes).putInt(Bits.make4cc("mdat")).array());
+    out.writeBytes(
+        ByteBuffer.allocate(8).putInt(8 + mediaBytes).putInt(Bits.make4cc("mdat")).array());
     out.writeBytes(new byte[mediaBytes]);
     return out.toByteArray();
   }

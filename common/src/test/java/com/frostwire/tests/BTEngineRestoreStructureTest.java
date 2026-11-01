@@ -31,8 +31,10 @@ class BTEngineRestoreStructureTest {
   @Test
   void restoreDiscoveryStaysLimitedToThePrivateSessionDirectory() throws Exception {
     String source = read("../common/src/main/java/com/frostwire/bittorrent/BTEngine.java");
-    String restore = source.substring(source.indexOf("public void restoreDownloads()"),
-        source.indexOf("File settingsFile()"));
+    String restore =
+        source.substring(
+            source.indexOf("public void restoreDownloads()"),
+            source.indexOf("File settingsFile()"));
 
     assertTrue(
         restore.contains("ctx.homeDir.listFiles"),

@@ -119,5 +119,4 @@ class SessionTorrentCopyTest {
     assertNotNull(th, "the torrent was added");
     return th;
   }
-
 }

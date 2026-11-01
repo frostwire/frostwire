@@ -19,8 +19,7 @@ class BTDownloadFinishedStateStructureTest {
 
   @Test
   void pausedFinishedProgressMapsToPausedNotFinished() throws Exception {
-    String source =
-        read("../common/src/main/java/com/frostwire/bittorrent/BTDownload.java");
+    String source = read("../common/src/main/java/com/frostwire/bittorrent/BTDownload.java");
     String compact = source.replaceAll("\\s+", "");
     assertTrue(compact.contains("status.isFinished()"));
     assertTrue(compact.contains("Float.compare(status.progress(),1f)>=0"));
@@ -31,9 +30,11 @@ class BTDownloadFinishedStateStructureTest {
         compact.contains("caseTORRENT_FINISHED:try{if(th.isValid()){cachedStatus=th.status();"));
     assertTrue(compact.contains("AlertType.STATE_CHANGED.swig()"));
     assertTrue(
-        compact.contains("caseSTATE_CHANGED:if(listener!=null){try{listener.stateChanged(BTDownload.this);"));
+        compact.contains(
+            "caseSTATE_CHANGED:if(listener!=null){try{listener.stateChanged(BTDownload.this);"));
     assertTrue(
-        compact.contains("publicvoidrefreshStatusCache(){synchronized(statusRefreshLock){if(!th.isValid())"));
+        compact.contains(
+            "publicvoidrefreshStatusCache(){synchronized(statusRefreshLock){if(!th.isValid())"));
   }
 
   private static String read(String relativePath) throws IOException {

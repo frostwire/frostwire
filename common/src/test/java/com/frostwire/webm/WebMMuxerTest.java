@@ -23,10 +23,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
- * WebM merge tests on tiny synthetic fixtures ({@code v-in.webm}: VP9, 2
- * clusters x 2 blocks; {@code a-in.webm}: Opus with a real OpusHead, 2 x 3,
- * both files on track 1 to exercise renumbering). Output is re-demuxed and
- * every packet payload is byte-compared.
+ * WebM merge tests on tiny synthetic fixtures ({@code v-in.webm}: VP9, 2 clusters x 2 blocks;
+ * {@code a-in.webm}: Opus with a real OpusHead, 2 x 3, both files on track 1 to exercise
+ * renumbering). Output is re-demuxed and every packet payload is byte-compared.
  */
 class WebMMuxerTest {
 
@@ -93,7 +92,7 @@ class WebMMuxerTest {
       assertEquals(2, a.number);
       assertEquals("V_VP9", v.codecId);
       assertEquals("A_OPUS", a.codecId);
-      assertArrayEquals(new byte[]{1, 2, 3, 4, 5, 6, 7, 8}, v.codecPrivate);
+      assertArrayEquals(new byte[] {1, 2, 3, 4, 5, 6, 7, 8}, v.codecPrivate);
 
       assertEquals(List.of(0L, 42L, 35000L, 35042L), timestamps(v));
       assertEquals(List.of(0L, 20L, 40L, 35000L, 35020L, 35040L), timestamps(a));
@@ -135,7 +134,7 @@ class WebMMuxerTest {
   void clusterizeSplitsBeyondInt16Range() {
     WebMDemuxer.WebMTrack video = new WebMDemuxer.WebMTrack();
     WebMDemuxer.WebMTrack audio = new WebMDemuxer.WebMTrack();
-    for (long ts : new long[]{0, 40000}) {
+    for (long ts : new long[] {0, 40000}) {
       WebMDemuxer.Packet vp = new WebMDemuxer.Packet();
       vp.timestamp = ts;
       video.packets.add(vp);

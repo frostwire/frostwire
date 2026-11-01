@@ -18,62 +18,65 @@
 
 package com.frostwire.platform;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
-
-import static org.junit.jupiter.api.Assertions.assertSame;
+import org.junit.jupiter.api.Test;
 
 class DefaultFileSystemCopyErrorThreadSafetyTest {
 
-    @Test
-    void copyErrorsRemainBoundToTheCopyingThread() throws Exception {
-        TestFileSystem fs = new TestFileSystem();
-        CountDownLatch ready = new CountDownLatch(2);
-        CountDownLatch release = new CountDownLatch(1);
-        AtomicReference<Throwable> firstResult = new AtomicReference<>();
-        AtomicReference<Throwable> secondResult = new AtomicReference<>();
-        IOException firstError = new IOException("first");
-        IOException secondError = new IOException("second");
+  @Test
+  void copyErrorsRemainBoundToTheCopyingThread() throws Exception {
+    TestFileSystem fs = new TestFileSystem();
+    CountDownLatch ready = new CountDownLatch(2);
+    CountDownLatch release = new CountDownLatch(1);
+    AtomicReference<Throwable> firstResult = new AtomicReference<>();
+    AtomicReference<Throwable> secondResult = new AtomicReference<>();
+    IOException firstError = new IOException("first");
+    IOException secondError = new IOException("second");
 
-        Thread first = new Thread(() -> {
-            fs.setCopyError(firstError);
-            ready.countDown();
-            await(release);
-            firstResult.set(fs.lastCopyError());
-        });
-        Thread second = new Thread(() -> {
-            fs.setCopyError(secondError);
-            ready.countDown();
-            await(release);
-            secondResult.set(fs.lastCopyError());
-        });
+    Thread first =
+        new Thread(
+            () -> {
+              fs.setCopyError(firstError);
+              ready.countDown();
+              await(release);
+              firstResult.set(fs.lastCopyError());
+            });
+    Thread second =
+        new Thread(
+            () -> {
+              fs.setCopyError(secondError);
+              ready.countDown();
+              await(release);
+              secondResult.set(fs.lastCopyError());
+            });
 
-        first.start();
-        second.start();
-        ready.await();
-        release.countDown();
-        first.join();
-        second.join();
+    first.start();
+    second.start();
+    ready.await();
+    release.countDown();
+    first.join();
+    second.join();
 
-        assertSame(firstError, firstResult.get());
-        assertSame(secondError, secondResult.get());
+    assertSame(firstError, firstResult.get());
+    assertSame(secondError, secondResult.get());
+  }
+
+  private static void await(CountDownLatch latch) {
+    try {
+      latch.await();
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new AssertionError(e);
     }
+  }
 
-    private static void await(CountDownLatch latch) {
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new AssertionError(e);
-        }
+  private static final class TestFileSystem extends DefaultFileSystem {
+    void setCopyError(Throwable error) {
+      lastCopyError.set(error);
     }
-
-    private static final class TestFileSystem extends DefaultFileSystem {
-        void setCopyError(Throwable error) {
-            lastCopyError.set(error);
-        }
-    }
+  }
 }

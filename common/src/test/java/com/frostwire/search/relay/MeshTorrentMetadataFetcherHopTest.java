@@ -8,11 +8,11 @@
 package com.frostwire.search.relay;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.frostwire.search.relay.icebridge.MeshProtocolId;
 import java.security.SecureRandom;
@@ -23,8 +23,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.junit.jupiter.api.Test;
 
 /**
- * RELAY_RESPONSE attributes the hop (EC2) as transport sourcePub, not the
- * holder. Chunks must still assemble when the holder signature verifies.
+ * RELAY_RESPONSE attributes the hop (EC2) as transport sourcePub, not the holder. Chunks must still
+ * assemble when the holder signature verifies.
  */
 class MeshTorrentMetadataFetcherHopTest {
 
@@ -51,9 +51,13 @@ class MeshTorrentMetadataFetcherHopTest {
     IdentityKeys holder = IdentityKeys.generate(0);
     byte[] selected = TestTorrentMetadata.infoHash();
     selected[0] ^= 1;
-    assertNull(MeshTorrentMetadataFetcher.fetch(
-        new HopTransport(holder, new byte[32], TestTorrentMetadata.bytes(500)), IdentityKeys.generate(0),
-        holder.ed25519PubRaw(), selected, 1000));
+    assertNull(
+        MeshTorrentMetadataFetcher.fetch(
+            new HopTransport(holder, new byte[32], TestTorrentMetadata.bytes(500)),
+            IdentityKeys.generate(0),
+            holder.ed25519PubRaw(),
+            selected,
+            1000));
   }
 
   @Test
@@ -61,29 +65,40 @@ class MeshTorrentMetadataFetcherHopTest {
     IdentityKeys holder = IdentityKeys.generate(0);
     HopTransport transport = new HopTransport(holder, new byte[32], TestTorrentMetadata.bytes(500));
     transport.reverse = true;
-    assertArrayEquals(TestTorrentMetadata.bytes(500), MeshTorrentMetadataFetcher.fetch(
-        transport, IdentityKeys.generate(0), holder.ed25519PubRaw(), TestTorrentMetadata.infoHash(), 1000));
+    assertArrayEquals(
+        TestTorrentMetadata.bytes(500),
+        MeshTorrentMetadataFetcher.fetch(
+            transport,
+            IdentityKeys.generate(0),
+            holder.ed25519PubRaw(),
+            TestTorrentMetadata.infoHash(),
+            1000));
   }
 
   @Test
   void nativeVerificationMatchesV1V2AndHybridOriginalHashes() throws Exception {
-    assertTrue(MeshTorrentMetadataFetcher.matchesInfoHash(
-        TestTorrentMetadata.bytes(0), TestTorrentMetadata.infoHash()));
-    for (boolean hybrid : new boolean[]{false, true}) {
+    assertTrue(
+        MeshTorrentMetadataFetcher.matchesInfoHash(
+            TestTorrentMetadata.bytes(0), TestTorrentMetadata.infoHash()));
+    for (boolean hybrid : new boolean[] {false, true}) {
       byte[] torrent = TestTorrentMetadata.v2Bytes(hybrid);
-      byte[] v2 = java.security.MessageDigest.getInstance("SHA-256")
-          .digest(TestTorrentMetadata.v2Info(hybrid));
+      byte[] v2 =
+          java.security.MessageDigest.getInstance("SHA-256")
+              .digest(TestTorrentMetadata.v2Info(hybrid));
       assertTrue(MeshTorrentMetadataFetcher.matchesInfoHash(torrent, v2));
-      assertTrue(MeshTorrentMetadataFetcher.matchesInfoHash(torrent, java.util.Arrays.copyOf(v2, 20)));
-      byte[] v1 = java.security.MessageDigest.getInstance("SHA-1")
-          .digest(TestTorrentMetadata.v2Info(hybrid));
+      assertTrue(
+          MeshTorrentMetadataFetcher.matchesInfoHash(torrent, java.util.Arrays.copyOf(v2, 20)));
+      byte[] v1 =
+          java.security.MessageDigest.getInstance("SHA-1")
+              .digest(TestTorrentMetadata.v2Info(hybrid));
       assertEquals(hybrid, MeshTorrentMetadataFetcher.matchesInfoHash(torrent, v1));
       v2[0] ^= 1;
       assertFalse(MeshTorrentMetadataFetcher.matchesInfoHash(torrent, v2));
     }
-    assertFalse(MeshTorrentMetadataFetcher.matchesInfoHash(new byte[]{1}, new byte[20]));
-    assertFalse(MeshTorrentMetadataFetcher.matchesInfoHash(
-        new byte[(int) TorrentMetadataResponse.MAX_TORRENT_BYTES + 1], new byte[20]));
+    assertFalse(MeshTorrentMetadataFetcher.matchesInfoHash(new byte[] {1}, new byte[20]));
+    assertFalse(
+        MeshTorrentMetadataFetcher.matchesInfoHash(
+            new byte[(int) TorrentMetadataResponse.MAX_TORRENT_BYTES + 1], new byte[20]));
   }
 
   @Test
@@ -91,13 +106,23 @@ class MeshTorrentMetadataFetcherHopTest {
     IdentityKeys holder = IdentityKeys.generate(0);
     HopTransport gap = new HopTransport(holder, new byte[32], TestTorrentMetadata.bytes(500));
     gap.onlyFinal = true;
-    assertNull(MeshTorrentMetadataFetcher.fetch(gap, IdentityKeys.generate(0),
-        holder.ed25519PubRaw(), TestTorrentMetadata.infoHash(), 200));
+    assertNull(
+        MeshTorrentMetadataFetcher.fetch(
+            gap,
+            IdentityKeys.generate(0),
+            holder.ed25519PubRaw(),
+            TestTorrentMetadata.infoHash(),
+            200));
     assertTrue(gap.listeners.isEmpty());
     HopTransport conflict = new HopTransport(holder, new byte[32], TestTorrentMetadata.bytes(500));
     conflict.conflict = true;
-    assertNull(MeshTorrentMetadataFetcher.fetch(conflict, IdentityKeys.generate(0),
-        holder.ed25519PubRaw(), TestTorrentMetadata.infoHash(), 1000));
+    assertNull(
+        MeshTorrentMetadataFetcher.fetch(
+            conflict,
+            IdentityKeys.generate(0),
+            holder.ed25519PubRaw(),
+            TestTorrentMetadata.infoHash(),
+            1000));
     assertTrue(conflict.listeners.isEmpty());
   }
 
@@ -106,8 +131,14 @@ class MeshTorrentMetadataFetcherHopTest {
     IdentityKeys holder = IdentityKeys.generate(0);
     HopTransport transport = new HopTransport(holder, new byte[32], TestTorrentMetadata.bytes(500));
     transport.staleError = true;
-    assertArrayEquals(TestTorrentMetadata.bytes(500), MeshTorrentMetadataFetcher.fetch(transport,
-        IdentityKeys.generate(0), holder.ed25519PubRaw(), TestTorrentMetadata.infoHash(), 1000));
+    assertArrayEquals(
+        TestTorrentMetadata.bytes(500),
+        MeshTorrentMetadataFetcher.fetch(
+            transport,
+            IdentityKeys.generate(0),
+            holder.ed25519PubRaw(),
+            TestTorrentMetadata.infoHash(),
+            1000));
   }
 
   @Test
@@ -117,8 +148,13 @@ class MeshTorrentMetadataFetcherHopTest {
     transport.blockSend = new java.util.concurrent.CountDownLatch(1);
     long start = System.nanoTime();
     try {
-      assertNull(MeshTorrentMetadataFetcher.fetch(transport, IdentityKeys.generate(0),
-          holder.ed25519PubRaw(), TestTorrentMetadata.infoHash(), 200));
+      assertNull(
+          MeshTorrentMetadataFetcher.fetch(
+              transport,
+              IdentityKeys.generate(0),
+              holder.ed25519PubRaw(),
+              TestTorrentMetadata.infoHash(),
+              200));
       assertTrue(System.nanoTime() - start < java.util.concurrent.TimeUnit.SECONDS.toNanos(2));
       assertTrue(transport.listeners.isEmpty());
     } finally {
@@ -131,29 +167,51 @@ class MeshTorrentMetadataFetcherHopTest {
     java.util.concurrent.CountDownLatch entered = new java.util.concurrent.CountDownLatch(1);
     java.util.concurrent.CountDownLatch cancelled = new java.util.concurrent.CountDownLatch(1);
     List<DistributedSearchTransport.PayloadListener> listeners = new CopyOnWriteArrayList<>();
-    DistributedSearchTransport transport = new DistributedSearchTransport() {
-      public boolean send(byte[] pub, int protocol, byte[] payload) { return false; }
-      public SendOperation createSend(byte[] pub, int protocol, byte[] payload, long deadline) {
-        return new SendOperation() {
-          public boolean execute() {
-            entered.countDown();
-            try { cancelled.await(); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+    DistributedSearchTransport transport =
+        new DistributedSearchTransport() {
+          public boolean send(byte[] pub, int protocol, byte[] payload) {
             return false;
           }
-          public void cancel() { cancelled.countDown(); }
+
+          public SendOperation createSend(byte[] pub, int protocol, byte[] payload, long deadline) {
+            return new SendOperation() {
+              public boolean execute() {
+                entered.countDown();
+                try {
+                  cancelled.await();
+                } catch (InterruptedException e) {
+                  Thread.currentThread().interrupt();
+                }
+                return false;
+              }
+
+              public void cancel() {
+                cancelled.countDown();
+              }
+            };
+          }
+
+          public void addListener(PayloadListener listener) {
+            listeners.add(listener);
+          }
+
+          public void removeListener(PayloadListener listener) {
+            listeners.remove(listener);
+          }
         };
-      }
-      public void addListener(PayloadListener listener) { listeners.add(listener); }
-      public void removeListener(PayloadListener listener) { listeners.remove(listener); }
-    };
     IdentityKeys requester = IdentityKeys.generate(0);
-    java.util.concurrent.atomic.AtomicReference<byte[]> result = new java.util.concurrent.atomic.AtomicReference<>();
-    java.util.concurrent.atomic.AtomicBoolean interrupted = new java.util.concurrent.atomic.AtomicBoolean();
-    Thread worker = new Thread(() -> {
-      result.set(MeshTorrentMetadataFetcher.fetch(
-          transport, requester, new byte[32], TestTorrentMetadata.infoHash(), 10_000));
-      interrupted.set(Thread.currentThread().isInterrupted());
-    });
+    java.util.concurrent.atomic.AtomicReference<byte[]> result =
+        new java.util.concurrent.atomic.AtomicReference<>();
+    java.util.concurrent.atomic.AtomicBoolean interrupted =
+        new java.util.concurrent.atomic.AtomicBoolean();
+    Thread worker =
+        new Thread(
+            () -> {
+              result.set(
+                  MeshTorrentMetadataFetcher.fetch(
+                      transport, requester, new byte[32], TestTorrentMetadata.infoHash(), 10_000));
+              interrupted.set(Thread.currentThread().isInterrupted());
+            });
     worker.start();
     try {
       assertTrue(entered.await(2, java.util.concurrent.TimeUnit.SECONDS));
@@ -208,9 +266,18 @@ class MeshTorrentMetadataFetcherHopTest {
                 request.nonce(), request.infoHash(), System.currentTimeMillis() / 1000L, torrent);
         List<TorrentMetadataResponse> signed = signAll(unsigned, holder);
         if (staleError) {
-          signed.add(0, signAll(List.of(TorrentMetadataResponse.buildError(request.nonce(), request.infoHash(),
-              System.currentTimeMillis() / 1000L - 2 * TorrentMetadataRequest.MAX_TIMESTAMP_SKEW_SEC,
-              TorrentMetadataResponse.ERR_NOT_FOUND)), holder).get(0));
+          signed.add(
+              0,
+              signAll(
+                      List.of(
+                          TorrentMetadataResponse.buildError(
+                              request.nonce(),
+                              request.infoHash(),
+                              System.currentTimeMillis() / 1000L
+                                  - 2 * TorrentMetadataRequest.MAX_TIMESTAMP_SKEW_SEC,
+                              TorrentMetadataResponse.ERR_NOT_FOUND)),
+                      holder)
+                  .get(0));
         }
         if (reverse) {
           java.util.Collections.reverse(signed);
@@ -221,8 +288,16 @@ class MeshTorrentMetadataFetcherHopTest {
         } else if (conflict) {
           byte[] other = torrent.clone();
           other[0] ^= 1;
-          signed.add(1, signAll(TorrentMetadataResponse.buildChunks(
-              request.nonce(), request.infoHash(), System.currentTimeMillis() / 1000L, other), holder).get(0));
+          signed.add(
+              1,
+              signAll(
+                      TorrentMetadataResponse.buildChunks(
+                          request.nonce(),
+                          request.infoHash(),
+                          System.currentTimeMillis() / 1000L,
+                          other),
+                      holder)
+                  .get(0));
         }
         for (TorrentMetadataResponse chunk : signed) {
           byte[] wire = SearchPayloadCodec.encodeTorrentMetadataResponse(chunk);
