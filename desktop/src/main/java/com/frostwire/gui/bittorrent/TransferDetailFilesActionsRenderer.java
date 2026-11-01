@@ -154,13 +154,13 @@ public class TransferDetailFilesActionsRenderer extends FWAbstractJPanelTableCel
       return;
     }
     if (TorrentUtil.askForPermissionToSeedAndSeedDownloads(null)) {
-      new Thread(
-              () -> {
-                TorrentUtil.makeTorrentAndDownload(file, null, true);
-                GUIMediator.safeInvokeLater(
-                    () -> BTDownloadMediator.instance().updateTableFilters());
-              })
-          .start();
+      // Hashing the file can take long, so it waits on the background queue, as the transfer's own
+      // seed action does, instead of a thread started on the EDT.
+      BackgroundQueuedExecutorService.schedule(
+          () -> {
+            TorrentUtil.makeTorrentAndDownload(file, null, true);
+            GUIMediator.safeInvokeLater(() -> BTDownloadMediator.instance().updateTableFilters());
+          });
     }
   }
 

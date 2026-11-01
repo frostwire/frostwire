@@ -26,16 +26,23 @@ import com.frostwire.transfers.TransferState;
 import com.frostwire.util.Logger;
 import com.frostwire.util.SafeText;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.util.WarmExecutors;
 import com.limegroup.gnutella.settings.BittorrentSettings;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import javax.swing.*;
 import net.miginfocom.swing.MigLayout;
 
 public final class TransferDetailFiles extends JPanel
     implements TransferDetailComponent.TransferDetailPanel {
   private static final Logger LOG = Logger.getLogger(TransferDetailFiles.class);
+
+  /** Rebuilds of the file rows requested from the EDT. */
+  private static final ExecutorService REBUILDS =
+      WarmExecutors.serialQueue("TransferDetailFiles-Rebuild");
+
   private final TransferDetailFilesTableMediator tableMediator;
   private final JCheckBox showSkippedCheckbox;
   private BittorrentDownload btDownload;
@@ -227,9 +234,9 @@ public final class TransferDetailFiles extends JPanel
         };
 
     if (SwingUtilities.isEventDispatchThread()) {
-      // Spawns a dedicated thread (Android HIGH_PRIORITY pattern) so the
-      // task starts immediately and never waits behind queued background work.
-      new Thread(task, "TransferDetailFiles-Rebuild-" + System.currentTimeMillis()).start();
+      // Its own worker, already running, so the task starts at once and never waits behind other
+      // background work, without starting a thread on the EDT.
+      REBUILDS.execute(task);
     } else {
       // Called from TransferDetailComponent's background refresh loop.
       task.run();

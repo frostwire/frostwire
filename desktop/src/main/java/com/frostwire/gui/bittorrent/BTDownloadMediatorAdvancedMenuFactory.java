@@ -28,6 +28,7 @@ import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
+import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -470,7 +471,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      new Thread(dm::requestTrackerScrape).start();
+      DesktopParallelExecutor.execute(dm::requestTrackerScrape);
     }
   }
 
@@ -484,7 +485,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      new Thread(dm::forceRecheck).start();
+      DesktopParallelExecutor.execute(dm::forceRecheck);
     }
   }
 
