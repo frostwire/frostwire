@@ -1,11 +1,9 @@
 package com.limegroup.gnutella.gui.options.panes;
 
-import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.LabeledComponent;
-import com.limegroup.gnutella.gui.WindowsUtils;
+import com.limegroup.gnutella.gui.LoginItem;
 import com.limegroup.gnutella.settings.StartupSettings;
-import com.limegroup.gnutella.util.MacOSXUtils;
 import javax.swing.*;
 
 /**
@@ -59,10 +57,8 @@ public final class StartupPaneItem extends AbstractPaneItem {
    */
   public boolean applyOptions() {
     StartupSettings.RUN_ON_STARTUP.setValue(CHECK_BOX.isSelected());
-    // If on OSX, add or remove the item from the login items.
-    if (OSUtils.isMacOSX()) MacOSXUtils.setLoginStatus(CHECK_BOX.isSelected());
-    else if (WindowsUtils.isLoginStatusAvailable())
-      WindowsUtils.setLoginStatus(CHECK_BOX.isSelected());
+    // Add or remove FrostWire from the login items, off the EDT that applies the options.
+    LoginItem.setOffEdt(CHECK_BOX.isSelected());
     return false;
   }
 

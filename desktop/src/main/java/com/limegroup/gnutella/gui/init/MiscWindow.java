@@ -19,12 +19,10 @@
 package com.limegroup.gnutella.gui.init;
 
 import com.frostwire.gui.theme.ThemeMediator;
-import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.WindowsUtils;
+import com.limegroup.gnutella.gui.LoginItem;
 import com.limegroup.gnutella.settings.StartupSettings;
-import com.limegroup.gnutella.util.MacOSXUtils;
 import java.awt.*;
 import javax.swing.*;
 
@@ -88,8 +86,7 @@ final class MiscWindow extends SetupWindow {
     // System Startup
     if (GUIUtils.shouldShowStartOnStartupWindow()) {
       boolean allow = _startup.isSelected();
-      if (OSUtils.isMacOSX()) MacOSXUtils.setLoginStatus(allow);
-      else if (WindowsUtils.isLoginStatusAvailable()) WindowsUtils.setLoginStatus(allow);
+      LoginItem.setOffEdt(allow);
       StartupSettings.RUN_ON_STARTUP.setValue(allow);
     }
   }
