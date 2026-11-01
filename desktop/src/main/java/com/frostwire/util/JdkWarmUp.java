@@ -8,6 +8,7 @@
 package com.frostwire.util;
 
 import com.frostwire.gui.theme.PlatformFonts;
+import com.frostwire.gui.theme.SkinMenu;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
@@ -302,6 +303,13 @@ public final class JdkWarmUp {
       } catch (Throwable t) {
         LOG.warn("Warm-up of " + className + " failed: " + t.getMessage(), t);
       }
+    }
+    try {
+      // The first right-click menu built a SkinMenu, whose reflective field accessor the JVM
+      // generated on the EDT (GitHub #1439).
+      SkinMenu.warmUpPopupMenuAccess();
+    } catch (Throwable t) {
+      LOG.warn("Menu accessor warm-up failed: " + t.getMessage(), t);
     }
     try {
       warmUpDataTransfer();
