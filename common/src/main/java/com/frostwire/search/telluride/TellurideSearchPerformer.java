@@ -35,6 +35,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.regex.Pattern;
 
 /**
  * V2-compatible search performer for Telluride (cloud backup/streaming platform). Uses non-HTTP
@@ -48,7 +49,6 @@ import java.util.concurrent.CountDownLatch;
 public class TellurideSearchPerformer implements ISearchPerformer {
   private static final Logger LOG = Logger.getLogger(TellurideSearchPerformer.class);
   private static Gson gson = null;
-  private static Calendar calendar = null;
 
   private final long token;
   private final CountDownLatch performerLatch;
@@ -87,9 +87,6 @@ public class TellurideSearchPerformer implements ISearchPerformer {
     performerLatch = new CountDownLatch(1);
     if (gson == null) {
       gson = new GsonBuilder().create();
-    }
-    if (calendar == null) {
-      calendar = Calendar.getInstance();
     }
   }
 
@@ -269,9 +266,7 @@ public class TellurideSearchPerformer implements ISearchPerformer {
         format.url,
         result.thumbnail,
         format.filesize,
-        result.upload_date == null
-            ? calendar.getTimeInMillis()
-            : dateStringToTimestamp(result.upload_date),
+        uploadDateToTimestamp(result.upload_date),
         withFullRange(format.http_headers));
   }
 
@@ -297,9 +292,7 @@ public class TellurideSearchPerformer implements ISearchPerformer {
         muxed.url,
         result.thumbnail,
         muxed.filesize,
-        result.upload_date == null
-            ? calendar.getTimeInMillis()
-            : dateStringToTimestamp(result.upload_date),
+        uploadDateToTimestamp(result.upload_date),
         withFullRange(muxed.http_headers));
   }
 
@@ -357,10 +350,7 @@ public class TellurideSearchPerformer implements ISearchPerformer {
       }
       String source = "Cloud:" + playlist.extractor;
       String detailsUrl = entry.webpage_url != null ? entry.webpage_url : entry.url;
-      long creationTime =
-          entry.upload_date != null
-              ? dateStringToTimestamp(entry.upload_date)
-              : calendar.getTimeInMillis();
+      long creationTime = uploadDateToTimestamp(entry.upload_date);
       results.add(
           new TellurideSearchResult(
               entry.id, entry.title, source, detailsUrl, entry.thumbnail, creationTime));
@@ -368,17 +358,20 @@ public class TellurideSearchPerformer implements ISearchPerformer {
     return results;
   }
 
-  // 20200324
-  private static long dateStringToTimestamp(String YYYY_MM_DD) {
-    int YEAR = Integer.parseInt(YYYY_MM_DD.substring(0, 4));
-    int MONTH = Integer.parseInt(YYYY_MM_DD.substring(4, 6));
-    int DATE = Integer.parseInt(YYYY_MM_DD.substring(6));
-    if (calendar == null) {
-      calendar = Calendar.getInstance();
+  private static final Pattern UPLOAD_DATE = Pattern.compile("\\d{8}");
+
+  /**
+   * yt-dlp's {@code upload_date} (YYYYMMDD, e.g. 20200324) as a timestamp on that day. A missing
+   * date, or one that is not eight digits, means the current time.
+   */
+  private static long uploadDateToTimestamp(String yyyymmdd) {
+    if (yyyymmdd == null || !UPLOAD_DATE.matcher(yyyymmdd).matches()) {
+      return System.currentTimeMillis();
     }
-    calendar.set(Calendar.YEAR, YEAR);
-    calendar.set(Calendar.MONTH, MONTH - 1);
-    calendar.set(Calendar.DAY_OF_MONTH, DATE);
+    Calendar calendar = Calendar.getInstance();
+    calendar.set(Calendar.YEAR, Integer.parseInt(yyyymmdd.substring(0, 4)));
+    calendar.set(Calendar.MONTH, Integer.parseInt(yyyymmdd.substring(4, 6)) - 1);
+    calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(yyyymmdd.substring(6, 8)));
     return calendar.getTimeInMillis();
   }
 
