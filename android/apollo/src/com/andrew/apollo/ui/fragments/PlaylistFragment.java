@@ -22,6 +22,7 @@ import static com.andrew.apollo.loaders.PlaylistLoader.FAVORITE_PLAYLIST_ID;
 import static com.andrew.apollo.loaders.PlaylistLoader.LAST_ADDED_PLAYLIST_ID;
 import static com.andrew.apollo.loaders.PlaylistLoader.NEW_PLAYLIST_ID;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -89,33 +90,37 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
     // Initialize the tint color
     int tintColor = UIUtils.getAppIconPrimaryColor(getActivity());
 
-    // Play the playlist
-    MenuItem playSelectionItem =
-        menu.add(
-            Fragments.PLAYLIST_FRAGMENT_GROUP_ID,
-            FragmentMenuItems.PLAY_SELECTION,
-            Menu.NONE,
-            R.string.context_menu_play_selection);
-    Drawable playIcon = ContextCompat.getDrawable(getActivity(), R.drawable.contextmenu_icon_play);
-    if (playIcon != null) {
-      playIcon = DrawableCompat.wrap(playIcon);
-      DrawableCompat.setTint(playIcon, tintColor);
-      playSelectionItem.setIcon(playIcon);
-    }
+    // Play and queue need songs: the "New playlist" row has none
+    if (mItem.mPlaylistId != NEW_PLAYLIST_ID) {
+      // Play the playlist
+      MenuItem playSelectionItem =
+          menu.add(
+              Fragments.PLAYLIST_FRAGMENT_GROUP_ID,
+              FragmentMenuItems.PLAY_SELECTION,
+              Menu.NONE,
+              R.string.context_menu_play_selection);
+      Drawable playIcon =
+          ContextCompat.getDrawable(getActivity(), R.drawable.contextmenu_icon_play);
+      if (playIcon != null) {
+        playIcon = DrawableCompat.wrap(playIcon);
+        DrawableCompat.setTint(playIcon, tintColor);
+        playSelectionItem.setIcon(playIcon);
+      }
 
-    // Add the playlist to the queue
-    MenuItem addToQueueItem =
-        menu.add(
-            Fragments.PLAYLIST_FRAGMENT_GROUP_ID,
-            FragmentMenuItems.ADD_TO_QUEUE,
-            Menu.NONE,
-            R.string.add_to_queue);
-    Drawable queueIcon =
-        ContextCompat.getDrawable(getActivity(), R.drawable.contextmenu_icon_queue_add);
-    if (queueIcon != null) {
-      queueIcon = DrawableCompat.wrap(queueIcon);
-      DrawableCompat.setTint(queueIcon, tintColor);
-      addToQueueItem.setIcon(queueIcon);
+      // Add the playlist to the queue
+      MenuItem addToQueueItem =
+          menu.add(
+              Fragments.PLAYLIST_FRAGMENT_GROUP_ID,
+              FragmentMenuItems.ADD_TO_QUEUE,
+              Menu.NONE,
+              R.string.add_to_queue);
+      Drawable queueIcon =
+          ContextCompat.getDrawable(getActivity(), R.drawable.contextmenu_icon_queue_add);
+      if (queueIcon != null) {
+        queueIcon = DrawableCompat.wrap(queueIcon);
+        DrawableCompat.setTint(queueIcon, tintColor);
+        addToQueueItem.setIcon(queueIcon);
+      }
     }
 
     // Delete and rename (user made playlists)
@@ -171,45 +176,25 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
   @Override
   public boolean onContextItemSelected(final android.view.MenuItem item) {
     if (item.getGroupId() == Fragments.PLAYLIST_FRAGMENT_GROUP_ID) {
-      final AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+      // Decided by the playlist's id, not its row: the rows are New playlist, Favorites, Last
+      // added, then the user's playlists, and the handlers took row 0 for Favorites and row 1 for
+      // Last added, so Play on Favorites played Last added (GitHub #1446). Captured here, not read
+      // from mItem on the worker.
+      final Activity activity = getActivity();
+      final long playlistId = mItem != null ? mItem.mPlaylistId : NEW_PLAYLIST_ID;
       switch (item.getItemId()) {
         case FragmentMenuItems.PLAY_SELECTION:
-          if (info.position == 0) {
+          if (activity != null && playlistId != NEW_PLAYLIST_ID) {
             com.frostwire.android.util.SystemUtils.postToHandler(
                 com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
-                () -> MusicUtils.playFavorites(getActivity()));
-          } else if (info.position == 1) {
-            com.frostwire.android.util.SystemUtils.postToHandler(
-                com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
-                () -> MusicUtils.playLastAdded(getActivity()));
-          } else {
-            com.frostwire.android.util.SystemUtils.postToHandler(
-                com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
-                () -> MusicUtils.playPlaylist(getActivity(), mItem.mPlaylistId));
+                () -> play(activity, playlistId));
           }
           return true;
         case FragmentMenuItems.ADD_TO_QUEUE:
-          if (info.position == 0) {
+          if (activity != null && playlistId != NEW_PLAYLIST_ID) {
             com.frostwire.android.util.SystemUtils.postToHandler(
                 com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
-                () -> {
-                  long[] list = MusicUtils.getSongListForFavorites(getActivity());
-                  MusicUtils.addToQueue(getActivity(), list);
-                });
-          } else if (info.position == 1) {
-            com.frostwire.android.util.SystemUtils.postToHandler(
-                com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
-                () -> {
-                  long[] list = MusicUtils.getSongListForLastAdded(getActivity());
-                  MusicUtils.addToQueue(getActivity(), list);
-                });
-          } else {
-            com.frostwire.android.util.SystemUtils.postToHandler(
-                com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
-                () -> {
-                  long[] list = MusicUtils.getSongListForPlaylist(getActivity(), mItem.mPlaylistId);
-                  MusicUtils.addToQueue(getActivity(), list);
-                });
+                () -> MusicUtils.addToQueue(activity, songsOf(activity, playlistId)));
           }
           return true;
         case FragmentMenuItems.RENAME_PLAYLIST:
@@ -226,6 +211,30 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
       }
     }
     return super.onContextItemSelected(item);
+  }
+
+  /** Plays the playlist with {@code playlistId}: Favorites, Last added or a user playlist. */
+  private static void play(Activity activity, long playlistId) {
+    if (playlistId == FAVORITE_PLAYLIST_ID) {
+      MusicUtils.playFavorites(activity);
+    } else if (playlistId == LAST_ADDED_PLAYLIST_ID) {
+      MusicUtils.playLastAdded(activity);
+    } else {
+      MusicUtils.playPlaylist(activity, playlistId);
+    }
+  }
+
+  /**
+   * The songs of the playlist with {@code playlistId}: Favorites, Last added or a user playlist.
+   */
+  private static long[] songsOf(Activity activity, long playlistId) {
+    if (playlistId == FAVORITE_PLAYLIST_ID) {
+      return MusicUtils.getSongListForFavorites(activity);
+    }
+    if (playlistId == LAST_ADDED_PLAYLIST_ID) {
+      return MusicUtils.getSongListForLastAdded(activity);
+    }
+    return MusicUtils.getSongListForPlaylist(activity, playlistId);
   }
 
   @Override
