@@ -189,7 +189,7 @@ public class ID3v2Frame {
         if (group != other.group) return false;
         if (compression != other.compression) return false;
         if (encryption != other.encryption) return false;
-        if (unsynchronisation != other.encryption) return false;
+        if (unsynchronisation != other.unsynchronisation) return false;
         if (dataLengthIndicator != other.dataLengthIndicator) return false;
         if (id == null) {
             if (other.id != null) return false;
