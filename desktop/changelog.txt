@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:Cancelling the first-run setup wizard, or quitting from the fatal error window, no longer freezes the window while FrostWire exits (#1437)
    - fix:An Internet Archive search answer with one empty entry no longer hides all Internet Archive results (#1432)
    - fix:Pasting a SoundCloud link whose answer holds an empty track now downloads the other tracks instead of doing nothing (#1433)
    - fix:Cloud video links whose details come back empty no longer throw an error: they show no results (#1434)
