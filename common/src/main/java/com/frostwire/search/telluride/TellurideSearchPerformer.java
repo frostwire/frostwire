@@ -122,6 +122,13 @@ public class TellurideSearchPerformer implements ISearchPerformer {
     return false;
   }
 
+  /**
+   * Reads yt-dlp's JSON metadata for one video into the best video and audio results. Empty or
+   * {@code null} metadata gives no results.
+   *
+   * @throws com.google.gson.JsonParseException if {@code jsonMeta} is not JSON of the shape yt-dlp
+   *     prints
+   */
   public static List<TellurideSearchResult> getValidResults(
       String jsonMeta,
       Gson gson,
@@ -129,6 +136,10 @@ public class TellurideSearchPerformer implements ISearchPerformer {
       long token,
       String debugUrl) {
     TellurideJSONResult result = gson.fromJson(jsonMeta, TellurideJSONResult.class);
+    if (result == null) {
+      LOG.info("getValidResults no metadata, no valid search results for " + debugUrl);
+      return new ArrayList<>();
+    }
 
     if (performerListener != null) {
       performerListener.onTellurideJSONResult(token, result);
@@ -321,6 +332,13 @@ public class TellurideSearchPerformer implements ISearchPerformer {
     return result;
   }
 
+  /**
+   * Reads yt-dlp's JSON metadata for a playlist into one result per entry. Empty or {@code null}
+   * metadata gives no results, and {@code null} entries are skipped.
+   *
+   * @throws com.google.gson.JsonParseException if {@code jsonMeta} is not JSON of the shape yt-dlp
+   *     prints
+   */
   public static List<TellurideSearchResult> getValidPlaylistResults(
       String jsonMeta,
       Gson gson,
@@ -329,11 +347,14 @@ public class TellurideSearchPerformer implements ISearchPerformer {
       String debugUrl) {
     TellurideJSONPlaylist playlist = gson.fromJson(jsonMeta, TellurideJSONPlaylist.class);
     ArrayList<TellurideSearchResult> results = new ArrayList<>();
-    if (playlist.entries == null) {
+    if (playlist == null || playlist.entries == null) {
       LOG.info("getValidPlaylistResults entries are null, no valid search results for " + debugUrl);
       return results;
     }
     for (TellurideJSONPlaylistEntry entry : playlist.entries) {
+      if (entry == null) {
+        continue;
+      }
       String source = "Cloud:" + playlist.extractor;
       String detailsUrl = entry.webpage_url != null ? entry.webpage_url : entry.url;
       long creationTime =
