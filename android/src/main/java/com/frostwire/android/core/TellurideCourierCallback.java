@@ -135,7 +135,7 @@ public class TellurideCourierCallback<
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    TellurideCourierCallback that = (TellurideCourierCallback) o;
+    TellurideCourierCallback<?> that = (TellurideCourierCallback<?>) o;
     return Objects.equals(url, that.url);
   }
 

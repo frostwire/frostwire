@@ -172,7 +172,7 @@ public final class SearchEnginesPreferenceFragment extends AbstractPreferenceFra
   }
 
   @Override
-  protected RecyclerView.Adapter onCreateAdapter(PreferenceScreen preferenceScreen) {
+  protected RecyclerView.Adapter<?> onCreateAdapter(PreferenceScreen preferenceScreen) {
     return new CheckedAwarePreferenceGroupAdapter(preferenceScreen);
   }
 

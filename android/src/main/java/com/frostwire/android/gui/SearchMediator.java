@@ -53,7 +53,7 @@ public final class SearchMediator {
   private long currentSearchToken;
   private List<String> currentSearchTokens;
   private boolean searchFinished;
-  private TellurideCourier.SearchPerformer lastTellurideCourier;
+  private TellurideCourier.SearchPerformer<?> lastTellurideCourier;
   private volatile DistributedSearchPerformer distributedPerformer;
 
   private static final class InstanceHolder {

@@ -37,7 +37,7 @@ import java.util.List;
 public final class TellurideCourier {
   private static final Logger LOG = Logger.getLogger(TellurideCourier.class);
   private static volatile Gson gson = null;
-  private static volatile TellurideCourierCallback lastKnownCallback = null;
+  private static volatile TellurideCourierCallback<?> lastKnownCallback = null;
   private static volatile String cachedYtDlpVersion = null;
 
   /** Returns the cached yt_dlp version if available, otherwise null. */

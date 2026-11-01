@@ -41,7 +41,7 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
   private static final Logger LOG = Logger.getLogger(TransferDetailPiecesFragment.class);
   private TextView piecesNumberTextView;
   private TextView pieceSizeTextView;
-  private HexHiveView hexHiveView;
+  private HexHiveView<PieceIndexBitfield> hexHiveView;
   private HexHiveView.HexDataAdapter<PieceIndexBitfield> hexDataAdapter;
   //    private ProgressBar progressBar;
   private int totalPieces;

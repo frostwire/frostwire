@@ -294,7 +294,7 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog
   public void onSaveInstanceState(Bundle outState) {
     if (adapter != null) {
       if (selectionMode == SelectionMode.MULTIPLE_SELECTION) {
-        final Set checked = adapter.getChecked();
+        final Set<T> checked = adapter.getChecked();
         if (outState != null && checked != null && !checked.isEmpty()) {
           outState.putBooleanArray(BUNDLE_KEY_CHECKED_OFFSETS, getSelected());
         }

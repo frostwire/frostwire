@@ -817,7 +817,8 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I> exte
   @SuppressWarnings("unchecked")
   private void songClickTask(int position) {
     try {
-      final ApolloFragmentAdapter adapter = getAdapter();
+      // Only song lists play on click; their adapter holds Songs.
+      final ApolloFragmentAdapter<Song> adapter = (ApolloFragmentAdapter<Song>) getAdapter();
       if (adapter == null) {
         return;
       }

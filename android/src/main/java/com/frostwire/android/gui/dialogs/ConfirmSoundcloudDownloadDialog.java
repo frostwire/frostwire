@@ -89,27 +89,27 @@ public class ConfirmSoundcloudDownloadDialog
   // TODO: this class needs heavy refactor/cleanup
   private static class OnStartDownloadsClickListener implements View.OnClickListener {
     private final WeakReference<Context> ctxRef;
-    private final WeakReference<AbstractConfirmListDialog> dlgRef;
+    private final WeakReference<AbstractConfirmListDialog<SoundcloudSearchResult>> dlgRef;
 
-    OnStartDownloadsClickListener(Context ctx, AbstractConfirmListDialog dlg) {
+    OnStartDownloadsClickListener(
+        Context ctx, AbstractConfirmListDialog<SoundcloudSearchResult> dlg) {
       ctxRef = new WeakReference<>(ctx);
       dlgRef = new WeakReference<>(dlg);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void onClick(View v) {
       if (Ref.alive(ctxRef) && Ref.alive(dlgRef)) {
-        final AbstractConfirmListDialog dlg = dlgRef.get();
+        final AbstractConfirmListDialog<SoundcloudSearchResult> dlg = dlgRef.get();
 
         final AbstractConfirmListDialog.SelectionMode selectionMode = dlg.getSelectionMode();
         List<SoundcloudSearchResult> results =
             (selectionMode == AbstractConfirmListDialog.SelectionMode.NO_SELECTION)
-                ? (List<SoundcloudSearchResult>) dlg.getList()
+                ? dlg.getList()
                 : new ArrayList<>();
 
         if (results.isEmpty()) {
-          results.addAll((java.util.Collection<SoundcloudSearchResult>) dlg.getChecked());
+          results.addAll(dlg.getChecked());
         }
 
         if (!results.isEmpty()) {
@@ -120,11 +120,12 @@ public class ConfirmSoundcloudDownloadDialog
     }
   }
 
-  @SuppressWarnings("unchecked")
   private static class SoundcloudPlaylistConfirmListDialogAdapter
       extends ConfirmListDialogDefaultAdapter<SoundcloudSearchResult> {
     SoundcloudPlaylistConfirmListDialogAdapter(
-        Context context, List list, AbstractConfirmListDialog.SelectionMode selectionMode) {
+        Context context,
+        List<SoundcloudSearchResult> list,
+        AbstractConfirmListDialog.SelectionMode selectionMode) {
       super(context, list, selectionMode);
     }
 

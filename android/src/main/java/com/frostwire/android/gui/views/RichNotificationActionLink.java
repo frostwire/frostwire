@@ -35,10 +35,10 @@ import java.lang.ref.WeakReference;
  */
 public class RichNotificationActionLink {
   private final String text;
-  private final ClickAdapter clickAdapter;
+  private final ClickAdapter<?> clickAdapter;
   private final WeakReference<Context> contextReference;
 
-  public RichNotificationActionLink(Context context, String text, ClickAdapter clickAdapter) {
+  public RichNotificationActionLink(Context context, String text, ClickAdapter<?> clickAdapter) {
     this.contextReference = Ref.weak(context);
     this.text = text;
     this.clickAdapter = clickAdapter;
@@ -48,7 +48,7 @@ public class RichNotificationActionLink {
     return text;
   }
 
-  public ClickAdapter getClickAdapter() {
+  public ClickAdapter<?> getClickAdapter() {
     return this.clickAdapter;
   }
 

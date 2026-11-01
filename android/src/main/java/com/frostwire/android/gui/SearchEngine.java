@@ -87,7 +87,7 @@ public abstract class SearchEngine {
 
   public abstract ISearchPerformer getPerformer(long token, String keywords);
 
-  public TellurideCourier.SearchPerformer getTelluridePerformer(
+  public TellurideCourier.SearchPerformer<SearchResultListAdapter> getTelluridePerformer(
       long currentSearchToken, String pageUrl, SearchResultListAdapter adapter) {
     // override me
     return null;
