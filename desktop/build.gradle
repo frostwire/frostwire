@@ -48,27 +48,40 @@ def commonJavaSources = fileTree('../common') {
 def googleJavaFormatJvmArgs = ['api', 'code', 'file', 'parser', 'tree', 'util'].collect {
     "--add-exports=jdk.compiler/com.sun.tools.javac.${it}=ALL-UNNAMED"
 }
-tasks.register('checkCommonFormat', JavaExec) {
-    group = 'verification'
-    description = 'Fails if common/ is not formatted with google-java-format.'
-    classpath = configurations.googleJavaFormat
-    mainClass = 'com.google.googlejavaformat.java.Main'
-    jvmArgs googleJavaFormatJvmArgs
-    inputs.files(commonJavaSources)
-    outputs.upToDateWhen { true }
-    doFirst {
-        args(['--dry-run', '--set-exit-if-changed'] + commonJavaSources.files.collect { it.absolutePath })
+// Runs google-java-format over common/ in batches: one command line with every file exceeds
+// Windows' length limit.
+def runGoogleJavaFormat = { List<String> options, boolean failOnChange ->
+    def execOps = project.services.get(org.gradle.process.ExecOperations)
+    def files = commonJavaSources.files.collect { it.absolutePath }.sort()
+    def failed = false
+    files.collate(100).each { batch ->
+        def result = execOps.javaexec {
+            classpath = configurations.googleJavaFormat
+            mainClass = 'com.google.googlejavaformat.java.Main'
+            jvmArgs googleJavaFormatJvmArgs
+            args(options + batch)
+            ignoreExitValue = true
+        }
+        failed |= result.exitValue != 0
+    }
+    if (failed) {
+        throw new GradleException(failOnChange
+                ? 'common/ is not formatted (files listed above); run ./gradlew spotlessApply'
+                : 'google-java-format failed on common/ (see above)')
     }
 }
-tasks.register('formatCommon', JavaExec) {
+tasks.register('checkCommonFormat') {
+    group = 'verification'
+    description = 'Fails if common/ is not formatted with google-java-format.'
+    inputs.files(commonJavaSources)
+    inputs.files(configurations.googleJavaFormat)
+    outputs.upToDateWhen { true }
+    doLast { runGoogleJavaFormat(['--dry-run', '--set-exit-if-changed'], true) }
+}
+tasks.register('formatCommon') {
     group = 'formatting'
     description = 'Formats common/ with google-java-format.'
-    classpath = configurations.googleJavaFormat
-    mainClass = 'com.google.googlejavaformat.java.Main'
-    jvmArgs googleJavaFormatJvmArgs
-    doFirst {
-        args(['--replace'] + commonJavaSources.files.collect { it.absolutePath })
-    }
+    doLast { runGoogleJavaFormat(['--replace'], false) }
 }
 tasks.named('spotlessCheck') { dependsOn 'checkCommonFormat' }
 tasks.named('spotlessApply') { finalizedBy 'formatCommon' }
