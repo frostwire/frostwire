@@ -53,13 +53,16 @@ public final class  JdkHttpClient extends AbstractHttpClient {
         connection.setRequestMethod("HEAD");
         copyMultiMap(connection.getHeaderFields(), outputHeaders);
         int code = connection.getResponseCode();
-        // Drain the input stream (or error stream) before disconnect.
-        try (InputStream is = connection.getInputStream()) {
-            // drain
+        // Close the input stream (or the error stream) before disconnect.
+        try {
+            connection.getInputStream().close();
         } catch (IOException ignored) {
-            try (InputStream es = connection.getErrorStream()) {
-                // drain error stream
-            } catch (IOException ignored2) {
+            InputStream es = connection.getErrorStream();
+            if (es != null) {
+                try {
+                    es.close();
+                } catch (IOException ignored2) {
+                }
             }
         }
         connection.disconnect();

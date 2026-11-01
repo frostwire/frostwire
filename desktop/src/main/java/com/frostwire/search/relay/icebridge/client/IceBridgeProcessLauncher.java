@@ -519,7 +519,8 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
             + Math.min(
                 TimeUnit.SECONDS.toNanos(5), Math.max(0, startupDeadline - System.nanoTime()));
     while (deadline - System.nanoTime() > 0) {
-      try (java.net.DatagramSocket probe = new java.net.DatagramSocket(rudpPort)) {
+      try {
+        new java.net.DatagramSocket(rudpPort).close();
         return; // port is free
       } catch (IOException notYetFree) {
         try {

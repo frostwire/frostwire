@@ -49,4 +49,8 @@ public interface KarmaChainStore extends AutoCloseable {
     default KarmaChain loadChainForWriting(byte[] ownerPub) {
         return loadChain(ownerPub);
     }
+
+    /** Releases the store. No implementation throws a checked exception here. */
+    @Override
+    void close();
 }
