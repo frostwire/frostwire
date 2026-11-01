@@ -1,4 +1,8 @@
 FrostWire 3.2.3 build 779 UNRELEASED
+  - fix:Pasting a SoundCloud link whose answer holds an empty track now downloads the other tracks instead of doing nothing (#1433)
+  - fix:Cloud video links whose details come back empty no longer crash the app (#1434)
+  - fix:Cloud video and playlist results without an upload date no longer crash or show another result's date (#1435)
+  - fix:An Internet Archive search answer with one empty entry no longer hides all Internet Archive results (#1432)
   - fix:A torrent with a malformed license or payment-options section no longer loses both: the bad section is ignored and the other still shows (#1430)
   - fix:Hashes and other hex values from peers and block explorers must be plain ASCII hex: look-alike digits from other scripts are rejected instead of decoding to the same bytes (#1431)
   - jlibtorrent: the copies of the libtorrent library that older versions left in the temp folder on every start (13-30 MB each) are deleted
