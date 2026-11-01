@@ -42,6 +42,8 @@ import java.util.regex.PatternSyntaxException;
 public class One337xSearchPattern implements SearchPattern {
   private static final Logger LOG = Logger.getLogger(One337xSearchPattern.class);
   private static final String DOMAIN = "www.1377x.to";
+  // RE2/J: String.replaceAll("<.*?>") backtracks, quadratic on a run of '<' with no '>'.
+  private static final Pattern HTML_TAG = Pattern.compile("<.*?>");
   private static Pattern searchResultsPattern;
   private static Pattern detailsPattern;
 
@@ -101,7 +103,7 @@ public class One337xSearchPattern implements SearchPattern {
           }
 
           // Clean up display name
-          displayName = displayName.replaceAll("<.*?>", "").trim();
+          displayName = HTML_TAG.matcher(displayName).replaceAll("").trim();
           if (displayName.length() > 150) {
             displayName = displayName.substring(0, 150);
           }
