@@ -1504,11 +1504,13 @@ public final class MusicUtils {
   }
 
   /**
-   * Returns The ID for a playlist.
+   * Returns the id of FrostWire's playlist named {@code name}. On Android 11 and later only
+   * playlists FrostWire owns count, as in {@link PlaylistLoader}: another app's playlist with the
+   * same name is not FrostWire's to change.
    *
    * @param context The {@link Context} to use.
    * @param name The name of the playlist.
-   * @return The ID for a playlist.
+   * @return The ID for a playlist, or -1.
    */
   public static long getIdForPlaylist(final Context context, final String name) {
     if (SystemUtils.isUIThread()) {
@@ -1520,14 +1522,20 @@ public final class MusicUtils {
       return -1;
     }
     Uri playlistContentUri = MusicUtils.getPlaylistContentUri();
+    String selection = PlaylistsColumns.NAME + "=?";
+    String[] selectionArgs = {name};
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+      selection = "owner_package_name = ? AND " + selection;
+      selectionArgs = new String[] {context.getPackageName(), name};
+    }
     Cursor cursor =
         context
             .getContentResolver()
             .query(
                 playlistContentUri,
                 new String[] {BaseColumns._ID},
-                PlaylistsColumns.NAME + "=?",
-                new String[] {name},
+                selection,
+                selectionArgs,
                 PlaylistsColumns.NAME);
     return getFirstId(cursor, -1);
   }
