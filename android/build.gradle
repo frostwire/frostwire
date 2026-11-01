@@ -325,9 +325,9 @@ androidComponents {
 
 spotless {
     java {
-        target 'src/main/java/**/*.java', 'src/test/java/**/*.java', '../common/src/main/java/**/*.java', '../common/src/test/java/**/*.java'
+        target 'src/main/java/**/*.java', 'src/test/java/**/*.java', 'apollo/src/**/*.java', '../common/src/main/java/**/*.java', '../common/src/test/java/**/*.java'
         ratchetFrom 'origin/master'
-        googleJavaFormat('1.24.0')
+        googleJavaFormat('1.36.1')
         toggleOffOn()
         removeUnusedImports()
         trimTrailingWhitespace()
