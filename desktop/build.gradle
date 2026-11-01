@@ -22,7 +22,9 @@ version = (file('src/main/java/com/limegroup/gnutella/util/FrostWireUtils.java')
 
 spotless {
     java {
-        target 'src/main/java/**/*.java', 'src/test/java/**/*.java', 'src/simulation/java/**/*.java', '../common/src/main/java/**/*.java', '../common/src/test/java/**/*.java', '../common/fuzz/src/test/java/**/*.java'
+        // common/ is outside this project's directory, which Spotless refuses; checkCommonFormat and
+        // formatCommon below cover it with the same google-java-format.
+        target 'src/main/java/**/*.java', 'src/test/java/**/*.java', 'src/simulation/java/**/*.java'
         googleJavaFormat('1.36.1')
         toggleOffOn()
         removeUnusedImports()
@@ -30,6 +32,45 @@ spotless {
         endWithNewline()
     }
 }
+
+// google-java-format for common/ (shared with Android), which Spotless can't reach: it only formats
+// files inside the project directory. Same version as the Spotless step above.
+configurations {
+    googleJavaFormat
+}
+dependencies {
+    googleJavaFormat 'com.google.googlejavaformat:google-java-format:1.36.1'
+}
+def commonJavaSources = fileTree('../common') {
+    include 'src/main/java/**/*.java', 'src/test/java/**/*.java', 'fuzz/src/test/java/**/*.java'
+}
+def googleJavaFormatJvmArgs = ['api', 'code', 'file', 'parser', 'tree', 'util'].collect {
+    "--add-exports=jdk.compiler/com.sun.tools.javac.${it}=ALL-UNNAMED"
+}
+tasks.register('checkCommonFormat', JavaExec) {
+    group = 'verification'
+    description = 'Fails if common/ is not formatted with google-java-format.'
+    classpath = configurations.googleJavaFormat
+    mainClass = 'com.google.googlejavaformat.java.Main'
+    jvmArgs googleJavaFormatJvmArgs
+    inputs.files(commonJavaSources)
+    outputs.upToDateWhen { true }
+    doFirst {
+        args(['--dry-run', '--set-exit-if-changed'] + commonJavaSources.files.collect { it.absolutePath })
+    }
+}
+tasks.register('formatCommon', JavaExec) {
+    group = 'formatting'
+    description = 'Formats common/ with google-java-format.'
+    classpath = configurations.googleJavaFormat
+    mainClass = 'com.google.googlejavaformat.java.Main'
+    jvmArgs googleJavaFormatJvmArgs
+    doFirst {
+        args(['--replace'] + commonJavaSources.files.collect { it.absolutePath })
+    }
+}
+tasks.named('spotlessCheck') { dependsOn 'checkCommonFormat' }
+tasks.named('spotlessApply') { finalizedBy 'formatCommon' }
 
 tasks.register('lint') {
     group = 'verification'

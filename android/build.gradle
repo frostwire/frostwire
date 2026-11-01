@@ -325,7 +325,9 @@ androidComponents {
 
 spotless {
     java {
-        target 'src/main/java/**/*.java', 'src/test/java/**/*.java', 'apollo/src/**/*.java', '../common/src/main/java/**/*.java', '../common/src/test/java/**/*.java'
+        // common/ is formatted and checked by the desktop build (checkCommonFormat): Spotless only
+        // reaches files inside this project's directory.
+        target 'src/main/java/**/*.java', 'src/test/java/**/*.java', 'apollo/src/**/*.java'
         googleJavaFormat('1.36.1')
         toggleOffOn()
         removeUnusedImports()
