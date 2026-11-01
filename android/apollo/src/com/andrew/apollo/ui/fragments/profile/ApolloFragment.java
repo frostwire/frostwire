@@ -99,9 +99,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I> exte
   /** Represents a song/album/ */
   protected I mItem;
 
-  /** Song list. The playlist's, the album's, the artist's discography available. */
-  private long[] mSongList;
-
   /** Id of a context menu item */
   private long mSelectedId;
 
@@ -198,7 +195,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I> exte
       mSongName = mSong.mSongName;
       mAlbumName = mSong.mAlbumName;
       mArtistName = mSong.mArtistName;
-      mSongList = null;
     } else if (mItem instanceof Album) {
       Album mAlbum = (Album) mItem;
       mSelectedId = mAlbum.mAlbumId;
@@ -217,7 +213,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I> exte
       Playlist mPlaylist = (Playlist) mItem;
       mSelectedId = mPlaylist.mPlaylistId;
     }
-    prefetchSongListForSelectedItem();
     // Play the selected songs
     menu.add(
             GROUP_ID,
@@ -267,45 +262,19 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I> exte
       if (activity == null) {
         return true;
       }
-      final long[] songList = mSongList != null ? mSongList : new long[] {mSelectedId};
       switch (item.getItemId()) {
         case FragmentMenuItems.PLAY_SELECTION:
-          MusicUtils.executeWithMusicPlaybackService(
-              activity, () -> MusicUtils.playFDs(songList, 0, MusicUtils.isShuffleEnabled()));
-          return true;
         case FragmentMenuItems.PLAY_NEXT:
-          MusicUtils.executeWithMusicPlaybackService(activity, () -> MusicUtils.playNext(songList));
-          return true;
         case FragmentMenuItems.ADD_TO_QUEUE:
-          MusicUtils.executeWithMusicPlaybackService(
-              activity, () -> MusicUtils.addToQueue(activity, songList));
-          return true;
         case FragmentMenuItems.ADD_TO_FAVORITES:
-          onAddToFavorites();
+        case FragmentMenuItems.NEW_PLAYLIST:
+        case FragmentMenuItems.PLAYLIST_SELECTED:
+        case FragmentMenuItems.DELETE:
+          withSongListOfSelection(item, songList -> onSongListAction(item, songList));
           return true;
         case FragmentMenuItems.REMOVE_FROM_FAVORITES:
           onRemoveFromFavorites();
           return true;
-        case FragmentMenuItems.NEW_PLAYLIST:
-          if (!isAdded() || getParentFragmentManager().isStateSaved()) {
-            return true;
-          }
-          CreateNewPlaylist.getInstance(songList)
-              .show(getParentFragmentManager(), "CreatePlaylist");
-          return true;
-        case FragmentMenuItems.PLAYLIST_SELECTED:
-          final long playlistId = item.getIntent().getLongExtra("playlist", 0);
-          Context playlistContext = getStableAppContext();
-          if (playlistContext == null) {
-            return true;
-          }
-          SystemUtils.postToHandler(
-              SystemUtils.HandlerThreadName.MISC,
-              () -> MusicUtils.addToPlaylist(playlistContext, songList, playlistId));
-          refresh();
-          return true;
-        case FragmentMenuItems.DELETE:
-          return onDelete(songList);
         case FragmentMenuItems.MORE_BY_ARTIST:
           openMoreByArtist();
           return true;
@@ -318,6 +287,161 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I> exte
       }
     }
     return super.onContextItemSelected(item);
+  }
+
+  /**
+   * Loads the songs of the item the menu was opened for, off the main thread, then runs {@code
+   * action} with them on the main thread. The list was prefetched into a field when the menu
+   * opened, and an action picked before that finished used the previous selection's songs, or an
+   * album or artist id as a song id: "Delete" could delete songs nobody chose (GitHub #1442). An
+   * item with no songs does nothing.
+   */
+  private void withSongListOfSelection(
+      android.view.MenuItem menuItem, java.util.function.Consumer<long[]> action) {
+    final Context context = getStableAppContext();
+    final Object selected = mItem;
+    final long selectedId = mSelectedId;
+    if (context == null || selected == null) {
+      return;
+    }
+    SystemUtils.postToHandler(
+        SystemUtils.HandlerThreadName.MISC,
+        () -> {
+          long[] songList = songListFor(selected, selectedId, new MediaStoreSongLists(context));
+          if (songList.length == 0) {
+            return;
+          }
+          SystemUtils.postToUIThread(
+              () -> {
+                if (isAdded() && getLiveActivity() != null) {
+                  action.accept(songList);
+                }
+              });
+        });
+  }
+
+  /** Where {@link #songListFor} gets the songs of an album, artist, genre or playlist. */
+  interface SongLists {
+    long[] album(long id);
+
+    long[] artist(long id);
+
+    long[] genre(long id);
+
+    long[] playlist(long id);
+
+    long[] favorites();
+
+    long[] lastAdded();
+  }
+
+  /**
+   * The songs of a selected item: a song is itself; an album, artist, genre or playlist is the
+   * songs it holds, possibly none. Never treats a non-song id as a song id.
+   */
+  static long[] songListFor(Object selected, long selectedId, SongLists lists) {
+    long[] songs = null;
+    if (selected instanceof Song) {
+      songs = new long[] {selectedId};
+    } else if (selected instanceof Album) {
+      songs = lists.album(selectedId);
+    } else if (selected instanceof Artist) {
+      songs = lists.artist(selectedId);
+    } else if (selected instanceof Genre) {
+      songs = lists.genre(selectedId);
+    } else if (selected instanceof Playlist) {
+      if (selectedId == PlaylistLoader.FAVORITE_PLAYLIST_ID) {
+        songs = lists.favorites();
+      } else if (selectedId == PlaylistLoader.LAST_ADDED_PLAYLIST_ID) {
+        songs = lists.lastAdded();
+      } else {
+        songs = lists.playlist(selectedId);
+      }
+    }
+    return songs != null ? songs : new long[0];
+  }
+
+  private static final class MediaStoreSongLists implements SongLists {
+    private final Context context;
+
+    MediaStoreSongLists(Context context) {
+      this.context = context;
+    }
+
+    @Override
+    public long[] album(long id) {
+      return MusicUtils.getSongListForAlbum(context, id);
+    }
+
+    @Override
+    public long[] artist(long id) {
+      return MusicUtils.getSongListForArtist(context, id);
+    }
+
+    @Override
+    public long[] genre(long id) {
+      return MusicUtils.getSongListForGenre(context, id);
+    }
+
+    @Override
+    public long[] playlist(long id) {
+      return MusicUtils.getSongListForPlaylist(context, id);
+    }
+
+    @Override
+    public long[] favorites() {
+      return MusicUtils.getSongListForFavorites(context);
+    }
+
+    @Override
+    public long[] lastAdded() {
+      return MusicUtils.getSongListForLastAdded(context);
+    }
+  }
+
+  /** Runs a song-list menu action, on the main thread, with the selection's songs. */
+  private void onSongListAction(android.view.MenuItem item, final long[] songList) {
+    Activity activity = getLiveActivity();
+    if (activity == null) {
+      return;
+    }
+    switch (item.getItemId()) {
+      case FragmentMenuItems.PLAY_SELECTION:
+        MusicUtils.executeWithMusicPlaybackService(
+            activity, () -> MusicUtils.playFDs(songList, 0, MusicUtils.isShuffleEnabled()));
+        break;
+      case FragmentMenuItems.PLAY_NEXT:
+        MusicUtils.executeWithMusicPlaybackService(activity, () -> MusicUtils.playNext(songList));
+        break;
+      case FragmentMenuItems.ADD_TO_QUEUE:
+        MusicUtils.executeWithMusicPlaybackService(
+            activity, () -> MusicUtils.addToQueue(activity, songList));
+        break;
+      case FragmentMenuItems.ADD_TO_FAVORITES:
+        onAddToFavorites(songList);
+        break;
+      case FragmentMenuItems.NEW_PLAYLIST:
+        if (!getParentFragmentManager().isStateSaved()) {
+          CreateNewPlaylist.getInstance(songList)
+              .show(getParentFragmentManager(), "CreatePlaylist");
+        }
+        break;
+      case FragmentMenuItems.PLAYLIST_SELECTED:
+        final long playlistId = item.getIntent().getLongExtra("playlist", 0);
+        Context playlistContext = getStableAppContext();
+        if (playlistContext != null) {
+          SystemUtils.postToHandler(
+              SystemUtils.HandlerThreadName.MISC,
+              () -> MusicUtils.addToPlaylist(playlistContext, songList, playlistId));
+          refresh();
+        }
+        break;
+      case FragmentMenuItems.DELETE:
+        onDelete(songList);
+        break;
+      default:
+        break;
+    }
   }
 
   private boolean onRemoveFromRecent() {
@@ -395,9 +519,11 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I> exte
     return false;
   }
 
-  private void onAddToFavorites() {
+  /** Adds {@code songList}, the selection's songs, to Favorites, off the main thread. */
+  private void onAddToFavorites(final long[] songList) {
     if (SystemUtils.isUIThread()) {
-      SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, this::onAddToFavorites);
+      SystemUtils.postToHandler(
+          SystemUtils.HandlerThreadName.MISC, () -> onAddToFavorites(songList));
       return;
     }
     final Activity activity = getActivity();
@@ -408,51 +534,34 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I> exte
     if (favoritesStore == null) {
       return;
     }
-    if (mSongList != null) {
-      int added = 0;
-      for (Long songId : mSongList) {
-        try {
-          final Song song = MusicUtils.getSong(activity, songId);
-          if (song != null) {
-            favoritesStore.addSongId(songId, song.mSongName, song.mAlbumName, song.mArtistName);
-            added++;
-          }
-        } catch (Throwable t) {
-          t.printStackTrace();
+    int added = 0;
+    for (long songId : songList) {
+      try {
+        final Song song = MusicUtils.getSong(activity, songId);
+        if (song != null) {
+          favoritesStore.addSongId(songId, song.mSongName, song.mAlbumName, song.mArtistName);
+          added++;
         }
+      } catch (Throwable t) {
+        t.printStackTrace();
       }
-      if (added > 0) {
-        final String message =
-            activity.getResources().getQuantityString(R.plurals.NNNtrackstoplaylist, added, added);
-
-        SystemUtils.postToUIThread(
-            () -> {
-              if (!isAdded()) {
-                return;
-              }
-              final Activity uiActivity = getActivity();
-              if (uiActivity == null || uiActivity.isFinishing()) {
-                return;
-              }
-              AppMsg.makeText(uiActivity, message, AppMsg.STYLE_CONFIRM).show();
-            });
-      }
-    } else if (mSelectedId != -1) {
-      favoritesStore.addSongId(mSelectedId, mSongName, mAlbumName, mArtistName);
-      final String message =
-          activity.getResources().getQuantityString(R.plurals.NNNtrackstoplaylist, 1);
-      SystemUtils.postToUIThread(
-          () -> {
-            if (!isAdded()) {
-              return;
-            }
-            final Activity uiActivity = getActivity();
-            if (uiActivity == null || uiActivity.isFinishing()) {
-              return;
-            }
-            AppMsg.makeText(uiActivity, message, AppMsg.STYLE_CONFIRM).show();
-          });
     }
+    if (added == 0) {
+      return;
+    }
+    final String message =
+        activity.getResources().getQuantityString(R.plurals.NNNtrackstoplaylist, added, added);
+    SystemUtils.postToUIThread(
+        () -> {
+          if (!isAdded()) {
+            return;
+          }
+          final Activity uiActivity = getActivity();
+          if (uiActivity == null || uiActivity.isFinishing()) {
+            return;
+          }
+          AppMsg.makeText(uiActivity, message, AppMsg.STYLE_CONFIRM).show();
+        });
   }
 
   private void onRemoveFromFavorites() {
@@ -463,41 +572,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I> exte
       favoritesStore.removeItem(mSelectedId);
     }
     refresh();
-  }
-
-  private void prefetchSongListForSelectedItem() {
-    final Context context = getStableAppContext();
-    if (context == null) {
-      mSongList = null;
-      return;
-    }
-    SystemUtils.postToHandler(
-        SystemUtils.HandlerThreadName.MISC, () -> mSongList = loadSongListForSelectedItem(context));
-  }
-
-  private long[] loadSongListForSelectedItem(Context context) {
-    if (mItem instanceof Song) {
-      return null;
-    }
-    if (mItem instanceof Album) {
-      return MusicUtils.getSongListForAlbum(context, mSelectedId);
-    }
-    if (mItem instanceof Artist) {
-      return MusicUtils.getSongListForArtist(context, mSelectedId);
-    }
-    if (mItem instanceof Genre) {
-      return MusicUtils.getSongListForGenre(context, mSelectedId);
-    }
-    if (mItem instanceof Playlist) {
-      if (mSelectedId == PlaylistLoader.FAVORITE_PLAYLIST_ID) {
-        return MusicUtils.getSongListForFavorites(context);
-      }
-      if (mSelectedId == PlaylistLoader.LAST_ADDED_PLAYLIST_ID) {
-        return MusicUtils.getSongListForLastAdded(context);
-      }
-      return MusicUtils.getSongListForPlaylist(context, mSelectedId);
-    }
-    return null;
   }
 
   private void openMoreByArtist() {
