@@ -58,6 +58,7 @@ import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
+import androidx.media3.common.Timeline;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.session.MediaNotification;
 import androidx.media3.session.MediaSession;
@@ -255,7 +256,8 @@ public class MusicPlaybackService extends MediaSessionService {
         MediaStore.Audio.Media.DATA,
         MediaStore.Audio.Media.MIME_TYPE,
         MediaStore.Audio.Media.ALBUM_ID,
-        MediaStore.Audio.Media.ARTIST_ID
+        MediaStore.Audio.Media.ARTIST_ID,
+        MediaStore.Audio.Media.DURATION
       };
 
   // AUDIO_FOCUS_REQUEST removed — ExoPlayer in MultiPlayer handles audio focus internally.
@@ -1547,6 +1549,29 @@ public class MusicPlaybackService extends MediaSessionService {
     }
   }
 
+  /**
+   * The duration Recent records for the track that just opened: MediaStore's, else the player's.
+   * Recent is written on META_CHANGED, when the player still holds the previous track's duration
+   * (an explicit open) or -1 (an automatic advance), and RecentStore drops songs without one, so
+   * auto-advanced songs never reached Recent (GitHub #1451).
+   */
+  static long recentDuration(long mediaStoreDuration, long playerDuration) {
+    return mediaStoreDuration > 0 ? mediaStoreDuration : playerDuration;
+  }
+
+  /** The current track's duration in milliseconds from MediaStore, or 0 if unknown. */
+  long getTrackMediaStoreDuration() {
+    if (mCursor == null || mCursor.isClosed()) {
+      return 0;
+    }
+    try {
+      int column = mCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
+      return column >= 0 && !mCursor.isNull(column) ? mCursor.getLong(column) : 0;
+    } catch (Throwable e) {
+      return 0;
+    }
+  }
+
   private static void recentsStoreAddSongIdTask(MusicPlaybackService musicPlaybackService) {
     if (musicPlaybackService.mRecentsCache == null) {
       musicPlaybackService.mRecentsCache = RecentStore.getInstance(musicPlaybackService);
@@ -1555,7 +1580,9 @@ public class MusicPlaybackService extends MediaSessionService {
     String songName = musicPlaybackService.getTrackName();
     String artistName = musicPlaybackService.getArtistName();
     String albumName = musicPlaybackService.getAlbumName();
-    long duration = musicPlaybackService.duration();
+    long duration =
+        recentDuration(
+            musicPlaybackService.getTrackMediaStoreDuration(), musicPlaybackService.duration());
     if (musicPlaybackService.mRecentsCache != null) {
       musicPlaybackService.mRecentsCache.addSongId(
           songId,
@@ -2984,8 +3011,7 @@ public class MusicPlaybackService extends MediaSessionService {
                   MusicPlaybackService.mPlayerHandler.sendEmptyMessage(TRACK_ENDED);
                 }
               } else if (state == Player.STATE_READY) {
-                long d = mExoPlayer.getDuration();
-                mCachedDuration = (d == C.TIME_UNSET) ? -1 : d;
+                mCachedDuration = knownDuration(mExoPlayer.getDuration());
                 refreshTimelineCache();
                 // Start position polling on the HandlerThread.
                 if (MusicPlaybackService.mPlayerHandler != null) {
@@ -2996,6 +3022,14 @@ public class MusicPlaybackService extends MediaSessionService {
                 if (svc != null) {
                   svc.updateNotification();
                 }
+              }
+            }
+
+            @Override
+            public void onTimelineChanged(@NonNull Timeline timeline, int reason) {
+              // The current item's duration becomes known once its source is prepared.
+              if (mCachedDuration <= 0) {
+                mCachedDuration = knownDuration(mExoPlayer.getDuration());
               }
             }
 
@@ -3032,7 +3066,8 @@ public class MusicPlaybackService extends MediaSessionService {
                         + previousIndex
                         + " — advancing service state");
                 mCachedPosition = 0;
-                mCachedDuration = -1;
+                // A gapless transition stays READY, so onPlaybackStateChanged won't set it.
+                mCachedDuration = knownDuration(mExoPlayer.getDuration());
                 if (MusicPlaybackService.mPlayerHandler != null) {
                   MusicPlaybackService.mPlayerHandler.sendEmptyMessage(TRACK_WENT_TO_NEXT);
                 }
@@ -3046,7 +3081,7 @@ public class MusicPlaybackService extends MediaSessionService {
                         + previousIndex
                         + " — rewinding service state");
                 mCachedPosition = 0;
-                mCachedDuration = -1;
+                mCachedDuration = knownDuration(mExoPlayer.getDuration());
                 if (MusicPlaybackService.mPlayerHandler != null) {
                   MusicPlaybackService.mPlayerHandler.sendEmptyMessage(TRACK_WENT_TO_PREVIOUS);
                 }
@@ -3279,6 +3314,11 @@ public class MusicPlaybackService extends MediaSessionService {
               }
             });
       }
+    }
+
+    /** ExoPlayer's duration in milliseconds, or -1 while it isn't known. */
+    static long knownDuration(long exoDuration) {
+      return exoDuration == C.TIME_UNSET || exoDuration < 0 ? -1 : exoDuration;
     }
 
     /**
