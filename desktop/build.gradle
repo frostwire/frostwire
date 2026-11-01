@@ -838,6 +838,10 @@ test {
     // SettingsFactory keys (e.g. DOWNLOAD_TABLE_SORT) for the rest of the JVM.
     systemProperty 'java.awt.headless', 'true'
     jvmArgs '-Djava.awt.headless=true'
+    // The app opens these at runtime (applicationDefaultJvmArgs and the release launchers);
+    // without them, code that reaches into AWT or Swing internals runs a fallback path in tests.
+    jvmArgs '--add-opens=java.desktop/java.awt=ALL-UNNAMED'
+    jvmArgs '--add-opens=java.desktop/javax.swing=ALL-UNNAMED'
     // Explicitly authorize JNI in the test worker, not the Gradle daemon.
     jvmArgs '--enable-native-access=ALL-UNNAMED'
     if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_24)) {
