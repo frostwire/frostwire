@@ -1,4 +1,5 @@
 FrostWire 3.2.3 build 779 UNRELEASED
+  - fix:The music player's Albums, Artists, Genres, Playlists and Recent lists no longer come back empty after switching away from the app and back (#1444)
   - fix:The music player's Recent list is no longer wiped when the media library can't be read yet, and freshly downloaded songs no longer drop out of it (#1443)
   - fix:Delete, Play, Add to queue and the playlist actions on an album, artist, genre or playlist in the music player now act on that item's songs. Picking the action right after long-pressing could use the previous item's songs, or delete a song you never chose (#1442)
   - fix:The search mesh no longer fails to start now and then because another app took its local port first (#1424)
