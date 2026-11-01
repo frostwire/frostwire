@@ -377,8 +377,8 @@ public abstract class BaseActivity extends AbstractActivity {
         /** {@inheritDoc} */
         @Override
         public void onClick(final View v) {
-          long currentAlbumId = MusicUtils.getCurrentAudioId();
-          if (currentAlbumId != -1) {
+          long currentAudioId = MusicUtils.getCurrentAudioId();
+          if (currentAudioId != -1) {
             String albumName = MusicUtils.getAlbumName();
             String artistName = MusicUtils.getArtistName();
             long albumId = MusicUtils.getCurrentAlbumId();
@@ -390,7 +390,9 @@ public abstract class BaseActivity extends AbstractActivity {
                         albumName,
                         artistName,
                         albumId,
-                        MusicUtils.getSongListForAlbum(BaseActivity.this, currentAlbumId)));
+                        // The album's songs, by album id: the song's id fetched another
+                        // album's songs (GitHub #1454).
+                        MusicUtils.getSongListForAlbum(BaseActivity.this, albumId)));
           } else {
             MusicUtils.shuffleAll(BaseActivity.this);
           }
