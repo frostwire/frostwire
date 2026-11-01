@@ -2294,7 +2294,8 @@ public final class MusicUtils {
               final Intent intent = new Intent();
               String name = cursor.getString(1);
               if (name != null) {
-                intent.putExtra("playlist", getIdForPlaylist(context, name));
+                // The listed row's own id: a lookup by name could find another playlist.
+                intent.putExtra("playlist", cursor.getLong(0));
 
                 // Apply tint color to the icon
                 Drawable icon =

@@ -18,10 +18,17 @@ import android.database.MatrixCursor;
 import android.net.Uri;
 import android.os.Looper;
 import android.provider.MediaStore;
+import android.view.MenuItem;
+import android.view.SubMenu;
+import android.view.View;
+import android.widget.PopupMenu;
 import androidx.test.core.app.ApplicationProvider;
+import com.andrew.apollo.menu.FragmentMenuItems;
+import com.frostwire.android.R;
 import com.frostwire.platform.Platform;
 import com.frostwire.platform.Platforms;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
@@ -31,10 +38,12 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowLooper;
 
 /**
- * Looking a playlist up by name found another app's playlist with the same name as one of
- * FrostWire's, so "Add to playlist" and "Save as playlist" could change it (GitHub #1448).
+ * "Add to playlist" could add songs to another app's playlist that had the same name as one of
+ * FrostWire's: the menu listed FrostWire's playlists, then looked each one's id up again by name,
+ * among every app's playlists (GitHub #1448).
  */
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 34, application = Application.class)
@@ -132,5 +141,29 @@ public class MusicUtilsPlaylistIdTest {
     worker.join(5_000);
 
     assertEquals(100L, id.get());
+  }
+
+  @Test
+  public void theMenuAddsToTheListedPlaylistWithoutLookingItUpByName() throws Exception {
+    Context context = ApplicationProvider.getApplicationContext();
+    context.setTheme(R.style.Theme_FrostWire);
+    SubMenu subMenu = new PopupMenu(context, new View(context)).getMenu().addSubMenu("Add to");
+
+    MusicUtils.makePlaylistMenu(context, 0, subMenu, false);
+    long deadline = System.currentTimeMillis() + 5_000;
+    List<Long> playlists = new ArrayList<>();
+    while (playlists.isEmpty() && System.currentTimeMillis() < deadline) {
+      Thread.sleep(10);
+      ShadowLooper.idleMainLooper();
+      for (int i = 0; i < subMenu.size(); i++) {
+        MenuItem item = subMenu.getItem(i);
+        if (item.getItemId() == FragmentMenuItems.PLAYLIST_SELECTED) {
+          playlists.add(item.getIntent().getLongExtra("playlist", -1));
+        }
+      }
+    }
+
+    assertEquals(List.of(100L), playlists);
+    assertEquals(List.of(), FakeMediaProvider.nameLookups);
   }
 }
