@@ -137,11 +137,14 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
   }
 
   /**
+   * Shows a copy of {@code data}. The list belongs to the loader, which delivers the same list
+   * again when the screen comes back; the adapter kept it by reference, so {@link #unload()}
+   * emptied the loader's list and the screen came back blank (GitHub #1444).
+   *
    * @param data The {@link List} used to return the count for the adapter.
    */
   public void setDataList(final List<I> data) {
-    mDataList.clear();
-    mDataList = data;
+    mDataList = data != null ? new ArrayList<>(data) : new ArrayList<>();
   }
 
   /**
