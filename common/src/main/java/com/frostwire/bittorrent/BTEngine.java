@@ -699,16 +699,27 @@ public final class BTEngine extends SessionManager {
       if (hash == null || resumeTorrentFile(hash).exists()) {
         return;
       }
-      TorrentInfo ti = th.torrentFile();
-      if (ti == null) {
+      byte[] bytes = sessionTorrentBytes(th);
+      if (bytes == null) {
         return;
       }
-      entry e = ti.toEntry().swig();
-      FileUtils.writeByteArrayToFile(
-          resumeTorrentFile(hash), Vectors.byte_vector2bytes(e.bencode()));
+      FileUtils.writeByteArrayToFile(resumeTorrentFile(hash), bytes);
     } catch (Throwable t) {
       LOG.warn("Error ensuring resume torrent file", t);
     }
+  }
+
+  /**
+   * The session copy of {@code th}'s metadata, bencoded, or null without metadata yet.
+   *
+   * <p>Read with torrentFileWithHashes(): torrentFile() drops the v2 piece layers, and re-encoding
+   * a v2-only torrent without them throws, so its copy was never written and the transfer vanished
+   * after a restart (GitHub #1383). For a v2 magnet download whose piece layers haven't arrived
+   * yet this still throws; the next resume save calls {@link #ensureResumeTorrentFile} again.
+   */
+  static byte[] sessionTorrentBytes(TorrentHandle th) {
+    TorrentInfo ti = th.torrentFileWithHashes();
+    return ti == null ? null : Vectors.byte_vector2bytes(ti.toEntry().swig().bencode());
   }
 
   File torrentFile(String name) {
