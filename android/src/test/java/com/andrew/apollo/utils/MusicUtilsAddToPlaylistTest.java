@@ -7,6 +7,7 @@
 
 package com.andrew.apollo.utils;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -19,8 +20,11 @@ import android.net.Uri;
 import android.os.Looper;
 import android.provider.MediaStore;
 import androidx.test.core.app.ApplicationProvider;
+import com.andrew.apollo.MusicPlaybackService;
 import com.frostwire.platform.Platform;
 import com.frostwire.platform.Platforms;
+import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +34,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowLooper;
 
 /**
  * "Add to playlist" (GitHub #1448): on Android 8 and 9 it asked MediaStore for the
@@ -164,5 +169,39 @@ public class MusicUtilsAddToPlaylistTest {
       previous = member[1];
     }
     assertEquals(5, FakeMediaProvider.members.size());
+  }
+
+  /** Adding to the playlist that is playing also queues the new songs, so they get played. */
+  @Test
+  @Config(sdk = 34)
+  public void songsAddedToThePlayingPlaylistJoinTheQueue() throws Exception {
+    FakeMediaProvider.members.add(new long[] {1, 0});
+    FakeMediaProvider.members.add(new long[] {2, 1});
+    MusicPlaybackService service =
+        Robolectric.buildService(MusicPlaybackService.class).create().get();
+    setField(service, "mPlayList", new long[] {1, 2, 3});
+    setField(service, "mPlayListLen", 3);
+    setField(service, "mPlayPos", 0);
+    Field ref = MusicUtils.class.getDeclaredField("musicPlaybackServiceRef");
+    ref.setAccessible(true);
+    ref.set(null, new WeakReference<>(service));
+    try {
+      add(9);
+      long deadline = System.currentTimeMillis() + 5_000;
+      while (service.getQueue().length < 4 && System.currentTimeMillis() < deadline) {
+        Thread.sleep(10);
+        ShadowLooper.idleMainLooper();
+      }
+
+      assertArrayEquals(new long[] {1, 2, 3, 9}, service.getQueue());
+    } finally {
+      ref.set(null, null);
+    }
+  }
+
+  private static void setField(Object target, String name, Object value) throws Exception {
+    Field field = MusicPlaybackService.class.getDeclaredField(name);
+    field.setAccessible(true);
+    field.set(target, value);
   }
 }

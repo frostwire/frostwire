@@ -1816,7 +1816,7 @@ public final class MusicUtils {
 
     long[] currentQueue = getQueue();
     long[] playlist = getSongListForPlaylist(context, playlistid);
-    boolean updateQueue = isPlaylistInQueue(playlist, currentQueue);
+    boolean updateQueue = isPlaylistInQueue(currentQueue, playlist);
     final int size = ids.length;
     final ContentResolver resolver = context.getContentResolver();
     final String[] projection = new String[] {Playlists.Members.PLAY_ORDER};
@@ -1867,6 +1867,7 @@ public final class MusicUtils {
     }
   }
 
+  /** Whether every song of {@code playlist} is in {@code currentQueue}: it is being played. */
   private static boolean isPlaylistInQueue(long[] currentQueue, long[] playlist) {
     if (playlist.length == 0 || currentQueue.length == 0 || playlist.length > currentQueue.length) {
       return false;
