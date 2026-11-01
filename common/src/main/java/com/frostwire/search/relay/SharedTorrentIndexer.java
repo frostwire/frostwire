@@ -15,511 +15,505 @@ import com.frostwire.jlibtorrent.Sha1Hash;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
-
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Auto-magic populator for the local distributed-search index.
  *
- * <p>Registered as a {@link BTEngineListener}. On each
- * {@code downloadAdded} or {@code downloadUpdate} callback (the
- * magnet-to-metadata transition), a background task inspects the
- * torrent's {@link TorrentInfo} and, once it is available, upserts a
- * {@link LocalSharedTorrent} row into the configured
- * {@link LocalIndex}.
+ * <p>Registered as a {@link BTEngineListener}. On each {@code downloadAdded} or {@code
+ * downloadUpdate} callback (the magnet-to-metadata transition), a background task inspects the
+ * torrent's {@link TorrentInfo} and, once it is available, upserts a {@link LocalSharedTorrent} row
+ * into the configured {@link LocalIndex}.
  *
- * <p>Signed index identities use metadata v1 when available. Hybrid handle
- * prefixes are only legacy aliases, never a second published identity.
+ * <p>Signed index identities use metadata v1 when available. Hybrid handle prefixes are only legacy
+ * aliases, never a second published identity.
  *
- * <p>When constructed with an {@link IdentityKeys}, the publisher
- * fields carry the node's real Ed25519 public key and derived node
- * ID. When constructed without keys (e.g. unit tests), placeholder
- * zero bytes are used.
+ * <p>When constructed with an {@link IdentityKeys}, the publisher fields carry the node's real
+ * Ed25519 public key and derived node ID. When constructed without keys (e.g. unit tests),
+ * placeholder zero bytes are used.
  */
 public final class SharedTorrentIndexer implements BTEngineListener {
 
-    static final String UNKNOWN_NAME = "unknown";
-    private static final String THREAD_NAME_PREFIX = "SharedTorrentIndexer-";
+  static final String UNKNOWN_NAME = "unknown";
+  private static final String THREAD_NAME_PREFIX = "SharedTorrentIndexer-";
 
-    private static final Logger LOG = Logger.getLogger(SharedTorrentIndexer.class);
+  private static final Logger LOG = Logger.getLogger(SharedTorrentIndexer.class);
 
-    private final LocalIndex index;
-    private final Runnable indexChangedListener;
-    private final byte[] publisherNodeId;
-    private final byte[] publisherEd25519Pub;
-    private final AtomicReference<TorrentInfoSource> torrentInfoSource = new AtomicReference<>(
-            new DefaultTorrentInfoSource());
+  private final LocalIndex index;
+  private final Runnable indexChangedListener;
+  private final byte[] publisherNodeId;
+  private final byte[] publisherEd25519Pub;
+  private final AtomicReference<TorrentInfoSource> torrentInfoSource =
+      new AtomicReference<>(new DefaultTorrentInfoSource());
 
-    /** Construct with placeholder identity (for tests). */
-    public SharedTorrentIndexer(LocalIndex index) {
-        this(index, null);
+  /** Construct with placeholder identity (for tests). */
+  public SharedTorrentIndexer(LocalIndex index) {
+    this(index, null);
+  }
+
+  /** Construct with a real node identity. */
+  public SharedTorrentIndexer(LocalIndex index, IdentityKeys identity) {
+    this(index, identity, null);
+  }
+
+  /** Listener runs after a successful index write, on the producer's worker thread. */
+  public SharedTorrentIndexer(
+      LocalIndex index, IdentityKeys identity, Runnable indexChangedListener) {
+    if (index == null) {
+      throw new IllegalArgumentException("index is null");
     }
-
-    /** Construct with a real node identity. */
-    public SharedTorrentIndexer(LocalIndex index, IdentityKeys identity) {
-        this(index, identity, null);
+    this.index = index;
+    this.indexChangedListener = indexChangedListener;
+    if (identity != null) {
+      this.publisherNodeId = identity.nodeId();
+      this.publisherEd25519Pub = identity.ed25519PubRaw();
+    } else {
+      this.publisherNodeId = new byte[IdentityRecord.NODE_ID_LENGTH];
+      this.publisherEd25519Pub = new byte[IdentityRecord.ED25519_PUB_LENGTH];
     }
+  }
 
-    /** Listener runs after a successful index write, on the producer's worker thread. */
-    public SharedTorrentIndexer(LocalIndex index, IdentityKeys identity, Runnable indexChangedListener) {
-        if (index == null) {
-            throw new IllegalArgumentException("index is null");
+  void setTorrentInfoSource(TorrentInfoSource source) {
+    if (source == null) {
+      throw new IllegalArgumentException("source is null");
+    }
+    torrentInfoSource.set(source);
+  }
+
+  @Override
+  public void started(BTEngine engine) {}
+
+  @Override
+  public void stopped(BTEngine engine) {}
+
+  @Override
+  public void downloadAdded(BTEngine engine, BTDownload dl) {
+    scheduleIndex(dl, IndexTrigger.ADDED);
+  }
+
+  @Override
+  public void downloadUpdate(BTEngine engine, BTDownload dl) {
+    scheduleIndex(dl, IndexTrigger.UPDATE);
+  }
+
+  /**
+   * Index downloads that were restored before this listener was installed. Safe to call multiple
+   * times (upsert is idempotent).
+   */
+  public void indexExisting(Iterable<? extends BTDownload> downloads) {
+    if (downloads == null) {
+      return;
+    }
+    java.util.HashSet<String> live = new java.util.HashSet<>();
+    boolean canPrune = true;
+    int n = 0;
+    for (BTDownload dl : downloads) {
+      if (dl == null) {
+        continue;
+      }
+      TorrentInfo ti = null;
+      try {
+        ti = torrentInfoSource.get().torrentInfo(dl);
+      } catch (Throwable unavailable) {
+        LOG.debug("Metadata unavailable during live index reconciliation", unavailable);
+      }
+      String hex = ti == null ? safeInfoHash(dl) : infoHashHex(ti);
+      if (hex != null) {
+        live.add(hex);
+      }
+      if (ti == null || hex == null) {
+        // A transient metadata gap cannot prove a canonical row is no longer live.
+        canPrune = false;
+      } else {
+        String alias = legacyAlias(ti, hex);
+        if (alias != null) {
+          // Preserve the old row until its canonical upsert commits successfully.
+          live.add(alias);
         }
-        this.index = index;
-        this.indexChangedListener = indexChangedListener;
-        if (identity != null) {
-            this.publisherNodeId = identity.nodeId();
-            this.publisherEd25519Pub = identity.ed25519PubRaw();
-        } else {
-            this.publisherNodeId = new byte[IdentityRecord.NODE_ID_LENGTH];
-            this.publisherEd25519Pub = new byte[IdentityRecord.ED25519_PUB_LENGTH];
+      }
+      scheduleIndex(dl, IndexTrigger.ADDED);
+      n++;
+    }
+    try {
+      int removed = 0;
+      java.util.List<LocalSharedTorrent> rows =
+          canPrune ? index.listAll() : java.util.Collections.emptyList();
+      for (LocalSharedTorrent t : rows) {
+        if (t == null || t.infoHashHex() == null) {
+          continue;
         }
-    }
-
-    void setTorrentInfoSource(TorrentInfoSource source) {
-        if (source == null) {
-            throw new IllegalArgumentException("source is null");
+        if (!live.contains(t.infoHashHex().toLowerCase(java.util.Locale.ROOT))) {
+          index.delete(t.infoHashHex());
+          notifyIndexChanged();
+          removed++;
         }
-        torrentInfoSource.set(source);
+      }
+      if (removed > 0) {
+        LOG.info("Pruned " + removed + " stale LocalIndex row(s) not in the live session");
+      }
+    } catch (Throwable t) {
+      LOG.warn("Failed to prune stale LocalIndex rows", t);
     }
-
-    @Override
-    public void started(BTEngine engine) {
+    if (n > 0) {
+      LOG.info("Scheduled reindex of " + n + " existing download(s)");
     }
+  }
 
-    @Override
-    public void stopped(BTEngine engine) {
+  private void scheduleIndex(BTDownload dl, IndexTrigger trigger) {
+    if (dl == null) {
+      return;
     }
-
-    @Override
-    public void downloadAdded(BTEngine engine, BTDownload dl) {
-        scheduleIndex(dl, IndexTrigger.ADDED);
+    String infoHashHex = safeInfoHash(dl);
+    if (infoHashHex == null) {
+      return;
     }
+    ThreadExecutor.startThread(
+        () -> indexIfReady(dl, infoHashHex, trigger), THREAD_NAME_PREFIX + infoHashHex);
+  }
 
-    @Override
-    public void downloadUpdate(BTEngine engine, BTDownload dl) {
-        scheduleIndex(dl, IndexTrigger.UPDATE);
+  /**
+   * Index a torrent we just created (YouTube/HTTP complete → .torrent) without waiting for BTEngine
+   * downloadAdded.
+   */
+  public IndexResult indexTorrentInfo(TorrentInfo ti, String displayName) {
+    if (ti == null) {
+      return IndexResult.NULL_INPUT;
     }
-
-    /**
-     * Index downloads that were restored before this listener was installed.
-     * Safe to call multiple times (upsert is idempotent).
-     */
-    public void indexExisting(Iterable<? extends BTDownload> downloads) {
-        if (downloads == null) {
-            return;
-        }
-        java.util.HashSet<String> live = new java.util.HashSet<>();
-        boolean canPrune = true;
-        int n = 0;
-        for (BTDownload dl : downloads) {
-            if (dl == null) {
-                continue;
-            }
-            TorrentInfo ti = null;
-            try {
-                ti = torrentInfoSource.get().torrentInfo(dl);
-            } catch (Throwable unavailable) {
-                LOG.debug("Metadata unavailable during live index reconciliation", unavailable);
-            }
-            String hex = ti == null ? safeInfoHash(dl) : infoHashHex(ti);
-            if (hex != null) {
-                live.add(hex);
-            }
-            if (ti == null || hex == null) {
-                // A transient metadata gap cannot prove a canonical row is no longer live.
-                canPrune = false;
-            } else {
-                String alias = legacyAlias(ti, hex);
-                if (alias != null) {
-                    // Preserve the old row until its canonical upsert commits successfully.
-                    live.add(alias);
-                }
-            }
-            scheduleIndex(dl, IndexTrigger.ADDED);
-            n++;
-        }
+    String infoHashHex = infoHashHex(ti);
+    if (infoHashHex == null) {
+      return IndexResult.NO_METADATA;
+    }
+    try {
+      String name = displayName;
+      if (name == null || name.isEmpty()) {
         try {
-            int removed = 0;
-            java.util.List<LocalSharedTorrent> rows = canPrune
-                    ? index.listAll() : java.util.Collections.emptyList();
-            for (LocalSharedTorrent t : rows) {
-                if (t == null || t.infoHashHex() == null) {
-                    continue;
-                }
-                if (!live.contains(t.infoHashHex().toLowerCase(java.util.Locale.ROOT))) {
-                    index.delete(t.infoHashHex());
-                    notifyIndexChanged();
-                    removed++;
-                }
-            }
-            if (removed > 0) {
-                LOG.info("Pruned " + removed + " stale LocalIndex row(s) not in the live session");
-            }
-        } catch (Throwable t) {
-            LOG.warn("Failed to prune stale LocalIndex rows", t);
+          name = ti.name();
+        } catch (Throwable ignored) {
+          name = null;
         }
-        if (n > 0) {
-            LOG.info("Scheduled reindex of " + n + " existing download(s)");
-        }
+      }
+      if (name == null || name.isEmpty()) {
+        name = resolveName(null, ti);
+      }
+      long size = safeSize(ti);
+      int fileCount = safeFileCount(ti);
+      long now = Instant.now().getEpochSecond();
+      LocalSharedTorrent torrent =
+          new LocalSharedTorrent.Builder()
+              .infoHash(Hex.decode(infoHashHex))
+              .name(name)
+              .sizeBytes(size)
+              .fileCount(fileCount)
+              .filesJson(buildFilesJson(ti, fileCount, size))
+              .publisherNodeId(publisherNodeId)
+              .publisherEd25519Pub(publisherEd25519Pub)
+              .publisherUtpPort(0)
+              .addedAt(now)
+              .lastSeenAt(now)
+              .build();
+      index.upsert(torrent);
+      notifyIndexChanged();
+      removeLegacyAlias(ti, infoHashHex);
+      LOG.info("Indexed torrent " + infoHashHex + " from " + IndexTrigger.CREATED.name());
+      return IndexResult.UPSERTED;
+    } catch (Throwable t) {
+      LOG.warn("Failed to index torrent from " + IndexTrigger.CREATED.name(), t);
+      return IndexResult.ERROR;
     }
+  }
 
-    private void scheduleIndex(BTDownload dl, IndexTrigger trigger) {
-        if (dl == null) {
-            return;
-        }
-        String infoHashHex = safeInfoHash(dl);
-        if (infoHashHex == null) {
-            return;
-        }
-        ThreadExecutor.startThread(
-                () -> indexIfReady(dl, infoHashHex, trigger),
-                THREAD_NAME_PREFIX + infoHashHex);
+  IndexResult indexIfReady(BTDownload dl, String infoHashHex, IndexTrigger trigger) {
+    if (dl == null || infoHashHex == null) {
+      return IndexResult.NULL_INPUT;
     }
-
-    /**
-     * Index a torrent we just created (YouTube/HTTP complete → .torrent)
-     * without waiting for BTEngine downloadAdded.
-     */
-    public IndexResult indexTorrentInfo(TorrentInfo ti, String displayName) {
-        if (ti == null) {
-            return IndexResult.NULL_INPUT;
-        }
-        String infoHashHex = infoHashHex(ti);
-        if (infoHashHex == null) {
-            return IndexResult.NO_METADATA;
-        }
-        try {
-            String name = displayName;
-            if (name == null || name.isEmpty()) {
-                try {
-                    name = ti.name();
-                } catch (Throwable ignored) {
-                    name = null;
-                }
-            }
-            if (name == null || name.isEmpty()) {
-                name = resolveName(null, ti);
-            }
-            long size = safeSize(ti);
-            int fileCount = safeFileCount(ti);
-            long now = Instant.now().getEpochSecond();
-            LocalSharedTorrent torrent = new LocalSharedTorrent.Builder()
-                    .infoHash(Hex.decode(infoHashHex))
-                    .name(name)
-                    .sizeBytes(size)
-                    .fileCount(fileCount)
-                    .filesJson(buildFilesJson(ti, fileCount, size))
-                    .publisherNodeId(publisherNodeId)
-                    .publisherEd25519Pub(publisherEd25519Pub)
-                    .publisherUtpPort(0)
-                    .addedAt(now)
-                    .lastSeenAt(now)
-                    .build();
-            index.upsert(torrent);
-            notifyIndexChanged();
-            removeLegacyAlias(ti, infoHashHex);
-            LOG.info("Indexed torrent " + infoHashHex + " from " + IndexTrigger.CREATED.name());
-            return IndexResult.UPSERTED;
-        } catch (Throwable t) {
-            LOG.warn("Failed to index torrent from " + IndexTrigger.CREATED.name(), t);
-            return IndexResult.ERROR;
-        }
+    try {
+      TorrentInfo ti = torrentInfoSource.get().torrentInfo(dl);
+      if (ti == null) {
+        return IndexResult.NO_METADATA;
+      }
+      String canonical = infoHashHex(ti);
+      if (canonical == null) {
+        return IndexResult.NO_METADATA;
+      }
+      LocalSharedTorrent torrent = buildTorrent(dl, ti, canonical);
+      index.upsert(torrent);
+      notifyIndexChanged();
+      removeLegacyAlias(ti, canonical);
+      LOG.info("Indexed torrent " + canonical + " from " + trigger.name());
+      return IndexResult.UPSERTED;
+    } catch (Throwable t) {
+      LOG.warn("Failed to index torrent " + infoHashHex + " from " + trigger.name(), t);
+      return IndexResult.ERROR;
     }
+  }
 
-    IndexResult indexIfReady(BTDownload dl, String infoHashHex, IndexTrigger trigger) {
-        if (dl == null || infoHashHex == null) {
-            return IndexResult.NULL_INPUT;
-        }
-        try {
-            TorrentInfo ti = torrentInfoSource.get().torrentInfo(dl);
-            if (ti == null) {
-                return IndexResult.NO_METADATA;
-            }
-            String canonical = infoHashHex(ti);
-            if (canonical == null) {
-                return IndexResult.NO_METADATA;
-            }
-            LocalSharedTorrent torrent = buildTorrent(dl, ti, canonical);
-            index.upsert(torrent);
-            notifyIndexChanged();
-            removeLegacyAlias(ti, canonical);
-            LOG.info("Indexed torrent " + canonical + " from " + trigger.name());
-            return IndexResult.UPSERTED;
-        } catch (Throwable t) {
-            LOG.warn("Failed to index torrent " + infoHashHex + " from " + trigger.name(), t);
-            return IndexResult.ERROR;
-        }
+  private void notifyIndexChanged() {
+    if (indexChangedListener != null) {
+      try {
+        indexChangedListener.run();
+      } catch (Throwable t) {
+        // Notification failure must not turn an already committed write into ERROR.
+        LOG.warn("Failed to notify LocalIndex change", t);
+      }
     }
+  }
 
-    private void notifyIndexChanged() {
-        if (indexChangedListener != null) {
-            try {
-                indexChangedListener.run();
-            } catch (Throwable t) {
-                // Notification failure must not turn an already committed write into ERROR.
-                LOG.warn("Failed to notify LocalIndex change", t);
-            }
-        }
+  private void removeLegacyAlias(TorrentInfo ti, String canonical) {
+    String alias = legacyAlias(ti, canonical);
+    if (alias == null) {
+      return;
     }
-
-    private void removeLegacyAlias(TorrentInfo ti, String canonical) {
-        String alias = legacyAlias(ti, canonical);
-        if (alias == null) {
-            return;
-        }
-        try {
-            if (index.get(alias).isPresent()) {
-                index.delete(alias);
-                notifyIndexChanged();
-            }
-        } catch (Throwable t) {
-            // Keep the committed canonical row searchable; retry cleanup on the next callback.
-            LOG.warn("Failed to remove proven LocalIndex alias " + alias, t);
-        }
+    try {
+      if (index.get(alias).isPresent()) {
+        index.delete(alias);
+        notifyIndexChanged();
+      }
+    } catch (Throwable t) {
+      // Keep the committed canonical row searchable; retry cleanup on the next callback.
+      LOG.warn("Failed to remove proven LocalIndex alias " + alias, t);
     }
+  }
 
-    /** Only native metadata linking both hashes authorizes alias removal. */
-    private static String legacyAlias(TorrentInfo ti, String canonical) {
-        try {
-            if (!ti.infoHashType().has_v1()) {
-                return null;
-            }
-            Sha1Hash v1 = ti.infoHashV1();
-            if (v1 == null || !v1.toHex().equalsIgnoreCase(canonical)) {
-                return null;
-            }
-            String alias = v2Prefix(ti);
-            return alias == null || alias.equals(canonical) ? null : alias;
-        } catch (Throwable unavailable) {
-            return null;
-        }
-    }
-
-    LocalSharedTorrent buildTorrent(BTDownload dl, TorrentInfo ti, String infoHashHex) {
-        long now = Instant.now().getEpochSecond();
-        long size = safeSize(ti);
-        int fileCount = safeFileCount(ti);
-        String name = safeName(dl, ti);
-        String filesJson = buildFilesJson(ti, fileCount, size);
-
-        return new LocalSharedTorrent.Builder()
-                .infoHash(Hex.decode(infoHashHex))
-                .name(name)
-                .sizeBytes(size)
-                .fileCount(fileCount)
-                .filesJson(filesJson)
-                .publisherNodeId(publisherNodeId)
-                .publisherEd25519Pub(publisherEd25519Pub)
-                .publisherUtpPort(0)
-                .addedAt(now)
-                .lastSeenAt(now)
-                .build();
-    }
-
-    /**
-     * Build a JSON array of real file paths extracted from the torrent's
-     * {@link TorrentInfo}. Each entry is {@code {"path":"...","size":N}}.
-     *
-     * <p>Skips pad files and hidden files (same filters as
-     * {@link com.frostwire.search.PerformersHelper#crawlTorrentInfo}).
-     * Falls back to {@link FilesJson#minimal} if extraction fails.
-     */
-    private static String buildFilesJson(TorrentInfo ti, int fileCount, long totalSize) {
-        try {
-            var fs = ti.files();
-            int n = fs.numFiles();
-            if (n <= 0) {
-                return FilesJson.minimal(fileCount, totalSize);
-            }
-            StringBuilder sb = new StringBuilder(256);
-            sb.append('[');
-            boolean first = true;
-            for (int i = 0; i < n; i++) {
-                // Skip pad files and hidden files.
-                if (fs.padFileAt(i)) {
-                    continue;
-                }
-                try {
-                    var flags = fs.fileFlags(i);
-                    if (flags != null && flags.and_(com.frostwire.jlibtorrent.FileStorage.FLAG_HIDDEN).nonZero()) {
-                        continue;
-                    }
-                } catch (Throwable ignored) {
-                    // fileFlags may not be available on all platforms; proceed.
-                }
-                String path;
-                try {
-                    path = fs.filePath(i);
-                } catch (Throwable t) {
-                    path = null;
-                }
-                if (path == null || path.isEmpty()) {
-                    continue;
-                }
-                long fileSize;
-                try {
-                    fileSize = fs.fileSize(i);
-                } catch (Throwable t) {
-                    fileSize = 0;
-                }
-                if (!first) {
-                    sb.append(',');
-                }
-                first = false;
-                sb.append("{\"path\":");
-                // Escape JSON string content.
-                appendJsonString(sb, path);
-                sb.append(",\"size\":").append(fileSize).append('}');
-            }
-            sb.append(']');
-            if (first) {
-                // No real files extracted — fall back to minimal.
-                return FilesJson.minimal(fileCount, totalSize);
-            }
-            return sb.toString();
-        } catch (Throwable t) {
-            LOG.debug("buildFilesJson: extraction failed, using minimal", t);
-            return FilesJson.minimal(fileCount, totalSize);
-        }
-    }
-
-    /**
-     * Append a JSON-escaped string (with surrounding double quotes) to
-     * the builder. Escapes backslash, double-quote, newline, carriage
-     * return, and tab.
-     */
-    private static void appendJsonString(StringBuilder sb, String s) {
-        sb.append('"');
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            switch (c) {
-                case '\\' -> sb.append("\\\\");
-                case '"' -> sb.append("\\\"");
-                case '\n' -> sb.append("\\n");
-                case '\r' -> sb.append("\\r");
-                case '\t' -> sb.append("\\t");
-                default -> {
-                    if (c < 0x20) {
-                        sb.append(String.format("\\u%04x", (int) c));
-                    } else {
-                        sb.append(c);
-                    }
-                }
-            }
-        }
-        sb.append('"');
-    }
-
-    static String resolveName(String downloadName, TorrentInfo ti) {
-        if (downloadName != null && !downloadName.isEmpty()) {
-            return downloadName;
-        }
-        if (ti != null) {
-            try {
-                Sha1Hash v1 = ti.infoHashV1();
-                if (v1 != null) {
-                    return v1.toHex();
-                }
-            } catch (Throwable t) {
-                LOG.debug("TorrentInfo.infoHashV1() lookup failed during name fallback", t);
-            }
-        }
-        return UNKNOWN_NAME;
-    }
-
-    private static String infoHashHex(TorrentInfo ti) {
-        try {
-            if (ti.infoHashType().has_v1()) {
-                Sha1Hash v1 = ti.infoHashV1();
-                return v1 == null ? null : v1.toHex().toLowerCase(java.util.Locale.ROOT);
-            }
-            // The current wire/index identity is 20 bytes. Preserve the existing v2-only
-            // handle-prefix behavior; this is not a full v2 protocol identity.
-            return v2Prefix(ti);
-        } catch (Throwable t) {
-            LOG.debug("TorrentInfo.infoHashV1() lookup failed", t);
-            // Do not publish a hybrid as v2 just because v1 lookup is temporarily unavailable.
-            return null;
-        }
-    }
-
-    private static String v2Prefix(TorrentInfo ti) {
-        try {
-            if (!ti.infoHashType().has_v2()) {
-                return null;
-            }
-            com.frostwire.jlibtorrent.Sha256Hash v2 = ti.infoHashV2();
-            if (v2 != null && !v2.isAllZeros()) {
-                return v2.toHex().substring(0, 40).toLowerCase(java.util.Locale.ROOT);
-            }
-        } catch (Throwable unavailable) {
-            LOG.debug("TorrentInfo.infoHashV2() lookup failed", unavailable);
-        }
+  /** Only native metadata linking both hashes authorizes alias removal. */
+  private static String legacyAlias(TorrentInfo ti, String canonical) {
+    try {
+      if (!ti.infoHashType().has_v1()) {
         return null;
+      }
+      Sha1Hash v1 = ti.infoHashV1();
+      if (v1 == null || !v1.toHex().equalsIgnoreCase(canonical)) {
+        return null;
+      }
+      String alias = v2Prefix(ti);
+      return alias == null || alias.equals(canonical) ? null : alias;
+    } catch (Throwable unavailable) {
+      return null;
     }
+  }
 
-    private static String safeInfoHash(BTDownload dl) {
+  LocalSharedTorrent buildTorrent(BTDownload dl, TorrentInfo ti, String infoHashHex) {
+    long now = Instant.now().getEpochSecond();
+    long size = safeSize(ti);
+    int fileCount = safeFileCount(ti);
+    String name = safeName(dl, ti);
+    String filesJson = buildFilesJson(ti, fileCount, size);
+
+    return new LocalSharedTorrent.Builder()
+        .infoHash(Hex.decode(infoHashHex))
+        .name(name)
+        .sizeBytes(size)
+        .fileCount(fileCount)
+        .filesJson(filesJson)
+        .publisherNodeId(publisherNodeId)
+        .publisherEd25519Pub(publisherEd25519Pub)
+        .publisherUtpPort(0)
+        .addedAt(now)
+        .lastSeenAt(now)
+        .build();
+  }
+
+  /**
+   * Build a JSON array of real file paths extracted from the torrent's {@link TorrentInfo}. Each
+   * entry is {@code {"path":"...","size":N}}.
+   *
+   * <p>Skips pad files and hidden files (same filters as {@link
+   * com.frostwire.search.PerformersHelper#crawlTorrentInfo}). Falls back to {@link
+   * FilesJson#minimal} if extraction fails.
+   */
+  private static String buildFilesJson(TorrentInfo ti, int fileCount, long totalSize) {
+    try {
+      var fs = ti.files();
+      int n = fs.numFiles();
+      if (n <= 0) {
+        return FilesJson.minimal(fileCount, totalSize);
+      }
+      StringBuilder sb = new StringBuilder(256);
+      sb.append('[');
+      boolean first = true;
+      for (int i = 0; i < n; i++) {
+        // Skip pad files and hidden files.
+        if (fs.padFileAt(i)) {
+          continue;
+        }
         try {
-            String v1 = dl.getV1InfoHash();
-            if (v1 != null && !v1.isEmpty()) {
-                return v1.toLowerCase(java.util.Locale.ROOT);
-            }
-            String hex = dl.getInfoHash();
-            if (hex == null || hex.isEmpty()) {
-                return null;
-            }
-            return hex.toLowerCase(java.util.Locale.ROOT);
-        } catch (Throwable t) {
-            LOG.warn("Unable to read info hash from BTDownload", t);
-            return null;
+          var flags = fs.fileFlags(i);
+          if (flags != null
+              && flags.and_(com.frostwire.jlibtorrent.FileStorage.FLAG_HIDDEN).nonZero()) {
+            continue;
+          }
+        } catch (Throwable ignored) {
+          // fileFlags may not be available on all platforms; proceed.
         }
-    }
-
-    private static long safeSize(TorrentInfo ti) {
+        String path;
         try {
-            long size = ti.totalSize();
-            return size < 0 ? 0 : size;
+          path = fs.filePath(i);
         } catch (Throwable t) {
-            LOG.debug("TorrentInfo.totalSize() lookup failed", t);
-            return 0;
+          path = null;
         }
-    }
-
-    private static int safeFileCount(TorrentInfo ti) {
+        if (path == null || path.isEmpty()) {
+          continue;
+        }
+        long fileSize;
         try {
-            int n = ti.files().numFiles();
-            return n <= 0 ? 1 : n;
+          fileSize = fs.fileSize(i);
         } catch (Throwable t) {
-            LOG.debug("TorrentInfo.files().numFiles() lookup failed", t);
-            return 1;
+          fileSize = 0;
         }
-    }
-
-    private static String safeName(BTDownload dl, TorrentInfo ti) {
-        String downloadName = null;
-        try {
-            downloadName = dl.getName();
-        } catch (Throwable t) {
-            LOG.debug("BTDownload.getName() lookup failed", t);
+        if (!first) {
+          sb.append(',');
         }
-        return resolveName(downloadName, ti);
+        first = false;
+        sb.append("{\"path\":");
+        // Escape JSON string content.
+        appendJsonString(sb, path);
+        sb.append(",\"size\":").append(fileSize).append('}');
+      }
+      sb.append(']');
+      if (first) {
+        // No real files extracted — fall back to minimal.
+        return FilesJson.minimal(fileCount, totalSize);
+      }
+      return sb.toString();
+    } catch (Throwable t) {
+      LOG.debug("buildFilesJson: extraction failed, using minimal", t);
+      return FilesJson.minimal(fileCount, totalSize);
     }
+  }
 
-    /**
-     * Tiny seam so unit tests can drive the indexer without a real
-     * libtorrent {@code BTDownload} and {@code TorrentInfo}. The default
-     * implementation reads from the live handle.
-     */
-    interface TorrentInfoSource {
-        TorrentInfo torrentInfo(BTDownload dl);
-    }
-
-    private static final class DefaultTorrentInfoSource implements TorrentInfoSource {
-        @Override
-        public TorrentInfo torrentInfo(BTDownload dl) {
-            return dl.getTorrentHandle().torrentFile();
+  /**
+   * Append a JSON-escaped string (with surrounding double quotes) to the builder. Escapes
+   * backslash, double-quote, newline, carriage return, and tab.
+   */
+  private static void appendJsonString(StringBuilder sb, String s) {
+    sb.append('"');
+    for (int i = 0; i < s.length(); i++) {
+      char c = s.charAt(i);
+      switch (c) {
+        case '\\' -> sb.append("\\\\");
+        case '"' -> sb.append("\\\"");
+        case '\n' -> sb.append("\\n");
+        case '\r' -> sb.append("\\r");
+        case '\t' -> sb.append("\\t");
+        default -> {
+          if (c < 0x20) {
+            sb.append(String.format("\\u%04x", (int) c));
+          } else {
+            sb.append(c);
+          }
         }
+      }
     }
+    sb.append('"');
+  }
+
+  static String resolveName(String downloadName, TorrentInfo ti) {
+    if (downloadName != null && !downloadName.isEmpty()) {
+      return downloadName;
+    }
+    if (ti != null) {
+      try {
+        Sha1Hash v1 = ti.infoHashV1();
+        if (v1 != null) {
+          return v1.toHex();
+        }
+      } catch (Throwable t) {
+        LOG.debug("TorrentInfo.infoHashV1() lookup failed during name fallback", t);
+      }
+    }
+    return UNKNOWN_NAME;
+  }
+
+  private static String infoHashHex(TorrentInfo ti) {
+    try {
+      if (ti.infoHashType().has_v1()) {
+        Sha1Hash v1 = ti.infoHashV1();
+        return v1 == null ? null : v1.toHex().toLowerCase(java.util.Locale.ROOT);
+      }
+      // The current wire/index identity is 20 bytes. Preserve the existing v2-only
+      // handle-prefix behavior; this is not a full v2 protocol identity.
+      return v2Prefix(ti);
+    } catch (Throwable t) {
+      LOG.debug("TorrentInfo.infoHashV1() lookup failed", t);
+      // Do not publish a hybrid as v2 just because v1 lookup is temporarily unavailable.
+      return null;
+    }
+  }
+
+  private static String v2Prefix(TorrentInfo ti) {
+    try {
+      if (!ti.infoHashType().has_v2()) {
+        return null;
+      }
+      com.frostwire.jlibtorrent.Sha256Hash v2 = ti.infoHashV2();
+      if (v2 != null && !v2.isAllZeros()) {
+        return v2.toHex().substring(0, 40).toLowerCase(java.util.Locale.ROOT);
+      }
+    } catch (Throwable unavailable) {
+      LOG.debug("TorrentInfo.infoHashV2() lookup failed", unavailable);
+    }
+    return null;
+  }
+
+  private static String safeInfoHash(BTDownload dl) {
+    try {
+      String v1 = dl.getV1InfoHash();
+      if (v1 != null && !v1.isEmpty()) {
+        return v1.toLowerCase(java.util.Locale.ROOT);
+      }
+      String hex = dl.getInfoHash();
+      if (hex == null || hex.isEmpty()) {
+        return null;
+      }
+      return hex.toLowerCase(java.util.Locale.ROOT);
+    } catch (Throwable t) {
+      LOG.warn("Unable to read info hash from BTDownload", t);
+      return null;
+    }
+  }
+
+  private static long safeSize(TorrentInfo ti) {
+    try {
+      long size = ti.totalSize();
+      return size < 0 ? 0 : size;
+    } catch (Throwable t) {
+      LOG.debug("TorrentInfo.totalSize() lookup failed", t);
+      return 0;
+    }
+  }
+
+  private static int safeFileCount(TorrentInfo ti) {
+    try {
+      int n = ti.files().numFiles();
+      return n <= 0 ? 1 : n;
+    } catch (Throwable t) {
+      LOG.debug("TorrentInfo.files().numFiles() lookup failed", t);
+      return 1;
+    }
+  }
+
+  private static String safeName(BTDownload dl, TorrentInfo ti) {
+    String downloadName = null;
+    try {
+      downloadName = dl.getName();
+    } catch (Throwable t) {
+      LOG.debug("BTDownload.getName() lookup failed", t);
+    }
+    return resolveName(downloadName, ti);
+  }
+
+  /**
+   * Tiny seam so unit tests can drive the indexer without a real libtorrent {@code BTDownload} and
+   * {@code TorrentInfo}. The default implementation reads from the live handle.
+   */
+  interface TorrentInfoSource {
+    TorrentInfo torrentInfo(BTDownload dl);
+  }
+
+  private static final class DefaultTorrentInfoSource implements TorrentInfoSource {
+    @Override
+    public TorrentInfo torrentInfo(BTDownload dl) {
+      return dl.getTorrentHandle().torrentFile();
+    }
+  }
 }

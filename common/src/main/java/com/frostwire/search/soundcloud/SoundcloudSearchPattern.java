@@ -18,94 +18,99 @@
 
 package com.frostwire.search.soundcloud;
 
-import com.frostwire.search.SearchResult;
-import com.frostwire.search.soundcloud.SoundcloudItem;
-import com.frostwire.search.soundcloud.SoundcloudResponse;
-import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.SearchPattern;
+import com.frostwire.search.SearchResult;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * V2 pattern-based search for Soundcloud audio streaming service.
- * Searches for tracks via Soundcloud's JSON API and returns HTTP download URLs.
+ * V2 pattern-based search for Soundcloud audio streaming service. Searches for tracks via
+ * Soundcloud's JSON API and returns HTTP download URLs.
  *
  * @author gubatron
  */
 public class SoundcloudSearchPattern implements SearchPattern {
-    private static final Logger LOG = Logger.getLogger(SoundcloudSearchPattern.class);
-    private static final String DOMAIN = "api-v2.soundcloud.com";
+  private static final Logger LOG = Logger.getLogger(SoundcloudSearchPattern.class);
+  private static final String DOMAIN = "api-v2.soundcloud.com";
 
-    private final String clientId;
-    private final String appVersion;
+  private final String clientId;
+  private final String appVersion;
 
-    public SoundcloudSearchPattern(String clientId, String appVersion) {
-        this.clientId = clientId != null ? clientId : "A8wpv6WPWhcpz9BhiL66KfK8IHy6NLoz";
-        this.appVersion = appVersion != null ? appVersion : "1780910323";
+  public SoundcloudSearchPattern(String clientId, String appVersion) {
+    this.clientId = clientId != null ? clientId : "A8wpv6WPWhcpz9BhiL66KfK8IHy6NLoz";
+    this.appVersion = appVersion != null ? appVersion : "1780910323";
+  }
+
+  @Override
+  public String getSearchUrl(String encodedKeywords) {
+    return "https://"
+        + DOMAIN
+        + "/search/tracks?q="
+        + encodedKeywords
+        + "&limit=50&offset=0&client_id="
+        + clientId;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<FileSearchResult> parseResults(String responseBody) {
+    List<SearchResult> results = new ArrayList<>();
+
+    if (responseBody == null || responseBody.isEmpty()) {
+      LOG.warn("Soundcloud: Received empty response body");
+      return (List<FileSearchResult>) (List<?>) results;
     }
 
-    @Override
-    public String getSearchUrl(String encodedKeywords) {
-        return "https://" + DOMAIN + "/search/tracks?q=" + encodedKeywords + "&limit=50&offset=0&client_id=" + clientId;
-    }
+    try {
+      // Parse JSON response
+      SoundcloudResponse response = JsonUtils.toObject(responseBody, SoundcloudResponse.class);
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<FileSearchResult> parseResults(String responseBody) {
-        List<SearchResult> results = new ArrayList<>();
+      if (response == null || response.collection == null || response.collection.isEmpty()) {
+        LOG.debug("Soundcloud: No tracks in response");
+        return (List<FileSearchResult>) (List<?>) results;
+      }
 
-        if (responseBody == null || responseBody.isEmpty()) {
-            LOG.warn("Soundcloud: Received empty response body");
-            return (List<FileSearchResult>) (List<?>) results;
+      // Parse each track
+      for (SoundcloudItem item : response.collection) {
+        if (!isValidSearchResult(item)) {
+          continue;
         }
 
         try {
-            // Parse JSON response
-            SoundcloudResponse response = JsonUtils.toObject(responseBody, SoundcloudResponse.class);
+          // Create legacy SoundcloudSearchResult for compatibility with download/UI layer
+          SoundcloudSearchResult result = new SoundcloudSearchResult(item, clientId, appVersion);
+          results.add(result);
 
-            if (response == null || response.collection == null || response.collection.isEmpty()) {
-                LOG.debug("Soundcloud: No tracks in response");
-                return (List<FileSearchResult>) (List<?>) results;
-            }
-
-            // Parse each track
-            for (SoundcloudItem item : response.collection) {
-                if (!isValidSearchResult(item)) {
-                    continue;
-                }
-
-                try {
-                    // Create legacy SoundcloudSearchResult for compatibility with download/UI layer
-                    SoundcloudSearchResult result = new SoundcloudSearchResult(item, clientId, appVersion);
-                    results.add(result);
-
-                    LOG.debug("Soundcloud: Created result - displayName: '" + result.getDisplayName() +
-                             "', hash: " + result.getHash() + ", size: " + result.getSize());
-                } catch (Exception e) {
-                    LOG.warn("Soundcloud: Error parsing track: " + e.getMessage());
-                }
-            }
-
-            LOG.debug("Soundcloud: Parsed " + results.size() + " results from response");
+          LOG.debug(
+              "Soundcloud: Created result - displayName: '"
+                  + result.getDisplayName()
+                  + "', hash: "
+                  + result.getHash()
+                  + ", size: "
+                  + result.getSize());
         } catch (Exception e) {
-            LOG.error("Soundcloud: Error parsing response: " + e.getMessage(), e);
+          LOG.warn("Soundcloud: Error parsing track: " + e.getMessage());
         }
+      }
 
-        return (List<FileSearchResult>) (List<?>) results;
+      LOG.debug("Soundcloud: Parsed " + results.size() + " results from response");
+    } catch (Exception e) {
+      LOG.error("Soundcloud: Error parsing response: " + e.getMessage(), e);
     }
 
-    private boolean isValidSearchResult(SoundcloudItem item) {
-        if (item == null) {
-            return false;
-        }
-        boolean hasDownload = item.isValidSearchResult();
-        boolean hasUrl = !StringUtils.isNullOrEmpty(item.permalink_url);
-        return hasDownload && hasUrl;
-    }
+    return (List<FileSearchResult>) (List<?>) results;
+  }
 
+  private boolean isValidSearchResult(SoundcloudItem item) {
+    if (item == null) {
+      return false;
+    }
+    boolean hasDownload = item.isValidSearchResult();
+    boolean hasUrl = !StringUtils.isNullOrEmpty(item.permalink_url);
+    return hasDownload && hasUrl;
+  }
 }

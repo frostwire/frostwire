@@ -25,6 +25,6 @@ import java.util.List;
  * @author aldenml
  */
 public class InternetArchiveResponseField {
-    public int start;
-    public List<InternetArchiveItem> docs;
+  public int start;
+  public List<InternetArchiveItem> docs;
 }

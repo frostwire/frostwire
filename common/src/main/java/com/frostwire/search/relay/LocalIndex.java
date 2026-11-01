@@ -14,33 +14,32 @@ import java.util.Optional;
 /**
  * Storage boundary for the local distributed-search torrent index.
  *
- * <p>Desktop uses a SQLite + FTS5 implementation. Headless relayd may use
- * an in-memory implementation or no-op implementation depending on role.
+ * <p>Desktop uses a SQLite + FTS5 implementation. Headless relayd may use an in-memory
+ * implementation or no-op implementation depending on role.
  */
 public interface LocalIndex {
-    void upsert(LocalSharedTorrent torrent);
+  void upsert(LocalSharedTorrent torrent);
 
-    void delete(String infoHashHex);
+  void delete(String infoHashHex);
 
-    Optional<LocalSharedTorrent> get(String infoHashHex);
+  Optional<LocalSharedTorrent> get(String infoHashHex);
 
-    List<LocalSharedTorrent> search(String query, int limit);
+  List<LocalSharedTorrent> search(String query, int limit);
 
-    void markPublished(String infoHashHex, long timestamp);
+  void markPublished(String infoHashHex, long timestamp);
 
-    List<String> needsRepublish(long nowSec, long thresholdSec);
+  List<String> needsRepublish(long nowSec, long thresholdSec);
 
-    void updateLastSeen(String infoHashHex, long ts);
+  void updateLastSeen(String infoHashHex, long ts);
 
-    int size();
+  int size();
 
-    /**
-     * Return all torrents in the index, ordered by most recently seen
-     * first. Used by catalog browse responses. The default implementation
-     * returns an empty list; production implementations should override
-     * with a real query.
-     */
-    default List<LocalSharedTorrent> listAll() {
-        return Collections.emptyList();
-    }
+  /**
+   * Return all torrents in the index, ordered by most recently seen first. Used by catalog browse
+   * responses. The default implementation returns an empty list; production implementations should
+   * override with a real query.
+   */
+  default List<LocalSharedTorrent> listAll() {
+    return Collections.emptyList();
+  }
 }

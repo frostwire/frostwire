@@ -12,186 +12,186 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Lightweight in-memory counters for the IceBridge servent.
  *
- * <p>No disk I/O. Counters are exposed through the HTTP control interface and
- * can be reset remotely during development.
+ * <p>No disk I/O. Counters are exposed through the HTTP control interface and can be reset remotely
+ * during development.
  */
 public final class IceBridgeMetrics {
 
-    private final AtomicLong rudpPacketsIn = new AtomicLong();
-    private final AtomicLong rudpPacketsOut = new AtomicLong();
-    private final AtomicLong rudpBytesIn = new AtomicLong();
-    private final AtomicLong rudpBytesOut = new AtomicLong();
-    private final AtomicLong controlRequests = new AtomicLong();
-    private final AtomicLong controlErrors = new AtomicLong();
-    private final AtomicLong helloRejectedCount = new AtomicLong();
-    private final AtomicLong relayRateLimitedCount = new AtomicLong();
-    private final AtomicLong searchRateLimitedCount = new AtomicLong();
-    private final AtomicLong powRejectedCount = new AtomicLong();
-    private final AtomicLong spamMarkedDroppedCount = new AtomicLong();
-    private final AtomicLong transportPollRunsCount = new AtomicLong();
-    private final AtomicLong transportPollErrorsCount = new AtomicLong();
-    private final AtomicLong transportPollDrainBatchesCount = new AtomicLong();
-    private final AtomicLong transportMessagesDrainedCount = new AtomicLong();
-    private final AtomicLong requestWorkQueueDepthGauge = new AtomicLong();
-    private final AtomicLong requestWorkRejectedCount = new AtomicLong();
-    private final AtomicLong verifyFailuresCount = new AtomicLong();
+  private final AtomicLong rudpPacketsIn = new AtomicLong();
+  private final AtomicLong rudpPacketsOut = new AtomicLong();
+  private final AtomicLong rudpBytesIn = new AtomicLong();
+  private final AtomicLong rudpBytesOut = new AtomicLong();
+  private final AtomicLong controlRequests = new AtomicLong();
+  private final AtomicLong controlErrors = new AtomicLong();
+  private final AtomicLong helloRejectedCount = new AtomicLong();
+  private final AtomicLong relayRateLimitedCount = new AtomicLong();
+  private final AtomicLong searchRateLimitedCount = new AtomicLong();
+  private final AtomicLong powRejectedCount = new AtomicLong();
+  private final AtomicLong spamMarkedDroppedCount = new AtomicLong();
+  private final AtomicLong transportPollRunsCount = new AtomicLong();
+  private final AtomicLong transportPollErrorsCount = new AtomicLong();
+  private final AtomicLong transportPollDrainBatchesCount = new AtomicLong();
+  private final AtomicLong transportMessagesDrainedCount = new AtomicLong();
+  private final AtomicLong requestWorkQueueDepthGauge = new AtomicLong();
+  private final AtomicLong requestWorkRejectedCount = new AtomicLong();
+  private final AtomicLong verifyFailuresCount = new AtomicLong();
 
-    public void rudpPacketIn(int bytes) {
-        rudpPacketsIn.incrementAndGet();
-        rudpBytesIn.addAndGet(bytes);
-    }
+  public void rudpPacketIn(int bytes) {
+    rudpPacketsIn.incrementAndGet();
+    rudpBytesIn.addAndGet(bytes);
+  }
 
-    public void rudpPacketOut(int bytes) {
-        rudpPacketsOut.incrementAndGet();
-        rudpBytesOut.addAndGet(bytes);
-    }
+  public void rudpPacketOut(int bytes) {
+    rudpPacketsOut.incrementAndGet();
+    rudpBytesOut.addAndGet(bytes);
+  }
 
-    public void controlRequest() {
-        controlRequests.incrementAndGet();
-    }
+  public void controlRequest() {
+    controlRequests.incrementAndGet();
+  }
 
-    public void controlError() {
-        controlErrors.incrementAndGet();
-    }
+  public void controlError() {
+    controlErrors.incrementAndGet();
+  }
 
-    public void helloRejected() {
-        helloRejectedCount.incrementAndGet();
-    }
+  public void helloRejected() {
+    helloRejectedCount.incrementAndGet();
+  }
 
-    public void relayRateLimited() {
-        relayRateLimitedCount.incrementAndGet();
-    }
+  public void relayRateLimited() {
+    relayRateLimitedCount.incrementAndGet();
+  }
 
-    public void searchRateLimited() {
-        searchRateLimitedCount.incrementAndGet();
-    }
+  public void searchRateLimited() {
+    searchRateLimitedCount.incrementAndGet();
+  }
 
-    public void powRejected() {
-        powRejectedCount.incrementAndGet();
-    }
+  public void powRejected() {
+    powRejectedCount.incrementAndGet();
+  }
 
-    public void spamMarkedDropped() {
-        spamMarkedDroppedCount.incrementAndGet();
-    }
+  public void spamMarkedDropped() {
+    spamMarkedDroppedCount.incrementAndGet();
+  }
 
-    public void incrementTransportPollRuns(long delta) {
-        transportPollRunsCount.addAndGet(delta);
-    }
+  public void incrementTransportPollRuns(long delta) {
+    transportPollRunsCount.addAndGet(delta);
+  }
 
-    public void incrementTransportPollErrors(long delta) {
-        transportPollErrorsCount.addAndGet(delta);
-    }
+  public void incrementTransportPollErrors(long delta) {
+    transportPollErrorsCount.addAndGet(delta);
+  }
 
-    public void incrementTransportPollDrainBatches(long delta) {
-        transportPollDrainBatchesCount.addAndGet(delta);
-    }
+  public void incrementTransportPollDrainBatches(long delta) {
+    transportPollDrainBatchesCount.addAndGet(delta);
+  }
 
-    public void incrementTransportMessagesDrained(long delta) {
-        transportMessagesDrainedCount.addAndGet(delta);
-    }
+  public void incrementTransportMessagesDrained(long delta) {
+    transportMessagesDrainedCount.addAndGet(delta);
+  }
 
-    public void setRequestWorkQueueDepthGauge(long value) {
-        requestWorkQueueDepthGauge.set(value);
-    }
+  public void setRequestWorkQueueDepthGauge(long value) {
+    requestWorkQueueDepthGauge.set(value);
+  }
 
-    public void incrementRequestWorkRejected(long delta) {
-        requestWorkRejectedCount.addAndGet(delta);
-    }
+  public void incrementRequestWorkRejected(long delta) {
+    requestWorkRejectedCount.addAndGet(delta);
+  }
 
-    public void incrementVerifyFailures(long delta) {
-        verifyFailuresCount.addAndGet(delta);
-    }
+  public void incrementVerifyFailures(long delta) {
+    verifyFailuresCount.addAndGet(delta);
+  }
 
-    public long rudpPacketsIn() {
-        return rudpPacketsIn.get();
-    }
+  public long rudpPacketsIn() {
+    return rudpPacketsIn.get();
+  }
 
-    public long rudpPacketsOut() {
-        return rudpPacketsOut.get();
-    }
+  public long rudpPacketsOut() {
+    return rudpPacketsOut.get();
+  }
 
-    public long rudpBytesIn() {
-        return rudpBytesIn.get();
-    }
+  public long rudpBytesIn() {
+    return rudpBytesIn.get();
+  }
 
-    public long rudpBytesOut() {
-        return rudpBytesOut.get();
-    }
+  public long rudpBytesOut() {
+    return rudpBytesOut.get();
+  }
 
-    public long controlRequests() {
-        return controlRequests.get();
-    }
+  public long controlRequests() {
+    return controlRequests.get();
+  }
 
-    public long controlErrors() {
-        return controlErrors.get();
-    }
+  public long controlErrors() {
+    return controlErrors.get();
+  }
 
-    public long helloRejectedCount() {
-        return helloRejectedCount.get();
-    }
+  public long helloRejectedCount() {
+    return helloRejectedCount.get();
+  }
 
-    public long relayRateLimitedCount() {
-        return relayRateLimitedCount.get();
-    }
+  public long relayRateLimitedCount() {
+    return relayRateLimitedCount.get();
+  }
 
-    public long searchRateLimitedCount() {
-        return searchRateLimitedCount.get();
-    }
+  public long searchRateLimitedCount() {
+    return searchRateLimitedCount.get();
+  }
 
-    public long powRejectedCount() {
-        return powRejectedCount.get();
-    }
+  public long powRejectedCount() {
+    return powRejectedCount.get();
+  }
 
-    public long spamMarkedDroppedCount() {
-        return spamMarkedDroppedCount.get();
-    }
+  public long spamMarkedDroppedCount() {
+    return spamMarkedDroppedCount.get();
+  }
 
-    public long transportPollRunsCount() {
-        return transportPollRunsCount.get();
-    }
+  public long transportPollRunsCount() {
+    return transportPollRunsCount.get();
+  }
 
-    public long transportPollErrorsCount() {
-        return transportPollErrorsCount.get();
-    }
+  public long transportPollErrorsCount() {
+    return transportPollErrorsCount.get();
+  }
 
-    public long transportPollDrainBatchesCount() {
-        return transportPollDrainBatchesCount.get();
-    }
+  public long transportPollDrainBatchesCount() {
+    return transportPollDrainBatchesCount.get();
+  }
 
-    public long transportMessagesDrainedCount() {
-        return transportMessagesDrainedCount.get();
-    }
+  public long transportMessagesDrainedCount() {
+    return transportMessagesDrainedCount.get();
+  }
 
-    public long requestWorkQueueDepthGauge() {
-        return requestWorkQueueDepthGauge.get();
-    }
+  public long requestWorkQueueDepthGauge() {
+    return requestWorkQueueDepthGauge.get();
+  }
 
-    public long requestWorkRejectedCount() {
-        return requestWorkRejectedCount.get();
-    }
+  public long requestWorkRejectedCount() {
+    return requestWorkRejectedCount.get();
+  }
 
-    public long verifyFailuresCount() {
-        return verifyFailuresCount.get();
-    }
+  public long verifyFailuresCount() {
+    return verifyFailuresCount.get();
+  }
 
-    public void reset() {
-        rudpPacketsIn.set(0);
-        rudpPacketsOut.set(0);
-        rudpBytesIn.set(0);
-        rudpBytesOut.set(0);
-        controlRequests.set(0);
-        controlErrors.set(0);
-        helloRejectedCount.set(0);
-        relayRateLimitedCount.set(0);
-        searchRateLimitedCount.set(0);
-        powRejectedCount.set(0);
-        spamMarkedDroppedCount.set(0);
-        transportPollRunsCount.set(0);
-        transportPollErrorsCount.set(0);
-        transportPollDrainBatchesCount.set(0);
-        transportMessagesDrainedCount.set(0);
-        requestWorkQueueDepthGauge.set(0);
-        requestWorkRejectedCount.set(0);
-        verifyFailuresCount.set(0);
-    }
+  public void reset() {
+    rudpPacketsIn.set(0);
+    rudpPacketsOut.set(0);
+    rudpBytesIn.set(0);
+    rudpBytesOut.set(0);
+    controlRequests.set(0);
+    controlErrors.set(0);
+    helloRejectedCount.set(0);
+    relayRateLimitedCount.set(0);
+    searchRateLimitedCount.set(0);
+    powRejectedCount.set(0);
+    spamMarkedDroppedCount.set(0);
+    transportPollRunsCount.set(0);
+    transportPollErrorsCount.set(0);
+    transportPollDrainBatchesCount.set(0);
+    transportMessagesDrainedCount.set(0);
+    requestWorkQueueDepthGauge.set(0);
+    requestWorkRejectedCount.set(0);
+    verifyFailuresCount.set(0);
+  }
 }

@@ -52,6 +52,7 @@ public final class KarmaChainWriter implements KarmaEndorsementSink, AutoCloseab
    * loaded would overwrite it, so nothing is written until the next start loads it.
    */
   private final boolean storeLoaded;
+
   private final ReentrantLock writeLock = new ReentrantLock();
   private final DhtAdvertiser.Lifecycle lifecycle;
 

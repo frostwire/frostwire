@@ -14,7 +14,6 @@ import com.frostwire.jlibtorrent.swig.error_code;
 import com.frostwire.jlibtorrent.swig.tcp_endpoint_vector;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,95 +26,92 @@ import java.util.List;
  */
 public class LibTorrentMagnetDownloader implements MagnetDownloader {
 
-    private static final Logger LOG = Logger.getLogger(LibTorrentMagnetDownloader.class);
+  private static final Logger LOG = Logger.getLogger(LibTorrentMagnetDownloader.class);
 
-    public LibTorrentMagnetDownloader() {
-    }
+  public LibTorrentMagnetDownloader() {}
 
-    public byte[] download(String magnet, int timeout) {
-        return BTEngine.getInstance().fetchMagnet(magnet, timeout, getTempDir());
-    }
+  public byte[] download(String magnet, int timeout) {
+    return BTEngine.getInstance().fetchMagnet(magnet, timeout, getTempDir());
+  }
 
-    /**
-     * Extracts the {@code x.pe} bootstrap peers from a magnet URI.
-     * Fails closed: any null/empty/http input or parse error yields an empty list.
-     */
-    public static List<TcpEndpoint> parsePeers(String magnetUri) {
-        if (StringUtils.isNullOrEmpty(magnetUri) || magnetUri.startsWith("http")) {
-            return Collections.emptyList();
-        }
-        try {
-            error_code ec = new error_code();
-            add_torrent_params params = add_torrent_params.parse_magnet_uri(magnetUri, ec);
-            tcp_endpoint_vector v = params.get_peers();
-            int size = v.size();
-            List<TcpEndpoint> peers = new ArrayList<>(size);
-            for (int i = 0; i < size; i++) {
-                peers.add(new TcpEndpoint(v.get(i)));
-            }
-            return peers;
-        } catch (Throwable t) {
-            LOG.warn("Failed to parse peers from magnet URI", t);
-            return Collections.emptyList();
-        }
+  /**
+   * Extracts the {@code x.pe} bootstrap peers from a magnet URI. Fails closed: any null/empty/http
+   * input or parse error yields an empty list.
+   */
+  public static List<TcpEndpoint> parsePeers(String magnetUri) {
+    if (StringUtils.isNullOrEmpty(magnetUri) || magnetUri.startsWith("http")) {
+      return Collections.emptyList();
     }
+    try {
+      error_code ec = new error_code();
+      add_torrent_params params = add_torrent_params.parse_magnet_uri(magnetUri, ec);
+      tcp_endpoint_vector v = params.get_peers();
+      int size = v.size();
+      List<TcpEndpoint> peers = new ArrayList<>(size);
+      for (int i = 0; i < size; i++) {
+        peers.add(new TcpEndpoint(v.get(i)));
+      }
+      return peers;
+    } catch (Throwable t) {
+      LOG.warn("Failed to parse peers from magnet URI", t);
+      return Collections.emptyList();
+    }
+  }
 
-    /**
-     * Extracts the {@code x.hp} holder Ed25519 pub (base64url, 32 bytes) from
-     * a Distributed search magnet — the mesh return address for TORRENT_FETCH
-     * metadata requests when the seeder is not directly reachable (NAT).
-     * Fails closed: absent/invalid values yield null.
-     */
-    public static byte[] parseHolderPub(String magnetUri) {
-        if (StringUtils.isNullOrEmpty(magnetUri) || magnetUri.startsWith("http")) {
-            return null;
-        }
-        try {
-            int i = magnetUri.indexOf("x.hp=");
-            if (i < 0) {
-                return null;
-            }
-            int start = i + "x.hp=".length();
-            int end = magnetUri.indexOf('&', start);
-            String b64 = end < 0 ? magnetUri.substring(start) : magnetUri.substring(start, end);
-            if (b64.isEmpty()) {
-                return null;
-            }
-            byte[] pub = java.util.Base64.getUrlDecoder().decode(b64);
-            return pub.length == 32 ? pub : null;
-        } catch (Throwable t) {
-            return null;
-        }
+  /**
+   * Extracts the {@code x.hp} holder Ed25519 pub (base64url, 32 bytes) from a Distributed search
+   * magnet — the mesh return address for TORRENT_FETCH metadata requests when the seeder is not
+   * directly reachable (NAT). Fails closed: absent/invalid values yield null.
+   */
+  public static byte[] parseHolderPub(String magnetUri) {
+    if (StringUtils.isNullOrEmpty(magnetUri) || magnetUri.startsWith("http")) {
+      return null;
     }
+    try {
+      int i = magnetUri.indexOf("x.hp=");
+      if (i < 0) {
+        return null;
+      }
+      int start = i + "x.hp=".length();
+      int end = magnetUri.indexOf('&', start);
+      String b64 = end < 0 ? magnetUri.substring(start) : magnetUri.substring(start, end);
+      if (b64.isEmpty()) {
+        return null;
+      }
+      byte[] pub = java.util.Base64.getUrlDecoder().decode(b64);
+      return pub.length == 32 ? pub : null;
+    } catch (Throwable t) {
+      return null;
+    }
+  }
 
-    /**
-     * Reads the {@code x.hc} public-catalog flag the Distributed search
-     * performer appends to a result magnet when its holder has opted in to
-     * PUBLIC_CATALOG. When set, catalogs of that holder may be browsed, so the
-     * UI offers the "Browse Shared Torrents" action. Fails closed: absent,
-     * malformed, or any value other than {@code 1}/{@code true} yields false.
-     */
-    public static boolean hasPublicCatalogFlag(String magnetUri) {
-        if (StringUtils.isNullOrEmpty(magnetUri) || magnetUri.startsWith("http")) {
-            return false;
-        }
-        int i = magnetUri.indexOf("x.hc=");
-        if (i < 0) {
-            return false;
-        }
-        int start = i + "x.hc=".length();
-        int end = magnetUri.indexOf('&', start);
-        String value = end < 0 ? magnetUri.substring(start) : magnetUri.substring(start, end);
-        return "1".equals(value) || "true".equalsIgnoreCase(value);
+  /**
+   * Reads the {@code x.hc} public-catalog flag the Distributed search performer appends to a result
+   * magnet when its holder has opted in to PUBLIC_CATALOG. When set, catalogs of that holder may be
+   * browsed, so the UI offers the "Browse Shared Torrents" action. Fails closed: absent, malformed,
+   * or any value other than {@code 1}/{@code true} yields false.
+   */
+  public static boolean hasPublicCatalogFlag(String magnetUri) {
+    if (StringUtils.isNullOrEmpty(magnetUri) || magnetUri.startsWith("http")) {
+      return false;
     }
+    int i = magnetUri.indexOf("x.hc=");
+    if (i < 0) {
+      return false;
+    }
+    int start = i + "x.hc=".length();
+    int end = magnetUri.indexOf('&', start);
+    String value = end < 0 ? magnetUri.substring(start) : magnetUri.substring(start, end);
+    return "1".equals(value) || "true".equalsIgnoreCase(value);
+  }
 
-    public static File getTempDir() {
-        File fwDummy = null;
-        try {
-            fwDummy = File.createTempFile("fw_dummy_", ".txt");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return fwDummy.getParentFile();
+  public static File getTempDir() {
+    File fwDummy = null;
+    try {
+      fwDummy = File.createTempFile("fw_dummy_", ".txt");
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
+    return fwDummy.getParentFile();
+  }
 }

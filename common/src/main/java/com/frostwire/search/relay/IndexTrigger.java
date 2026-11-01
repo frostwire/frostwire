@@ -8,12 +8,11 @@
 package com.frostwire.search.relay;
 
 /**
- * Reason why a {@link SharedTorrentIndexer} pass ran. Used in logs
- * and (eventually) in the distributed-search event bus to label
- * {@code LOCAL_INDEX_UPDATED} events.
+ * Reason why a {@link SharedTorrentIndexer} pass ran. Used in logs and (eventually) in the
+ * distributed-search event bus to label {@code LOCAL_INDEX_UPDATED} events.
  */
 public enum IndexTrigger {
-    ADDED,
-    UPDATE,
-    CREATED
+  ADDED,
+  UPDATE,
+  CREATED
 }

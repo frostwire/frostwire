@@ -18,76 +18,70 @@
 
 package com.frostwire.search;
 
-import com.frostwire.search.ISearchPerformer;
 import com.frostwire.util.UrlUtils;
 
 /**
- * Factory for creating ISearchPerformer instances with appropriate patterns and strategies.
- * Creates V2 SearchPerformer concrete instances that implement the ISearchPerformer interface.
+ * Factory for creating ISearchPerformer instances with appropriate patterns and strategies. Creates
+ * V2 SearchPerformer concrete instances that implement the ISearchPerformer interface.
  *
  * @author gubatron
  */
 public class SearchPerformerFactory {
-    private static final int DEFAULT_TIMEOUT = 30000;
-    private static final TorrentCrawlingStrategy DEFAULT_TORRENT_CRAWLING = new TorrentCrawlingStrategy();
+  private static final int DEFAULT_TIMEOUT = 30000;
+  private static final TorrentCrawlingStrategy DEFAULT_TORRENT_CRAWLING =
+      new TorrentCrawlingStrategy();
 
-    /**
-     * Creates a simple search performer without crawling.
-     *
-     * @param token the search token
-     * @param keywords the search keywords
-     * @param pattern the search pattern
-     * @return a configured ISearchPerformer
-     */
-    public static ISearchPerformer createSimpleSearch(long token, String keywords, SearchPattern pattern) {
-        return new SearchPerformer(
-                token,
-                keywords,
-                UrlUtils.encode(keywords),
-                pattern,
-                null,  // No crawling
-                DEFAULT_TIMEOUT
-        );
-    }
+  /**
+   * Creates a simple search performer without crawling.
+   *
+   * @param token the search token
+   * @param keywords the search keywords
+   * @param pattern the search pattern
+   * @return a configured ISearchPerformer
+   */
+  public static ISearchPerformer createSimpleSearch(
+      long token, String keywords, SearchPattern pattern) {
+    return new SearchPerformer(
+        token,
+        keywords,
+        UrlUtils.encode(keywords),
+        pattern,
+        null, // No crawling
+        DEFAULT_TIMEOUT);
+  }
 
-    /**
-     * Creates a search performer with crawling capability.
-     *
-     * @param token the search token
-     * @param keywords the search keywords
-     * @param pattern the search pattern
-     * @param crawlingStrategy the crawling strategy
-     * @return a configured ISearchPerformer
-     */
-    public static ISearchPerformer createCrawlingSearch(long token, String keywords, SearchPattern pattern, CrawlingStrategy crawlingStrategy) {
-        return new SearchPerformer(
-                token,
-                keywords,
-                UrlUtils.encode(keywords),
-                pattern,
-                crawlingStrategy,
-                DEFAULT_TIMEOUT
-        );
-    }
+  /**
+   * Creates a search performer with crawling capability.
+   *
+   * @param token the search token
+   * @param keywords the search keywords
+   * @param pattern the search pattern
+   * @param crawlingStrategy the crawling strategy
+   * @return a configured ISearchPerformer
+   */
+  public static ISearchPerformer createCrawlingSearch(
+      long token, String keywords, SearchPattern pattern, CrawlingStrategy crawlingStrategy) {
+    return new SearchPerformer(
+        token, keywords, UrlUtils.encode(keywords), pattern, crawlingStrategy, DEFAULT_TIMEOUT);
+  }
 
-    /**
-     * Creates a search performer with custom timeout.
-     *
-     * @param token the search token
-     * @param keywords the search keywords
-     * @param pattern the search pattern
-     * @param crawlingStrategy the crawling strategy (null if no crawling)
-     * @param timeout the HTTP timeout in milliseconds
-     * @return a configured ISearchPerformer
-     */
-    public static ISearchPerformer createSearchPerformer(long token, String keywords, SearchPattern pattern, CrawlingStrategy crawlingStrategy, int timeout) {
-        return new SearchPerformer(
-                token,
-                keywords,
-                UrlUtils.encode(keywords),
-                pattern,
-                crawlingStrategy,
-                timeout
-        );
-    }
+  /**
+   * Creates a search performer with custom timeout.
+   *
+   * @param token the search token
+   * @param keywords the search keywords
+   * @param pattern the search pattern
+   * @param crawlingStrategy the crawling strategy (null if no crawling)
+   * @param timeout the HTTP timeout in milliseconds
+   * @return a configured ISearchPerformer
+   */
+  public static ISearchPerformer createSearchPerformer(
+      long token,
+      String keywords,
+      SearchPattern pattern,
+      CrawlingStrategy crawlingStrategy,
+      int timeout) {
+    return new SearchPerformer(
+        token, keywords, UrlUtils.encode(keywords), pattern, crawlingStrategy, timeout);
+  }
 }

@@ -24,125 +24,135 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.util.concurrent.DefaultThreadFactory;
-
 import java.util.concurrent.TimeUnit;
 
 /**
  * Local HTTP control server for an IceBridge servent.
  *
- * <p>Binds to {@link IceBridgeConfig#controlHttpPort()} on localhost only so
- * only co-located FrostWire processes can manage it.
+ * <p>Binds to {@link IceBridgeConfig#controlHttpPort()} on localhost only so only co-located
+ * FrostWire processes can manage it.
  */
 @SuppressWarnings("deprecation")
 public final class ControlServer implements AutoCloseable {
 
-    private static final Logger LOG = Logger.getLogger(ControlServer.class);
-    private static final int MAX_CONTENT_LENGTH = 64 * 1024;
+  private static final Logger LOG = Logger.getLogger(ControlServer.class);
+  private static final int MAX_CONTENT_LENGTH = 64 * 1024;
 
-    private final PeerRegistry registry;
-    private final IceBridgeMetrics metrics;
-    private final IceBridgeConfig config;
-    private final RudpSessionManager rudpSessionManager;
-    private final InboundMessageQueue inboundQueue;
-    private final IceBridgeTokens authTokens;
-    private volatile CatalogFetcher catalogFetcher;
-    private volatile TorrentFetcher torrentFetcher;
-    private EventLoopGroup bossGroup;
-    private EventLoopGroup workerGroup;
-    private Channel channel;
+  private final PeerRegistry registry;
+  private final IceBridgeMetrics metrics;
+  private final IceBridgeConfig config;
+  private final RudpSessionManager rudpSessionManager;
+  private final InboundMessageQueue inboundQueue;
+  private final IceBridgeTokens authTokens;
+  private volatile CatalogFetcher catalogFetcher;
+  private volatile TorrentFetcher torrentFetcher;
+  private EventLoopGroup bossGroup;
+  private EventLoopGroup workerGroup;
+  private Channel channel;
 
-    public ControlServer(PeerRegistry registry,
-                         IceBridgeMetrics metrics,
-                         IceBridgeConfig config,
-                         RudpSessionManager rudpSessionManager,
-                         InboundMessageQueue inboundQueue,
-                         IceBridgeTokens authTokens) {
-        this.registry = registry;
-        this.metrics = metrics;
-        this.config = config;
-        this.rudpSessionManager = rudpSessionManager;
-        this.inboundQueue = inboundQueue;
-        this.authTokens = (authTokens != null) ? authTokens : new IceBridgeTokens(config.authTokensFile());
+  public ControlServer(
+      PeerRegistry registry,
+      IceBridgeMetrics metrics,
+      IceBridgeConfig config,
+      RudpSessionManager rudpSessionManager,
+      InboundMessageQueue inboundQueue,
+      IceBridgeTokens authTokens) {
+    this.registry = registry;
+    this.metrics = metrics;
+    this.config = config;
+    this.rudpSessionManager = rudpSessionManager;
+    this.inboundQueue = inboundQueue;
+    this.authTokens =
+        (authTokens != null) ? authTokens : new IceBridgeTokens(config.authTokensFile());
+  }
+
+  /**
+   * For compatibility. With file-based tokens this may return null. Prefer using the tokens object
+   * for validation.
+   */
+  public String authToken() {
+    return null;
+  }
+
+  public IceBridgeTokens authTokens() {
+    return authTokens;
+  }
+
+  /**
+   * Install the catalog fetch hook used by {@code GET /catalog}. May be called after {@link
+   * #start()}: each new connection reads the current value when its {@link ControlHandler} is
+   * created.
+   */
+  public void setCatalogFetcher(CatalogFetcher catalogFetcher) {
+    this.catalogFetcher = catalogFetcher;
+  }
+
+  /**
+   * Install the torrent fetch hook used by {@code GET /torrent}. May be called after {@link
+   * #start()}: each new connection reads the current value when its {@link ControlHandler} is
+   * created.
+   */
+  public void setTorrentFetcher(TorrentFetcher torrentFetcher) {
+    this.torrentFetcher = torrentFetcher;
+  }
+
+  public void start() throws InterruptedException {
+    // 0 binds a free port; port() reports it.
+    int port = config.controlHttpPort();
+    bossGroup = new NioEventLoopGroup(1, new DefaultThreadFactory("icebridge-control-boss"));
+    workerGroup = new NioEventLoopGroup(0, new DefaultThreadFactory("icebridge-control-worker"));
+
+    ServerBootstrap bootstrap = new ServerBootstrap();
+    bootstrap
+        .group(bossGroup, workerGroup)
+        .channel(NioServerSocketChannel.class)
+        .childOption(ChannelOption.SO_REUSEADDR, true)
+        .childHandler(
+            new ChannelInitializer<SocketChannel>() {
+              @Override
+              public void initChannel(SocketChannel ch) {
+                ch.pipeline()
+                    .addLast(new HttpServerCodec())
+                    .addLast(new HttpObjectAggregator(MAX_CONTENT_LENGTH))
+                    .addLast(
+                        new ControlHandler(
+                            registry,
+                            metrics,
+                            config,
+                            rudpSessionManager,
+                            inboundQueue,
+                            authTokens,
+                            catalogFetcher,
+                            torrentFetcher));
+              }
+            });
+
+    channel = bootstrap.bind("127.0.0.1", port).sync().channel();
+    LOG.info("IceBridge control server listening on http://127.0.0.1:" + port());
+  }
+
+  /** Return the actual bound port (useful when {@code port} was 0). */
+  public int port() {
+    if (channel == null) {
+      return config.controlHttpPort();
     }
+    return ((java.net.InetSocketAddress) channel.localAddress()).getPort();
+  }
 
-    /**
-     * For compatibility. With file-based tokens this may return null.
-     * Prefer using the tokens object for validation.
-     */
-    public String authToken() {
-        return null;
+  @Override
+  public void close() {
+    if (channel != null) {
+      try {
+        channel.close().awaitUninterruptibly(5, TimeUnit.SECONDS);
+      } catch (Throwable ignored) {
+      }
     }
-
-    public IceBridgeTokens authTokens() {
-        return authTokens;
+    if (bossGroup != null) {
+      bossGroup.shutdownGracefully(0, 500, TimeUnit.MILLISECONDS);
     }
-
-    /**
-     * Install the catalog fetch hook used by {@code GET /catalog}. May be
-     * called after {@link #start()}: each new connection reads the current
-     * value when its {@link ControlHandler} is created.
-     */
-    public void setCatalogFetcher(CatalogFetcher catalogFetcher) {
-        this.catalogFetcher = catalogFetcher;
+    if (workerGroup != null) {
+      workerGroup.shutdownGracefully(0, 500, TimeUnit.MILLISECONDS);
     }
-
-    /**
-     * Install the torrent fetch hook used by {@code GET /torrent}. May be
-     * called after {@link #start()}: each new connection reads the current
-     * value when its {@link ControlHandler} is created.
-     */
-    public void setTorrentFetcher(TorrentFetcher torrentFetcher) {
-        this.torrentFetcher = torrentFetcher;
-    }
-
-    public void start() throws InterruptedException {
-        // 0 binds a free port; port() reports it.
-        int port = config.controlHttpPort();
-        bossGroup = new NioEventLoopGroup(1, new DefaultThreadFactory("icebridge-control-boss"));
-        workerGroup = new NioEventLoopGroup(0, new DefaultThreadFactory("icebridge-control-worker"));
-
-        ServerBootstrap bootstrap = new ServerBootstrap();
-        bootstrap.group(bossGroup, workerGroup)
-                .channel(NioServerSocketChannel.class)
-                .childOption(ChannelOption.SO_REUSEADDR, true)
-                .childHandler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    public void initChannel(SocketChannel ch) {
-                        ch.pipeline()
-                                .addLast(new HttpServerCodec())
-                                .addLast(new HttpObjectAggregator(MAX_CONTENT_LENGTH))
-                                .addLast(new ControlHandler(registry, metrics, config, rudpSessionManager, inboundQueue, authTokens, catalogFetcher, torrentFetcher));
-                    }
-                });
-
-        channel = bootstrap.bind("127.0.0.1", port).sync().channel();
-        LOG.info("IceBridge control server listening on http://127.0.0.1:" + port());
-    }
-
-    /**
-     * Return the actual bound port (useful when {@code port} was 0).
-     */
-    public int port() {
-        if (channel == null) {
-            return config.controlHttpPort();
-        }
-        return ((java.net.InetSocketAddress) channel.localAddress()).getPort();
-    }
-
-    @Override
-    public void close() {
-        if (channel != null) {
-            try {
-                channel.close().awaitUninterruptibly(5, TimeUnit.SECONDS);
-            } catch (Throwable ignored) {
-            }
-        }
-        if (bossGroup != null) {
-            bossGroup.shutdownGracefully(0, 500, TimeUnit.MILLISECONDS);
-        }
-        if (workerGroup != null) {
-            workerGroup.shutdownGracefully(0, 500, TimeUnit.MILLISECONDS);
-        }
-        LOG.info("IceBridge control server stopped");
-    }
+    LOG.info("IceBridge control server stopped");
+  }
 }

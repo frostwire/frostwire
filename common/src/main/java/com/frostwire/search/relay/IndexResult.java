@@ -10,20 +10,19 @@ package com.frostwire.search.relay;
 /**
  * Outcome of a single {@link SharedTorrentIndexer#indexIfReady} pass.
  *
- * <p>Returned to the caller so the future
- * {@code DistributedSearchEventBus} can route
- * {@code LOCAL_INDEX_UPDATED} events without parsing logs.
+ * <p>Returned to the caller so the future {@code DistributedSearchEventBus} can route {@code
+ * LOCAL_INDEX_UPDATED} events without parsing logs.
  */
 public enum IndexResult {
-    /** The torrent row was inserted or replaced in the local index. */
-    UPSERTED,
+  /** The torrent row was inserted or replaced in the local index. */
+  UPSERTED,
 
-    /** The torrent metadata was not yet available (magnet still resolving). */
-    NO_METADATA,
+  /** The torrent metadata was not yet available (magnet still resolving). */
+  NO_METADATA,
 
-    /** One or more required parameters were null; skipped. */
-    NULL_INPUT,
+  /** One or more required parameters were null; skipped. */
+  NULL_INPUT,
 
-    /** An unexpected exception prevented indexing. */
-    ERROR
+  /** An unexpected exception prevented indexing. */
+  ERROR
 }

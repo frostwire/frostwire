@@ -17,35 +17,34 @@ package com.frostwire.search.relay.icebridge;
  */
 public final class NodeMetaPayload {
 
-    public static final int VERSION = 1;
-    public static final int LENGTH = 9;
+  public static final int VERSION = 1;
+  public static final int LENGTH = 9;
 
-    private NodeMetaPayload() {
-    }
+  private NodeMetaPayload() {}
 
-    public static byte[] encode(long capabilities) {
-        byte[] out = new byte[LENGTH];
-        out[0] = (byte) VERSION;
-        for (int i = 0; i < 8; i++) {
-            out[1 + i] = (byte) (capabilities >>> (8 * (7 - i)));
-        }
-        return out;
+  public static byte[] encode(long capabilities) {
+    byte[] out = new byte[LENGTH];
+    out[0] = (byte) VERSION;
+    for (int i = 0; i < 8; i++) {
+      out[1 + i] = (byte) (capabilities >>> (8 * (7 - i)));
     }
+    return out;
+  }
 
-    /**
-     * Decode a NODE_META payload.
-     *
-     * @return the advertised capabilities, or {@code -1} when the frame is not a valid
-     *     announcement of the current version (capabilities are a non-negative bitmask).
-     */
-    public static long decode(byte[] payload) {
-        if (payload == null || payload.length != LENGTH || payload[0] != (byte) VERSION) {
-            return -1L;
-        }
-        long capabilities = 0L;
-        for (int i = 0; i < 8; i++) {
-            capabilities = (capabilities << 8) | (payload[1 + i] & 0xFFL);
-        }
-        return capabilities;
+  /**
+   * Decode a NODE_META payload.
+   *
+   * @return the advertised capabilities, or {@code -1} when the frame is not a valid announcement
+   *     of the current version (capabilities are a non-negative bitmask).
+   */
+  public static long decode(byte[] payload) {
+    if (payload == null || payload.length != LENGTH || payload[0] != (byte) VERSION) {
+      return -1L;
     }
+    long capabilities = 0L;
+    for (int i = 0; i < 8; i++) {
+      capabilities = (capabilities << 8) | (payload[1 + i] & 0xFFL);
+    }
+    return capabilities;
+  }
 }

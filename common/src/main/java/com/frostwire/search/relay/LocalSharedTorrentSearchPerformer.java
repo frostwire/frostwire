@@ -8,254 +8,249 @@
 package com.frostwire.search.relay;
 
 import com.frostwire.bittorrent.DefaultTrackers;
+import com.frostwire.search.CompositeFileSearchResult;
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.ISearchPerformer;
 import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchResult;
-import com.frostwire.search.CompositeFileSearchResult;
 import com.frostwire.util.Logger;
 import com.frostwire.util.UrlUtils;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
- * Search performer that reads from the local {@link LocalIndex} and
- * surfaces matching rows as FrostWire search results.
+ * Search performer that reads from the local {@link LocalIndex} and surfaces matching rows as
+ * FrostWire search results.
  *
- * <p><b>Purpose:</b> Local search is a <em>self-test / diagnostic</em> of the
- * same shared-torrent index that {@link RelaySearchService} uses to answer
- * inbound distributed searches over IceBridge. Enabling it in the search UI
- * does <strong>not</strong> query peers — it only proves that this node would
- * return these hits to a remote requester. Production discovery of other
- * nodes' shares is {@link DistributedSearchPerformer} via IceBridge.
+ * <p><b>Purpose:</b> Local search is a <em>self-test / diagnostic</em> of the same shared-torrent
+ * index that {@link RelaySearchService} uses to answer inbound distributed searches over IceBridge.
+ * Enabling it in the search UI does <strong>not</strong> query peers — it only proves that this
+ * node would return these hits to a remote requester. Production discovery of other nodes' shares
+ * is {@link DistributedSearchPerformer} via IceBridge.
  *
- * <p>It queries the {@code shared_torrents} table populated by
- * {@link SharedTorrentIndexer} and returns each row as a magnet-bearing
- * {@link CompositeFileSearchResult}. It performs no network I/O and
- * reports itself as a non-crawler performer so {@code SearchManager}
- * routes it to the single-page executor.
+ * <p>It queries the {@code shared_torrents} table populated by {@link SharedTorrentIndexer} and
+ * returns each row as a magnet-bearing {@link CompositeFileSearchResult}. It performs no network
+ * I/O and reports itself as a non-crawler performer so {@code SearchManager} routes it to the
+ * single-page executor.
  *
- * <p><b>Karma weighting (optional):</b> if a {@link PeerKarmaCache}
- * is supplied at construction, results are sorted by the publisher's
- * karma score (descending). Ties keep the index's natural order
- * (FTS5 rank). The first lookup for an unknown peer blocks on a
- * DHT fetch; subsequent lookups are O(1) from the cache. Pass
- * {@code null} for the karma cache to preserve the original
- * FTS5-only ordering.
+ * <p><b>Karma weighting (optional):</b> if a {@link PeerKarmaCache} is supplied at construction,
+ * results are sorted by the publisher's karma score (descending). Ties keep the index's natural
+ * order (FTS5 rank). The first lookup for an unknown peer blocks on a DHT fetch; subsequent lookups
+ * are O(1) from the cache. Pass {@code null} for the karma cache to preserve the original FTS5-only
+ * ordering.
  *
  * <p>Source label: {@link #SOURCE_NAME}.
  */
 public final class LocalSharedTorrentSearchPerformer implements ISearchPerformer {
 
-    public static final String SOURCE_NAME = "Local";
-    public static final int DEFAULT_RESULT_LIMIT = 50;
+  public static final String SOURCE_NAME = "Local";
+  public static final int DEFAULT_RESULT_LIMIT = 50;
 
-    private static final Logger LOG = Logger.getLogger(LocalSharedTorrentSearchPerformer.class);
+  private static final Logger LOG = Logger.getLogger(LocalSharedTorrentSearchPerformer.class);
 
-    private final long token;
-    private final String keywords;
-    private final LocalIndex index;
-    private final PeerKarmaCache karmaCache;
-    private final ShareVisibilityPolicy visibility;
-    private final int limit;
+  private final long token;
+  private final String keywords;
+  private final LocalIndex index;
+  private final PeerKarmaCache karmaCache;
+  private final ShareVisibilityPolicy visibility;
+  private final int limit;
 
-    private boolean stopped;
-    private SearchListener listener;
+  private boolean stopped;
+  private SearchListener listener;
 
-    public LocalSharedTorrentSearchPerformer(long token, String keywords, LocalIndex index) {
-        this(token, keywords, index, null, null, DEFAULT_RESULT_LIMIT);
+  public LocalSharedTorrentSearchPerformer(long token, String keywords, LocalIndex index) {
+    this(token, keywords, index, null, null, DEFAULT_RESULT_LIMIT);
+  }
+
+  public LocalSharedTorrentSearchPerformer(
+      long token, String keywords, LocalIndex index, int limit) {
+    this(token, keywords, index, null, null, limit);
+  }
+
+  public LocalSharedTorrentSearchPerformer(
+      long token, String keywords, LocalIndex index, PeerKarmaCache karmaCache) {
+    this(token, keywords, index, karmaCache, null, DEFAULT_RESULT_LIMIT);
+  }
+
+  public LocalSharedTorrentSearchPerformer(
+      long token, String keywords, LocalIndex index, PeerKarmaCache karmaCache, int limit) {
+    this(token, keywords, index, karmaCache, null, limit);
+  }
+
+  public LocalSharedTorrentSearchPerformer(
+      long token,
+      String keywords,
+      LocalIndex index,
+      PeerKarmaCache karmaCache,
+      ShareVisibilityPolicy visibility,
+      int limit) {
+    if (token < 0) {
+      throw new IllegalArgumentException("token must be >= 0");
     }
-
-    public LocalSharedTorrentSearchPerformer(long token, String keywords,
-                                             LocalIndex index, int limit) {
-        this(token, keywords, index, null, null, limit);
+    if (keywords == null) {
+      throw new IllegalArgumentException("keywords is null");
     }
-
-    public LocalSharedTorrentSearchPerformer(long token, String keywords,
-                                             LocalIndex index,
-                                             PeerKarmaCache karmaCache) {
-        this(token, keywords, index, karmaCache, null, DEFAULT_RESULT_LIMIT);
+    if (index == null) {
+      throw new IllegalArgumentException("index is null");
     }
-
-    public LocalSharedTorrentSearchPerformer(long token, String keywords,
-                                             LocalIndex index,
-                                             PeerKarmaCache karmaCache,
-                                             int limit) {
-        this(token, keywords, index, karmaCache, null, limit);
+    if (limit <= 0) {
+      throw new IllegalArgumentException("limit must be > 0");
     }
+    this.token = token;
+    this.keywords = keywords;
+    this.index = index;
+    this.karmaCache = karmaCache;
+    this.visibility = visibility;
+    this.limit = limit;
+  }
 
-    public LocalSharedTorrentSearchPerformer(long token, String keywords,
-                                             LocalIndex index,
-                                             PeerKarmaCache karmaCache,
-                                             ShareVisibilityPolicy visibility,
-                                             int limit) {
-        if (token < 0) {
-            throw new IllegalArgumentException("token must be >= 0");
-        }
-        if (keywords == null) {
-            throw new IllegalArgumentException("keywords is null");
-        }
-        if (index == null) {
-            throw new IllegalArgumentException("index is null");
-        }
-        if (limit <= 0) {
-            throw new IllegalArgumentException("limit must be > 0");
-        }
-        this.token = token;
-        this.keywords = keywords;
-        this.index = index;
-        this.karmaCache = karmaCache;
-        this.visibility = visibility;
-        this.limit = limit;
+  @Override
+  public long getToken() {
+    return token;
+  }
+
+  public String getKeywords() {
+    return keywords;
+  }
+
+  @Override
+  public void perform() {
+    SearchListener l;
+    List<FileSearchResult> results = Collections.emptyList();
+    try {
+      l = listener;
+      if (stopped || l == null) {
+        return;
+      }
+      results = queryIndex();
+      if (stopped) {
+        return;
+      }
+      List<SearchResult> widened = new ArrayList<>(results.size());
+      widened.addAll(results);
+      l.onResults(token, widened);
+    } catch (Throwable t) {
+      LOG.warn("LocalSharedTorrentSearchPerformer failed for token " + token, t);
+      if (listener != null && !stopped) {
+        listener.onError(token, new SearchError(-1, t.getMessage()));
+      }
     }
+  }
 
-    @Override
-    public long getToken() {
-        return token;
+  @Override
+  public void crawl(com.frostwire.search.CrawlableSearchResult sr) {
+    // Local results already carry their file metadata; nothing to crawl.
+  }
+
+  @Override
+  public void stop() {
+    stopped = true;
+    try {
+      if (listener != null) {
+        listener.onStopped(token);
+      }
+    } catch (Throwable t) {
+      LOG.warn("Error stopping local search: " + t.getMessage());
     }
+  }
 
-    public String getKeywords() {
-        return keywords;
+  @Override
+  public boolean isStopped() {
+    return stopped;
+  }
+
+  @Override
+  public SearchListener getListener() {
+    return listener;
+  }
+
+  @Override
+  public void setListener(SearchListener listener) {
+    this.listener = listener;
+  }
+
+  @Override
+  public boolean isDDOSProtectionActive() {
+    return false;
+  }
+
+  @Override
+  public boolean isCrawler() {
+    return false;
+  }
+
+  private List<FileSearchResult> queryIndex() {
+    // Over-fetch slightly so active-only filtering still fills the limit.
+    int fetch =
+        visibility == null || visibility == ShareVisibilityPolicy.INCLUDE_ALL
+            ? limit
+            : Math.min(limit * 4, Math.max(limit, 200));
+    List<LocalSharedTorrent> rows =
+        ShareVisibility.filter(index.search(keywords, fetch), visibility);
+    if (rows.size() > limit) {
+      rows = rows.subList(0, limit);
     }
-
-    @Override
-    public void perform() {
-        SearchListener l;
-        List<FileSearchResult> results = Collections.emptyList();
-        try {
-            l = listener;
-            if (stopped || l == null) {
-                return;
-            }
-            results = queryIndex();
-            if (stopped) {
-                return;
-            }
-            List<SearchResult> widened = new ArrayList<>(results.size());
-            widened.addAll(results);
-            l.onResults(token, widened);
-        } catch (Throwable t) {
-            LOG.warn("LocalSharedTorrentSearchPerformer failed for token " + token, t);
-            if (listener != null && !stopped) {
-                listener.onError(token, new SearchError(-1, t.getMessage()));
-            }
-        }
+    if (karmaCache == null) {
+      List<FileSearchResult> out = new ArrayList<>(rows.size());
+      for (LocalSharedTorrent row : rows) {
+        out.add(toResult(row));
+      }
+      return out;
     }
-
-    @Override
-    public void crawl(com.frostwire.search.CrawlableSearchResult sr) {
-        // Local results already carry their file metadata; nothing to crawl.
-    }
-
-    @Override
-    public void stop() {
-        stopped = true;
-        try {
-            if (listener != null) {
-                listener.onStopped(token);
-            }
-        } catch (Throwable t) {
-            LOG.warn("Error stopping local search: " + t.getMessage());
-        }
-    }
-
-    @Override
-    public boolean isStopped() {
-        return stopped;
-    }
-
-    @Override
-    public SearchListener getListener() {
-        return listener;
-    }
-
-    @Override
-    public void setListener(SearchListener listener) {
-        this.listener = listener;
-    }
-
-    @Override
-    public boolean isDDOSProtectionActive() {
-        return false;
-    }
-
-    @Override
-    public boolean isCrawler() {
-        return false;
-    }
-
-    private List<FileSearchResult> queryIndex() {
-        // Over-fetch slightly so active-only filtering still fills the limit.
-        int fetch = visibility == null || visibility == ShareVisibilityPolicy.INCLUDE_ALL
-                ? limit
-                : Math.min(limit * 4, Math.max(limit, 200));
-        List<LocalSharedTorrent> rows = ShareVisibility.filter(
-                index.search(keywords, fetch), visibility);
-        if (rows.size() > limit) {
-            rows = rows.subList(0, limit);
-        }
-        if (karmaCache == null) {
-            List<FileSearchResult> out = new ArrayList<>(rows.size());
-            for (LocalSharedTorrent row : rows) {
-                out.add(toResult(row));
-            }
-            return out;
-        }
-        // Karma-weighted sort. Stable: ties keep FTS5 rank order.
-        List<LocalSharedTorrent> sorted = new ArrayList<>(rows);
-        sorted.sort((a, b) -> {
-            long kb = karmaFor(b);
-            long ka = karmaFor(a);
-            return Long.compare(kb, ka);
+    // Karma-weighted sort. Stable: ties keep FTS5 rank order.
+    List<LocalSharedTorrent> sorted = new ArrayList<>(rows);
+    sorted.sort(
+        (a, b) -> {
+          long kb = karmaFor(b);
+          long ka = karmaFor(a);
+          return Long.compare(kb, ka);
         });
-        List<FileSearchResult> out = new ArrayList<>(sorted.size());
-        for (LocalSharedTorrent row : sorted) {
-            out.add(toResult(row));
-        }
-        return out;
+    List<FileSearchResult> out = new ArrayList<>(sorted.size());
+    for (LocalSharedTorrent row : sorted) {
+      out.add(toResult(row));
     }
+    return out;
+  }
 
-    private long karmaFor(LocalSharedTorrent t) {
-        try {
-            byte[] pub = t.publisherEd25519Pub();
-            if (pub == null || pub.length != 32) {
-                return 0;
-            }
-            return karmaCache.getKarma(pub);
-        } catch (Throwable ignored) {
-            return 0;
-        }
+  private long karmaFor(LocalSharedTorrent t) {
+    try {
+      byte[] pub = t.publisherEd25519Pub();
+      if (pub == null || pub.length != 32) {
+        return 0;
+      }
+      return karmaCache.getKarma(pub);
+    } catch (Throwable ignored) {
+      return 0;
     }
+  }
 
-    static CompositeFileSearchResult toResult(LocalSharedTorrent t) {
-        return toResult(t, SOURCE_NAME);
-    }
+  static CompositeFileSearchResult toResult(LocalSharedTorrent t) {
+    return toResult(t, SOURCE_NAME);
+  }
 
-    static CompositeFileSearchResult toResult(LocalSharedTorrent t, String source) {
-        String name = t.name();
-        String infoHashHex = t.infoHashHex();
-        long size = t.sizeBytes();
-        String magnet = UrlUtils.buildMagnetUrl(infoHashHex, name, DefaultTrackers.MAGNET_URL_PARAMETERS);
-        String detailsUrl = magnet;
-        String matched = t.matchedFile();
-        if (matched != null && (matched.isEmpty() || matched.length() > 4096)) {
-            matched = null;
-        }
-        String filename = matched != null
-                ? matched
-                : name + ".torrent";
-        return CompositeFileSearchResult.builder()
-                .displayName(name)
-                .filename(filename)
-                .size(size)
-                .detailsUrl(detailsUrl)
-                .source(source)
-                .creationTime(t.addedAt() * 1000L)
-                .preliminary(false)
-                .torrent(magnet, infoHashHex, 0, magnet)
-                .build();
+  static CompositeFileSearchResult toResult(LocalSharedTorrent t, String source) {
+    String name = t.name();
+    String infoHashHex = t.infoHashHex();
+    long size = t.sizeBytes();
+    String magnet =
+        UrlUtils.buildMagnetUrl(infoHashHex, name, DefaultTrackers.MAGNET_URL_PARAMETERS);
+    String detailsUrl = magnet;
+    String matched = t.matchedFile();
+    if (matched != null && (matched.isEmpty() || matched.length() > 4096)) {
+      matched = null;
     }
+    String filename = matched != null ? matched : name + ".torrent";
+    return CompositeFileSearchResult.builder()
+        .displayName(name)
+        .filename(filename)
+        .size(size)
+        .detailsUrl(detailsUrl)
+        .source(source)
+        .creationTime(t.addedAt() * 1000L)
+        .preliminary(false)
+        .torrent(magnet, infoHashHex, 0, magnet)
+        .build();
+  }
 }

@@ -14,12 +14,12 @@ package com.frostwire.search.relay.icebridge.control;
  */
 public final class ProbeRequest {
 
-    /** Literal IPv4/IPv6 address. Names are not resolved by the daemon. */
-    public String host;
+  /** Literal IPv4/IPv6 address. Names are not resolved by the daemon. */
+  public String host;
 
-    /** rUDP port of the endpoint. */
-    public int port;
+  /** rUDP port of the endpoint. */
+  public int port;
 
-    /** Drop a handshake that never completed instead of polling it. */
-    public boolean cancel;
+  /** Drop a handshake that never completed instead of polling it. */
+  public boolean cancel;
 }

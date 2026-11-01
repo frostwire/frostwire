@@ -17,32 +17,34 @@ import java.util.Optional;
  * its NODE_META message.
  */
 public final class ProbedPeer {
-    private final byte[] pub;
-    private final IdentityRecord record;
+  private final byte[] pub;
+  private final IdentityRecord record;
 
-    public ProbedPeer(byte[] pub) {
-        this(pub, null);
-    }
+  public ProbedPeer(byte[] pub) {
+    this(pub, null);
+  }
 
-    /** @param record the peer's signed identity record, or null; its key must be {@code pub} */
-    public ProbedPeer(byte[] pub, IdentityRecord record) {
-        if (pub == null || pub.length != 32) {
-            throw new IllegalArgumentException("pub must be 32 bytes");
-        }
-        if (record != null && !Arrays.equals(record.ed25519Pub(), pub)) {
-            throw new IllegalArgumentException("record belongs to another key");
-        }
-        this.pub = pub.clone();
-        this.record = record;
+  /**
+   * @param record the peer's signed identity record, or null; its key must be {@code pub}
+   */
+  public ProbedPeer(byte[] pub, IdentityRecord record) {
+    if (pub == null || pub.length != 32) {
+      throw new IllegalArgumentException("pub must be 32 bytes");
     }
+    if (record != null && !Arrays.equals(record.ed25519Pub(), pub)) {
+      throw new IllegalArgumentException("record belongs to another key");
+    }
+    this.pub = pub.clone();
+    this.record = record;
+  }
 
-    /** The authenticated 32-byte Ed25519 public key. */
-    public byte[] pub() {
-        return pub.clone();
-    }
+  /** The authenticated 32-byte Ed25519 public key. */
+  public byte[] pub() {
+    return pub.clone();
+  }
 
-    /** The peer's role/capabilities/version, when its identity record could be fetched. */
-    public Optional<IdentityRecord> record() {
-        return Optional.ofNullable(record);
-    }
+  /** The peer's role/capabilities/version, when its identity record could be fetched. */
+  public Optional<IdentityRecord> record() {
+    return Optional.ofNullable(record);
+  }
 }

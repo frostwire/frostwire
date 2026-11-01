@@ -23,5 +23,5 @@ package com.frostwire.search.internetarchive;
  * @author aldenml
  */
 public class InternetArchiveResponse {
-    public InternetArchiveResponseField response;
+  public InternetArchiveResponseField response;
 }

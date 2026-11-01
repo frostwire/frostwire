@@ -13,7 +13,6 @@ import com.frostwire.util.Logger;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
@@ -35,58 +34,48 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * Fetches a peer's full shared-torrent catalog over the IceBridge mesh.
  *
- * <p>Counterpart to the DHT-backed {@link RemoteIndexFetcher.DhtIndexSource}:
- * instead of resolving a BEP 46 mutable item, this client sends a signed
- * {@link RemoteCatalogBrowseRequest} directly to the target peer on
-     * {@link MeshProtocolId#CATALOG} and waits for the peer-signed
- * JSON manifest that
- * {@code com.frostwire.search.relay.icebridge.client.IncomingSearchRequestHandler}
- * builds.
+ * <p>Counterpart to the DHT-backed {@link RemoteIndexFetcher.DhtIndexSource}: instead of resolving
+ * a BEP 46 mutable item, this client sends a signed {@link RemoteCatalogBrowseRequest} directly to
+ * the target peer on {@link MeshProtocolId#CATALOG} and waits for the peer-signed JSON manifest
+ * that {@code com.frostwire.search.relay.icebridge.client.IncomingSearchRequestHandler} builds.
  *
  * <p><b>Flow (fail-closed):</b>
+ *
  * <ol>
- *   <li>register a {@link DistributedSearchTransport.PayloadListener}
- *       <em>before</em> sending, so no response can be missed;</li>
- *   <li>build, sign, and encode a {@link RemoteCatalogBrowseRequest}
- *       ({@code targetPub == peerPub}, fresh 32-byte nonce, current epoch
- *       seconds);</li>
- *   <li>{@code createSend(peerPub, SEARCH, bytes, deadline)} and execute the
- *       send off-thread;</li>
- *   <li>block on a latch up to a single monotonic {@link System#nanoTime()}
- *       deadline while the listener decodes, bounds, and verifies the
- *       manifest;</li>
- *   <li>always remove the listener and cancel the send in {@code finally}.</li>
+ *   <li>register a {@link DistributedSearchTransport.PayloadListener} <em>before</em> sending, so
+ *       no response can be missed;
+ *   <li>build, sign, and encode a {@link RemoteCatalogBrowseRequest} ({@code targetPub == peerPub},
+ *       fresh 32-byte nonce, current epoch seconds);
+ *   <li>{@code createSend(peerPub, SEARCH, bytes, deadline)} and execute the send off-thread;
+ *   <li>block on a latch up to a single monotonic {@link System#nanoTime()} deadline while the
+ *       listener decodes, bounds, and verifies the manifest;
+ *   <li>always remove the listener and cancel the send in {@code finally}.
  * </ol>
  *
- * <p><b>Correlation:</b> the shipped manifest
- * ({@link RemoteIndexFetcher#buildManifestJson(int, String, long, List, byte[])})
- * carries no nonce field, so when an inbound manifest has no {@code nonce}
- * the first manifest that verifies against {@code peerPub} within the timeout
- * window is accepted. If a future manifest version includes a {@code nonce}
- * field, it must equal the request nonce or the payload is ignored. The
- * Ed25519 signature over
- * {@link RemoteIndexFetcher#manifestCanonicalBytes(int, String, long, List)}
- * is always the authoritative check; the transport {@code sourcePub} is not
- * trusted (relayed manifests still authenticate via the signature).
+ * <p><b>Correlation:</b> the shipped manifest ({@link RemoteIndexFetcher#buildManifestJson(int,
+ * String, long, List, byte[])}) carries no nonce field, so when an inbound manifest has no {@code
+ * nonce} the first manifest that verifies against {@code peerPub} within the timeout window is
+ * accepted. If a future manifest version includes a {@code nonce} field, it must equal the request
+ * nonce or the payload is ignored. The Ed25519 signature over {@link
+ * RemoteIndexFetcher#manifestCanonicalBytes(int, String, long, List)} is always the authoritative
+ * check; the transport {@code sourcePub} is not trusted (relayed manifests still authenticate via
+ * the signature).
  *
- * <p><b>Bounds:</b> inbound payloads larger than
- * {@link RemoteSearchResponse#MAX_STREAM_BYTES} are dropped, and manifests
- * with more than {@link RemoteSearchRequest#MAX_LIMIT} rows are rejected.
+ * <p><b>Bounds:</b> inbound payloads larger than {@link RemoteSearchResponse#MAX_STREAM_BYTES} are
+ * dropped, and manifests with more than {@link RemoteSearchRequest#MAX_LIMIT} rows are rejected.
  *
- * <p><b>Threading / units:</b> a {@code CatalogBrowser} is <b>not
- * thread-safe</b> — callers must serialize {@link #fetchCatalog(byte[], int)}
- * calls. Only one fetch is expected per call. All timeouts are milliseconds;
- * the internal deadline is monotonic nanoseconds. Never throws out: any
- * validation, transport, decode, verification, or timeout failure yields an
- * empty list.
+ * <p><b>Threading / units:</b> a {@code CatalogBrowser} is <b>not thread-safe</b> — callers must
+ * serialize {@link #fetchCatalog(byte[], int)} calls. Only one fetch is expected per call. All
+ * timeouts are milliseconds; the internal deadline is monotonic nanoseconds. Never throws out: any
+ * validation, transport, decode, verification, or timeout failure yields an empty list.
  */
 public final class CatalogBrowser {
 
   private static final Logger LOG = Logger.getLogger(CatalogBrowser.class);
 
   /**
-   * Maximum accepted encoded manifest size. Mirrors the search-response stream
-   * bound so no single catalog frame can exceed the mesh payload budget.
+   * Maximum accepted encoded manifest size. Mirrors the search-response stream bound so no single
+   * catalog frame can exceed the mesh payload budget.
    */
   private static final int MAX_MANIFEST_BYTES = RemoteSearchResponse.MAX_STREAM_BYTES;
 
@@ -97,12 +86,18 @@ public final class CatalogBrowser {
   private static final int ED25519_SIGNATURE_LENGTH = 64;
   private static final int NONCE_LENGTH = 32;
 
-  private static final ThreadPoolExecutor SENDERS = new ThreadPoolExecutor(
-      2, 2, 30, TimeUnit.SECONDS, new ArrayBlockingQueue<>(16), r -> {
-        Thread thread = new Thread(r, "catalog-browser-send");
-        thread.setDaemon(true);
-        return thread;
-      });
+  private static final ThreadPoolExecutor SENDERS =
+      new ThreadPoolExecutor(
+          2,
+          2,
+          30,
+          TimeUnit.SECONDS,
+          new ArrayBlockingQueue<>(16),
+          r -> {
+            Thread thread = new Thread(r, "catalog-browser-send");
+            thread.setDaemon(true);
+            return thread;
+          });
 
   private final IdentityKeys identity;
   private final DistributedSearchTransport transport;
@@ -121,10 +116,9 @@ public final class CatalogBrowser {
   /**
    * Fetch {@code peerPub}'s shared-torrent catalog.
    *
-   * @param peerPub   raw 32-byte Ed25519 public key of the peer to browse
+   * @param peerPub raw 32-byte Ed25519 public key of the peer to browse
    * @param timeoutMs total wall-clock budget in milliseconds ({@code > 0})
-   * @return the verified catalog rows, or an empty list on any failure. Never
-   *     throws.
+   * @return the verified catalog rows, or an empty list on any failure. Never throws.
    */
   public List<RemoteIndexFetcher.RemoteTorrentEntry> fetchCatalog(byte[] peerPub, int timeoutMs) {
     if (peerPub == null || peerPub.length != PUBLIC_KEY_LENGTH || timeoutMs <= 0) {
@@ -219,8 +213,13 @@ public final class CatalogBrowser {
         synchronized (pages) {
           if (!pages.isEmpty()) {
             // Some pages were lost in transit: show what verified rather than nothing.
-            LOG.info("CatalogBrowser: partial catalog " + pages.size() + "/" + expectedPages[0]
-                + " pages from " + Hex.encode(target));
+            LOG.info(
+                "CatalogBrowser: partial catalog "
+                    + pages.size()
+                    + "/"
+                    + expectedPages[0]
+                    + " pages from "
+                    + Hex.encode(target));
             return CatalogManifestPages.merge(pages);
           }
         }
@@ -247,11 +246,12 @@ public final class CatalogBrowser {
   private RemoteCatalogBrowseRequest buildSignedRequest(byte[] targetPub, byte[] nonce) {
     try {
       long timestamp = System.currentTimeMillis() / 1000L;
-      RemoteCatalogBrowseRequest.Builder builder = RemoteCatalogBrowseRequest.builder()
-          .requesterPub(identity.ed25519PubRaw())
-          .targetPub(targetPub)
-          .nonce(nonce)
-          .timestamp(timestamp);
+      RemoteCatalogBrowseRequest.Builder builder =
+          RemoteCatalogBrowseRequest.builder()
+              .requesterPub(identity.ed25519PubRaw())
+              .targetPub(targetPub)
+              .nonce(nonce)
+              .timestamp(timestamp);
       RemoteCatalogBrowseRequest unsigned =
           builder.signature(new byte[ED25519_SIGNATURE_LENGTH]).build();
       Signature signer = IdentityKeys.softwareSignature("Ed25519");
@@ -278,17 +278,16 @@ public final class CatalogBrowser {
   }
 
   /**
-   * Decode, bound, and verify an inbound manifest. Returns {@code null} when
-   * the payload is not a valid, peer-signed manifest for this fetch.
+   * Decode, bound, and verify an inbound manifest. Returns {@code null} when the payload is not a
+   * valid, peer-signed manifest for this fetch.
    */
-  static Page decodeAndVerifyManifest(
-      byte[] payload, byte[] expectedNonce, byte[] peerPub) {
+  static Page decodeAndVerifyManifest(byte[] payload, byte[] expectedNonce, byte[] peerPub) {
     if (payload == null || payload.length == 0 || payload.length > MAX_MANIFEST_BYTES) {
       return null;
     }
     try {
-      JsonObject root = JsonParser.parseString(new String(payload, StandardCharsets.UTF_8))
-          .getAsJsonObject();
+      JsonObject root =
+          JsonParser.parseString(new String(payload, StandardCharsets.UTF_8)).getAsJsonObject();
       if (root == null) {
         return null;
       }
@@ -304,8 +303,7 @@ public final class CatalogBrowser {
       JsonElement pubElement = root.get("pub");
       JsonElement tsElement = root.get("ts");
       JsonElement sigElement = root.get("sig");
-      if (versionElement == null || pubElement == null
-          || tsElement == null || sigElement == null) {
+      if (versionElement == null || pubElement == null || tsElement == null || sigElement == null) {
         return null;
       }
       int version = versionElement.getAsInt();
@@ -338,8 +336,9 @@ public final class CatalogBrowser {
         if (pages < 1 || pages > CatalogManifestPages.MAX_PAGES || page < 0 || page >= pages) {
           return null;
         }
-        canonical = CatalogManifestPages.canonicalBytes(
-            pubB64, timestamp, entries, manifestNonce, page, pages);
+        canonical =
+            CatalogManifestPages.canonicalBytes(
+                pubB64, timestamp, entries, manifestNonce, page, pages);
       } else {
         canonical = RemoteIndexFetcher.manifestCanonicalBytes(version, pubB64, timestamp, entries);
       }

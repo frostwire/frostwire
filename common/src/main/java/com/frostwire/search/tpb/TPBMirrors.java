@@ -19,25 +19,24 @@
 package com.frostwire.search.tpb;
 
 /**
- * TPB mirror list utility class
- * Extracted from legacy TPBSearchPerformer for V2 architecture
+ * TPB mirror list utility class Extracted from legacy TPBSearchPerformer for V2 architecture
  *
  * @author gubatron
  */
 public class TPBMirrors {
-    public static String[] getMirrors() {
-        return new String[]{
-                "pirate-bay.info",
-                "piratebay.live",
-                "pirateproxylive.org",
-                "thehiddenbay.com",
-                "thepiratebay-unblocked.org",
-                "thepiratebay.party",
-                "thepiratebay.zone",
-                "thepiratebay0.org",
-                "thepiratebay10.org",
-                "thepiratebay7.com",
-                "tpb.party",
-        };
-    }
+  public static String[] getMirrors() {
+    return new String[] {
+      "pirate-bay.info",
+      "piratebay.live",
+      "pirateproxylive.org",
+      "thehiddenbay.com",
+      "thepiratebay-unblocked.org",
+      "thepiratebay.party",
+      "thepiratebay.zone",
+      "thepiratebay0.org",
+      "thepiratebay10.org",
+      "thepiratebay7.com",
+      "tpb.party",
+    };
+  }
 }

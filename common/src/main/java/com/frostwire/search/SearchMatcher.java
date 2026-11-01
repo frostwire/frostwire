@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -21,47 +21,47 @@ package com.frostwire.search;
 import com.frostwire.regex.Matcher;
 
 /**
- * <strong>A memory conscious Matcher</strong><br/>
- * Instead of using the groups() that reference the original HTML strings,
- * we just make copies of those substrings with this search matcher everytime
- * we invoke group(), this way the original HTML can be dereferenced and garbage collected.
+ * <strong>A memory conscious Matcher</strong><br>
+ * Instead of using the groups() that reference the original HTML strings, we just make copies of
+ * those substrings with this search matcher everytime we invoke group(), this way the original HTML
+ * can be dereferenced and garbage collected.
  *
  * @author gubatron
  * @author aldenml
  */
 public final class SearchMatcher {
-    private final Matcher matcher;
+  private final Matcher matcher;
 
-    public SearchMatcher(Matcher matcher) {
-        this.matcher = matcher;
-    }
+  public SearchMatcher(Matcher matcher) {
+    this.matcher = matcher;
+  }
 
-    public static SearchMatcher from(Matcher matcher) {
-        return new SearchMatcher(matcher);
-    }
+  public static SearchMatcher from(Matcher matcher) {
+    return new SearchMatcher(matcher);
+  }
 
-    public boolean find() {
-        return matcher.find();
-    }
+  public boolean find() {
+    return matcher.find();
+  }
 
-    public String group(int group) {
-        return copy(matcher.group(group));
-    }
+  public String group(int group) {
+    return copy(matcher.group(group));
+  }
 
-    public String group(String group) {
-        if (matcher.hasGroup(group)) {
-            return copy(matcher.group(group));
-        }
-        return null;
+  public String group(String group) {
+    if (matcher.hasGroup(group)) {
+      return copy(matcher.group(group));
     }
+    return null;
+  }
 
-    private String copy(String str) {
-        if (str == null) {
-            return null;
-        }
-        // Create a new String instance to allow original HTML to be garbage collected.
-        // Using new String(str) is more efficient than toCharArray() which creates
-        // an intermediate char array before creating the new String.
-        return new String(str);
+  private String copy(String str) {
+    if (str == null) {
+      return null;
     }
+    // Create a new String instance to allow original HTML to be garbage collected.
+    // Using new String(str) is more efficient than toCharArray() which creates
+    // an intermediate char array before creating the new String.
+    return new String(str);
+  }
 }

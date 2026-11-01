@@ -26,7 +26,8 @@ import java.util.function.Consumer;
  * <p>Design:
  *
  * <ul>
- *   <li>Fixed-capacity ring buffer (oldest evicted first) — memory is bounded regardless of traffic.
+ *   <li>Fixed-capacity ring buffer (oldest evicted first) — memory is bounded regardless of
+ *       traffic.
  *   <li>{@link #enabled} is a volatile fast-path; emitters check it and skip all formatting when no
  *       one is observing, so disabled logging costs almost nothing.
  *   <li>Listeners are notified outside the lock; a slow listener cannot stall producers.
@@ -157,19 +158,19 @@ public final class IceBridgeEventLog {
     if (minLevel != null && e.level().ordinal() < minLevel.ordinal()) {
       return false;
     }
-    if (categories != null
-        && !categories.isEmpty()
-        && !categories.contains(e.category())) {
+    if (categories != null && !categories.isEmpty() && !categories.contains(e.category())) {
       return false;
     }
     if (sinceMs > 0 && e.timestampMs() < sinceMs) {
       return false;
     }
-    if (text != null && !text.isEmpty()
+    if (text != null
+        && !text.isEmpty()
         && !e.message().toLowerCase(Locale.ROOT).contains(text.toLowerCase(Locale.ROOT))) {
       return false;
     }
-    if (peerPubSubstr != null && !peerPubSubstr.isEmpty()
+    if (peerPubSubstr != null
+        && !peerPubSubstr.isEmpty()
         && !e.peerPub().toLowerCase(Locale.ROOT).contains(peerPubSubstr.toLowerCase(Locale.ROOT))) {
       return false;
     }

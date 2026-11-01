@@ -8,16 +8,16 @@
 package com.frostwire.search.relay.icebridge;
 
 /**
- * Runtime exception thrown when the IceBridge servent encounters an
- * unrecoverable configuration or protocol error.
+ * Runtime exception thrown when the IceBridge servent encounters an unrecoverable configuration or
+ * protocol error.
  */
 public class IceBridgeException extends RuntimeException {
 
-    public IceBridgeException(String message) {
-        super(message);
-    }
+  public IceBridgeException(String message) {
+    super(message);
+  }
 
-    public IceBridgeException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public IceBridgeException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

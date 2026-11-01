@@ -8,7 +8,6 @@
 package com.frostwire.search.relay;
 
 import com.frostwire.search.relay.icebridge.IceBridgeHostCache;
-
 import java.util.Optional;
 
 /**
@@ -20,34 +19,34 @@ import java.util.Optional;
  * added here.
  */
 public final class HostCacheTrackingProber implements PeerProber {
-    private final PeerProber delegate;
-    private final IceBridgeHostCache cache;
+  private final PeerProber delegate;
+  private final IceBridgeHostCache cache;
 
-    public HostCacheTrackingProber(PeerProber delegate, IceBridgeHostCache cache) {
-        if (delegate == null || cache == null) {
-            throw new IllegalArgumentException("delegate and cache are required");
-        }
-        this.delegate = delegate;
-        this.cache = cache;
+  public HostCacheTrackingProber(PeerProber delegate, IceBridgeHostCache cache) {
+    if (delegate == null || cache == null) {
+      throw new IllegalArgumentException("delegate and cache are required");
     }
+    this.delegate = delegate;
+    this.cache = cache;
+  }
 
-    @Override
-    public Optional<ProbedPeer> probe(String host, int port, long deadlineNanos) {
-        Optional<ProbedPeer> peer = delegate.probe(host, port, deadlineNanos);
-        try {
-            if (peer.isPresent()) {
-                String role = peer.get().record().map(IdentityRecord::role).orElse(null);
-                if ("FORWARDER".equals(role) || "BOTH".equals(role)) {
-                    cache.markSuccess(host, port, role);
-                } else {
-                    cache.markSuccessIfKnown(host, port);
-                }
-            } else {
-                cache.markFailure(host, port);
-            }
-        } catch (RuntimeException ignored) {
-            // the cache is best-effort
+  @Override
+  public Optional<ProbedPeer> probe(String host, int port, long deadlineNanos) {
+    Optional<ProbedPeer> peer = delegate.probe(host, port, deadlineNanos);
+    try {
+      if (peer.isPresent()) {
+        String role = peer.get().record().map(IdentityRecord::role).orElse(null);
+        if ("FORWARDER".equals(role) || "BOTH".equals(role)) {
+          cache.markSuccess(host, port, role);
+        } else {
+          cache.markSuccessIfKnown(host, port);
         }
-        return peer;
+      } else {
+        cache.markFailure(host, port);
+      }
+    } catch (RuntimeException ignored) {
+      // the cache is best-effort
     }
+    return peer;
+  }
 }

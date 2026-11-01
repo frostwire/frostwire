@@ -9,7 +9,6 @@ package com.frostwire.search.relay;
 
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
-
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -23,293 +22,316 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
- * In-process handler for incoming {@link RemoteSearchRequest}s.
- * Performs the steps needed to turn a request into a signed
- * response, cheap rejects first (DDoS hardening — never pay
- * Ed25519 verify before the O(1) gates):
+ * In-process handler for incoming {@link RemoteSearchRequest}s. Performs the steps needed to turn a
+ * request into a signed response, cheap rejects first (DDoS hardening — never pay Ed25519 verify
+ * before the O(1) gates):
+ *
  * <ol>
- *   <li>TTL-range sanity (fail closed on absurd hop budgets).</li>
- *   <li>Known-spam drop (cheap directory read, no crypto).</li>
- *   <li>Freshness and global ingress budget.</li>
- *   <li>Verify the requester's Ed25519 signature over the
- *       request's canonical bytes.</li>
- *   <li>Bounded requester/nonce replay admission and authenticated quota.</li>
- *   <li>Query the local {@link LocalIndex} and build a
- *       {@link RemoteSearchResponse} signed by this node's key.</li>
+ *   <li>TTL-range sanity (fail closed on absurd hop budgets).
+ *   <li>Known-spam drop (cheap directory read, no crypto).
+ *   <li>Freshness and global ingress budget.
+ *   <li>Verify the requester's Ed25519 signature over the request's canonical bytes.
+ *   <li>Bounded requester/nonce replay admission and authenticated quota.
+ *   <li>Query the local {@link LocalIndex} and build a {@link RemoteSearchResponse} signed by this
+ *       node's key.
  * </ol>
  *
- * <p>Returns {@link Optional#empty()} for any rejection. The
- * transport layer can map empty to a generic error reply without
- * leaking the rejection reason (which would help attackers tune
- * their bypasses).
+ * <p>Returns {@link Optional#empty()} for any rejection. The transport layer can map empty to a
+ * generic error reply without leaking the rejection reason (which would help attackers tune their
+ * bypasses).
  *
- * <p>Fail-closed: any error in the verification or query path
- * returns empty and is logged. A malicious or buggy peer can
- * never crash the responder.
+ * <p>Fail-closed: any error in the verification or query path returns empty and is logged. A
+ * malicious or buggy peer can never crash the responder.
  */
 public final class RelaySearchService {
 
-    private static final Logger LOG = Logger.getLogger(RelaySearchService.class);
+  private static final Logger LOG = Logger.getLogger(RelaySearchService.class);
 
-    private static final int RESULT_LIMIT_CAP = RemoteSearchRequest.MAX_LIMIT;
-    private static final int MAX_REPLAY_ENTRIES = 4096;
+  private static final int RESULT_LIMIT_CAP = RemoteSearchRequest.MAX_LIMIT;
+  private static final int MAX_REPLAY_ENTRIES = 4096;
 
-    private final LocalIndex index;
-    private final IdentityKeys identity;
-    private final RateLimiter rateLimiter;
-    private final ShareVisibilityPolicy visibility;
-    private final RateLimiter ingress = new RateLimiter(100, 100, 1, 60_000);
-    private final Map<String, Admission> replay = new LinkedHashMap<>();
+  private final LocalIndex index;
+  private final IdentityKeys identity;
+  private final RateLimiter rateLimiter;
+  private final ShareVisibilityPolicy visibility;
+  private final RateLimiter ingress = new RateLimiter(100, 100, 1, 60_000);
+  private final Map<String, Admission> replay = new LinkedHashMap<>();
 
-    private static final class Admission {
-        final RemoteSearchRequest request;
-        final long expiresNanos;
-        boolean ready;
-        boolean forwarded;
+  private static final class Admission {
+    final RemoteSearchRequest request;
+    final long expiresNanos;
+    boolean ready;
+    boolean forwarded;
 
-        Admission(RemoteSearchRequest request) {
-            this.request = request;
-            this.expiresNanos = System.nanoTime()
-                    + (2 * RemoteSearchRequest.MAX_TIMESTAMP_SKEW_SEC + 1) * 1_000_000_000L;
+    Admission(RemoteSearchRequest request) {
+      this.request = request;
+      this.expiresNanos =
+          System.nanoTime() + (2 * RemoteSearchRequest.MAX_TIMESTAMP_SKEW_SEC + 1) * 1_000_000_000L;
+    }
+  }
+
+  private volatile SeederEndpointProvider seederEndpointProvider = SeederEndpointProvider.NONE;
+
+  /**
+   * Cheap pre-verify spam gate. Defaults to always-false (accept unknowns, same as before); wire a
+   * directory-backed predicate to drop known spammers before paying Ed25519 verify. Never null
+   * (null resets to always-false). The predicate must not retain the passed array.
+   */
+  private volatile Predicate<byte[]> spamChecker = k -> false;
+
+  /**
+   * Advertised PUBLIC_CATALOG opt-in. When true, response rows carry {@code pc} and the response is
+   * written as wire v4 so requesters can gate "crawl peer" without probing; when false the response
+   * stays wire v3 (old peers keep verifying it).
+   */
+  private volatile boolean publicCatalog;
+
+  /** Enable advertising this node's catalog as crawlable on search results. */
+  public void setPublicCatalog(boolean publicCatalog) {
+    this.publicCatalog = publicCatalog;
+  }
+
+  public boolean isPublicCatalog() {
+    return publicCatalog;
+  }
+
+  public RelaySearchService(LocalIndex index, IdentityKeys identity) {
+    this(
+        index,
+        identity,
+        new RateLimiter(RelayConstants.DEFAULT_MAX_QPS, RelayConstants.DEFAULT_MAX_QPS),
+        null);
+  }
+
+  public RelaySearchService(LocalIndex index, IdentityKeys identity, RateLimiter rateLimiter) {
+    this(index, identity, rateLimiter, null);
+  }
+
+  public RelaySearchService(
+      LocalIndex index, IdentityKeys identity, ShareVisibilityPolicy visibility) {
+    this(
+        index,
+        identity,
+        new RateLimiter(RelayConstants.DEFAULT_MAX_QPS, RelayConstants.DEFAULT_MAX_QPS),
+        visibility);
+  }
+
+  public RelaySearchService(
+      LocalIndex index,
+      IdentityKeys identity,
+      RateLimiter rateLimiter,
+      ShareVisibilityPolicy visibility) {
+    if (index == null) {
+      throw new IllegalArgumentException("index is null");
+    }
+    if (identity == null) {
+      throw new IllegalArgumentException("identity is null");
+    }
+    if (rateLimiter == null) {
+      throw new IllegalArgumentException("rateLimiter is null");
+    }
+    this.index = index;
+    this.identity = identity;
+    this.rateLimiter = rateLimiter;
+    this.visibility = visibility == null ? hash -> false : visibility;
+  }
+
+  /**
+   * Advertise this node's BT listen endpoints inside signed response rows (v3 {@code bt} field) so
+   * requesters can fetch the torrent directly. Default {@link SeederEndpointProvider#NONE}
+   * advertises nothing.
+   */
+  public void setSeederEndpointProvider(SeederEndpointProvider provider) {
+    this.seederEndpointProvider = provider != null ? provider : SeederEndpointProvider.NONE;
+  }
+
+  /**
+   * Additive spam gate for cheap-reject-first ordering. A null argument resets to always-false
+   * (never null internally).
+   */
+  public void setSpamChecker(Predicate<byte[]> spamChecker) {
+    this.spamChecker = spamChecker != null ? spamChecker : k -> false;
+  }
+
+  /** Reuses the public policy for catalog and other serving paths. */
+  public boolean isPubliclyShared(String infoHashHex) {
+    return ShareVisibility.isPubliclyShared(infoHashHex, visibility);
+  }
+
+  private static String replayKey(RemoteSearchRequest request) {
+    return Hex.encode(request.requesterPub()) + ':' + Hex.encode(request.nonce());
+  }
+
+  /** One forwarding permit for the exact successfully handled immutable request. */
+  public boolean claimForward(RemoteSearchRequest request) {
+    if (request == null) {
+      return false;
+    }
+    synchronized (replay) {
+      Admission admission = replay.get(replayKey(request));
+      if (admission == null
+          || admission.request != request
+          || !admission.ready
+          || admission.forwarded
+          || System.nanoTime() - admission.expiresNanos >= 0) {
+        return false;
+      }
+      admission.forwarded = true;
+      return true;
+    }
+  }
+
+  /** Periodic maintenance; no provider or network work. */
+  public void evictIdle() {
+    rateLimiter.evictIdle(10 * 60_000L);
+    synchronized (replay) {
+      long now = System.nanoTime();
+      replay.values().removeIf(entry -> now - entry.expiresNanos >= 0);
+    }
+  }
+
+  /**
+   * Handle an incoming request. Returns empty if the request is rejected for any reason (bad
+   * signature, stale timestamp, rate limit, internal error).
+   */
+  public Optional<RemoteSearchResponse> handle(RemoteSearchRequest request) {
+    if (request == null) {
+      return Optional.empty();
+    }
+    try {
+      int ttl = request.ttl();
+      if (ttl <= 0
+          || ttl > RemoteSearchRequest.MAX_PATH_LENGTH
+          || request.isLoop(identity.ed25519PubRaw())) {
+        LOG.debug(
+            "RelaySearchService: rejected request (ttl out of range "
+                + ttl
+                + ") keywords="
+                + request.keywords());
+        return Optional.empty();
+      }
+      byte[] requesterPub = request.requesterPub();
+      Predicate<byte[]> spamChecker = this.spamChecker;
+      if (spamChecker != null && spamChecker.test(requesterPub)) {
+        LOG.debug("RelaySearchService: rejected request (spam) keywords=" + request.keywords());
+        return Optional.empty();
+      }
+      long nowSec = System.currentTimeMillis() / 1000L;
+      if (request.timestamp() < nowSec - RemoteSearchRequest.MAX_TIMESTAMP_SKEW_SEC
+          || request.timestamp() > nowSec + RemoteSearchRequest.MAX_TIMESTAMP_SKEW_SEC
+          || !ingress.tryAcquire("search")) {
+        return Optional.empty();
+      }
+      if (!verifySignature(request)) {
+        LOG.debug(
+            "RelaySearchService: rejected request (bad signature) keywords=" + request.keywords());
+        return Optional.empty();
+      }
+      Admission admission;
+      synchronized (replay) {
+        long now = System.nanoTime();
+        replay.values().removeIf(entry -> now - entry.expiresNanos >= 0);
+        String key = replayKey(request);
+        if (replay.containsKey(key)
+            || replay.size() >= MAX_REPLAY_ENTRIES
+            || !rateLimiter.tryAcquire(requesterPub)) {
+          return Optional.empty();
         }
+        admission = new Admission(request);
+        replay.put(key, admission);
+      }
+      int limit = Math.min(request.limit(), RESULT_LIMIT_CAP);
+      int fetch =
+          visibility == ShareVisibilityPolicy.INCLUDE_ALL
+              ? limit
+              : Math.min(limit * 4, Math.max(limit, 200));
+      List<LocalSharedTorrent> rows = index.search(request.keywords(), fetch);
+      if (rows == null) {
+        rows = new ArrayList<>();
+      }
+      rows = ShareVisibility.filter(rows, this::isPubliclyShared);
+      if (rows.size() > limit) {
+        rows = new ArrayList<>(rows.subList(0, limit));
+      }
+      LOG.info(
+          "RelaySearchService: answered keywords=\""
+              + request.keywords()
+              + "\" rows="
+              + rows.size());
+      RemoteSearchResponse response = buildResponse(request, rows);
+      synchronized (replay) {
+        admission.ready = true;
+      }
+      return Optional.of(response);
+    } catch (Throwable t) {
+      LOG.warn("RelaySearchService.handle failed", t);
+      return Optional.empty();
     }
-    private volatile SeederEndpointProvider seederEndpointProvider = SeederEndpointProvider.NONE;
-    /**
-     * Cheap pre-verify spam gate. Defaults to always-false (accept unknowns,
-     * same as before); wire a directory-backed predicate to drop known
-     * spammers before paying Ed25519 verify. Never null (null resets to
-     * always-false). The predicate must not retain the passed array.
-     */
-    private volatile Predicate<byte[]> spamChecker = k -> false;
+  }
 
-    /**
-     * Advertised PUBLIC_CATALOG opt-in. When true, response rows carry {@code pc} and the response
-     * is written as wire v4 so requesters can gate "crawl peer" without probing; when false the
-     * response stays wire v3 (old peers keep verifying it).
-     */
-    private volatile boolean publicCatalog;
-
-    /** Enable advertising this node's catalog as crawlable on search results. */
-    public void setPublicCatalog(boolean publicCatalog) {
-        this.publicCatalog = publicCatalog;
+  private RemoteSearchResponse buildResponse(
+      RemoteSearchRequest request, List<LocalSharedTorrent> rows) {
+    boolean catalog = publicCatalog;
+    RemoteSearchResponse.Builder b =
+        RemoteSearchResponse.builder()
+            .nonce(request.nonce())
+            .timestamp(System.currentTimeMillis() / 1000L);
+    List<String> endpoints = seederEndpointProvider.seederEndpoints();
+    for (LocalSharedTorrent t : rows) {
+      byte[] nodeId = t.publisherNodeId();
+      b.addRow(
+          t.infoHash(),
+          t.name(),
+          t.sizeBytes(),
+          t.fileCount(),
+          t.publisherEd25519Pub(),
+          nodeId,
+          t.matchedFile(),
+          endpoints,
+          catalog);
     }
+    RemoteSearchResponse unsigned = b.signature(new byte[64]).build();
+    byte[] sig = sign(unsigned.canonicalBytes());
+    return b.signature(sig).build();
+  }
 
-    public boolean isPublicCatalog() {
-        return publicCatalog;
+  private static boolean verifySignature(RemoteSearchRequest request) {
+    try {
+      byte[] raw = request.requesterPub();
+      if (raw == null || raw.length != 32) {
+        return false;
+      }
+      // X.509 prefix for Ed25519 (12 bytes)
+      byte[] prefix = {0x30, 0x2a, 0x30, 0x05, 0x06, 0x03, 0x2b, 0x65, 0x70, 0x03, 0x21, 0x00};
+      byte[] encoded = new byte[prefix.length + raw.length];
+      System.arraycopy(prefix, 0, encoded, 0, prefix.length);
+      System.arraycopy(raw, 0, encoded, prefix.length, raw.length);
+      PublicKey pub =
+          IdentityKeys.softwareKeyFactory("Ed25519")
+              .generatePublic(new X509EncodedKeySpec(encoded));
+      Signature verifier = IdentityKeys.softwareSignature("Ed25519");
+      verifier.initVerify(pub);
+      verifier.update(request.canonicalBytes());
+      return verifier.verify(request.signature());
+    } catch (GeneralSecurityException e) {
+      LOG.debug("Signature verification threw", e);
+      return false;
     }
+  }
 
-    public RelaySearchService(LocalIndex index, IdentityKeys identity) {
-        this(index, identity, new RateLimiter(
-                RelayConstants.DEFAULT_MAX_QPS,
-                RelayConstants.DEFAULT_MAX_QPS), null);
+  private byte[] sign(byte[] data) {
+    try {
+      PrivateKey priv = identity.ed25519().getPrivate();
+      Signature signer = IdentityKeys.softwareSignature("Ed25519");
+      signer.initSign(priv);
+      signer.update(data);
+      return signer.sign();
+    } catch (GeneralSecurityException e) {
+      throw new IllegalStateException("Failed to sign relay response", e);
     }
+  }
 
-    public RelaySearchService(LocalIndex index, IdentityKeys identity,
-                              RateLimiter rateLimiter) {
-        this(index, identity, rateLimiter, null);
-    }
-
-    public RelaySearchService(LocalIndex index, IdentityKeys identity,
-                              ShareVisibilityPolicy visibility) {
-        this(index, identity, new RateLimiter(
-                RelayConstants.DEFAULT_MAX_QPS,
-                RelayConstants.DEFAULT_MAX_QPS), visibility);
-    }
-
-    public RelaySearchService(LocalIndex index, IdentityKeys identity,
-                              RateLimiter rateLimiter,
-                              ShareVisibilityPolicy visibility) {
-        if (index == null) {
-            throw new IllegalArgumentException("index is null");
-        }
-        if (identity == null) {
-            throw new IllegalArgumentException("identity is null");
-        }
-        if (rateLimiter == null) {
-            throw new IllegalArgumentException("rateLimiter is null");
-        }
-        this.index = index;
-        this.identity = identity;
-        this.rateLimiter = rateLimiter;
-        this.visibility = visibility == null ? hash -> false : visibility;
-    }
-
-    /**
-     * Advertise this node's BT listen endpoints inside signed response rows
-     * (v3 {@code bt} field) so requesters can fetch the torrent directly.
-     * Default {@link SeederEndpointProvider#NONE} advertises nothing.
-     */
-    public void setSeederEndpointProvider(SeederEndpointProvider provider) {
-        this.seederEndpointProvider = provider != null ? provider : SeederEndpointProvider.NONE;
-    }
-
-    /**
-     * Additive spam gate for cheap-reject-first ordering. A null argument
-     * resets to always-false (never null internally).
-     */
-    public void setSpamChecker(Predicate<byte[]> spamChecker) {
-        this.spamChecker = spamChecker != null ? spamChecker : k -> false;
-    }
-
-    /** Reuses the public policy for catalog and other serving paths. */
-    public boolean isPubliclyShared(String infoHashHex) {
-        return ShareVisibility.isPubliclyShared(infoHashHex, visibility);
-    }
-
-    private static String replayKey(RemoteSearchRequest request) {
-        return Hex.encode(request.requesterPub()) + ':' + Hex.encode(request.nonce());
-    }
-
-    /** One forwarding permit for the exact successfully handled immutable request. */
-    public boolean claimForward(RemoteSearchRequest request) {
-        if (request == null) {
-            return false;
-        }
-        synchronized (replay) {
-            Admission admission = replay.get(replayKey(request));
-            if (admission == null || admission.request != request || !admission.ready
-                    || admission.forwarded || System.nanoTime() - admission.expiresNanos >= 0) {
-                return false;
-            }
-            admission.forwarded = true;
-            return true;
-        }
-    }
-
-    /** Periodic maintenance; no provider or network work. */
-    public void evictIdle() {
-        rateLimiter.evictIdle(10 * 60_000L);
-        synchronized (replay) {
-            long now = System.nanoTime();
-            replay.values().removeIf(entry -> now - entry.expiresNanos >= 0);
-        }
-    }
-
-    /**
-     * Handle an incoming request. Returns empty if the request
-     * is rejected for any reason (bad signature, stale timestamp,
-     * rate limit, internal error).
-     */
-    public Optional<RemoteSearchResponse> handle(RemoteSearchRequest request) {
-        if (request == null) {
-            return Optional.empty();
-        }
-        try {
-            int ttl = request.ttl();
-            if (ttl <= 0 || ttl > RemoteSearchRequest.MAX_PATH_LENGTH
-                    || request.isLoop(identity.ed25519PubRaw())) {
-                LOG.debug("RelaySearchService: rejected request (ttl out of range "
-                        + ttl + ") keywords=" + request.keywords());
-                return Optional.empty();
-            }
-            byte[] requesterPub = request.requesterPub();
-            Predicate<byte[]> spamChecker = this.spamChecker;
-            if (spamChecker != null && spamChecker.test(requesterPub)) {
-                LOG.debug("RelaySearchService: rejected request (spam) keywords="
-                        + request.keywords());
-                return Optional.empty();
-            }
-            long nowSec = System.currentTimeMillis() / 1000L;
-            if (request.timestamp() < nowSec - RemoteSearchRequest.MAX_TIMESTAMP_SKEW_SEC
-                    || request.timestamp() > nowSec + RemoteSearchRequest.MAX_TIMESTAMP_SKEW_SEC
-                    || !ingress.tryAcquire("search")) {
-                return Optional.empty();
-            }
-            if (!verifySignature(request)) {
-                LOG.debug("RelaySearchService: rejected request (bad signature) keywords="
-                        + request.keywords());
-                return Optional.empty();
-            }
-            Admission admission;
-            synchronized (replay) {
-                long now = System.nanoTime();
-                replay.values().removeIf(entry -> now - entry.expiresNanos >= 0);
-                String key = replayKey(request);
-                if (replay.containsKey(key) || replay.size() >= MAX_REPLAY_ENTRIES
-                        || !rateLimiter.tryAcquire(requesterPub)) {
-                    return Optional.empty();
-                }
-                admission = new Admission(request);
-                replay.put(key, admission);
-            }
-            int limit = Math.min(request.limit(), RESULT_LIMIT_CAP);
-            int fetch = visibility == ShareVisibilityPolicy.INCLUDE_ALL
-                    ? limit
-                    : Math.min(limit * 4, Math.max(limit, 200));
-            List<LocalSharedTorrent> rows = index.search(request.keywords(), fetch);
-            if (rows == null) {
-                rows = new ArrayList<>();
-            }
-            rows = ShareVisibility.filter(rows, this::isPubliclyShared);
-            if (rows.size() > limit) {
-                rows = new ArrayList<>(rows.subList(0, limit));
-            }
-            LOG.info("RelaySearchService: answered keywords=\"" + request.keywords()
-                    + "\" rows=" + rows.size());
-            RemoteSearchResponse response = buildResponse(request, rows);
-            synchronized (replay) {
-                admission.ready = true;
-            }
-            return Optional.of(response);
-        } catch (Throwable t) {
-            LOG.warn("RelaySearchService.handle failed", t);
-            return Optional.empty();
-        }
-    }
-
-    private RemoteSearchResponse buildResponse(RemoteSearchRequest request,
-                                               List<LocalSharedTorrent> rows) {
-        boolean catalog = publicCatalog;
-        RemoteSearchResponse.Builder b = RemoteSearchResponse.builder()
-                .nonce(request.nonce())
-                .timestamp(System.currentTimeMillis() / 1000L);
-        List<String> endpoints = seederEndpointProvider.seederEndpoints();
-        for (LocalSharedTorrent t : rows) {
-            byte[] nodeId = t.publisherNodeId();
-            b.addRow(t.infoHash(), t.name(), t.sizeBytes(), t.fileCount(),
-                    t.publisherEd25519Pub(), nodeId, t.matchedFile(), endpoints, catalog);
-        }
-        RemoteSearchResponse unsigned = b.signature(new byte[64]).build();
-        byte[] sig = sign(unsigned.canonicalBytes());
-        return b.signature(sig).build();
-    }
-
-    private static boolean verifySignature(RemoteSearchRequest request) {
-        try {
-            byte[] raw = request.requesterPub();
-            if (raw == null || raw.length != 32) {
-                return false;
-            }
-            // X.509 prefix for Ed25519 (12 bytes)
-            byte[] prefix = {0x30, 0x2a, 0x30, 0x05, 0x06, 0x03, 0x2b, 0x65, 0x70, 0x03, 0x21, 0x00};
-            byte[] encoded = new byte[prefix.length + raw.length];
-            System.arraycopy(prefix, 0, encoded, 0, prefix.length);
-            System.arraycopy(raw, 0, encoded, prefix.length, raw.length);
-            PublicKey pub = IdentityKeys.softwareKeyFactory("Ed25519")
-                    .generatePublic(new X509EncodedKeySpec(encoded));
-            Signature verifier = IdentityKeys.softwareSignature("Ed25519");
-            verifier.initVerify(pub);
-            verifier.update(request.canonicalBytes());
-            return verifier.verify(request.signature());
-        } catch (GeneralSecurityException e) {
-            LOG.debug("Signature verification threw", e);
-            return false;
-        }
-    }
-
-    private byte[] sign(byte[] data) {
-        try {
-            PrivateKey priv = identity.ed25519().getPrivate();
-            Signature signer = IdentityKeys.softwareSignature("Ed25519");
-            signer.initSign(priv);
-            signer.update(data);
-            return signer.sign();
-        } catch (GeneralSecurityException e) {
-            throw new IllegalStateException("Failed to sign relay response", e);
-        }
-    }
-
-    public RateLimiter rateLimiter() {
-        return rateLimiter;
-    }
+  public RateLimiter rateLimiter() {
+    return rateLimiter;
+  }
 }

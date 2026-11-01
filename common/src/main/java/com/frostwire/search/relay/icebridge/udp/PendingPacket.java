@@ -9,23 +9,21 @@ package com.frostwire.search.relay.icebridge.udp;
 
 import java.net.InetSocketAddress;
 
-/**
- * Outbound packet awaiting acknowledgement.
- */
+/** Outbound packet awaiting acknowledgement. */
 final class PendingPacket {
 
-    final RudpPacket packet;
-    final InetSocketAddress recipient;
-    volatile long firstSentMs;
-    volatile long lastSentMs;
-    volatile int retries;
-    RudpPacket wirePacket;
-    boolean sent;
+  final RudpPacket packet;
+  final InetSocketAddress recipient;
+  volatile long firstSentMs;
+  volatile long lastSentMs;
+  volatile int retries;
+  RudpPacket wirePacket;
+  boolean sent;
 
-    PendingPacket(RudpPacket packet, InetSocketAddress recipient, long nowMs) {
-        this.packet = packet;
-        this.recipient = recipient;
-        this.firstSentMs = nowMs;
-        this.lastSentMs = nowMs;
-    }
+  PendingPacket(RudpPacket packet, InetSocketAddress recipient, long nowMs) {
+    this.packet = packet;
+    this.recipient = recipient;
+    this.firstSentMs = nowMs;
+    this.lastSentMs = nowMs;
+  }
 }

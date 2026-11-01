@@ -11,7 +11,6 @@ import com.frostwire.search.relay.RateLimiter;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,290 +24,306 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * In-memory registry of authenticated IceBridge peers.
  *
- * <p>All state is kept in RAM. Stale peers are evicted periodically by
- * {@link #evictStale(long)}. The registry is intentionally isolated from
- * search semantics: it only tracks who can relay and how to reach them.
+ * <p>All state is kept in RAM. Stale peers are evicted periodically by {@link #evictStale(long)}.
+ * The registry is intentionally isolated from search semantics: it only tracks who can relay and
+ * how to reach them.
  */
 public final class PeerRegistry {
 
-    private static final Logger LOG = Logger.getLogger(PeerRegistry.class);
+  private static final Logger LOG = Logger.getLogger(PeerRegistry.class);
 
-    private final Map<String, PeerRecord> byPubHex = new ConcurrentHashMap<>();
-    private final RateLimiter rateLimiter;
-    private final int maxPeers;
-    private final AtomicLong registrations = new AtomicLong();
-    private final AtomicLong lookups = new AtomicLong();
-    private final AtomicLong evicted = new AtomicLong();
+  private final Map<String, PeerRecord> byPubHex = new ConcurrentHashMap<>();
+  private final RateLimiter rateLimiter;
+  private final int maxPeers;
+  private final AtomicLong registrations = new AtomicLong();
+  private final AtomicLong lookups = new AtomicLong();
+  private final AtomicLong evicted = new AtomicLong();
 
-    public PeerRegistry(IceBridgeConfig config) {
-        this.maxPeers = config.maxPeers();
-        // Capacity = max burst in one second; refill = sustained QPS.
-        this.rateLimiter = new RateLimiter(
-                config.maxQpsPerKey(), config.maxQpsPerKey(), maxPeers, 10 * 60_000L);
+  public PeerRegistry(IceBridgeConfig config) {
+    this.maxPeers = config.maxPeers();
+    // Capacity = max burst in one second; refill = sustained QPS.
+    this.rateLimiter =
+        new RateLimiter(config.maxQpsPerKey(), config.maxQpsPerKey(), maxPeers, 10 * 60_000L);
+  }
+
+  /**
+   * Register or refresh a peer. Registration is rate-limited per public key to prevent a single
+   * identity from spamming the registry.
+   *
+   * @return true if the record was accepted
+   */
+  public synchronized boolean register(PeerRecord record) {
+    if (record == null) {
+      return false;
     }
+    byte[] pub = record.ed25519Pub();
+    if (pub == null
+        || pub.length != 32
+        || record.host() == null
+        || record.host().isBlank()
+        || record.host().length() > 253
+        || record.rudpPort() <= 0
+        || record.rudpPort() > 65535
+        || (record.icebridgeVersion() != null && record.icebridgeVersion().length() > 64)) {
+      return false;
+    }
+    if (!byPubHex.containsKey(Hex.encode(pub)) && byPubHex.size() >= maxPeers) {
+      return false;
+    }
+    if (!rateLimiter.tryAcquire(pub)) {
+      LOG.debug("PeerRegistry: rate-limited registration from " + record.ed25519PubHex());
+      return false;
+    }
+    String key = Hex.encode(pub);
 
-    /**
-     * Register or refresh a peer. Registration is rate-limited per public key
-     * to prevent a single identity from spamming the registry.
-     *
-     * @return true if the record was accepted
-     */
-    public synchronized boolean register(PeerRecord record) {
-        if (record == null) {
-            return false;
-        }
-        byte[] pub = record.ed25519Pub();
-        if (pub == null || pub.length != 32 || record.host() == null || record.host().isBlank()
-                || record.host().length() > 253 || record.rudpPort() <= 0 || record.rudpPort() > 65535
-                || (record.icebridgeVersion() != null && record.icebridgeVersion().length() > 64)) {
-            return false;
-        }
-        if (!byPubHex.containsKey(Hex.encode(pub)) && byPubHex.size() >= maxPeers) {
-            return false;
-        }
-        if (!rateLimiter.tryAcquire(pub)) {
-            LOG.debug("PeerRegistry: rate-limited registration from " + record.ed25519PubHex());
-            return false;
-        }
-        String key = Hex.encode(pub);
-
-        byPubHex.merge(key, record, (existing, incoming) -> {
-            // Fresher endpoint wins; otherwise keep existing.
-            if (incoming.lastSeenMs() < existing.lastSeenMs()) {
-                return existing;
-            }
-            // Preserve a previously advertised IceBridge version when the
-            // refresh omitted it (e.g. /route without version).
-            String ver = (incoming.icebridgeVersion() != null
-                    && !incoming.icebridgeVersion().isBlank())
-                    ? incoming.icebridgeVersion()
-                    : existing.icebridgeVersion();
-            return new PeerRecord(
-                    incoming.ed25519Pub(),
-                    incoming.host(),
-                    incoming.rudpPort(),
-                    incoming.role(),
-                    incoming.lastSeenMs(),
-                    ver);
+    byPubHex.merge(
+        key,
+        record,
+        (existing, incoming) -> {
+          // Fresher endpoint wins; otherwise keep existing.
+          if (incoming.lastSeenMs() < existing.lastSeenMs()) {
+            return existing;
+          }
+          // Preserve a previously advertised IceBridge version when the
+          // refresh omitted it (e.g. /route without version).
+          String ver =
+              (incoming.icebridgeVersion() != null && !incoming.icebridgeVersion().isBlank())
+                  ? incoming.icebridgeVersion()
+                  : existing.icebridgeVersion();
+          return new PeerRecord(
+              incoming.ed25519Pub(),
+              incoming.host(),
+              incoming.rudpPort(),
+              incoming.role(),
+              incoming.lastSeenMs(),
+              ver);
         });
-        registrations.incrementAndGet();
-        return true;
-    }
+    registrations.incrementAndGet();
+    return true;
+  }
 
-    /**
-     * Learn a peer endpoint observed on the wire (authenticated inbound
-     * HELLO). Observed proof of life at this endpoint wins over stale
-     * registrations (e.g. a client that moved from USE_REMOTE 127.0.0.1
-     * demux to in-process rUDP). Peers known only from observation are
-     * recorded as CLIENT: deliverable, but never used as mesh forwarders.
-     */
-    public synchronized void learnObservedEndpoint(byte[] pub, String host, int rudpPort) {
-        if (pub == null || pub.length != 32 || host == null || host.isBlank()
-                || rudpPort <= 0 || rudpPort > 65535) {
-            return;
-        }
-        String key = Hex.encode(pub);
-        if (host.length() > 253 || (!byPubHex.containsKey(key) && byPubHex.size() >= maxPeers)) {
-            return;
-        }
-        byPubHex.compute(key, (k, existing) -> existing != null
-                ? new PeerRecord(existing.ed25519Pub(), host, rudpPort,
-                        existing.role(), System.currentTimeMillis(), existing.icebridgeVersion())
-                : new PeerRecord(pub, host, rudpPort, IceBridgeConfig.Role.CLIENT,
-                        System.currentTimeMillis(), null));
+  /**
+   * Learn a peer endpoint observed on the wire (authenticated inbound HELLO). Observed proof of
+   * life at this endpoint wins over stale registrations (e.g. a client that moved from USE_REMOTE
+   * 127.0.0.1 demux to in-process rUDP). Peers known only from observation are recorded as CLIENT:
+   * deliverable, but never used as mesh forwarders.
+   */
+  public synchronized void learnObservedEndpoint(byte[] pub, String host, int rudpPort) {
+    if (pub == null
+        || pub.length != 32
+        || host == null
+        || host.isBlank()
+        || rudpPort <= 0
+        || rudpPort > 65535) {
+      return;
     }
-
-    /**
-     * Refresh a known peer's liveness without touching its advertised role/version. Called on
-     * authenticated inbound traffic so a stable peer whose session stays up (no new HELLO) does
-     * not age out of the registry and become unaddressable between re-handshakes.
-     *
-     * <p>No-op when the peer is unknown; callers must not use this to create entries.
-     */
-    public synchronized void touch(byte[] ed25519Pub) {
-        if (ed25519Pub == null || ed25519Pub.length != 32) {
-            return;
-        }
-        byPubHex.computeIfPresent(
-                Hex.encode(ed25519Pub),
-                (k, existing) -> existing.withLastSeen(System.currentTimeMillis()));
+    String key = Hex.encode(pub);
+    if (host.length() > 253 || (!byPubHex.containsKey(key) && byPubHex.size() >= maxPeers)) {
+      return;
     }
+    byPubHex.compute(
+        key,
+        (k, existing) ->
+            existing != null
+                ? new PeerRecord(
+                    existing.ed25519Pub(),
+                    host,
+                    rudpPort,
+                    existing.role(),
+                    System.currentTimeMillis(),
+                    existing.icebridgeVersion())
+                : new PeerRecord(
+                    pub,
+                    host,
+                    rudpPort,
+                    IceBridgeConfig.Role.CLIENT,
+                    System.currentTimeMillis(),
+                    null));
+  }
 
-    /**
-     * Mesh forwarders for a RELAY flood: eligible peers (FORWARDER/BOTH roles)
-     * in shuffled order with a best-effort per-/24 diversity cap, so repeated
-     * floods against a large registry spread load instead of hammering the
-     * same first-N peers or collapsing onto one hosting subnet. Stale peers
-     * are handled by periodic {@link #evictStale(long)}, not here.
-     */
-    public List<PeerRecord> lookupForwarders(int maxResults) {
-        return lookupForwarders(maxResults, ThreadLocalRandom.current());
+  /**
+   * Refresh a known peer's liveness without touching its advertised role/version. Called on
+   * authenticated inbound traffic so a stable peer whose session stays up (no new HELLO) does not
+   * age out of the registry and become unaddressable between re-handshakes.
+   *
+   * <p>No-op when the peer is unknown; callers must not use this to create entries.
+   */
+  public synchronized void touch(byte[] ed25519Pub) {
+    if (ed25519Pub == null || ed25519Pub.length != 32) {
+      return;
     }
+    byPubHex.computeIfPresent(
+        Hex.encode(ed25519Pub), (k, existing) -> existing.withLastSeen(System.currentTimeMillis()));
+  }
 
-    /**
-     * Deterministic overload for tests: same selection driven by the given
-     * source of randomness.
-     */
-    public List<PeerRecord> lookupForwarders(int maxResults, Random random) {
-        if (maxResults <= 0) {
-            return Collections.emptyList();
-        }
-        if (random == null) {
-            throw new IllegalArgumentException("random is null");
-        }
-        lookups.incrementAndGet();
-        List<PeerRecord> eligible = new ArrayList<>();
-        for (PeerRecord r : byPubHex.values()) {
-            if (r.canForward()) {
-                eligible.add(r);
-            }
-        }
-        Collections.shuffle(eligible, random);
-        List<PeerRecord> result = new ArrayList<>(Math.min(maxResults, eligible.size()));
-        Map<String, Integer> perSubnet = new HashMap<>();
-        for (PeerRecord r : eligible) {
-            if (result.size() >= maxResults) {
-                break;
-            }
-            String subnet = subnet24(r.host());
-            if (subnet != null && perSubnet.getOrDefault(subnet, 0) >= MAX_FORWARD_PER_SUBNET) {
-                continue;
-            }
-            if (subnet != null) {
-                perSubnet.put(subnet, perSubnet.getOrDefault(subnet, 0) + 1);
-            }
-            result.add(r);
-        }
-        // Never shrink coverage: if the cap starved the result, fill up ignoring it.
-        for (PeerRecord r : eligible) {
-            if (result.size() >= maxResults) {
-                break;
-            }
-            if (!result.contains(r)) {
-                result.add(r);
-            }
-        }
-        return Collections.unmodifiableList(result);
+  /**
+   * Mesh forwarders for a RELAY flood: eligible peers (FORWARDER/BOTH roles) in shuffled order with
+   * a best-effort per-/24 diversity cap, so repeated floods against a large registry spread load
+   * instead of hammering the same first-N peers or collapsing onto one hosting subnet. Stale peers
+   * are handled by periodic {@link #evictStale(long)}, not here.
+   */
+  public List<PeerRecord> lookupForwarders(int maxResults) {
+    return lookupForwarders(maxResults, ThreadLocalRandom.current());
+  }
+
+  /** Deterministic overload for tests: same selection driven by the given source of randomness. */
+  public List<PeerRecord> lookupForwarders(int maxResults, Random random) {
+    if (maxResults <= 0) {
+      return Collections.emptyList();
     }
-
-    /** Max flood targets per /24 subnet before the diversity cap fills up elsewhere. */
-    private static final int MAX_FORWARD_PER_SUBNET = 2;
-
-    /**
-     * Best-effort /24 of a literal IPv4 host, or null for hostnames/IPv6.
-     * Non-IP hosts bypass the diversity cap rather than being excluded.
-     */
-    private static String subnet24(String host) {
-        if (host == null) {
-            return null;
-        }
-        String[] parts = host.split("\\.", -1);
-        if (parts.length != 4) {
-            return null;
-        }
-        for (String part : parts) {
-            if (!part.matches("\\d{1,3}")) {
-                return null;
-            }
-            int octet;
-            try {
-                octet = Integer.parseInt(part);
-            } catch (NumberFormatException e) {
-                return null;
-            }
-            if (octet < 0 || octet > 255) {
-                return null;
-            }
-        }
-        return parts[0] + "." + parts[1] + "." + parts[2];
+    if (random == null) {
+      throw new IllegalArgumentException("random is null");
     }
-
-    /**
-     * Look up registered peers for mesh discovery / routing, rotating the page on every call.
-     *
-     * <p>A forwarder's directory only converges on the whole registry if successive lookups return
-     * <em>different</em> slices. Returning a stable prefix (e.g. a {@code HashMap} iteration order)
-     * leaves the peers past {@code maxResults} permanently undiscovered — which is how leaf/CLIENT
-     * holders become invisible to holder-aware routing.
-     *
-     * @param maxResults   maximum number of records to return
-     * @param forwardersOnly if true, only FORWARDER/BOTH roles
-     */
-    public List<PeerRecord> lookupPeers(int maxResults, boolean forwardersOnly) {
-        return lookupPeers(maxResults, forwardersOnly, ThreadLocalRandom.current());
+    lookups.incrementAndGet();
+    List<PeerRecord> eligible = new ArrayList<>();
+    for (PeerRecord r : byPubHex.values()) {
+      if (r.canForward()) {
+        eligible.add(r);
+      }
     }
+    Collections.shuffle(eligible, random);
+    List<PeerRecord> result = new ArrayList<>(Math.min(maxResults, eligible.size()));
+    Map<String, Integer> perSubnet = new HashMap<>();
+    for (PeerRecord r : eligible) {
+      if (result.size() >= maxResults) {
+        break;
+      }
+      String subnet = subnet24(r.host());
+      if (subnet != null && perSubnet.getOrDefault(subnet, 0) >= MAX_FORWARD_PER_SUBNET) {
+        continue;
+      }
+      if (subnet != null) {
+        perSubnet.put(subnet, perSubnet.getOrDefault(subnet, 0) + 1);
+      }
+      result.add(r);
+    }
+    // Never shrink coverage: if the cap starved the result, fill up ignoring it.
+    for (PeerRecord r : eligible) {
+      if (result.size() >= maxResults) {
+        break;
+      }
+      if (!result.contains(r)) {
+        result.add(r);
+      }
+    }
+    return Collections.unmodifiableList(result);
+  }
 
-    /**
-     * Deterministic overload for tests: same rotating selection driven by the given source of
-     * randomness.
-     */
-    public List<PeerRecord> lookupPeers(int maxResults, boolean forwardersOnly, Random random) {
-        if (maxResults <= 0) {
-            return Collections.emptyList();
+  /** Max flood targets per /24 subnet before the diversity cap fills up elsewhere. */
+  private static final int MAX_FORWARD_PER_SUBNET = 2;
+
+  /**
+   * Best-effort /24 of a literal IPv4 host, or null for hostnames/IPv6. Non-IP hosts bypass the
+   * diversity cap rather than being excluded.
+   */
+  private static String subnet24(String host) {
+    if (host == null) {
+      return null;
+    }
+    String[] parts = host.split("\\.", -1);
+    if (parts.length != 4) {
+      return null;
+    }
+    for (String part : parts) {
+      if (!part.matches("\\d{1,3}")) {
+        return null;
+      }
+      int octet;
+      try {
+        octet = Integer.parseInt(part);
+      } catch (NumberFormatException e) {
+        return null;
+      }
+      if (octet < 0 || octet > 255) {
+        return null;
+      }
+    }
+    return parts[0] + "." + parts[1] + "." + parts[2];
+  }
+
+  /**
+   * Look up registered peers for mesh discovery / routing, rotating the page on every call.
+   *
+   * <p>A forwarder's directory only converges on the whole registry if successive lookups return
+   * <em>different</em> slices. Returning a stable prefix (e.g. a {@code HashMap} iteration order)
+   * leaves the peers past {@code maxResults} permanently undiscovered — which is how leaf/CLIENT
+   * holders become invisible to holder-aware routing.
+   *
+   * @param maxResults maximum number of records to return
+   * @param forwardersOnly if true, only FORWARDER/BOTH roles
+   */
+  public List<PeerRecord> lookupPeers(int maxResults, boolean forwardersOnly) {
+    return lookupPeers(maxResults, forwardersOnly, ThreadLocalRandom.current());
+  }
+
+  /**
+   * Deterministic overload for tests: same rotating selection driven by the given source of
+   * randomness.
+   */
+  public List<PeerRecord> lookupPeers(int maxResults, boolean forwardersOnly, Random random) {
+    if (maxResults <= 0) {
+      return Collections.emptyList();
+    }
+    if (random == null) {
+      throw new IllegalArgumentException("random is null");
+    }
+    lookups.incrementAndGet();
+    List<PeerRecord> eligible = new ArrayList<>();
+    for (PeerRecord r : byPubHex.values()) {
+      if (forwardersOnly && !r.canForward()) {
+        continue;
+      }
+      eligible.add(r);
+    }
+    Collections.shuffle(eligible, random);
+    return Collections.unmodifiableList(
+        new ArrayList<>(eligible.subList(0, Math.min(maxResults, eligible.size()))));
+  }
+
+  /** Look up a single peer by public key. */
+  public PeerRecord lookup(byte[] ed25519Pub) {
+    if (ed25519Pub == null || ed25519Pub.length != 32) {
+      return null;
+    }
+    return byPubHex.get(Hex.encode(ed25519Pub));
+  }
+
+  /**
+   * Remove peers whose {@link PeerRecord#lastSeenMs()} is older than {@code ttlMs}.
+   *
+   * @return number of records removed
+   */
+  public int evictStale(long ttlMs) {
+    if (ttlMs <= 0) {
+      return 0;
+    }
+    long cutoff = System.currentTimeMillis() - ttlMs;
+    int removed = 0;
+    for (Map.Entry<String, PeerRecord> e : byPubHex.entrySet()) {
+      if (e.getValue().lastSeenMs() < cutoff) {
+        if (byPubHex.remove(e.getKey(), e.getValue())) {
+          removed++;
         }
-        if (random == null) {
-            throw new IllegalArgumentException("random is null");
-        }
-        lookups.incrementAndGet();
-        List<PeerRecord> eligible = new ArrayList<>();
-        for (PeerRecord r : byPubHex.values()) {
-            if (forwardersOnly && !r.canForward()) {
-                continue;
-            }
-            eligible.add(r);
-        }
-        Collections.shuffle(eligible, random);
-        return Collections.unmodifiableList(
-                new ArrayList<>(eligible.subList(0, Math.min(maxResults, eligible.size()))));
+      }
     }
+    evicted.addAndGet(removed);
+    rateLimiter.evictIdle(Math.max(ttlMs, 60_000));
+    return removed;
+  }
 
-    /**
-     * Look up a single peer by public key.
-     */
-    public PeerRecord lookup(byte[] ed25519Pub) {
-        if (ed25519Pub == null || ed25519Pub.length != 32) {
-            return null;
-        }
-        return byPubHex.get(Hex.encode(ed25519Pub));
-    }
+  public int size() {
+    return byPubHex.size();
+  }
 
-    /**
-     * Remove peers whose {@link PeerRecord#lastSeenMs()} is older than
-     * {@code ttlMs}.
-     *
-     * @return number of records removed
-     */
-    public int evictStale(long ttlMs) {
-        if (ttlMs <= 0) {
-            return 0;
-        }
-        long cutoff = System.currentTimeMillis() - ttlMs;
-        int removed = 0;
-        for (Map.Entry<String, PeerRecord> e : byPubHex.entrySet()) {
-            if (e.getValue().lastSeenMs() < cutoff) {
-                if (byPubHex.remove(e.getKey(), e.getValue())) {
-                    removed++;
-                }
-            }
-        }
-        evicted.addAndGet(removed);
-        rateLimiter.evictIdle(Math.max(ttlMs, 60_000));
-        return removed;
-    }
+  public long registrations() {
+    return registrations.get();
+  }
 
-    public int size() {
-        return byPubHex.size();
-    }
+  public long lookups() {
+    return lookups.get();
+  }
 
-    public long registrations() {
-        return registrations.get();
-    }
-
-    public long lookups() {
-        return lookups.get();
-    }
-
-    public long evicted() {
-        return evicted.get();
-    }
+  public long evicted() {
+    return evicted.get();
+  }
 }

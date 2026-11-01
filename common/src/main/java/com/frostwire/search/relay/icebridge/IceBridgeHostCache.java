@@ -10,7 +10,6 @@ package com.frostwire.search.relay.icebridge;
 import com.frostwire.search.relay.PeerProber;
 import com.frostwire.search.relay.ProbedPeer;
 import com.frostwire.util.Logger;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -23,16 +22,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.function.LongSupplier;
 
 /**
- * Simple persistent cache of known IceBridge relay hosts (for bootstrapping
- * and for display in settings).
+ * Simple persistent cache of known IceBridge relay hosts (for bootstrapping and for display in
+ * settings).
  *
  * <p>Format (text, one entry per line):
+ *
  * <pre>
  * # icebridge host cache
  * host:port,ROLE,lastSuccessfulPingMs,consecutiveFailures
@@ -40,477 +39,524 @@ import java.util.function.LongSupplier;
  * relay.example.com:6888,FORWARDER,1712345678900,2
  * </pre>
  *
- * <p>The port of an entry is its <b>rUDP</b> port: servers are verified with the rUDP identity-discovery
- * handshake, never with a TCP connection.
+ * <p>The port of an entry is its <b>rUDP</b> port: servers are verified with the rUDP
+ * identity-discovery handshake, never with a TCP connection.
  *
- * <p>Only entries that have successfully pinged (via identity handshake)
- * are considered "live" for display. Entries that fail
- * {@link #MAX_CONSECUTIVE_FAILURES} consecutive pings are evicted so dead
- * hosts (and our own un-hairpinnable external IP) stop being retried every
- * discovery tick. Any success resets the streak.
+ * <p>Only entries that have successfully pinged (via identity handshake) are considered "live" for
+ * display. Entries that fail {@link #MAX_CONSECUTIVE_FAILURES} consecutive pings are evicted so
+ * dead hosts (and our own un-hairpinnable external IP) stop being retried every discovery tick. Any
+ * success resets the streak.
  *
  * <p>Entries live in memory; the file is rewritten at most once per {@link #SAVE_INTERVAL_MS}
  * (discovery and registry sync update dozens of hosts per round, each of which used to rewrite the
- * whole file). The first change after a quiet interval is written immediately, the rest are
- * written by a later change, {@link #flush()}, or the JVM shutdown hook registered by
- * {@link #getInstance()}. Losing the last few minutes of ping timestamps on a crash is harmless.
+ * whole file). The first change after a quiet interval is written immediately, the rest are written
+ * by a later change, {@link #flush()}, or the JVM shutdown hook registered by {@link
+ * #getInstance()}. Losing the last few minutes of ping timestamps on a crash is harmless.
  */
 public final class IceBridgeHostCache {
 
-    private static final Logger LOG = Logger.getLogger(IceBridgeHostCache.class);
+  private static final Logger LOG = Logger.getLogger(IceBridgeHostCache.class);
 
-    private static final String DEFAULT_FILE_NAME = "icebridge_host_cache.txt";
+  private static final String DEFAULT_FILE_NAME = "icebridge_host_cache.txt";
 
-    /**
-     * Consecutive ping failures after which a dead entry is evicted. Success
-     * resets the streak, so a brief outage (reboot, redeploy) never evicts a
-     * live host: at most ~1 strike accrues per discovery tick.
-     */
-    public static final int MAX_CONSECUTIVE_FAILURES = 5;
+  /**
+   * Consecutive ping failures after which a dead entry is evicted. Success resets the streak, so a
+   * brief outage (reboot, redeploy) never evicts a live host: at most ~1 strike accrues per
+   * discovery tick.
+   */
+  public static final int MAX_CONSECUTIVE_FAILURES = 5;
 
-    /** Minimum time between two writes of the cache file caused by entry changes. */
-    static final long SAVE_INTERVAL_MS = TimeUnit.MINUTES.toMillis(5);
+  /** Minimum time between two writes of the cache file caused by entry changes. */
+  static final long SAVE_INTERVAL_MS = TimeUnit.MINUTES.toMillis(5);
 
-    private final File cacheFile;
-    private final List<Entry> entries = new CopyOnWriteArrayList<>();
-    /** Monotonic milliseconds, injectable for tests. */
-    private final LongSupplier clock;
-    /** True when entries changed since the last successful write; guarded by this. */
-    private boolean dirty;
-    /**
-     * Whether this instance attempted a write, and when (clock time). Failed writes count too, so a
-     * read-only or full disk is retried once per interval instead of on every change. Guarded by this.
-     */
-    private boolean saveAttempted;
-    private long lastSaveAttemptMs;
-    /**
-     * How Settings "Refresh / Ping" authenticates a cached server: the rUDP identity-discovery
-     * handshake. Without a prober (stack not running) there is nothing to ping with.
-     */
-    private volatile PeerProber pingProber;
+  private final File cacheFile;
+  private final List<Entry> entries = new CopyOnWriteArrayList<>();
 
-    private static volatile IceBridgeHostCache INSTANCE;
-    /** Optional platform path (Android: libtorrent home). Set before {@link #getInstance()}. */
-    private static volatile File configuredCacheFile;
-    /** Guarded by the class lock. */
-    private static boolean shutdownFlushRegistered;
+  /** Monotonic milliseconds, injectable for tests. */
+  private final LongSupplier clock;
 
-    /**
-     * Point the singleton at a specific cache file (e.g. Android app-private
-     * {@code files/libtorrent/icebridge_host_cache.txt}). Reloads if the path
-     * changes. Call early during relay-stack startup.
-     */
-    public static void configure(File cacheFile) {
-        if (cacheFile == null) {
-            throw new IllegalArgumentException("cacheFile is null");
-        }
-        synchronized (IceBridgeHostCache.class) {
-            configuredCacheFile = cacheFile;
-            if (INSTANCE != null
-                    && !INSTANCE.cacheFile.getAbsolutePath().equals(cacheFile.getAbsolutePath())) {
-                INSTANCE.flush();
-                INSTANCE = new IceBridgeHostCache(cacheFile);
-            }
-        }
+  /** True when entries changed since the last successful write; guarded by this. */
+  private boolean dirty;
+
+  /**
+   * Whether this instance attempted a write, and when (clock time). Failed writes count too, so a
+   * read-only or full disk is retried once per interval instead of on every change. Guarded by
+   * this.
+   */
+  private boolean saveAttempted;
+
+  private long lastSaveAttemptMs;
+
+  /**
+   * How Settings "Refresh / Ping" authenticates a cached server: the rUDP identity-discovery
+   * handshake. Without a prober (stack not running) there is nothing to ping with.
+   */
+  private volatile PeerProber pingProber;
+
+  private static volatile IceBridgeHostCache INSTANCE;
+
+  /** Optional platform path (Android: libtorrent home). Set before {@link #getInstance()}. */
+  private static volatile File configuredCacheFile;
+
+  /** Guarded by the class lock. */
+  private static boolean shutdownFlushRegistered;
+
+  /**
+   * Point the singleton at a specific cache file (e.g. Android app-private {@code
+   * files/libtorrent/icebridge_host_cache.txt}). Reloads if the path changes. Call early during
+   * relay-stack startup.
+   */
+  public static void configure(File cacheFile) {
+    if (cacheFile == null) {
+      throw new IllegalArgumentException("cacheFile is null");
     }
+    synchronized (IceBridgeHostCache.class) {
+      configuredCacheFile = cacheFile;
+      if (INSTANCE != null
+          && !INSTANCE.cacheFile.getAbsolutePath().equals(cacheFile.getAbsolutePath())) {
+        INSTANCE.flush();
+        INSTANCE = new IceBridgeHostCache(cacheFile);
+      }
+    }
+  }
 
-    public static IceBridgeHostCache getInstance() {
+  public static IceBridgeHostCache getInstance() {
+    if (INSTANCE == null) {
+      synchronized (IceBridgeHostCache.class) {
         if (INSTANCE == null) {
-            synchronized (IceBridgeHostCache.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new IceBridgeHostCache();
-                    registerShutdownFlush();
-                }
-            }
+          INSTANCE = new IceBridgeHostCache();
+          registerShutdownFlush();
         }
-        return INSTANCE;
+      }
     }
+    return INSTANCE;
+  }
 
-    public IceBridgeHostCache() {
-        this(defaultCacheFile());
+  public IceBridgeHostCache() {
+    this(defaultCacheFile());
+  }
+
+  public IceBridgeHostCache(File cacheFile) {
+    this(cacheFile, () -> TimeUnit.NANOSECONDS.toMillis(System.nanoTime()));
+  }
+
+  IceBridgeHostCache(File cacheFile, LongSupplier clock) {
+    if (cacheFile == null) {
+      throw new IllegalArgumentException("cacheFile is null");
     }
+    this.cacheFile = cacheFile;
+    this.clock = clock;
+    load();
+  }
 
-    public IceBridgeHostCache(File cacheFile) {
-        this(cacheFile, () -> TimeUnit.NANOSECONDS.toMillis(System.nanoTime()));
+  /**
+   * Writes pending changes of whichever instance is current when the JVM exits. Class lock held.
+   */
+  private static void registerShutdownFlush() {
+    if (shutdownFlushRegistered) {
+      return;
     }
+    shutdownFlushRegistered = true;
+    Runtime.getRuntime()
+        .addShutdownHook(
+            new Thread(
+                () -> {
+                  IceBridgeHostCache cache = INSTANCE;
+                  if (cache != null) {
+                    cache.flush();
+                  }
+                },
+                "IceBridgeHostCache-flush"));
+  }
 
-    IceBridgeHostCache(File cacheFile, LongSupplier clock) {
-        if (cacheFile == null) {
-            throw new IllegalArgumentException("cacheFile is null");
+  /** Absolute path of the cache file (for settings UI). */
+  public File cacheFile() {
+    return cacheFile;
+  }
+
+  private static File defaultCacheFile() {
+    File configured = configuredCacheFile;
+    if (configured != null) {
+      return configured;
+    }
+    File dir = new File(System.getProperty("user.home"), ".frostwire");
+    if (!dir.exists()) {
+      // best effort
+      dir.mkdirs();
+    }
+    return new File(dir, DEFAULT_FILE_NAME);
+  }
+
+  public synchronized void load() {
+    entries.clear();
+    if (!cacheFile.exists()) {
+      return;
+    }
+    try (BufferedReader r =
+        new BufferedReader(
+            new InputStreamReader(new FileInputStream(cacheFile), StandardCharsets.UTF_8))) {
+      String line;
+      while ((line = r.readLine()) != null) {
+        line = line.trim();
+        if (line.isEmpty() || line.startsWith("#")) continue;
+        Entry e = parseLine(line);
+        if (e != null) {
+          entries.add(e);
         }
-        this.cacheFile = cacheFile;
-        this.clock = clock;
-        load();
+      }
+    } catch (Exception e) {
+      LOG.warn("Failed to load IceBridge host cache: " + cacheFile, e);
     }
+  }
 
-    /** Writes pending changes of whichever instance is current when the JVM exits. Class lock held. */
-    private static void registerShutdownFlush() {
-        if (shutdownFlushRegistered) {
-            return;
-        }
-        shutdownFlushRegistered = true;
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            IceBridgeHostCache cache = INSTANCE;
-            if (cache != null) {
-                cache.flush();
-            }
-        }, "IceBridgeHostCache-flush"));
-    }
-
-    /** Absolute path of the cache file (for settings UI). */
-    public File cacheFile() {
-        return cacheFile;
-    }
-
-    private static File defaultCacheFile() {
-        File configured = configuredCacheFile;
-        if (configured != null) {
-            return configured;
-        }
-        File dir = new File(System.getProperty("user.home"), ".frostwire");
-        if (!dir.exists()) {
-            // best effort
-            dir.mkdirs();
-        }
-        return new File(dir, DEFAULT_FILE_NAME);
-    }
-
-    public synchronized void load() {
-        entries.clear();
-        if (!cacheFile.exists()) {
-            return;
-        }
-        try (BufferedReader r = new BufferedReader(
-                new InputStreamReader(new FileInputStream(cacheFile), StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = r.readLine()) != null) {
-                line = line.trim();
-                if (line.isEmpty() || line.startsWith("#")) continue;
-                Entry e = parseLine(line);
-                if (e != null) {
-                    entries.add(e);
-                }
-            }
-        } catch (Exception e) {
-            LOG.warn("Failed to load IceBridge host cache: " + cacheFile, e);
-        }
-    }
-
-    private static Entry parseLine(String line) {
+  private static Entry parseLine(String line) {
+    try {
+      // host:port,ROLE, timestamp
+      String[] parts = line.split(",", -1);
+      if (parts.length < 2) return null;
+      String hp = parts[0].trim();
+      int colon = hp.lastIndexOf(':');
+      if (colon <= 0) return null;
+      String host = hp.substring(0, colon).trim();
+      int port = Integer.parseInt(hp.substring(colon + 1).trim());
+      String role = (parts.length > 1 && !parts[1].trim().isEmpty()) ? parts[1].trim() : null;
+      long lastSuccess = 0;
+      if (parts.length > 2) {
         try {
-            // host:port,ROLE, timestamp
-            String[] parts = line.split(",", -1);
-            if (parts.length < 2) return null;
-            String hp = parts[0].trim();
-            int colon = hp.lastIndexOf(':');
-            if (colon <= 0) return null;
-            String host = hp.substring(0, colon).trim();
-            int port = Integer.parseInt(hp.substring(colon + 1).trim());
-            String role = (parts.length > 1 && !parts[1].trim().isEmpty()) ? parts[1].trim() : null;
-            long lastSuccess = 0;
-            if (parts.length > 2) {
-                try { lastSuccess = Long.parseLong(parts[2].trim()); } catch (NumberFormatException ignored) {}
-            }
-            int failures = 0;
-            if (parts.length > 3) {
-                try { failures = Integer.parseInt(parts[3].trim()); } catch (NumberFormatException ignored) {}
-                if (failures < 0) failures = 0;
-            }
-            return new Entry(host, port, role, lastSuccess, failures);
-        } catch (Exception ignored) {
-            return null;
+          lastSuccess = Long.parseLong(parts[2].trim());
+        } catch (NumberFormatException ignored) {
         }
-    }
-
-    /** Writes the cache now if it changed since the last successful write. */
-    public synchronized void flush() {
-        if (dirty) {
-            save();
-        }
-    }
-
-    /**
-     * Writes every entry to a temporary file and renames it over the cache file, so a crash or a
-     * full disk mid-write never leaves a truncated cache behind.
-     */
-    public synchronized void save() {
-        saveAttempted = true;
-        lastSaveAttemptMs = clock.getAsLong();
-        File tmp = new File(cacheFile.getPath() + ".tmp");
+      }
+      int failures = 0;
+      if (parts.length > 3) {
         try {
-            File parent = cacheFile.getParentFile();
-            if (parent != null && !parent.exists()) {
-                parent.mkdirs();
-            }
-            try (BufferedWriter w = new BufferedWriter(
-                    new OutputStreamWriter(new FileOutputStream(tmp), StandardCharsets.UTF_8))) {
-                w.write("# IceBridge host cache - host:port,ROLE,lastSuccessfulPingMs,consecutiveFailures\n");
-                for (Entry e : entries) {
-                    String role = (e.role != null) ? e.role : "";
-                    w.write(e.host + ":" + e.port + "," + role + "," + e.lastSuccessfulPingMs
-                            + "," + e.consecutiveFailures + "\n");
-                }
-            }
-            if (!replace(tmp, cacheFile)) {
-                throw new IOException("could not rename " + tmp + " to " + cacheFile);
-            }
-            dirty = false;
-        } catch (Exception e) {
-            tmp.delete();
-            LOG.warn("Failed to save IceBridge host cache: " + cacheFile, e);
+          failures = Integer.parseInt(parts[3].trim());
+        } catch (NumberFormatException ignored) {
         }
+        if (failures < 0) failures = 0;
+      }
+      return new Entry(host, port, role, lastSuccess, failures);
+    } catch (Exception ignored) {
+      return null;
     }
+  }
 
-    /** Atomic on POSIX; Windows cannot rename over an existing file, so it deletes the target first. */
-    private static boolean replace(File source, File target) {
-        return source.renameTo(target) || (target.delete() && source.renameTo(target));
+  /** Writes the cache now if it changed since the last successful write. */
+  public synchronized void flush() {
+    if (dirty) {
+      save();
     }
+  }
 
-    /**
-     * Records that the entries changed; writes them only if nothing was written during the last
-     * {@link #SAVE_INTERVAL_MS}. Callers hold this object's lock.
-     */
-    private void changed() {
-        dirty = true;
-        if (!saveAttempted || clock.getAsLong() - lastSaveAttemptMs >= SAVE_INTERVAL_MS) {
-            save();
-        }
-    }
-
-    /**
-     * Add or update a known relay host. If it was previously known we keep the
-     * most recent success timestamp and failure streak (unless a newer success
-     * is provided via {@link #markSuccess}).
-     */
-    public synchronized void addOrUpdate(String host, int port, String role) {
-        if (host == null || host.isEmpty() || port <= 0) return;
-        for (int i = 0; i < entries.size(); i++) {
-            Entry e = entries.get(i);
-            if (e.host.equals(host) && e.port == port) {
-                String newRole = (role != null && !role.isEmpty()) ? role : e.role;
-                long ts = e.lastSuccessfulPingMs; // keep existing success time
-                entries.set(i, new Entry(host, port, newRole, ts, e.consecutiveFailures));
-                changed();
-                return;
-            }
-        }
-        entries.add(new Entry(host, port, role, 0, 0));
-        changed();
-    }
-
-    /** Mark a successful ping for the given host (updates timestamp and role, resets failures). */
-    public synchronized void markSuccess(String host, int port, String role) {
-        if (host == null || host.isEmpty() || port <= 0) return;
-        long now = System.currentTimeMillis();
-        for (int i = 0; i < entries.size(); i++) {
-            Entry e = entries.get(i);
-            if (e.host.equals(host) && e.port == port) {
-                String newRole = (role != null && !role.isEmpty()) ? role : e.role;
-                entries.set(i, new Entry(host, port, newRole, now, 0));
-                changed();
-                return;
-            }
-        }
-        entries.add(new Entry(host, port, role, now, 0));
-        changed();
-    }
-
-    /** Refresh a cached host after a successful handshake; unknown hosts are never added. */
-    public synchronized void markSuccessIfKnown(String host, int port) {
-        if (host == null || host.isEmpty() || port <= 0) return;
-        for (int i = 0; i < entries.size(); i++) {
-            Entry e = entries.get(i);
-            if (e.host.equals(host) && e.port == port) {
-                entries.set(i, new Entry(host, port, e.role, System.currentTimeMillis(), 0));
-                changed();
-                return;
-            }
-        }
-    }
-
-    /**
-     * Record one failed ping for a known host. Unknown hosts are ignored
-     * (never cache pure failures). At {@link #MAX_CONSECUTIVE_FAILURES} the
-     * entry is evicted so discovery stops retrying corpses.
-     *
-     * @return true when this failure evicted the entry
-     */
-    public synchronized boolean markFailure(String host, int port) {
-        if (host == null || host.isEmpty() || port <= 0) return false;
-        for (int i = 0; i < entries.size(); i++) {
-            Entry e = entries.get(i);
-            if (e.host.equals(host) && e.port == port) {
-                int failures = e.consecutiveFailures + 1;
-                if (failures >= MAX_CONSECUTIVE_FAILURES) {
-                    entries.remove(i);
-                    LOG.info("IceBridge host cache: evicting " + host + ":" + port
-                            + " after " + failures + " consecutive failures");
-                } else {
-                    entries.set(i, new Entry(host, port, e.role,
-                            e.lastSuccessfulPingMs, failures));
-                }
-                changed();
-                return failures >= MAX_CONSECUTIVE_FAILURES;
-            }
-        }
-        return false;
-    }
-
-    /** Use this prober for {@link #refreshPings()}; null (stack stopped) makes the refresh a no-op. */
-    public void setPingProber(PeerProber prober) {
-        this.pingProber = prober;
-    }
-
-    public List<Entry> getAll() {
-        return Collections.unmodifiableList(new ArrayList<>(entries));
-    }
-
-    /**
-     * Returns entries that have successfully pinged at least once (and optionally within a window).
-     * If withinMs <= 0, returns all that ever succeeded.
-     */
-    public List<Entry> getPingable(long withinMs) {
-        long cutoff = (withinMs > 0) ? (System.currentTimeMillis() - withinMs) : 0;
-        List<Entry> out = new ArrayList<>();
+  /**
+   * Writes every entry to a temporary file and renames it over the cache file, so a crash or a full
+   * disk mid-write never leaves a truncated cache behind.
+   */
+  public synchronized void save() {
+    saveAttempted = true;
+    lastSaveAttemptMs = clock.getAsLong();
+    File tmp = new File(cacheFile.getPath() + ".tmp");
+    try {
+      File parent = cacheFile.getParentFile();
+      if (parent != null && !parent.exists()) {
+        parent.mkdirs();
+      }
+      try (BufferedWriter w =
+          new BufferedWriter(
+              new OutputStreamWriter(new FileOutputStream(tmp), StandardCharsets.UTF_8))) {
+        w.write(
+            "# IceBridge host cache - host:port,ROLE,lastSuccessfulPingMs,consecutiveFailures\n");
         for (Entry e : entries) {
-            if (e.lastSuccessfulPingMs > cutoff) {
-                out.add(e);
-            }
+          String role = (e.role != null) ? e.role : "";
+          w.write(
+              e.host
+                  + ":"
+                  + e.port
+                  + ","
+                  + role
+                  + ","
+                  + e.lastSuccessfulPingMs
+                  + ","
+                  + e.consecutiveFailures
+                  + "\n");
         }
-        return out;
+      }
+      if (!replace(tmp, cacheFile)) {
+        throw new IOException("could not rename " + tmp + " to " + cacheFile);
+      }
+      dirty = false;
+    } catch (Exception e) {
+      tmp.delete();
+      LOG.warn("Failed to save IceBridge host cache: " + cacheFile, e);
     }
+  }
 
-    /**
-     * Attempt to reach every known entry with the rUDP identity-discovery handshake (the same
-     * handshake mesh peers use; it needs no TCP port). This is <em>not</em> the IceBridge control
-     * HTTP API and not mesh TELEMETRY.
-     *
-     * <p>Successful pings update lastSuccessfulPingMs (the role stays as learned from the mesh).
-     * Failed pings accrue a consecutive-failure streak ({@link #markFailure}) and evict after
-     * {@link #MAX_CONSECUTIVE_FAILURES}. Blocking; call from a background thread.
-     */
-    public void refreshPings() {
-        PeerProber prober = pingProber;
-        if (prober == null) {
-            LOG.info("IceBridge host refresh: stack not running (nothing to ping with)");
-            return;
-        }
-        List<Entry> snapshot = new ArrayList<>(entries);
-        if (snapshot.isEmpty()) {
-            LOG.info("IceBridge host refresh: cache empty (nothing to ping)");
-            return;
-        }
-        int ok = 0;
-        int fail = 0;
-        LOG.info("IceBridge host refresh: rUDP identity ping of " + snapshot.size() + " host(s)");
-        for (Entry e : snapshot) {
-            try {
-                java.util.Optional<ProbedPeer> peer = prober.probe(e.host, e.port,
-                        System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(5));
-                if (peer.isPresent()) {
-                    markSuccess(e.host, e.port, e.role);
-                    ok++;
-                    LOG.info("IceBridge host ping OK " + e.host + ":" + e.port);
-                } else {
-                    fail++;
-                    markFailure(e.host, e.port);
-                    LOG.warn("IceBridge host ping failed " + e.host + ":" + e.port
-                            + " (no rUDP identity proof)");
-                }
-            } catch (RuntimeException ex) {
-                fail++;
-                markFailure(e.host, e.port);
-                LOG.warn("IceBridge host ping failed " + e.host + ":" + e.port + ": " + ex);
-            }
-        }
-        LOG.info("IceBridge host refresh done: ok=" + ok + " fail=" + fail
-                + " total=" + snapshot.size());
+  /**
+   * Atomic on POSIX; Windows cannot rename over an existing file, so it deletes the target first.
+   */
+  private static boolean replace(File source, File target) {
+    return source.renameTo(target) || (target.delete() && source.renameTo(target));
+  }
+
+  /**
+   * Records that the entries changed; writes them only if nothing was written during the last
+   * {@link #SAVE_INTERVAL_MS}. Callers hold this object's lock.
+   */
+  private void changed() {
+    dirty = true;
+    if (!saveAttempted || clock.getAsLong() - lastSaveAttemptMs >= SAVE_INTERVAL_MS) {
+      save();
     }
+  }
 
-    /**
-     * Optional second half of "Refresh / Ping" for USE_REMOTE / in-process
-     * clients that have an {@link com.frostwire.search.relay.icebridge.client.IceBridgeClient}:
-     * control {@code /health} plus mesh {@link MeshProtocolId#TELEMETRY} PING
-     * (single-byte {@code 0x01}) to every looked-up peer. That is what produces
-     * {@code TELEMETRY PING} lines on a standalone forwarder's control/mesh logs.
-     *
-     * @param client live control client, or null to no-op
-     */
-    public void refreshMeshTelemetry(
-            com.frostwire.search.relay.icebridge.client.IceBridgeClient client) {
-        if (client == null) {
-            LOG.info("IceBridge mesh refresh: no control client (stack not running?)");
-            return;
+  /**
+   * Add or update a known relay host. If it was previously known we keep the most recent success
+   * timestamp and failure streak (unless a newer success is provided via {@link #markSuccess}).
+   */
+  public synchronized void addOrUpdate(String host, int port, String role) {
+    if (host == null || host.isEmpty() || port <= 0) return;
+    for (int i = 0; i < entries.size(); i++) {
+      Entry e = entries.get(i);
+      if (e.host.equals(host) && e.port == port) {
+        String newRole = (role != null && !role.isEmpty()) ? role : e.role;
+        long ts = e.lastSuccessfulPingMs; // keep existing success time
+        entries.set(i, new Entry(host, port, newRole, ts, e.consecutiveFailures));
+        changed();
+        return;
+      }
+    }
+    entries.add(new Entry(host, port, role, 0, 0));
+    changed();
+  }
+
+  /** Mark a successful ping for the given host (updates timestamp and role, resets failures). */
+  public synchronized void markSuccess(String host, int port, String role) {
+    if (host == null || host.isEmpty() || port <= 0) return;
+    long now = System.currentTimeMillis();
+    for (int i = 0; i < entries.size(); i++) {
+      Entry e = entries.get(i);
+      if (e.host.equals(host) && e.port == port) {
+        String newRole = (role != null && !role.isEmpty()) ? role : e.role;
+        entries.set(i, new Entry(host, port, newRole, now, 0));
+        changed();
+        return;
+      }
+    }
+    entries.add(new Entry(host, port, role, now, 0));
+    changed();
+  }
+
+  /** Refresh a cached host after a successful handshake; unknown hosts are never added. */
+  public synchronized void markSuccessIfKnown(String host, int port) {
+    if (host == null || host.isEmpty() || port <= 0) return;
+    for (int i = 0; i < entries.size(); i++) {
+      Entry e = entries.get(i);
+      if (e.host.equals(host) && e.port == port) {
+        entries.set(i, new Entry(host, port, e.role, System.currentTimeMillis(), 0));
+        changed();
+        return;
+      }
+    }
+  }
+
+  /**
+   * Record one failed ping for a known host. Unknown hosts are ignored (never cache pure failures).
+   * At {@link #MAX_CONSECUTIVE_FAILURES} the entry is evicted so discovery stops retrying corpses.
+   *
+   * @return true when this failure evicted the entry
+   */
+  public synchronized boolean markFailure(String host, int port) {
+    if (host == null || host.isEmpty() || port <= 0) return false;
+    for (int i = 0; i < entries.size(); i++) {
+      Entry e = entries.get(i);
+      if (e.host.equals(host) && e.port == port) {
+        int failures = e.consecutiveFailures + 1;
+        if (failures >= MAX_CONSECUTIVE_FAILURES) {
+          entries.remove(i);
+          LOG.info(
+              "IceBridge host cache: evicting "
+                  + host
+                  + ":"
+                  + port
+                  + " after "
+                  + failures
+                  + " consecutive failures");
+        } else {
+          entries.set(i, new Entry(host, port, e.role, e.lastSuccessfulPingMs, failures));
         }
+        changed();
+        return failures >= MAX_CONSECUTIVE_FAILURES;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Use this prober for {@link #refreshPings()}; null (stack stopped) makes the refresh a no-op.
+   */
+  public void setPingProber(PeerProber prober) {
+    this.pingProber = prober;
+  }
+
+  public List<Entry> getAll() {
+    return Collections.unmodifiableList(new ArrayList<>(entries));
+  }
+
+  /**
+   * Returns entries that have successfully pinged at least once (and optionally within a window).
+   * If withinMs <= 0, returns all that ever succeeded.
+   */
+  public List<Entry> getPingable(long withinMs) {
+    long cutoff = (withinMs > 0) ? (System.currentTimeMillis() - withinMs) : 0;
+    List<Entry> out = new ArrayList<>();
+    for (Entry e : entries) {
+      if (e.lastSuccessfulPingMs > cutoff) {
+        out.add(e);
+      }
+    }
+    return out;
+  }
+
+  /**
+   * Attempt to reach every known entry with the rUDP identity-discovery handshake (the same
+   * handshake mesh peers use; it needs no TCP port). This is <em>not</em> the IceBridge control
+   * HTTP API and not mesh TELEMETRY.
+   *
+   * <p>Successful pings update lastSuccessfulPingMs (the role stays as learned from the mesh).
+   * Failed pings accrue a consecutive-failure streak ({@link #markFailure}) and evict after {@link
+   * #MAX_CONSECUTIVE_FAILURES}. Blocking; call from a background thread.
+   */
+  public void refreshPings() {
+    PeerProber prober = pingProber;
+    if (prober == null) {
+      LOG.info("IceBridge host refresh: stack not running (nothing to ping with)");
+      return;
+    }
+    List<Entry> snapshot = new ArrayList<>(entries);
+    if (snapshot.isEmpty()) {
+      LOG.info("IceBridge host refresh: cache empty (nothing to ping)");
+      return;
+    }
+    int ok = 0;
+    int fail = 0;
+    LOG.info("IceBridge host refresh: rUDP identity ping of " + snapshot.size() + " host(s)");
+    for (Entry e : snapshot) {
+      try {
+        java.util.Optional<ProbedPeer> peer =
+            prober.probe(
+                e.host,
+                e.port,
+                System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(5));
+        if (peer.isPresent()) {
+          markSuccess(e.host, e.port, e.role);
+          ok++;
+          LOG.info("IceBridge host ping OK " + e.host + ":" + e.port);
+        } else {
+          fail++;
+          markFailure(e.host, e.port);
+          LOG.warn(
+              "IceBridge host ping failed " + e.host + ":" + e.port + " (no rUDP identity proof)");
+        }
+      } catch (RuntimeException ex) {
+        fail++;
+        markFailure(e.host, e.port);
+        LOG.warn("IceBridge host ping failed " + e.host + ":" + e.port + ": " + ex);
+      }
+    }
+    LOG.info(
+        "IceBridge host refresh done: ok=" + ok + " fail=" + fail + " total=" + snapshot.size());
+  }
+
+  /**
+   * Optional second half of "Refresh / Ping" for USE_REMOTE / in-process clients that have an
+   * {@link com.frostwire.search.relay.icebridge.client.IceBridgeClient}: control {@code /health}
+   * plus mesh {@link MeshProtocolId#TELEMETRY} PING (single-byte {@code 0x01}) to every looked-up
+   * peer. That is what produces {@code TELEMETRY PING} lines on a standalone forwarder's
+   * control/mesh logs.
+   *
+   * @param client live control client, or null to no-op
+   */
+  public void refreshMeshTelemetry(
+      com.frostwire.search.relay.icebridge.client.IceBridgeClient client) {
+    if (client == null) {
+      LOG.info("IceBridge mesh refresh: no control client (stack not running?)");
+      return;
+    }
+    try {
+      if (!client.health()) {
+        LOG.warn("IceBridge mesh refresh: control /health failed");
+        return;
+      }
+      LOG.info("IceBridge mesh refresh: control /health OK");
+      java.util.List<com.frostwire.search.relay.icebridge.control.PeerInfo> peers =
+          client.lookup(50);
+      if (peers == null || peers.isEmpty()) {
+        LOG.info("IceBridge mesh refresh: lookup empty (no registered peers yet)");
+        return;
+      }
+      int sent = 0;
+      int failed = 0;
+      byte[] ping = new byte[] {0x01};
+      for (com.frostwire.search.relay.icebridge.control.PeerInfo info : peers) {
+        if (info == null || info.pub == null || info.pub.isEmpty()) {
+          continue;
+        }
+        byte[] pub;
         try {
-            if (!client.health()) {
-                LOG.warn("IceBridge mesh refresh: control /health failed");
-                return;
-            }
-            LOG.info("IceBridge mesh refresh: control /health OK");
-            java.util.List<com.frostwire.search.relay.icebridge.control.PeerInfo> peers =
-                    client.lookup(50);
-            if (peers == null || peers.isEmpty()) {
-                LOG.info("IceBridge mesh refresh: lookup empty (no registered peers yet)");
-                return;
-            }
-            int sent = 0;
-            int failed = 0;
-            byte[] ping = new byte[]{0x01};
-            for (com.frostwire.search.relay.icebridge.control.PeerInfo info : peers) {
-                if (info == null || info.pub == null || info.pub.isEmpty()) {
-                    continue;
-                }
-                byte[] pub;
-                try {
-                    pub = java.util.Base64.getUrlDecoder().decode(info.pub);
-                } catch (IllegalArgumentException e) {
-                    try {
-                        pub = java.util.Base64.getDecoder().decode(info.pub);
-                    } catch (IllegalArgumentException e2) {
-                        failed++;
-                        continue;
-                    }
-                }
-                if (pub.length != 32) {
-                    failed++;
-                    continue;
-                }
-                if (client.send(pub, MeshProtocolId.TELEMETRY, ping)) {
-                    sent++;
-                } else {
-                    failed++;
-                }
-            }
-            LOG.info("IceBridge mesh refresh: TELEMETRY PING sent=" + sent
-                    + " failed=" + failed + " peers=" + peers.size());
-        } catch (Throwable t) {
-            LOG.warn("IceBridge mesh refresh failed", t);
+          pub = java.util.Base64.getUrlDecoder().decode(info.pub);
+        } catch (IllegalArgumentException e) {
+          try {
+            pub = java.util.Base64.getDecoder().decode(info.pub);
+          } catch (IllegalArgumentException e2) {
+            failed++;
+            continue;
+          }
         }
+        if (pub.length != 32) {
+          failed++;
+          continue;
+        }
+        if (client.send(pub, MeshProtocolId.TELEMETRY, ping)) {
+          sent++;
+        } else {
+          failed++;
+        }
+      }
+      LOG.info(
+          "IceBridge mesh refresh: TELEMETRY PING sent="
+              + sent
+              + " failed="
+              + failed
+              + " peers="
+              + peers.size());
+    } catch (Throwable t) {
+      LOG.warn("IceBridge mesh refresh failed", t);
+    }
+  }
+
+  public static final class Entry {
+    public final String host;
+    public final int port;
+    public final String role; // "BOTH", "FORWARDER", "CLIENT", or null
+    public final long lastSuccessfulPingMs;
+    public final int consecutiveFailures;
+
+    public Entry(String host, int port, String role, long lastSuccessfulPingMs) {
+      this(host, port, role, lastSuccessfulPingMs, 0);
     }
 
-    public static final class Entry {
-        public final String host;
-        public final int port;
-        public final String role; // "BOTH", "FORWARDER", "CLIENT", or null
-        public final long lastSuccessfulPingMs;
-        public final int consecutiveFailures;
-
-        public Entry(String host, int port, String role, long lastSuccessfulPingMs) {
-            this(host, port, role, lastSuccessfulPingMs, 0);
-        }
-
-        public Entry(String host, int port, String role, long lastSuccessfulPingMs, int consecutiveFailures) {
-            this.host = host;
-            this.port = port;
-            this.role = role;
-            this.lastSuccessfulPingMs = lastSuccessfulPingMs;
-            this.consecutiveFailures = Math.max(0, consecutiveFailures);
-        }
-
-        @Override
-        public String toString() {
-            return host + ":" + port + (role != null ? " (" + role + ")" : "");
-        }
+    public Entry(
+        String host, int port, String role, long lastSuccessfulPingMs, int consecutiveFailures) {
+      this.host = host;
+      this.port = port;
+      this.role = role;
+      this.lastSuccessfulPingMs = lastSuccessfulPingMs;
+      this.consecutiveFailures = Math.max(0, consecutiveFailures);
     }
+
+    @Override
+    public String toString() {
+      return host + ":" + port + (role != null ? " (" + role + ")" : "");
+    }
+  }
 }

@@ -21,22 +21,22 @@ package com.frostwire.search;
 import java.util.List;
 
 /**
- * Crawlable capability metadata composed into FileSearchResult.
- * Represents the optional crawling capability and crawled children.
+ * Crawlable capability metadata composed into FileSearchResult. Represents the optional crawling
+ * capability and crawled children.
  *
  * @author gubatron
  */
 public class CrawlableCapability {
-    public List<FileSearchResult> children;
-    public boolean isComplete;
+  public List<FileSearchResult> children;
+  public boolean isComplete;
 
-    public CrawlableCapability() {
-        this.children = null;
-        this.isComplete = false;
-    }
+  public CrawlableCapability() {
+    this.children = null;
+    this.isComplete = false;
+  }
 
-    public CrawlableCapability(List<FileSearchResult> children, boolean isComplete) {
-        this.children = children;
-        this.isComplete = isComplete;
-    }
+  public CrawlableCapability(List<FileSearchResult> children, boolean isComplete) {
+    this.children = children;
+    this.isComplete = isComplete;
+  }
 }

@@ -19,13 +19,10 @@
 package com.frostwire.search;
 
 import com.frostwire.licenses.License;
-import com.frostwire.search.PerformersHelper;
-import com.frostwire.search.SearchListener;
 import com.frostwire.search.torrent.TorrentCrawlableSearchResult;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
 import com.frostwire.util.http.HttpClient;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -33,211 +30,212 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Strategy for crawling torrent files to extract file listings.
- * Caches .torrent files to avoid repeated downloads.
+ * Strategy for crawling torrent files to extract file listings. Caches .torrent files to avoid
+ * repeated downloads.
  *
  * @author gubatron
  */
 public class TorrentCrawlingStrategy implements CrawlingStrategy {
-    private static final Logger LOG = Logger.getLogger(TorrentCrawlingStrategy.class);
+  private static final Logger LOG = Logger.getLogger(TorrentCrawlingStrategy.class);
 
-    /**
-     * LRU cache for .torrent file bytes. Synchronized via the monitor on
-     * the map object itself (see {@link #cacheGet} and {@link #cachePut}).
-     * Evicts the least-recently-accessed entry when full.
-     */
-    private static final Map<String, byte[]> CACHE = Collections.synchronizedMap(
-            new LinkedHashMap<String, byte[]>(64, 0.75f, true) {
-                @Override
-                protected boolean removeEldestEntry(Map.Entry<String, byte[]> eldest) {
-                    return size() > CACHE_MAX_SIZE;
+  /**
+   * LRU cache for .torrent file bytes. Synchronized via the monitor on the map object itself (see
+   * {@link #cacheGet} and {@link #cachePut}). Evicts the least-recently-accessed entry when full.
+   */
+  private static final Map<String, byte[]> CACHE =
+      Collections.synchronizedMap(
+          new LinkedHashMap<String, byte[]>(64, 0.75f, true) {
+            @Override
+            protected boolean removeEldestEntry(Map.Entry<String, byte[]> eldest) {
+              return size() > CACHE_MAX_SIZE;
+            }
+          });
+
+  private static final int CACHE_MAX_SIZE = 500;
+
+  private final HttpClient httpClient;
+  private final int timeout;
+  private final int maxCrawls;
+
+  public TorrentCrawlingStrategy() {
+    this(HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH), 30000, 100);
+  }
+
+  public TorrentCrawlingStrategy(HttpClient httpClient, int timeout, int maxCrawls) {
+    this.httpClient = httpClient;
+    this.timeout = timeout;
+    this.maxCrawls = maxCrawls;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public void crawlResults(List<FileSearchResult> results, SearchListener listener, long token) {
+    int crawlCount = 0;
+    List<FileSearchResult> crawledResults = new ArrayList<>();
+
+    for (FileSearchResult fsr : results) {
+      if (crawlCount >= maxCrawls) {
+        break;
+      }
+
+      if (fsr instanceof CompositeFileSearchResult) {
+        CompositeFileSearchResult result = (CompositeFileSearchResult) fsr;
+        if (result.isTorrent()) {
+          try {
+            String torrentUrl = result.getTorrentUrl().orElse(null);
+            if (torrentUrl != null) {
+              byte[] torrentData = fetchTorrentData(torrentUrl);
+              if (torrentData != null) {
+                // Extract files from torrent - result will be updated in-place
+                List<? extends com.frostwire.search.SearchResult> crawledSearchResults =
+                    PerformersHelper.crawlTorrentInfo(
+                        null, // No performer reference needed in v2
+                        new LegacyTorrentCrawlableResult(result),
+                        torrentData);
+
+                if (!crawledSearchResults.isEmpty()) {
+                  // Cast the results to FileSearchResult
+                  List<FileSearchResult> children = new ArrayList<>();
+                  for (com.frostwire.search.SearchResult sr : crawledSearchResults) {
+                    if (sr instanceof FileSearchResult) {
+                      children.add((FileSearchResult) sr);
+                    }
+                  }
+                  if (!children.isEmpty()) {
+                    result.setCrawlableChildren(children);
+                    crawledResults.add(result);
+                    crawlCount++;
+                  }
                 }
-            });
-    private static final int CACHE_MAX_SIZE = 500;
-
-    private final HttpClient httpClient;
-    private final int timeout;
-    private final int maxCrawls;
-
-    public TorrentCrawlingStrategy() {
-        this(HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH), 30000, 100);
+              }
+            }
+          } catch (Exception e) {
+            LOG.warn("Error crawling torrent " + result.getFilename() + ": " + e.getMessage());
+          }
+        }
+      }
     }
 
-    public TorrentCrawlingStrategy(HttpClient httpClient, int timeout, int maxCrawls) {
-        this.httpClient = httpClient;
-        this.timeout = timeout;
-        this.maxCrawls = maxCrawls;
+    // Report results to listener
+    if (listener != null) {
+      listener.onResults(token, (List) results);
+    }
+  }
+
+  private byte[] fetchTorrentData(String torrentUrl) {
+    // Check cache first
+    byte[] cachedData = cacheGet(torrentUrl);
+    if (cachedData != null) {
+      return cachedData;
+    }
+
+    // Fetch from URL
+    try {
+      byte[] data = httpClient.getBytes(torrentUrl, timeout, "FrostWire/1.0", null);
+      if (data != null && data.length > 0) {
+        cachePut(torrentUrl, data);
+      }
+      return data;
+    } catch (Exception e) {
+      LOG.warn("Error fetching torrent: " + e.getMessage());
+      return null;
+    }
+  }
+
+  private static byte[] cacheGet(String url) {
+    synchronized (CACHE) {
+      return CACHE.get(url);
+    }
+  }
+
+  private static void cachePut(String url, byte[] data) {
+    synchronized (CACHE) {
+      CACHE.put(url, data);
+    }
+  }
+
+  public static void clearCache() {
+    CACHE.clear();
+  }
+
+  public static int getCacheSize() {
+    return CACHE.size();
+  }
+
+  /**
+   * Adapter to make CompositeFileSearchResult compatible with PerformersHelper.crawlTorrentInfo()
+   * which expects a TorrentCrawlableSearchResult interface.
+   */
+  private static class LegacyTorrentCrawlableResult implements TorrentCrawlableSearchResult {
+    private final CompositeFileSearchResult result;
+
+    public LegacyTorrentCrawlableResult(CompositeFileSearchResult result) {
+      this.result = result;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public void crawlResults(List<FileSearchResult> results, SearchListener listener, long token) {
-        int crawlCount = 0;
-        List<FileSearchResult> crawledResults = new ArrayList<>();
-
-        for (FileSearchResult fsr : results) {
-            if (crawlCount >= maxCrawls) {
-                break;
-            }
-
-            if (fsr instanceof CompositeFileSearchResult) {
-                CompositeFileSearchResult result = (CompositeFileSearchResult) fsr;
-                if (result.isTorrent()) {
-                    try {
-                        String torrentUrl = result.getTorrentUrl().orElse(null);
-                        if (torrentUrl != null) {
-                            byte[] torrentData = fetchTorrentData(torrentUrl);
-                            if (torrentData != null) {
-                                // Extract files from torrent - result will be updated in-place
-                                List<? extends com.frostwire.search.SearchResult> crawledSearchResults = PerformersHelper.crawlTorrentInfo(
-                                        null,  // No performer reference needed in v2
-                                        new LegacyTorrentCrawlableResult(result),
-                                        torrentData
-                                );
-
-                                if (!crawledSearchResults.isEmpty()) {
-                                    // Cast the results to FileSearchResult
-                                    List<FileSearchResult> children = new ArrayList<>();
-                                    for (com.frostwire.search.SearchResult sr : crawledSearchResults) {
-                                        if (sr instanceof FileSearchResult) {
-                                            children.add((FileSearchResult) sr);
-                                        }
-                                    }
-                                    if (!children.isEmpty()) {
-                                        result.setCrawlableChildren(children);
-                                        crawledResults.add(result);
-                                        crawlCount++;
-                                    }
-                                }
-                            }
-                        }
-                    } catch (Exception e) {
-                        LOG.warn("Error crawling torrent " + result.getFilename() + ": " + e.getMessage());
-                    }
-                }
-            }
-        }
-
-        // Report results to listener
-        if (listener != null) {
-            listener.onResults(token, (List) results);
-        }
+    public String getDisplayName() {
+      return result.getDisplayName();
     }
 
-    private byte[] fetchTorrentData(String torrentUrl) {
-        // Check cache first
-        byte[] cachedData = cacheGet(torrentUrl);
-        if (cachedData != null) {
-            return cachedData;
-        }
-
-        // Fetch from URL
-        try {
-            byte[] data = httpClient.getBytes(torrentUrl, timeout, "FrostWire/1.0", null);
-            if (data != null && data.length > 0) {
-                cachePut(torrentUrl, data);
-            }
-            return data;
-        } catch (Exception e) {
-            LOG.warn("Error fetching torrent: " + e.getMessage());
-            return null;
-        }
+    @Override
+    public String getDetailsUrl() {
+      return result.getDetailsUrl();
     }
 
-    private static byte[] cacheGet(String url) {
-        synchronized (CACHE) {
-            return CACHE.get(url);
-        }
+    @Override
+    public long getCreationTime() {
+      return result.getCreationTime();
     }
 
-    private static void cachePut(String url, byte[] data) {
-        synchronized (CACHE) {
-            CACHE.put(url, data);
-        }
+    @Override
+    public String getSource() {
+      return result.getSource();
     }
 
-    public static void clearCache() {
-        CACHE.clear();
+    @Override
+    public License getLicense() {
+      return result.getLicense();
     }
 
-    public static int getCacheSize() {
-        return CACHE.size();
+    @Override
+    public String getThumbnailUrl() {
+      return result.getThumbnailUrl();
     }
 
-    /**
-     * Adapter to make CompositeFileSearchResult compatible with PerformersHelper.crawlTorrentInfo()
-     * which expects a TorrentCrawlableSearchResult interface.
-     */
-    private static class LegacyTorrentCrawlableResult implements TorrentCrawlableSearchResult {
-        private final CompositeFileSearchResult result;
-
-        public LegacyTorrentCrawlableResult(CompositeFileSearchResult result) {
-            this.result = result;
-        }
-
-        @Override
-        public String getDisplayName() {
-            return result.getDisplayName();
-        }
-
-        @Override
-        public String getDetailsUrl() {
-            return result.getDetailsUrl();
-        }
-
-        @Override
-        public long getCreationTime() {
-            return result.getCreationTime();
-        }
-
-        @Override
-        public String getSource() {
-            return result.getSource();
-        }
-
-        @Override
-        public License getLicense() {
-            return result.getLicense();
-        }
-
-        @Override
-        public String getThumbnailUrl() {
-            return result.getThumbnailUrl();
-        }
-
-        @Override
-        public String getFilename() {
-            return result.getFilename();
-        }
-
-        @Override
-        public long getSize() {
-            return result.getSize();
-        }
-
-        @Override
-        public String getTorrentUrl() {
-            return result.getTorrentUrl().orElse(null);
-        }
-
-        @Override
-        public String getReferrerUrl() {
-            return result.getReferrerUrl().orElse(null);
-        }
-
-        @Override
-        public int getSeeds() {
-            return result.getSeeds().orElse(0);
-        }
-
-        @Override
-        public String getHash() {
-            return result.getTorrentHash().orElse(null);
-        }
-
-        @Override
-        public boolean isComplete() {
-            return !result.isCrawlable();
-        }
+    @Override
+    public String getFilename() {
+      return result.getFilename();
     }
+
+    @Override
+    public long getSize() {
+      return result.getSize();
+    }
+
+    @Override
+    public String getTorrentUrl() {
+      return result.getTorrentUrl().orElse(null);
+    }
+
+    @Override
+    public String getReferrerUrl() {
+      return result.getReferrerUrl().orElse(null);
+    }
+
+    @Override
+    public int getSeeds() {
+      return result.getSeeds().orElse(0);
+    }
+
+    @Override
+    public String getHash() {
+      return result.getTorrentHash().orElse(null);
+    }
+
+    @Override
+    public boolean isComplete() {
+      return !result.isCrawlable();
+    }
+  }
 }

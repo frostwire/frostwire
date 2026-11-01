@@ -14,24 +14,23 @@ package com.frostwire.search.relay.icebridge.control;
  */
 public final class ApiResponse<T> {
 
-    public boolean ok;
-    public String error;
-    public T data;
+  public boolean ok;
+  public String error;
+  public T data;
 
-    public ApiResponse() {
-    }
+  public ApiResponse() {}
 
-    private ApiResponse(boolean ok, T data, String error) {
-        this.ok = ok;
-        this.data = data;
-        this.error = error;
-    }
+  private ApiResponse(boolean ok, T data, String error) {
+    this.ok = ok;
+    this.data = data;
+    this.error = error;
+  }
 
-    public static <T> ApiResponse<T> success(T data) {
-        return new ApiResponse<>(true, data, null);
-    }
+  public static <T> ApiResponse<T> success(T data) {
+    return new ApiResponse<>(true, data, null);
+  }
 
-    public static <T> ApiResponse<T> error(String error) {
-        return new ApiResponse<>(false, null, error);
-    }
+  public static <T> ApiResponse<T> error(String error) {
+    return new ApiResponse<>(false, null, error);
+  }
 }

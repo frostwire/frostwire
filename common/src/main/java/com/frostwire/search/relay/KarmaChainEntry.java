@@ -11,7 +11,6 @@ import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.util.Bencode;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
-
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
@@ -25,611 +24,625 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * A single entry in a peer's karma chain. Two kinds: epoch
- * commitments (declare energy budget) and endorsements (credit
- * a peer for a download).
+ * A single entry in a peer's karma chain. Two kinds: epoch commitments (declare energy budget) and
+ * endorsements (credit a peer for a download).
  *
  * <p>Each entry is:
+ *
  * <ul>
- *   <li>Hash-linked to the previous entry via {@code prevHash} (SHA-256 of the previous entry's canonical bytes)</li>
- *   <li>Anchored to a Bitcoin block ({@code blockHeight} + {@code blockHash})</li>
- *   <li>Signed with the chain owner's Ed25519 key</li>
+ *   <li>Hash-linked to the previous entry via {@code prevHash} (SHA-256 of the previous entry's
+ *       canonical bytes)
+ *   <li>Anchored to a Bitcoin block ({@code blockHeight} + {@code blockHash})
+ *   <li>Signed with the chain owner's Ed25519 key
  * </ul>
  *
  * <p>Genesis entries use {@link #GENESIS_PREV_HASH} (32 zero bytes).
  */
 public final class KarmaChainEntry {
 
-    public enum Kind {
-        EPOCH_COMMITMENT("EC"),
-        ENDORSEMENT("EN");
+  public enum Kind {
+    EPOCH_COMMITMENT("EC"),
+    ENDORSEMENT("EN");
 
-        final String code;
+    final String code;
 
-        Kind(String code) {
-            this.code = code;
+    Kind(String code) {
+      this.code = code;
+    }
+
+    public String code() {
+      return code;
+    }
+  }
+
+  /** Sentinel prevHash for the first entry in a chain (32 zero bytes). */
+  public static final byte[] GENESIS_PREV_HASH = new byte[32];
+
+  private static final Logger LOG = Logger.getLogger(KarmaChainEntry.class);
+
+  /** The manifest entry fields {@link #fromDictionary(Map, byte[])} reads. */
+  private static final String[] MANIFEST_FIELDS = {
+    "k", "seq", "bh", "bkh", "ph", "pub", "s", "ep", "en", "pp", "ih", "sd"
+  };
+
+  private final Kind kind;
+  private final byte[] prevHash;
+  private final long seq;
+  private final byte[] endorserPub;
+  private final long timestamp;
+  private final byte[] signature;
+  private final long blockHeight;
+  private final byte[] blockHash;
+
+  // Epoch commitment fields (null/0 for ENDORSEMENT)
+  private final Long epoch;
+  private final Double energy;
+
+  // Endorsement fields (null for EPOCH_COMMITMENT)
+  private final byte[] peerPub;
+  private final byte[] infoHash;
+  private final Integer scoreDelta;
+
+  private KarmaChainEntry(Builder b) {
+    this.kind = b.kind;
+    this.prevHash = b.prevHash.clone();
+    this.seq = b.seq;
+    this.endorserPub = b.endorserPub.clone();
+    this.timestamp = b.timestamp;
+    this.signature = b.signature.clone();
+    this.blockHeight = b.blockHeight;
+    this.blockHash = b.blockHash.clone();
+    this.epoch = b.epoch;
+    this.energy = b.energy;
+    this.peerPub = b.peerPub == null ? null : b.peerPub.clone();
+    this.infoHash = b.infoHash == null ? null : b.infoHash.clone();
+    this.scoreDelta = b.scoreDelta;
+  }
+
+  /**
+   * Create and sign an epoch commitment entry.
+   *
+   * @param prevHash SHA-256 of the previous entry's canonical bytes (or GENESIS_PREV_HASH)
+   * @param seq 0-based monotonic sequence number
+   * @param endorserPub 32-byte raw Ed25519 pubkey of the chain owner
+   * @param block Bitcoin block reference for this epoch
+   * @param energy available energy at this epoch (with decay)
+   * @param signingKey chain owner's Ed25519 PrivateKey
+   */
+  public static KarmaChainEntry createEpochCommitment(
+      byte[] prevHash,
+      long seq,
+      byte[] endorserPub,
+      BitcoinBlockReference block,
+      double energy,
+      PrivateKey signingKey) {
+    if (prevHash == null || prevHash.length != 32) {
+      throw new IllegalArgumentException("prevHash must be 32 bytes");
+    }
+    if (endorserPub == null || endorserPub.length != 32) {
+      throw new IllegalArgumentException("endorserPub must be 32 bytes");
+    }
+    if (block == null) {
+      throw new IllegalArgumentException("block is null");
+    }
+    if (signingKey == null) {
+      throw new IllegalArgumentException("signingKey is null");
+    }
+    if (!Double.isFinite(energy) || energy < 0 || energy > KarmaConstants.MAX_ENERGY) {
+      throw new IllegalArgumentException(
+          "energy must be in [0, " + KarmaConstants.MAX_ENERGY + "]");
+    }
+
+    Builder b = new Builder();
+    b.kind = Kind.EPOCH_COMMITMENT;
+    b.prevHash = prevHash;
+    b.seq = seq;
+    b.endorserPub = endorserPub;
+    b.timestamp = Instant.now().getEpochSecond();
+    b.blockHeight = block.height();
+    b.blockHash = block.hash();
+    b.epoch = KarmaConstants.epochForHeight(block.height());
+    b.energy = energy;
+
+    b.canonicalBytesForSigning();
+    b.signature = sign(b.canonicalBytes, signingKey);
+    return b.build();
+  }
+
+  /** Create and sign an endorsement entry. */
+  public static KarmaChainEntry createEndorsement(
+      byte[] prevHash,
+      long seq,
+      byte[] endorserPub,
+      BitcoinBlockReference block,
+      byte[] peerPub,
+      byte[] infoHash,
+      int scoreDelta,
+      PrivateKey signingKey) {
+    if (prevHash == null || prevHash.length != 32) {
+      throw new IllegalArgumentException("prevHash must be 32 bytes");
+    }
+    if (endorserPub == null || endorserPub.length != 32) {
+      throw new IllegalArgumentException("endorserPub must be 32 bytes");
+    }
+    if (block == null) {
+      throw new IllegalArgumentException("block is null");
+    }
+    if (peerPub == null || peerPub.length != 32) {
+      throw new IllegalArgumentException("peerPub must be 32 bytes");
+    }
+    if (infoHash == null || infoHash.length != 20) {
+      throw new IllegalArgumentException("infoHash must be 20 bytes");
+    }
+    if (signingKey == null) {
+      throw new IllegalArgumentException("signingKey is null");
+    }
+
+    Builder b = new Builder();
+    b.kind = Kind.ENDORSEMENT;
+    b.prevHash = prevHash;
+    b.seq = seq;
+    b.endorserPub = endorserPub;
+    b.timestamp = Instant.now().getEpochSecond();
+    b.blockHeight = block.height();
+    b.blockHash = block.hash();
+    b.peerPub = peerPub;
+    b.infoHash = infoHash;
+    b.scoreDelta = scoreDelta;
+
+    b.canonicalBytesForSigning();
+    b.signature = sign(b.canonicalBytes, signingKey);
+    return b.build();
+  }
+
+  /**
+   * Reconstruct an entry from its persisted fields without re-signing. Used by {@link
+   * KarmaChainTable#loadChain}. The caller is responsible for verifying the loaded chain with
+   * {@link KarmaChain#verify}.
+   */
+  public static KarmaChainEntry fromStoredFields(
+      Kind kind,
+      byte[] prevHash,
+      long seq,
+      byte[] endorserPub,
+      long timestamp,
+      long blockHeight,
+      byte[] blockHash,
+      Long epoch,
+      Double energy,
+      byte[] peerPub,
+      byte[] infoHash,
+      Integer scoreDelta,
+      byte[] signature) {
+    if (kind == null) {
+      throw new IllegalArgumentException("kind is null");
+    }
+    if (prevHash == null || prevHash.length != 32) {
+      throw new IllegalArgumentException("prevHash must be 32 bytes");
+    }
+    if (endorserPub == null || endorserPub.length != 32) {
+      throw new IllegalArgumentException("endorserPub must be 32 bytes");
+    }
+    if (blockHash == null || blockHash.length != 32) {
+      throw new IllegalArgumentException("blockHash must be 32 bytes");
+    }
+    if (signature == null || signature.length != 64) {
+      throw new IllegalArgumentException("signature must be 64 bytes");
+    }
+    Builder b = new Builder();
+    b.kind = kind;
+    b.prevHash = prevHash;
+    b.seq = seq;
+    b.endorserPub = endorserPub;
+    b.timestamp = timestamp;
+    b.blockHeight = blockHeight;
+    b.blockHash = blockHash;
+    b.signature = signature.clone();
+    if (kind == Kind.EPOCH_COMMITMENT) {
+      if (epoch == null || energy == null) {
+        throw new IllegalArgumentException("epoch and energy are required for EPOCH_COMMITMENT");
+      }
+      if (energy < 0 || energy > KarmaConstants.MAX_ENERGY) {
+        throw new IllegalArgumentException("energy out of range");
+      }
+      b.epoch = epoch;
+      b.energy = energy;
+    } else {
+      if (peerPub == null || peerPub.length != 32) {
+        throw new IllegalArgumentException("peerPub must be 32 bytes for ENDORSEMENT");
+      }
+      if (infoHash == null || infoHash.length != 20) {
+        throw new IllegalArgumentException("infoHash must be 20 bytes for ENDORSEMENT");
+      }
+      if (scoreDelta == null) {
+        throw new IllegalArgumentException("scoreDelta is required for ENDORSEMENT");
+      }
+      b.peerPub = peerPub;
+      b.infoHash = infoHash;
+      b.scoreDelta = scoreDelta;
+    }
+    b.canonicalBytesForSigning();
+    return b.build();
+  }
+
+  public Kind kind() {
+    return kind;
+  }
+
+  public byte[] prevHash() {
+    return prevHash.clone();
+  }
+
+  public long seq() {
+    return seq;
+  }
+
+  public byte[] endorserPub() {
+    return endorserPub.clone();
+  }
+
+  public long timestamp() {
+    return timestamp;
+  }
+
+  public byte[] signature() {
+    return signature.clone();
+  }
+
+  public long blockHeight() {
+    return blockHeight;
+  }
+
+  public byte[] blockHash() {
+    return blockHash.clone();
+  }
+
+  public Long epoch() {
+    return epoch;
+  }
+
+  public Double energy() {
+    return energy;
+  }
+
+  public byte[] peerPub() {
+    return peerPub == null ? null : peerPub.clone();
+  }
+
+  public byte[] infoHash() {
+    return infoHash == null ? null : infoHash.clone();
+  }
+
+  public Integer scoreDelta() {
+    return scoreDelta;
+  }
+
+  /**
+   * Returns the canonical bencoded form (excluding signature). Same input always produces the same
+   * bytes — TreeMap guarantees sorted key order.
+   */
+  public byte[] canonicalBytes() {
+    Builder b = new Builder();
+    b.kind = this.kind;
+    b.prevHash = this.prevHash;
+    b.seq = this.seq;
+    b.endorserPub = this.endorserPub;
+    b.timestamp = this.timestamp;
+    b.blockHeight = this.blockHeight;
+    b.blockHash = this.blockHash;
+    b.epoch = this.epoch;
+    b.energy = this.energy;
+    b.peerPub = this.peerPub;
+    b.infoHash = this.infoHash;
+    b.scoreDelta = this.scoreDelta;
+    b.canonicalBytesForSigning();
+    return b.canonicalBytes.clone();
+  }
+
+  /**
+   * SHA-256 of {@link #canonicalBytes()}. This is what the next entry's {@code prevHash} must
+   * reference.
+   */
+  public byte[] entryHash() {
+    return sha256(canonicalBytes());
+  }
+
+  /**
+   * Reconstruct a chain entry from a bencoded dictionary as published by {@link
+   * KarmaChainPublisher}. Does NOT verify the signature — use {@link
+   * KarmaChain#verify(java.util.List)} for that, since verification requires the full chain
+   * context.
+   *
+   * <p>Field names match the publisher's manifest format:
+   *
+   * <ul>
+   *   <li>{@code k}: kind code ({@code "EC"} or {@code "EN"})
+   *   <li>{@code seq}: 0-based sequence number
+   *   <li>{@code bh}: Bitcoin block height
+   *   <li>{@code bkh}: Bitcoin block hash (hex)
+   *   <li>{@code ph}: previous entry hash (hex)
+   *   <li>{@code pub}: endorser public key (base64url, no padding)
+   *   <li>{@code s}: signature (base64url, no padding)
+   *   <li>EC only: {@code ep} (epoch), {@code en} (energy, decimal string)
+   *   <li>EN only: {@code pp} (peer pub, base64url), {@code ih} (info hash hex), {@code sd} (score
+   *       delta)
+   * </ul>
+   *
+   * <p>Timestamp is not present in the published manifest; it is reconstructed as 0 (the canonical
+   * signing form does not include it either, so {@link #verifySignature()} works correctly).
+   *
+   * @return a new entry, or null if the dict is missing required fields or has the wrong shape for
+   *     the declared kind
+   *     <p>The per-entry {@code pub} field is optional: the publisher omits it (the manifest-level
+   *     {@code pub} already carries the owner's key) and {@link #reconstruct(Map, byte[])} fills it
+   *     from the manifest owner. The single-argument form requires it (legacy full dicts).
+   */
+  public static KarmaChainEntry reconstruct(Map<String, Entry> dict) {
+    return reconstruct(dict, null);
+  }
+
+  /**
+   * Reconstruct with a fallback endorser key for dicts whose {@code pub} field was omitted by the
+   * publisher. Adapter over {@link #fromDictionary(Map, byte[])} for dictionaries libtorrent has
+   * decoded; returns null for anything that one rejects.
+   *
+   * @param ownerPub manifest-level owner key, or null to require inline pub
+   */
+  public static KarmaChainEntry reconstruct(Map<String, Entry> dict, byte[] ownerPub) {
+    if (dict == null) {
+      return null;
+    }
+    try {
+      // Only the fields fromDictionary reads, so an unrelated extra
+      // value is ignored as before.
+      Map<String, Object> neutral = new TreeMap<>();
+      for (String field : MANIFEST_FIELDS) {
+        Entry value = dict.get(field);
+        if (value != null) {
+          neutral.put(field, Bencode.decode(value.bencode()));
         }
+      }
+      return fromDictionary(neutral, ownerPub);
+    } catch (RuntimeException e) {
+      // Malformed peer data. Errors (e.g. a missing API on an old Android) must surface.
+      LOG.debug("Failed to reconstruct chain entry from manifest", e);
+      return null;
+    }
+  }
 
-        public String code() {
-            return code;
-        }
+  /**
+   * Parses one bencoded manifest entry dictionary (see {@link #reconstruct(Map)} for the fields).
+   * Does not verify the signature.
+   *
+   * @return the entry, or null if the dictionary is missing required fields or has the wrong shape
+   *     for its kind
+   * @throws IllegalArgumentException if {@code bencoded} is not canonical bencode of a dictionary,
+   *     or a hex or base64 field is malformed
+   */
+  public static KarmaChainEntry fromBencode(byte[] bencoded) {
+    return fromDictionary(Bencode.decodeDictionary(bencoded), null);
+  }
+
+  /**
+   * As {@link #fromBencode(byte[])}, with the manifest owner's key as the fallback for an omitted
+   * {@code pub} field.
+   *
+   * @throws IllegalArgumentException as {@link #fromBencode(byte[])} does
+   */
+  public static KarmaChainEntry fromBencode(byte[] bencoded, byte[] ownerPub) {
+    return fromDictionary(Bencode.decodeDictionary(bencoded), ownerPub);
+  }
+
+  /**
+   * Parses one manifest entry from its dictionary in {@link Bencode}'s neutral form. Does not
+   * verify the signature.
+   *
+   * @param ownerPub manifest-level owner key, or null to require inline pub
+   * @return the entry, or null if the dictionary is null, is missing required fields, or has the
+   *     wrong shape for its kind
+   * @throws IllegalArgumentException if a hex or base64 field is malformed
+   */
+  static KarmaChainEntry fromDictionary(Map<String, Object> dict, byte[] ownerPub) {
+    if (dict == null) {
+      return null;
+    }
+    String kindCode = Bencode.asString(dict.get("k"));
+    Long seq = Bencode.asLong(dict.get("seq"));
+    Long bh = Bencode.asLong(dict.get("bh"));
+    String bkh = Bencode.asString(dict.get("bkh"));
+    String ph = Bencode.asString(dict.get("ph"));
+    Object pubValue = dict.get("pub");
+    String pub = Bencode.asString(pubValue);
+    String sig = Bencode.asString(dict.get("s"));
+    if (kindCode == null
+        || seq == null
+        || bh == null
+        || bkh == null
+        || ph == null
+        || sig == null
+        || (pubValue != null && pub == null)) {
+      return null;
+    }
+    if (pub == null && (ownerPub == null || ownerPub.length != 32)) {
+      return null;
     }
 
-    /** Sentinel prevHash for the first entry in a chain (32 zero bytes). */
-    public static final byte[] GENESIS_PREV_HASH = new byte[32];
-
-    private static final Logger LOG = Logger.getLogger(KarmaChainEntry.class);
-
-    /** The manifest entry fields {@link #fromDictionary(Map, byte[])} reads. */
-    private static final String[] MANIFEST_FIELDS =
-            {"k", "seq", "bh", "bkh", "ph", "pub", "s", "ep", "en", "pp", "ih", "sd"};
-
-    private final Kind kind;
-    private final byte[] prevHash;
-    private final long seq;
-    private final byte[] endorserPub;
-    private final long timestamp;
-    private final byte[] signature;
-    private final long blockHeight;
-    private final byte[] blockHash;
-
-    // Epoch commitment fields (null/0 for ENDORSEMENT)
-    private final Long epoch;
-    private final Double energy;
-
-    // Endorsement fields (null for EPOCH_COMMITMENT)
-    private final byte[] peerPub;
-    private final byte[] infoHash;
-    private final Integer scoreDelta;
-
-    private KarmaChainEntry(Builder b) {
-        this.kind = b.kind;
-        this.prevHash = b.prevHash.clone();
-        this.seq = b.seq;
-        this.endorserPub = b.endorserPub.clone();
-        this.timestamp = b.timestamp;
-        this.signature = b.signature.clone();
-        this.blockHeight = b.blockHeight;
-        this.blockHash = b.blockHash.clone();
-        this.epoch = b.epoch;
-        this.energy = b.energy;
-        this.peerPub = b.peerPub == null ? null : b.peerPub.clone();
-        this.infoHash = b.infoHash == null ? null : b.infoHash.clone();
-        this.scoreDelta = b.scoreDelta;
+    Kind kind;
+    if ("EC".equals(kindCode)) {
+      kind = Kind.EPOCH_COMMITMENT;
+    } else if ("EN".equals(kindCode)) {
+      kind = Kind.ENDORSEMENT;
+    } else {
+      return null;
     }
 
-    /**
-     * Create and sign an epoch commitment entry.
-     *
-     * @param prevHash     SHA-256 of the previous entry's canonical bytes (or GENESIS_PREV_HASH)
-     * @param seq          0-based monotonic sequence number
-     * @param endorserPub  32-byte raw Ed25519 pubkey of the chain owner
-     * @param block        Bitcoin block reference for this epoch
-     * @param energy       available energy at this epoch (with decay)
-     * @param signingKey   chain owner's Ed25519 PrivateKey
-     */
-    public static KarmaChainEntry createEpochCommitment(
-            byte[] prevHash, long seq, byte[] endorserPub,
-            BitcoinBlockReference block, double energy,
-            PrivateKey signingKey) {
-        if (prevHash == null || prevHash.length != 32) {
-            throw new IllegalArgumentException("prevHash must be 32 bytes");
-        }
-        if (endorserPub == null || endorserPub.length != 32) {
-            throw new IllegalArgumentException("endorserPub must be 32 bytes");
-        }
-        if (block == null) {
-            throw new IllegalArgumentException("block is null");
-        }
-        if (signingKey == null) {
-            throw new IllegalArgumentException("signingKey is null");
-        }
-        if (!Double.isFinite(energy) || energy < 0 || energy > KarmaConstants.MAX_ENERGY) {
-            throw new IllegalArgumentException("energy must be in [0, " + KarmaConstants.MAX_ENERGY + "]");
-        }
+    Builder b = new Builder();
+    b.kind = kind;
+    b.prevHash = Hex.decode(ph);
+    b.seq = seq;
+    b.endorserPub = pub != null ? Base64.getUrlDecoder().decode(pub) : ownerPub.clone();
+    b.timestamp = 0L;
+    b.signature = Base64.getUrlDecoder().decode(sig);
+    b.blockHeight = bh;
+    b.blockHash = Hex.decode(bkh);
 
-        Builder b = new Builder();
-        b.kind = Kind.EPOCH_COMMITMENT;
-        b.prevHash = prevHash;
-        b.seq = seq;
-        b.endorserPub = endorserPub;
-        b.timestamp = Instant.now().getEpochSecond();
-        b.blockHeight = block.height();
-        b.blockHash = block.hash();
-        b.epoch = KarmaConstants.epochForHeight(block.height());
-        b.energy = energy;
+    if (kind == Kind.EPOCH_COMMITMENT) {
+      Long ep = Bencode.asLong(dict.get("ep"));
+      String en = Bencode.asString(dict.get("en"));
+      if (ep == null || en == null) {
+        return null;
+      }
+      b.epoch = ep;
+      try {
+        b.energy = Double.parseDouble(en);
+      } catch (NumberFormatException e) {
+        return null;
+      }
+      // Not just the range: NaN fails both comparisons and would lift the endorsement
+      // budget in KarmaChain.verify (frostwire/frostwire#1401).
+      if (!Double.isFinite(b.energy)
+          || b.energy < 0
+          || b.energy > KarmaConstants.MAX_ENERGY + 0.01) {
+        return null;
+      }
+    } else {
+      String pp = Bencode.asString(dict.get("pp"));
+      String ih = Bencode.asString(dict.get("ih"));
+      Object sdValue = dict.get("sd");
+      Long sd = Bencode.asLong(sdValue);
+      if (pp == null || ih == null || (sdValue != null && sd == null)) {
+        return null;
+      }
+      // Reject rather than truncate: (int) of an out-of-range value still verified (#1401).
+      if (sd != null && (sd < Integer.MIN_VALUE || sd > Integer.MAX_VALUE)) {
+        return null;
+      }
+      b.peerPub = Base64.getUrlDecoder().decode(pp);
+      b.infoHash = Hex.decode(ih);
+      if (b.infoHash.length != 20) {
+        return null;
+      }
+      // Score deltas are always 1 in this protocol version; the
+      // publisher omits the field in that case to fit the DHT cap.
+      b.scoreDelta = sd == null ? 1 : (int) sd.longValue();
+    }
+    return b.build();
+  }
 
-        b.canonicalBytesForSigning();
-        b.signature = sign(b.canonicalBytes, signingKey);
-        return b.build();
+  /**
+   * Verifies the Ed25519 signature against the canonical bytes.
+   *
+   * <p>Uses {@link IdentityKeys#softwareSignature} so verification accepts the same providers as
+   * signing (notably BouncyCastle on Android, where the default provider may reject software keys).
+   */
+  public boolean verifySignature() {
+    try {
+      Signature verifier = IdentityKeys.softwareSignature("Ed25519");
+      verifier.initVerify(rawEd25519ToPublicKey(endorserPub));
+      verifier.update(canonicalBytes());
+      return verifier.verify(signature);
+    } catch (Exception e) {
+      LOG.debug("Signature verification failed", e);
+      return false;
+    }
+  }
+
+  private static byte[] sign(byte[] data, PrivateKey key) {
+    try {
+      Signature signer = IdentityKeys.softwareSignature("Ed25519");
+      signer.initSign(key);
+      signer.update(data);
+      return signer.sign();
+    } catch (GeneralSecurityException e) {
+      throw new IllegalStateException("Failed to sign karma chain entry", e);
+    }
+  }
+
+  /**
+   * Reconstructs an Ed25519 public key from its raw 32-byte form. The X.509 SubjectPublicKeyInfo
+   * prefix for Ed25519 is 30 2a 30 05 06 03 2b 65 70 03 21 00 (12 bytes).
+   */
+  private static PublicKey rawEd25519ToPublicKey(byte[] raw) throws GeneralSecurityException {
+    byte[] prefix = {0x30, 0x2a, 0x30, 0x05, 0x06, 0x03, 0x2b, 0x65, 0x70, 0x03, 0x21, 0x00};
+    byte[] encoded = new byte[prefix.length + raw.length];
+    System.arraycopy(prefix, 0, encoded, 0, prefix.length);
+    System.arraycopy(raw, 0, encoded, prefix.length, raw.length);
+    return IdentityKeys.softwareKeyFactory("Ed25519")
+        .generatePublic(new X509EncodedKeySpec(encoded));
+  }
+
+  private static byte[] sha256(byte[] data) {
+    try {
+      return MessageDigest.getInstance("SHA-256").digest(data);
+    } catch (Exception e) {
+      throw new IllegalStateException("SHA-256 unavailable", e);
+    }
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof KarmaChainEntry)) return false;
+    KarmaChainEntry that = (KarmaChainEntry) o;
+    return seq == that.seq
+        && Arrays.equals(signature, that.signature)
+        && Arrays.equals(prevHash, that.prevHash);
+  }
+
+  @Override
+  public int hashCode() {
+    return 31 * Long.hashCode(seq) + Arrays.hashCode(signature);
+  }
+
+  @Override
+  public String toString() {
+    return "KarmaChainEntry{kind=" + kind + ", seq=" + seq + ", blockHeight=" + blockHeight + "}";
+  }
+
+  private static final class Builder {
+    Kind kind;
+    byte[] prevHash;
+    long seq;
+    byte[] endorserPub;
+    long timestamp;
+    byte[] signature = new byte[64];
+    long blockHeight;
+    byte[] blockHash;
+    Long epoch;
+    Double energy;
+    byte[] peerPub;
+    byte[] infoHash;
+    Integer scoreDelta;
+    byte[] canonicalBytes;
+
+    void canonicalBytesForSigning() {
+      // Bencode sorts the keys by their bytes, as libtorrent's entry did.
+      Map<String, Object> map = new TreeMap<>();
+      map.put("bh", blockHeight);
+      map.put("bk", Hex.encode(blockHash));
+      map.put("k", kind.code);
+      map.put("ph", Hex.encode(prevHash));
+      map.put("pub", Base64.getUrlEncoder().withoutPadding().encodeToString(endorserPub));
+      map.put("seq", seq);
+      // Note: timestamp is NOT included in the signed canonical form
+      // so that two entries created at the same logical state produce
+      // identical signatures. Timestamp is informational and part of
+      // the public record but not part of the integrity contract.
+
+      if (kind == Kind.EPOCH_COMMITMENT) {
+        map.put("e", String.format(java.util.Locale.ROOT, "%.2f", energy));
+        map.put("ep", epoch);
+      } else { // ENDORSEMENT
+        map.put("ih", Hex.encode(infoHash));
+        map.put("pp", Base64.getUrlEncoder().withoutPadding().encodeToString(peerPub));
+        map.put("sd", (long) scoreDelta);
+      }
+
+      this.canonicalBytes = Bencode.encode(map);
     }
 
-    /**
-     * Create and sign an endorsement entry.
-     */
-    public static KarmaChainEntry createEndorsement(
-            byte[] prevHash, long seq, byte[] endorserPub,
-            BitcoinBlockReference block,
-            byte[] peerPub, byte[] infoHash, int scoreDelta,
-            PrivateKey signingKey) {
-        if (prevHash == null || prevHash.length != 32) {
-            throw new IllegalArgumentException("prevHash must be 32 bytes");
-        }
-        if (endorserPub == null || endorserPub.length != 32) {
-            throw new IllegalArgumentException("endorserPub must be 32 bytes");
-        }
-        if (block == null) {
-            throw new IllegalArgumentException("block is null");
-        }
-        if (peerPub == null || peerPub.length != 32) {
-            throw new IllegalArgumentException("peerPub must be 32 bytes");
-        }
-        if (infoHash == null || infoHash.length != 20) {
-            throw new IllegalArgumentException("infoHash must be 20 bytes");
-        }
-        if (signingKey == null) {
-            throw new IllegalArgumentException("signingKey is null");
-        }
-
-        Builder b = new Builder();
-        b.kind = Kind.ENDORSEMENT;
-        b.prevHash = prevHash;
-        b.seq = seq;
-        b.endorserPub = endorserPub;
-        b.timestamp = Instant.now().getEpochSecond();
-        b.blockHeight = block.height();
-        b.blockHash = block.hash();
-        b.peerPub = peerPub;
-        b.infoHash = infoHash;
-        b.scoreDelta = scoreDelta;
-
-        b.canonicalBytesForSigning();
-        b.signature = sign(b.canonicalBytes, signingKey);
-        return b.build();
+    KarmaChainEntry build() {
+      return new KarmaChainEntry(this);
     }
-
-    /**
-     * Reconstruct an entry from its persisted fields without re-signing.
-     * Used by {@link KarmaChainTable#loadChain}. The caller is responsible
-     * for verifying the loaded chain with {@link KarmaChain#verify}.
-     */
-    public static KarmaChainEntry fromStoredFields(
-            Kind kind, byte[] prevHash, long seq, byte[] endorserPub,
-            long timestamp, long blockHeight, byte[] blockHash,
-            Long epoch, Double energy, byte[] peerPub, byte[] infoHash,
-            Integer scoreDelta, byte[] signature) {
-        if (kind == null) {
-            throw new IllegalArgumentException("kind is null");
-        }
-        if (prevHash == null || prevHash.length != 32) {
-            throw new IllegalArgumentException("prevHash must be 32 bytes");
-        }
-        if (endorserPub == null || endorserPub.length != 32) {
-            throw new IllegalArgumentException("endorserPub must be 32 bytes");
-        }
-        if (blockHash == null || blockHash.length != 32) {
-            throw new IllegalArgumentException("blockHash must be 32 bytes");
-        }
-        if (signature == null || signature.length != 64) {
-            throw new IllegalArgumentException("signature must be 64 bytes");
-        }
-        Builder b = new Builder();
-        b.kind = kind;
-        b.prevHash = prevHash;
-        b.seq = seq;
-        b.endorserPub = endorserPub;
-        b.timestamp = timestamp;
-        b.blockHeight = blockHeight;
-        b.blockHash = blockHash;
-        b.signature = signature.clone();
-        if (kind == Kind.EPOCH_COMMITMENT) {
-            if (epoch == null || energy == null) {
-                throw new IllegalArgumentException("epoch and energy are required for EPOCH_COMMITMENT");
-            }
-            if (energy < 0 || energy > KarmaConstants.MAX_ENERGY) {
-                throw new IllegalArgumentException("energy out of range");
-            }
-            b.epoch = epoch;
-            b.energy = energy;
-        } else {
-            if (peerPub == null || peerPub.length != 32) {
-                throw new IllegalArgumentException("peerPub must be 32 bytes for ENDORSEMENT");
-            }
-            if (infoHash == null || infoHash.length != 20) {
-                throw new IllegalArgumentException("infoHash must be 20 bytes for ENDORSEMENT");
-            }
-            if (scoreDelta == null) {
-                throw new IllegalArgumentException("scoreDelta is required for ENDORSEMENT");
-            }
-            b.peerPub = peerPub;
-            b.infoHash = infoHash;
-            b.scoreDelta = scoreDelta;
-        }
-        b.canonicalBytesForSigning();
-        return b.build();
-    }
-
-    public Kind kind() {
-        return kind;
-    }
-
-    public byte[] prevHash() {
-        return prevHash.clone();
-    }
-
-    public long seq() {
-        return seq;
-    }
-
-    public byte[] endorserPub() {
-        return endorserPub.clone();
-    }
-
-    public long timestamp() {
-        return timestamp;
-    }
-
-    public byte[] signature() {
-        return signature.clone();
-    }
-
-    public long blockHeight() {
-        return blockHeight;
-    }
-
-    public byte[] blockHash() {
-        return blockHash.clone();
-    }
-
-    public Long epoch() {
-        return epoch;
-    }
-
-    public Double energy() {
-        return energy;
-    }
-
-    public byte[] peerPub() {
-        return peerPub == null ? null : peerPub.clone();
-    }
-
-    public byte[] infoHash() {
-        return infoHash == null ? null : infoHash.clone();
-    }
-
-    public Integer scoreDelta() {
-        return scoreDelta;
-    }
-
-    /**
-     * Returns the canonical bencoded form (excluding signature).
-     * Same input always produces the same bytes — TreeMap guarantees
-     * sorted key order.
-     */
-    public byte[] canonicalBytes() {
-        Builder b = new Builder();
-        b.kind = this.kind;
-        b.prevHash = this.prevHash;
-        b.seq = this.seq;
-        b.endorserPub = this.endorserPub;
-        b.timestamp = this.timestamp;
-        b.blockHeight = this.blockHeight;
-        b.blockHash = this.blockHash;
-        b.epoch = this.epoch;
-        b.energy = this.energy;
-        b.peerPub = this.peerPub;
-        b.infoHash = this.infoHash;
-        b.scoreDelta = this.scoreDelta;
-        b.canonicalBytesForSigning();
-        return b.canonicalBytes.clone();
-    }
-
-    /**
-     * SHA-256 of {@link #canonicalBytes()}. This is what the next
-     * entry's {@code prevHash} must reference.
-     */
-    public byte[] entryHash() {
-        return sha256(canonicalBytes());
-    }
-
-    /**
-     * Reconstruct a chain entry from a bencoded dictionary as published
-     * by {@link KarmaChainPublisher}. Does NOT verify the signature —
-     * use {@link KarmaChain#verify(java.util.List)} for that, since
-     * verification requires the full chain context.
-     *
-     * <p>Field names match the publisher's manifest format:
-     * <ul>
-     *   <li>{@code k}: kind code ({@code "EC"} or {@code "EN"})</li>
-     *   <li>{@code seq}: 0-based sequence number</li>
-     *   <li>{@code bh}: Bitcoin block height</li>
-     *   <li>{@code bkh}: Bitcoin block hash (hex)</li>
-     *   <li>{@code ph}: previous entry hash (hex)</li>
-     *   <li>{@code pub}: endorser public key (base64url, no padding)</li>
-     *   <li>{@code s}: signature (base64url, no padding)</li>
-     *   <li>EC only: {@code ep} (epoch), {@code en} (energy, decimal string)</li>
-     *   <li>EN only: {@code pp} (peer pub, base64url), {@code ih} (info hash hex),
-     *       {@code sd} (score delta)</li>
-     * </ul>
-     *
-     * <p>Timestamp is not present in the published manifest; it is
-     * reconstructed as 0 (the canonical signing form does not include
-     * it either, so {@link #verifySignature()} works correctly).
-     *
-     * @return a new entry, or null if the dict is missing required
-     *         fields or has the wrong shape for the declared kind
-     *
-     * <p>The per-entry {@code pub} field is optional: the publisher omits
-     * it (the manifest-level {@code pub} already carries the owner's key)
-     * and {@link #reconstruct(Map, byte[])} fills it from the manifest
-     * owner. The single-argument form requires it (legacy full dicts).
-     */
-    public static KarmaChainEntry reconstruct(Map<String, Entry> dict) {
-        return reconstruct(dict, null);
-    }
-
-    /**
-     * Reconstruct with a fallback endorser key for dicts whose
-     * {@code pub} field was omitted by the publisher. Adapter over
-     * {@link #fromDictionary(Map, byte[])} for dictionaries libtorrent
-     * has decoded; returns null for anything that one rejects.
-     *
-     * @param ownerPub manifest-level owner key, or null to require inline pub
-     */
-    public static KarmaChainEntry reconstruct(Map<String, Entry> dict, byte[] ownerPub) {
-        if (dict == null) {
-            return null;
-        }
-        try {
-            // Only the fields fromDictionary reads, so an unrelated extra
-            // value is ignored as before.
-            Map<String, Object> neutral = new TreeMap<>();
-            for (String field : MANIFEST_FIELDS) {
-                Entry value = dict.get(field);
-                if (value != null) {
-                    neutral.put(field, Bencode.decode(value.bencode()));
-                }
-            }
-            return fromDictionary(neutral, ownerPub);
-        } catch (RuntimeException e) {
-            // Malformed peer data. Errors (e.g. a missing API on an old Android) must surface.
-            LOG.debug("Failed to reconstruct chain entry from manifest", e);
-            return null;
-        }
-    }
-
-    /**
-     * Parses one bencoded manifest entry dictionary (see
-     * {@link #reconstruct(Map)} for the fields). Does not verify the
-     * signature.
-     *
-     * @return the entry, or null if the dictionary is missing required
-     *         fields or has the wrong shape for its kind
-     * @throws IllegalArgumentException if {@code bencoded} is not canonical
-     *         bencode of a dictionary, or a hex or base64 field is malformed
-     */
-    public static KarmaChainEntry fromBencode(byte[] bencoded) {
-        return fromDictionary(Bencode.decodeDictionary(bencoded), null);
-    }
-
-    /**
-     * As {@link #fromBencode(byte[])}, with the manifest owner's key as
-     * the fallback for an omitted {@code pub} field.
-     *
-     * @throws IllegalArgumentException as {@link #fromBencode(byte[])} does
-     */
-    public static KarmaChainEntry fromBencode(byte[] bencoded, byte[] ownerPub) {
-        return fromDictionary(Bencode.decodeDictionary(bencoded), ownerPub);
-    }
-
-    /**
-     * Parses one manifest entry from its dictionary in {@link Bencode}'s
-     * neutral form. Does not verify the signature.
-     *
-     * @param ownerPub manifest-level owner key, or null to require inline pub
-     * @return the entry, or null if the dictionary is null, is missing
-     *         required fields, or has the wrong shape for its kind
-     * @throws IllegalArgumentException if a hex or base64 field is malformed
-     */
-    static KarmaChainEntry fromDictionary(Map<String, Object> dict, byte[] ownerPub) {
-        if (dict == null) {
-            return null;
-        }
-        String kindCode = Bencode.asString(dict.get("k"));
-        Long seq = Bencode.asLong(dict.get("seq"));
-        Long bh = Bencode.asLong(dict.get("bh"));
-        String bkh = Bencode.asString(dict.get("bkh"));
-        String ph = Bencode.asString(dict.get("ph"));
-        Object pubValue = dict.get("pub");
-        String pub = Bencode.asString(pubValue);
-        String sig = Bencode.asString(dict.get("s"));
-        if (kindCode == null || seq == null || bh == null || bkh == null || ph == null
-                || sig == null || (pubValue != null && pub == null)) {
-            return null;
-        }
-        if (pub == null && (ownerPub == null || ownerPub.length != 32)) {
-            return null;
-        }
-
-        Kind kind;
-        if ("EC".equals(kindCode)) {
-            kind = Kind.EPOCH_COMMITMENT;
-        } else if ("EN".equals(kindCode)) {
-            kind = Kind.ENDORSEMENT;
-        } else {
-            return null;
-        }
-
-        Builder b = new Builder();
-        b.kind = kind;
-        b.prevHash = Hex.decode(ph);
-        b.seq = seq;
-        b.endorserPub = pub != null
-                ? Base64.getUrlDecoder().decode(pub)
-                : ownerPub.clone();
-        b.timestamp = 0L;
-        b.signature = Base64.getUrlDecoder().decode(sig);
-        b.blockHeight = bh;
-        b.blockHash = Hex.decode(bkh);
-
-        if (kind == Kind.EPOCH_COMMITMENT) {
-            Long ep = Bencode.asLong(dict.get("ep"));
-            String en = Bencode.asString(dict.get("en"));
-            if (ep == null || en == null) {
-                return null;
-            }
-            b.epoch = ep;
-            try {
-                b.energy = Double.parseDouble(en);
-            } catch (NumberFormatException e) {
-                return null;
-            }
-            // Not just the range: NaN fails both comparisons and would lift the endorsement
-            // budget in KarmaChain.verify (frostwire/frostwire#1401).
-            if (!Double.isFinite(b.energy)
-                    || b.energy < 0 || b.energy > KarmaConstants.MAX_ENERGY + 0.01) {
-                return null;
-            }
-        } else {
-            String pp = Bencode.asString(dict.get("pp"));
-            String ih = Bencode.asString(dict.get("ih"));
-            Object sdValue = dict.get("sd");
-            Long sd = Bencode.asLong(sdValue);
-            if (pp == null || ih == null || (sdValue != null && sd == null)) {
-                return null;
-            }
-            // Reject rather than truncate: (int) of an out-of-range value still verified (#1401).
-            if (sd != null && (sd < Integer.MIN_VALUE || sd > Integer.MAX_VALUE)) {
-                return null;
-            }
-            b.peerPub = Base64.getUrlDecoder().decode(pp);
-            b.infoHash = Hex.decode(ih);
-            if (b.infoHash.length != 20) {
-                return null;
-            }
-            // Score deltas are always 1 in this protocol version; the
-            // publisher omits the field in that case to fit the DHT cap.
-            b.scoreDelta = sd == null ? 1 : (int) sd.longValue();
-        }
-        return b.build();
-    }
-
-    /**
-     * Verifies the Ed25519 signature against the canonical bytes.
-     *
-     * <p>Uses {@link IdentityKeys#softwareSignature} so verification
-     * accepts the same providers as signing (notably BouncyCastle on
-     * Android, where the default provider may reject software keys).
-     */
-    public boolean verifySignature() {
-        try {
-            Signature verifier = IdentityKeys.softwareSignature("Ed25519");
-            verifier.initVerify(rawEd25519ToPublicKey(endorserPub));
-            verifier.update(canonicalBytes());
-            return verifier.verify(signature);
-        } catch (Exception e) {
-            LOG.debug("Signature verification failed", e);
-            return false;
-        }
-    }
-
-    private static byte[] sign(byte[] data, PrivateKey key) {
-        try {
-            Signature signer = IdentityKeys.softwareSignature("Ed25519");
-            signer.initSign(key);
-            signer.update(data);
-            return signer.sign();
-        } catch (GeneralSecurityException e) {
-            throw new IllegalStateException("Failed to sign karma chain entry", e);
-        }
-    }
-
-    /**
-     * Reconstructs an Ed25519 public key from its raw 32-byte form.
-     * The X.509 SubjectPublicKeyInfo prefix for Ed25519 is
-     * 30 2a 30 05 06 03 2b 65 70 03 21 00 (12 bytes).
-     */
-    private static PublicKey rawEd25519ToPublicKey(byte[] raw) throws GeneralSecurityException {
-        byte[] prefix = {0x30, 0x2a, 0x30, 0x05, 0x06, 0x03, 0x2b, 0x65, 0x70, 0x03, 0x21, 0x00};
-        byte[] encoded = new byte[prefix.length + raw.length];
-        System.arraycopy(prefix, 0, encoded, 0, prefix.length);
-        System.arraycopy(raw, 0, encoded, prefix.length, raw.length);
-        return IdentityKeys.softwareKeyFactory("Ed25519").generatePublic(new X509EncodedKeySpec(encoded));
-    }
-
-    private static byte[] sha256(byte[] data) {
-        try {
-            return MessageDigest.getInstance("SHA-256").digest(data);
-        } catch (Exception e) {
-            throw new IllegalStateException("SHA-256 unavailable", e);
-        }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof KarmaChainEntry)) return false;
-        KarmaChainEntry that = (KarmaChainEntry) o;
-        return seq == that.seq
-                && Arrays.equals(signature, that.signature)
-                && Arrays.equals(prevHash, that.prevHash);
-    }
-
-    @Override
-    public int hashCode() {
-        return 31 * Long.hashCode(seq) + Arrays.hashCode(signature);
-    }
-
-    @Override
-    public String toString() {
-        return "KarmaChainEntry{kind=" + kind + ", seq=" + seq +
-                ", blockHeight=" + blockHeight + "}";
-    }
-
-    private static final class Builder {
-        Kind kind;
-        byte[] prevHash;
-        long seq;
-        byte[] endorserPub;
-        long timestamp;
-        byte[] signature = new byte[64];
-        long blockHeight;
-        byte[] blockHash;
-        Long epoch;
-        Double energy;
-        byte[] peerPub;
-        byte[] infoHash;
-        Integer scoreDelta;
-        byte[] canonicalBytes;
-
-        void canonicalBytesForSigning() {
-            // Bencode sorts the keys by their bytes, as libtorrent's entry did.
-            Map<String, Object> map = new TreeMap<>();
-            map.put("bh", blockHeight);
-            map.put("bk", Hex.encode(blockHash));
-            map.put("k", kind.code);
-            map.put("ph", Hex.encode(prevHash));
-            map.put("pub", Base64.getUrlEncoder().withoutPadding().encodeToString(endorserPub));
-            map.put("seq", seq);
-            // Note: timestamp is NOT included in the signed canonical form
-            // so that two entries created at the same logical state produce
-            // identical signatures. Timestamp is informational and part of
-            // the public record but not part of the integrity contract.
-
-            if (kind == Kind.EPOCH_COMMITMENT) {
-                map.put("e", String.format(java.util.Locale.ROOT, "%.2f", energy));
-                map.put("ep", epoch);
-            } else { // ENDORSEMENT
-                map.put("ih", Hex.encode(infoHash));
-                map.put("pp", Base64.getUrlEncoder().withoutPadding().encodeToString(peerPub));
-                map.put("sd", (long) scoreDelta);
-            }
-
-            this.canonicalBytes = Bencode.encode(map);
-        }
-
-        KarmaChainEntry build() {
-            return new KarmaChainEntry(this);
-        }
-    }
+  }
 }

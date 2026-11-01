@@ -19,30 +19,25 @@
 package com.frostwire.search;
 
 /**
- * Torrent-specific metadata composed into FileSearchResult.
- * Represents the optional torrent capability.
+ * Torrent-specific metadata composed into FileSearchResult. Represents the optional torrent
+ * capability.
  *
  * @author gubatron
  */
-public record TorrentMetadata(
-        String url,
-        String hash,
-        int seeds,
-        String referrerUrl
-) {
-    public String getUrl() {
-        return url;
-    }
+public record TorrentMetadata(String url, String hash, int seeds, String referrerUrl) {
+  public String getUrl() {
+    return url;
+  }
 
-    public String getHash() {
-        return hash;
-    }
+  public String getHash() {
+    return hash;
+  }
 
-    public int getSeeds() {
-        return seeds;
-    }
+  public int getSeeds() {
+    return seeds;
+  }
 
-    public String getReferrerUrl() {
-        return referrerUrl;
-    }
+  public String getReferrerUrl() {
+    return referrerUrl;
+  }
 }

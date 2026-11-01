@@ -10,40 +10,37 @@ package com.frostwire.search.relay;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Tracks whether this node has received unsolicited inbound connections,
- * which is the simplest empirical NAT traversal indicator.
+ * Tracks whether this node has received unsolicited inbound connections, which is the simplest
+ * empirical NAT traversal indicator.
  *
- * <p>A node is "connectable" if it has received at least one incoming
- * rUDP packet from a peer that it did not recently initiate a connection
- * to. This is set by the rUDP session manager when it receives a HELLO
- * from an address that has no existing outbound session.
+ * <p>A node is "connectable" if it has received at least one incoming rUDP packet from a peer that
+ * it did not recently initiate a connection to. This is set by the rUDP session manager when it
+ * receives a HELLO from an address that has no existing outbound session.
  *
- * <p>The flag is sticky — once connectable, always connectable for the
- * session. NAT state rarely changes mid-session without the user
- * switching networks, in which case the app restarts anyway.
+ * <p>The flag is sticky — once connectable, always connectable for the session. NAT state rarely
+ * changes mid-session without the user switching networks, in which case the app restarts anyway.
  */
 public final class ConnectivityDetector {
 
-    private static final ConnectivityDetector INSTANCE = new ConnectivityDetector();
+  private static final ConnectivityDetector INSTANCE = new ConnectivityDetector();
 
-    private final AtomicBoolean connectable = new AtomicBoolean(false);
+  private final AtomicBoolean connectable = new AtomicBoolean(false);
 
-    public static ConnectivityDetector instance() {
-        return INSTANCE;
-    }
+  public static ConnectivityDetector instance() {
+    return INSTANCE;
+  }
 
-    private ConnectivityDetector() {
-    }
+  private ConnectivityDetector() {}
 
-    public boolean isConnectable() {
-        return connectable.get();
-    }
+  public boolean isConnectable() {
+    return connectable.get();
+  }
 
-    public void markConnectable() {
-        connectable.set(true);
-    }
+  public void markConnectable() {
+    connectable.set(true);
+  }
 
-    public void reset() {
-        connectable.set(false);
-    }
+  public void reset() {
+    connectable.set(false);
+  }
 }

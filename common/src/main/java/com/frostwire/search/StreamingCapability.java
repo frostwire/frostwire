@@ -19,15 +19,13 @@
 package com.frostwire.search;
 
 /**
- * Streaming capability metadata composed into FileSearchResult.
- * Represents the optional streaming capability.
+ * Streaming capability metadata composed into FileSearchResult. Represents the optional streaming
+ * capability.
  *
  * @author gubatron
  */
-public record StreamingCapability(
-        String url
-) {
-    public String getUrl() {
-        return url;
-    }
+public record StreamingCapability(String url) {
+  public String getUrl() {
+    return url;
+  }
 }

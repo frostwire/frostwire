@@ -18,8 +18,6 @@
 
 package com.frostwire.search;
 
-import com.frostwire.search.SearchListener;
-
 import java.util.List;
 
 /**
@@ -29,13 +27,13 @@ import java.util.List;
  * @author gubatron
  */
 public interface CrawlingStrategy {
-    /**
-     * Crawls into the given results to extract additional information.
-     * Updates results in-place by setting crawled children via FileSearchResult.setCrawlableChildren().
-     *
-     * @param results the initial search results to crawl into
-     * @param listener the search listener to notify when crawling is complete
-     * @param token the search token for identifying the search session
-     */
-    void crawlResults(List<FileSearchResult> results, SearchListener listener, long token);
+  /**
+   * Crawls into the given results to extract additional information. Updates results in-place by
+   * setting crawled children via FileSearchResult.setCrawlableChildren().
+   *
+   * @param results the initial search results to crawl into
+   * @param listener the search listener to notify when crawling is complete
+   * @param token the search token for identifying the search session
+   */
+  void crawlResults(List<FileSearchResult> results, SearchListener listener, long token);
 }

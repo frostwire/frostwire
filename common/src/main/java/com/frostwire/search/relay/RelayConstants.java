@@ -11,122 +11,123 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
-/**
- * Constants shared by distributed search, relayd, and desktop UI glue.
- */
+/** Constants shared by distributed search, relayd, and desktop UI glue. */
 public final class RelayConstants {
-    public static final int RELAY_REGISTRY_TTL_SEC = 30 * 60;
-    public static final int IDENTITY_REPUBLISH_INTERVAL_SEC = 5 * 60;
-    public static final int RELAY_REPUBLISH_INTERVAL_SEC = 5 * 60;
-    public static final int KARMA_COMMIT_INTERVAL_SEC = 30 * 60;
-    public static final int KARMA_PUBLISH_INTERVAL_SEC = 30 * 60;
-    public static final int DEFAULT_MAX_QPS = 5;
-    public static final int WOT_MAX_DEPTH = 3;
+  public static final int RELAY_REGISTRY_TTL_SEC = 30 * 60;
+  public static final int IDENTITY_REPUBLISH_INTERVAL_SEC = 5 * 60;
+  public static final int RELAY_REPUBLISH_INTERVAL_SEC = 5 * 60;
+  public static final int KARMA_COMMIT_INTERVAL_SEC = 30 * 60;
+  public static final int KARMA_PUBLISH_INTERVAL_SEC = 30 * 60;
+  public static final int DEFAULT_MAX_QPS = 5;
+  public static final int WOT_MAX_DEPTH = 3;
 
-    public static final int CHALLENGE_NONCE_BYTES = 32;
-    public static final int TRANSPORT_NONCE_BYTES = 12;
-    public static final int PAYLOAD_NONCE_BYTES = 12;
+  public static final int CHALLENGE_NONCE_BYTES = 32;
+  public static final int TRANSPORT_NONCE_BYTES = 12;
+  public static final int PAYLOAD_NONCE_BYTES = 12;
 
-    public static final String TOPIC_PEERS = "frostwire-peers-v1";
-    public static final String TOPIC_RELAYS = "frostwire-relays-v1";
-    public static final String TOPIC_BOOTSTRAP = "frostwire-bootstrap-v1";
-    /**
-     * Time-bucketed rendezvous topic nodes announce under so an observer can estimate how many
-     * peers are online in a window without ever dialing any of them. See {@link
-     * #heartbeatTopic(long)}.
-     */
-    public static final String TOPIC_HEARTBEAT_PREFIX = "frostwire-heartbeat-v1";
+  public static final String TOPIC_PEERS = "frostwire-peers-v1";
+  public static final String TOPIC_RELAYS = "frostwire-relays-v1";
+  public static final String TOPIC_BOOTSTRAP = "frostwire-bootstrap-v1";
 
-    /** Bucket width for {@link #heartbeatTopic(long)}; one hour balances resolution and topic count. */
-    public static final long HEARTBEAT_BUCKET_MS = 60L * 60L * 1000L;
+  /**
+   * Time-bucketed rendezvous topic nodes announce under so an observer can estimate how many peers
+   * are online in a window without ever dialing any of them. See {@link #heartbeatTopic(long)}.
+   */
+  public static final String TOPIC_HEARTBEAT_PREFIX = "frostwire-heartbeat-v1";
 
-    public static final String BEP46_SALT_IDENTITY = "frostwire-identity-v1";
-    public static final String BEP46_SALT_INDEX = "frostwire-index-v1";
+  /**
+   * Bucket width for {@link #heartbeatTopic(long)}; one hour balances resolution and topic count.
+   */
+  public static final long HEARTBEAT_BUCKET_MS = 60L * 60L * 1000L;
 
-    public static final String TRANSPORT_KDF_LABEL = "frostwire-relay-transport-v1";
-    public static final String PAYLOAD_KDF_LABEL = "frostwire-search-v1";
+  public static final String BEP46_SALT_IDENTITY = "frostwire-identity-v1";
+  public static final String BEP46_SALT_INDEX = "frostwire-index-v1";
 
-    public static final int LOCAL_INDEX_MAX_RESULTS = 50;
-    public static final int LOCAL_INDEX_PEER_LRU_PER_PEER = 10_000;
-    public static final int PEER_INDEX_SWEEP_INTERVAL_SEC = 600;
-    public static final int EVENT_LOG_MAX_ROWS = 10_000;
-    public static final String EVENT_LOG_PATH = "distributed_search_log.jsonl";
-    public static final String IDENTITY_FILE = "identity.dat";
-    /**
-     * Subdirectory under the platform user settings dir for identity, local
-     * index DB, and related relay state (desktop: FrostWire5 settings;
-     * Android: app files dir when callers pass that root).
-     */
-    public static final String RELAY_HOME_DIR = "libtorrent";
-    public static final String BITCOIN_HEADER_CACHE_DIR = "bitcoin-headers";
+  public static final String TRANSPORT_KDF_LABEL = "frostwire-relay-transport-v1";
+  public static final String PAYLOAD_KDF_LABEL = "frostwire-search-v1";
 
-    /**
-     * Legacy default of the removed TCP identity/search port. Peers are verified over rUDP now;
-     * {@code IceBridgeConfig} keeps it only as the "standalone forwarder" marker.
-     */
-    public static final int RELAY_LISTEN_PORT = 6888;
+  public static final int LOCAL_INDEX_MAX_RESULTS = 50;
+  public static final int LOCAL_INDEX_PEER_LRU_PER_PEER = 10_000;
+  public static final int PEER_INDEX_SWEEP_INTERVAL_SEC = 600;
+  public static final int EVENT_LOG_MAX_ROWS = 10_000;
+  public static final String EVENT_LOG_PATH = "distributed_search_log.jsonl";
+  public static final String IDENTITY_FILE = "identity.dat";
 
-    /**
-     * Last-resort IceBridge servers every client tries even when the DHT, the host cache and the LAN
-     * all come back empty, so a fresh install can always find the network. They are only candidates:
-     * each one must still pass the rUDP identity handshake (the port is the rUDP port). Override with the
-     * {@code frostwire.icebridge.seeds} system property (comma separated {@code host:port}; empty
-     * disables the built-in seeds).
-     */
-    public static final String[] DEFAULT_SEED_HOSTS = {"virginia1.frostwire.com:6889"};
+  /**
+   * Subdirectory under the platform user settings dir for identity, local index DB, and related
+   * relay state (desktop: FrostWire5 settings; Android: app files dir when callers pass that root).
+   */
+  public static final String RELAY_HOME_DIR = "libtorrent";
 
-    public static java.util.List<String> seedHosts() {
-        String override = System.getProperty("frostwire.icebridge.seeds");
-        if (override == null) {
-            return java.util.Arrays.asList(DEFAULT_SEED_HOSTS);
-        }
-        java.util.List<String> seeds = new java.util.ArrayList<>();
-        for (String seed : override.split(",")) {
-            if (!seed.trim().isEmpty()) {
-                seeds.add(seed.trim());
-            }
-        }
-        return seeds;
+  public static final String BITCOIN_HEADER_CACHE_DIR = "bitcoin-headers";
+
+  /**
+   * Legacy default of the removed TCP identity/search port. Peers are verified over rUDP now;
+   * {@code IceBridgeConfig} keeps it only as the "standalone forwarder" marker.
+   */
+  public static final int RELAY_LISTEN_PORT = 6888;
+
+  /**
+   * Last-resort IceBridge servers every client tries even when the DHT, the host cache and the LAN
+   * all come back empty, so a fresh install can always find the network. They are only candidates:
+   * each one must still pass the rUDP identity handshake (the port is the rUDP port). Override with
+   * the {@code frostwire.icebridge.seeds} system property (comma separated {@code host:port}; empty
+   * disables the built-in seeds).
+   */
+  public static final String[] DEFAULT_SEED_HOSTS = {"virginia1.frostwire.com:6889"};
+
+  public static java.util.List<String> seedHosts() {
+    String override = System.getProperty("frostwire.icebridge.seeds");
+    if (override == null) {
+      return java.util.Arrays.asList(DEFAULT_SEED_HOSTS);
     }
-
-    private RelayConstants() {
+    java.util.List<String> seeds = new java.util.ArrayList<>();
+    for (String seed : override.split(",")) {
+      if (!seed.trim().isEmpty()) {
+        seeds.add(seed.trim());
+      }
     }
+    return seeds;
+  }
 
-    /**
-     * {@code userSettingsDir/libtorrent} — shared home for identity + index.
-     *
-     * @param userSettingsDir platform settings root (must not be null)
-     */
-    public static File relayHomeDir(File userSettingsDir) {
-        if (userSettingsDir == null) {
-            throw new IllegalArgumentException("userSettingsDir is null");
-        }
-        return new File(userSettingsDir, RELAY_HOME_DIR);
-    }
+  private RelayConstants() {}
 
-    /**
-     * Canonical identity path used by desktop Initializer, Identity settings,
-     * and IceBridge child launch: {@code userSettingsDir/libtorrent/identity.dat}.
-     */
-    public static File identityFile(File userSettingsDir) {
-        return new File(relayHomeDir(userSettingsDir), IDENTITY_FILE);
+  /**
+   * {@code userSettingsDir/libtorrent} — shared home for identity + index.
+   *
+   * @param userSettingsDir platform settings root (must not be null)
+   */
+  public static File relayHomeDir(File userSettingsDir) {
+    if (userSettingsDir == null) {
+      throw new IllegalArgumentException("userSettingsDir is null");
     }
+    return new File(userSettingsDir, RELAY_HOME_DIR);
+  }
 
-    /** Bucket index for a wall-clock time; stable within an hour. */
-    public static long heartbeatBucketIndex(long epochMs) {
-        return Math.floorDiv(epochMs, HEARTBEAT_BUCKET_MS);
-    }
+  /**
+   * Canonical identity path used by desktop Initializer, Identity settings, and IceBridge child
+   * launch: {@code userSettingsDir/libtorrent/identity.dat}.
+   */
+  public static File identityFile(File userSettingsDir) {
+    return new File(relayHomeDir(userSettingsDir), IDENTITY_FILE);
+  }
 
-    /** Topic a peer announces under for the bucket containing {@code epochMs}. */
-    public static String heartbeatTopic(long epochMs) {
-        return TOPIC_HEARTBEAT_PREFIX + "-" + heartbeatBucketIndex(epochMs);
-    }
+  /** Bucket index for a wall-clock time; stable within an hour. */
+  public static long heartbeatBucketIndex(long epochMs) {
+    return Math.floorDiv(epochMs, HEARTBEAT_BUCKET_MS);
+  }
 
-    public static byte[] topicHash(String topic) {        try {
-            MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
-            return sha1.digest(topic.getBytes(StandardCharsets.US_ASCII));
-        } catch (Exception e) {
-            throw new IllegalStateException("SHA-1 unavailable", e);
-        }
+  /** Topic a peer announces under for the bucket containing {@code epochMs}. */
+  public static String heartbeatTopic(long epochMs) {
+    return TOPIC_HEARTBEAT_PREFIX + "-" + heartbeatBucketIndex(epochMs);
+  }
+
+  public static byte[] topicHash(String topic) {
+    try {
+      MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
+      return sha1.digest(topic.getBytes(StandardCharsets.US_ASCII));
+    } catch (Exception e) {
+      throw new IllegalStateException("SHA-1 unavailable", e);
     }
+  }
 }

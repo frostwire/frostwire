@@ -34,7 +34,6 @@ import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.QueryStringDecoder;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
@@ -45,607 +44,693 @@ import java.util.stream.Collectors;
  * Netty HTTP handler for the local IceBridge control API.
  *
  * <p>Endpoints:
+ *
  * <ul>
- *   <li>{@code POST /register} — register or refresh a peer identity and endpoint (signed).</li>
- *   <li>{@code POST /consumer} — enable/disable an authoritative identity queue (administrator).</li>
- *   <li>{@code POST /route} — add a peer to the registry without a signature (localhost-only trust).</li>
- *   <li>{@code GET /lookup?count=N} — return up to N forward-capable peers.</li>
- *   <li>{@code POST /send} — send an opaque payload to a target peer.</li>
- *   <li>{@code GET /poll?count=N} — retrieve received payloads queued for the local process.</li>
- *   <li>{@code GET /metrics} — return in-memory counters and registry size.</li>
- *   <li>{@code GET /events} — return recent IceBridge events, newest first (filterable).</li>
- *   <li>{@code GET /catalog?pub=<base64url>&timeoutMs=<n>} — fetch a peer's shared-torrent catalog.</li>
- *   <li>{@code GET /torrent?ih=<hex>&pub=<base64url>&timeoutMs=<n>} — fetch a holder-signed .torrent.</li>
- *   <li>{@code GET /health} — liveness check.</li>
+ *   <li>{@code POST /register} — register or refresh a peer identity and endpoint (signed).
+ *   <li>{@code POST /consumer} — enable/disable an authoritative identity queue (administrator).
+ *   <li>{@code POST /route} — add a peer to the registry without a signature (localhost-only
+ *       trust).
+ *   <li>{@code GET /lookup?count=N} — return up to N forward-capable peers.
+ *   <li>{@code POST /send} — send an opaque payload to a target peer.
+ *   <li>{@code GET /poll?count=N} — retrieve received payloads queued for the local process.
+ *   <li>{@code GET /metrics} — return in-memory counters and registry size.
+ *   <li>{@code GET /events} — return recent IceBridge events, newest first (filterable).
+ *   <li>{@code GET /catalog?pub=<base64url>&timeoutMs=<n>} — fetch a peer's shared-torrent catalog.
+ *   <li>{@code GET /torrent?ih=<hex>&pub=<base64url>&timeoutMs=<n>} — fetch a holder-signed
+ *       .torrent.
+ *   <li>{@code GET /health} — liveness check.
  * </ul>
  */
 public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
-    private static final Logger LOG = Logger.getLogger(ControlHandler.class);
-    private static final Gson GSON = new Gson();
-    private static final int DEFAULT_LOOKUP_COUNT = 10;
-    private static final int DEFAULT_POLL_COUNT = 64;
-    private static final int DEFAULT_EVENTS_LIMIT = 100;
-    private static final int MAX_EVENTS_LIMIT = 1000;
-    private static final int MAX_BODY_BYTES = 64 * 1024;
-    private static final int DEFAULT_CATALOG_TIMEOUT_MS = 5000;
-    private static final int MIN_CATALOG_TIMEOUT_MS = 100;
-    private static final int MAX_CATALOG_TIMEOUT_MS = 30000;
-    private static final int DEFAULT_TORRENT_TIMEOUT_MS = 15000;
-    private static final int MIN_TORRENT_TIMEOUT_MS = 100;
-    private static final int MAX_TORRENT_TIMEOUT_MS = 30000;
-    private static final int INFO_HASH_HEX_LENGTH = 40;
+  private static final Logger LOG = Logger.getLogger(ControlHandler.class);
+  private static final Gson GSON = new Gson();
+  private static final int DEFAULT_LOOKUP_COUNT = 10;
+  private static final int DEFAULT_POLL_COUNT = 64;
+  private static final int DEFAULT_EVENTS_LIMIT = 100;
+  private static final int MAX_EVENTS_LIMIT = 1000;
+  private static final int MAX_BODY_BYTES = 64 * 1024;
+  private static final int DEFAULT_CATALOG_TIMEOUT_MS = 5000;
+  private static final int MIN_CATALOG_TIMEOUT_MS = 100;
+  private static final int MAX_CATALOG_TIMEOUT_MS = 30000;
+  private static final int DEFAULT_TORRENT_TIMEOUT_MS = 15000;
+  private static final int MIN_TORRENT_TIMEOUT_MS = 100;
+  private static final int MAX_TORRENT_TIMEOUT_MS = 30000;
+  private static final int INFO_HASH_HEX_LENGTH = 40;
 
-    private final PeerRegistry registry;
-    private final IceBridgeMetrics metrics;
-    private final IceBridgeConfig config;
-    private final RudpSessionManager rudpSessionManager;
-    private final InboundMessageQueue inboundQueue;
-    private final IceBridgeTokens authTokens;
-    private final CatalogFetcher catalogFetcher;
-    private final TorrentFetcher torrentFetcher;
+  private final PeerRegistry registry;
+  private final IceBridgeMetrics metrics;
+  private final IceBridgeConfig config;
+  private final RudpSessionManager rudpSessionManager;
+  private final InboundMessageQueue inboundQueue;
+  private final IceBridgeTokens authTokens;
+  private final CatalogFetcher catalogFetcher;
+  private final TorrentFetcher torrentFetcher;
 
-    public ControlHandler(PeerRegistry registry,
-                          IceBridgeMetrics metrics,
-                          IceBridgeConfig config,
-                          RudpSessionManager rudpSessionManager,
-                          InboundMessageQueue inboundQueue,
-                          IceBridgeTokens authTokens,
-                          CatalogFetcher catalogFetcher,
-                          TorrentFetcher torrentFetcher) {
-        this.registry = registry;
-        this.metrics = metrics;
-        this.config = config;
-        this.rudpSessionManager = rudpSessionManager;
-        this.inboundQueue = inboundQueue;
-        this.authTokens = (authTokens != null) ? authTokens : new IceBridgeTokens(config.authTokensFile());
-        this.catalogFetcher = catalogFetcher;
-        this.torrentFetcher = torrentFetcher;
+  public ControlHandler(
+      PeerRegistry registry,
+      IceBridgeMetrics metrics,
+      IceBridgeConfig config,
+      RudpSessionManager rudpSessionManager,
+      InboundMessageQueue inboundQueue,
+      IceBridgeTokens authTokens,
+      CatalogFetcher catalogFetcher,
+      TorrentFetcher torrentFetcher) {
+    this.registry = registry;
+    this.metrics = metrics;
+    this.config = config;
+    this.rudpSessionManager = rudpSessionManager;
+    this.inboundQueue = inboundQueue;
+    this.authTokens =
+        (authTokens != null) ? authTokens : new IceBridgeTokens(config.authTokensFile());
+    this.catalogFetcher = catalogFetcher;
+    this.torrentFetcher = torrentFetcher;
+  }
+
+  @Override
+  protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) {
+    metrics.controlRequest();
+
+    // SEC5: Require a valid bearer token (supports multiple) on all endpoints except /health.
+    String path;
+    try {
+      path = new QueryStringDecoder(request.uri()).path();
+    } catch (IllegalArgumentException malformedEscape) {
+      // A path like "/%" or "/%zz" (frostwire/frostwire#1396): answer 400 like the query
+      // decoders below do, instead of throwing out of the handler before the token check.
+      sendJson(
+          ctx,
+          request,
+          HttpResponseStatus.BAD_REQUEST,
+          ApiResponse.error("malformed request path"));
+      return;
+    }
+    if (!"/health".equals(path)) {
+      String token = request.headers().get("X-IceBridge-Token");
+      if (authTokens == null || !authTokens.isValid(token)) {
+        sendJson(ctx, request, HttpResponseStatus.UNAUTHORIZED, ApiResponse.error("unauthorized"));
+        return;
+      }
     }
 
-    @Override
-    protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) {
-        metrics.controlRequest();
+    String uri = request.uri();
+    HttpMethod method = request.method();
 
-        // SEC5: Require a valid bearer token (supports multiple) on all endpoints except /health.
-        String path;
-        try {
-            path = new QueryStringDecoder(request.uri()).path();
-        } catch (IllegalArgumentException malformedEscape) {
-            // A path like "/%" or "/%zz" (frostwire/frostwire#1396): answer 400 like the query
-            // decoders below do, instead of throwing out of the handler before the token check.
-            sendJson(ctx, request, HttpResponseStatus.BAD_REQUEST,
-                    ApiResponse.error("malformed request path"));
-            return;
-        }
-        if (!"/health".equals(path)) {
-            String token = request.headers().get("X-IceBridge-Token");
-            if (authTokens == null || !authTokens.isValid(token)) {
-                sendJson(ctx, request, HttpResponseStatus.UNAUTHORIZED,
-                        ApiResponse.error("unauthorized"));
-                return;
-            }
-        }
+    try {
+      ApiResponse<?> response;
+      if (request.content().readableBytes() > MAX_BODY_BYTES) {
+        sendJson(
+            ctx,
+            request,
+            HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE,
+            ApiResponse.error("request body too large"));
+        return;
+      }
+      if (method == HttpMethod.POST && "/register".equals(path)) {
+        response = handleRegister(request);
+      } else if (method == HttpMethod.POST && "/consumer".equals(path)) {
+        response = handleConsumer(request);
+      } else if (method == HttpMethod.POST && "/route".equals(path)) {
+        response = handleRoute(request);
+      } else if (method == HttpMethod.POST && "/probe".equals(path)) {
+        response = handleProbe(request);
+      } else if (method == HttpMethod.GET && "/lookup".equals(path)) {
+        response = handleLookup(uri);
+      } else if (method == HttpMethod.POST && "/send".equals(path)) {
+        response = handleSend(request);
+      } else if (method == HttpMethod.GET && "/poll".equals(path)) {
+        response = handlePoll(uri);
+      } else if (method == HttpMethod.GET && "/metrics".equals(path)) {
+        response = handleMetrics();
+      } else if (method == HttpMethod.GET && "/events".equals(path)) {
+        response = handleEvents(uri);
+      } else if (method == HttpMethod.GET && "/catalog".equals(path)) {
+        response = handleCatalog(uri);
+      } else if (method == HttpMethod.GET && "/torrent".equals(path)) {
+        response = handleTorrent(uri);
+      } else if (method == HttpMethod.GET && "/health".equals(path)) {
+        response = ApiResponse.success("ok");
+      } else {
+        response = ApiResponse.error("unknown endpoint: " + method + " " + path);
+      }
+      sendJson(
+          ctx,
+          request,
+          response.ok ? HttpResponseStatus.OK : HttpResponseStatus.BAD_REQUEST,
+          response);
+    } catch (com.google.gson.JsonParseException | IllegalArgumentException e) {
+      sendJson(ctx, request, HttpResponseStatus.BAD_REQUEST, ApiResponse.error("invalid request"));
+    } catch (RuntimeException t) {
+      LOG.warn("Control handler error", t);
+      metrics.controlError();
+      sendJson(
+          ctx,
+          request,
+          HttpResponseStatus.INTERNAL_SERVER_ERROR,
+          ApiResponse.error("internal error"));
+    }
+  }
 
-        String uri = request.uri();
-        HttpMethod method = request.method();
-
-        try {
-            ApiResponse<?> response;
-            if (request.content().readableBytes() > MAX_BODY_BYTES) {
-                sendJson(ctx, request, HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE,
-                        ApiResponse.error("request body too large"));
-                return;
-            }
-            if (method == HttpMethod.POST && "/register".equals(path)) {
-                response = handleRegister(request);
-            } else if (method == HttpMethod.POST && "/consumer".equals(path)) {
-                response = handleConsumer(request);
-            } else if (method == HttpMethod.POST && "/route".equals(path)) {
-                response = handleRoute(request);
-            } else if (method == HttpMethod.POST && "/probe".equals(path)) {
-                response = handleProbe(request);
-            } else if (method == HttpMethod.GET && "/lookup".equals(path)) {
-                response = handleLookup(uri);
-            } else if (method == HttpMethod.POST && "/send".equals(path)) {
-                response = handleSend(request);
-            } else if (method == HttpMethod.GET && "/poll".equals(path)) {
-                response = handlePoll(uri);
-            } else if (method == HttpMethod.GET && "/metrics".equals(path)) {
-                response = handleMetrics();
-            } else if (method == HttpMethod.GET && "/events".equals(path)) {
-                response = handleEvents(uri);
-            } else if (method == HttpMethod.GET && "/catalog".equals(path)) {
-                response = handleCatalog(uri);
-            } else if (method == HttpMethod.GET && "/torrent".equals(path)) {
-                response = handleTorrent(uri);
-            } else if (method == HttpMethod.GET && "/health".equals(path)) {
-                response = ApiResponse.success("ok");
-            } else {
-                response = ApiResponse.error("unknown endpoint: " + method + " " + path);
-            }
-            sendJson(ctx, request, response.ok ? HttpResponseStatus.OK : HttpResponseStatus.BAD_REQUEST, response);
-        } catch (com.google.gson.JsonParseException | IllegalArgumentException e) {
-            sendJson(ctx, request, HttpResponseStatus.BAD_REQUEST, ApiResponse.error("invalid request"));
-        } catch (RuntimeException t) {
-            LOG.warn("Control handler error", t);
-            metrics.controlError();
-            sendJson(ctx, request, HttpResponseStatus.INTERNAL_SERVER_ERROR,
-                    ApiResponse.error("internal error"));
-        }
+  private ApiResponse<String> handleRegister(FullHttpRequest request) {
+    ByteBuf content = request.content();
+    byte[] bytes = new byte[content.readableBytes()];
+    content.readBytes(bytes);
+    RegisterRequest req =
+        GSON.fromJson(new String(bytes, StandardCharsets.UTF_8), RegisterRequest.class);
+    if (req == null) {
+      return ApiResponse.error("missing request body");
+    }
+    if (req.pub == null || req.signature == null) {
+      return ApiResponse.error("pub and signature are required");
     }
 
-    private ApiResponse<String> handleRegister(FullHttpRequest request) {
-        ByteBuf content = request.content();
-        byte[] bytes = new byte[content.readableBytes()];
-        content.readBytes(bytes);
-        RegisterRequest req = GSON.fromJson(new String(bytes, StandardCharsets.UTF_8), RegisterRequest.class);
-        if (req == null) {
-            return ApiResponse.error("missing request body");
-        }
-        if (req.pub == null || req.signature == null) {
-            return ApiResponse.error("pub and signature are required");
-        }
-
-        byte[] rawPub;
-        byte[] signature;
-        try {
-            rawPub = IceBridgeAuth.decodeBase64(req.pub);
-            signature = IceBridgeAuth.decodeBase64(req.signature);
-        } catch (IllegalArgumentException e) {
-            return ApiResponse.error("invalid base64: " + e.getMessage());
-        }
-        if (rawPub.length != 32) {
-            return ApiResponse.error("pub must be 32 bytes");
-        }
-        if (signature.length != 64) {
-            return ApiResponse.error("signature must be 64 bytes");
-        }
-
-        boolean verified = IceBridgeAuth.verify(rawPub, canonicalBytes(req), signature);
-        if (!verified) {
-            return ApiResponse.error("invalid signature");
-        }
-
-        long nowSec = System.currentTimeMillis() / 1000L;
-        if (req.timestamp < nowSec - 60 || req.timestamp > nowSec + 60) {
-            return ApiResponse.error("timestamp skew too large");
-        }
-
-        PeerRecord record = new PeerRecord(rawPub, req.host, req.rudpPort,
-                req.role == null ? IceBridgeConfig.Role.CLIENT : req.role,
-                System.currentTimeMillis(),
-                req.icebridgeVersion);
-        boolean accepted = registry.register(record);
-        return accepted
-                ? ApiResponse.success("registered")
-                : ApiResponse.error("rate limited or at capacity");
+    byte[] rawPub;
+    byte[] signature;
+    try {
+      rawPub = IceBridgeAuth.decodeBase64(req.pub);
+      signature = IceBridgeAuth.decodeBase64(req.signature);
+    } catch (IllegalArgumentException e) {
+      return ApiResponse.error("invalid base64: " + e.getMessage());
+    }
+    if (rawPub.length != 32) {
+      return ApiResponse.error("pub must be 32 bytes");
+    }
+    if (signature.length != 64) {
+      return ApiResponse.error("signature must be 64 bytes");
     }
 
-    private byte[] canonicalBytes(RegisterRequest req) {
-        return req.canonicalString().getBytes(StandardCharsets.UTF_8);
+    boolean verified = IceBridgeAuth.verify(rawPub, canonicalBytes(req), signature);
+    if (!verified) {
+      return ApiResponse.error("invalid signature");
     }
 
-    private ApiResponse<String> handleConsumer(FullHttpRequest request) {
-        ConsumerRequest req = decodeBody(request, ConsumerRequest.class);
-        if (inboundQueue == null || req == null || req.pub == null || req.enabled == null) {
-            return ApiResponse.error("pub and enabled required");
-        }
-        byte[] pub;
-        try {
-            pub = IceBridgeAuth.decodeBase64(req.pub);
-        } catch (IllegalArgumentException e) {
-            return ApiResponse.error("invalid pub");
-        }
-        boolean accepted = req.enabled ? inboundQueue.registerConsumer(pub)
-                : inboundQueue.unregisterConsumer(pub);
-        return accepted ? ApiResponse.success("consumer updated")
-                : ApiResponse.error("invalid identity, capacity, or pending work");
+    long nowSec = System.currentTimeMillis() / 1000L;
+    if (req.timestamp < nowSec - 60 || req.timestamp > nowSec + 60) {
+      return ApiResponse.error("timestamp skew too large");
     }
 
-    private static final class ConsumerRequest {
-        String pub;
-        Boolean enabled;
-    }
+    PeerRecord record =
+        new PeerRecord(
+            rawPub,
+            req.host,
+            req.rudpPort,
+            req.role == null ? IceBridgeConfig.Role.CLIENT : req.role,
+            System.currentTimeMillis(),
+            req.icebridgeVersion);
+    boolean accepted = registry.register(record);
+    return accepted
+        ? ApiResponse.success("registered")
+        : ApiResponse.error("rate limited or at capacity");
+  }
 
-    /**
-     * Administrator-authorized endpoint that adds a routing hint without an
-     * identity signature. A hint is not endpoint proof; rUDP pins and challenges
-     * the expected identity before sending application data.
-     */
-    private ApiResponse<String> handleRoute(FullHttpRequest request) {
-        RouteRequest req = decodeBody(request, RouteRequest.class);
-        if (req == null || req.pub == null || req.host == null) {
-            return ApiResponse.error("pub and host are required");
-        }
-        byte[] rawPub;
-        try {
-            rawPub = IceBridgeAuth.decodeBase64(req.pub);
-        } catch (IllegalArgumentException e) {
-            return ApiResponse.error("invalid base64: " + e.getMessage());
-        }
-        if (rawPub.length != 32) {
-            return ApiResponse.error("pub must be 32 bytes");
-        }
-        if (req.rudpPort <= 0 || req.rudpPort > 65535) {
-            return ApiResponse.error("rudpPort must be in [1, 65535]");
-        }
-        if (req.ifAbsent && registry.lookup(rawPub) != null) {
-            return ApiResponse.success("known");
-        }
-        PeerRecord record = new PeerRecord(rawPub, req.host, req.rudpPort,
-                req.role == null ? IceBridgeConfig.Role.BOTH : req.role,
-                System.currentTimeMillis());
-        boolean accepted = registry.register(record);
-        return accepted
-                ? ApiResponse.success("routed")
-                : ApiResponse.error("rate limited or at capacity");
-    }
+  private byte[] canonicalBytes(RegisterRequest req) {
+    return req.canonicalString().getBytes(StandardCharsets.UTF_8);
+  }
 
-    /** Identity discovery over rUDP: open or poll a handshake with an {@code ip:udpPort}. */
-    private ApiResponse<ProbeResponse> handleProbe(FullHttpRequest request) {
-        ProbeRequest req = decodeBody(request, ProbeRequest.class);
-        if (req == null || req.host == null || req.host.isEmpty()) {
-            return ApiResponse.error("host is required");
-        }
-        if (req.port <= 0 || req.port > 65535) {
-            return ApiResponse.error("port must be in [1, 65535]");
-        }
-        RudpSessionManager.ProbeResult result =
-                rudpSessionManager.probe(req.host, req.port, req.cancel);
-        String pub = result.pub() == null ? null : Base64.getUrlEncoder().withoutPadding().encodeToString(result.pub());
-        return ApiResponse.success(new ProbeResponse(
-                result.state().name().toLowerCase(java.util.Locale.ROOT), pub));
+  private ApiResponse<String> handleConsumer(FullHttpRequest request) {
+    ConsumerRequest req = decodeBody(request, ConsumerRequest.class);
+    if (inboundQueue == null || req == null || req.pub == null || req.enabled == null) {
+      return ApiResponse.error("pub and enabled required");
     }
+    byte[] pub;
+    try {
+      pub = IceBridgeAuth.decodeBase64(req.pub);
+    } catch (IllegalArgumentException e) {
+      return ApiResponse.error("invalid pub");
+    }
+    boolean accepted =
+        req.enabled ? inboundQueue.registerConsumer(pub) : inboundQueue.unregisterConsumer(pub);
+    return accepted
+        ? ApiResponse.success("consumer updated")
+        : ApiResponse.error("invalid identity, capacity, or pending work");
+  }
 
-    private ApiResponse<List<PeerInfo>> handleLookup(String uri) {
-        QueryStringDecoder decoder = new QueryStringDecoder(uri);
-        int count = DEFAULT_LOOKUP_COUNT;
-        List<String> countParams = decoder.parameters().get("count");
-        if (countParams != null && !countParams.isEmpty()) {
-            try {
-                count = Integer.parseInt(countParams.get(0));
-            } catch (NumberFormatException ignored) {
-            }
-        }
-        // Default: all registered peers (mesh discovery / search targets).
-        // ?forwarders=1 keeps the older forward-capable-only filter.
-        boolean forwardersOnly = false;
-        List<String> fwdParams = decoder.parameters().get("forwarders");
-        if (fwdParams != null && !fwdParams.isEmpty()) {
-            String v = fwdParams.get(0);
-            forwardersOnly = "1".equals(v) || "true".equalsIgnoreCase(v);
-        }
-        List<PeerRecord> peers =
-                registry.lookupPeers(Math.max(1, Math.min(count, 100)), forwardersOnly);
-        List<PeerInfo> info = peers.stream()
-                .map(p -> new PeerInfo(
+  private static final class ConsumerRequest {
+    String pub;
+    Boolean enabled;
+  }
+
+  /**
+   * Administrator-authorized endpoint that adds a routing hint without an identity signature. A
+   * hint is not endpoint proof; rUDP pins and challenges the expected identity before sending
+   * application data.
+   */
+  private ApiResponse<String> handleRoute(FullHttpRequest request) {
+    RouteRequest req = decodeBody(request, RouteRequest.class);
+    if (req == null || req.pub == null || req.host == null) {
+      return ApiResponse.error("pub and host are required");
+    }
+    byte[] rawPub;
+    try {
+      rawPub = IceBridgeAuth.decodeBase64(req.pub);
+    } catch (IllegalArgumentException e) {
+      return ApiResponse.error("invalid base64: " + e.getMessage());
+    }
+    if (rawPub.length != 32) {
+      return ApiResponse.error("pub must be 32 bytes");
+    }
+    if (req.rudpPort <= 0 || req.rudpPort > 65535) {
+      return ApiResponse.error("rudpPort must be in [1, 65535]");
+    }
+    if (req.ifAbsent && registry.lookup(rawPub) != null) {
+      return ApiResponse.success("known");
+    }
+    PeerRecord record =
+        new PeerRecord(
+            rawPub,
+            req.host,
+            req.rudpPort,
+            req.role == null ? IceBridgeConfig.Role.BOTH : req.role,
+            System.currentTimeMillis());
+    boolean accepted = registry.register(record);
+    return accepted
+        ? ApiResponse.success("routed")
+        : ApiResponse.error("rate limited or at capacity");
+  }
+
+  /** Identity discovery over rUDP: open or poll a handshake with an {@code ip:udpPort}. */
+  private ApiResponse<ProbeResponse> handleProbe(FullHttpRequest request) {
+    ProbeRequest req = decodeBody(request, ProbeRequest.class);
+    if (req == null || req.host == null || req.host.isEmpty()) {
+      return ApiResponse.error("host is required");
+    }
+    if (req.port <= 0 || req.port > 65535) {
+      return ApiResponse.error("port must be in [1, 65535]");
+    }
+    RudpSessionManager.ProbeResult result =
+        rudpSessionManager.probe(req.host, req.port, req.cancel);
+    String pub =
+        result.pub() == null
+            ? null
+            : Base64.getUrlEncoder().withoutPadding().encodeToString(result.pub());
+    return ApiResponse.success(
+        new ProbeResponse(result.state().name().toLowerCase(java.util.Locale.ROOT), pub));
+  }
+
+  private ApiResponse<List<PeerInfo>> handleLookup(String uri) {
+    QueryStringDecoder decoder = new QueryStringDecoder(uri);
+    int count = DEFAULT_LOOKUP_COUNT;
+    List<String> countParams = decoder.parameters().get("count");
+    if (countParams != null && !countParams.isEmpty()) {
+      try {
+        count = Integer.parseInt(countParams.get(0));
+      } catch (NumberFormatException ignored) {
+      }
+    }
+    // Default: all registered peers (mesh discovery / search targets).
+    // ?forwarders=1 keeps the older forward-capable-only filter.
+    boolean forwardersOnly = false;
+    List<String> fwdParams = decoder.parameters().get("forwarders");
+    if (fwdParams != null && !fwdParams.isEmpty()) {
+      String v = fwdParams.get(0);
+      forwardersOnly = "1".equals(v) || "true".equalsIgnoreCase(v);
+    }
+    List<PeerRecord> peers =
+        registry.lookupPeers(Math.max(1, Math.min(count, 100)), forwardersOnly);
+    List<PeerInfo> info =
+        peers.stream()
+            .map(
+                p ->
+                    new PeerInfo(
                         Base64.getUrlEncoder().withoutPadding().encodeToString(p.ed25519Pub()),
                         p.host(),
                         p.rudpPort(),
                         p.role(),
                         p.lastSeenMs(),
                         p.icebridgeVersion()))
-                .collect(Collectors.toList());
-        return ApiResponse.success(info);
-    }
+            .collect(Collectors.toList());
+    return ApiResponse.success(info);
+  }
 
-    private ApiResponse<String> handleSend(FullHttpRequest request) {
-        if (rudpSessionManager == null) {
-            return ApiResponse.error("rUDP stack not available");
-        }
-        SendRequest req = decodeBody(request, SendRequest.class);
-        if (req == null || req.targetPub == null || req.payload == null) {
-            return ApiResponse.error("targetPub and payload are required");
-        }
-        byte[] targetPub;
-        byte[] payload;
-        try {
-            targetPub = IceBridgeAuth.decodeBase64(req.targetPub);
-            payload = IceBridgeAuth.decodeBase64(req.payload);
-        } catch (IllegalArgumentException e) {
-            return ApiResponse.error("invalid base64: " + e.getMessage());
-        }
-        if (targetPub.length != 32) {
-            return ApiResponse.error("targetPub must be 32 bytes");
-        }
-        if (payload.length == 0) {
-            return ApiResponse.error("payload must not be empty");
-        }
-        int protocolId = req.protocolId == null
-                ? MeshProtocolId.SEARCH
-                : MeshProtocolId.effective(req.protocolId);
-        byte[] wire;
-        try {
-            wire = MeshEnvelope.encodeForWire(protocolId, payload);
-        } catch (IllegalArgumentException e) {
-            return ApiResponse.error("invalid envelope: " + e.getMessage());
-        }
-        if (!rudpSessionManager.deliver(targetPub, wire)) {
-            return ApiResponse.error("target queue full or no route");
-        }
-        LOG.info("IceBridge mesh: " + MeshProtocolId.name(protocolId)
-                + " send queued target="
-                + com.frostwire.util.Hex.encode(targetPub).substring(0, 12) + "…"
-                + " bytes=" + payload.length);
-        return ApiResponse.success("queued");
+  private ApiResponse<String> handleSend(FullHttpRequest request) {
+    if (rudpSessionManager == null) {
+      return ApiResponse.error("rUDP stack not available");
     }
+    SendRequest req = decodeBody(request, SendRequest.class);
+    if (req == null || req.targetPub == null || req.payload == null) {
+      return ApiResponse.error("targetPub and payload are required");
+    }
+    byte[] targetPub;
+    byte[] payload;
+    try {
+      targetPub = IceBridgeAuth.decodeBase64(req.targetPub);
+      payload = IceBridgeAuth.decodeBase64(req.payload);
+    } catch (IllegalArgumentException e) {
+      return ApiResponse.error("invalid base64: " + e.getMessage());
+    }
+    if (targetPub.length != 32) {
+      return ApiResponse.error("targetPub must be 32 bytes");
+    }
+    if (payload.length == 0) {
+      return ApiResponse.error("payload must not be empty");
+    }
+    int protocolId =
+        req.protocolId == null ? MeshProtocolId.SEARCH : MeshProtocolId.effective(req.protocolId);
+    byte[] wire;
+    try {
+      wire = MeshEnvelope.encodeForWire(protocolId, payload);
+    } catch (IllegalArgumentException e) {
+      return ApiResponse.error("invalid envelope: " + e.getMessage());
+    }
+    if (!rudpSessionManager.deliver(targetPub, wire)) {
+      return ApiResponse.error("target queue full or no route");
+    }
+    LOG.info(
+        "IceBridge mesh: "
+            + MeshProtocolId.name(protocolId)
+            + " send queued target="
+            + com.frostwire.util.Hex.encode(targetPub).substring(0, 12)
+            + "…"
+            + " bytes="
+            + payload.length);
+    return ApiResponse.success("queued");
+  }
 
-    private ApiResponse<List<InboundMessageInfo>> handlePoll(String uri) {
-        if (inboundQueue == null) {
-            return ApiResponse.error("inbound queue not available");
+  private ApiResponse<List<InboundMessageInfo>> handlePoll(String uri) {
+    if (inboundQueue == null) {
+      return ApiResponse.error("inbound queue not available");
+    }
+    QueryStringDecoder decoder = new QueryStringDecoder(uri);
+    int count = DEFAULT_POLL_COUNT;
+    List<String> countParams = decoder.parameters().get("count");
+    if (countParams != null && !countParams.isEmpty()) {
+      try {
+        count = Integer.parseInt(countParams.get(0));
+      } catch (NumberFormatException ignored) {
+      }
+    }
+    int max = Math.max(1, Math.min(count, 256));
+    // Optional ?pub= base64url client identity for multi USE_REMOTE demux.
+    byte[] clientPub = null;
+    List<String> pubParams = decoder.parameters().get("pub");
+    if (pubParams != null) {
+      if (pubParams.size() != 1 || pubParams.get(0) == null || pubParams.get(0).isEmpty()) {
+        return ApiResponse.error("invalid pub");
+      }
+      try {
+        clientPub = IceBridgeAuth.decodeBase64(pubParams.get(0));
+        if (clientPub.length != 32) {
+          return ApiResponse.error("invalid pub");
         }
-        QueryStringDecoder decoder = new QueryStringDecoder(uri);
-        int count = DEFAULT_POLL_COUNT;
-        List<String> countParams = decoder.parameters().get("count");
-        if (countParams != null && !countParams.isEmpty()) {
-            try {
-                count = Integer.parseInt(countParams.get(0));
-            } catch (NumberFormatException ignored) {
-            }
-        }
-        int max = Math.max(1, Math.min(count, 256));
-        // Optional ?pub= base64url client identity for multi USE_REMOTE demux.
-        byte[] clientPub = null;
-        List<String> pubParams = decoder.parameters().get("pub");
-        if (pubParams != null) {
-            if (pubParams.size() != 1 || pubParams.get(0) == null || pubParams.get(0).isEmpty()) {
-                return ApiResponse.error("invalid pub");
-            }
-            try {
-                clientPub = IceBridgeAuth.decodeBase64(pubParams.get(0));
-                if (clientPub.length != 32) {
-                    return ApiResponse.error("invalid pub");
-                }
-            } catch (IllegalArgumentException ignored) {
-                return ApiResponse.error("invalid pub");
-            }
-        }
-        List<InboundMessage> drained = clientPub != null
-                ? inboundQueue.pollForTarget(clientPub, max)
-                : inboundQueue.poll(max);
-        List<InboundMessageInfo> result = drained.stream()
-                .map(m -> new InboundMessageInfo(
+      } catch (IllegalArgumentException ignored) {
+        return ApiResponse.error("invalid pub");
+      }
+    }
+    List<InboundMessage> drained =
+        clientPub != null ? inboundQueue.pollForTarget(clientPub, max) : inboundQueue.poll(max);
+    List<InboundMessageInfo> result =
+        drained.stream()
+            .map(
+                m ->
+                    new InboundMessageInfo(
                         Base64.getUrlEncoder().withoutPadding().encodeToString(m.sourcePub()),
                         Base64.getUrlEncoder().withoutPadding().encodeToString(m.payload()),
                         m.receivedMs(),
                         m.protocolId()))
-                .collect(Collectors.toList());
-        return ApiResponse.success(result);
+            .collect(Collectors.toList());
+    return ApiResponse.success(result);
+  }
+
+  private <T> T decodeBody(FullHttpRequest request, Class<T> type) {
+    ByteBuf content = request.content();
+    byte[] bytes = new byte[content.readableBytes()];
+    content.readBytes(bytes);
+    return GSON.fromJson(new String(bytes, StandardCharsets.UTF_8), type);
+  }
+
+  private ApiResponse<MetricsSnapshot> handleMetrics() {
+    MetricsSnapshot snapshot =
+        new MetricsSnapshot(
+            metrics.rudpPacketsIn(),
+            metrics.rudpPacketsOut(),
+            metrics.rudpBytesIn(),
+            metrics.rudpBytesOut(),
+            metrics.controlRequests(),
+            metrics.controlErrors(),
+            metrics.helloRejectedCount(),
+            metrics.relayRateLimitedCount(),
+            metrics.searchRateLimitedCount(),
+            metrics.powRejectedCount(),
+            metrics.spamMarkedDroppedCount(),
+            registry.size(),
+            registry.registrations(),
+            registry.lookups(),
+            registry.evicted(),
+            metrics.transportPollRunsCount(),
+            metrics.transportPollErrorsCount(),
+            metrics.transportPollDrainBatchesCount(),
+            metrics.transportMessagesDrainedCount(),
+            metrics.requestWorkQueueDepthGauge(),
+            metrics.requestWorkRejectedCount(),
+            metrics.verifyFailuresCount(),
+            rudpSessionManager.boundPort());
+    return ApiResponse.success(snapshot);
+  }
+
+  private ApiResponse<List<IceBridgeEvent>> handleEvents(String uri) {
+    QueryStringDecoder decoder = new QueryStringDecoder(uri);
+    IceBridgeEvent.Level level = IceBridgeEventLog.parseLevel(firstParam(decoder, "level"));
+    Set<IceBridgeEvent.Category> categories =
+        IceBridgeEventLog.parseCategories(firstParam(decoder, "category"));
+    String text = firstParam(decoder, "q");
+    String peer = firstParam(decoder, "peer");
+    long since = 0L;
+    String sinceParam = firstParam(decoder, "since");
+    if (sinceParam != null) {
+      try {
+        since = Long.parseLong(sinceParam);
+      } catch (NumberFormatException ignored) {
+      }
+    }
+    int limit = DEFAULT_EVENTS_LIMIT;
+    String limitParam = firstParam(decoder, "limit");
+    if (limitParam != null) {
+      try {
+        limit = Integer.parseInt(limitParam);
+      } catch (NumberFormatException ignored) {
+      }
+    }
+    limit = Math.max(1, Math.min(limit, MAX_EVENTS_LIMIT));
+    return ApiResponse.success(
+        IceBridgeEventLog.instance().query(level, categories, text, peer, since, limit));
+  }
+
+  private ApiResponse<JsonElement> handleCatalog(String uri) {
+    QueryStringDecoder decoder = new QueryStringDecoder(uri);
+    String pubParam = firstParam(decoder, "pub");
+    if (pubParam == null || pubParam.isEmpty()) {
+      return ApiResponse.error("invalid pub");
+    }
+    try {
+      if (IceBridgeAuth.decodeBase64(pubParam).length != 32) {
+        return ApiResponse.error("invalid pub");
+      }
+    } catch (IllegalArgumentException e) {
+      return ApiResponse.error("invalid pub");
     }
 
-    private <T> T decodeBody(FullHttpRequest request, Class<T> type) {
-        ByteBuf content = request.content();
-        byte[] bytes = new byte[content.readableBytes()];
-        content.readBytes(bytes);
-        return GSON.fromJson(new String(bytes, StandardCharsets.UTF_8), type);
+    int timeoutMs = DEFAULT_CATALOG_TIMEOUT_MS;
+    String timeoutParam = firstParam(decoder, "timeoutMs");
+    if (timeoutParam != null) {
+      try {
+        timeoutMs = Integer.parseInt(timeoutParam);
+      } catch (NumberFormatException ignored) {
+      }
+    }
+    timeoutMs = Math.max(MIN_CATALOG_TIMEOUT_MS, Math.min(timeoutMs, MAX_CATALOG_TIMEOUT_MS));
+
+    if (catalogFetcher == null) {
+      return ApiResponse.error("catalog fetch not available");
+    }
+    return ApiResponse.success(catalogFetcher.fetch(pubParam, timeoutMs));
+  }
+
+  private ApiResponse<JsonElement> handleTorrent(String uri) {
+    QueryStringDecoder decoder = new QueryStringDecoder(uri);
+    String infoHashHex = firstParam(decoder, "ih");
+    if (infoHashHex == null
+        || infoHashHex.length() != INFO_HASH_HEX_LENGTH
+        || !infoHashHex.matches("[0-9a-fA-F]{" + INFO_HASH_HEX_LENGTH + "}")) {
+      return ApiResponse.error("invalid ih");
+    }
+    String holderPub = firstParam(decoder, "pub");
+    if (holderPub == null || holderPub.isEmpty()) {
+      return ApiResponse.error("invalid pub");
+    }
+    try {
+      if (IceBridgeAuth.decodeBase64(holderPub).length != 32) {
+        return ApiResponse.error("invalid pub");
+      }
+    } catch (IllegalArgumentException e) {
+      return ApiResponse.error("invalid pub");
     }
 
-    private ApiResponse<MetricsSnapshot> handleMetrics() {
-        MetricsSnapshot snapshot = new MetricsSnapshot(
-                metrics.rudpPacketsIn(), metrics.rudpPacketsOut(),
-                metrics.rudpBytesIn(), metrics.rudpBytesOut(),
-                metrics.controlRequests(), metrics.controlErrors(),
-                metrics.helloRejectedCount(), metrics.relayRateLimitedCount(),
-                metrics.searchRateLimitedCount(), metrics.powRejectedCount(),
-                metrics.spamMarkedDroppedCount(),
-                registry.size(), registry.registrations(), registry.lookups(), registry.evicted(),
-                metrics.transportPollRunsCount(), metrics.transportPollErrorsCount(),
-                metrics.transportPollDrainBatchesCount(), metrics.transportMessagesDrainedCount(),
-                metrics.requestWorkQueueDepthGauge(), metrics.requestWorkRejectedCount(),
-                metrics.verifyFailuresCount(), rudpSessionManager.boundPort());
-        return ApiResponse.success(snapshot);
+    int timeoutMs = DEFAULT_TORRENT_TIMEOUT_MS;
+    String timeoutParam = firstParam(decoder, "timeoutMs");
+    if (timeoutParam != null) {
+      try {
+        timeoutMs = Integer.parseInt(timeoutParam);
+      } catch (NumberFormatException ignored) {
+      }
     }
+    timeoutMs = Math.max(MIN_TORRENT_TIMEOUT_MS, Math.min(timeoutMs, MAX_TORRENT_TIMEOUT_MS));
 
-    private ApiResponse<List<IceBridgeEvent>> handleEvents(String uri) {
-        QueryStringDecoder decoder = new QueryStringDecoder(uri);
-        IceBridgeEvent.Level level = IceBridgeEventLog.parseLevel(firstParam(decoder, "level"));
-        Set<IceBridgeEvent.Category> categories =
-                IceBridgeEventLog.parseCategories(firstParam(decoder, "category"));
-        String text = firstParam(decoder, "q");
-        String peer = firstParam(decoder, "peer");
-        long since = 0L;
-        String sinceParam = firstParam(decoder, "since");
-        if (sinceParam != null) {
-            try {
-                since = Long.parseLong(sinceParam);
-            } catch (NumberFormatException ignored) {
-            }
-        }
-        int limit = DEFAULT_EVENTS_LIMIT;
-        String limitParam = firstParam(decoder, "limit");
-        if (limitParam != null) {
-            try {
-                limit = Integer.parseInt(limitParam);
-            } catch (NumberFormatException ignored) {
-            }
-        }
-        limit = Math.max(1, Math.min(limit, MAX_EVENTS_LIMIT));
-        return ApiResponse.success(
-                IceBridgeEventLog.instance().query(level, categories, text, peer, since, limit));
+    if (torrentFetcher == null) {
+      return ApiResponse.error("torrent fetch not available");
     }
+    return ApiResponse.success(torrentFetcher.fetch(infoHashHex, holderPub, timeoutMs));
+  }
 
-    private ApiResponse<JsonElement> handleCatalog(String uri) {
-        QueryStringDecoder decoder = new QueryStringDecoder(uri);
-        String pubParam = firstParam(decoder, "pub");
-        if (pubParam == null || pubParam.isEmpty()) {
-            return ApiResponse.error("invalid pub");
-        }
-        try {
-            if (IceBridgeAuth.decodeBase64(pubParam).length != 32) {
-                return ApiResponse.error("invalid pub");
-            }
-        } catch (IllegalArgumentException e) {
-            return ApiResponse.error("invalid pub");
-        }
-
-        int timeoutMs = DEFAULT_CATALOG_TIMEOUT_MS;
-        String timeoutParam = firstParam(decoder, "timeoutMs");
-        if (timeoutParam != null) {
-            try {
-                timeoutMs = Integer.parseInt(timeoutParam);
-            } catch (NumberFormatException ignored) {
-            }
-        }
-        timeoutMs = Math.max(MIN_CATALOG_TIMEOUT_MS, Math.min(timeoutMs, MAX_CATALOG_TIMEOUT_MS));
-
-        if (catalogFetcher == null) {
-            return ApiResponse.error("catalog fetch not available");
-        }
-        return ApiResponse.success(catalogFetcher.fetch(pubParam, timeoutMs));
+  private static String firstParam(QueryStringDecoder decoder, String name) {
+    List<String> values = decoder.parameters().get(name);
+    if (values == null || values.isEmpty()) {
+      return null;
     }
+    return values.get(0);
+  }
 
-    private ApiResponse<JsonElement> handleTorrent(String uri) {
-        QueryStringDecoder decoder = new QueryStringDecoder(uri);
-        String infoHashHex = firstParam(decoder, "ih");
-        if (infoHashHex == null
-                || infoHashHex.length() != INFO_HASH_HEX_LENGTH
-                || !infoHashHex.matches("[0-9a-fA-F]{" + INFO_HASH_HEX_LENGTH + "}")) {
-            return ApiResponse.error("invalid ih");
-        }
-        String holderPub = firstParam(decoder, "pub");
-        if (holderPub == null || holderPub.isEmpty()) {
-            return ApiResponse.error("invalid pub");
-        }
-        try {
-            if (IceBridgeAuth.decodeBase64(holderPub).length != 32) {
-                return ApiResponse.error("invalid pub");
-            }
-        } catch (IllegalArgumentException e) {
-            return ApiResponse.error("invalid pub");
-        }
-
-        int timeoutMs = DEFAULT_TORRENT_TIMEOUT_MS;
-        String timeoutParam = firstParam(decoder, "timeoutMs");
-        if (timeoutParam != null) {
-            try {
-                timeoutMs = Integer.parseInt(timeoutParam);
-            } catch (NumberFormatException ignored) {
-            }
-        }
-        timeoutMs = Math.max(MIN_TORRENT_TIMEOUT_MS, Math.min(timeoutMs, MAX_TORRENT_TIMEOUT_MS));
-
-        if (torrentFetcher == null) {
-            return ApiResponse.error("torrent fetch not available");
-        }
-        return ApiResponse.success(torrentFetcher.fetch(infoHashHex, holderPub, timeoutMs));
+  private void sendJson(
+      ChannelHandlerContext ctx, FullHttpRequest request, HttpResponseStatus status, Object body) {
+    byte[] bytes = GSON.toJson(body).getBytes(StandardCharsets.UTF_8);
+    FullHttpResponse response =
+        new DefaultFullHttpResponse(
+            request.protocolVersion(), status, Unpooled.wrappedBuffer(bytes));
+    response
+        .headers()
+        .set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=UTF-8")
+        .set(HttpHeaderNames.CONTENT_LENGTH, bytes.length);
+    boolean keepAlive = HttpUtil.isKeepAlive(request);
+    if (!keepAlive) {
+      ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+    } else {
+      response.headers().set(HttpHeaderNames.CONNECTION, "keep-alive");
+      ctx.writeAndFlush(response);
     }
+  }
 
-    private static String firstParam(QueryStringDecoder decoder, String name) {
-        List<String> values = decoder.parameters().get(name);
-        if (values == null || values.isEmpty()) {
-            return null;
-        }
-        return values.get(0);
+  @Override
+  public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+    LOG.warn("Control channel exception", cause);
+    metrics.controlError();
+    ctx.close();
+  }
+
+  private static final class MetricsSnapshot {
+    final int rudpPort;
+
+    @SuppressWarnings("unused")
+    final long rudpPacketsIn;
+
+    @SuppressWarnings("unused")
+    final long rudpPacketsOut;
+
+    @SuppressWarnings("unused")
+    final long rudpBytesIn;
+
+    @SuppressWarnings("unused")
+    final long rudpBytesOut;
+
+    @SuppressWarnings("unused")
+    final long controlRequests;
+
+    @SuppressWarnings("unused")
+    final long controlErrors;
+
+    @SuppressWarnings("unused")
+    final long helloRejected;
+
+    @SuppressWarnings("unused")
+    final long relayRateLimited;
+
+    @SuppressWarnings("unused")
+    final long searchRateLimited;
+
+    @SuppressWarnings("unused")
+    final long powRejected;
+
+    @SuppressWarnings("unused")
+    final long spamMarkedDropped;
+
+    @SuppressWarnings("unused")
+    final int registrySize;
+
+    @SuppressWarnings("unused")
+    final long registrations;
+
+    @SuppressWarnings("unused")
+    final long lookups;
+
+    @SuppressWarnings("unused")
+    final long evicted;
+
+    @SuppressWarnings("unused")
+    final long transportPollRuns;
+
+    @SuppressWarnings("unused")
+    final long transportPollErrors;
+
+    @SuppressWarnings("unused")
+    final long transportPollDrainBatches;
+
+    @SuppressWarnings("unused")
+    final long transportMessagesDrained;
+
+    @SuppressWarnings("unused")
+    final long requestWorkQueueDepth;
+
+    @SuppressWarnings("unused")
+    final long requestWorkRejected;
+
+    @SuppressWarnings("unused")
+    final long verifyFailures;
+
+    MetricsSnapshot(
+        long rudpPacketsIn,
+        long rudpPacketsOut,
+        long rudpBytesIn,
+        long rudpBytesOut,
+        long controlRequests,
+        long controlErrors,
+        long helloRejected,
+        long relayRateLimited,
+        long searchRateLimited,
+        long powRejected,
+        long spamMarkedDropped,
+        int registrySize,
+        long registrations,
+        long lookups,
+        long evicted,
+        long transportPollRuns,
+        long transportPollErrors,
+        long transportPollDrainBatches,
+        long transportMessagesDrained,
+        long requestWorkQueueDepth,
+        long requestWorkRejected,
+        long verifyFailures,
+        int rudpPort) {
+      this.rudpPort = rudpPort;
+      this.rudpPacketsIn = rudpPacketsIn;
+      this.rudpPacketsOut = rudpPacketsOut;
+      this.rudpBytesIn = rudpBytesIn;
+      this.rudpBytesOut = rudpBytesOut;
+      this.controlRequests = controlRequests;
+      this.controlErrors = controlErrors;
+      this.helloRejected = helloRejected;
+      this.relayRateLimited = relayRateLimited;
+      this.searchRateLimited = searchRateLimited;
+      this.powRejected = powRejected;
+      this.spamMarkedDropped = spamMarkedDropped;
+      this.registrySize = registrySize;
+      this.registrations = registrations;
+      this.lookups = lookups;
+      this.evicted = evicted;
+      this.transportPollRuns = transportPollRuns;
+      this.transportPollErrors = transportPollErrors;
+      this.transportPollDrainBatches = transportPollDrainBatches;
+      this.transportMessagesDrained = transportMessagesDrained;
+      this.requestWorkQueueDepth = requestWorkQueueDepth;
+      this.requestWorkRejected = requestWorkRejected;
+      this.verifyFailures = verifyFailures;
     }
-
-    private void sendJson(ChannelHandlerContext ctx, FullHttpRequest request,
-                          HttpResponseStatus status, Object body) {
-        byte[] bytes = GSON.toJson(body).getBytes(StandardCharsets.UTF_8);
-        FullHttpResponse response = new DefaultFullHttpResponse(
-                request.protocolVersion(), status,
-                Unpooled.wrappedBuffer(bytes));
-        response.headers()
-                .set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=UTF-8")
-                .set(HttpHeaderNames.CONTENT_LENGTH, bytes.length);
-        boolean keepAlive = HttpUtil.isKeepAlive(request);
-        if (!keepAlive) {
-            ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
-        } else {
-            response.headers().set(HttpHeaderNames.CONNECTION, "keep-alive");
-            ctx.writeAndFlush(response);
-        }
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        LOG.warn("Control channel exception", cause);
-        metrics.controlError();
-        ctx.close();
-    }
-
-    private static final class MetricsSnapshot {
-        final int rudpPort;
-        @SuppressWarnings("unused")
-        final long rudpPacketsIn;
-        @SuppressWarnings("unused")
-        final long rudpPacketsOut;
-        @SuppressWarnings("unused")
-        final long rudpBytesIn;
-        @SuppressWarnings("unused")
-        final long rudpBytesOut;
-        @SuppressWarnings("unused")
-        final long controlRequests;
-        @SuppressWarnings("unused")
-        final long controlErrors;
-        @SuppressWarnings("unused")
-        final long helloRejected;
-        @SuppressWarnings("unused")
-        final long relayRateLimited;
-        @SuppressWarnings("unused")
-        final long searchRateLimited;
-        @SuppressWarnings("unused")
-        final long powRejected;
-        @SuppressWarnings("unused")
-        final long spamMarkedDropped;
-        @SuppressWarnings("unused")
-        final int registrySize;
-        @SuppressWarnings("unused")
-        final long registrations;
-        @SuppressWarnings("unused")
-        final long lookups;
-        @SuppressWarnings("unused")
-        final long evicted;
-        @SuppressWarnings("unused")
-        final long transportPollRuns;
-        @SuppressWarnings("unused")
-        final long transportPollErrors;
-        @SuppressWarnings("unused")
-        final long transportPollDrainBatches;
-        @SuppressWarnings("unused")
-        final long transportMessagesDrained;
-        @SuppressWarnings("unused")
-        final long requestWorkQueueDepth;
-        @SuppressWarnings("unused")
-        final long requestWorkRejected;
-        @SuppressWarnings("unused")
-        final long verifyFailures;
-
-        MetricsSnapshot(long rudpPacketsIn, long rudpPacketsOut,
-                        long rudpBytesIn, long rudpBytesOut,
-                        long controlRequests, long controlErrors,
-                        long helloRejected, long relayRateLimited,
-                        long searchRateLimited, long powRejected,
-                        long spamMarkedDropped,
-                        int registrySize, long registrations,
-                        long lookups, long evicted,
-                        long transportPollRuns, long transportPollErrors,
-                        long transportPollDrainBatches, long transportMessagesDrained,
-                        long requestWorkQueueDepth, long requestWorkRejected,
-                        long verifyFailures, int rudpPort) {
-            this.rudpPort = rudpPort;
-            this.rudpPacketsIn = rudpPacketsIn;
-            this.rudpPacketsOut = rudpPacketsOut;
-            this.rudpBytesIn = rudpBytesIn;
-            this.rudpBytesOut = rudpBytesOut;
-            this.controlRequests = controlRequests;
-            this.controlErrors = controlErrors;
-            this.helloRejected = helloRejected;
-            this.relayRateLimited = relayRateLimited;
-            this.searchRateLimited = searchRateLimited;
-            this.powRejected = powRejected;
-            this.spamMarkedDropped = spamMarkedDropped;
-            this.registrySize = registrySize;
-            this.registrations = registrations;
-            this.lookups = lookups;
-            this.evicted = evicted;
-            this.transportPollRuns = transportPollRuns;
-            this.transportPollErrors = transportPollErrors;
-            this.transportPollDrainBatches = transportPollDrainBatches;
-            this.transportMessagesDrained = transportMessagesDrained;
-            this.requestWorkQueueDepth = requestWorkQueueDepth;
-            this.requestWorkRejected = requestWorkRejected;
-            this.verifyFailures = verifyFailures;
-        }
-    }
+  }
 }

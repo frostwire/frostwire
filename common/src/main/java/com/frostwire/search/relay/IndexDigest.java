@@ -41,8 +41,8 @@ public final class IndexDigest {
   public static final int DEFAULT_BYTES = 4096;
 
   /**
-   * Bit-array size of an ultrapeer's cluster table (OR of its leaves, expanded).
-   * 16384 × 8 = 131072 bits, the size late Gnutella used between ultrapeers.
+   * Bit-array size of an ultrapeer's cluster table (OR of its leaves, expanded). 16384 × 8 = 131072
+   * bits, the size late Gnutella used between ultrapeers.
    */
   public static final int CLUSTER_BYTES = 16384;
 
@@ -52,20 +52,19 @@ public final class IndexDigest {
   /** Wire version. Frames without it are rejected so an old hash cannot be misread. */
   public static final int VERSION = 1;
 
-  private static final Set<String> STOPWORDS = Set.of(
-      "the", "and", "for", "with", "from", "that", "this", "you", "not",
-      "mp3", "mp4", "m4a", "m4v", "flac", "ogg", "wav", "aac", "wma",
-      "mkv", "avi", "wmv", "webm", "mov", "mpg", "mpeg",
-      "jpg", "jpeg", "png", "gif", "pdf", "zip", "rar",
-      "720", "1080", "2160", "480", "1440",
-      "x264", "x265", "h264", "h265", "uhd", "hdr");
+  private static final Set<String> STOPWORDS =
+      Set.of(
+          "the", "and", "for", "with", "from", "that", "this", "you", "not", "mp3", "mp4", "m4a",
+          "m4v", "flac", "ogg", "wav", "aac", "wma", "mkv", "avi", "wmv", "webm", "mov", "mpg",
+          "mpeg", "jpg", "jpeg", "png", "gif", "pdf", "zip", "rar", "720", "1080", "2160", "480",
+          "1440", "x264", "x265", "h264", "h265", "uhd", "hdr");
 
   /** Number of Bloom hash probes per token. */
   public static final int HASHES = 4;
 
   /**
-   * Upper bound on indexed tokens so the false-positive rate stays low: with 2048 tokens over
-   * 32768 bits and k=4 the rate is ~0.24%.
+   * Upper bound on indexed tokens so the false-positive rate stays low: with 2048 tokens over 32768
+   * bits and k=4 the rate is ~0.24%.
    */
   public static final int MAX_TOKENS = 2048;
 
@@ -192,8 +191,8 @@ public final class IndexDigest {
   }
 
   /**
-   * OR leaf filters into one cluster table. A token set in a smaller power-of-two
-   * filter is expanded so a probe of the cluster cannot miss it.
+   * OR leaf filters into one cluster table. A token set in a smaller power-of-two filter is
+   * expanded so a probe of the cluster cannot miss it.
    */
   public static IndexDigest aggregate(Collection<IndexDigest> parts) {
     byte[] cluster = new byte[CLUSTER_BYTES];
@@ -208,9 +207,9 @@ public final class IndexDigest {
   }
 
   /**
-   * Hits required before a peer counts as a holder. One or two tokens must all hit.
-   * Longer queries use LimeWire's two-thirds rule so one noisy token cannot hide a match
-   * and one common token cannot mark every library.
+   * Hits required before a peer counts as a holder. One or two tokens must all hit. Longer queries
+   * use LimeWire's two-thirds rule so one noisy token cannot hide a match and one common token
+   * cannot mark every library.
    */
   public static int requiredHits(int tokenCount) {
     if (tokenCount <= 2) {
