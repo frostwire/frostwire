@@ -19,14 +19,13 @@ import org.junit.Test;
 
 /**
  * Structural regression test: My Music deletion must use optimistic UI removal so deleted items
- * disappear from the adapter immediately, not after an asynchronous loader refresh.
+ * disappear from the adapter immediately, not after an asynchronous loader refresh. When the
+ * callback runs is covered by {@link com.andrew.apollo.menu.DeleteDialogConfirmationTest}.
  */
 public class MyMusicDeleteOptimisticRemovalStructureTest {
 
   private static final String APOLLO_FRAGMENT_SOURCE =
       "apollo/src/com/andrew/apollo/ui/fragments/profile/ApolloFragment.java";
-  private static final String DELETE_DIALOG_SOURCE =
-      "apollo/src/com/andrew/apollo/menu/DeleteDialog.java";
 
   @Test
   public void deleteDialog_declaresPreDeleteCallbackInterface() {
@@ -66,23 +65,5 @@ public class MyMusicDeleteOptimisticRemovalStructureTest {
         "ApolloFragment.onDelete must wire setOnDeleteConfirmedCallback "
             + "for optimistic adapter removal before the async deletion completes",
         source.contains("setOnDeleteConfirmedCallback"));
-  }
-
-  @Test
-  public void deleteDialog_positiveButton_firesPreDeleteCallbackBeforeBackgroundDeletion()
-      throws IOException {
-    Path projectRoot = Paths.get(".").toAbsolutePath().normalize();
-    Path sourceFile = projectRoot.resolve(DELETE_DIALOG_SOURCE);
-    if (!Files.exists(sourceFile)) {
-      String classFile = getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
-      Path buildDir = Paths.get(classFile).normalize();
-      projectRoot = buildDir.getParent().getParent().getParent().getParent();
-      sourceFile = projectRoot.resolve(DELETE_DIALOG_SOURCE);
-    }
-    String source = new String(Files.readAllBytes(sourceFile));
-    assertTrue(
-        "DeleteDialog PositiveButtonOnClickListener must invoke preDeleteCallback "
-            + "before MusicUtils.deleteTracks() so the UI updates immediately",
-        source.contains("preDeleteCallback.onDeleteConfirmed"));
   }
 }
