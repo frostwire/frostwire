@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat;
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.MainApplication;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
@@ -101,7 +102,8 @@ public final class DangerousPermissionsChecker<
         // their songs
         // to properly created playlists
         SystemUtils.postToHandler(
-            SystemUtils.HandlerThreadName.MISC, () -> MusicUtils.fixPlaylistsOwnership());
+            SystemUtils.HandlerThreadName.MISC,
+            () -> MusicUtils.fixPlaylistsOwnership(MainApplication.context()));
       }
     } else if (requestCode == POST_NOTIFICATIONS_PERMISSIONS_REQUEST_CODE) {
       // do nothing for now

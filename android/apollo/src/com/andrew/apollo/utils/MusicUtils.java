@@ -316,71 +316,54 @@ public final class MusicUtils {
     return !MusicUtils.isPlaying() && !MusicUtils.isStopped();
   }
 
-  public static void fixPlaylistsOwnership() {
-    Context context = MainApplication.context();
-    if (context == null) {
+  /**
+   * Takes over the playlists FrostWire created with no owner (an older FrostWire saved them through
+   * the wrong URI on Android 11+, and then could not add to, rename or delete them): each is
+   * recreated as FrostWire's, with its songs, and the ownerless one deleted. Before Android 11
+   * playlists have no owner at all, so there is nothing to fix; on 11+ other apps' playlists are
+   * theirs and left alone.
+   */
+  public static void fixPlaylistsOwnership(final Context context) {
+    if (context == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
       return;
     }
 
-    Uri playlistUri = MusicUtils.getPlaylistContentUri();
-
-    List<String> projectionList = new ArrayList<>();
-    projectionList.add(MediaStore.Audio.Playlists._ID);
-    projectionList.add(MediaStore.Audio.Playlists.NAME);
-
-    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-      projectionList.add("owner_package_name");
-    }
-
-    String[] projection = projectionList.toArray(new String[0]);
-
+    final String[] projection = {Playlists._ID, Playlists.NAME, "owner_package_name"};
     try (Cursor cursor =
         context
             .getContentResolver()
-            .query(playlistUri, projection, null, null, Playlists.DEFAULT_SORT_ORDER)) {
-
-      if (cursor != null) {
-        while (cursor.moveToNext()) {
-          long playlistId = cursor.getLong(cursor.getColumnIndex(Playlists._ID));
-          String playlistName = cursor.getString(cursor.getColumnIndex(Playlists.NAME));
-          String ownerPackage = null;
-
-          if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            ownerPackage = cursor.getString(cursor.getColumnIndex("owner_package_name"));
-          }
-
-          // Check if the playlist is owner less
-          if (ownerPackage == null || !ownerPackage.equals(context.getPackageName())) {
-            LOG.info(
-                "MusicUtils.fixPlaylistsOwnership: Fixing ownerless playlist: " + playlistName);
-
-            // Recreate the playlist
-            long newPlaylistId = createPlaylist(context, playlistName, true);
-            if (newPlaylistId != -1) {
-              LOG.info(
-                  "MusicUtils.fixPlaylistsOwnership: Recreated playlist: "
-                      + playlistName
-                      + " with new ID: "
-                      + newPlaylistId);
-
-              // Migrate songs from the old playlist to the new one
-              migratePlaylistSongs(context, playlistId, newPlaylistId);
-
-              // Try to Delete the old ownerless playlist, might not be able to since we don't own
-              // it
-              try {
-                deletePlaylist(context, playlistId);
-              } catch (Throwable t) {
-                LOG.warn(
-                    "MusicUtils.fixPlaylistsOwnership: Failed to delete ownerless playlist: "
-                        + playlistName);
-              }
-            } else {
-              LOG.error(
-                  "MusicUtils.fixPlaylistsOwnership: Failed to recreate ownerless playlist: "
-                      + playlistName);
-            }
-          }
+            .query(
+                getPlaylistContentUri(),
+                projection,
+                "owner_package_name IS NULL",
+                null,
+                Playlists.DEFAULT_SORT_ORDER)) {
+      while (cursor != null && cursor.moveToNext()) {
+        final long playlistId = cursor.getLong(0);
+        final String playlistName = cursor.getString(1);
+        if (cursor.getString(2) != null || playlistName == null) {
+          continue;
+        }
+        LOG.info("MusicUtils.fixPlaylistsOwnership: Fixing ownerless playlist: " + playlistName);
+        final long newPlaylistId = createPlaylist(context, playlistName, true);
+        if (newPlaylistId == -1) {
+          LOG.error(
+              "MusicUtils.fixPlaylistsOwnership: Failed to recreate ownerless playlist: "
+                  + playlistName);
+          continue;
+        }
+        LOG.info(
+            "MusicUtils.fixPlaylistsOwnership: Recreated playlist: "
+                + playlistName
+                + " with new ID: "
+                + newPlaylistId);
+        migratePlaylistSongs(context, playlistId, newPlaylistId);
+        try {
+          deletePlaylist(context, playlistId);
+        } catch (Throwable t) {
+          LOG.warn(
+              "MusicUtils.fixPlaylistsOwnership: Failed to delete ownerless playlist: "
+                  + playlistName);
         }
       }
     } catch (Throwable t) {
