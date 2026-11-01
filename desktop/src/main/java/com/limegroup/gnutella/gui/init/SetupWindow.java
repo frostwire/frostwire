@@ -215,6 +215,26 @@ abstract class SetupWindow extends JPanel {
   public void applySettings(boolean loadCoreComponents) throws ApplySettingsException {}
 
   /**
+   * Returns the disk work the settings chosen on this page need, such as checking or creating a
+   * folder, or null when there is none. {@link SetupManager} calls it on the EDT right after {@link
+   * #applySettings(boolean)}, so it may read the page's components, and runs the work it returns on
+   * a background thread before it leaves the page: done on the EDT, a slow or sleeping disk froze
+   * the wizard when the user clicked Next (Icebase #9325f45dd41f).
+   */
+  DiskWork diskWork() {
+    return null;
+  }
+
+  /** Settings work that touches the disk, run off the EDT. */
+  @FunctionalInterface
+  interface DiskWork {
+    /**
+     * @throws ApplySettingsException if the settings could not be applied; its message is shown
+     */
+    void run() throws ApplySettingsException;
+  }
+
+  /**
    * @param setupComponent the `Component` to add to this window
    */
   void setSetupComponent(JComponent setupComponent) {

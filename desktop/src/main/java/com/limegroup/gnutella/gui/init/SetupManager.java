@@ -33,6 +33,8 @@ import java.awt.event.WindowEvent;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
+import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.function.Supplier;
 import javax.swing.*;
@@ -77,6 +79,9 @@ public final class SetupManager {
   /** Exits the JVM; {@link Finalizer#exitOffEdt(int)} outside of tests. */
   private final IntConsumer exiter;
 
+  /** Runs the pages' {@link SetupWindow#diskWork()}; the background queue outside of tests. */
+  private final Executor diskExecutor;
+
   /** Set when the user quit from the wizard, so startup must not resume once it closes. */
   private volatile boolean exiting;
 
@@ -89,8 +94,13 @@ public final class SetupManager {
   }
 
   SetupManager(Supplier<Pages> decider, IntConsumer exiter) {
+    this(decider, exiter, BackgroundQueuedExecutorService::schedule);
+  }
+
+  SetupManager(Supplier<Pages> decider, IntConsumer exiter, Executor diskExecutor) {
     this.decider = decider;
     this.exiter = exiter;
+    this.diskExecutor = diskExecutor;
   }
 
   /**
@@ -339,30 +349,96 @@ public final class SetupManager {
     cancelAction.setEnabled((actions & ACTION_CANCEL) != 0);
   }
 
+  /**
+   * Applies {@code window}'s settings, then calls {@code then} on the EDT with the error, or null
+   * when they were applied. The page reads its settings on the EDT; the disk work they need ({@link
+   * SetupWindow#diskWork()}) runs on {@link #diskExecutor} while the wizard's buttons, other than
+   * Cancel, are disabled, so a slow disk can't freeze the wizard and the user can't leave the page
+   * twice. Without disk work, {@code then} runs right away.
+   */
+  void applySettings(SetupWindow window, boolean loadCoreComponents, Consumer<String> then) {
+    String pageError = null;
+    try {
+      window.applySettings(loadCoreComponents);
+    } catch (ApplySettingsException e) {
+      pageError = messageOf(e);
+    }
+    SetupWindow.DiskWork work = window.diskWork();
+    if (work == null) {
+      then.accept(pageError);
+      return;
+    }
+    String errorBeforeDisk = pageError;
+    enableActions(ACTION_CANCEL);
+    diskExecutor.execute(
+        () -> {
+          String diskError = null;
+          boolean ran = false;
+          try {
+            work.run();
+            ran = true;
+          } catch (ApplySettingsException e) {
+            diskError = messageOf(e);
+            ran = true;
+          } finally {
+            // An unexpected exception keeps the user on the page, as it did on the EDT.
+            boolean finished = ran;
+            String error = joinErrors(diskError, errorBeforeDisk);
+            SwingUtilities.invokeLater(
+                () -> {
+                  enableActions(window.getAppropriateActions());
+                  if (finished) {
+                    then.accept(error);
+                  }
+                });
+          }
+        });
+  }
+
+  private static String messageOf(ApplySettingsException e) {
+    return e.getMessage() == null ? "" : e.getMessage();
+  }
+
+  /** Both errors, one paragraph each, or null when there are none. */
+  private static String joinErrors(String first, String second) {
+    if (first == null) {
+      return second;
+    }
+    if (second == null) {
+      return first;
+    }
+    return first + "\n\n" + second;
+  }
+
+  /** Shows a page's error to the user, unless it has no message. */
+  private static void showError(String error) {
+    if (!error.isEmpty()) {
+      GUIMediator.showError(error);
+    }
+  }
+
   /** Displays the next window in the setup sequence. */
   private void next() {
-    SetupWindow newWindow = _currentWindow.getNext();
-    try {
-      _currentWindow.applySettings(true);
-      show(newWindow);
-    } catch (ApplySettingsException ase) {
-      // there was a problem applying the settings from
-      // the current window, so display the error message
-      // to the user.
-      if (ase.getMessage() != null && ase.getMessage().length() > 0)
-        GUIMediator.showError(ase.getMessage());
-    }
+    SetupWindow current = _currentWindow;
+    applySettings(
+        current,
+        true,
+        error -> {
+          if (error != null) {
+            // there was a problem applying the settings from the current window, so display the
+            // error message to the user.
+            showError(error);
+          } else {
+            show(current.getNext());
+          }
+        });
   }
 
   /** Displays the previous window in the setup sequence. */
   private void previous() {
-    SetupWindow newWindow = _currentWindow.getPrevious();
-    try {
-      _currentWindow.applySettings(false);
-    } catch (ApplySettingsException ase) {
-      // ignore errors when going backwards
-    }
-    show(newWindow);
+    SetupWindow current = _currentWindow;
+    // ignore errors when going backwards
+    applySettings(current, false, error -> show(current.getPrevious()));
   }
 
   /** Cancels the setup. */
@@ -383,19 +459,26 @@ public final class SetupManager {
 
   /** Completes the setup. */
   private void finishSetup() {
-    if (_currentWindow != null) {
-      try {
-        _currentWindow.applySettings(true);
-      } catch (ApplySettingsException e) {
-        // there was a problem applying the settings from
-        // the current window, so display the error message
-        // to the user.
-        if (e.getMessage() != null && e.getMessage().length() > 0) {
-          GUIMediator.showError(e.getMessage());
-        }
-        return;
-      }
+    if (_currentWindow == null) {
+      completeSetup();
+      return;
     }
+    applySettings(
+        _currentWindow,
+        true,
+        error -> {
+          if (error != null) {
+            // there was a problem applying the settings from the current window, so display the
+            // error message to the user.
+            showError(error);
+          } else {
+            completeSetup();
+          }
+        });
+  }
+
+  /** Saves that the setup is done and closes the wizard, once the last page's settings applied. */
+  private void completeSetup() {
     dialogFrame.getDialog().dispose();
     ApplicationSettings.INSTALLED.setValue(true);
     InstallSettings.SAVE_DIRECTORY.setValue(true);
@@ -427,11 +510,8 @@ public final class SetupManager {
     for (LanguageAwareAction action : actions) {
       action.updateLanguage();
     }
-    try {
-      _currentWindow.applySettings(false);
-    } catch (ApplySettingsException ignored) {
-    }
-    _currentWindow.handleWindowOpeningEvent();
+    SetupWindow current = _currentWindow;
+    applySettings(current, false, ignored -> current.handleWindowOpeningEvent());
   }
 
   /** Show the specified window */

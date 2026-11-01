@@ -26,10 +26,7 @@ import com.limegroup.gnutella.settings.LibrarySettings;
 import com.limegroup.gnutella.settings.SharingSettings;
 import java.awt.*;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import javax.swing.*;
-import org.limewire.util.StringUtils;
 
 /**
  * This class displays a setup window for allowing the user to choose the directory for saving their
@@ -85,17 +82,9 @@ class BitTorrentSettingsWindow extends SetupWindow {
    * <p>This method applies any settings associated with this setup window.
    */
   public void applySettings(boolean loadCoreComponents) throws ApplySettingsException {
-    List<String> errors = new ArrayList<>(2);
-    applyTorrentDataSaveFolderSettings(errors);
-    applyTorrentSeedingSettings(errors);
-    if (!errors.isEmpty()) {
-      throw new ApplySettingsException(StringUtils.explode(errors, "\n\n"));
-    }
-  }
-
-  private void applyTorrentSeedingSettings(List<String> errors) {
-    if (!_torrentSeedingSettingComponent.hasOneBeenSelected()) {
-      errors.add(
+    Boolean seeding = seedingChoice();
+    if (seeding == null) {
+      throw new ApplySettingsException(
           "<html><p>"
               + I18n.tr("You forgot to select your finished downloads \"Seeding\" setting.")
               + "</p>\n"
@@ -104,23 +93,46 @@ class BitTorrentSettingsWindow extends SetupWindow {
               + "\">"
               + I18n.tr("What is \"Seeding\"?")
               + "</a></p></html>");
-      return;
     }
-    SharingSettings.SEED_FINISHED_TORRENTS.setValue(_torrentSeedingSettingComponent.wantsSeeding());
+    SharingSettings.SEED_FINISHED_TORRENTS.setValue(seeding);
   }
 
-  private void applyTorrentDataSaveFolderSettings(List<String> errors) {
-    File folder = new File(_torrentSaveFolderComponent.getTorrentSaveFolderPath());
-    if (folder.exists() && folder.isDirectory() && folder.canWrite()) {
+  /** The Torrent Data folder typed on this page is checked, created and saved off the EDT. */
+  @Override
+  DiskWork diskWork() {
+    File folder = new File(torrentDataFolderPath());
+    return () -> applyTorrentDataSaveFolder(folder);
+  }
+
+  /** The folder typed in the Torrent Data field. */
+  String torrentDataFolderPath() {
+    return _torrentSaveFolderComponent.getTorrentSaveFolderPath();
+  }
+
+  /** Whether the user chose to seed finished downloads, or null until they pick one. */
+  Boolean seedingChoice() {
+    return _torrentSeedingSettingComponent.hasOneBeenSelected()
+        ? _torrentSeedingSettingComponent.wantsSeeding()
+        : null;
+  }
+
+  /**
+   * Saves {@code folder} as the Torrent Data folder, creating it if needed, and sets up the initial
+   * library folders. It checks and creates folders on disk, so it must not run on the EDT.
+   *
+   * @throws ApplySettingsException if the folder is not usable and could not be created
+   */
+  static void applyTorrentDataSaveFolder(File folder) throws ApplySettingsException {
+    boolean usable =
+        (folder.exists() && folder.isDirectory() && folder.canWrite()) || folder.mkdirs();
+    if (usable) {
       SharingSettings.TORRENT_DATA_DIR_SETTING.setValue(folder);
-    } else {
-      if (!folder.mkdirs()) {
-        errors.add(I18n.tr("FrostWire could not create the Torrent Data Folder {0}", folder));
-      } else {
-        SharingSettings.TORRENT_DATA_DIR_SETTING.setValue(folder);
-      }
     }
     // setup initial library folders here
     LibrarySettings.setupInitialLibraryFolders();
+    if (!usable) {
+      throw new ApplySettingsException(
+          I18n.tr("FrostWire could not create the Torrent Data Folder {0}", folder));
+    }
   }
 }
