@@ -216,47 +216,6 @@ public class ArrayUtils {
     // Generic array
     //-----------------------------------------------------------------------
 
-    /**
-     * <p>Create a type-safe generic array.</p>
-     *
-     * <p>The Java language does not allow an array to be created from a generic type:</p>
-     *
-     * <pre>
-     * public static &lt;T&gt; T[] createAnArray(int size) {
-     * return new T[size]; // compiler error here
-     * }
-     * public static &lt;T&gt; T[] createAnArray(int size) {
-     * return (T[])new Object[size]; // ClassCastException at runtime
-     * }
-     * </pre>
-     *
-     * <p>Therefore new arrays of generic types can be created with this method.
-     * For example, an array of Strings can be created:</p>
-     *
-     * <pre>
-     * String[] array = ArrayUtils.toArray("1", "2");
-     * String[] emptyArray = ArrayUtils.&lt;String&gt;toArray();
-     * </pre>
-     *
-     * <p>The method is typically used in scenarios, where the caller itself uses generic types
-     * that have to be combined into an array.</p>
-     *
-     * <p>Note, this method makes only sense to provide arguments of the same type so that the
-     * compiler can deduce the type of the array itself. While it is possible to select the
-     * type explicitly like in
-     * <code>Number[] array = ArrayUtils.&lt;Number&gt;toArray(Integer.valueOf(42), Double.valueOf(Math.PI))</code>,
-     * there is no real advantage when compared to
-     * <code>new Number[] {Integer.valueOf(42), Double.valueOf(Math.PI)}</code>.</p>
-     *
-     * @param <T>   the array's element type
-     * @param items the varargs array items, null allowed
-     * @return the array, not null unless a null array is passed in
-     * @since 3.0
-     */
-    @SafeVarargs
-    public static <T> T[] toArray(final T... items) {
-        return items;
-    }
     // Clone
     //-----------------------------------------------------------------------
 
@@ -3577,59 +3536,6 @@ public class ArrayUtils {
         return (array != null && array.length != 0);
     }
 
-    /**
-     * <p>Adds all the elements of the given arrays into a new array.</p>
-     * <p>The new array contains all of the element of {@code array1} followed
-     * by all of the elements {@code array2}. When an array is returned, it is always
-     * a new array.</p>
-     *
-     * <pre>
-     * ArrayUtils.addAll(null, null)     = null
-     * ArrayUtils.addAll(array1, null)   = cloned copy of array1
-     * ArrayUtils.addAll(null, array2)   = cloned copy of array2
-     * ArrayUtils.addAll([], [])         = []
-     * ArrayUtils.addAll([null], [null]) = [null, null]
-     * ArrayUtils.addAll(["a", "b", "c"], ["1", "2", "3"]) = ["a", "b", "c", "1", "2", "3"]
-     * </pre>
-     *
-     * @param <T>    the component type of the array
-     * @param array1 the first array whose elements are added to the new array, may be {@code null}
-     * @param array2 the second array whose elements are added to the new array, may be {@code null}
-     * @return The new array, {@code null} if both arrays are {@code null}.
-     * The type of the new array is the type of the first array,
-     * unless the first array is null, in which case the type is the same as the second array.
-     * @throws IllegalArgumentException if the array types are incompatible
-     * @since 2.1
-     */
-    @SafeVarargs
-    public static <T> T[] addAll(final T[] array1, final T... array2) {
-        if (array1 == null) {
-            return clone(array2);
-        } else if (array2 == null) {
-            return clone(array1);
-        }
-        final Class<?> type1 = array1.getClass().getComponentType();
-        @SuppressWarnings("unchecked") // OK, because array is of type T
-        final T[] joinedArray = (T[]) Array.newInstance(type1, array1.length + array2.length);
-        System.arraycopy(array1, 0, joinedArray, 0, array1.length);
-        try {
-            System.arraycopy(array2, 0, joinedArray, array1.length, array2.length);
-        } catch (final ArrayStoreException ase) {
-            // Check if problem was due to incompatible types
-            /*
-             * We do this here, rather than before the copy because:
-             * - it would be a wasted check most of the time
-             * - safer, in case check turns out to be too strict
-             */
-            final Class<?> type2 = array2.getClass().getComponentType();
-            if (!type1.isAssignableFrom(type2)) {
-                throw new IllegalArgumentException("Cannot store " + type2.getName() + " in an array of "
-                        + type1.getName(), ase);
-            }
-            throw ase; // No, so rethrow original
-        }
-        return joinedArray;
-    }
 
     /**
      * <p>Adds all the elements of the given arrays into a new array.</p>
