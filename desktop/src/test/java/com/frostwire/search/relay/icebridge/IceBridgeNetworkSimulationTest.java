@@ -19,8 +19,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Hierarchical network simulation benchmarks (uniform LimeWire-style mesh
- * and hybrid EC2 hub mesh + FrostWire leaves).
+ * Hierarchical network simulation benchmarks (uniform LimeWire-style mesh and hybrid EC2 hub mesh +
+ * FrostWire leaves).
  */
 class IceBridgeNetworkSimulationTest {
 
@@ -57,21 +57,26 @@ class IceBridgeNetworkSimulationTest {
     assertEquals(3, report.config.leafUpConnections);
 
     // Mesh is connected enough
-    assertTrue(report.iceBridgeEdges > report.config.iceBridgeCount,
+    assertTrue(
+        report.iceBridgeEdges > report.config.iceBridgeCount,
         "mesh should have more edges than nodes: " + report.iceBridgeEdges);
 
     // Soft-max + real graph: mesh msgs must be far below infinite-tree bound
-    assertTrue(report.meanMeshMessages < report.worstCaseInfiniteMesh / 10.0,
+    assertTrue(
+        report.meanMeshMessages < report.worstCaseInfiniteMesh / 10.0,
         "real mesh traffic should be << infinite tree: mean="
-            + report.meanMeshMessages + " infinite=" + report.worstCaseInfiniteMesh);
+            + report.meanMeshMessages
+            + " infinite="
+            + report.worstCaseInfiniteMesh);
 
     // Content discovery should usually succeed with 80 holders / 1500 leaves
-    assertTrue(report.hitRate >= 0.70,
+    assertTrue(
+        report.hitRate >= 0.70,
         "expected high hit rate with dense leaf attachments; was " + report.hitRate);
 
     // p95 mesh stays bounded (soft max + degree limit)
-    assertTrue(report.p95MeshMessages < 5_000,
-        "p95 mesh messages too high: " + report.p95MeshMessages);
+    assertTrue(
+        report.p95MeshMessages < 5_000, "p95 mesh messages too high: " + report.p95MeshMessages);
   }
 
   @Test
@@ -112,7 +117,8 @@ class IceBridgeNetworkSimulationTest {
     LOG.info("mild:  " + rMild);
 
     // Ultrapeer-like should spend more search-peer messages (higher M)
-    assertTrue(rUltra.meanSearchPeerMessages >= rMild.meanSearchPeerMessages * 0.9,
+    assertTrue(
+        rUltra.meanSearchPeerMessages >= rMild.meanSearchPeerMessages * 0.9,
         "ultrapeer M=30 should query at least as many leaves as mild M=8");
   }
 
@@ -153,13 +159,20 @@ class IceBridgeNetworkSimulationTest {
 
     // Soft-max + degree-32 mesh reaches most IBs (diameter ~2–3); traffic is
     // O(|E|) not infinite-tree N^TTL. Leaves hit via M=30 per IB + dual-envelope.
-    assertTrue(report.meanMeshMessages < report.worstCaseInfiniteMesh / 5.0,
+    assertTrue(
+        report.meanMeshMessages < report.worstCaseInfiniteMesh / 5.0,
         "mesh should stay well below infinite-tree bound: mean="
-            + report.meanMeshMessages + " infinite=" + report.worstCaseInfiniteMesh);
-    assertTrue(report.meanMeshMessages <= report.iceBridgeEdges * 3.0 + 100,
-        "mesh msgs should be O(|E|): mean=" + report.meanMeshMessages
-            + " edges=" + report.iceBridgeEdges);
-    assertTrue(report.p95SearchPeerMessages <= cfg.frostWireCount * 2.0,
+            + report.meanMeshMessages
+            + " infinite="
+            + report.worstCaseInfiniteMesh);
+    assertTrue(
+        report.meanMeshMessages <= report.iceBridgeEdges * 3.0 + 100,
+        "mesh msgs should be O(|E|): mean="
+            + report.meanMeshMessages
+            + " edges="
+            + report.iceBridgeEdges);
+    assertTrue(
+        report.p95SearchPeerMessages <= cfg.frostWireCount * 2.0,
         "search p95 too high: " + report.p95SearchPeerMessages);
     assertTrue(report.hitRate > 0.5, "hit rate " + report.hitRate);
   }

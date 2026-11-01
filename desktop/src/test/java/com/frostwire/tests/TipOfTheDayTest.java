@@ -7,23 +7,23 @@
 
 package com.frostwire.tests;
 
-import com.limegroup.gnutella.gui.TipOfTheDayMediator;
-import org.junit.jupiter.api.Test;
-
-import javax.swing.*;
-
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.limegroup.gnutella.gui.TipOfTheDayMediator;
+import javax.swing.*;
+import org.junit.jupiter.api.Test;
+
 class TipOfTheDayTest {
 
-    @Test
-    void preloadHtmlEngine_completesOffEdtWithKitAvailable() {
-        assertDoesNotThrow(TipOfTheDayMediator::preloadHtmlEngine);
+  @Test
+  void preloadHtmlEngine_completesOffEdtWithKitAvailable() {
+    assertDoesNotThrow(TipOfTheDayMediator::preloadHtmlEngine);
 
-        String kitClassName = new JEditorPane().getEditorKitClassNameForContentType("text/html");
+    String kitClassName = new JEditorPane().getEditorKitClassNameForContentType("text/html");
 
-        assertTrue(kitClassName != null && kitClassName.contains("HTMLEditorKit"),
-                "HTML editor kit must resolve so tip contents render");
-    }
+    assertTrue(
+        kitClassName != null && kitClassName.contains("HTMLEditorKit"),
+        "HTML editor kit must resolve so tip contents render");
+  }
 }

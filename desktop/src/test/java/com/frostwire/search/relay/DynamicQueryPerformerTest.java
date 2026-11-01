@@ -10,9 +10,9 @@ package com.frostwire.search.relay;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.frostwire.search.SearchError;
-import com.frostwire.search.relay.icebridge.IceBridgeTopology;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchResult;
+import com.frostwire.search.relay.icebridge.IceBridgeTopology;
 import com.frostwire.util.Hex;
 import java.security.Signature;
 import java.util.ArrayList;
@@ -28,9 +28,9 @@ import org.junit.jupiter.api.Test;
 /**
  * Originator dynamic querying ({@code DESIGN_DYNAMIC_QUERYING.md}).
  *
- * <p>A fake transport counts every first-hop {@code send} and signs a
- * canned answer per registered peer, so each test observes exactly how
- * many phases fired, with which TTLs, and within which budget.
+ * <p>A fake transport counts every first-hop {@code send} and signs a canned answer per registered
+ * peer, so each test observes exactly how many phases fired, with which TTLs, and within which
+ * budget.
  */
 class DynamicQueryPerformerTest {
 
@@ -42,9 +42,17 @@ class DynamicQueryPerformerTest {
     RecordingListener listener = new RecordingListener();
     DistributedSearchPerformer p =
         new DistributedSearchPerformer(
-            1L, "ubuntu", new InMemoryLocalIndex(), directory,
-            IdentityKeys.generate(), transport,
-            10, 50, 25, 10, DynamicQueryConfig.withDesiredResults(2));
+            1L,
+            "ubuntu",
+            new InMemoryLocalIndex(),
+            directory,
+            IdentityKeys.generate(),
+            transport,
+            10,
+            50,
+            25,
+            10,
+            DynamicQueryConfig.withDesiredResults(2));
     p.setListener(listener);
 
     p.perform();
@@ -65,9 +73,17 @@ class DynamicQueryPerformerTest {
     RecordingListener listener = new RecordingListener();
     DistributedSearchPerformer p =
         new DistributedSearchPerformer(
-            2L, "ubuntu", new InMemoryLocalIndex(), directory,
-            IdentityKeys.generate(), transport,
-            10, 50, 25, 10, DynamicQueryConfig.withDesiredResults(10));
+            2L,
+            "ubuntu",
+            new InMemoryLocalIndex(),
+            directory,
+            IdentityKeys.generate(),
+            transport,
+            10,
+            50,
+            25,
+            10,
+            DynamicQueryConfig.withDesiredResults(10));
     p.setListener(listener);
 
     p.perform();
@@ -92,14 +108,23 @@ class DynamicQueryPerformerTest {
     int maxPeers = 30;
     DistributedSearchPerformer p =
         new DistributedSearchPerformer(
-            3L, "rare-content-xyz", new InMemoryLocalIndex(), directory,
-            IdentityKeys.generate(), transport,
-            maxPeers, 50, 25, 10, DynamicQueryConfig.defaults());
+            3L,
+            "rare-content-xyz",
+            new InMemoryLocalIndex(),
+            directory,
+            IdentityKeys.generate(),
+            transport,
+            maxPeers,
+            50,
+            25,
+            10,
+            DynamicQueryConfig.defaults());
     p.setListener(listener);
 
     p.perform();
 
-    assertTrue(transport.sentRequests.size() <= maxPeers,
+    assertTrue(
+        transport.sentRequests.size() <= maxPeers,
         "all phases together must not exceed maxPeers, was " + transport.sentRequests.size());
     assertTrue(transport.sentTtls().contains(1));
     assertTrue(transport.sentTtls().contains(2));
@@ -119,9 +144,17 @@ class DynamicQueryPerformerTest {
     RecordingListener listener = new RecordingListener();
     DistributedSearchPerformer p =
         new DistributedSearchPerformer(
-            4L, "ubuntu", new InMemoryLocalIndex(), directory,
-            IdentityKeys.generate(), transport,
-            12, 50, 25, 10, DynamicQueryConfig.withDesiredResults(10));
+            4L,
+            "ubuntu",
+            new InMemoryLocalIndex(),
+            directory,
+            IdentityKeys.generate(),
+            transport,
+            12,
+            50,
+            25,
+            10,
+            DynamicQueryConfig.withDesiredResults(10));
     p.setListener(listener);
 
     p.perform();
@@ -167,12 +200,10 @@ class DynamicQueryPerformerTest {
     }
 
     @Override
-    public void onStopped(long token) {
-    }
+    public void onStopped(long token) {}
 
     @Override
-    public void onError(long token, SearchError error) {
-    }
+    public void onError(long token, SearchError error) {}
   }
 
   private static final class InMemoryLocalIndex implements LocalIndex {
@@ -205,8 +236,7 @@ class DynamicQueryPerformerTest {
     }
 
     @Override
-    public void markPublished(String infoHashHex, long timestamp) {
-    }
+    public void markPublished(String infoHashHex, long timestamp) {}
 
     @Override
     public List<String> needsRepublish(long nowSec, long thresholdSec) {
@@ -214,8 +244,7 @@ class DynamicQueryPerformerTest {
     }
 
     @Override
-    public void updateLastSeen(String infoHashHex, long ts) {
-    }
+    public void updateLastSeen(String infoHashHex, long ts) {}
 
     @Override
     public int size() {
@@ -242,9 +271,8 @@ class DynamicQueryPerformerTest {
   }
 
   /**
-   * Fake transport with synchronous delivery. Registered peers answer
-   * with one signed row; unregistered peers NACK the send (fail-closed,
-   * no latch wait) so expansion tests stay fast.
+   * Fake transport with synchronous delivery. Registered peers answer with one signed row;
+   * unregistered peers NACK the send (fail-closed, no latch wait) so expansion tests stay fast.
    */
   private static final class FakeTransport implements DistributedSearchTransport {
     private final Map<String, IdentityKeys> responders = new ConcurrentHashMap<>();
@@ -335,9 +363,17 @@ class DynamicQueryPerformerTest {
     RecordingListener listener = new RecordingListener();
     DistributedSearchPerformer p =
         new DistributedSearchPerformer(
-            5L, "ubuntu", new InMemoryLocalIndex(), directory,
-            IdentityKeys.generate(), transport,
-            10, 50, 25, 10, null);
+            5L,
+            "ubuntu",
+            new InMemoryLocalIndex(),
+            directory,
+            IdentityKeys.generate(),
+            transport,
+            10,
+            50,
+            25,
+            10,
+            null);
     p.setListener(listener);
 
     p.perform();

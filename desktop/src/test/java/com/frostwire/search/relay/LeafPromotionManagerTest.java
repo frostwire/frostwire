@@ -44,8 +44,7 @@ class LeafPromotionManagerTest {
     }
 
     LeafPromotionManager manager() {
-      return new LeafPromotionManager(
-          connectable::get, sessions::get, uptime::get, extra::get);
+      return new LeafPromotionManager(connectable::get, sessions::get, uptime::get, extra::get);
     }
 
     void makeHealthy() {
@@ -68,8 +67,7 @@ class LeafPromotionManagerTest {
     assertTrue(mgr.evaluate());
     assertTrue(mgr.isPromoted());
     assertEquals(List.of(true), env.enabledCalls);
-    assertEquals(
-        List.of(LeafPromotionManager.PROMOTED_MAX_FORWARD_TARGETS), env.capCalls);
+    assertEquals(List.of(LeafPromotionManager.PROMOTED_MAX_FORWARD_TARGETS), env.capCalls);
   }
 
   @Test
@@ -164,8 +162,7 @@ class LeafPromotionManagerTest {
     Env late = new Env();
     mgr.addTarget(late.target());
     assertEquals(List.of(true), late.enabledCalls);
-    assertEquals(
-        List.of(LeafPromotionManager.PROMOTED_MAX_FORWARD_TARGETS), late.capCalls);
+    assertEquals(List.of(LeafPromotionManager.PROMOTED_MAX_FORWARD_TARGETS), late.capCalls);
   }
 
   @Test

@@ -18,9 +18,12 @@ class SoundcloudHlsDownloadWiringTest {
   void bothTransferPathsAssembleHlsAudioInsteadOfSavingAPlaylist() {
     assertDoesNotThrow(
         () -> {
-          String shared = source("../common/src/main/java/com/frostwire/transfers/SoundcloudDownload.java");
-          String desktop = source("src/main/java/com/frostwire/gui/bittorrent/SoundcloudDownload.java");
-          String base = source("../common/src/main/java/com/frostwire/transfers/BaseHttpDownload.java");
+          String shared =
+              source("../common/src/main/java/com/frostwire/transfers/SoundcloudDownload.java");
+          String desktop =
+              source("src/main/java/com/frostwire/gui/bittorrent/SoundcloudDownload.java");
+          String base =
+              source("../common/src/main/java/com/frostwire/transfers/BaseHttpDownload.java");
 
           assertTrue(base.contains("save(client,url,temp,resumeAttempt,httpHeaders)"));
           assertTrue(shared.contains("if(sr.isHls())"));
@@ -36,8 +39,10 @@ class SoundcloudHlsDownloadWiringTest {
   void aacOutputIsNotMislabelledOrPassedToTheMp3TagWriter() {
     assertDoesNotThrow(
         () -> {
-          String shared = source("../common/src/main/java/com/frostwire/transfers/SoundcloudDownload.java");
-          String desktop = source("src/main/java/com/frostwire/gui/bittorrent/SoundcloudDownload.java");
+          String shared =
+              source("../common/src/main/java/com/frostwire/transfers/SoundcloudDownload.java");
+          String desktop =
+              source("src/main/java/com/frostwire/gui/bittorrent/SoundcloudDownload.java");
           assertTrue(shared.contains("if(!sr.isHls()){downloadAndUpdateCoverArt(sr,tempPath);}"));
           assertTrue(desktop.contains("FilenameUtils.getExtension(filename)"));
           assertTrue(desktop.contains("if(sr.isHls()){returnfalse;"));

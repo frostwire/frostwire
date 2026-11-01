@@ -1,44 +1,44 @@
 /*
  *     Created by Angel Leon (@gubatron)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.frostwire.tests;
 
-import com.frostwire.search.knaben.KnabenSearchPattern;
-import com.frostwire.search.FileSearchResult;
-import com.frostwire.search.CompositeFileSearchResult;
-import com.frostwire.util.Logger;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.frostwire.search.CompositeFileSearchResult;
+import com.frostwire.search.FileSearchResult;
+import com.frostwire.search.knaben.KnabenSearchPattern;
+import com.frostwire.util.Logger;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+
 /**
- * V2 Architecture: Unit tests for KnabenSearchPattern JSON parsing
- * gradle test --tests "com.frostwire.tests.KnabenSearchPerformerUnitTest.testJsonParsing"
+ * V2 Architecture: Unit tests for KnabenSearchPattern JSON parsing gradle test --tests
+ * "com.frostwire.tests.KnabenSearchPerformerUnitTest.testJsonParsing"
  */
 public class KnabenSearchPerformerUnitTest {
-    private final static Logger LOG = Logger.getLogger(KnabenSearchPerformerUnitTest.class);
-    
-    @Test
-    public void testJsonParsing() {
-        // Sample JSON response matching Knaben API format with "hits" array
-        String sampleJson = """
+  private static final Logger LOG = Logger.getLogger(KnabenSearchPerformerUnitTest.class);
+
+  @Test
+  public void testJsonParsing() {
+    // Sample JSON response matching Knaben API format with "hits" array
+    String sampleJson =
+        """
         {
             "hits": [
                 {
@@ -63,27 +63,28 @@ public class KnabenSearchPerformerUnitTest {
         }
         """;
 
-        KnabenSearchPattern pattern = new KnabenSearchPattern();
-        List<FileSearchResult> results = pattern.parseResults(sampleJson);
+    KnabenSearchPattern pattern = new KnabenSearchPattern();
+    List<FileSearchResult> results = pattern.parseResults(sampleJson);
 
-        assertNotNull(results);
-        assertTrue(results.size() > 0, "Should parse at least one result");
+    assertNotNull(results);
+    assertTrue(results.size() > 0, "Should parse at least one result");
 
-        // Test first result
-        CompositeFileSearchResult result1 = (CompositeFileSearchResult) results.get(0);
-        assertNotNull(result1.getDisplayName());
-        assertNotNull(result1.getTorrentHash());
-        assertEquals(4000000000L, result1.getSize());
-        assertTrue(result1.getSeeds().isPresent());
-        assertEquals("Knaben", result1.getSource());
+    // Test first result
+    CompositeFileSearchResult result1 = (CompositeFileSearchResult) results.get(0);
+    assertNotNull(result1.getDisplayName());
+    assertNotNull(result1.getTorrentHash());
+    assertEquals(4000000000L, result1.getSize());
+    assertTrue(result1.getSeeds().isPresent());
+    assertEquals("Knaben", result1.getSource());
 
-        LOG.info("JSON parsing test passed successfully");
-    }
+    LOG.info("JSON parsing test passed successfully");
+  }
 
-    @Test
-    public void testAlternativeJsonFormat() {
-        // Test with minimal hits format
-        String sampleJson = """
+  @Test
+  public void testAlternativeJsonFormat() {
+    // Test with minimal hits format
+    String sampleJson =
+        """
         {
             "hits": [
                 {
@@ -99,24 +100,25 @@ public class KnabenSearchPerformerUnitTest {
         }
         """;
 
-        KnabenSearchPattern pattern = new KnabenSearchPattern();
-        List<FileSearchResult> results = pattern.parseResults(sampleJson);
+    KnabenSearchPattern pattern = new KnabenSearchPattern();
+    List<FileSearchResult> results = pattern.parseResults(sampleJson);
 
-        assertNotNull(results);
-        assertTrue(results.size() > 0, "Should parse results from array format");
+    assertNotNull(results);
+    assertTrue(results.size() > 0, "Should parse results from array format");
 
-        CompositeFileSearchResult result = (CompositeFileSearchResult) results.get(0);
-        assertNotNull(result.getDisplayName());
-        assertNotNull(result.getTorrentHash());
-        assertEquals(3000000000L, result.getSize());
+    CompositeFileSearchResult result = (CompositeFileSearchResult) results.get(0);
+    assertNotNull(result.getDisplayName());
+    assertNotNull(result.getTorrentHash());
+    assertEquals(3000000000L, result.getSize());
 
-        LOG.info("Alternative JSON format test passed successfully");
-    }
+    LOG.info("Alternative JSON format test passed successfully");
+  }
 
-    @Test
-    public void testActualKnabenApiFormat() {
-        // Test with the actual format returned by Knaben API (hits array)
-        String sampleJson = """
+  @Test
+  public void testActualKnabenApiFormat() {
+    // Test with the actual format returned by Knaben API (hits array)
+    String sampleJson =
+        """
         {
             "hits": [
                 {
@@ -133,25 +135,26 @@ public class KnabenSearchPerformerUnitTest {
         }
         """;
 
-        KnabenSearchPattern pattern = new KnabenSearchPattern();
-        List<FileSearchResult> results = pattern.parseResults(sampleJson);
+    KnabenSearchPattern pattern = new KnabenSearchPattern();
+    List<FileSearchResult> results = pattern.parseResults(sampleJson);
 
-        assertNotNull(results);
-        assertTrue(results.size() > 0, "Should parse Knaben API format");
+    assertNotNull(results);
+    assertTrue(results.size() > 0, "Should parse Knaben API format");
 
-        CompositeFileSearchResult result = (CompositeFileSearchResult) results.get(0);
-        assertNotNull(result.getDisplayName());
-        assertNotNull(result.getTorrentHash());
-        assertEquals(328613232L, result.getSize());
-        assertTrue(result.getSeeds().isPresent());
+    CompositeFileSearchResult result = (CompositeFileSearchResult) results.get(0);
+    assertNotNull(result.getDisplayName());
+    assertNotNull(result.getTorrentHash());
+    assertEquals(328613232L, result.getSize());
+    assertTrue(result.getSeeds().isPresent());
 
-        LOG.info("Actual Knaben API format test passed successfully");
-    }
+    LOG.info("Actual Knaben API format test passed successfully");
+  }
 
-    @Test
-    public void testHtmlErrorHandling() {
-        // Test that HTML responses are handled gracefully
-        String htmlResponse = """
+  @Test
+  public void testHtmlErrorHandling() {
+    // Test that HTML responses are handled gracefully
+    String htmlResponse =
+        """
         <!DOCTYPE html>
         <html>
         <head>
@@ -164,12 +167,12 @@ public class KnabenSearchPerformerUnitTest {
         </html>
         """;
 
-        KnabenSearchPattern pattern = new KnabenSearchPattern();
-        List<FileSearchResult> results = pattern.parseResults(htmlResponse);
+    KnabenSearchPattern pattern = new KnabenSearchPattern();
+    List<FileSearchResult> results = pattern.parseResults(htmlResponse);
 
-        // Should handle gracefully and return empty list or handle error
-        assertNotNull(results);
+    // Should handle gracefully and return empty list or handle error
+    assertNotNull(results);
 
-        LOG.info("HTML error handling test passed successfully");
-    }
+    LOG.info("HTML error handling test passed successfully");
+  }
 }

@@ -25,45 +25,48 @@ import org.junit.jupiter.api.Test;
  */
 class DhtPeerDiscoverySourceTest {
 
-    @Test
-    void collectEndpointsSurvivesConcurrentMutationOfSourceList() throws Exception {
-        ArrayList<TcpEndpoint> live = new ArrayList<>();
-        for (int i = 0; i < 64; i++) {
-            live.add(new TcpEndpoint("1.2.3." + (i % 250 + 1), 6888 + (i % 10)));
-        }
+  @Test
+  void collectEndpointsSurvivesConcurrentMutationOfSourceList() throws Exception {
+    ArrayList<TcpEndpoint> live = new ArrayList<>();
+    for (int i = 0; i < 64; i++) {
+      live.add(new TcpEndpoint("1.2.3." + (i % 250 + 1), 6888 + (i % 10)));
+    }
 
-        AtomicBoolean mutatorFailed = new AtomicBoolean(false);
-        CountDownLatch started = new CountDownLatch(1);
-        Thread mutator = new Thread(() -> {
-            started.countDown();
-            try {
+    AtomicBoolean mutatorFailed = new AtomicBoolean(false);
+    CountDownLatch started = new CountDownLatch(1);
+    Thread mutator =
+        new Thread(
+            () -> {
+              started.countDown();
+              try {
                 for (int i = 0; i < 10_000; i++) {
-                    live.add(new TcpEndpoint("9.9.9." + (i % 200 + 1), 7000));
-                    if (live.size() > 200) {
-                        live.remove(0);
-                    }
+                  live.add(new TcpEndpoint("9.9.9." + (i % 200 + 1), 7000));
+                  if (live.size() > 200) {
+                    live.remove(0);
+                  }
                 }
-            } catch (Throwable t) {
+              } catch (Throwable t) {
                 mutatorFailed.set(true);
-            }
-        }, "dht-list-mutator");
-        mutator.setDaemon(true);
-        mutator.start();
-        assertTrue(started.await(1, TimeUnit.SECONDS));
+              }
+            },
+            "dht-list-mutator");
+    mutator.setDaemon(true);
+    mutator.start();
+    assertTrue(started.await(1, TimeUnit.SECONDS));
 
-        // Must not throw ConcurrentModificationException (the production bug).
-        List<DiscoveredEndpoint> collected = assertDoesNotThrow(
-                () -> DhtPeerDiscoverySource.collectEndpointsForTest(live));
+    // Must not throw ConcurrentModificationException (the production bug).
+    List<DiscoveredEndpoint> collected =
+        assertDoesNotThrow(() -> DhtPeerDiscoverySource.collectEndpointsForTest(live));
 
-        mutator.join(5_000);
-        assertFalse(mutatorFailed.get());
-        // May be empty or non-empty depending on races; just ensure no crash.
-        assertTrue(collected != null);
-    }
+    mutator.join(5_000);
+    assertFalse(mutatorFailed.get());
+    // May be empty or non-empty depending on races; just ensure no crash.
+    assertTrue(collected != null);
+  }
 
-    @Test
-    void collectEndpointsHandlesNullAndEmpty() {
-        assertTrue(DhtPeerDiscoverySource.collectEndpointsForTest(null).isEmpty());
-        assertTrue(DhtPeerDiscoverySource.collectEndpointsForTest(new ArrayList<>()).isEmpty());
-    }
+  @Test
+  void collectEndpointsHandlesNullAndEmpty() {
+    assertTrue(DhtPeerDiscoverySource.collectEndpointsForTest(null).isEmpty());
+    assertTrue(DhtPeerDiscoverySource.collectEndpointsForTest(new ArrayList<>()).isEmpty());
+  }
 }

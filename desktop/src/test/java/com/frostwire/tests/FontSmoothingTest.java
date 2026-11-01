@@ -7,42 +7,44 @@
 
 package com.frostwire.tests;
 
-import com.limegroup.gnutella.gui.Main;
-import org.junit.jupiter.api.Test;
-
-import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.limegroup.gnutella.gui.Main;
+import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+
 class FontSmoothingTest {
 
-    @Test
-    void grayscaleFontHints_requestsGrayscaleAntialiasing() {
-        Map<Object, Object> hints = Main.grayscaleFontHints(null);
+  @Test
+  void grayscaleFontHints_requestsGrayscaleAntialiasing() {
+    Map<Object, Object> hints = Main.grayscaleFontHints(null);
 
-        assertEquals(RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
-                hints.get(RenderingHints.KEY_TEXT_ANTIALIASING),
-                "Swing text must render grayscale, not subpixel-LCD");
-    }
+    assertEquals(
+        RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
+        hints.get(RenderingHints.KEY_TEXT_ANTIALIASING),
+        "Swing text must render grayscale, not subpixel-LCD");
+  }
 
-    @Test
-    void grayscaleFontHints_preservesOtherDesktopHints() {
-        Map<Object, Object> current = new HashMap<>();
-        current.put(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-        current.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+  @Test
+  void grayscaleFontHints_preservesOtherDesktopHints() {
+    Map<Object, Object> current = new HashMap<>();
+    current.put(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+    current.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 
-        Map<Object, Object> hints = Main.grayscaleFontHints(current);
+    Map<Object, Object> hints = Main.grayscaleFontHints(current);
 
-        assertNotSame(current, hints);
-        assertEquals(RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
-                hints.get(RenderingHints.KEY_TEXT_ANTIALIASING));
-        assertEquals(RenderingHints.VALUE_FRACTIONALMETRICS_ON,
-                hints.get(RenderingHints.KEY_FRACTIONALMETRICS));
-        assertTrue(current.get(RenderingHints.KEY_TEXT_ANTIALIASING)
-                == RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB, "Input map must not be mutated");
-    }
+    assertNotSame(current, hints);
+    assertEquals(
+        RenderingHints.VALUE_TEXT_ANTIALIAS_ON, hints.get(RenderingHints.KEY_TEXT_ANTIALIASING));
+    assertEquals(
+        RenderingHints.VALUE_FRACTIONALMETRICS_ON, hints.get(RenderingHints.KEY_FRACTIONALMETRICS));
+    assertTrue(
+        current.get(RenderingHints.KEY_TEXT_ANTIALIASING)
+            == RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB,
+        "Input map must not be mutated");
+  }
 }

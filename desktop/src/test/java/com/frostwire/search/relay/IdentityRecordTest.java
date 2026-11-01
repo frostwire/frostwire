@@ -152,8 +152,9 @@ class IdentityRecordTest {
     byte[] rawEd = IdentityRecord.extractRawEd25519(kp.getPublic());
     long now = java.time.Instant.now().getEpochSecond();
     java.util.Map<String, Object> canonical = new java.util.TreeMap<>();
-    canonical.put("ed25519_pub", new Entry(java.util.Base64.getEncoder().withoutPadding()
-            .encodeToString(rawEd)));
+    canonical.put(
+        "ed25519_pub",
+        new Entry(java.util.Base64.getEncoder().withoutPadding().encodeToString(rawEd)));
     canonical.put("first_seen", new Entry(now));
     canonical.put("last_seen", new Entry(now));
     canonical.put("node_id", new Entry(com.frostwire.util.Hex.encode(nodeId)));
@@ -161,15 +162,17 @@ class IdentityRecordTest {
     canonical.put("role", new Entry("BOTH"));
     canonical.put("utp_port", new Entry(6888L));
     canonical.put("v", new Entry(2L));
-    canonical.put("x25519_pub", new Entry(java.util.Base64.getEncoder().withoutPadding()
-            .encodeToString(x25519)));
+    canonical.put(
+        "x25519_pub",
+        new Entry(java.util.Base64.getEncoder().withoutPadding().encodeToString(x25519)));
     byte[] toSign = Entry.fromMap(canonical).bencode();
     java.security.Signature signer = java.security.Signature.getInstance("Ed25519");
     signer.initSign(kp.getPrivate());
     signer.update(toSign);
     java.util.Map<String, Object> v2Map = new java.util.TreeMap<>(canonical);
-    v2Map.put("sig", new Entry(java.util.Base64.getEncoder().withoutPadding()
-            .encodeToString(signer.sign())));
+    v2Map.put(
+        "sig",
+        new Entry(java.util.Base64.getEncoder().withoutPadding().encodeToString(signer.sign())));
     IdentityRecord parsed = IdentityRecord.fromEntry(Entry.fromMap(v2Map));
     assertEquals(2, parsed.version());
     assertEquals(6889, parsed.rudpPort());
@@ -196,18 +199,26 @@ class IdentityRecordTest {
     map.put("utp_port", new Entry(dict.get("utp_port").integer()));
     map.put("v", new Entry(99L));
     map.put("x25519_pub", new Entry(dict.get("x25519_pub").string()));
-    assertThrows(IllegalArgumentException.class, () -> IdentityRecord.fromEntry(Entry.fromMap(map)));
+    assertThrows(
+        IllegalArgumentException.class, () -> IdentityRecord.fromEntry(Entry.fromMap(map)));
   }
 
   @Test
   void v4RecordAdvertisesCapabilitiesAndIceBridgeVersion() throws Exception {
     KeyPair kp = ed25519();
-    IdentityRecord record = IdentityRecord.createSigned(
-            randomBytes(20), kp, randomBytes(32), 6888, 6889, "FORWARDER",
+    IdentityRecord record =
+        IdentityRecord.createSigned(
+            randomBytes(20),
+            kp,
+            randomBytes(32),
+            6888,
+            6889,
+            "FORWARDER",
             NodeCapabilities.DEFAULT_FORWARDER);
     assertEquals(4, record.version());
-    assertEquals(com.frostwire.search.relay.icebridge.IceBridgeConstants.SOFTWARE_VERSION,
-            record.icebridgeVersion());
+    assertEquals(
+        com.frostwire.search.relay.icebridge.IceBridgeConstants.SOFTWARE_VERSION,
+        record.icebridgeVersion());
     assertTrue(NodeCapabilities.has(record.capabilities(), NodeCapabilities.RELAY));
     assertFalse(NodeCapabilities.has(record.capabilities(), NodeCapabilities.SEARCH));
     IdentityRecord parsed = IdentityRecord.fromEntry(record.toEntry());

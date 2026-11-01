@@ -19,7 +19,8 @@ class DistributedSearchSettingsStructureTest {
 
   @Test
   void distributedSearchDefaultsOnAndIsFirstButDoesNotGateParticipation() throws Exception {
-    String settings = read("src/main/java/com/limegroup/gnutella/settings/SearchEnginesSettings.java");
+    String settings =
+        read("src/main/java/com/limegroup/gnutella/settings/SearchEnginesSettings.java");
     String pane =
         read("src/main/java/com/limegroup/gnutella/gui/options/panes/SearchEnginesPaneItem.java");
     String visibility =
@@ -27,15 +28,18 @@ class DistributedSearchSettingsStructureTest {
     String urlHandler =
         read("src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java");
 
-    assertTrue(
-        settings.contains("createBooleanSetting(\"DISTRIBUTED_SEARCH_ENABLED\", true)"));
+    assertTrue(settings.contains("createBooleanSetting(\"DISTRIBUTED_SEARCH_ENABLED\", true)"));
     assertTrue(pane.contains("addDistributedSearchCheckbox(panel);"));
     assertTrue(pane.contains("I18n.tr(\"Distributed Search\")"));
     assertFalse(
         visibility
-            .substring(visibility.indexOf("public boolean isVisible"), visibility.indexOf("private static boolean isActiveTransfer"))
+            .substring(
+                visibility.indexOf("public boolean isVisible"),
+                visibility.indexOf("private static boolean isActiveTransfer"))
             .contains("DISTRIBUTED_SEARCH_ENABLED"));
-    assertTrue(urlHandler.contains("distributed == null || !distributed.isEnabled() || !distributed.isReady()"));
+    assertTrue(
+        urlHandler.contains(
+            "distributed == null || !distributed.isEnabled() || !distributed.isReady()"));
   }
 
   private static String read(String relativePath) throws Exception {

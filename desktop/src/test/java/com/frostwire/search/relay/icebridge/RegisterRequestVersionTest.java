@@ -41,9 +41,11 @@ class RegisterRequestVersionTest {
     req.icebridgeVersion = IceBridgeConstants.SOFTWARE_VERSION;
     String c = req.canonicalString();
     String expectedSuffix =
-        "|" + IceBridgeConstants.SOFTWARE_VERSION.length() + ":" + IceBridgeConstants.SOFTWARE_VERSION;
+        "|"
+            + IceBridgeConstants.SOFTWARE_VERSION.length()
+            + ":"
+            + IceBridgeConstants.SOFTWARE_VERSION;
     assertTrue(c.endsWith(expectedSuffix), c);
-    assertEquals(
-        "4:abcd|11:example.com|6889|FORWARDER|1000" + expectedSuffix, c);
+    assertEquals("4:abcd|11:example.com|6889|FORWARDER|1000" + expectedSuffix, c);
   }
 }
