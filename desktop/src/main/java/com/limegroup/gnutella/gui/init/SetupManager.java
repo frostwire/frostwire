@@ -33,6 +33,7 @@ import java.awt.event.WindowEvent;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.IntConsumer;
 import java.util.function.Supplier;
 import javax.swing.*;
 import org.limewire.setting.SettingsGroupManager;
@@ -73,12 +74,23 @@ public final class SetupManager {
   /** The pages {@link #decidePages()} chose, read by {@link #createIfNeeded()} on the EDT. */
   private volatile Pages pages;
 
+  /** Exits the JVM; {@link Finalizer#exitOffEdt(int)} outside of tests. */
+  private final IntConsumer exiter;
+
+  /** Set when the user quit from the wizard, so startup must not resume once it closes. */
+  private volatile boolean exiting;
+
   public SetupManager() {
     this(SetupManager::decide);
   }
 
   SetupManager(Supplier<Pages> decider) {
+    this(decider, Finalizer::exitOffEdt);
+  }
+
+  SetupManager(Supplier<Pages> decider, IntConsumer exiter) {
     this.decider = decider;
+    this.exiter = exiter;
   }
 
   /**
@@ -293,6 +305,10 @@ public final class SetupManager {
 
   /** Brings the splash back for the rest of startup and lets {@link #awaitClosed()} return. */
   void wizardClosed() {
+    if (exiting) {
+      // The JVM is exiting: keep the startup thread parked so the core never starts.
+      return;
+    }
     SplashWindow.instance().setVisible(true);
     closed.countDown();
   }
@@ -351,8 +367,18 @@ public final class SetupManager {
 
   /** Cancels the setup. */
   private void cancelSetup() {
+    exit(0);
     dialogFrame.getDialog().dispose();
-    System.exit(0);
+  }
+
+  /**
+   * Quits the app from the wizard. System.exit runs the shutdown hooks and waits for them, so it
+   * runs off the EDT; the wizard's modal loop then ends normally, and {@link #wizardClosed()} keeps
+   * startup from resuming while the JVM exits.
+   */
+  void exit(int status) {
+    exiting = true;
+    exiter.accept(status);
   }
 
   /** Completes the setup. */
@@ -388,9 +414,10 @@ public final class SetupManager {
       if (!intent.isConfirmedWillNot()) {
         GUIMediator.showWarning(
             "FrostWire is not distributed to people who intend to use it for the purposes of copyright infringement.\n\nThank you for your interest; however, you cannot continue to use FrostWire at this time.");
-        System.exit(1);
+        exit(1);
+      } else {
+        intent.applySettings(true);
       }
-      intent.applySettings(true);
     }
     dialogFrame.getDialog().dispose();
   }
