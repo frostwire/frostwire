@@ -17,8 +17,6 @@ import com.frostwire.search.relay.icebridge.peer.PeerRegistry;
 import com.frostwire.search.relay.icebridge.udp.RudpSessionManager;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -50,7 +48,8 @@ class ControlServerTest {
     identity = IdentityKeys.generate(0);
     IceBridgeConfig config =
         IceBridgeConfig.newBuilder()
-            .controlHttpPort(freePort())
+            // 0: the server binds a free port itself (GitHub #1424).
+            .controlHttpPort(0)
             .rudpPort(0)
             .role(IceBridgeConfig.Role.BOTH)
             .maxPeers(100)
@@ -297,10 +296,19 @@ class ControlServerTest {
     return "http://127.0.0.1:" + server.port();
   }
 
-  private static int freePort() throws IOException {
-    try (ServerSocket s = new ServerSocket(0)) {
-      return s.getLocalPort();
-    }
+  /**
+   * Picking a free port, closing it and handing the number to the server raced any other process
+   * for that port (GitHub #1424). Port 0 makes the server bind a free port and report it.
+   */
+  @Test
+  void controlPortZeroBindsAFreePortAndReportsIt() throws Exception {
+    assertTrue(server.port() > 0, "the bound port, not 0");
+    HttpResponse<String> health =
+        HttpClient.newHttpClient()
+            .send(
+                HttpRequest.newBuilder(URI.create(baseUrl() + "/health")).GET().build(),
+                HttpResponse.BodyHandlers.ofString());
+    assertEquals(200, health.statusCode());
   }
 
   @Test

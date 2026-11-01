@@ -98,7 +98,7 @@ public final class IceBridgeConfig {
         this.host = Objects.requireNonNullElse(host, "0.0.0.0");
         this.rudpPort = requirePositiveOrZero(rudpPort, "rudpPort");
         this.relayPort = requirePositiveOrZero(relayPort, "relayPort");
-        this.controlHttpPort = requirePositive(controlHttpPort, "controlHttpPort");
+        this.controlHttpPort = requirePositiveOrZero(controlHttpPort, "controlHttpPort");
         if (rudpPort > 65535 || relayPort > 65535 || controlHttpPort > 65535) {
             throw new IllegalArgumentException("ports must be <= 65535");
         }
@@ -128,6 +128,10 @@ public final class IceBridgeConfig {
         return relayPort;
     }
 
+    /**
+     * The configured control API port; 0 binds a free one, read with
+     * {@link IceBridgeServer#controlPort()} after start.
+     */
     public int controlHttpPort() {
         return controlHttpPort;
     }
@@ -242,6 +246,11 @@ public final class IceBridgeConfig {
             return this;
         }
 
+        /**
+         * The control API port. 0 binds a free port when the server starts, which
+         * {@link IceBridgeServer#controlPort()} then reports: picking a free port first and
+         * binding it later races any other process for it (GitHub #1424).
+         */
         public Builder controlHttpPort(int controlHttpPort) {
             this.controlHttpPort = controlHttpPort;
             return this;

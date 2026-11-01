@@ -96,10 +96,8 @@ public final class ControlServer implements AutoCloseable {
     }
 
     public void start() throws InterruptedException {
+        // 0 binds a free port; port() reports it.
         int port = config.controlHttpPort();
-        if (port <= 0) {
-            return;
-        }
         bossGroup = new NioEventLoopGroup(1, new DefaultThreadFactory("icebridge-control-boss"));
         workerGroup = new NioEventLoopGroup(0, new DefaultThreadFactory("icebridge-control-worker"));
 
@@ -118,7 +116,7 @@ public final class ControlServer implements AutoCloseable {
                 });
 
         channel = bootstrap.bind("127.0.0.1", port).sync().channel();
-        LOG.info("IceBridge control server listening on http://127.0.0.1:" + port);
+        LOG.info("IceBridge control server listening on http://127.0.0.1:" + port());
     }
 
     /**
