@@ -1027,6 +1027,7 @@ test {
         includeTestsMatching "com.frostwire.gui.library.LibraryCoverArtPanelEdtTest"
         includeTestsMatching "com.limegroup.gnutella.gui.actions.OpenMagnetClipboardPrefillTest"
         includeTestsMatching "com.limegroup.gnutella.gui.dnd.TransferVisualizerTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.dnd.FileTransferableDragImageTest"
         includeTestsMatching "com.limegroup.gnutella.gui.util.RestartDialogGateTest"
         includeTestsMatching "com.frostwire.gui.theme.PlatformFontsTest"
         includeTestsMatching "com.frostwire.gui.theme.BaseFileChooserUIDirectoryComboTest"

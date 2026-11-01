@@ -40,11 +40,16 @@ class TransferVisualizer {
 
   Image getImage() {
     if (!t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) return null;
-    List<?> l = null;
-    try {
-      l = (List<?>) t.getTransferData(DataFlavor.javaFileListFlavor);
-    } catch (UnsupportedFlavorException | IOException ufe) {
-      return null;
+    List<?> l;
+    if (t instanceof FileTransferable files) {
+      // Drawn on the EDT as the drag starts: never list files that are only listed on drop.
+      l = files.filesForDragImage();
+    } else {
+      try {
+        l = (List<?>) t.getTransferData(DataFlavor.javaFileListFlavor);
+      } catch (UnsupportedFlavorException | IOException ufe) {
+        return null;
+      }
     }
     // if no data, there's nothing to draw.
     if (l.size() == 0) return null;

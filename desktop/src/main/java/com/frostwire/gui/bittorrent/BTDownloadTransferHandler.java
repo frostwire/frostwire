@@ -93,7 +93,20 @@ final class BTDownloadTransferHandler extends LimeTransferHandler {
    */
   static FileTransferable transferableFor(BTDownload[] downloads, Supplier<Set<File>> ignorable) {
     BTDownload[] dragged = downloads.clone();
-    return FileTransferable.listedOnDrop(() -> listFiles(dragged, ignorable.get()));
+    return FileTransferable.listedOnDrop(
+        () -> listFiles(dragged, ignorable.get()), () -> saveLocations(dragged));
+  }
+
+  /** The transfers' own folders or files, for the drag image: known without touching the disk. */
+  private static List<File> saveLocations(BTDownload[] downloads) {
+    List<File> locations = new ArrayList<>();
+    for (BTDownload download : downloads) {
+      File saveLocation = download.getSaveLocation();
+      if (saveLocation != null) {
+        locations.add(saveLocation);
+      }
+    }
+    return locations;
   }
 
   private static List<File> listFiles(BTDownload[] downloads, Set<File> ignore) {

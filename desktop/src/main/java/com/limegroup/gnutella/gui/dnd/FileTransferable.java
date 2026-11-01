@@ -45,6 +45,9 @@ public class FileTransferable implements Transferable {
   private final List<? extends FileTransfer> lazyFiles;
   private Supplier<List<File>> pendingFiles;
 
+  /** What the drag image shows while {@link #pendingFiles} isn't listed yet. */
+  private Supplier<List<File>> preview = Collections::emptyList;
+
   public FileTransferable(List<File> files) {
     this(files, EMPTY_FILE_TRANSFER_LiST);
   }
@@ -52,11 +55,23 @@ public class FileTransferable implements Transferable {
   /**
    * Lists the files only when a drop target asks for them, once. Use it when listing touches the
    * disk: drags start on the EDT, and most are cancelled or dropped on a target that never asks.
+   * The drag image shows {@code preview}: files known without touching the disk, so drawing it
+   * doesn't list the files on the EDT (GitHub #1459).
    */
-  public static FileTransferable listedOnDrop(Supplier<List<File>> files) {
+  public static FileTransferable listedOnDrop(
+      Supplier<List<File>> files, Supplier<List<File>> preview) {
     FileTransferable transferable = new FileTransferable(Collections.emptyList());
     transferable.pendingFiles = files;
+    transferable.preview = preview;
     return transferable;
+  }
+
+  /**
+   * The files for the drag image: the preview while the files aren't listed yet, otherwise the
+   * files themselves. Never lists them.
+   */
+  synchronized List<File> filesForDragImage() {
+    return pendingFiles != null ? preview.get() : getFiles();
   }
 
   FileTransferable(List<File> realFiles, List<? extends FileTransfer> lazyFiles) {
@@ -87,7 +102,7 @@ public class FileTransferable implements Transferable {
     }
   }
 
-  private List<File> getFiles() {
+  private synchronized List<File> getFiles() {
     if (pendingFiles != null) {
       files.addAll(pendingFiles.get());
       pendingFiles = null;
