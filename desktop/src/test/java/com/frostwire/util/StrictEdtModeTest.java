@@ -237,6 +237,48 @@ class StrictEdtModeTest {
     assertTrue(StrictEdtMode.isWindowsToolkitOnlyStall(stack));
   }
 
+  /** Icebase #81f177418e06: AWT asking Windows about the touch keyboard on a mouse release. */
+  private static final StackTraceElement[] TOUCH_KEYBOARD_ON_MOUSE_RELEASE = {
+    frame("sun.awt.windows.WToolkit", "showTouchKeyboard"),
+    frame("sun.awt.windows.WToolkit", "showOrHideTouchKeyboard"),
+    frame("java.awt.Component", "dispatchEventImpl"),
+    frame("java.awt.Container", "dispatchEventImpl"),
+    frame("java.awt.Component", "dispatchEvent"),
+    frame("java.awt.LightweightDispatcher", "retargetMouseEvent"),
+    frame("java.awt.LightweightDispatcher", "processMouseEvent"),
+    frame("java.awt.LightweightDispatcher", "dispatchEvent"),
+    frame("java.awt.Container", "dispatchEventImpl"),
+    frame("java.awt.Window", "dispatchEventImpl"),
+    frame("java.awt.Component", "dispatchEvent")
+  };
+
+  @Test
+  void touchKeyboardCheckOnMouseReleaseIsWindowsToolkitOnlyStall() {
+    assertTrue(
+        StrictEdtMode.isWindowsToolkitOnlyStall(stack(TOUCH_KEYBOARD_ON_MOUSE_RELEASE, EDT_LOOP)));
+  }
+
+  /** The same native call with FrostWire code in the stalled event is still reported. */
+  @Test
+  void touchKeyboardCheckUnderAnAppFrameIsReported() {
+    StackTraceElement[] withApp =
+        stack(
+            new StackTraceElement[] {
+              frame("sun.awt.windows.WToolkit", "showTouchKeyboard"),
+              frame("sun.awt.windows.WToolkit", "showOrHideTouchKeyboard"),
+              frame("java.awt.Component", "dispatchEventImpl"),
+              frame("com.limegroup.gnutella.gui.tables.LimeJTable", "processMouseEvent")
+            },
+            java.util.Arrays.copyOfRange(
+                TOUCH_KEYBOARD_ON_MOUSE_RELEASE, 3, TOUCH_KEYBOARD_ON_MOUSE_RELEASE.length),
+            EDT_LOOP);
+    StackTraceElement[] partial =
+        stack(java.util.Arrays.copyOfRange(TOUCH_KEYBOARD_ON_MOUSE_RELEASE, 0, 5), EDT_LOOP);
+
+    assertFalse(StrictEdtMode.isWindowsToolkitOnlyStall(withApp));
+    assertFalse(StrictEdtMode.isWindowsToolkitOnlyStall(partial));
+  }
+
   /** The Windows input method deactivating on focus loss, from the bottom of the stall up. */
   private static final StackTraceElement[] IME_FOCUS_LOST = {
     frame("sun.awt.windows.WInputMethod", "getNativeLocale"),

@@ -590,6 +590,21 @@ public final class StrictEdtMode {
       "java.awt.Window.dispatchEventImpl",
       "java.awt.Component.dispatchEvent"
     },
+    // The toolkit asking Windows whether to show the touch keyboard, which AWT does for every mouse
+    // release on a component before any listener sees it (Icebase #81f177418e06, GitHub #1438).
+    {
+      "sun.awt.windows.WToolkit.showTouchKeyboard",
+      "sun.awt.windows.WToolkit.showOrHideTouchKeyboard",
+      "java.awt.Component.dispatchEventImpl",
+      "java.awt.Container.dispatchEventImpl",
+      "java.awt.Component.dispatchEvent",
+      "java.awt.LightweightDispatcher.retargetMouseEvent",
+      "java.awt.LightweightDispatcher.processMouseEvent",
+      "java.awt.LightweightDispatcher.dispatchEvent",
+      "java.awt.Container.dispatchEventImpl",
+      "java.awt.Window.dispatchEventImpl",
+      "java.awt.Component.dispatchEvent"
+    },
     // The Windows input method (IME) deactivating on a focus change, before any focus listener
     // runs; the sample lands anywhere in the JDK code the native call goes back into.
     {
