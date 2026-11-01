@@ -498,7 +498,9 @@ Never batch failed tests into a "fix later" commit. Never commit `desktop/GROK_R
 
 - **Process-wide singletons** (`IceBridgeTopology`, settings factories) must be reset in `@BeforeEach`/`@AfterEach` (`resetToDefaults()`), or equivalent hooks for the module's runner. JVM forks run many test classes; leaked singleton state = order-dependent failures that only appear on CI.
 - **A test's extractor is code too** — a greedy regex `[^>]*` swallows the `/` of self-closing XML tags and hides every following key from parity checks (AndroidStringResourceParityTest blind spot, 2026-07). Use `[^>]*?` and test the extractor itself.
-- **Spotless ratchet expectation** — verify the current ratchet (historically `origin/master`): touching a legacy file may format the WHOLE file. Expect large diffs; keep mechanical reformatting separate from product logic, not hidden inside an unrelated test/docs commit. Only the coordinator runs formatting in a shared tree.
+- **Formatting** — the whole tree is formatted with google-java-format 1.36.1 and `spotlessCheck` checks every file (`common/` through desktop's `checkCommonFormat`), so a change only reformats what it touches. Run `./gradlew spotlessApply` from `desktop/` (also formats `common/`) and `android/`. Only the coordinator runs formatting in a shared tree.
+- **Compiler warnings fail the build** — both builds compile with `-Xlint:all -Werror` (off on purpose: serial, this-escape, restricted; Android also classfile). Fix the warning; a `@SuppressWarnings` must be as narrow as possible and say why.
+- **Coverage only goes up** — CI measures JaCoCo coverage on every push (desktop+common: `jacocoTestCoverageVerification`; Android: `coverage_summary.py --fail-under-line`). Every fix adds tests; raise the minimums when coverage rises. The goal is 100%.
 
 ### Benchmarks & Simulations
 

@@ -13,9 +13,7 @@ House rules (follow exactly):
   - Tests in package com.limegroup.gnutella.gui (the root package only) must be added by class name to desktop/build.gradle includeTestsMatching.
   - Fake interfaces with java.lang.reflect.Proxy.
   - To prove work runs off the EDT, record the calling thread.
-- **Spotless.** It ratchets from origin/master, so touching a legacy file reformats the whole file.
-  - Check first: touch the file, run `./gradlew spotlessApply` from desktop/, then look at `git diff --stat`.
-  - If the whole file was reformatted, commit that alone first as `[desktop] Format <Class> with google-java-format`, with the body "Mechanical spotlessApply only, no behavior change." Then put the fix on top.
+- **Spotless.** The whole tree is formatted (google-java-format 1.36.1), and `spotlessCheck` checks every file: desktop and Android with Spotless, `common/` through desktop's `checkCommonFormat`. Run `./gradlew spotlessApply` from `desktop/` (it also formats `common/`) and from `android/` for Android code, and commit the result with the change. There are no whole-file reformats to split out any more.
 - **Gradle pipes.** Always `set -o pipefail` before piping Gradle output, and check for BUILD FAILED.
 - **Gates.**
   - Run `./gradlew compileJava spotlessCheck` and the relevant tests (`./gradlew test --tests '<Class>'`).

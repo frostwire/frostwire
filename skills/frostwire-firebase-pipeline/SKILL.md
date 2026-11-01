@@ -29,7 +29,7 @@ Copies, kept identical: the frostwire repo's `skills/frostwire-firebase-pipeline
 - **Tickets are public; Crashlytics events are not.** Copy into a ticket only: stack frames, exception type and message, device model, OS version, app version, process state, event and user counts. Never user ids, installation ids, custom keys, logs or breadcrumbs (the script never prints them). Strip anything personal from a message (file paths with user names, URLs, search terms, torrent names) before posting.
 - **Root cause, not the symptom.** No catch-and-swallow around the crashing call, no `try/catch (Throwable)` in a lifecycle method, no muting an issue to make it go away. If an exception is legitimately expected, handle it where the API documents it.
 - **Fix it everywhere.** Search `android/`, `android/apollo/` (the vendored Apollo player, AppMsg, etc.) and `common/` for the same mistake.
-- **Every fix has a regression test that fails without it**, run by CI: Android CI runs only the tests listed in `.github/workflows/android-unit-tests.yml` (`--tests` filter), so add the new test class there. Prove the test fails with the fix reverted.
+- **Every fix has a regression test that fails without it**, run by CI: Android CI runs the whole unit-test suite with coverage (`createPlus1DebugUnitTestCoverageReport`; `android/build.gradle` excludes the few packages that hang under Robolectric). Prove the test fails with the fix reverted.
 - **CI red is never "pre-existing"** (Icebase pipeline §0).
 - **Authorization:** noting the ticket on a Crashlytics issue and closing it once the ticket exists are part of this pipeline. `MUTED` (the analogue of Icebase's `ignored`), closing by inference without a fix for that exact stack, and editing GitHub comments need the maintainer's OK.
 
@@ -89,7 +89,7 @@ As the Icebase pipeline's §2, with these differences:
 ## 4. Fix (one ticket at a time)
 
 As the Icebase pipeline's §3–§4, sequential unless the maintainer asks for parallel agents, with the Android gates:
-- **Test:** JUnit 4 under `android/src/test/java/<package of the code>` (Robolectric `@RunWith(RobolectricTestRunner.class)` when it needs Android classes; vendored Apollo classes are reachable from the same package). Add the class to the `--tests` filter in `.github/workflows/android-unit-tests.yml`. Run from `android/`: `./gradlew testPlus1DebugUnitTest --tests '<FQCN>'`. Revert the fix, watch it fail, restore.
+- **Test:** JUnit 4 under `android/src/test/java/<package of the code>` (Robolectric `@RunWith(RobolectricTestRunner.class)` when it needs Android classes; vendored Apollo classes are reachable from the same package). CI runs every unit test, so no workflow change is needed. Run from `android/`: `./gradlew testPlus1DebugUnitTest --tests '<FQCN>'`. Revert the fix, watch it fail, restore.
 - **When no automated test can express the failure** (an OEM-only crash, an ANR that needs a device's timing): say what limits it, in the commit body, the ticket's closing comment and the report, instead of skipping the test silently.
 - **Gates:** `./gradlew spotlessCheck compilePlus1DebugJavaWithJavac` and the CI test filter; `assemblePlus1Debug` for manifest, service or resource changes; the full `testPlus1DebugUnitTest` for anything shared. A change in `common/` also needs desktop's `./gradlew compileJava` and its tests.
 - **Review:** a `frostwire-code-reviewer` pass on the diff (Android checklist: main-thread rules, lifecycle, minSdk 26 dead guards, background execution limits, foreground-service types) before committing.
