@@ -52,6 +52,7 @@ import android.view.Menu;
 import android.view.SubMenu;
 import android.widget.ArrayAdapter;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.loader.content.CursorLoader;
@@ -2546,28 +2547,28 @@ public final class MusicUtils {
     SystemUtils.postToHandler(
         SystemUtils.HandlerThreadName.MISC,
         () -> {
-          final ArrayList<Uri> uris =
-              Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
-                  ? trackUris(appContext, trackIds)
-                  : new ArrayList<>();
-          if (uris.isEmpty()) {
-            if (onConfirmed != null) {
-              SystemUtils.postToUIThread(onConfirmed);
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            final ArrayList<Uri> uris = trackUris(appContext, trackIds);
+            if (!uris.isEmpty()) {
+              SystemUtils.postToUIThread(
+                  () ->
+                      requestTrackDelete(
+                          activity, uris, trackIds, showNotification, onConfirmed, onDeleted));
+              return;
             }
-            deleteTracks(appContext, trackIds, showNotification);
-            if (onDeleted != null) {
-              SystemUtils.postToUIThread(onDeleted);
-            }
-            return;
           }
-          SystemUtils.postToUIThread(
-              () ->
-                  requestTrackDelete(
-                      activity, uris, trackIds, showNotification, onConfirmed, onDeleted));
+          if (onConfirmed != null) {
+            SystemUtils.postToUIThread(onConfirmed);
+          }
+          deleteTracks(appContext, trackIds, showNotification);
+          if (onDeleted != null) {
+            SystemUtils.postToUIThread(onDeleted);
+          }
         });
   }
 
   /** Launches Android's delete confirmation for {@code uris}; runs on the main thread. */
+  @RequiresApi(Build.VERSION_CODES.R)
   private static void requestTrackDelete(
       final Activity activity,
       final ArrayList<Uri> uris,
