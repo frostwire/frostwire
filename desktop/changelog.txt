@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:Torrents that use only the new BitTorrent v2 format no longer disappear from Transfers after a restart: their saved copy now keeps the v2 piece hashes (#1383)
    - fix:Freeze reports no longer include stalls inside Windows' own touch-keyboard check on mouse clicks, which FrostWire can't change (#1438)
    - fix:FrostWire with thousands of transfers no longer crashes with a stack overflow, and every transfer update does far less work: torrent events reach their transfer through one lookup instead of every transfer checking each one (#1441)
    - fix:The first right-click on a transfer no longer freezes while Java prepares the menus' internals: that work now happens at startup, in the background (#1439)
