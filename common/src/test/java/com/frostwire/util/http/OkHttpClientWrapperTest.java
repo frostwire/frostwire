@@ -164,9 +164,13 @@ public class OkHttpClientWrapperTest {
         }
 
         @Override
-        public void close() throws Exception {
+        public void close() throws IOException {
             serverSocket.close();
-            thread.join(5000);
+            try {
+                thread.join(5000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
     }
 }

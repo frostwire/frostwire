@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.quality.Strictness;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
@@ -214,7 +215,8 @@ public class AndroidShareVisibilityTest {
   // live-transfer predicate and participation flag, never by parsing metadata.
   @Test
   public void onlyLiveActivePublicTransfersAreEligible() {
-    UIBittorrentDownload ui = mock(UIBittorrentDownload.class, withSettings().stubOnly().lenient());
+    UIBittorrentDownload ui =
+        mock(UIBittorrentDownload.class, withSettings().stubOnly().strictness(Strictness.LENIENT));
     when(ui.getDl()).thenReturn(null);
     when(ui.isSharingPaused()).thenReturn(false);
     when(ui.isRemovedFromSharing()).thenReturn(false);
@@ -269,9 +271,9 @@ public class AndroidShareVisibilityTest {
     // A lookup that resolves to a different UI object on recheck revokes the old transfer,
     // even without dereferencing native handles.
     UIBittorrentDownload first =
-        mock(UIBittorrentDownload.class, withSettings().stubOnly().lenient());
+        mock(UIBittorrentDownload.class, withSettings().stubOnly().strictness(Strictness.LENIENT));
     UIBittorrentDownload second =
-        mock(UIBittorrentDownload.class, withSettings().stubOnly().lenient());
+        mock(UIBittorrentDownload.class, withSettings().stubOnly().strictness(Strictness.LENIENT));
     when(first.getDl()).thenReturn(null);
     when(second.getDl()).thenReturn(null);
     java.util.concurrent.atomic.AtomicInteger lookups =

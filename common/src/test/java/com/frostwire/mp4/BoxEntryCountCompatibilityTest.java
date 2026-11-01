@@ -240,7 +240,7 @@ class BoxEntryCountCompatibilityTest {
 
   private static long allocatedBytes() {
     return ((com.sun.management.ThreadMXBean) ManagementFactory.getThreadMXBean())
-        .getThreadAllocatedBytes(Thread.currentThread().getId());
+        .getThreadAllocatedBytes(Thread.currentThread().threadId());
   }
 
   @SuppressWarnings("unchecked")

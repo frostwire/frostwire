@@ -138,7 +138,7 @@ class ID3v2FrameLengthCompatibilityTest {
 
   private static long allocatedBytes() {
     return ((com.sun.management.ThreadMXBean) ManagementFactory.getThreadMXBean())
-        .getThreadAllocatedBytes(Thread.currentThread().getId());
+        .getThreadAllocatedBytes(Thread.currentThread().threadId());
   }
 
   /** A whole tag: the 10-byte header with a synchsafe size, then {@code parts}. */
