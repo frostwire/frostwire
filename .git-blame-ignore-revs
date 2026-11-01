@@ -1,4 +1,4 @@
-# Formatting-only commits: the one-time google-java-format pass over the whole source tree
+# Formatting-only commits: the one-time google-java-format pass over the whole source tree,
 # (2026-11-01). Use with: git config blame.ignoreRevsFile .git-blame-ignore-revs
 # (GitHub's blame view reads this file automatically).
 b34ad1357738c33e1912a0f997f586c5367dd24a
@@ -9,3 +9,7 @@ e27dda0c0359c8042ad003ead93ac679e769eaff
 1ffb59aa3a375ef7c6b5bf9f6851287a29533547
 72f30b535a024411c4c87a0f968f0b5602bd3943
 7c994547a72b5104c94880c7d8f3ab1e33e4ea30
+5db683ccc6cdb91db49103267311df94b3f22453
+14ab52913163e4111cda2030f7c7b4ed809a8feb
+712a96b469e96b6a94e1ab7a5447373688ff5312
+77ba17b32743fa9353105fcd81ad10696802fecd
