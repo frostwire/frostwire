@@ -219,14 +219,17 @@ public class NowPlayingCursor extends AbstractCursor {
     }
     mQueueCursor.moveToFirst();
 
-    int removed = 0;
-    for (int i = mNowPlaying.length - 1; i >= 0; i--) {
-      final long trackId = mNowPlaying[i];
-      final int cursorIndex = Arrays.binarySearch(mCursorIndexes, trackId);
-      if (cursorIndex < 0) {
-        removed += MusicUtils.removeTrack(trackId);
+    // Songs MediaStore no longer has leave the queue together, so playback never opens one of
+    // them on the way past another.
+    final long[] missing = new long[mNowPlaying.length];
+    int missingCount = 0;
+    for (final long trackId : mNowPlaying) {
+      if (Arrays.binarySearch(mCursorIndexes, trackId) < 0) {
+        missing[missingCount++] = trackId;
       }
     }
+    final int removed =
+        missingCount > 0 ? MusicUtils.removeTracks(Arrays.copyOf(missing, missingCount)) : 0;
     if (removed > 0) {
       mNowPlaying = MusicUtils.getQueue();
       mSize = mNowPlaying.length;
