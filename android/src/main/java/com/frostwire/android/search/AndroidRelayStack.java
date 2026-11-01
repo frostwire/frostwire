@@ -404,7 +404,6 @@ public final class AndroidRelayStack implements AutoCloseable {
         // No in-process IceBridgeServer when remote — the forwarder owns the mesh.
         srv = null;
       } else {
-        int controlPort = freeLocalControlPort();
         int configuredRudp = readConfiguredRudpPort();
         IceBridgeConfig.Role role = readConfiguredRole();
         // relayPort=0: peers are verified over rUDP, there is no identity TCP port.
@@ -413,7 +412,9 @@ public final class AndroidRelayStack implements AutoCloseable {
                 .host("0.0.0.0")
                 .rudpPort(configuredRudp)
                 .relayPort(0)
-                .controlHttpPort(controlPort)
+                // 0: the server binds a free port itself; picking one first raced other
+                // processes for it (GitHub #1424). srv.controlPort() reports it.
+                .controlHttpPort(0)
                 .role(role)
                 .identityFile(identityFile)
                 .maxPeers(500)
@@ -822,12 +823,6 @@ public final class AndroidRelayStack implements AutoCloseable {
   /** True when the mesh transport is up, so a catalog browse can be attempted. */
   public boolean canBrowseCatalog() {
     return transport != null && identity != null;
-  }
-
-  private static int freeLocalControlPort() throws java.io.IOException {
-    try (java.net.ServerSocket socket = new java.net.ServerSocket(0)) {
-      return socket.getLocalPort();
-    }
   }
 
   private static int readConfiguredRudpPort() {
