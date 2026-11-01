@@ -20,6 +20,7 @@ package com.limegroup.gnutella.gui.options;
 
 import com.frostwire.service.ErrorService;
 import com.limegroup.gnutella.gui.options.panes.AbstractPaneItem;
+import java.util.List;
 
 /**
  * Static factory class that creates the option panes based on their keys.
@@ -40,7 +41,7 @@ class OptionsPaneFactory {
 
   /** Creates the options pane for a key. */
   OptionsPane createOptionsPane(OptionsTreeNode node) {
-    Class<? extends AbstractPaneItem>[] clazzes = node.getClasses();
+    List<Class<? extends AbstractPaneItem>> clazzes = node.getClasses();
     if (clazzes != null) {
       final OptionsPane pane = new OptionsPaneImpl(node.getTitleKey());
       for (Class<? extends AbstractPaneItem> clazz : clazzes) {

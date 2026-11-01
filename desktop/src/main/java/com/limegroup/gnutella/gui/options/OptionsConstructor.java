@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import javax.swing.*;
 import org.limewire.setting.IntSetting;
@@ -339,7 +340,7 @@ public final class OptionsConstructor {
       Class<? extends AbstractPaneItem>... clazzes) {
     OptionsTreeNode node =
         TREE_MANAGER.addNode(parentKey, childKey, label, label + " " + extractLabels(clazzes));
-    node.setClasses(clazzes);
+    node.setClasses(List.of(clazzes));
     keysToNodes.put(childKey, node);
     return node;
   }

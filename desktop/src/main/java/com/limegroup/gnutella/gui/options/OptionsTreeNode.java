@@ -19,6 +19,7 @@
 package com.limegroup.gnutella.gui.options;
 
 import com.limegroup.gnutella.gui.options.panes.AbstractPaneItem;
+import java.util.List;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
@@ -39,7 +40,7 @@ public class OptionsTreeNode extends DefaultMutableTreeNode {
   /** The name of this node as it is displayed to the user. */
   private final String _displayName;
 
-  private Class<? extends AbstractPaneItem>[] clazzes;
+  private List<Class<? extends AbstractPaneItem>> clazzes;
 
   /**
    * This constructor sets the values for the name of the node to display to the user as well as the
@@ -72,11 +73,12 @@ public class OptionsTreeNode extends DefaultMutableTreeNode {
     return _titleKey;
   }
 
-  public Class<? extends AbstractPaneItem>[] getClasses() {
+  /** The pane items shown for this node, in order, or null for a node without a pane. */
+  public List<Class<? extends AbstractPaneItem>> getClasses() {
     return clazzes;
   }
 
-  public void setClasses(Class<? extends AbstractPaneItem>[] clazzes) {
+  public void setClasses(List<Class<? extends AbstractPaneItem>> clazzes) {
     this.clazzes = clazzes;
   }
 }
