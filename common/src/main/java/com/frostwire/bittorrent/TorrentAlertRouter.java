@@ -9,6 +9,7 @@ package com.frostwire.bittorrent;
 
 import com.frostwire.jlibtorrent.AlertListener;
 import com.frostwire.jlibtorrent.alerts.Alert;
+import com.frostwire.jlibtorrent.swig.torrent_handle;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,6 +43,25 @@ final class TorrentAlertRouter<H> {
     /** True when both handles point to the same torrent, even after it was removed. */
     boolean same(H a, H b);
   }
+
+  /**
+   * libtorrent's handles. {@code id()} is the torrent object's address shifted right by 10 bits,
+   * and 0 once the torrent is gone. {@code op_eq} compares the handles' {@code weak_ptr} owners, so
+   * it still matches after the torrent is removed, and no new torrent can share an owner while a
+   * handle to the old one exists.
+   */
+  static final Handles<torrent_handle> NATIVE_HANDLES =
+      new Handles<>() {
+        @Override
+        public long id(torrent_handle handle) {
+          return handle.id();
+        }
+
+        @Override
+        public boolean same(torrent_handle a, torrent_handle b) {
+          return a.op_eq(b);
+        }
+      };
 
   private static final class Route<H> {
     final H handle;

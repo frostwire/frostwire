@@ -68,18 +68,7 @@ public final class BTEngine extends SessionManager {
 
   /** Routes torrent alerts to their download, through one session listener (GitHub #1441). */
   private final TorrentAlertRouter<torrent_handle> downloadAlerts =
-      new TorrentAlertRouter<>(
-          new TorrentAlertRouter.Handles<>() {
-            @Override
-            public long id(torrent_handle handle) {
-              return handle.id();
-            }
-
-            @Override
-            public boolean same(torrent_handle a, torrent_handle b) {
-              return a.op_eq(b);
-            }
-          });
+      new TorrentAlertRouter<>(TorrentAlertRouter.NATIVE_HANDLES);
   private final Queue<RestoreDownloadTask> restoreDownloadsQueue;
   private volatile BTEngineListener listener;
 
