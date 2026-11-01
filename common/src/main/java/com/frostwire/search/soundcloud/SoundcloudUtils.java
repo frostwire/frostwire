@@ -53,6 +53,9 @@ public final class SoundcloudUtils {
   /**
    * Parses Soundcloud JSON response and creates SoundcloudSearchResult objects. Uses default client
    * ID and app version.
+   *
+   * @throws com.google.gson.JsonParseException if {@code json} is not JSON of the shape SoundCloud
+   *     documents
    */
   public static LinkedList<SoundcloudSearchResult> fromJson(String json, boolean fromPastedUrl) {
     return fromJson(
@@ -61,7 +64,10 @@ public final class SoundcloudUtils {
 
   /**
    * Parses Soundcloud JSON response and creates SoundcloudSearchResult objects using the provided
-   * API credentials.
+   * API credentials. Null tracks in a collection or playlist are skipped.
+   *
+   * @throws com.google.gson.JsonParseException if {@code json} is not JSON of the shape SoundCloud
+   *     documents
    */
   public static LinkedList<SoundcloudSearchResult> fromJson(
       String json, boolean fromPastedUrl, String clientId, String appVersion) {
@@ -72,7 +78,7 @@ public final class SoundcloudUtils {
       SoundcloudResponse obj = JsonUtils.toObject(json, SoundcloudResponse.class);
       if (obj != null && obj.collection != null) {
         obj.collection.stream()
-            .filter(SoundcloudItem::isValidSearchResult)
+            .filter(item -> item != null && item.isValidSearchResult())
             .forEach(
                 item -> r.add(new SoundcloudSearchResult(item, clientIdToUse, appVersionToUse)));
       }
@@ -80,7 +86,7 @@ public final class SoundcloudUtils {
       SoundcloudPlaylist obj = JsonUtils.toObject(json, SoundcloudPlaylist.class);
       if (obj != null && obj.tracks != null) {
         obj.tracks.stream()
-            .filter(SoundcloudItem::isValidSearchResult)
+            .filter(item -> item != null && item.isValidSearchResult())
             .forEach(
                 item -> r.add(new SoundcloudSearchResult(item, clientIdToUse, appVersionToUse)));
       }
