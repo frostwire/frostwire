@@ -94,6 +94,10 @@ public final class SavedStateSizes {
    * The leaves (non-bundle values, or bundles at MAX_DEPTH) of bundle, which must be a copy the
    * caller owns, with their sizes.
    */
+  // Bundle.get(String) is deprecated for typed getters, but it is the only one that reads a value
+  // of
+  // any type, which measuring every entry needs.
+  @SuppressWarnings("deprecation")
   static void collect(String prefix, Bundle bundle, int depth, List<Entry> out) {
     for (String key : new ArrayList<>(bundle.keySet())) {
       // On API 33+ a value still waiting to be read is shared with the original bundle and gets

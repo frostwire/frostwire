@@ -281,7 +281,7 @@ public final class NotificationUpdateDaemon {
     int uploads = transferManager.getActiveUploads();
 
     double downloadRate = transferManager.getDownloadsBandwidth() / 1024d;
-    double uploadRate = (double) transferManager.getUploadsBandwidth() / 1024d;
+    double uploadRate = transferManager.getUploadsBandwidth() / 1024d;
 
     String sDown = UIUtils.rate2speed(downloadRate);
     String sUp = UIUtils.rate2speed(uploadRate);

@@ -586,6 +586,9 @@ public final class UIUtils {
     }
   }
 
+  // SHOW_IMPLICIT is deprecated only on the newest API; it still matters on the API 26+ devices
+  // the app supports.
+  @SuppressWarnings("deprecation")
   public static void showKeyboard(Context context, View view) {
     view.requestFocus();
     InputMethodManager imm =
