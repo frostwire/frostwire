@@ -10,7 +10,7 @@ import com.limegroup.gnutella.gui.search.SearchMediator;
  * application for production (non_testing) code. This method makes sure that all of the necessary
  * classes are notified that the virtual machine is about to be exited.
  */
-final class Finalizer {
+public final class Finalizer {
   private static final Logger LOG = Logger.getLogger(Finalizer.class);
 
   /** Suppress the default constructor to ensure that this class can never be constructed. */
@@ -39,6 +39,22 @@ final class Finalizer {
           LimeWireCore.instance().getLifecycleManager().shutdown(null);
         },
         () -> System.exit(0));
+  }
+
+  /**
+   * Exits the virtual machine from a new thread, for exits that skip {@link #shutdown()} because
+   * the core never started (the setup wizard, the fatal error dialog). System.exit runs every
+   * shutdown hook and waits for it, which must not happen on the EDT: the UI freezes meanwhile, and
+   * a hook that needs the EDT would never finish.
+   */
+  public static void exitOffEdt(int status) {
+    startExitThread(() -> System.exit(status));
+  }
+
+  static Thread startExitThread(Runnable exit) {
+    Thread thread = new Thread(exit, "Exit Thread");
+    thread.start();
+    return thread;
   }
 
   /**

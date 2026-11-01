@@ -10,9 +10,12 @@ package com.limegroup.gnutella.gui;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.swing.SwingUtilities;
 import org.junit.jupiter.api.Test;
@@ -76,5 +79,43 @@ class FinalizerShutdownThreadTest {
             () -> steps.add("exit"));
     thread.join(10_000);
     assertEquals(List.of("exit"), steps);
+  }
+
+  /**
+   * The setup wizard's Cancel and the fatal error dialog called System.exit on the EDT, which runs
+   * the shutdown hooks and waits for them there (Icebase #2503b0a74dce, GitHub #1437). The exit
+   * must run on its own thread, and the EDT event must return while it is still running.
+   */
+  @Test
+  void exitRunsOffTheEdtWithoutBlockingIt() throws Exception {
+    AtomicReference<Thread> edt = new AtomicReference<>();
+    AtomicReference<Thread> exiter = new AtomicReference<>();
+    CountDownLatch exitStarted = new CountDownLatch(1);
+    CountDownLatch hooksDone = new CountDownLatch(1);
+    AtomicReference<Thread> started = new AtomicReference<>();
+
+    SwingUtilities.invokeAndWait(
+        () -> {
+          edt.set(Thread.currentThread());
+          started.set(
+              Finalizer.startExitThread(
+                  () -> {
+                    exiter.set(Thread.currentThread());
+                    exitStarted.countDown();
+                    try {
+                      // A slow shutdown hook.
+                      hooksDone.await(10, TimeUnit.SECONDS);
+                    } catch (InterruptedException e) {
+                      Thread.currentThread().interrupt();
+                    }
+                  }));
+        });
+
+    assertTrue(exitStarted.await(5, TimeUnit.SECONDS));
+    assertTrue(started.get().isAlive(), "the EDT event returned while the exit was still running");
+    assertNotSame(edt.get(), exiter.get(), "System.exit must not run on the EDT");
+    assertEquals("Exit Thread", exiter.get().getName());
+    hooksDone.countDown();
+    started.get().join(10_000);
   }
 }
