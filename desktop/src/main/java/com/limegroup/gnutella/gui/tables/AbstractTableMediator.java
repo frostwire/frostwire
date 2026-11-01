@@ -732,7 +732,7 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
   protected void sortAndMaintainSelection(int columnToSort) {
     // store the currently selected rows
     int[] rows = TABLE.getSelectedRows();
-    DataLine<?>[] dls = new DataLine[rows.length];
+    DataLine<?>[] dls = new DataLine<?>[rows.length];
     Object inView = null;
     for (int i = 0; i < rows.length; i++) {
       dls[i] = DATA_MODEL.get(rows[i]);

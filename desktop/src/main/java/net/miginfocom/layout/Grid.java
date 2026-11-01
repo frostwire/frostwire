@@ -1646,7 +1646,7 @@ public final class Grid {
     TreeSet<Integer> primIndexes = isRows ? rowIndexes : colIndexes;
     TreeSet<Integer> secIndexes = isRows ? colIndexes : rowIndexes;
     DimConstraint[] primDCs = (isRows ? rowConstr : colConstr).getConstaints();
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"}) // Java can't create a generic array directly
     ArrayList<LinkedDimGroup>[] groupLists = new ArrayList[primIndexes.size()];
     int gIx = 0;
     for (int i : primIndexes) {

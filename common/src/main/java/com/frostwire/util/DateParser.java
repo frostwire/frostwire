@@ -19,6 +19,7 @@
 package com.frostwire.util;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -90,8 +91,7 @@ public final class DateParser {
         });
     
     // Array of all cached formatters for fallback parsing
-    @SuppressWarnings("unchecked")
-    private static final ThreadLocal<SimpleDateFormat>[] CACHED_FORMATTERS = new ThreadLocal[]{
+    private static final List<ThreadLocal<SimpleDateFormat>> CACHED_FORMATTERS = List.of(
         FORMAT_YYYY_MM_DD_HH_MM_SS,
         FORMAT_YYYY_MM_DD_T_HH_MM_SS_Z,
         FORMAT_YYYY_MM_DD_T_HH_MM_SS_SSS_Z,
@@ -100,7 +100,7 @@ public final class DateParser {
         FORMAT_MM_DD_YYYY,
         FORMAT_YYYY_MM_DD_SLASH,
         FORMAT_YYYY_MM_DD_HH_MM_SS_Z
-    };
+    );
     
     private DateParser() {
         // Utility class, no instances

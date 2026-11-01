@@ -310,7 +310,7 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
   }
 
   /** Returns the Value whose Key has the longest prefix in common with our lookup key. */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"}) // the result holder is a generic array
   public V select(K key) {
     int keyLength = length(key);
     TrieEntry<K, V>[] result = new TrieEntry[1];
@@ -353,7 +353,7 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
     return false;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"}) // the result holder is a generic array
   public Map.Entry<K, V> select(K key, Cursor<? super K, ? super V> cursor) {
     int keyLength = length(key);
     TrieEntry<K, V>[] result = new TrieEntry[] {null};

@@ -147,7 +147,7 @@ public class Main {
       // displayed later.
       try {
         Class.forName("com.limegroup.gnutella.gui.GUILoader")
-            .getMethod("load", new Class[] {String[].class, Frame.class})
+            .getMethod("load", new Class<?>[] {String[].class, Frame.class})
             .invoke(null, args, splash);
       } catch (Exception e) {
         e.printStackTrace();

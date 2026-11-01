@@ -79,7 +79,7 @@ public class HexHivePanel extends JPanel implements Scrollable {
   private CubePaint emptyHexPaint;
   private CubePaint fullHexPaint;
   private DrawingProperties drawingProperties;
-  private HexDataAdapter latestAdapter;
+  private HexDataAdapter<?> latestAdapter;
   private BufferedImage bitmap;
 
   /**
@@ -217,7 +217,7 @@ public class HexHivePanel extends JPanel implements Scrollable {
   /** Re-wraps the rows to the new width, e.g. when the window or the viewport is resized. */
   private void relayoutIfWidthChanged() {
     DrawingProperties snapshot;
-    HexDataAdapter adapter;
+    HexDataAdapter<?> adapter;
     synchronized (drawingPropertiesLock) {
       snapshot = drawingProperties;
       adapter = latestAdapter;
@@ -267,7 +267,7 @@ public class HexHivePanel extends JPanel implements Scrollable {
 
   private void updateHover(Point mouse, Point mouseOnScreen) {
     DrawingProperties snapshot;
-    HexDataAdapter adapter;
+    HexDataAdapter<?> adapter;
     synchronized (drawingPropertiesLock) {
       snapshot = drawingProperties;
       adapter = latestAdapter;
@@ -653,8 +653,8 @@ public class HexHivePanel extends JPanel implements Scrollable {
   public static void main(String[] args) {
     final HexHivePanel hexPanel =
         new HexHivePanel(50, 0x264053, 0xf2f2f2, 0x33b5e5, 0xffffff, 0, 0, 0, 0, true);
-    final HexDataAdapter mockAdapter =
-        new HexDataAdapter() {
+    final HexDataAdapter<Object> mockAdapter =
+        new HexDataAdapter<>() {
           @Override
           public void updateData(Object data) {}
 
@@ -696,7 +696,7 @@ public class HexHivePanel extends JPanel implements Scrollable {
     hexPanel.updateData(mockAdapter);
   }
 
-  void updateData(HexDataAdapter hexDataAdapter) {
+  void updateData(HexDataAdapter<?> hexDataAdapter) {
     final int canvasWidth = getWidth();
     final int canvasHeight = getHeight();
     DrawingProperties snapshot = null;
@@ -840,7 +840,7 @@ public class HexHivePanel extends JPanel implements Scrollable {
   }
 
   private void requestFocusedRender(
-      DrawingProperties drawingProperties, HexDataAdapter adapter, boolean force) {
+      DrawingProperties drawingProperties, HexDataAdapter<?> adapter, boolean force) {
     Rectangle visibleRect = currentVisibleRect();
     Rectangle window = ensureBackingBitmap(drawingProperties, visibleRect);
     // nothing outside the backing window can be kept, nor needs rendering
@@ -914,7 +914,7 @@ public class HexHivePanel extends JPanel implements Scrollable {
   }
 
   private void renderRegionIntoBackingBitmap(
-      HexDataAdapter adapter,
+      HexDataAdapter<?> adapter,
       DrawingProperties drawingProperties,
       Rectangle renderBounds,
       boolean prioritizeLatency) {
@@ -993,7 +993,7 @@ public class HexHivePanel extends JPanel implements Scrollable {
 
   private void drawRowsToGraphics(
       DrawingProperties drawingProperties,
-      HexDataAdapter adapter,
+      HexDataAdapter<?> adapter,
       Graphics2D graphics,
       Rectangle renderBounds,
       int firstRow,
@@ -1260,7 +1260,7 @@ public class HexHivePanel extends JPanel implements Scrollable {
     AffineTransform transform = g2d.getTransform();
     double deviceScale = sanitizeScale(transform.getScaleX());
     DrawingProperties snapshotProperties;
-    HexDataAdapter adapterSnapshot;
+    HexDataAdapter<?> adapterSnapshot;
     synchronized (drawingPropertiesLock) {
       snapshotProperties = drawingProperties;
       adapterSnapshot = latestAdapter;
@@ -1304,7 +1304,7 @@ public class HexHivePanel extends JPanel implements Scrollable {
     if (rescale) {
       renderScale = deviceScale;
       if (adapterSnapshot != null) {
-        final HexDataAdapter adapter = adapterSnapshot;
+        final HexDataAdapter<?> adapter = adapterSnapshot;
         SwingUtilities.invokeLater(() -> updateData(adapter));
       }
     }
@@ -1481,13 +1481,13 @@ public class HexHivePanel extends JPanel implements Scrollable {
   }
 
   private static final class RenderRequest {
-    private final HexDataAdapter adapter;
+    private final HexDataAdapter<?> adapter;
     private final DrawingProperties drawingProperties;
     private final Rectangle renderBounds;
     private final boolean prioritizeLatency;
 
     private RenderRequest(
-        HexDataAdapter adapter,
+        HexDataAdapter<?> adapter,
         DrawingProperties drawingProperties,
         Rectangle renderBounds,
         boolean prioritizeLatency) {
@@ -1590,7 +1590,7 @@ public class HexHivePanel extends JPanel implements Scrollable {
     }
 
     DrawingProperties(
-        HexDataAdapter adapter,
+        HexDataAdapter<?> adapter,
         int hexSideLen,
         float hexBorderWidth,
         int left,
