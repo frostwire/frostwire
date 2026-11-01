@@ -42,7 +42,8 @@ final class ClipboardSearchFocusListener extends FocusAdapter {
     this.clipboardReader = clipboardReader;
     this.onText = onText;
     this.worker = worker;
-    field.getDocument()
+    field
+        .getDocument()
         .addDocumentListener(
             new DocumentListener() {
               public void insertUpdate(DocumentEvent event) {
@@ -92,7 +93,9 @@ final class ClipboardSearchFocusListener extends FocusAdapter {
       SwingUtilities.invokeLater(
           () -> {
             reading = false;
-            if (ticket != generation || document != field.getDocument() || !enabled.getAsBoolean()) {
+            if (ticket != generation
+                || document != field.getDocument()
+                || !enabled.getAsBoolean()) {
               return;
             }
             if (result != null && !result.isEmpty()) {

@@ -122,9 +122,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
   }
 
   private static void addSpeedMenus(
-      SkinMenu menuAdvanced,
-      final com.frostwire.bittorrent.BTDownload[] dms,
-      SpeedLimits limits) {
+      SkinMenu menuAdvanced, final com.frostwire.bittorrent.BTDownload[] dms, SpeedLimits limits) {
     boolean upSpeedDisabled = false;
     long totalUpSpeed = 0;
     boolean upSpeedUnlimited = false;

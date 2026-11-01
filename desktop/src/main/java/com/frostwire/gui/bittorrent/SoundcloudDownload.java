@@ -1,24 +1,23 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.frostwire.gui.bittorrent;
 
-import com.frostwire.util.PlaybackUtil;
 import com.frostwire.mp3.*;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.transfers.HlsAudioDownloader;
@@ -29,192 +28,199 @@ import com.frostwire.util.ThreadPool;
 import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.http.HttpClient.HttpClientListener;
 import com.limegroup.gnutella.settings.SharingSettings;
-import org.apache.commons.io.FilenameUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
+import org.apache.commons.io.FilenameUtils;
 
 /**
  * @author gubatron
  * @author aldenml
  */
 public class SoundcloudDownload extends HttpBTDownload {
-    private static final Logger LOG = Logger.getLogger(SoundcloudDownload.class);
-    private static final Executor SOUNDCLOUD_THREAD_POOL = ThreadPool.newThreadPool("SoundcloudDownload", 6, true);
-    private final SoundcloudSearchResult sr;
-    private final File tempAudio;
+  private static final Logger LOG = Logger.getLogger(SoundcloudDownload.class);
+  private static final Executor SOUNDCLOUD_THREAD_POOL =
+      ThreadPool.newThreadPool("SoundcloudDownload", 6, true);
+  private final SoundcloudSearchResult sr;
+  private final File tempAudio;
 
-    SoundcloudDownload(SoundcloudSearchResult sr) {
-        super(sr.getFilename(), sr.getSize());
-        this.sr = sr;
-        String filename = sr.getFilename();
-        tempAudio = buildTempFile(FilenameUtils.getBaseName(filename), FilenameUtils.getExtension(filename));
-        start();
+  SoundcloudDownload(SoundcloudSearchResult sr) {
+    super(sr.getFilename(), sr.getSize());
+    this.sr = sr;
+    String filename = sr.getFilename();
+    tempAudio =
+        buildTempFile(FilenameUtils.getBaseName(filename), FilenameUtils.getExtension(filename));
+    start();
+  }
+
+  @Override
+  HttpClientListener createHttpClientListener() {
+    return new HttpDownloadListenerImpl(this);
+  }
+
+  @Override
+  public long getSize() {
+    if (isCompleted() && getSaveLocation().exists()) {
+      return getSaveLocation().length();
     }
+    return size;
+  }
 
-    @Override
-    HttpClientListener createHttpClientListener() {
-        return new HttpDownloadListenerImpl(this);
-    }
+  @Override
+  public String getDisplayName() {
+    return sr.getDisplayName();
+  }
 
-    @Override
-    public long getSize() {
-        if (isCompleted() && getSaveLocation().exists()) {
-            return getSaveLocation().length();
-        }
-        return size;
-    }
+  @Override
+  public String getName() {
+    return sr.getFilename();
+  }
 
-    @Override
-    public String getDisplayName() {
-        return sr.getDisplayName();
-    }
+  @Override
+  public void resume() {
+    start();
+  }
 
-    @Override
-    public String getName() {
-        return sr.getFilename();
-    }
+  @Override
+  public String getHash() {
+    return sr.getHash();
+  }
 
-    @Override
-    public void resume() {
-        start();
-    }
+  private void start() {
+    start(tempAudio);
+  }
 
-    @Override
-    public String getHash() {
-        return sr.getHash();
-    }
-
-    private void start() {
-        start(tempAudio);
-    }
-
-    private void start(final File temp) {
-        state = TransferState.WAITING;
-        SOUNDCLOUD_THREAD_POOL.execute(() -> {
-            String downloadUrl = null;
-            try {
-                downloadUrl = sr.getDownloadUrl();
-                if (sr.isHls()) {
-                    HlsAudioDownloader.save(httpClient, downloadUrl, temp);
-                } else {
-                    httpClient.save(downloadUrl, temp, false);
-                }
-            } catch (Throwable e) {
-                LOG.error("SoundCloud audio download failed", e);
-                httpClientListener.onError(httpClient, e);
-            }
-        });
-    }
-
-    @Override
-    void cleanupIncomplete() {
-        cleanupFile(tempAudio);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return obj instanceof SoundcloudDownload && sr.getHash().equals(((SoundcloudDownload) obj).sr.getHash());
-    }
-
-    private boolean setAlbumArt(String mp3Filename, String mp3outputFilename) {
-        if (sr.isHls()) {
-            return false; // AAC/M4A cannot be tagged by the MP3 ID3 writer.
-        }
-        try {
-            byte[] imageBytes = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD).getBytes(sr.getThumbnailUrl());
-            return prepareMP3File(mp3Filename, mp3outputFilename, imageBytes, sr);
-        } catch (Throwable e) {
-            return false;
-        }
-    }
-
-    public static boolean prepareMP3File(String mp3Filename, String mp3outputFilename, byte[] imageBytes, SoundcloudSearchResult sr) throws IOException, UnsupportedTagException, InvalidDataException, NotSupportedException {
-        Mp3File mp3 = new Mp3File(mp3Filename);
-        ID3Wrapper newId3Wrapper = new ID3Wrapper(new ID3v1Tag(), new ID3v23Tag());
-        newId3Wrapper.setAlbum(sr.getUsername() + ": " + sr.getDisplayName() + " via SoundCloud.com");
-        newId3Wrapper.setArtist(sr.getUsername());
-        newId3Wrapper.setTitle(sr.getDisplayName());
-        newId3Wrapper.setAlbumImage(imageBytes, "image/jpg");
-        newId3Wrapper.setUrl(sr.getDetailsUrl());
-        newId3Wrapper.getId3v2Tag().setPadding(true);
-        mp3.setId3v1Tag(newId3Wrapper.getId3v1Tag());
-        mp3.setId3v2Tag(newId3Wrapper.getId3v2Tag());
-        mp3.save(mp3outputFilename);
-        return true;
-    }
-
-    @Override
-    public File getPreviewFile() {
-        if (isCompleted()) {
-            return completeFile;
-        } else {
-            return tempAudio;
-        }
-    }
-
-    private final class HttpDownloadListenerImpl implements HttpClientListener {
-        private final SoundcloudDownload dl;
-
-        HttpDownloadListenerImpl(SoundcloudDownload soundcloudDownload) {
-            dl = soundcloudDownload;
-        }
-
-        @Override
-        public void onError(HttpClient client, Throwable e) {
-            state = TransferState.ERROR;
-            cleanup();
-        }
-
-        @Override
-        public void onData(HttpClient client, byte[] buffer, int offset, int length) {
-            if (!state.equals(TransferState.PAUSING) && !state.equals(TransferState.CANCELING)) {
-                bytesReceived += length;
-                updateAverageDownloadSpeed();
-                state = TransferState.DOWNLOADING;
-            }
-        }
-
-        @Override
-        public void onComplete(HttpClient client) {
-            if (state != TransferState.REDIRECTING) {
-                if (!setAlbumArt(tempAudio.getAbsolutePath(), completeFile.getAbsolutePath())) {
-                    boolean renameTo = tempAudio.renameTo(completeFile);
-                    if (!renameTo) {
-                        state = TransferState.ERROR_MOVING_INCOMPLETE;
-                        cleanupIncomplete();
-                        return;
-                    }
-                }
-                state = TransferState.FINISHED;
-                if (SharingSettings.SEED_FINISHED_TORRENTS.getValue()) {
-                    BittorrentDownload.RendererHelper.onSeedTransfer(dl, false);
-                }
-                cleanupIncomplete();
-            }
-        }
-
-        @Override
-        public void onCancel(HttpClient client) {
-            if (state.equals(TransferState.CANCELING)) {
-                cleanup();
-                state = TransferState.CANCELED;
-            } else if (state.equals(TransferState.PAUSING)) {
-                state = TransferState.PAUSED;
+  private void start(final File temp) {
+    state = TransferState.WAITING;
+    SOUNDCLOUD_THREAD_POOL.execute(
+        () -> {
+          String downloadUrl = null;
+          try {
+            downloadUrl = sr.getDownloadUrl();
+            if (sr.isHls()) {
+              HlsAudioDownloader.save(httpClient, downloadUrl, temp);
             } else {
-                state = TransferState.CANCELED;
+              httpClient.save(downloadUrl, temp, false);
             }
-        }
+          } catch (Throwable e) {
+            LOG.error("SoundCloud audio download failed", e);
+            httpClientListener.onError(httpClient, e);
+          }
+        });
+  }
 
-        @Override
-        public void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields) {
-            if (headerFields != null && headerFields.containsKey("Content-Length")) {
-                String lengthStr = headerFields.get("Content-Length").get(0);
-                SoundcloudDownload.this.size = Long.parseLong(lengthStr);
-            }
-        }
+  @Override
+  void cleanupIncomplete() {
+    cleanupFile(tempAudio);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof SoundcloudDownload
+        && sr.getHash().equals(((SoundcloudDownload) obj).sr.getHash());
+  }
+
+  private boolean setAlbumArt(String mp3Filename, String mp3outputFilename) {
+    if (sr.isHls()) {
+      return false; // AAC/M4A cannot be tagged by the MP3 ID3 writer.
     }
+    try {
+      byte[] imageBytes =
+          HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD)
+              .getBytes(sr.getThumbnailUrl());
+      return prepareMP3File(mp3Filename, mp3outputFilename, imageBytes, sr);
+    } catch (Throwable e) {
+      return false;
+    }
+  }
+
+  public static boolean prepareMP3File(
+      String mp3Filename, String mp3outputFilename, byte[] imageBytes, SoundcloudSearchResult sr)
+      throws IOException, UnsupportedTagException, InvalidDataException, NotSupportedException {
+    Mp3File mp3 = new Mp3File(mp3Filename);
+    ID3Wrapper newId3Wrapper = new ID3Wrapper(new ID3v1Tag(), new ID3v23Tag());
+    newId3Wrapper.setAlbum(sr.getUsername() + ": " + sr.getDisplayName() + " via SoundCloud.com");
+    newId3Wrapper.setArtist(sr.getUsername());
+    newId3Wrapper.setTitle(sr.getDisplayName());
+    newId3Wrapper.setAlbumImage(imageBytes, "image/jpg");
+    newId3Wrapper.setUrl(sr.getDetailsUrl());
+    newId3Wrapper.getId3v2Tag().setPadding(true);
+    mp3.setId3v1Tag(newId3Wrapper.getId3v1Tag());
+    mp3.setId3v2Tag(newId3Wrapper.getId3v2Tag());
+    mp3.save(mp3outputFilename);
+    return true;
+  }
+
+  @Override
+  public File getPreviewFile() {
+    if (isCompleted()) {
+      return completeFile;
+    } else {
+      return tempAudio;
+    }
+  }
+
+  private final class HttpDownloadListenerImpl implements HttpClientListener {
+    private final SoundcloudDownload dl;
+
+    HttpDownloadListenerImpl(SoundcloudDownload soundcloudDownload) {
+      dl = soundcloudDownload;
+    }
+
+    @Override
+    public void onError(HttpClient client, Throwable e) {
+      state = TransferState.ERROR;
+      cleanup();
+    }
+
+    @Override
+    public void onData(HttpClient client, byte[] buffer, int offset, int length) {
+      if (!state.equals(TransferState.PAUSING) && !state.equals(TransferState.CANCELING)) {
+        bytesReceived += length;
+        updateAverageDownloadSpeed();
+        state = TransferState.DOWNLOADING;
+      }
+    }
+
+    @Override
+    public void onComplete(HttpClient client) {
+      if (state != TransferState.REDIRECTING) {
+        if (!setAlbumArt(tempAudio.getAbsolutePath(), completeFile.getAbsolutePath())) {
+          boolean renameTo = tempAudio.renameTo(completeFile);
+          if (!renameTo) {
+            state = TransferState.ERROR_MOVING_INCOMPLETE;
+            cleanupIncomplete();
+            return;
+          }
+        }
+        state = TransferState.FINISHED;
+        if (SharingSettings.SEED_FINISHED_TORRENTS.getValue()) {
+          BittorrentDownload.RendererHelper.onSeedTransfer(dl, false);
+        }
+        cleanupIncomplete();
+      }
+    }
+
+    @Override
+    public void onCancel(HttpClient client) {
+      if (state.equals(TransferState.CANCELING)) {
+        cleanup();
+        state = TransferState.CANCELED;
+      } else if (state.equals(TransferState.PAUSING)) {
+        state = TransferState.PAUSED;
+      } else {
+        state = TransferState.CANCELED;
+      }
+    }
+
+    @Override
+    public void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields) {
+      if (headerFields != null && headerFields.containsKey("Content-Length")) {
+        String lengthStr = headerFields.get("Content-Length").get(0);
+        SoundcloudDownload.this.size = Long.parseLong(lengthStr);
+      }
+    }
+  }
 }

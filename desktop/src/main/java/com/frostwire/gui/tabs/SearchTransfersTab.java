@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -22,7 +22,6 @@ import com.frostwire.gui.bittorrent.BTDownloadMediator;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.UISettings;
-
 import javax.swing.*;
 
 /**
@@ -32,45 +31,48 @@ import javax.swing.*;
  * @author aldenml
  */
 public final class SearchTransfersTab extends AbstractTab {
-    private final SearchTab searchTab;
-    private final TransfersTab transfersTab;
-    private JSplitPane searchDownloadSplitPane;
+  private final SearchTab searchTab;
+  private final TransfersTab transfersTab;
+  private JSplitPane searchDownloadSplitPane;
 
-    public SearchTransfersTab(SearchTab searchTab, TransfersTab transfersTab) {
-        // It will look like the SearchTab.
-        super(I18n.tr("Search"),
-                I18n.tr("Search and Download Files from the Internet."),
-                "search_tab");
-        this.searchTab = searchTab;
-        this.transfersTab = transfersTab;
-        this.searchDownloadSplitPane = null;
-    }
+  public SearchTransfersTab(SearchTab searchTab, TransfersTab transfersTab) {
+    // It will look like the SearchTab.
+    super(I18n.tr("Search"), I18n.tr("Search and Download Files from the Internet."), "search_tab");
+    this.searchTab = searchTab;
+    this.transfersTab = transfersTab;
+    this.searchDownloadSplitPane = null;
+  }
 
-    @Override
-    public JComponent getComponent() {
-        if (searchDownloadSplitPane == null) {
-            searchDownloadSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                    searchTab.getComponent(),
-                    transfersTab.getComponent());
-            searchDownloadSplitPane.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeMediator.LIGHT_BORDER_COLOR));
-            searchDownloadSplitPane.setContinuousLayout(true);
-            searchDownloadSplitPane.setResizeWeight(0.6);
-            searchDownloadSplitPane.setDividerLocation(UISettings.UI_TRANSFERS_DIVIDER_LOCATION.getValue());
-            searchDownloadSplitPane.addPropertyChangeListener(JSplitPane.LAST_DIVIDER_LOCATION_PROPERTY, evt -> {
-                JSplitPane splitPane = (JSplitPane) evt.getSource();
-                int current = splitPane.getDividerLocation();
-                if (splitPane.getSize().height - current < BTDownloadMediator.MIN_HEIGHT) {
-                    splitPane.setDividerLocation(splitPane.getSize().height - BTDownloadMediator.MIN_HEIGHT);
-                }
-                UISettings.UI_TRANSFERS_DIVIDER_LOCATION.setValue(splitPane.getDividerLocation());
-            });
-        }
-        return searchDownloadSplitPane;
+  @Override
+  public JComponent getComponent() {
+    if (searchDownloadSplitPane == null) {
+      searchDownloadSplitPane =
+          new JSplitPane(
+              JSplitPane.VERTICAL_SPLIT, searchTab.getComponent(), transfersTab.getComponent());
+      searchDownloadSplitPane.setBorder(
+          BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeMediator.LIGHT_BORDER_COLOR));
+      searchDownloadSplitPane.setContinuousLayout(true);
+      searchDownloadSplitPane.setResizeWeight(0.6);
+      searchDownloadSplitPane.setDividerLocation(
+          UISettings.UI_TRANSFERS_DIVIDER_LOCATION.getValue());
+      searchDownloadSplitPane.addPropertyChangeListener(
+          JSplitPane.LAST_DIVIDER_LOCATION_PROPERTY,
+          evt -> {
+            JSplitPane splitPane = (JSplitPane) evt.getSource();
+            int current = splitPane.getDividerLocation();
+            if (splitPane.getSize().height - current < BTDownloadMediator.MIN_HEIGHT) {
+              splitPane.setDividerLocation(
+                  splitPane.getSize().height - BTDownloadMediator.MIN_HEIGHT);
+            }
+            UISettings.UI_TRANSFERS_DIVIDER_LOCATION.setValue(splitPane.getDividerLocation());
+          });
     }
+    return searchDownloadSplitPane;
+  }
 
-    public void setDividerLocation(int newLocation) {
-        if (searchDownloadSplitPane != null) {
-            searchDownloadSplitPane.setDividerLocation(newLocation);
-        }
+  public void setDividerLocation(int newLocation) {
+    if (searchDownloadSplitPane != null) {
+      searchDownloadSplitPane.setDividerLocation(newLocation);
     }
+  }
 }

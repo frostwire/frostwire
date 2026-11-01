@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -21,7 +21,6 @@ package com.frostwire.gui.bittorrent;
 import com.frostwire.bittorrent.CopyrightLicenseBroker;
 import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.transfers.TransferState;
-
 import java.io.File;
 import java.util.Date;
 
@@ -30,64 +29,64 @@ import java.util.Date;
  * @author aldenml
  */
 public interface BTDownload {
-    long getSize();
+  long getSize();
 
-    @SuppressWarnings("unused")
-    String getName();
+  @SuppressWarnings("unused")
+  String getName();
 
-    String getDisplayName();
+  String getDisplayName();
 
-    boolean isResumable();
+  boolean isResumable();
 
-    boolean isPausable();
+  boolean isPausable();
 
-    boolean isCompleted();
+  boolean isCompleted();
 
-    TransferState getState();
+  TransferState getState();
 
-    void remove();
+  void remove();
 
-    void pause();
+  void pause();
 
-    File getSaveLocation();
+  File getSaveLocation();
 
-    void resume();
+  void resume();
 
-    int getProgress();
+  int getProgress();
 
-    long getBytesReceived();
+  long getBytesReceived();
 
-    long getBytesSent();
+  long getBytesSent();
 
-    double getDownloadSpeed();
+  double getDownloadSpeed();
 
-    double getUploadSpeed();
+  double getUploadSpeed();
 
-    long getETA();
+  long getETA();
 
-    String getPeersString();
+  String getPeersString();
 
-    String getSeedsString();
+  String getSeedsString();
 
-    void setDeleteTorrentWhenRemove(boolean deleteTorrentWhenRemove);
+  void setDeleteTorrentWhenRemove(boolean deleteTorrentWhenRemove);
 
-    void setDeleteDataWhenRemove(boolean deleteDataWhenRemove);
+  void setDeleteDataWhenRemove(boolean deleteDataWhenRemove);
 
-    String getHash();
+  String getHash();
 
-    String getSeedToPeerRatio();
+  String getSeedToPeerRatio();
 
-    String getShareRatio();
+  String getShareRatio();
 
-    boolean isPartialDownload();
+  boolean isPartialDownload();
 
-    Date getDateCreated();
+  Date getDateCreated();
 
-    PaymentOptions getPaymentOptions();
+  PaymentOptions getPaymentOptions();
 
-    CopyrightLicenseBroker getCopyrightLicenseBroker();
+  CopyrightLicenseBroker getCopyrightLicenseBroker();
 
-    boolean canPreview();
+  boolean canPreview();
 
-    File getPreviewFile();
+  File getPreviewFile();
 }
