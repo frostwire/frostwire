@@ -290,6 +290,12 @@ class SharedTorrentIndexerIdentityTest {
       return valid;
     }
 
+    /** No native torrent: the engine routes this download's alerts by handle comparison. */
+    @Override
+    public long id() {
+      return 0;
+    }
+
     @Override
     public com.frostwire.jlibtorrent.swig.int_vector get_file_priorities2() {
       com.frostwire.jlibtorrent.swig.int_vector priorities =
