@@ -31,7 +31,6 @@ import com.frostwire.util.Ref;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class ConfirmSoundcloudDownloadDialog
     extends AbstractConfirmListDialog<SoundcloudSearchResult> {
@@ -156,7 +155,7 @@ public class ConfirmSoundcloudDownloadDialog
       }
 
       long totalBytes = 0;
-      for (SoundcloudSearchResult sr : (Set<SoundcloudSearchResult>) checked) {
+      for (SoundcloudSearchResult sr : checked) {
         totalBytes += sr.getSize();
       }
 

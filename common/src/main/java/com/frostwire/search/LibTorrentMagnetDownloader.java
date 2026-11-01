@@ -48,7 +48,7 @@ public class LibTorrentMagnetDownloader implements MagnetDownloader {
             error_code ec = new error_code();
             add_torrent_params params = add_torrent_params.parse_magnet_uri(magnetUri, ec);
             tcp_endpoint_vector v = params.get_peers();
-            int size = (int) v.size();
+            int size = v.size();
             List<TcpEndpoint> peers = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
                 peers.add(new TcpEndpoint(v.get(i)));

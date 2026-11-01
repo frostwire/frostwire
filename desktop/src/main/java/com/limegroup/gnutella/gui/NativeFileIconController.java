@@ -17,7 +17,6 @@ import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.filechooser.FileView;
 import javax.swing.plaf.ComponentUI;
-import javax.swing.plaf.FileChooserUI;
 import org.apache.commons.io.FilenameUtils;
 import org.limewire.collection.FixedsizeForgetfulHashMap;
 import org.limewire.collection.FixedsizeForgetfulHashSet;
@@ -169,7 +168,7 @@ public class NativeFileIconController implements FileIconController {
       super();
       this.nativeUi = nativeUi;
       updateUI();
-      setFileView(((FileChooserUI) getUI()).getFileView(this));
+      setFileView(getUI().getFileView(this));
     }
 
     @Override

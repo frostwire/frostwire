@@ -112,7 +112,7 @@ public abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAda
 
   @Override
   public View getView(int position, View view, ViewGroup parent) {
-    T item = (T) getItem(position);
+    T item = getItem(position);
     Context ctx = getContext();
 
     if (view == null && ctx != null) {

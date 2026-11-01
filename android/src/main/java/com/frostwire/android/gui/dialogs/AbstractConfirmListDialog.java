@@ -333,9 +333,9 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog
     Set<T> result = new HashSet<>();
     if (adapter != null) {
       if (selectionMode == SelectionMode.MULTIPLE_SELECTION) {
-        result = (Set<T>) adapter.getChecked();
+        result = adapter.getChecked();
       } else if (selectionMode == SelectionMode.SINGLE_SELECTION) {
-        result.add((T) adapter.getSelectedItem());
+        result.add(adapter.getSelectedItem());
       } else if (selectionMode == SelectionMode.NO_SELECTION) {
         result.addAll(adapter.getFullList());
       }
@@ -380,7 +380,7 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog
     if (adapter == null) {
       return null;
     }
-    return (T) adapter.getSelectedItem();
+    return adapter.getSelectedItem();
   }
 
   private int getLastSelectedIndex() {
