@@ -45,7 +45,9 @@ class BugDialogRemovalTest {
         source.contains("HttpClientFactory"), "FatalBugManager must not POST anywhere directly");
     assertTrue(
         source.contains("recordSync"), "FatalBugManager must still spool the Icebase report");
-    assertTrue(source.contains("System.exit"), "FatalBugManager must still exit");
+    assertTrue(
+        source.contains("Finalizer.exitOffEdt(1)"),
+        "FatalBugManager must still exit, off the EDT (frostwire/frostwire#1437)");
   }
 
   @Test
