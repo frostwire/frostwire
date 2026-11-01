@@ -219,6 +219,21 @@ public class FavoritesStore extends SQLiteOpenHelper {
         FavoriteColumns.NAME, FavoriteColumns.ID + " = ?", new String[] {String.valueOf(songId)});
   }
 
+  /** Removes {@code songIds} in one statement. */
+  public void removeItems(final java.util.Collection<Long> songIds) {
+    if (songIds.isEmpty()) {
+      return;
+    }
+    StringBuilder in = new StringBuilder();
+    for (Long id : songIds) {
+      if (in.length() > 0) {
+        in.append(',');
+      }
+      in.append(id.longValue());
+    }
+    writeableDatabase.delete(FavoriteColumns.NAME, FavoriteColumns.ID + " IN (" + in + ")", null);
+  }
+
   public interface FavoriteColumns {
 
     /* Table name */

@@ -875,6 +875,22 @@ public final class MusicUtils {
   }
 
   /**
+   * Removes every instance of {@code ids} from the queue at once.
+   *
+   * @return how many queue entries were removed
+   */
+  public static int removeTracks(final long[] ids) {
+    try {
+      MusicPlaybackService svc = getService();
+      if (svc != null) {
+        return svc.removeTracks(ids);
+      }
+    } catch (final Throwable ignored) {
+    }
+    return 0;
+  }
+
+  /**
    * @return The position of the current track in the queue.
    */
   private static int getQueuePosition() {
@@ -2591,16 +2607,18 @@ public final class MusicUtils {
   }
 
   private static String buildTrackIdSelection(final long[] list) {
-    final StringBuilder selection = new StringBuilder();
-    selection.append(BaseColumns._ID).append(" IN (");
-    for (int i = 0; i < list.length; i++) {
-      selection.append(list[i]);
-      if (i < list.length - 1) {
-        selection.append(",");
+    return BaseColumns._ID + " IN (" + joinIds(list) + ")";
+  }
+
+  private static String joinIds(final long[] ids) {
+    final StringBuilder joined = new StringBuilder();
+    for (int i = 0; i < ids.length; i++) {
+      if (i > 0) {
+        joined.append(',');
       }
+      joined.append(ids[i]);
     }
-    selection.append(")");
-    return selection.toString();
+    return joined.toString();
   }
 
   private static void cleanupDeletedTracks(
@@ -2608,20 +2626,20 @@ public final class MusicUtils {
     if (context == null || list == null) {
       return;
     }
-    for (long id : list) {
-      removeTrack(id);
-      removeSongFromAllPlaylists(context, id);
-    }
+    removeTracks(list);
+    removeSongsFromAllPlaylists(context, list);
 
-    RecentStore recentStore = RecentStore.getInstance(context);
-    FavoritesStore favoritesStore = FavoritesStore.getInstance(context);
+    final List<Long> ids = new ArrayList<>(list.length);
     for (long id : list) {
-      if (recentStore != null) {
-        recentStore.removeItem(id);
-      }
-      if (favoritesStore != null) {
-        favoritesStore.removeItem(id);
-      }
+      ids.add(id);
+    }
+    RecentStore recentStore = RecentStore.getInstance(context);
+    if (recentStore != null) {
+      recentStore.removeItems(ids);
+    }
+    FavoritesStore favoritesStore = FavoritesStore.getInstance(context);
+    if (favoritesStore != null) {
+      favoritesStore.removeItems(ids);
     }
 
     if (showNotification) {
@@ -2692,12 +2710,25 @@ public final class MusicUtils {
     }
   }
 
-  private static void removeSongFromAllPlaylists(final Context context, final long songId) {
+  /**
+   * Removes {@code songIds} from every playlist with one delete per playlist; off the main thread.
+   */
+  private static void removeSongsFromAllPlaylists(final Context context, final long[] songIds) {
     final List<Playlist> playlists = getPlaylists(context);
-
-    if (!playlists.isEmpty()) {
-      for (Playlist playlist : playlists) {
-        removeFromPlaylist(context, songId, playlist.mPlaylistId);
+    if (playlists.isEmpty()) {
+      return;
+    }
+    final String selection = Playlists.Members.AUDIO_ID + " IN (" + joinIds(songIds) + ")";
+    final ContentResolver resolver = context.getContentResolver();
+    final Uri baseUri = getPlaylistContentUri();
+    for (Playlist playlist : playlists) {
+      try {
+        resolver.delete(
+            Uri.withAppendedPath(baseUri, playlist.mPlaylistId + "/members"), selection, null);
+      } catch (Throwable t) {
+        LOG.error(
+            "MusicUtils.removeSongsFromAllPlaylists() failed for playlist " + playlist.mPlaylistId,
+            t);
       }
     }
   }
