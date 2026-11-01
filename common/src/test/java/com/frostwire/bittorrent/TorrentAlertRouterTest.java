@@ -28,19 +28,37 @@ import org.junit.jupiter.api.Test;
  */
 class TorrentAlertRouterTest {
 
-  /** A native handle stand-in: an id that is 0 once the torrent is gone, and its torrent. */
-  private record FakeHandle(long id, Object torrent) {}
+  /**
+   * Stands in for libtorrent's torrent_handle, a weak_ptr to a torrent object.
+   *
+   * <p>{@code owner} models the torrent object the weak_ptr points to: handles are the same torrent
+   * exactly when they share it, as torrent_handle::op_eq compares weak_ptr owners, and that stays
+   * true after the torrent is removed. {@code id} models torrent_handle::id(), the object's address
+   * shifted right by 10 bits: 0 once the torrent is gone, and reusable by a new torrent at the same
+   * address. Handles are only ever compared through {@link #HANDLES}; there is deliberately no
+   * equals(), which libtorrent's handles don't have either. {@link TorrentAlertRouterNativeTest}
+   * checks these semantics against real handles.
+   */
+  private static final class FakeHandle {
+    private final long id;
+    private final Object owner;
+
+    FakeHandle(long id, Object owner) {
+      this.id = id;
+      this.owner = owner;
+    }
+  }
 
   private static final TorrentAlertRouter.Handles<FakeHandle> HANDLES =
       new TorrentAlertRouter.Handles<>() {
         @Override
         public long id(FakeHandle handle) {
-          return handle.id();
+          return handle.id;
         }
 
         @Override
         public boolean same(FakeHandle a, FakeHandle b) {
-          return a.torrent() == b.torrent();
+          return a.owner == b.owner;
         }
       };
 
@@ -71,7 +89,7 @@ class TorrentAlertRouterTest {
       router.add(handle, listener);
     }
 
-    router.dispatch(new FakeHandle(2, handles.get(1).torrent()), null);
+    router.dispatch(new FakeHandle(2, handles.get(1).owner), null);
 
     assertEquals(0, listeners.get(0).alerts.get());
     assertEquals(1, listeners.get(1).alerts.get());
