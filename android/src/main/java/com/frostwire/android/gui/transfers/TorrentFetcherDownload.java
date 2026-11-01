@@ -276,6 +276,20 @@ public class TorrentFetcherDownload implements BittorrentDownload {
   }
 
   @Override
+  public int hashCode() {
+    // equals compares the URLs with equalsIgnoreCase: fold each char the same way.
+    String url = info.getTorrentUrl();
+    if (url == null) {
+      return 0;
+    }
+    int h = 0;
+    for (int i = 0; i < url.length(); i++) {
+      h = 31 * h + Character.toLowerCase(Character.toUpperCase(url.charAt(i)));
+    }
+    return h;
+  }
+
+  @Override
   public File previewFile() {
     return null;
   }

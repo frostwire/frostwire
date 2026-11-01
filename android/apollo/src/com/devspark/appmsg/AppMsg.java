@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.TextView;
 import com.frostwire.android.R;
+import java.util.Objects;
 
 /**
  * In-layout notifications. Based on {@link android.widget.Toast} notifications and article by Cyril
@@ -236,6 +237,11 @@ public class AppMsg {
       }
       Style style = (Style) o;
       return style.duration == duration && style.background == background;
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(duration, background);
     }
   }
 }
