@@ -1,4 +1,5 @@
 FrostWire 3.2.3 build 779 UNRELEASED
+  - fix:When the music player moves to the next song on its own, the seek bar and time work again, and the song is added to Recent (#1451)
   - fix:Tapping the album art in the music player's bottom bar opens the playing album with its own songs, not another album's (#1454)
   - fix:Opening one of your playlists in the music player shows its songs right away, instead of "empty playlist" when nothing was playing (#1447)
   - fix:Play and Add to queue on Favorites and Last added in the music player's Playlists tab now play the playlist you long-pressed: Favorites used to play Last added, and Last added played nothing (#1446)
