@@ -21,7 +21,6 @@ package com.frostwire.gui.bittorrent;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.gui.library.LibraryMediator;
 import com.frostwire.gui.library.LibraryUtils;
-import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.util.Logger;
 import com.frostwire.util.MediaSource;
 import com.frostwire.util.PlaybackUtil;
@@ -339,10 +338,7 @@ final class BTDownloadActions {
       }
       BTDownload btDownload = downloaders[0];
       if (btDownload instanceof BittorrentDownload) {
-        TorrentInfo t = ((BittorrentDownload) btDownload).getTorrentInfo();
-        if (t != null) { // avoid NPE due to an invalid torrent handle
-          new ShareTorrentDialog(GUIMediator.getAppFrame(), t).setVisible(true);
-        }
+        ShareTorrentOpener.open((BittorrentDownload) btDownload);
       }
     }
   }
