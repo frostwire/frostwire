@@ -126,8 +126,6 @@ public final class MusicUtils {
 
   private static ServiceConnectionListener serviceConnectionListener;
 
-  private static ContentValues[] mContentValuesCache = null;
-
   private static final Object startMusicPlaybackServiceLock = new Object();
 
   private static final Object getStartMusicPlaybackServiceLock = new Object();
@@ -1626,23 +1624,21 @@ public final class MusicUtils {
     }
   }
 
-  private static void makeInsertItems(final long[] ids, final int offset) {
-    final int base = 1000;
-    int len = 1000;
-    if (offset + len > ids.length) {
-      len = ids.length - offset;
-    }
+  private static final int PLAYLIST_INSERT_BATCH = 1000;
 
-    if (mContentValuesCache == null || mContentValuesCache.length != len) {
-      mContentValuesCache = new ContentValues[len];
+  /**
+   * The rows that add {@code ids[offset .. offset + count)} to a playlist, numbered from {@code
+   * firstPlayOrder} in order.
+   */
+  static ContentValues[] playlistInsertValues(
+      final long[] ids, final int offset, final int count, final long firstPlayOrder) {
+    final ContentValues[] values = new ContentValues[count];
+    for (int i = 0; i < count; i++) {
+      values[i] = new ContentValues(2);
+      values[i].put(Playlists.Members.PLAY_ORDER, firstPlayOrder + i);
+      values[i].put(Playlists.Members.AUDIO_ID, ids[offset + i]);
     }
-    for (int i = 0; i < len; i++) {
-      if (mContentValuesCache[i] == null) {
-        mContentValuesCache[i] = new ContentValues();
-      }
-      mContentValuesCache[i].put(Playlists.Members.PLAY_ORDER, base + offset + i);
-      mContentValuesCache[i].put(Playlists.Members.AUDIO_ID, ids[offset + i]);
-    }
+    return values;
   }
 
   /**
@@ -1823,8 +1819,7 @@ public final class MusicUtils {
     boolean updateQueue = isPlaylistInQueue(playlist, currentQueue);
     final int size = ids.length;
     final ContentResolver resolver = context.getContentResolver();
-    final String[] projection = new String[] {MediaStore.Audio.Playlists.Members._ID};
-
+    final String[] projection = new String[] {Playlists.Members.PLAY_ORDER};
     final Uri uri = getPlaylistMembersUri(playlistid);
 
     Cursor cursor = null;
@@ -1835,15 +1830,19 @@ public final class MusicUtils {
     }
 
     if (cursor != null) {
-      cursor.moveToFirst();
-      final int base = cursor.getCount();
+      // New songs go after the last one, whatever numbers earlier adds and moves left.
+      long nextPlayOrder = 0;
+      while (cursor.moveToNext()) {
+        nextPlayOrder = Math.max(nextPlayOrder, cursor.getLong(0) + 1);
+      }
       cursor.close();
       int numinserted = 0;
-      // TODO: Check this portion of code, seems is doing extra work.
-      for (int offSet = 0; offSet < size; offSet += 1000) {
-        makeInsertItems(ids, offSet);
+      for (int offset = 0; offset < size; offset += PLAYLIST_INSERT_BATCH) {
+        final int count = Math.min(PLAYLIST_INSERT_BATCH, size - offset);
         try {
-          numinserted += resolver.bulkInsert(uri, mContentValuesCache);
+          numinserted +=
+              resolver.bulkInsert(
+                  uri, playlistInsertValues(ids, offset, count, nextPlayOrder + offset));
         } catch (Throwable ignored) {
           LOG.error("MusicUtils.addToPlaylist() resolver.bulkInsert() failed", ignored, true);
         }

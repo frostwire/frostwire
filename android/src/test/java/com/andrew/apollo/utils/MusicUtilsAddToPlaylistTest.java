@@ -8,6 +8,7 @@
 package com.andrew.apollo.utils;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import android.app.Application;
 import android.content.ContentProvider;
@@ -146,5 +147,22 @@ public class MusicUtilsAddToPlaylistTest {
 
     assertEquals(
         "songs added: " + FakeMediaProvider.memberUris, 2, FakeMediaProvider.members.size());
+  }
+
+  @Test
+  @Config(sdk = 34)
+  public void songsFromALaterAddComeAfterTheOnesAlreadyThere() {
+    add(1, 2);
+    add(3);
+    add(4, 5);
+
+    long previous = Long.MIN_VALUE;
+    for (long[] member : FakeMediaProvider.members) {
+      assertTrue(
+          "play order " + member[1] + " of song " + member[0] + " after " + previous,
+          member[1] > previous);
+      previous = member[1];
+    }
+    assertEquals(5, FakeMediaProvider.members.size());
   }
 }
