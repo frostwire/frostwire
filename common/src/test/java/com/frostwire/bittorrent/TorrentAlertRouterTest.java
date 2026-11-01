@@ -8,9 +8,14 @@
 package com.frostwire.bittorrent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.frostwire.jlibtorrent.AlertListener;
 import com.frostwire.jlibtorrent.alerts.Alert;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -146,5 +151,19 @@ class TorrentAlertRouterTest {
 
     assertEquals(1, listeners.get(downloads - 1).alerts.get());
     assertEquals(downloads - 2, router.size());
+  }
+
+  @Test
+  void downloadsRegisterWithTheEngineRouterNotAsSessionListeners() throws Exception {
+    String source =
+        Files.readString(
+                Path.of(System.getProperty("user.dir"))
+                    .resolve("../common/src/main/java/com/frostwire/bittorrent/BTDownload.java"),
+                StandardCharsets.UTF_8)
+            .replaceAll("\\s+", "");
+    assertFalse(
+        source.contains("engine.addListener(") || source.contains("engine.removeListener("),
+        "a session listener per download chains jlibtorrent's listeners N deep");
+    assertTrue(source.contains("engine.addDownloadListener(th,innerListener);"));
   }
 }

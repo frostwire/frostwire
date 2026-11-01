@@ -65,6 +65,21 @@ public final class BTEngine extends SessionManager {
   // volatile: set by the startup thread, read by UI threads through getInstanceIfReady()
   public static volatile BTContext ctx;
   private final InnerListener innerListener;
+
+  /** Routes torrent alerts to their download, through one session listener (GitHub #1441). */
+  private final TorrentAlertRouter<torrent_handle> downloadAlerts =
+      new TorrentAlertRouter<>(
+          new TorrentAlertRouter.Handles<>() {
+            @Override
+            public long id(torrent_handle handle) {
+              return handle.id();
+            }
+
+            @Override
+            public boolean same(torrent_handle a, torrent_handle b) {
+              return a.op_eq(b);
+            }
+          });
   private final Queue<RestoreDownloadTask> restoreDownloadsQueue;
   private volatile BTEngineListener listener;
 
@@ -91,6 +106,17 @@ public final class BTEngine extends SessionManager {
     super(false);
     this.innerListener = new InnerListener();
     this.restoreDownloadsQueue = new LinkedList<>();
+    // Registered for the engine's lifetime, like the per-download listeners it replaces.
+    addListener(new DownloadAlertListener());
+  }
+
+  /** Sends the alerts of {@code th} that {@link BTDownload} handles to {@code listener}. */
+  void addDownloadListener(TorrentHandle th, AlertListener listener) {
+    downloadAlerts.add(th.swig(), listener);
+  }
+
+  void removeDownloadListener(AlertListener listener) {
+    downloadAlerts.remove(listener);
   }
 
   /**
@@ -1285,6 +1311,20 @@ public final class BTEngine extends SessionManager {
 
   private static class Loader {
     static final BTEngine INSTANCE = new BTEngine();
+  }
+
+  private final class DownloadAlertListener implements AlertListener {
+    @Override
+    public int[] types() {
+      return BTDownload.ALERT_TYPES;
+    }
+
+    @Override
+    public void alert(Alert<?> alert) {
+      if (alert instanceof TorrentAlert<?> torrentAlert) {
+        downloadAlerts.dispatch(torrentAlert.swig().getHandle(), alert);
+      }
+    }
   }
 
   private final class InnerListener implements AlertListener {

@@ -55,7 +55,8 @@ public final class BTDownload implements BittorrentDownload {
   static final ExecutorService STATUS_REFRESH_EXECUTOR =
       ExecutorsHelper.newFixedSizeUnboundedThreadPool(2, "BTDownload-StatusRefresh");
 
-  private static final int[] ALERT_TYPES = {
+  /** The alerts a download handles, routed to it by {@link BTEngine}. */
+  static final int[] ALERT_TYPES = {
     AlertType.TORRENT_FINISHED.swig(),
     AlertType.TORRENT_REMOVED.swig(),
     AlertType.TORRENT_CHECKED.swig(),
@@ -101,7 +102,7 @@ public final class BTDownload implements BittorrentDownload {
     this.extra = createExtra();
     this.paymentOptions = loadPaymentOptions(ti);
     this.innerListener = new InnerListener();
-    engine.addListener(innerListener);
+    engine.addDownloadListener(th, innerListener);
     try {
       // Backfill resume for torrents that never persist it otherwise
       // (zero-piece torrents never check, born-complete seeds may never
@@ -576,7 +577,7 @@ public final class BTDownload implements BittorrentDownload {
     incompleteFilesToRemove = getIncompleteFiles();
     // prevent any further resume serialization during removal
     removing = true;
-    engine.removeListener(innerListener);
+    engine.removeDownloadListener(innerListener);
     if (th.isValid()) {
       if (deleteData) {
         engine.remove(th, SessionHandle.DELETE_FILES);
@@ -691,7 +692,7 @@ public final class BTDownload implements BittorrentDownload {
   }
 
   private void torrentRemoved() {
-    engine.removeListener(innerListener);
+    engine.removeDownloadListener(innerListener);
     if (parts != null) {
       //noinspection ResultOfMethodCallIgnored
       parts.delete();
@@ -1035,14 +1036,9 @@ public final class BTDownload implements BittorrentDownload {
       return ALERT_TYPES;
     }
 
+    /** Called by the engine only with this download's alerts. */
     @Override
     public void alert(Alert<?> alert) {
-      if (!(alert instanceof TorrentAlert<?>)) {
-        return;
-      }
-      if (!((TorrentAlert<?>) alert).handle().swig().op_eq(th.swig())) {
-        return;
-      }
       AlertType type = alert.type();
       switch (type) {
         case STATE_CHANGED:
