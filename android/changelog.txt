@@ -1,4 +1,6 @@
 FrostWire 3.2.3 build 779 UNRELEASED
+  - fix:A torrent with a malformed license or payment-options section no longer loses both: the bad section is ignored and the other still shows (#1430)
+  - fix:Hashes and other hex values from peers and block explorers must be plain ASCII hex: look-alike digits from other scripts are rejected instead of decoding to the same bytes (#1431)
   - jlibtorrent: the copies of the libtorrent library that older versions left in the temp folder on every start (13-30 MB each) are deleted
   - jlibtorrent: updated to 2.0.15.3 (3.2.2 shipped 2.0.12.9): libtorrent RC_2_0 with the fixes of libtorrent 2.0.13, 2.0.14, 2.0.15 and the unreleased 2.0.16 (123 commits), and OpenSSL 3.6.0 → 4.1.0
   - jlibtorrent: App start no longer copies the 13.4 MB libtorrent library out of the app into its cache on every start (the copies were never deleted); Android loads it where it is installed (#1382)
