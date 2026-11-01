@@ -77,7 +77,10 @@ public class InternetArchiveSearchPattern implements SearchPattern {
           break;
         }
 
-        // Filter out items from "samples_only" collection
+        // Skip null docs and items from the "samples_only" collection
+        if (item == null) {
+          continue;
+        }
         if (item.collection != null && item.collection.contains("samples_only")) {
           continue;
         }
