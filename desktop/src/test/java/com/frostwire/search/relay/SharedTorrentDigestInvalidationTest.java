@@ -45,6 +45,7 @@ class SharedTorrentDigestInvalidationTest {
   @TempDir Path tempDir;
 
   @Test
+  @SuppressWarnings("try") // the handle only scopes the registration
   void createdTorrentBecomesHolderAndAnswersSignedQueryWithoutPeriodicSync() throws Exception {
     IdentityKeys desktop = IdentityKeys.generate(0);
     IdentityKeys relay = IdentityKeys.generate(0);

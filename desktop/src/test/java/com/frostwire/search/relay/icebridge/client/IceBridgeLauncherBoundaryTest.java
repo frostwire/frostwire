@@ -39,6 +39,7 @@ class IceBridgeLauncherBoundaryTest {
   @TempDir Path temp;
 
   @Test
+  @SuppressWarnings("try") // closes the launcher early to check its closed state
   void credentialIsRestrictedAndAbsentFromArgumentsAndLogs() throws Exception {
     try (IceBridgeProcessLauncher launcher = launcher()) {
       launcher.start();
@@ -120,6 +121,7 @@ class IceBridgeLauncherBoundaryTest {
   }
 
   @Test
+  @SuppressWarnings("try") // closes the launcher early to check its closed state
   void supervisorRetainsClientAndClosePreventsFurtherRespawns() throws Exception {
     try (IceBridgeProcessLauncher launcher = launcher()) {
       launcher.start();
@@ -282,6 +284,7 @@ class IceBridgeLauncherBoundaryTest {
 
   /** Minimal Java-only child that accepts a health connection but never responds. */
   public static class StalledChild {
+    @SuppressWarnings("try") // the resource only holds the port for the block
     public static void main(String[] args) throws Exception {
       List<String> arguments = Arrays.asList(args);
       int port = Integer.parseInt(arguments.get(arguments.indexOf("--control-http-port") + 1));

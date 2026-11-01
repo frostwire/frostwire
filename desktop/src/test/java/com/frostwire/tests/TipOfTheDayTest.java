@@ -20,7 +20,7 @@ class TipOfTheDayTest {
   void preloadHtmlEngine_completesOffEdtWithKitAvailable() {
     assertDoesNotThrow(TipOfTheDayMediator::preloadHtmlEngine);
 
-    String kitClassName = new JEditorPane().getEditorKitClassNameForContentType("text/html");
+    String kitClassName = JEditorPane.getEditorKitClassNameForContentType("text/html");
 
     assertTrue(
         kitClassName != null && kitClassName.contains("HTMLEditorKit"),

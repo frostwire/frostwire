@@ -121,6 +121,7 @@ class IceBridgeProcessLauncherTest {
    * the identity file) and start its own healthy child instead of silently failing to bind.
    */
   @Test
+  @SuppressWarnings("try") // the probe only holds the port for the block
   void killsStaleOrphanChildAndReclaimsTheRudpPort() throws Exception {
     File jar = new File(System.getProperty("user.dir"), "build/libs/icebridge.jar");
     assertTrue(jar.isFile(), "icebridge.jar must be built first (run icebridgeJar)");

@@ -138,6 +138,7 @@ class DesktopRelayLifecycleTest {
   }
 
   @Test
+  @SuppressWarnings("try") // the index only has to stay open for the block
   void oneDrainDeadlineCoversAllWorkers() throws Exception {
     AtomicLong firstBudget = new AtomicLong();
     AtomicLong secondBudget = new AtomicLong();

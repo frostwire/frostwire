@@ -249,6 +249,7 @@ class DiscoveryHardeningTest {
   }
 
   @Test
+  @SuppressWarnings("try") // closes the fetcher early to check its closed state
   void blockingLookupUsesBoundedWorkerAndIgnoresResultAfterClose() throws Exception {
     CountDownLatch entered = new CountDownLatch(1);
     CountDownLatch release = new CountDownLatch(1);

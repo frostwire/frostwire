@@ -369,10 +369,15 @@ class HttpDownloadCompletionTest {
     }
 
     @Override
-    public void close() throws InterruptedException {
+    public void close() {
       release.countDown();
       worker.shutdownNow();
-      assertTrue(worker.awaitTermination(5, TimeUnit.SECONDS));
+      try {
+        assertTrue(worker.awaitTermination(5, TimeUnit.SECONDS));
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new AssertionError("interrupted while stopping the fixture's worker", e);
+      }
     }
   }
 }

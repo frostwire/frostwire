@@ -81,6 +81,7 @@ class AutomaticRudpBindingTest {
   }
 
   @Test
+  @SuppressWarnings("try") // the resource only holds the port for the block
   void childReportsActualUdpBindAndRetainsItAcrossSupervisedRespawn() throws Exception {
     File identity = identity("child");
     File jar = new File("build/libs/icebridge.jar");
