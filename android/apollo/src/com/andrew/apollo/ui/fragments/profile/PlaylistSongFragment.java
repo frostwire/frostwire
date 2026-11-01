@@ -67,15 +67,6 @@ public final class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapte
   }
 
   @Override
-  public void onActivityCreated(Bundle savedInstanceState) {
-    final Bundle arguments = getArguments();
-    if (arguments != null) {
-      mPlaylistId = arguments.getLong(Config.ID);
-    }
-    super.onActivityCreated(savedInstanceState);
-  }
-
-  @Override
   public void onCreateContextMenu(
       final ContextMenu menu, final View v, final ContextMenuInfo menuInfo) {
     super.onCreateContextMenu(menu, v, menuInfo);
@@ -124,7 +115,20 @@ public final class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapte
   @NonNull
   @Override
   public Loader<List<Song>> onCreateLoader(final int id, final Bundle args) {
+    mPlaylistId = playlistIdFrom(args, getArguments());
     return new PlaylistSongLoader(getActivity(), mPlaylistId);
+  }
+
+  /**
+   * The playlist to show: from the loader's arguments, else the fragment's. The id used to be set
+   * in onActivityCreated, after ApolloFragment had already created the loader in onViewCreated, so
+   * the loader asked for playlist 0 and the screen said the playlist was empty (GitHub #1447).
+   */
+  static long playlistIdFrom(Bundle loaderArgs, Bundle fragmentArgs) {
+    if (loaderArgs != null && loaderArgs.containsKey(Config.ID)) {
+      return loaderArgs.getLong(Config.ID);
+    }
+    return fragmentArgs != null ? fragmentArgs.getLong(Config.ID) : 0;
   }
 
   @Override
