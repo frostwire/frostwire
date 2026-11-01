@@ -1646,6 +1646,14 @@ public final class MusicUtils {
   }
 
   /**
+   * The members of playlist {@code playlistId}, on the volume {@link #getPlaylistContentUri()}
+   * uses: "external_primary" exists only on Android 10 and later.
+   */
+  public static Uri getPlaylistMembersUri(final long playlistId) {
+    return Uri.withAppendedPath(getPlaylistContentUri(), playlistId + "/members");
+  }
+
+  /**
    * Resolves the appropriate playlist content URI based on the Android version.
    *
    * @return the appropriate content URI for accessing playlists
@@ -1817,9 +1825,7 @@ public final class MusicUtils {
     final ContentResolver resolver = context.getContentResolver();
     final String[] projection = new String[] {MediaStore.Audio.Playlists.Members._ID};
 
-    Uri uri =
-        MediaStore.Audio.Playlists.Members.getContentUri(
-            MediaStore.VOLUME_EXTERNAL_PRIMARY, playlistid);
+    final Uri uri = getPlaylistMembersUri(playlistid);
 
     Cursor cursor = null;
     try {
@@ -1902,8 +1908,7 @@ public final class MusicUtils {
       return;
     }
 
-    Uri baseUri = getPlaylistContentUri();
-    Uri uri = Uri.withAppendedPath(baseUri, playlistId + "/members");
+    final Uri uri = getPlaylistMembersUri(playlistId);
 
     final ContentResolver resolver = context.getContentResolver();
     try {
@@ -2764,11 +2769,9 @@ public final class MusicUtils {
     }
     final String selection = Playlists.Members.AUDIO_ID + " IN (" + joinIds(songIds) + ")";
     final ContentResolver resolver = context.getContentResolver();
-    final Uri baseUri = getPlaylistContentUri();
     for (Playlist playlist : playlists) {
       try {
-        resolver.delete(
-            Uri.withAppendedPath(baseUri, playlist.mPlaylistId + "/members"), selection, null);
+        resolver.delete(getPlaylistMembersUri(playlist.mPlaylistId), selection, null);
       } catch (Throwable t) {
         LOG.error(
             "MusicUtils.removeSongsFromAllPlaylists() failed for playlist " + playlist.mPlaylistId,
