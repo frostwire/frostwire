@@ -25,6 +25,7 @@ import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.http.OkHttpClientWrapper;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.VisibleCardLayout;
+import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import java.awt.*;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executor;
 import java.util.regex.Pattern;
 import javax.swing.*;
 
@@ -57,10 +59,18 @@ public class MultimediaSlideshowPanel extends JPanel implements SlideshowPanel {
   }
 
   public MultimediaSlideshowPanel(final String url, List<Slide> defaultSlides) {
+    this(url, defaultSlides, DesktopParallelExecutor::execute);
+  }
+
+  /**
+   * Loads {@code url}'s slides on {@code loader}. Search tabs build this panel on the EDT, so it
+   * must not start a thread itself: creating one can stall the EDT (GitHub #1457).
+   */
+  MultimediaSlideshowPanel(final String url, List<Slide> defaultSlides, Executor loader) {
     fallbackSlides = defaultSlides;
     setupUI();
     setup(defaultSlides);
-    new Thread(() -> load(url)).start();
+    loader.execute(() -> load(url));
   }
 
   @Override
