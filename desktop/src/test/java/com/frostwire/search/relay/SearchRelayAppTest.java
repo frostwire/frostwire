@@ -18,7 +18,6 @@ import com.frostwire.search.relay.icebridge.client.IceBridgeClient;
 import com.frostwire.search.relay.icebridge.client.IceBridgeSearchTransport;
 import com.frostwire.search.relay.icebridge.client.IncomingSearchRequestHandler;
 import java.io.File;
-import java.net.ServerSocket;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.spec.X509EncodedKeySpec;
@@ -58,7 +57,7 @@ class SearchRelayAppTest {
   void forwarderAppForwardsSignedRequestAndRoutesSignedResponse() throws Exception {
     // --- 1. Standalone forwarder + search app ---
     IdentityKeys.save(IdentityKeys.generate(0), new File(tempDir, "fwd-identity.dat"));
-    IceBridgeServer server = startForwarderWithRetry();
+    IceBridgeServer server = startForwarder();
     resources.add(server);
     SearchRelayApp app = SearchRelayApp.start(server);
     resources.add(app);
@@ -224,48 +223,24 @@ class SearchRelayAppTest {
         .build();
   }
 
-  /**
-   * freePort() close-then-bind is racy under a busy suite JVM fork; retry with fresh ports on
-   * BindException.
-   */
-  private IceBridgeServer startForwarderWithRetry() throws Exception {
-    Throwable last = null;
-    for (int attempt = 0; attempt < 5; attempt++) {
-      IceBridgeServer server = null;
-      try {
-        IceBridgeConfig config =
-            IceBridgeConfig.newBuilder()
-                .host("127.0.0.1")
-                .rudpPort(freePort())
-                .relayPort(freePort())
-                .controlHttpPort(freePort())
-                .role(IceBridgeConfig.Role.FORWARDER)
-                .maxPeers(100)
-                .peerTtlSec(60)
-                .maxQpsPerKey(1000.0)
-                .identityFile(new File(tempDir, "fwd-identity.dat"))
-                .dhtEnabled(false)
-                .build();
-        server = new IceBridgeServer(config);
-        server.start(true); // SearchRelayApp owns the shared /poll consumer.
-        return server;
-      } catch (Throwable t) {
-        last = t;
-        if (server != null) {
-          try {
-            server.close();
-          } catch (Throwable ignored) {
-          }
-        }
-      }
-    }
-    throw new IllegalStateException("forwarder could not bind after retries", last);
-  }
-
-  private static int freePort() throws Exception {
-    try (ServerSocket socket = new ServerSocket(0)) {
-      return socket.getLocalPort();
-    }
+  /** Binds free rUDP and control ports itself (port 0), so no other process can take them. */
+  private IceBridgeServer startForwarder() throws Exception {
+    IceBridgeConfig config =
+        IceBridgeConfig.newBuilder()
+            .host("127.0.0.1")
+            .rudpPort(0)
+            .relayPort(RelayConstants.RELAY_LISTEN_PORT)
+            .controlHttpPort(0)
+            .role(IceBridgeConfig.Role.FORWARDER)
+            .maxPeers(100)
+            .peerTtlSec(60)
+            .maxQpsPerKey(1000.0)
+            .identityFile(new File(tempDir, "fwd-identity.dat"))
+            .dhtEnabled(false)
+            .build();
+    IceBridgeServer server = new IceBridgeServer(config);
+    server.start(true); // SearchRelayApp owns the shared /poll consumer.
+    return server;
   }
 
   private static final class PeerClient {

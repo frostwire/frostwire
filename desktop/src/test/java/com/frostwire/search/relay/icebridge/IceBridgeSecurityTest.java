@@ -14,8 +14,6 @@ import com.frostwire.search.relay.icebridge.control.ControlServer;
 import com.frostwire.search.relay.icebridge.control.InboundMessageQueue;
 import com.frostwire.search.relay.icebridge.peer.PeerRegistry;
 import com.frostwire.search.relay.icebridge.udp.RudpSessionManager;
-import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -47,7 +45,7 @@ class IceBridgeSecurityTest {
     IdentityKeys identity = IdentityKeys.generate(0);
     IceBridgeConfig config =
         IceBridgeConfig.newBuilder()
-            .controlHttpPort(freePort())
+            .controlHttpPort(0)
             .rudpPort(0)
             .role(IceBridgeConfig.Role.BOTH)
             .maxPeers(100)
@@ -198,7 +196,7 @@ class IceBridgeSecurityTest {
     IdentityKeys identity = IdentityKeys.generate(0);
     IceBridgeConfig config =
         IceBridgeConfig.newBuilder()
-            .controlHttpPort(freePort())
+            .controlHttpPort(0)
             .rudpPort(0)
             .role(IceBridgeConfig.Role.BOTH)
             .maxPeers(100)
@@ -248,12 +246,6 @@ class IceBridgeSecurityTest {
                 .build(),
             HttpResponse.BodyHandlers.ofString());
     assertEquals(200, response.statusCode(), "poll with correct token should succeed");
-  }
-
-  private static int freePort() throws IOException {
-    try (ServerSocket s = new ServerSocket(0)) {
-      return s.getLocalPort();
-    }
   }
 
   @Test

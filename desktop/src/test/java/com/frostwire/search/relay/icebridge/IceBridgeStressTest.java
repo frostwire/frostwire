@@ -16,7 +16,6 @@ import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.icebridge.client.IceBridgeClient;
 import com.frostwire.search.relay.icebridge.client.IceBridgeSearchTransport;
 import com.frostwire.search.relay.icebridge.control.PeerInfo;
-import java.net.ServerSocket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -604,9 +603,9 @@ class IceBridgeStressTest {
     IceBridgeConfig config =
         IceBridgeConfig.newBuilder()
             .host(LOOPBACK)
-            .rudpPort(freePort())
+            .rudpPort(0)
             .relayPort(0)
-            .controlHttpPort(freePort())
+            .controlHttpPort(0)
             .role(IceBridgeConfig.Role.FORWARDER)
             .maxPeers(500)
             .peerTtlSec(180)
@@ -638,9 +637,9 @@ class IceBridgeStressTest {
     IceBridgeConfig config =
         IceBridgeConfig.newBuilder()
             .host(LOOPBACK)
-            .rudpPort(freePort())
+            .rudpPort(0)
             .relayPort(0)
-            .controlHttpPort(freePort())
+            .controlHttpPort(0)
             .role(IceBridgeConfig.Role.BOTH)
             .maxPeers(200)
             .peerTtlSec(180)
@@ -691,12 +690,6 @@ class IceBridgeStressTest {
       Thread.sleep(50);
     }
     fail("IceBridge " + label + " did not become healthy");
-  }
-
-  private static int freePort() throws Exception {
-    try (ServerSocket s = new ServerSocket(0)) {
-      return s.getLocalPort();
-    }
   }
 
   private static long msSince(long t0Nanos) {

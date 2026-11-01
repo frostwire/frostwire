@@ -245,8 +245,8 @@ class TorrentFetchOverMeshTest {
 
     IceBridgeConfig config =
         IceBridgeConfig.newBuilder()
-            .rudpPort(freePort())
-            .controlHttpPort(freePort())
+            .rudpPort(0)
+            .controlHttpPort(0)
             .role(IceBridgeConfig.Role.BOTH)
             .maxPeers(100)
             .peerTtlSec(120)
@@ -292,12 +292,6 @@ class TorrentFetchOverMeshTest {
     resources.add(() -> incomingHandler.stop());
 
     return new Instance(identity, directory, client, transport, provider, server.rudpPort());
-  }
-
-  private static int freePort() throws java.io.IOException {
-    try (java.net.ServerSocket s = new java.net.ServerSocket(0)) {
-      return s.getLocalPort();
-    }
   }
 
   private static final class MutableProvider implements TorrentMetadataProvider {

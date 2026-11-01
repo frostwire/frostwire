@@ -43,7 +43,7 @@ class IceBridgeClientTest {
     identity = IdentityKeys.generate(0);
     IceBridgeConfig config =
         IceBridgeConfig.newBuilder()
-            .controlHttpPort(freePort())
+            .controlHttpPort(0)
             .rudpPort(0)
             .role(IceBridgeConfig.Role.BOTH)
             .maxPeers(100)

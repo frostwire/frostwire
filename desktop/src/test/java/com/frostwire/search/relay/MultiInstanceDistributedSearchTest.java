@@ -355,9 +355,9 @@ class MultiInstanceDistributedSearchTest {
     IceBridgeConfig config =
         IceBridgeConfig.newBuilder()
             .host("127.0.0.1")
-            .rudpPort(freePort())
-            .relayPort(freePort())
-            .controlHttpPort(freePort())
+            .rudpPort(0)
+            .relayPort(RelayConstants.RELAY_LISTEN_PORT)
+            .controlHttpPort(0)
             .role(IceBridgeConfig.Role.BOTH)
             .maxPeers(100)
             .peerTtlSec(120)
@@ -406,12 +406,6 @@ class MultiInstanceDistributedSearchTest {
 
   private static final java.util.concurrent.atomic.AtomicInteger HASH_COUNTER =
       new java.util.concurrent.atomic.AtomicInteger();
-
-  private static int freePort() throws java.io.IOException {
-    try (java.net.ServerSocket s = new java.net.ServerSocket(0)) {
-      return s.getLocalPort();
-    }
-  }
 
   private static LocalSharedTorrent torrent(String name, long size, int fileCount) {
     return torrent(name, size, fileCount, "[]");

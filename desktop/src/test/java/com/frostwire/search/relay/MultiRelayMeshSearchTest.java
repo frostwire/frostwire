@@ -192,9 +192,9 @@ class MultiRelayMeshSearchTest {
     IceBridgeConfig config =
         IceBridgeConfig.newBuilder()
             .host("127.0.0.1")
-            .rudpPort(freePort())
-            .relayPort(freePort())
-            .controlHttpPort(freePort())
+            .rudpPort(0)
+            .relayPort(RelayConstants.RELAY_LISTEN_PORT)
+            .controlHttpPort(0)
             .role(IceBridgeConfig.Role.FORWARDER)
             .maxPeers(200)
             .peerTtlSec(300)
@@ -293,12 +293,6 @@ class MultiRelayMeshSearchTest {
     }
     for (RelayNode node : nodes) {
       node.client.setOwnPub(null);
-    }
-  }
-
-  private static int freePort() throws java.io.IOException {
-    try (java.net.ServerSocket s = new java.net.ServerSocket(0)) {
-      return s.getLocalPort();
     }
   }
 

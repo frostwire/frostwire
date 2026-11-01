@@ -22,8 +22,6 @@ import com.frostwire.search.relay.icebridge.control.ControlServer;
 import com.frostwire.search.relay.icebridge.control.InboundMessageQueue;
 import com.frostwire.search.relay.icebridge.peer.PeerRegistry;
 import com.frostwire.search.relay.icebridge.udp.RudpSessionManager;
-import java.io.IOException;
-import java.net.ServerSocket;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
@@ -48,7 +46,7 @@ class PeerRegistrySyncTest {
     identity = IdentityKeys.generate(0);
     IceBridgeConfig config =
         IceBridgeConfig.newBuilder()
-            .controlHttpPort(freePort())
+            .controlHttpPort(0)
             .rudpPort(0)
             .role(IceBridgeConfig.Role.BOTH)
             .maxPeers(100)
@@ -324,11 +322,5 @@ class PeerRegistrySyncTest {
         5,
         metrics.controlRequests(),
         "routing a verified peer must warm its rUDP session with a TELEMETRY ping");
-  }
-
-  private static int freePort() throws IOException {
-    try (ServerSocket s = new ServerSocket(0)) {
-      return s.getLocalPort();
-    }
   }
 }
