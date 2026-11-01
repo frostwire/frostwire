@@ -28,7 +28,6 @@ import java.util.Objects;
  * underlying TableModel.
  */
 public class HashBasedDataLineModel<T extends DataLine<E>, E> extends BasicDataLineModel<T, E> {
-  /** */
   /** HashMap for quick access to indexes. */
   private final HashMap<E, Integer> _indexes = new HashMap<>();
 

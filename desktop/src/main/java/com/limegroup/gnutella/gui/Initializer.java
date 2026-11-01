@@ -640,15 +640,6 @@ final class Initializer {
   }
 
   /**
-   * Launch the local IceBridge daemon as a subprocess, create the {@link
-   * com.frostwire.search.relay.DistributedSearchTransport} that bridges the daemon's HTTP control
-   * API to the search engine, register an incoming-request handler so remote peers can search our
-   * index, and wire everything into the DISTRIBUTED search engine.
-   *
-   * <p>If the IceBridge jar is not found or the daemon fails to start, the DISTRIBUTED engine is
-   * left un-wired (not ready). Local search remains available; public services are rolled back.
-   */
-  /**
    * Logs the current IceBridge configuration from settings (and notes env override potential).
    * Called on startup.
    */
@@ -681,6 +672,15 @@ final class Initializer {
     log.info("===============================");
   }
 
+  /**
+   * Launch the local IceBridge daemon as a subprocess, create the {@link
+   * com.frostwire.search.relay.DistributedSearchTransport} that bridges the daemon's HTTP control
+   * API to the search engine, register an incoming-request handler so remote peers can search our
+   * index, and wire everything into the DISTRIBUTED search engine.
+   *
+   * <p>If the IceBridge jar is not found or the daemon fails to start, the DISTRIBUTED engine is
+   * left un-wired (not ready). Local search remains available; public services are rolled back.
+   */
   private void startIceBridgeSearch(
       LocalIndex localIndex,
       PeerDirectory directory,

@@ -32,7 +32,6 @@ import java.util.Map;
 import javax.swing.*;
 
 public class AssociationsWindow extends SetupWindow {
-  /** */
   /** a mapping of checkboxes to associations */
   private final Map<JCheckBox, LimeAssociationOption> associations = new HashMap<>();
 

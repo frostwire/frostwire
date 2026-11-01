@@ -43,7 +43,6 @@ import java.util.Map.Entry;
  * @author Sam Berlin -- extend LinkedHashMap (adds unimplemented methods, simplifies)
  */
 public class FixedsizeForgetfulHashMap<K, V> extends LinkedHashMap<K, V> {
-  /** */
   /** Maximum number of elements to be stored in the underlying hashMap */
   private final int MAXIMUM_SIZE;
 

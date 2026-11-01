@@ -40,7 +40,6 @@ import javax.swing.plaf.basic.BasicComboPopup;
  * @author Kirill Grouchnikov
  */
 public class SkinComboPopup extends BasicComboPopup {
-  /** */
 
   /**
    * Creates combo popup for the specified combobox.

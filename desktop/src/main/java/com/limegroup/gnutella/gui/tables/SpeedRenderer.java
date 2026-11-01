@@ -6,7 +6,6 @@ import javax.swing.*;
 
 /** Simple renderer for speeds. */
 public final class SpeedRenderer extends DefaultTableBevelledCellRenderer {
-  /** */
 
   /** Constructs the speed drawer. */
   SpeedRenderer() {

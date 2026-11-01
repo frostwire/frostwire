@@ -267,9 +267,9 @@ class ProgressMonitor implements Accessible {
     return note;
   }
 
-  /////////////////
+  // --------------
   // Accessibility support
-  ////////////////
+  // -------------
 
   /**
    * Specifies the additional note that is displayed along with the progress message. Used, for
@@ -376,9 +376,9 @@ class ProgressMonitor implements Accessible {
       return dialog;
     }
 
-    /////////////////
+    // --------------
     // Accessibility support for ProgressOptionPane
-    ////////////////
+    // -------------
 
     /**
      * Gets the AccessibleContext for the ProgressOptionPane

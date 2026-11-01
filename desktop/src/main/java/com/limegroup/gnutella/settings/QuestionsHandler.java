@@ -20,7 +20,7 @@ public class QuestionsHandler extends LimeWireSettings {
   public static final BooleanSetting NO_INTERNET_RETRYING =
       FACTORY.createBooleanSetting("NO_INTERNET_RETRYING ", false);
 
-  //////////// The actual questions ///////////////
+  // The actual questions ///////////////
   /** Initial warning for first download. */
   public static final IntSetting SKIP_FIRST_DOWNLOAD_WARNING =
       FACTORY.createIntSetting("SHOW_FIRST_DOWNLOAD_WARNING", 0);

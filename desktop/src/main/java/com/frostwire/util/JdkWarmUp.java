@@ -432,13 +432,6 @@ public final class JdkWarmUp {
   }
 
   /**
-   * Breaks {@link #GLYPH_SAMPLE} into lines the way a wrapped multi-line tooltip does
-   * (WrappedPlainView through javax.swing.text.Utilities.getBreakLocation). The first line
-   * BreakIterator loads the JDK's line-break rules (RuleBasedBreakIterator and its resource data),
-   * which the character BreakIterator of {@link #warmUpTextLayout} does not; the first multi-line
-   * tooltip paid that on the EDT (Icebase #7c1eec7b21f2).
-   */
-  /**
    * Looks up the JDK's data-transfer service and builds the default flavor map, as the main
    * window's first {@code new DropTarget(...)} does: the lookup is a ServiceLoader scan of the
    * module graph that loaded the provider from the boot class path on the EDT
@@ -449,6 +442,13 @@ public final class JdkWarmUp {
     SystemFlavorMap.getDefaultFlavorMap();
   }
 
+  /**
+   * Breaks {@link #GLYPH_SAMPLE} into lines the way a wrapped multi-line tooltip does
+   * (WrappedPlainView through javax.swing.text.Utilities.getBreakLocation). The first line
+   * BreakIterator loads the JDK's line-break rules (RuleBasedBreakIterator and its resource data),
+   * which the character BreakIterator of {@link #warmUpTextLayout} does not; the first multi-line
+   * tooltip paid that on the EDT (Icebase #7c1eec7b21f2).
+   */
   static void warmUpLineBreaks() {
     BreakIterator lines = BreakIterator.getLineInstance();
     lines.setText(GLYPH_SAMPLE);
@@ -553,10 +553,6 @@ public final class JdkWarmUp {
   }
 
   /**
-   * The first NumberFormat in the JVM loads the locale provider and its number data. The splash
-   * window's progress percentage and GUIUtils' size and speed formats need one right away.
-   */
-  /**
    * The locale of every formatter made without one ({@code new DecimalFormat()}, {@code
    * NumberFormat.getInstance()}, {@code new SimpleDateFormat(pattern)}): the FORMAT category, which
    * differs from {@link Locale#getDefault()} when the system's region formats differ from its
@@ -568,6 +564,10 @@ public final class JdkWarmUp {
     return Locale.getDefault(Locale.Category.FORMAT);
   }
 
+  /**
+   * The first NumberFormat in the JVM loads the locale provider and its number data. The splash
+   * window's progress percentage and GUIUtils' size and speed formats need one right away.
+   */
   static void warmUpNumberFormat(Locale locale) {
     NumberFormat.getNumberInstance(locale).format(1234.5);
   }

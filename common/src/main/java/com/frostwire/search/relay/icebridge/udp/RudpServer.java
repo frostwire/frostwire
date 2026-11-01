@@ -43,11 +43,6 @@ public final class RudpServer implements AutoCloseable {
     private static final Logger LOG = Logger.getLogger(RudpServer.class);
 
     /**
-     * rUDP ingest workers. A small fixed pool is enough: {@link
-     * RudpSessionManager#onPacket} is globally synchronized, so extra threads only
-     * absorb bursty arrivals while keeping the Netty event loop free.
-     */
-    /**
      * A single ingest worker: Netty delivers datagrams for a channel on one event-loop thread in
      * order, and fragment reassembly depends on that ordering. More workers would reorder
      * DATA_FRAG/DATA_END frames across threads and break reassembly, and they could not process

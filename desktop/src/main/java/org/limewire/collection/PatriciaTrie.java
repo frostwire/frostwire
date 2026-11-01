@@ -1759,7 +1759,6 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
   }
 
   private class SubMap extends AbstractMap<K, V> implements SortedMap<K, V>, java.io.Serializable {
-    /** */
     /** The key to start from, null if the beginning. */
     K fromKey;
 

@@ -73,11 +73,6 @@ public class SkinFileChooserUI extends BaseFileChooserUI {
     return fileView;
   }
 
-  /**
-   * Custom file view implementation that returns system-specific file icons.
-   *
-   * @author Kirill Grouchnikov
-   */
   /** One worker for every chooser's icon lookups: a big folder must not flood a shared pool. */
   private static final ExecutorService ICON_LOOKUPS = WarmExecutors.serialQueue("FileChooserIcons");
 

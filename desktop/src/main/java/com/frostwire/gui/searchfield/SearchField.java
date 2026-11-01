@@ -161,7 +161,7 @@ public class SearchField extends JXSearchField {
     super.setDocument(doc);
   }
 
-  ///// from AutoCompleteTextField
+  // from AutoCompleteTextField
   // ----------------------------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------------------------
@@ -225,7 +225,7 @@ public class SearchField extends JXSearchField {
     return new StringTrieSet(true);
   }
 
-  /// from ClearableAutoComplete
+  // from ClearableAutoComplete
 
   /**
    * Gets whether the component is currently performing autocomplete lookups as keystrokes are

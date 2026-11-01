@@ -358,14 +358,6 @@ public final class PeerRegistrySync implements AutoCloseable {
     }
 
     /**
-     * Announce this node's capability bitmask to directory peers.
-     *
-     * <p>The mesh registry only learns a peer's role from an explicit {@code /register} or
-     * {@code /route}; a relay that only ever observed the peer's authenticated session records it
-     * as a bare CLIENT. Announcing capabilities over the mesh lets those relays correct the peer's
-     * advertised role/capabilities instead of treating it as capability-less forever.
-     */
-    /**
      * Advertise the OR of this node's leaves so a neighboring ultrapeer can skip a forward when
      * the query cannot be in this cluster. Leaves do not publish one — they have no leaves.
      */

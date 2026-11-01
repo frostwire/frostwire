@@ -25,7 +25,6 @@ public final class AssociationPreferencePaneItem extends AbstractPaneItem {
       I18n.tr(
           "You can use FrostWire to open certain filetypes and protocols. You can also instruct FrostWire to always regain these associations if another program takes them.");
 
-  /** a mapping of checkboxes to associations */
   /**
    * Whether each association was ours when last read or applied; compared with the check boxes
    * instead of reading the registry on the EDT. Empty until the first read arrives.

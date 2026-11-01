@@ -57,9 +57,6 @@ public final class IOCase implements Serializable {
      */
     public static final IOCase SYSTEM = new IOCase("System", !FilenameUtils.isSystemWindows());
     /**
-     * Serialization version.
-     */
-    /**
      * The enumeration name.
      */
     private final String name;

@@ -26,9 +26,6 @@ import java.io.IOException;
  * @since 2.0
  */
 public class FileExistsException extends IOException {
-    /**
-     * Defines the serial version UID.
-     */
 
     /**
      * Default Constructor.

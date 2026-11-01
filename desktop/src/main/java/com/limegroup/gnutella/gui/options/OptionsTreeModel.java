@@ -6,7 +6,6 @@ import javax.swing.tree.MutableTreeNode;
 
 /** This class creates the `TreeModel` used in the `JTree` of the options pane. */
 final class OptionsTreeModel extends DefaultTreeModel {
-  /** */
   /** Constant handle to the root node of the tree. */
   private OptionsTreeNode ROOT = null;
 

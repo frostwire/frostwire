@@ -42,7 +42,6 @@ public final class ButtonRow extends JPanel {
   /** This will give the button panel no glue, leaving the buttons in the middle. */
   public static final int NO_GLUE = 14;
 
-  /** */
   /** The array of `JButton`s. */
   private JButton[] _buttons;
 

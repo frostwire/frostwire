@@ -30,7 +30,6 @@ import java.util.Map;
  * added as extra information to the existing lines, instead of as brand new lines.
  */
 class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearchResult> {
-  /** */
   /** The columns. */
   private final SearchTableColumns COLUMNS = new SearchTableColumns();
 

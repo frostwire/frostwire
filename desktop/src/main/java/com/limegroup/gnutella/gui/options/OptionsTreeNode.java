@@ -33,7 +33,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * incur.
  */
 public class OptionsTreeNode extends DefaultMutableTreeNode {
-  /** */
   /** The key for uniquely identifying this node. */
   private final String _titleKey;
 

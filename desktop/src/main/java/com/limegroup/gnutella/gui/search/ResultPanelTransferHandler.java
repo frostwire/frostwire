@@ -6,7 +6,6 @@ import java.awt.dnd.DnDConstants;
 import javax.swing.*;
 
 class ResultPanelTransferHandler extends LimeTransferHandler {
-  /** */
   /** The ResultPanel this is handling. */
   private final SearchResultMediator panel;
 

@@ -26,7 +26,6 @@ import javax.swing.*;
  * returning the result is chattable.
  */
 public final class IconRenderer extends DefaultTableBevelledCellRenderer {
-  /** */
 
   /** The constructor sets this `JLabel` to be opaque and sets the border. */
   public IconRenderer() {

@@ -29,7 +29,6 @@ import javax.swing.*;
  * @author aldenml
  */
 public final class ActionIconAndNameRenderer extends DefaultTableBevelledCellRenderer {
-  /** */
 
   /**
    * Constructs a new IconAndNameRenderer with the Icon aligned to the left of the text, with a text

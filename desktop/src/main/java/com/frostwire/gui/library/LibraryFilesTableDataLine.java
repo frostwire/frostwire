@@ -252,7 +252,6 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
     paymentOptions = newPaymentOptions;
   }
 
-  /** Returns the file of this data line. */
   /** Whether the row is a file, not a directory, as of when the folder was read. */
   public boolean isRegularFile() {
     return regularFile;

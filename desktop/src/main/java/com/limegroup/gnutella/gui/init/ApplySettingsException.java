@@ -20,7 +20,6 @@ package com.limegroup.gnutella.gui.init;
 
 /** Signifies that an exception has occurred in applying a setting during setup. */
 class ApplySettingsException extends Exception {
-  /** */
 
   /**
    * Constructs an ApplySettingsException with the specified detail message. The error message

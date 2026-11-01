@@ -25,7 +25,6 @@ import javax.swing.event.HyperlinkListener;
 
 /** Extend `JScrollPane` so that a scrolled html file is shown */
 final class ScrollingTextPane extends JScrollPane {
-  /** */
   /** `JEditorPane` to show the text */
   private final JEditorPane EDITOR_PANE;
 

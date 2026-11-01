@@ -147,7 +147,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
 
   private JPanel centerPanel;
 
-  ///////////////////////////////////////////////////////////////////////////
+  // ------------------------------------------------------------------------
   //  Construction
   /// ////////////////////////////////////////////////////////////////////////
   private Component centerComponent;

@@ -6,7 +6,6 @@ import com.limegroup.gnutella.gui.actions.LimeAction;
 import java.awt.event.ActionEvent;
 
 public class ConfigureOptionsAction extends AbstractAction {
-  /** */
   /** Resource key to go to in the options window */
   private final String paneTitle;
 

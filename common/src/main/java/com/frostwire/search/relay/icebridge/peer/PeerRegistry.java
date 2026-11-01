@@ -135,12 +135,6 @@ public final class PeerRegistry {
     }
 
     /**
-     * Look up recent peers that advertise relay/forward capability.
-     *
-     * @param maxResults maximum number of records to return
-     * @return an immutable list of forward-capable peers
-     */
-    /**
      * Mesh forwarders for a RELAY flood: eligible peers (FORWARDER/BOTH roles)
      * in shuffled order with a best-effort per-/24 diversity cap, so repeated
      * floods against a large registry spread load instead of hammering the

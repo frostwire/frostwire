@@ -34,7 +34,6 @@ import javax.swing.undo.UndoManager;
 
 /** A better JTextField. */
 public class LimeTextField extends JTextField {
-  /** */
   /** The undo action. */
   private static final Action UNDO_ACTION =
       new FieldAction(I18n.tr("Undo")) {
@@ -214,7 +213,6 @@ public class LimeTextField extends JTextField {
 
   /** Base Action that all LimeTextField actions extend. */
   private abstract static class FieldAction extends AbstractAction {
-    /** */
 
     /** Constructs a new FieldAction looking up the name from the MessagesBundles. */
     FieldAction(String name) {
