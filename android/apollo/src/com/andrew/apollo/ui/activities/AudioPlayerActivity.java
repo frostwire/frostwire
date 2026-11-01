@@ -208,6 +208,7 @@ public final class AudioPlayerActivity extends AbstractActivity
       LOG.error("AudioPlayerActivity::onCreate() (handled) " + t.getMessage(), t);
     }
     LOG.info("AudioPlayerActivity::onCreate -> intent:" + getIntent());
+    MusicUtils.restorePendingTrackDelete(this, savedInstanceState);
 
     // Control the media volume
     setVolumeControlStream(AudioManager.STREAM_MUSIC);
@@ -412,6 +413,12 @@ public final class AudioPlayerActivity extends AbstractActivity
     if (MusicUtils.getQueue().length == 0) {
       finish();
     }
+  }
+
+  @Override
+  protected void onSaveInstanceState(final Bundle outState) {
+    super.onSaveInstanceState(outState);
+    MusicUtils.savePendingTrackDelete(outState);
   }
 
   @Override

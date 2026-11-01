@@ -34,6 +34,7 @@ import android.graphics.drawable.Drawable;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Looper;
 import android.provider.BaseColumns;
@@ -2501,6 +2502,49 @@ public final class MusicUtils {
         pendingTrackDelete = null;
       }
       LOG.error("deleteTracks: failed to launch MediaStore delete request", t);
+    }
+  }
+
+  private static final String PENDING_TRACK_DELETE_IDS = "com.andrew.apollo.pendingTrackDelete.ids";
+  private static final String PENDING_TRACK_DELETE_NOTIFY =
+      "com.andrew.apollo.pendingTrackDelete.notify";
+
+  /**
+   * Saves the songs waiting for Android's delete confirmation, so the answer can still clean them
+   * up if Android kills the app while its dialog is showing. Call from the activity's {@code
+   * onSaveInstanceState}; pair with {@link #restorePendingTrackDelete}.
+   */
+  public static void savePendingTrackDelete(final Bundle outState) {
+    if (outState == null) {
+      return;
+    }
+    synchronized (pendingTrackDeleteLock) {
+      if (pendingTrackDelete != null) {
+        outState.putLongArray(PENDING_TRACK_DELETE_IDS, pendingTrackDelete.trackIds);
+        outState.putBoolean(PENDING_TRACK_DELETE_NOTIFY, pendingTrackDelete.showNotification);
+      }
+    }
+  }
+
+  /**
+   * Restores what {@link #savePendingTrackDelete} saved, when this process no longer knows about a
+   * delete in progress (it was killed and restarted). The callbacks of the original screen are
+   * gone; the music lists refresh from MediaStore instead.
+   */
+  public static void restorePendingTrackDelete(final Context context, final Bundle savedState) {
+    if (context == null || savedState == null) {
+      return;
+    }
+    final long[] trackIds = savedState.getLongArray(PENDING_TRACK_DELETE_IDS);
+    if (trackIds == null || trackIds.length == 0) {
+      return;
+    }
+    synchronized (pendingTrackDeleteLock) {
+      if (pendingTrackDelete == null) {
+        pendingTrackDelete =
+            new PendingTrackDelete(
+                context, trackIds, savedState.getBoolean(PENDING_TRACK_DELETE_NOTIFY), null, null);
+      }
     }
   }
 

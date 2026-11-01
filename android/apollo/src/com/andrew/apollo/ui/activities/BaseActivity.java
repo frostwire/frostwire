@@ -123,6 +123,7 @@ public abstract class BaseActivity extends AbstractActivity {
   @Override
   protected void onCreate(final Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    MusicUtils.restorePendingTrackDelete(this, savedInstanceState);
     headerBanner = findViewById(R.id.activity_base_header_banner);
     HeaderBanner.onResumeHideOrUpdate(headerBanner);
 
@@ -216,6 +217,12 @@ public abstract class BaseActivity extends AbstractActivity {
     updatePlaybackControls();
     // Current info
     updateBottomActionBarInfo();
+  }
+
+  @Override
+  protected void onSaveInstanceState(final Bundle outState) {
+    super.onSaveInstanceState(outState);
+    MusicUtils.savePendingTrackDelete(outState);
   }
 
   @Override
