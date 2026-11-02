@@ -239,13 +239,11 @@ public final class GUIMediator {
         .checkAndGrabInBackground(
             BackgroundQueuedExecutorService::schedule, GUIMediator::safeInvokeLater);
     if (TipOfTheDayMessages.hasLocalizedMessages() && StartupSettings.SHOW_TOTD.getValue()) {
-      // Construct it first...
-      TipOfTheDayMediator.instance();
       ThreadExecutor.startThread(
           () -> {
-            // Warm the HTML engine off the EDT so the tip contents render
-            // promptly instead of paying parser class loading on first paint.
-            TipOfTheDayMediator.preloadHtmlEngine();
+            // Load the HTML engine and decode the dialog's icon off the EDT; the dialog is built
+            // below, on the EDT, once they are ready (GitHub #1462).
+            TipOfTheDayMediator.preloadResources();
             try {
               Thread.sleep(500);
             } catch (InterruptedException ignored) {

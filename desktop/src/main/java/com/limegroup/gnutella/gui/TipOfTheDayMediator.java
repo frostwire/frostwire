@@ -120,6 +120,21 @@ public final class TipOfTheDayMediator {
     return instance != null;
   }
 
+  /** The theme image shown beside the tips. */
+  static final String ICON_NAME = "question";
+
+  /**
+   * Does the slow parts of building and first rendering the dialog off the EDT: loads the HTML
+   * editor kit's classes (parser, DTD, CSS) and decodes the dialog's icon into the theme image
+   * cache. Decoding it while the EDT built the dialog waited on the toolkit's image fetcher, busy
+   * with the main window's images at startup (GitHub #1462). Safe to call from any thread; creates
+   * no components.
+   */
+  public static void preloadResources() {
+    preloadHtmlEngine();
+    GUIMediator.getThemeImage(ICON_NAME);
+  }
+
   /**
    * Instantiates the HTML editor kit off the EDT so its class loading (parser, DTD, CSS) does not
    * stall the first tip render. Safe to call from any thread; creates no components.
@@ -226,7 +241,7 @@ public final class TipOfTheDayMediator {
     centerPanel.setOpaque(true);
     centerPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
     // left column
-    JLabel iconLabel = new JLabel(GUIMediator.getThemeImage("question"));
+    JLabel iconLabel = new JLabel(GUIMediator.getThemeImage(ICON_NAME));
     _foreground = iconLabel.getForeground();
     iconLabel.setOpaque(false);
     iconLabel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));

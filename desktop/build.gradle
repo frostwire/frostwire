@@ -984,6 +984,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.VisibleCardLayoutTest"
         includeTestsMatching "com.limegroup.gnutella.gui.GridToolTipTest"
         includeTestsMatching "com.limegroup.gnutella.gui.MainSplashImageTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.TipOfTheDayPreloadTest"
         includeTestsMatching "com.limegroup.gnutella.gui.SplashWindowIconCacheTest"
         includeTestsMatching "com.limegroup.gnutella.gui.TipOfTheDayHtmlFontTest"
         includeTestsMatching "com.limegroup.gnutella.gui.StatusLineEngineNotReadyTest"
