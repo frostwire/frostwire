@@ -415,6 +415,34 @@ public final class MusicUtils {
     }
   }
 
+  /**
+   * Deletes a playlist from MediaStore on the MISC thread, then runs {@code onDeleted} on the main
+   * thread if it was deleted. On Android 11+ a playlist FrostWire doesn't own deletes nothing.
+   */
+  public static void deletePlaylistInBackground(
+      @NonNull final Context context, final long playlistId, final Runnable onDeleted) {
+    final Context appContext = getStableAppContext(context);
+    SystemUtils.postToHandler(
+        SystemUtils.HandlerThreadName.MISC,
+        () -> {
+          int deleted = 0;
+          try {
+            deleted = deletePlaylist(appContext, playlistId);
+          } catch (Throwable t) {
+            LOG.error(
+                "deletePlaylistInBackground: delete of playlist " + playlistId + " failed", t);
+          }
+          if (deleted > 0) {
+            refresh();
+            if (onDeleted != null) {
+              SystemUtils.postToUIThread(onDeleted);
+            }
+          } else {
+            LOG.warn("deletePlaylistInBackground: playlist " + playlistId + " was not deleted");
+          }
+        });
+  }
+
   /** Deletes a playlist from the MediaStore. */
   public static int deletePlaylist(@NonNull Context context, long playlistId) {
     if (context.getContentResolver() == null) {

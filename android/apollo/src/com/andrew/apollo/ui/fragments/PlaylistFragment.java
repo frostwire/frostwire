@@ -295,14 +295,18 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
 
   private void deleteSelectedPlaylist(long playlistId) {
     AppCompatActivity activity = (AppCompatActivity) getActivity();
-    if (activity != null && activity.getContentResolver() != null) {
-      int deleted = MusicUtils.deletePlaylist(activity, playlistId);
-      if (deleted > 0) {
-        MusicUtils.refresh();
-        restartLoader(true);
-        refresh();
-      }
+    if (activity == null) {
+      return;
     }
+    MusicUtils.deletePlaylistInBackground(
+        activity,
+        playlistId,
+        () -> {
+          if (isAdded()) {
+            restartLoader(true);
+            refresh();
+          }
+        });
   }
 
   public static class PlaylistFragmentDeleteDialog extends AbstractDialog {
