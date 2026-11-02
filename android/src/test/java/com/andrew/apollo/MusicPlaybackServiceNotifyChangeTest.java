@@ -17,9 +17,11 @@ import android.os.Looper;
 import androidx.test.core.app.ApplicationProvider;
 import com.frostwire.platform.Platform;
 import com.frostwire.platform.Platforms;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.time.Duration;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,6 +49,18 @@ public class MusicPlaybackServiceNotifyChangeTest {
                     "isUIThread".equals(method.getName())
                         ? Looper.myLooper() == Looper.getMainLooper()
                         : null));
+  }
+
+  /** The handler is static: left set, later tests would post their work to this test's thread. */
+  @After
+  public void stopThePlayerThread() throws Exception {
+    Field field = MusicPlaybackService.class.getDeclaredField("mPlayerHandler");
+    field.setAccessible(true);
+    Handler handler = (Handler) field.get(null);
+    if (handler != null) {
+      handler.getLooper().quitSafely();
+      field.set(null, null);
+    }
   }
 
   private static long queueChangedBroadcasts() {
