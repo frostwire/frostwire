@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:Transfers and switching back to FrostWire no longer freeze the window now and then while a background worker has to start again: those workers stay ready (#1466)
    - new:Distributed search results show the karma of the peer that shared them in a new Karma column, and the Peer Directory's Trust Score column is now Karma (same number, now sorted by value) (#1418)
    - fix:The first-run setup wizard no longer freezes on Windows as it appears: it no longer sets up drag-and-drop, which it never used (#1464)
    - fix:The main window no longer freezes on Windows as it first appears while FrostWire loads its file-association support — that now happens in the background (#1463)
