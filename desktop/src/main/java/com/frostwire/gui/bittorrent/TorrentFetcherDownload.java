@@ -257,11 +257,18 @@ public class TorrentFetcherDownload implements BTDownload {
         () -> BTDownloadMediator.instance().remove(TorrentFetcherDownload.this));
   }
 
+  /** Called on the fetcher's thread, which decodes the torrent: never on the EDT (#1468). */
   private void downloadTorrent(final byte[] data, final List<TcpEndpoint> peers) {
     if (VPNDropGuard.canUseBitTorrent()) {
+      final TorrentInfo ti;
+      try {
+        ti = TorrentInfo.bdecode(data);
+      } catch (Throwable e) {
+        LOG.error("Error downloading torrent", e);
+        return;
+      }
       if (relativePath != null) {
         try {
-          TorrentInfo ti = TorrentInfo.bdecode(data);
           boolean[] selection = calculateSelection(ti, relativePath);
           BTEngine.getInstance()
               .download(ti, null, selection, peers, true, distributedSourcePeerPub);
@@ -276,7 +283,7 @@ public class TorrentFetcherDownload implements BTDownload {
                 File saveFolder = null;
                 if (partial) {
                   PartialFilesDialog dlg =
-                      new PartialFilesDialog(GUIMediator.getAppFrame(), data, displayName);
+                      new PartialFilesDialog(GUIMediator.getAppFrame(), ti, displayName);
                   dlg.setVisible(true);
                   selection = dlg.getFilesSelection();
                   if (selection == null) {
@@ -284,8 +291,7 @@ public class TorrentFetcherDownload implements BTDownload {
                   }
                   saveFolder = dlg.getSaveFolder();
                 }
-                // Decode on EDT (fast), then offload expensive download() to background
-                TorrentInfo ti = TorrentInfo.bdecode(data);
+                // download() is libtorrent work: back to the background queue.
                 boolean[] finalSelection = selection;
                 File finalSaveFolder = saveFolder;
                 BackgroundQueuedExecutorService.schedule(

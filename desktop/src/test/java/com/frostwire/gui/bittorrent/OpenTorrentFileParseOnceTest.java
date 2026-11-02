@@ -88,5 +88,26 @@ class OpenTorrentFileParseOnceTest {
     assertFalse(
         dialog.contains("PartialFilesDialog(JFrameframe,FiletorrentFile)"),
         "PartialFilesDialog parses a .torrent file in its constructor, on the EDT");
+    assertFalse(
+        dialog.contains("PartialFilesDialog(JFrameframe,byte[]bytes,"),
+        "PartialFilesDialog bdecodes torrent bytes in its constructor, on the EDT");
+  }
+
+  /**
+   * A torrent fetched from a magnet or a URL was bdecoded twice on the EDT too: by the dialog's
+   * byte[] constructor and again before the download. The fetcher's thread decodes it once.
+   */
+  @Test
+  void aFetchedTorrentIsDecodedOnceOnTheFetchersThread() throws IOException {
+    String fetcher =
+        source("src/main/java/com/frostwire/gui/bittorrent/TorrentFetcherDownload.java");
+    String download =
+        between(fetcher, "privatevoiddownloadTorrent(", "privateboolean[]calculateSelection(");
+    assertEquals(1, count(download, "TorrentInfo.bdecode("), "the torrent is decoded once");
+    String onEdt = download.substring(download.indexOf("GUIMediator.safeInvokeLater("));
+    assertFalse(onEdt.contains("bdecode("), "the fetched torrent is decoded on the EDT");
+    assertTrue(
+        download.indexOf("TorrentInfo.bdecode(data)") < download.indexOf("if(relativePath!=null)"),
+        "the torrent is decoded before either path uses it");
   }
 }
