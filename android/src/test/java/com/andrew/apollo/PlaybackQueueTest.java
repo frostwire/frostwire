@@ -74,6 +74,42 @@ public class PlaybackQueueTest {
     player.release();
   }
 
+  /**
+   * Controllers (Android Auto, Wear, car screens) show the whole queue; every song in it carries
+   * its title, artist and album, not only the one playing (GitHub #1452).
+   */
+  @Test
+  public void everyQueuedSongCarriesItsTitle() {
+    queue.setMetadataLookup(
+        ids -> {
+          java.util.Map<Long, androidx.media3.common.MediaMetadata> found =
+              new java.util.HashMap<>();
+          for (long id : ids) {
+            found.put(
+                id,
+                new androidx.media3.common.MediaMetadata.Builder()
+                    .setTitle("song " + id)
+                    .setArtist("artist " + id)
+                    .build());
+          }
+          return found;
+        });
+
+    queue.open(new long[] {10, 20}, 0, 0);
+    queue.add(new long[] {30}, false);
+
+    assertEquals("song 20", String.valueOf(player.getMediaItemAt(1).mediaMetadata.title));
+    assertEquals("artist 30", String.valueOf(player.getMediaItemAt(2).mediaMetadata.artist));
+  }
+
+  @Test
+  public void withoutALookupTheQueueStillWorks() {
+    queue.open(new long[] {10, 20}, 0, 0);
+
+    assertEquals(2, player.getMediaItemCount());
+    assertEquals("20", player.getMediaItemAt(1).mediaId);
+  }
+
   @Test
   public void nextAndPreviousWrapAroundARepeatingQueue() {
     queue.setRepeatMode(MusicPlaybackService.REPEAT_ALL);

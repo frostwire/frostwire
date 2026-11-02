@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
+import androidx.media3.common.MediaMetadata;
 import androidx.media3.common.Player;
 import androidx.media3.common.Timeline;
 import androidx.media3.exoplayer.ExoPlayer;
@@ -21,7 +22,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -92,6 +95,8 @@ final class PlaybackQueue {
   private final Listener listener;
   private final Random random = new Random();
   private volatile Snapshot snapshot = Snapshot.EMPTY;
+
+  private volatile Function<long[], Map<Long, MediaMetadata>> metadataLookup;
 
   // Player thread only.
   private long currentSongId = -1;
@@ -488,10 +493,33 @@ final class PlaybackQueue {
     player.setShuffleOrder(new ShuffleOrder.DefaultShuffleOrder(shuffled, random.nextLong()));
   }
 
-  private static List<MediaItem> mediaItemsOf(long[] ids) {
+  /**
+   * Sets where queued songs get their title, artist, album and artwork, so controllers that show
+   * the whole queue (Android Auto, Wear, car screens) can name every song, not only the one
+   * playing. Called with the ids being queued, on the player thread; songs it leaves out are queued
+   * without metadata.
+   */
+  void setMetadataLookup(Function<long[], Map<Long, MediaMetadata>> lookup) {
+    metadataLookup = lookup;
+  }
+
+  private List<MediaItem> mediaItemsOf(long[] ids) {
+    Map<Long, MediaMetadata> metadata = null;
+    final Function<long[], Map<Long, MediaMetadata>> lookup = metadataLookup;
+    if (lookup != null && ids.length > 0) {
+      try {
+        metadata = lookup.apply(ids);
+      } catch (RuntimeException e) {
+        // Queue the songs without metadata; the playing one gets it when it starts.
+        metadata = null;
+      }
+    }
     final List<MediaItem> items = new ArrayList<>(ids.length);
     for (long id : ids) {
-      items.add(mediaItemOf(id));
+      final MediaItem item = mediaItemOf(id);
+      final MediaMetadata songMetadata = metadata != null ? metadata.get(id) : null;
+      items.add(
+          songMetadata != null ? item.buildUpon().setMediaMetadata(songMetadata).build() : item);
     }
     return items;
   }

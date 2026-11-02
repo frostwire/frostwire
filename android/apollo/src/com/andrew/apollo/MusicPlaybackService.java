@@ -46,6 +46,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
+import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AlbumColumns;
 import android.provider.MediaStore.Audio.AudioColumns;
@@ -57,6 +58,7 @@ import androidx.datastore.preferences.core.Preferences;
 import androidx.media3.common.AudioAttributes;
 import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
+import androidx.media3.common.MediaMetadata;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
 import androidx.media3.common.Timeline;
@@ -86,6 +88,7 @@ import java.net.URLDecoder;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
@@ -1221,7 +1224,7 @@ public class MusicPlaybackService extends MediaSessionService {
    */
   void attachPlayer(ExoPlayer exoPlayer) {
     mPlayer = new MultiPlayer(exoPlayer);
-    mQueue =
+    final PlaybackQueue queue =
         new PlaybackQueue(
             exoPlayer,
             new PlaybackQueue.Listener() {
@@ -1235,6 +1238,63 @@ public class MusicPlaybackService extends MediaSessionService {
                 songChanged(audioId);
               }
             });
+    // Every queued song carries its title, so controllers can show the whole queue (#1452).
+    queue.setMetadataLookup(ids -> songMetadata(this, ids));
+    mQueue = queue;
+  }
+
+  /** Songs per MediaStore query when looking up queued songs' metadata. */
+  private static final int METADATA_BATCH = 500;
+
+  /**
+   * Title, artist, album and album art of the MediaStore songs {@code ids}, for the queue's media
+   * items. One query per {@value #METADATA_BATCH} songs; songs MediaStore doesn't know are left
+   * out. Off the main thread.
+   */
+  static Map<Long, MediaMetadata> songMetadata(final Context context, final long[] ids) {
+    final Map<Long, MediaMetadata> found = new HashMap<>();
+    for (int from = 0; from < ids.length; from += METADATA_BATCH) {
+      final StringBuilder in = new StringBuilder();
+      for (int i = from; i < Math.min(ids.length, from + METADATA_BATCH); i++) {
+        if (in.length() > 0) {
+          in.append(',');
+        }
+        in.append(ids[i]);
+      }
+      try (Cursor cursor =
+          context
+              .getContentResolver()
+              .query(
+                  MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                  new String[] {
+                    BaseColumns._ID,
+                    AudioColumns.TITLE,
+                    AudioColumns.ARTIST,
+                    AudioColumns.ALBUM,
+                    AudioColumns.ALBUM_ID
+                  },
+                  BaseColumns._ID + " IN (" + in + ")",
+                  null,
+                  null)) {
+        while (cursor != null && cursor.moveToNext()) {
+          final MediaMetadata.Builder metadata =
+              new MediaMetadata.Builder()
+                  .setTitle(cursor.getString(1))
+                  .setArtist(cursor.getString(2))
+                  .setAlbumTitle(cursor.getString(3));
+          final long albumId = cursor.getLong(4);
+          if (albumId > 0) {
+            metadata.setArtworkUri(
+                ContentUris.withAppendedId(
+                    Uri.parse("content://media/external/audio/albumart"), albumId));
+          }
+          found.put(cursor.getLong(0), metadata.build());
+        }
+      } catch (Throwable t) {
+        LOG.warn("songMetadata: MediaStore query failed: " + t.getMessage());
+      }
+    }
+    return found;
   }
 
   /** On the player thread: another song is current, so its metadata, Recent and notification. */
