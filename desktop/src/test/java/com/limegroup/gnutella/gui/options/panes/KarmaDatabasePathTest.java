@@ -15,9 +15,10 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 
 /**
- * The Options panes must read the karma chain from the database the writer appends to ({@code
- * Initializer.startRelayStack}: {@code settingsDir/libtorrent/frostwire-shared-torrents.db}), or
- * they show "(no karma database)" or a score of 0 (frostwire/frostwire#1412).
+ * The Karma pane must read the karma chain from the database the writer appends to ({@code
+ * Initializer.startRelayStack}: {@code settingsDir/libtorrent/frostwire-shared-torrents.db}), or it
+ * shows "(no karma database)" or a score of 0 (frostwire/frostwire#1412). The Identity pane no
+ * longer reads the chain: it shows PeerDirectory.displayKarma (frostwire/frostwire#1418).
  */
 public class KarmaDatabasePathTest {
 
@@ -38,10 +39,5 @@ public class KarmaDatabasePathTest {
   @Test
   public void karmaPaneReadsTheWriterDatabase() {
     assertEquals(writerDbFile(), KarmaSettingsPaneItem.karmaDbFile(SETTINGS_DIR));
-  }
-
-  @Test
-  public void identityPaneReadsTheWriterDatabase() {
-    assertEquals(writerDbFile(), IdentitySettingsPaneItem.karmaDbFile(SETTINGS_DIR));
   }
 }
