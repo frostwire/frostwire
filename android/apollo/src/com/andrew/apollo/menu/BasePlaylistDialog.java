@@ -32,6 +32,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import androidx.fragment.app.DialogFragment;
+import com.andrew.apollo.format.Capitalize;
 import com.andrew.apollo.ui.fragments.PlaylistFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
@@ -197,7 +198,8 @@ abstract class BasePlaylistDialog extends DialogFragment {
           SystemUtils.HandlerThreadName.MISC,
           () -> {
             int saveButtonResourceTextId =
-                MusicUtils.getIdForPlaylist(mCachedActivity, playlistName) >= 0
+                MusicUtils.getIdForPlaylist(mCachedActivity, Capitalize.capitalize(playlistName))
+                        >= 0
                     ? R.string.overwrite
                     : R.string.save;
             SystemUtils.postToUIThread(() -> mSaveButton.setText(saveButtonResourceTextId));

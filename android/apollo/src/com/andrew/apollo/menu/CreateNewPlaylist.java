@@ -29,6 +29,7 @@ import com.andrew.apollo.utils.MusicUtils;
 import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.util.Logger;
 
 /**
  * @author Andrew Neal (andrewdneal@gmail.com) TODO - The playlist names are automatically
@@ -37,6 +38,8 @@ import com.frostwire.android.util.SystemUtils;
  */
 @SuppressWarnings("deprecation")
 public final class CreateNewPlaylist extends BasePlaylistDialog {
+
+  private static final Logger LOG = Logger.getLogger(CreateNewPlaylist.class);
 
   // The playlist list
   private long[] mPlaylistList = new long[] {};
@@ -117,16 +120,33 @@ public final class CreateNewPlaylist extends BasePlaylistDialog {
     savePlaylist(appContext, playlistName, playlistList);
   }
 
-  private void savePlaylist(Context appContext, String playlistName, long[] playlistList) {
-    final int playlistId = (int) MusicUtils.getIdForPlaylist(appContext, playlistName);
-    if (playlistId >= 0) {
-      MusicUtils.clearPlaylist(appContext, playlistId);
-      MusicUtils.addToPlaylistSilently(appContext, playlistList, playlistId);
-    } else {
-      final long newId = MusicUtils.createPlaylist(appContext, Capitalize.capitalize(playlistName));
-      MusicUtils.addToPlaylistSilently(appContext, playlistList, newId);
+  /**
+   * Saves {@code songs} as the playlist named {@code typedName}, capitalized as playlists are
+   * created. An existing playlist of that name is overwritten (the dialog's button then reads
+   * "Overwrite"); otherwise a new one is created. Off the main thread.
+   *
+   * @return the playlist's id, or -1 when it could not be created
+   */
+  static long saveSongsAsPlaylist(Context appContext, String typedName, long[] songs) {
+    final String name = Capitalize.capitalize(typedName);
+    final long existingId = MusicUtils.getIdForPlaylist(appContext, name);
+    if (existingId >= 0) {
+      MusicUtils.clearPlaylist(appContext, (int) existingId);
+      MusicUtils.addToPlaylistSilently(appContext, songs, existingId);
+      return existingId;
     }
-    final int added = playlistList != null ? playlistList.length : 0;
+    final long newId = MusicUtils.createPlaylist(appContext, name);
+    if (newId < 0) {
+      LOG.error("saveSongsAsPlaylist: could not create playlist " + name);
+      return -1;
+    }
+    MusicUtils.addToPlaylistSilently(appContext, songs, newId);
+    return newId;
+  }
+
+  private void savePlaylist(Context appContext, String playlistName, long[] playlistList) {
+    final boolean saved = saveSongsAsPlaylist(appContext, playlistName, playlistList) >= 0;
+    final int added = saved && playlistList != null ? playlistList.length : 0;
     final String message =
         added > 0
             ? appContext
