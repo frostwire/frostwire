@@ -737,14 +737,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I> exte
     }
   }
 
-  @Override
-  public void onPause() {
-    super.onPause();
-    if (mAdapter != null) {
-      mAdapter.flush();
-    }
-  }
-
   public void restartLoader() {
     restartLoader(false);
   }
@@ -881,20 +873,10 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I> exte
     initAbsListView(mListView);
   }
 
-  /** Pause disk cache access to ensure smoother scrolling */
-  final VerticalScrollListener.ScrollableHeader mScrollableHeader =
-      new VerticalScrollListener.ScrollableHeader() {
-        @Override
-        public void onScrollStateChanged(final AbsListView view, final int scrollState) {
-          // Pause disk cache access to ensure smoother scrolling
-          if (mAdapter == null) {
-            return;
-          }
-          mAdapter.setPauseDiskCache(
-              scrollState == AbsListView.OnScrollListener.SCROLL_STATE_FLING
-                  || scrollState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL);
-        }
-      };
+  /**
+   * Scroll events for the header; images load with FWImageLoader, so there is no cache to pause.
+   */
+  final VerticalScrollListener.ScrollableHeader mScrollableHeader = (view, scrollState) -> {};
 
   /**
    * Scrolls the list to the currently playing song when the user touches the header in the

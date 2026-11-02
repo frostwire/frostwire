@@ -510,9 +510,6 @@ public final class AudioPlayerActivity extends AbstractActivity
   protected void onStop() {
     super.onStop();
     MusicUtils.notifyForegroundStateChanged(this, false);
-    if (mImageFetcher != null) {
-      mImageFetcher.flush();
-    }
   }
 
   @SuppressWarnings("CatchMayIgnoreException")

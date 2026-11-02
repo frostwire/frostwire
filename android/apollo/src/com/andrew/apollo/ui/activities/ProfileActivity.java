@@ -216,7 +216,6 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
   @Override
   protected void onPause() {
     super.onPause();
-    mImageFetcher.flush();
   }
 
   @Override

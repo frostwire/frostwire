@@ -41,7 +41,6 @@ public abstract class ImageWorker {
   Context mContext;
 
   /** Disk and memory caches */
-  ImageCache mImageCache;
 
   /**
    * Constructor of <code>ImageWorker</code>
@@ -67,22 +66,6 @@ public abstract class ImageWorker {
       }
     } else {
       mDefault = null;
-    }
-  }
-
-  /**
-   * Set the {@link ImageCache} object to use with this ImageWorker.
-   *
-   * @param cacheCallback new {@link ImageCache} object.
-   */
-  public void setImageCache(final ImageCache cacheCallback) {
-    mImageCache = cacheCallback;
-  }
-
-  /** flush() is called to synchronize up other methods that are accessing the cache first */
-  public void flush() {
-    if (mImageCache != null) {
-      mImageCache.flush();
     }
   }
 
@@ -132,7 +115,7 @@ public abstract class ImageWorker {
     if (imageView == null) {
       return;
     }
-    if (key == null || mImageCache == null) {
+    if (key == null) {
       imageView.setImageResource(R.drawable.default_artwork);
       return;
     }

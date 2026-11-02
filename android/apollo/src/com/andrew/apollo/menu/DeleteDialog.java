@@ -28,8 +28,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import androidx.fragment.app.DialogFragment;
 import com.andrew.apollo.Config;
-import com.andrew.apollo.cache.ImageFetcher;
-import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 
@@ -55,9 +53,6 @@ public final class DeleteDialog extends DialogFragment {
 
   /** The item(s) to delete */
   private long[] mItemList;
-
-  /** The image cache */
-  private ImageFetcher mFetcher;
 
   private DeleteDialogCallback onDeleteCallback;
   private DeleteDialogPreDeleteCallback preDeleteCallback;
@@ -96,8 +91,6 @@ public final class DeleteDialog extends DialogFragment {
     final Bundle arguments = getArguments();
     // Get the track(s) to delete
     mItemList = arguments.getLongArray("items");
-    //   Initialize the image cache
-    mFetcher = ApolloUtils.getImageFetcher(getActivity());
 
     final AlertDialog.Builder apolloDeleteFilesDialog = new AlertDialog.Builder(getActivity());
     LayoutInflater inflater = LayoutInflater.from(getActivity());
@@ -141,10 +134,6 @@ public final class DeleteDialog extends DialogFragment {
 
     @Override
     public void onClick(View view) {
-      // Remove the items from the image cache
-      if (mFetcher != null) {
-        mFetcher.removeFromCache(key);
-      }
       final Activity activityRef = getActivity();
       final long[] deletedIds = mItemList;
       final DeleteDialogPreDeleteCallback confirmedCallback = preDeleteCallback;

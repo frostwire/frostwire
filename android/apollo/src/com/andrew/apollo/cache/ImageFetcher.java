@@ -115,34 +115,6 @@ public class ImageFetcher extends ImageWorker {
   }
 
   /**
-   * @param pause True to temporarily pause the disk cache, false otherwise.
-   */
-  public void setPauseDiskCache(final boolean pause) {
-    if (mImageCache != null) {
-      mImageCache.setPauseDiskCache(pause);
-    }
-  }
-
-  /**
-   * @param key The key used to find the image to remove
-   */
-  public void removeFromCache(final String key) {
-    if (mImageCache != null) {
-      mImageCache.removeFromCache(key);
-    }
-  }
-
-  /**
-   * @param key The key used to find the image to return
-   */
-  public Bitmap getCachedBitmap(final String key) {
-    if (mImageCache != null) {
-      return mImageCache.getCachedBitmap(key);
-    }
-    return getDefaultArtwork();
-  }
-
-  /**
    * Finds cached or downloads album art. Used in {@link MusicPlaybackService} to set the current
    * album art in the notification and lock screen
    *
@@ -152,20 +124,8 @@ public class ImageFetcher extends ImageWorker {
    * @return The album art as an {@link Bitmap}
    */
   public Bitmap getArtwork(final String albumName, final long albumId, final String artistName) {
-    // Check the disk cache
-    Bitmap artwork = null;
-
-    if (albumName != null && mImageCache != null) {
-      artwork = mImageCache.getBitmapFromDiskCache(generateAlbumCacheKey(albumName, artistName));
-    }
-    if (artwork == null && albumId >= 0 && mImageCache != null) {
-      // Check for local artwork
-      artwork = mImageCache.getArtworkFromFile(mContext, albumId);
-    }
-    if (artwork != null) {
-      return artwork;
-    }
-    return getDefaultArtwork();
+    final Bitmap artwork = AlbumArtwork.decode(mContext, albumId);
+    return artwork != null ? artwork : getDefaultArtwork();
   }
 
   /**

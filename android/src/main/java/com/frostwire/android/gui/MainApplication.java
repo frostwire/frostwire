@@ -21,7 +21,6 @@ package com.frostwire.android.gui;
 import android.app.Application;
 import android.content.Context;
 import android.os.Build;
-import com.andrew.apollo.cache.ImageCache;
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.core.ConfigurationManager;
@@ -188,7 +187,6 @@ public class MainApplication extends Application {
 
   @Override
   public void onLowMemory() {
-    ImageCache.getInstance(this).evictAll();
     // Runs on the main thread: free memory only. clear() also wiped the disk cache here (#1389).
     FWImageLoader loader = FWImageLoader.getInstanceIfExists();
     if (loader != null) {

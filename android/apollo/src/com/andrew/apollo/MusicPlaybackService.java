@@ -64,7 +64,6 @@ import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.session.MediaNotification;
 import androidx.media3.session.MediaSession;
 import androidx.media3.session.MediaSessionService;
-import com.andrew.apollo.cache.ImageCache;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.provider.FavoritesStore;
 import com.andrew.apollo.provider.RecentStore;
@@ -1003,7 +1002,6 @@ public class MusicPlaybackService extends MediaSessionService {
     mRecentsCache = RecentStore.getInstance(this);
 
     mImageFetcher = ImageFetcher.getInstance(this);
-    mImageFetcher.setImageCache(ImageCache.getInstance(this));
 
     mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 

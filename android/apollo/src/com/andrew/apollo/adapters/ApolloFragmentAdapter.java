@@ -130,12 +130,6 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
     notifyDataSetChanged();
   }
 
-  public void flush() {
-    if (mImageFetcher != null) {
-      mImageFetcher.flush();
-    }
-  }
-
   /**
    * Shows a copy of {@code data}. The list belongs to the loader, which delivers the same list
    * again when the screen comes back; the adapter kept it by reference, so {@link #unload()}
@@ -200,15 +194,6 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
       convertView.setTag(holder);
     }
     return convertView;
-  }
-
-  /**
-   * @param pause True to temporarily pause the disk cache, false otherwise.
-   */
-  public void setPauseDiskCache(final boolean pause) {
-    if (mImageFetcher != null) {
-      mImageFetcher.setPauseDiskCache(pause);
-    }
   }
 
   /** {@inheritDoc} */

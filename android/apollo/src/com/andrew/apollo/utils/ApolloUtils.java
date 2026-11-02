@@ -35,7 +35,7 @@ import android.view.View;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.Toast;
 import com.andrew.apollo.Config;
-import com.andrew.apollo.cache.ImageCache;
+import com.andrew.apollo.cache.AlbumArtwork;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.ui.activities.ShortcutActivity;
 import com.devspark.appmsg.AppMsg;
@@ -128,15 +128,41 @@ public final class ApolloUtils {
   }
 
   /**
-   * Creates a new instance of the {@link ImageCache} and {@link ImageFetcher}
+   * The shared {@link ImageFetcher}
    *
    * @param activity The {@link Activity} to use.
    * @return A new {@link ImageFetcher} used to fetch images asynchronously.
    */
   public static ImageFetcher getImageFetcher(final Activity activity) {
-    final ImageFetcher imageFetcher = ImageFetcher.getInstance(activity);
-    imageFetcher.setImageCache(ImageCache.findOrCreateCache(activity));
-    return imageFetcher;
+    return ImageFetcher.getInstance(activity);
+  }
+
+  /**
+   * The album whose artwork a home-screen shortcut shows: the album itself, an artist's last played
+   * album, or the first song on an album of a playlist or genre. -1 if none. Queries MediaStore;
+   * call it off the main thread.
+   */
+  @SuppressWarnings("deprecation") // MediaStore.Audio.Playlists, still how Apollo stores playlists
+  static long shortcutAlbumId(
+      final Context context,
+      final String mimeType,
+      final long id,
+      final String displayName,
+      final String artistName) {
+    if (MediaStore.Audio.Albums.CONTENT_TYPE.equals(mimeType)) {
+      return id;
+    }
+    if (MediaStore.Audio.Artists.CONTENT_TYPE.equals(mimeType)) {
+      final String lastAlbum = MusicUtils.getLastAlbumForArtist(context, displayName);
+      return lastAlbum != null ? MusicUtils.getIdForAlbum(context, lastAlbum, displayName) : -1;
+    }
+    final long[] songs =
+        MediaStore.Audio.Playlists.CONTENT_TYPE.equals(mimeType)
+            ? MusicUtils.getSongListForPlaylist(context, id)
+            : MediaStore.Audio.Genres.CONTENT_TYPE.equals(mimeType)
+                ? MusicUtils.getSongListForGenre(context, id)
+                : null;
+    return SongArtwork.firstAlbumId(songs, songId -> MusicUtils.getAlbumIdForSong(context, songId));
   }
 
   /**
@@ -163,13 +189,11 @@ public final class ApolloUtils {
           Bitmap bitmap;
           boolean success = true;
           try {
-            if (mimeType.equals(MediaStore.Audio.Albums.CONTENT_TYPE)) {
-              bitmap =
-                  fetcher.getCachedBitmap(
-                      ImageFetcher.generateAlbumCacheKey(displayName, artistName));
-            } else {
-              bitmap = fetcher.getCachedBitmap(displayName);
-            }
+            // The real artwork; it was looked up in a cache nothing ever wrote (#1461).
+            bitmap =
+                AlbumArtwork.decode(
+                    context.get(),
+                    shortcutAlbumId(context.get(), mimeType, id, displayName, artistName));
             if (bitmap == null) {
               bitmap = fetcher.getDefaultArtwork();
             }

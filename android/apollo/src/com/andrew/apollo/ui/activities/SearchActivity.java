@@ -227,12 +227,7 @@ public final class SearchActivity extends AbstractActivity
 
   @Override
   public void onScrollStateChanged(final AbsListView view, final int scrollState) {
-    // Pause disk cache access to ensure smoother scrolling
-    if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_FLING
-        || scrollState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
-      mAdapter.setPauseDiskCache(true);
-    } else {
-      mAdapter.setPauseDiskCache(false);
+    if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE) {
       mAdapter.notifyDataSetChanged();
     }
   }
@@ -457,15 +452,6 @@ public final class SearchActivity extends AbstractActivity
     @Override
     public int getViewTypeCount() {
       return VIEW_TYPE_COUNT;
-    }
-
-    /**
-     * @param pause True to temporarily pause the disk cache, false otherwise.
-     */
-    void setPauseDiskCache(final boolean pause) {
-      if (mImageFetcher != null) {
-        mImageFetcher.setPauseDiskCache(pause);
-      }
     }
 
     /**
