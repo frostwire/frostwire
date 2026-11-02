@@ -19,6 +19,7 @@
 package com.limegroup.gnutella.gui;
 
 import com.frostwire.util.InMemoryImageIO;
+import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.notify.NotifyUserProxy;
 import com.limegroup.gnutella.settings.ApplicationSettings;
@@ -29,6 +30,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -55,6 +57,8 @@ public final class ResourceManager {
    * Cache of theme images (name as String -> image as ImageIcon). Limited to 200 entries to prevent
    * unbounded growth. Uses LRU eviction policy via FixedsizeForgetfulHashMap.
    */
+  private static final Logger LOG = Logger.getLogger(ResourceManager.class);
+
   private static final Map<String, ImageIcon> THEME_IMAGES = new FixedsizeForgetfulHashMap<>(200);
 
   /** Instance of this `ResourceManager`, following singleton. */
@@ -120,6 +124,28 @@ public final class ResourceManager {
   /** Resets the failure flag */
   static void resetLoadFailure() {
     loadFailureEncountered = false;
+  }
+
+  /**
+   * The theme images that exist only as GIFs, which load through Toolkit and make the ImageIcon
+   * constructor wait for the image fetcher thread. Built on the EDT with the Transfers tab, that
+   * wait froze the window (Icebase #c6d108968951, frostwire/frostwire#1470).
+   */
+  static final List<String> ANIMATED_THEME_IMAGES =
+      List.of("indeterminate_small_progress", "downloading");
+
+  /**
+   * Loads {@link #ANIMATED_THEME_IMAGES} into the theme-image cache. Call it off the EDT, at
+   * startup before the main window is built, so the EDT finds them cached.
+   */
+  static void preloadAnimatedThemeImages() {
+    for (String name : ANIMATED_THEME_IMAGES) {
+      try {
+        getThemeImage(name);
+      } catch (RuntimeException e) {
+        LOG.warn("Could not preload theme image " + name, e);
+      }
+    }
   }
 
   /**
@@ -199,8 +225,10 @@ public final class ResourceManager {
   }
 
   /**
-   * Creates an ImageIcon with deferred image loading to avoid blocking the EDT. Uses
-   * Toolkit.getDefaultToolkit().getImage() which loads asynchronously.
+   * Creates an ImageIcon from a Toolkit image, which keeps a GIF's animation. The ImageIcon
+   * constructor still waits (MediaTracker) until the image fetcher thread has decoded the image, so
+   * the theme images that load this way are preloaded off the EDT: {@link
+   * #preloadAnimatedThemeImages()}.
    */
   private static ImageIcon createDeferredImageIcon(URL url) {
     Image image = Toolkit.getDefaultToolkit().getImage(url);

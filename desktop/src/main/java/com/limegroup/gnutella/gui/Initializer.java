@@ -351,6 +351,9 @@ final class Initializer {
     // Pre-load header button background images to avoid MediaTracker blocking the EDT during
     // MainFrame construction
     ApplicationHeader.preloadImages();
+    // The animated GIF icons wait for the image fetcher thread too (the Transfers tab's seeding
+    // spinner, the search tab's spinner).
+    ResourceManager.preloadAnimatedThemeImages();
 
     // Load up the HTML engine (DTD, default style sheet) on this thread: parsing the DTD for a
     // throwaway HTML label on the EDT stalled it for seconds on slow machines.

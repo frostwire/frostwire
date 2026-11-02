@@ -971,6 +971,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.icebridge.*"
         includeTestsMatching "com.limegroup.gnutella.gui.ResourceManagerImageLoadingTest"
         includeTestsMatching "com.limegroup.gnutella.gui.ResourceManagerImageCacheTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.ResourceManagerAnimatedImagePreloadTest"
         includeTestsMatching "com.limegroup.gnutella.gui.NativeFileIconControllerTest"
         includeTestsMatching "com.limegroup.gnutella.gui.IconManagerNativeInitTest"
         includeTestsMatching "com.limegroup.gnutella.gui.NativeUiChooserTest"
