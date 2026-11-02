@@ -152,6 +152,25 @@ public final class JdkWarmUp {
           "javax.swing.PopupFactory");
 
   /**
+   * Windows-only JDK classes initialized like {@link #CLASSES_TO_INITIALIZE}. The first right-click
+   * on the tray icon created the AWT popup menu's peer, and WPopupMenuPeer's superclass
+   * WMenuItemPeer looked up AWT's localization bundle in its static initializer on the EDT (Icebase
+   * #4be674f95823, frostwire/frostwire#1469). Initializing the class initializes its superclasses.
+   */
+  static final List<String> WINDOWS_CLASSES_TO_INITIALIZE =
+      List.of("sun.awt.windows.WPopupMenuPeer");
+
+  /** The classes the warm-up initializes: the Windows-only ones too when {@code windows}. */
+  static List<String> classesToInitialize(boolean windows) {
+    if (!windows) {
+      return CLASSES_TO_INITIALIZE;
+    }
+    List<String> classes = new ArrayList<>(CLASSES_TO_INITIALIZE);
+    classes.addAll(WINDOWS_CLASSES_TO_INITIALIZE);
+    return classes;
+  }
+
+  /**
    * FrostWire packages whose classes the splash window paints with, loaded before it shows like the
    * other splash steps: the skin's progress bar painter (SkinProgressBarPainter) builds its shape
    * with ShapeGenerator, which the splash's first paint read from the jar on the EDT.
@@ -297,7 +316,7 @@ public final class JdkWarmUp {
     } catch (Throwable t) {
       LOG.warn("UI delegate warm-up failed: " + t.getMessage(), t);
     }
-    for (String className : CLASSES_TO_INITIALIZE) {
+    for (String className : classesToInitialize(OSUtils.isWindows())) {
       try {
         Class.forName(className);
       } catch (Throwable t) {

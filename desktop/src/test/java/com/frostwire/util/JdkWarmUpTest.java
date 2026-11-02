@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import com.frostwire.gui.theme.PlatformFonts;
 import java.awt.Color;
@@ -121,6 +122,28 @@ class JdkWarmUpTest {
   @Test
   void everyClassToInitializeExistsAndLoads() {
     for (String className : JdkWarmUp.CLASSES_TO_INITIALIZE) {
+      assertDoesNotThrow(() -> Class.forName(className), className);
+    }
+  }
+
+  /**
+   * The first right-click on the Windows tray icon created the AWT popup menu's peer, whose static
+   * initializers (WPopupMenuPeer, WMenuPeer, WMenuItemPeer) looked up AWT's localization bundle on
+   * the EDT (Icebase #4be674f95823, frostwire/frostwire#1469).
+   */
+  @Test
+  void theWindowsTrayMenuPeerIsInitializedOnlyOnWindows() {
+    assertTrue(
+        JdkWarmUp.classesToInitialize(true).contains("sun.awt.windows.WPopupMenuPeer"),
+        "the tray menu's peer is not warmed up on Windows");
+    assertTrue(JdkWarmUp.classesToInitialize(true).containsAll(JdkWarmUp.CLASSES_TO_INITIALIZE));
+    assertEquals(JdkWarmUp.CLASSES_TO_INITIALIZE, JdkWarmUp.classesToInitialize(false));
+  }
+
+  @Test
+  void everyWindowsClassToInitializeExistsAndLoadsOnWindows() {
+    assumeTrue(OSUtils.isWindows(), "sun.awt.windows exists only in Windows JDKs");
+    for (String className : JdkWarmUp.classesToInitialize(true)) {
       assertDoesNotThrow(() -> Class.forName(className), className);
     }
   }
