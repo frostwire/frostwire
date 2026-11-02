@@ -8,6 +8,8 @@
 package com.andrew.apollo.adapters;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import android.app.Application;
@@ -63,13 +65,34 @@ public class PagerAdapterChildManagerTest {
 
     PagerAdapter adapter = new PagerAdapter(activity, host.getChildFragmentManager());
     adapter.add(Page.class, null);
+    assertNull("not built yet: no detached stand-in", adapter.getFragment(0));
     adapter.startUpdate(host.pages);
     Object page = adapter.instantiateItem(host.pages, 0);
     adapter.finishUpdate(host.pages);
     ShadowLooper.idleMainLooper();
 
     assertTrue(host.getChildFragmentManager().getFragments().contains(page));
+    assertSame("the page the pager built", page, adapter.getFragment(0));
     assertFalse(activity.getSupportFragmentManager().getFragments().contains(page));
+  }
+
+  /** getFragment can return null now; no caller may use its result unchecked. */
+  @Test
+  public void everyCallerChecksThePage() throws Exception {
+    for (String file :
+        new String[] {
+          "apollo/src/com/andrew/apollo/ui/fragments/phone/MusicBrowserPhoneFragment.java",
+          "apollo/src/com/andrew/apollo/ui/activities/ProfileActivity.java",
+          "apollo/src/com/andrew/apollo/ui/activities/AudioPlayerActivity.java"
+        }) {
+      String source =
+          new String(
+                  Files.readAllBytes(Path.of(System.getProperty("user.dir")).resolve(file)),
+                  StandardCharsets.UTF_8)
+              .replaceAll("\\s+", "");
+      assertFalse(
+          file, source.matches("(?s).*\\([A-Za-z]+Fragment\\)mPagerAdapter\\.getFragment.*"));
+    }
   }
 
   /** Source check: the browser needs the music library and its loaders. */

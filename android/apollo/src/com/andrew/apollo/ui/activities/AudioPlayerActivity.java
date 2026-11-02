@@ -372,7 +372,7 @@ public final class AudioPlayerActivity extends AbstractActivity
     if (itemId == R.id.menu_player_shuffle) { // Shuffle all the songs
       MusicUtils.shuffleAll(this);
       // Refresh the queue
-      ((QueueFragment) mPagerAdapter.getFragment(0)).refreshQueue();
+      refreshQueueFragment();
       return true;
     } else if (itemId
         == R.id
@@ -409,7 +409,7 @@ public final class AudioPlayerActivity extends AbstractActivity
 
   @Override
   public void onDelete(long[] ids) {
-    ((QueueFragment) mPagerAdapter.getFragment(0)).refreshQueue();
+    refreshQueueFragment();
     if (MusicUtils.getQueue().length == 0) {
       finish();
     }
@@ -453,7 +453,7 @@ public final class AudioPlayerActivity extends AbstractActivity
       waitingToInitAlbumArtBanner.set(false);
       updatePlaybackControls();
       updateNowPlayingInfo();
-      ((QueueFragment) mPagerAdapter.getFragment(0)).refreshQueue();
+      refreshQueueFragment();
       loadCurrentAlbumArt();
     }
   }
@@ -465,7 +465,7 @@ public final class AudioPlayerActivity extends AbstractActivity
     // Current info
     updateNowPlayingInfo();
     // Refresh the queue
-    ((QueueFragment) mPagerAdapter.getFragment(0)).refreshQueue();
+    refreshQueueFragment();
     loadCurrentAlbumArt();
 
     onNewIntent(intentFromFileExplorer);
@@ -902,7 +902,7 @@ public final class AudioPlayerActivity extends AbstractActivity
       // Make sure to process intent only once
       setIntent(new Intent());
       // Refresh the queue
-      ((QueueFragment) mPagerAdapter.getFragment(0)).refreshQueue();
+      refreshQueueFragment();
     }
   }
 
@@ -925,11 +925,27 @@ public final class AudioPlayerActivity extends AbstractActivity
     }
   }
 
+  /** The queue page, or null if the pager hasn't built it (#1456). */
+  private QueueFragment queueFragment() {
+    return mPagerAdapter != null && mPagerAdapter.getFragment(0) instanceof QueueFragment queue
+        ? queue
+        : null;
+  }
+
+  private void refreshQueueFragment() {
+    final QueueFragment qFragment = queueFragment();
+    if (qFragment != null) {
+      qFragment.refreshQueue();
+    }
+  }
+
   private void updateQueueFragmentCurrentSong() {
     runOnUiThread(
         () -> {
-          final QueueFragment qFragment = (QueueFragment) mPagerAdapter.getFragment(0);
-          qFragment.notifyAdapterDataSetChanged();
+          final QueueFragment qFragment = queueFragment();
+          if (qFragment != null) {
+            qFragment.notifyAdapterDataSetChanged();
+          }
         });
   }
 
@@ -1373,7 +1389,10 @@ public final class AudioPlayerActivity extends AbstractActivity
 
         @Override
         public void onClick(final View v) {
-          ((QueueFragment) mPagerAdapter.getFragment(0)).scrollToCurrentSong();
+          final QueueFragment qFragment = queueFragment();
+          if (qFragment != null) {
+            qFragment.scrollToCurrentSong();
+          }
         }
       };
 

@@ -38,6 +38,7 @@ import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.menu.FragmentMenuItems;
 import com.andrew.apollo.ui.fragments.TabFragmentOrder;
 import com.andrew.apollo.ui.fragments.profile.AlbumSongFragment;
+import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
 import com.andrew.apollo.ui.fragments.profile.ArtistAlbumFragment;
 import com.andrew.apollo.ui.fragments.profile.ArtistSongFragment;
 import com.andrew.apollo.ui.fragments.profile.FavoriteFragment;
@@ -333,68 +334,68 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
     } else if (itemId == R.id.menu_player_sort_by_az) {
       if (isArtistSongPage()) {
         mPreferences.setArtistSongSortOrder(SortOrder.ArtistSongSortOrder.SONG_A_Z);
-        getArtistSongFragment().refresh();
+        refreshPage(0);
       } else if (isArtistAlbumPage()) {
         mPreferences.setArtistAlbumSortOrder(SortOrder.ArtistAlbumSortOrder.ALBUM_A_Z);
-        getArtistAlbumFragment().refresh();
+        refreshPage(1);
       } else {
         mPreferences.setAlbumSongSortOrder(SortOrder.AlbumSongSortOrder.SONG_A_Z);
-        getAlbumSongFragment().refresh();
+        refreshPage(0);
       }
       return true;
     } else if (itemId == R.id.menu_player_sort_by_za) {
       if (isArtistSongPage()) {
         mPreferences.setArtistSongSortOrder(SortOrder.ArtistSongSortOrder.SONG_Z_A);
-        getArtistSongFragment().refresh();
+        refreshPage(0);
       } else if (isArtistAlbumPage()) {
         mPreferences.setArtistAlbumSortOrder(SortOrder.ArtistAlbumSortOrder.ALBUM_Z_A);
-        getArtistAlbumFragment().refresh();
+        refreshPage(1);
       } else {
         mPreferences.setAlbumSongSortOrder(SortOrder.AlbumSongSortOrder.SONG_Z_A);
-        getAlbumSongFragment().refresh();
+        refreshPage(0);
       }
       return true;
     } else if (itemId == R.id.menu_player_sort_by_album) {
       if (isArtistSongPage()) {
         mPreferences.setArtistSongSortOrder(SortOrder.ArtistSongSortOrder.SONG_ALBUM);
-        getArtistSongFragment().refresh();
+        refreshPage(0);
       }
       return true;
     } else if (itemId == R.id.menu_player_sort_by_year) {
       if (isArtistSongPage()) {
         mPreferences.setArtistSongSortOrder(SortOrder.ArtistSongSortOrder.SONG_YEAR);
-        getArtistSongFragment().refresh();
+        refreshPage(0);
       } else if (isArtistAlbumPage()) {
         mPreferences.setArtistAlbumSortOrder(SortOrder.ArtistAlbumSortOrder.ALBUM_YEAR);
-        getArtistAlbumFragment().refresh();
+        refreshPage(1);
       }
       return true;
     } else if (itemId == R.id.menu_player_sort_by_duration) {
       if (isArtistSongPage()) {
         mPreferences.setArtistSongSortOrder(SortOrder.ArtistSongSortOrder.SONG_DURATION);
-        getArtistSongFragment().refresh();
+        refreshPage(0);
       } else {
         mPreferences.setAlbumSongSortOrder(SortOrder.AlbumSongSortOrder.SONG_DURATION);
-        getAlbumSongFragment().refresh();
+        refreshPage(0);
       }
       return true;
     } else if (itemId == R.id.menu_player_sort_by_date_added) {
       if (isArtistSongPage()) {
         mPreferences.setArtistSongSortOrder(SortOrder.ArtistSongSortOrder.SONG_DATE);
-        getArtistSongFragment().refresh();
+        refreshPage(0);
       }
       return true;
     } else if (itemId == R.id.menu_player_sort_by_track_list) {
       mPreferences.setAlbumSongSortOrder(SortOrder.AlbumSongSortOrder.SONG_TRACK_LIST);
-      getAlbumSongFragment().refresh();
+      refreshPage(0);
       return true;
     } else if (itemId == R.id.menu_player_sort_by_filename) {
       if (isArtistSongPage()) {
         mPreferences.setArtistSongSortOrder(SortOrder.ArtistSongSortOrder.SONG_FILENAME);
-        getArtistSongFragment().refresh();
+        refreshPage(0);
       } else {
         mPreferences.setAlbumSongSortOrder(SortOrder.AlbumSongSortOrder.SONG_FILENAME);
-        getAlbumSongFragment().refresh();
+        refreshPage(0);
       }
       return true;
     }
@@ -600,16 +601,11 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
     return isArtist() && mViewPager.getCurrentItem() == 1;
   }
 
-  private ArtistSongFragment getArtistSongFragment() {
-    return (ArtistSongFragment) mPagerAdapter.getFragment(0);
-  }
-
-  private ArtistAlbumFragment getArtistAlbumFragment() {
-    return (ArtistAlbumFragment) mPagerAdapter.getFragment(1);
-  }
-
-  private AlbumSongFragment getAlbumSongFragment() {
-    return (AlbumSongFragment) mPagerAdapter.getFragment(0);
+  /** Reloads the page at {@code position}, if the pager has built it (#1456). */
+  private void refreshPage(int position) {
+    if (mPagerAdapter.getFragment(position) instanceof ApolloFragment<?, ?> page) {
+      page.refresh();
+    }
   }
 
   private void setTitle(String s) {

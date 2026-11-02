@@ -89,14 +89,13 @@ public class PagerAdapter extends FragmentPagerAdapter {
    * Method that returns the {@link Fragment} in the argument position.
    *
    * @param position The position of the fragment to return.
-   * @return Fragment The {@link Fragment} in the argument position.
+   * @return the {@link Fragment} in the argument position, or null if the pager hasn't built it
    */
   public Fragment getFragment(final int position) {
     final WeakReference<Fragment> mWeakFragment = mFragmentArray.get(position);
-    if (mWeakFragment != null && mWeakFragment.get() != null) {
-      return mWeakFragment.get();
-    }
-    return getItem(position);
+    // Null until the pager has built the page. It used to return getItem(position), a new
+    // fragment never added anywhere, so calls on it did nothing (frostwire/frostwire#1456).
+    return mWeakFragment != null ? mWeakFragment.get() : null;
   }
 
   @Override
