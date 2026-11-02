@@ -6882,3 +6882,7 @@ msgstr "Spolu"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
 msgid "Last 5 minutes: blue is received, red is sent"
 msgstr "Posledných 5 minút: modrá je prijaté, červená odoslané"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
+msgid "Karma of the peer that shared this result"
+msgstr ""

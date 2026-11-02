@@ -66,4 +66,12 @@ public interface UISearchResult {
   String getQuery();
 
   void play();
+
+  /**
+   * Hex key of the peer that returned this distributed search result, whose karma the table shows;
+   * null for every other result.
+   */
+  default String getDistributedSourcePeerHex() {
+    return null;
+  }
 }

@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui.search;
 
+import com.frostwire.search.relay.DisplayKarma;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.tables.LimeTableColumn;
 import com.limegroup.gnutella.gui.tables.SizeHolder;
@@ -37,9 +38,10 @@ final class SearchTableColumns {
   static final int SOURCE_IDX = 5;
   static final int ADDED_IDX = 6;
   static final int EXTENSION_IDX = 7;
+  static final int KARMA_IDX = 8;
 
   /** The number of default columns. */
-  static final int COLUMN_COUNT = 8;
+  static final int COLUMN_COUNT = 9;
 
   private final LimeTableColumn ACTIONS_COLUMN =
       new SearchColumn(
@@ -66,6 +68,9 @@ final class SearchTableColumns {
   private final LimeTableColumn EXTENSION_COLUMN =
       new SearchColumn(
           EXTENSION_IDX, "RESULT_PANEL_EXTENSION", I18n.tr("Extension"), 55, true, String.class);
+  private final LimeTableColumn KARMA_COLUMN =
+      new SearchColumn(
+          KARMA_IDX, "RESULT_PANEL_KARMA", I18n.tr("Karma"), 45, true, DisplayKarma.class);
 
   /** Gets the column for the specified index. */
   LimeTableColumn getColumn(int idx) {
@@ -86,6 +91,8 @@ final class SearchTableColumns {
         return ADDED_COLUMN;
       case EXTENSION_IDX:
         return EXTENSION_COLUMN;
+      case KARMA_IDX:
+        return KARMA_COLUMN;
       default:
         return null;
     }

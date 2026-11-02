@@ -7239,3 +7239,7 @@ msgstr "Kabuuan"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
 msgid "Last 5 minutes: blue is received, red is sent"
 msgstr "Huling 5 minuto: asul ang natanggap, pula ang naipadala"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
+msgid "Karma of the peer that shared this result"
+msgstr ""

@@ -22,6 +22,7 @@ import com.frostwire.search.CompositeFileSearchResult;
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.LibTorrentMagnetDownloader;
 import com.frostwire.search.relay.DistributedSearchPerformer;
+import com.frostwire.search.relay.KarmaDisplayCache;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
@@ -40,10 +41,17 @@ import javax.swing.*;
  */
 public final class FileSearchResultUIWrapper extends AbstractUISearchResult {
   private final CompositeFileSearchResult searchResult;
+  private final String distributedSourcePeerHex;
 
   public FileSearchResultUIWrapper(CompositeFileSearchResult sr, SearchEngine se, String query) {
     super(createFileSearchResultAdapter(sr), se, query);
     this.searchResult = sr;
+    this.distributedSourcePeerHex = KarmaDisplayCache.sourcePeerHex(sr);
+  }
+
+  @Override
+  public String getDistributedSourcePeerHex() {
+    return distributedSourcePeerHex;
   }
 
   private static FileSearchResult createFileSearchResultAdapter(

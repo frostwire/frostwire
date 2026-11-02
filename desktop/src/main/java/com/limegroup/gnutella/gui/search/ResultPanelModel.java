@@ -20,7 +20,9 @@ package com.limegroup.gnutella.gui.search;
 
 import com.limegroup.gnutella.gui.tables.BasicDataLineModel;
 import com.limegroup.gnutella.gui.tables.LimeTableColumn;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -116,6 +118,30 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
     }
     fireChangedRowsSinceLastRefresh();
     return null;
+  }
+
+  /**
+   * Repaints the distributed rows, the ones that show their peer's karma, after karma loaded off
+   * the EDT. Other rows are not repainted.
+   */
+  void karmaChanged() {
+    List<int[]> ranges = new ArrayList<>();
+    synchronized (getListLock()) {
+      int rows = getRowCount();
+      int start = -1;
+      for (int r = 0; r <= rows; r++) {
+        boolean karmaRow = r < rows && get(r).hasKarma();
+        if (karmaRow && start == -1) {
+          start = r;
+        } else if (!karmaRow && start != -1) {
+          ranges.add(new int[] {start, r - 1});
+          start = -1;
+        }
+      }
+    }
+    for (int[] range : ranges) {
+      fireTableRowsUpdated(range[0], range[1]);
+    }
   }
 
   /** Maintains the indexes HashMap and MetadataModel. */

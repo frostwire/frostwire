@@ -118,6 +118,17 @@ public final class SearchMediator {
                       resultPanel.updateFiltersPanel();
                     }
                   });
+          // Karma loads off the EDT; repaint the visible tab's distributed rows when it arrives.
+          // Other tabs read the cache when they are painted.
+          DistributedSearchEngineWire.karmaDisplay()
+              .addListener(
+                  () -> {
+                    SearchResultMediator resultPanel =
+                        getSearchResultDisplayer().getSelectedResultPanel();
+                    if (resultPanel != null) {
+                      resultPanel.karmaChanged();
+                    }
+                  });
         });
 
     new Thread(

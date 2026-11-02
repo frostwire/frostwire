@@ -431,6 +431,11 @@ public final class SearchResultMediator
     return DATA_MODEL.getTotalResults();
   }
 
+  /** Repaints the rows that show karma; runs on the EDT when cached karma changes. */
+  void karmaChanged() {
+    DATA_MODEL.karmaChanged();
+  }
+
   /**
    * Determines whether or not repeat search is currently enabled. Repeat search will be disabled
    * if, for example, the original search was performed too recently.
