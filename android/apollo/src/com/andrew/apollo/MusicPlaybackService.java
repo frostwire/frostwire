@@ -45,6 +45,7 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AlbumColumns;
 import android.provider.MediaStore.Audio.AudioColumns;
@@ -78,7 +79,6 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.DataStoreManager;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
-import com.frostwire.util.TaskThrottle;
 import com.frostwire.util.UrlUtils;
 import com.google.android.gms.common.internal.Asserts;
 import java.io.File;
@@ -1652,10 +1652,26 @@ public class MusicPlaybackService extends MediaSessionService {
               + " interval not defined in notifyChangeIntervals, defaulting to 250ms",
           t);
     }
-    if (TaskThrottle.isReadyToSubmitTask(change, interval)) {
-      SystemUtils.exceptionSafePost(mPlayerHandler, notifyChangeTaskRunnable);
-    }
+    // Coalesce instead of dropping: a throttle that dropped repeats left the screen on the
+    // previous song and skipped saving the queue (GitHub #1453).
+    notifyChangeCoalescer.submit(change, interval, notifyChangeTaskRunnable);
   }
+
+  /** Runs change notifications on the player thread; repeats within an interval collapse. */
+  private final ChangeCoalescer notifyChangeCoalescer =
+      new ChangeCoalescer(
+          (task, delay) -> {
+            final Handler handler = mPlayerHandler;
+            if (handler == null) {
+              return false;
+            }
+            if (delay <= 0) {
+              SystemUtils.exceptionSafePost(handler, task);
+              return true;
+            }
+            return handler.postDelayed(() -> SystemUtils.exceptionSafePost(handler, task), delay);
+          },
+          SystemClock::uptimeMillis);
 
   private static void notifyChangeTask(MusicPlaybackService musicPlaybackService, String change) {
     LOG.info("notifyChangeTask(" + change + ")!");
