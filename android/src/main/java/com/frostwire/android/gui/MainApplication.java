@@ -30,6 +30,7 @@ import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.util.FWImageLoader;
+import com.frostwire.android.util.PreviousAnrReporter;
 import com.frostwire.android.util.RunStrict;
 import com.frostwire.android.util.SavedStateSizes;
 import com.frostwire.android.util.StaleWorkManagerJobs;
@@ -108,6 +109,9 @@ public class MainApplication extends Application {
 
     // Older versions' WorkManager jobs crash-looped the app at the 100-job limit (#1388).
     StaleWorkManagerJobs.remove(this);
+
+    // Which kind of ANR ended previous runs, for Crashlytics (Android 11+, #1376).
+    PreviousAnrReporter.reportPreviousAnrs(this);
 
     // Initialize DataStore + ConfigurationRepository (reads preferences from DataStore)
     DataStoreManager.initialize(this);
