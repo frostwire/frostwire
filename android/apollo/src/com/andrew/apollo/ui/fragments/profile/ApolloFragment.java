@@ -729,7 +729,9 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I> exte
     if (mAdapter != null) {
       mAdapter.clear();
     }
-    restartLoader(); // this won't be executed if it was recently called. no risk of endless loop.
+    // Forced: the list was just emptied, and the throttled restart skipped a second refresh within
+    // 5 s (two sort changes, two removals), leaving it empty (GitHub #1461).
+    restartLoader(true);
     if (mAdapter != null) {
       mAdapter.notifyDataSetChanged();
     }
