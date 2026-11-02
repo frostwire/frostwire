@@ -539,15 +539,12 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I> exte
       return;
     }
     int added = 0;
-    for (long songId : songList) {
+    for (Song song : MusicUtils.getSongs(activity, songList)) {
       try {
-        final Song song = MusicUtils.getSong(activity, songId);
-        if (song != null) {
-          favoritesStore.addSongId(songId, song.mSongName, song.mAlbumName, song.mArtistName);
-          added++;
-        }
+        favoritesStore.addSongId(song.mSongId, song.mSongName, song.mAlbumName, song.mArtistName);
+        added++;
       } catch (Throwable t) {
-        t.printStackTrace();
+        LOG.error("onAddToFavorites: could not add song " + song.mSongId, t);
       }
     }
     if (added == 0) {

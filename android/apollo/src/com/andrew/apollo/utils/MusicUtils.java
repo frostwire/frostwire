@@ -79,8 +79,10 @@ import com.frostwire.util.Logger;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.lang3.ArrayUtils;
@@ -938,6 +940,63 @@ public final class MusicUtils {
     }
     cursor.close();
     return list;
+  }
+
+  /**
+   * The songs with {@code songIds}, in that order, from one MediaStore query (as {@link #getSong}
+   * reads each one). Ids that aren't music, or no longer exist, are left out.
+   */
+  public static List<Song> getSongs(final Context context, final long[] songIds) {
+    final List<Song> songs = new ArrayList<>(songIds.length);
+    if (context == null || songIds.length == 0) {
+      return songs;
+    }
+    final String selection =
+        BaseColumns._ID
+            + " IN ("
+            + joinIds(songIds)
+            + ") AND "
+            + AudioColumns.IS_MUSIC
+            + "=1 AND "
+            + AudioColumns.TITLE
+            + " != ''";
+    final Map<Long, Song> byId = new HashMap<>();
+    try (Cursor cursor =
+        context
+            .getContentResolver()
+            .query(
+                Media.EXTERNAL_CONTENT_URI,
+                new String[] {
+                  BaseColumns._ID,
+                  AudioColumns.TITLE,
+                  AudioColumns.ARTIST,
+                  AudioColumns.ALBUM,
+                  AudioColumns.DURATION
+                },
+                selection,
+                null,
+                null)) {
+      while (cursor != null && cursor.moveToNext()) {
+        final long id = cursor.getLong(0);
+        byId.put(
+            id,
+            new Song(
+                id,
+                cursor.getString(1),
+                cursor.getString(2),
+                cursor.getString(3),
+                cursor.getInt(4)));
+      }
+    } catch (Throwable t) {
+      LOG.error("getSongs: query failed", t);
+    }
+    for (long id : songIds) {
+      final Song song = byId.get(id);
+      if (song != null) {
+        songs.add(song);
+      }
+    }
+    return songs;
   }
 
   public static Song getSong(Context context, final long songId) {
