@@ -68,9 +68,11 @@ final class SearchTableColumns {
   private final LimeTableColumn EXTENSION_COLUMN =
       new SearchColumn(
           EXTENSION_IDX, "RESULT_PANEL_EXTENSION", I18n.tr("Extension"), 55, true, String.class);
+  // Hidden by default: the score can still be inflated by the peer it describes
+  // (frostwire/frostwire#1417). It already ranks distributed results through the Seeds sort.
   private final LimeTableColumn KARMA_COLUMN =
       new SearchColumn(
-          KARMA_IDX, "RESULT_PANEL_KARMA", I18n.tr("Karma"), 45, true, DisplayKarma.class);
+          KARMA_IDX, "RESULT_PANEL_KARMA", I18n.tr("Karma"), 45, false, DisplayKarma.class);
 
   /** Gets the column for the specified index. */
   LimeTableColumn getColumn(int idx) {

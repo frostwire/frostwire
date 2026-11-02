@@ -97,6 +97,14 @@ class SearchResultKarmaColumnTest {
     assertEquals(DisplayKarma.class, model.getColumnClass(SearchTableColumns.KARMA_IDX));
   }
 
+  /** Hidden until #1417 stops a peer from inflating its own karma; users can still show it. */
+  @Test
+  void theKarmaColumnIsHiddenByDefault() {
+    SearchTableColumns columns = new SearchTableColumns();
+    assertFalse(columns.getColumn(SearchTableColumns.KARMA_IDX).getDefaultVisibility());
+    assertTrue(columns.getColumn(SearchTableColumns.COUNT_IDX).getDefaultVisibility());
+  }
+
   @Test
   void aKarmaChangeRepaintsOnlyTheDistributedRows() {
     ResultPanelModel model = new ResultPanelModel();
