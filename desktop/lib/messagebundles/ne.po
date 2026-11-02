@@ -6932,3 +6932,7 @@ msgstr "जम्मा"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
 msgid "Last 5 minutes: blue is received, red is sent"
 msgstr "पछिल्लो ५ मिनेट: नीलो प्राप्त, रातो पठाइएको"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
+msgid "Karma of the peer that shared this result"
+msgstr ""

@@ -9,8 +9,11 @@ package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.search.relay.DistributedSearchTransport;
 import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.KarmaDisplayCache;
 import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.PeerDirectory;
+import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
+import javax.swing.SwingUtilities;
 
 /**
  * Tiny installer that wires the user-facing DISTRIBUTED search engine.
@@ -22,6 +25,16 @@ import com.frostwire.search.relay.PeerDirectory;
  */
 public final class DistributedSearchEngineWire {
   private static volatile PeerDirectory peerDirectoryRef;
+
+  /**
+   * Karma of the peers behind distributed results, for the search table: loaded on {@link
+   * DesktopParallelExecutor}, listeners on the EDT.
+   */
+  private static final KarmaDisplayCache KARMA_DISPLAY =
+      new KarmaDisplayCache(
+          DistributedSearchEngineWire::getPeerDirectory,
+          DesktopParallelExecutor::execute,
+          SwingUtilities::invokeLater);
 
   private DistributedSearchEngineWire() {}
 
@@ -53,6 +66,7 @@ public final class DistributedSearchEngineWire {
         .setIdentityKeys(identity)
         .setSearchTransport(transport);
     peerDirectoryRef = peerDirectory;
+    KARMA_DISPLAY.clear();
   }
 
   /** Clear only the wiring owned by the stopping stack, never a replacement's transport. */
@@ -66,10 +80,16 @@ public final class DistributedSearchEngineWire {
           .setPeerDirectory(null)
           .setLocalIndex(null);
       peerDirectoryRef = null;
+      KARMA_DISPLAY.clear();
     }
   }
 
   public static PeerDirectory getPeerDirectory() {
     return peerDirectoryRef;
+  }
+
+  /** The karma shown on distributed search results; {@code get} never blocks the EDT. */
+  public static KarmaDisplayCache karmaDisplay() {
+    return KARMA_DISPLAY;
   }
 }

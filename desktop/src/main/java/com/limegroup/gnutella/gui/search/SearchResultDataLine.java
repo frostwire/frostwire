@@ -20,7 +20,9 @@ package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.gui.bittorrent.BTDownloadMediator;
 import com.frostwire.search.PerformersHelper;
+import com.frostwire.search.relay.DisplayKarma;
 import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.IconManager;
 import com.limegroup.gnutella.gui.tables.AbstractDataLine;
 import com.limegroup.gnutella.gui.tables.LimeTableColumn;
@@ -52,6 +54,7 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
   private boolean downloading;
   private SizeHolder size;
   private SourceHolder source;
+  private String karmaPeerHex;
   private double relevanceScore;
 
   private static final double KEYWORD_WEIGHT = 0.8;
@@ -77,6 +80,7 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
     downloading = isDownloading();
     size = new SizeHolder(getSize());
     source = new SourceHolder(RESULT);
+    karmaPeerHex = sr.getDistributedSourcePeerHex();
     computeRankingMetrics();
   }
 
@@ -181,6 +185,33 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
     return SearchTableColumns.NAME_IDX;
   }
 
+  /** Whether this row is a distributed result, the only kind that shows its peer's karma. */
+  boolean hasKarma() {
+    return karmaPeerHex != null;
+  }
+
+  /**
+   * The karma of the peer that returned this distributed result, from the cache: null for other
+   * results, and until the value has loaded off the EDT (the table repaints these rows then).
+   */
+  DisplayKarma getKarma() {
+    return karmaPeerHex != null
+        ? DistributedSearchEngineWire.karmaDisplay().get(karmaPeerHex)
+        : null;
+  }
+
+  @Override
+  public String[] getToolTipArray(int col) {
+    return col == SearchTableColumns.KARMA_IDX && hasKarma()
+        ? new String[] {I18n.tr("Karma of the peer that shared this result")}
+        : null;
+  }
+
+  @Override
+  public boolean isTooltipRequired(int col) {
+    return col == SearchTableColumns.KARMA_IDX && hasKarma();
+  }
+
   /** Gets the value for the specified idx. */
   public Object getValueAt(int index) {
     switch (index) {
@@ -200,6 +231,8 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
         return addedOn;
       case SearchTableColumns.EXTENSION_IDX:
         return getExtension();
+      case SearchTableColumns.KARMA_IDX:
+        return getKarma();
       default:
         return null;
     }

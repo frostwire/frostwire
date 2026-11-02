@@ -6508,3 +6508,7 @@ msgstr "Вкупно"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
 msgid "Last 5 minutes: blue is received, red is sent"
 msgstr "Последните 5 минути: сино е примено, црвено е испратено"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
+msgid "Karma of the peer that shared this result"
+msgstr ""
