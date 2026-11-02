@@ -38,7 +38,6 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.MediaType;
-import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.android.gui.SearchMediator;
 import com.frostwire.android.gui.activities.PreviewPlayerActivity;
 import com.frostwire.android.gui.adapters.menu.BrowseSharedTorrentsMenuAction;
@@ -59,8 +58,6 @@ import com.frostwire.search.LibTorrentMagnetDownloader;
 import com.frostwire.search.PerformersHelper;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.StreamableSearchResult;
-import com.frostwire.search.relay.DisplayKarma;
-import com.frostwire.search.relay.KarmaDisplayCache;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.util.Logger;
@@ -209,7 +206,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     TextView extra = findView(view, R.id.view_bittorrent_search_result_list_item_text_extra);
     extra.setText(FilenameUtils.getExtension(sr.getFilename()));
     TextView seeds = findView(view, R.id.view_bittorrent_search_result_list_item_text_seeds);
-    seeds.setText(karmaText(sr));
+    seeds.setText("");
     TextView age = findView(view, R.id.view_bittorrent_ssearch_result_list_item_text_age);
     age.setText("");
     String license = "";
@@ -228,24 +225,6 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     int underlineFlag = hasDetailsUrl ? Paint.UNDERLINE_TEXT_FLAG : 0;
     sourceLink.setPaintFlags(sourceLink.getPaintFlags() | underlineFlag);
     sourceLink.setOnClickListener(linkListener);
-  }
-
-  /**
-   * "Karma 1.50" for a distributed result, where torrents show their seeds; empty for other results
-   * and until the karma has loaded off the main thread (the list is redrawn then).
-   */
-  private String karmaText(SearchResult sr) {
-    String peer = KarmaDisplayCache.sourcePeerHex(sr);
-    DisplayKarma karma = peer != null ? karmaDisplay().get(peer) : null;
-    return karma != null ? getContext().getString(R.string.search_result_karma, karma.text()) : "";
-  }
-
-  /**
-   * Where rows read karma: the distributed search wiring's cache, which loads on the MISC handler
-   * thread. A test replaces it, since other tests' start-up work can park that shared thread.
-   */
-  protected KarmaDisplayCache karmaDisplay() {
-    return SearchEngine.DISTRIBUTED_WIRING.karmaDisplay();
   }
 
   private void populateThumbnail(View view, SearchResult sr) {
