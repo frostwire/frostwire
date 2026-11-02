@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:The Library no longer stops listing files when the Torrent Data folder setting isn't a path Windows accepts, such as one ending in a space (#1465)
    - fix:The main window no longer freezes on Windows during its first paint while the donation buttons prepare their font: it is prepared at startup with the others (#1467)
    - fix:Transfers and switching back to FrostWire no longer freeze the window now and then while a background worker has to start again: those workers stay ready (#1466)
    - new:Distributed search results show the karma of the peer that shared them in a new Karma column, and the Peer Directory's Trust Score column is now Karma (same number, now sorted by value) (#1418)
