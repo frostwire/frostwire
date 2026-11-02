@@ -431,9 +431,16 @@ public final class SearchResultMediator
     return DATA_MODEL.getTotalResults();
   }
 
-  /** Repaints the rows that show karma; runs on the EDT when cached karma changes. */
+  /**
+   * Repaints the rows that show karma, and re-ranks them when the table is sorted by seeds, since
+   * karma orders the distributed results there and loads after their rows were added. Runs on the
+   * EDT when cached karma changes.
+   */
   void karmaChanged() {
     DATA_MODEL.karmaChanged();
+    if (DATA_MODEL.ranksByKarma()) {
+      forceResort();
+    }
   }
 
   /**

@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui.search;
 
+import com.frostwire.search.relay.DisplayKarma;
 import com.limegroup.gnutella.gui.tables.BasicDataLineModel;
 import com.limegroup.gnutella.gui.tables.LimeTableColumn;
 import java.util.ArrayList;
@@ -61,8 +62,9 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
   }
 
   /**
-   * Sorts the Type column by file extension (its value is an icon), the count column by seeds, and
-   * the size column by the raw byte count.
+   * Sorts the Type column by file extension (its value is an icon), the count column by seeds and
+   * then by the karma of the peer behind a distributed result, and the size column by the raw byte
+   * count.
    */
   @Override
   protected Object sortKey(SearchResultDataLine line, int column) {
@@ -71,12 +73,32 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
     }
     if (column == SearchTableColumns.COUNT_IDX) {
       Integer seeds = line.getSeedsAsInteger();
-      return seeds == null ? 0 : seeds;
+      DisplayKarma karma = line.getKarma();
+      return new SeedsThenKarma(seeds == null ? 0 : seeds, karma == null ? 0 : karma.value());
     }
     if (column == SearchTableColumns.SIZE_IDX) {
       return line.getSize();
     }
     return super.sortKey(line, column);
+  }
+
+  /**
+   * The Seeds column's sort key. Distributed results carry no seed count (0), so among rows with
+   * the same seeds the one whose peer has more karma ranks first; a peer marked as spam (-1) ranks
+   * below results without karma (0). Karma only breaks ties: it never puts a result above one with
+   * more seeds, because a peer can still inflate its own karma (frostwire/frostwire#1417).
+   */
+  record SeedsThenKarma(int seeds, double karma) implements Comparable<SeedsThenKarma> {
+    @Override
+    public int compareTo(SeedsThenKarma o) {
+      int bySeeds = Integer.compare(seeds, o.seeds);
+      return bySeeds != 0 ? bySeeds : Double.compare(karma, o.karma);
+    }
+  }
+
+  /** Whether the table is ranked by the Seeds column, whose order karma changes. */
+  boolean ranksByKarma() {
+    return isSorted() && getSortColumn() == SearchTableColumns.COUNT_IDX;
   }
 
   /**
