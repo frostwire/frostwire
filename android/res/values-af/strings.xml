@@ -642,7 +642,6 @@
     <string name="distributed_identity_loading">Gestoorde identiteit word gelaai…</string>
     <string name="distributed_identity_loading_details">Loading…</string>
     <string name="distributed_identity_not_available">Nie beskikbaar nie</string>
-    <string name="distributed_identity_karma_score">%1$d aanbevelings</string>
     <string name="distributed_identity_shared_torrents">%1$d torrents</string>
     <string name="distributed_identity_tap_to_copy">Tap to copy</string>
     <string name="distributed_identity_copied">Na knipbord gekopieer</string>

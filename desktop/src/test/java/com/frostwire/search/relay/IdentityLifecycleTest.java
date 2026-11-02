@@ -9,6 +9,7 @@ package com.frostwire.search.relay;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -117,9 +118,11 @@ class IdentityLifecycleTest {
   @Test
   void summaryTextContainsNodeId() throws Exception {
     IdentityKeys keys = IdentityKeys.generate(0);
-    String summary = IdentityLifecycle.summaryText(keys, 3, 7);
+    String summary = IdentityLifecycle.summaryText(keys, DisplayKarma.of(3).text(), 7);
     assertTrue(summary.contains(Hex.encode(keys.nodeId())));
-    assertTrue(summary.contains("Karma: 3"));
+    // frostwire/frostwire#1418: the karma the identity screen shows, not "N endorsements" given.
+    assertTrue(summary.contains("\nKarma: " + DisplayKarma.of(3).text() + "\n"));
+    assertFalse(summary.contains("endorsements"));
     assertTrue(summary.contains("Shared torrents: 7"));
   }
 

@@ -642,7 +642,6 @@
     <string name="distributed_identity_loading">Φόρτωση αποθηκευμένης ταυτότητας…</string>
     <string name="distributed_identity_loading_details">Loading…</string>
     <string name="distributed_identity_not_available">Μη διαθέσιμο</string>
-    <string name="distributed_identity_karma_score">%1$d επιδοκιμασίες</string>
     <string name="distributed_identity_shared_torrents">%1$d torrent</string>
     <string name="distributed_identity_tap_to_copy">Tap to copy</string>
     <string name="distributed_identity_copied">Αντιγράφηκε στο πρόχειρο</string>

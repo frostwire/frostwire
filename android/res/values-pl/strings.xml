@@ -645,7 +645,6 @@
     <string name="distributed_identity_loading">Wczytywanie zapisanej tożsamości…</string>
     <string name="distributed_identity_loading_details">Loading…</string>
     <string name="distributed_identity_not_available">Niedostępne</string>
-    <string name="distributed_identity_karma_score">Rekomendacje: %1$d</string>
     <string name="distributed_identity_shared_torrents">Torrentów: %1$d</string>
     <string name="distributed_identity_tap_to_copy">Tap to copy</string>
     <string name="distributed_identity_copied">Skopiowano do schowka</string>

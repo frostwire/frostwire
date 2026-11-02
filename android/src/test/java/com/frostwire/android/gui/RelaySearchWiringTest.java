@@ -11,8 +11,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 
+import com.frostwire.search.relay.DisplayKarma;
 import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalSharedTorrent;
+import com.frostwire.search.relay.PeerDirectory;
+import com.frostwire.search.relay.PeerKarmaCache;
+import com.frostwire.search.relay.RemoteKarmaChainFetcher;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -53,6 +57,34 @@ public class RelaySearchWiringTest {
     assertNull(
         "getPerformer should return null when not ready",
         SearchEngine.DISTRIBUTED.getPerformer(1L, "test"));
+  }
+
+  /**
+   * frostwire/frostwire#1418: the Distributed Search preferences show the local identity's karma as
+   * every indicator shows a peer, {@link PeerDirectory#displayKarma}, not the endorsements it gave.
+   */
+  @Test
+  public void localKarmaIsTheDisplayKarmaOfTheLocalIdentity() {
+    byte[] ownPub = new byte[32];
+    ownPub[31] = 3;
+    PeerKarmaCache karmaCache =
+        new PeerKarmaCache(new RemoteKarmaChainFetcher(peerPub -> null)) {
+          @Override
+          public long getCachedKarma(byte[] peerPub) {
+            return 2;
+          }
+        };
+    PeerDirectory directory = new PeerDirectory(karmaCache);
+    RelaySearchWiring w = new RelaySearchWiring();
+
+    assertNull("no relay stack, no karma", w.localKarma(ownPub));
+    assertNull(w.peerDirectory(directory).localKarma(null));
+    // The node is never in its own directory, so today this is 0.
+    assertEquals(DisplayKarma.of(0), w.localKarma(ownPub));
+
+    directory.upsert(ownPub, "me.example", 6881);
+    assertEquals(DisplayKarma.of(directory.displayKarma(ownPub)), w.localKarma(ownPub));
+    assertEquals(DisplayKarma.of(3), w.localKarma(ownPub)); // 1 direct trust + 2 karma
   }
 
   @Test
