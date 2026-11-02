@@ -10,6 +10,7 @@ package com.frostwire.tests;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.frostwire.jlibtorrent.Entry;
+import com.frostwire.search.relay.DisplayKarma;
 import com.frostwire.search.relay.KarmaChainSource;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerKarmaCache;
@@ -22,8 +23,12 @@ import org.junit.jupiter.api.Test;
 
 class PeerDirectorySettingsPaneItemTest {
 
+  /**
+   * frostwire/frostwire#1418: the Karma column shows {@link PeerDirectory#displayKarma}, the value
+   * search results show, read off the EDT by the pane's refresh, and sorts it by value.
+   */
   @Test
-  void peerTableModel_usesPrecomputedTrustScores() throws Exception {
+  void peerTableModel_showsThePrecomputedDisplayKarma() throws Exception {
     PeerDirectory directory =
         new PeerDirectory(
             new PeerKarmaCache(
@@ -47,13 +52,17 @@ class PeerDirectorySettingsPaneItemTest {
         modelClass.getDeclaredMethod("setPeers", java.util.List.class, java.util.List.class);
     setPeers.setAccessible(true);
     AbstractTableModel model = (AbstractTableModel) constructor.newInstance();
+    DisplayKarma karma = DisplayKarma.forPeer(directory, peerPub);
     setPeers.invoke(
         model,
         Collections.singletonList(directory.get(peerPub).get()),
-        Collections.singletonList(7.5));
+        Collections.singletonList(karma));
 
-    // Trust Score is column 4 after IceBridge version column was added.
-    assertEquals("7.50", model.getValueAt(0, 4));
+    // Karma is column 4 after IceBridge version column was added.
+    assertEquals(DisplayKarma.of(directory.displayKarma(peerPub)), model.getValueAt(0, 4));
+    assertEquals(DisplayKarma.of(1).text(), model.getValueAt(0, 4).toString());
+    assertEquals("Karma", model.getColumnName(4));
+    assertEquals(DisplayKarma.class, model.getColumnClass(4));
     assertEquals("-", model.getValueAt(0, 2));
   }
 }
