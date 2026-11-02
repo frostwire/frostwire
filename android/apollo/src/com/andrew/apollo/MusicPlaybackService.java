@@ -87,6 +87,7 @@ import java.net.URLDecoder;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -1519,6 +1520,89 @@ public class MusicPlaybackService extends MediaSessionService {
   }
 
   /** Sets the track track to be played */
+  /**
+   * The queue position after ExoPlayer moved on to its queued next item, the song {@code audioId}:
+   * where that song is in the queue, nearest the position queued as next, which can be stale after
+   * the queue changed (GitHub #1452). Without the id, the queued position.
+   */
+  int positionAfterNext(final long audioId) {
+    final int expected = mNextPlayPos == -1 ? 0 : mNextPlayPos;
+    final int found = queuePositionOf(mPlayList, mPlayListLen, audioId, expected);
+    return found >= 0 ? found : expected;
+  }
+
+  /**
+   * The queue position after ExoPlayer went back to its previous item, the song {@code audioId}.
+   * ExoPlayer goes back to the song it played before, so with repeat on, going back from the first
+   * song plays the last one (GitHub #1452).
+   */
+  int positionAfterPrevious(final long audioId) {
+    int expected = mPlayPos;
+    if (mShuffleEnabled) {
+      synchronized (mHistory) {
+        if (!mHistory.isEmpty()) {
+          mHistory.pop();
+        }
+        if (!mHistory.isEmpty()) {
+          expected = mHistory.peek();
+        }
+      }
+    } else if (mPlayPos > 0) {
+      expected = mPlayPos - 1;
+    } else if (mRepeatMode == REPEAT_ALL && mPlayListLen > 0) {
+      expected = mPlayListLen - 1;
+    } else {
+      expected = 0;
+    }
+    final int found = queuePositionOf(mPlayList, mPlayListLen, audioId, expected);
+    return found >= 0 ? found : expected;
+  }
+
+  /**
+   * The position of {@code audioId} among the first {@code length} entries of {@code queue}: {@code
+   * expected} if it is there, else the nearest one; -1 if it isn't queued.
+   */
+  static int queuePositionOf(long[] queue, int length, long audioId, int expected) {
+    if (queue == null || audioId < 0) {
+      return -1;
+    }
+    final int end = Math.min(length, queue.length);
+    for (int distance = 0; distance < end; distance++) {
+      final int after = expected + distance;
+      if (after >= 0 && after < end && queue[after] == audioId) {
+        return after;
+      }
+      final int before = expected - distance;
+      if (before >= 0 && before < end && queue[before] == audioId) {
+        return before;
+      }
+    }
+    return -1;
+  }
+
+  /** The song id of a MediaStore audio item ({@code .../audio/media/<id>}), else -1. */
+  static long audioIdOf(@Nullable final MediaItem mediaItem) {
+    if (mediaItem == null || mediaItem.localConfiguration == null) {
+      return -1;
+    }
+    final Uri uri = mediaItem.localConfiguration.uri;
+    final List<String> segments = uri.getPathSegments();
+    if (!"content".equals(uri.getScheme())
+        || segments.size() < 2
+        || !"media".equals(segments.get(segments.size() - 2))) {
+      return -1;
+    }
+    try {
+      return Long.parseLong(uri.getLastPathSegment());
+    } catch (NumberFormatException e) {
+      return -1;
+    }
+  }
+
+  private static long audioIdOf(final Message msg) {
+    return msg.obj instanceof Long ? (Long) msg.obj : -1;
+  }
+
   private void setNextTrack() {
     mNextPlayPos = getNextPosition(false, isShuffleEnabled());
     if (D) LOG.info("setNextTrack: next play position = " + mNextPlayPos);
@@ -2944,10 +3028,7 @@ public class MusicPlaybackService extends MediaSessionService {
                   + service.mNextPlayPos
                   + " queueLen="
                   + service.mPlayListLen);
-          if (service.mNextPlayPos == -1) {
-            service.mNextPlayPos = 0;
-          }
-          service.mPlayPos = service.mNextPlayPos;
+          service.mPlayPos = service.positionAfterNext(audioIdOf(msg));
           if (service.mCursor != null) {
             service.mCursor.close();
           }
@@ -2968,20 +3049,7 @@ public class MusicPlaybackService extends MediaSessionService {
           if (service.mCursor != null) {
             service.mCursor.close();
           }
-          if (service.mShuffleEnabled) {
-            synchronized (mHistory) {
-              if (!mHistory.isEmpty()) {
-                mHistory.pop();
-              }
-              if (!mHistory.isEmpty()) {
-                service.mPlayPos = mHistory.peek();
-              }
-            }
-          } else if (service.mPlayPos > 0) {
-            service.mPlayPos--;
-          } else {
-            service.mPlayPos = 0;
-          }
+          service.mPlayPos = service.positionAfterPrevious(audioIdOf(msg));
 
           if (service.mPlayPos >= 0 && service.mPlayPos < service.mPlayListLen) {
             service.updateCursor(service.mPlayList[service.mPlayPos]);
@@ -3146,7 +3214,9 @@ public class MusicPlaybackService extends MediaSessionService {
                 // A gapless transition stays READY, so onPlaybackStateChanged won't set it.
                 mCachedDuration = knownDuration(mExoPlayer.getDuration());
                 if (MusicPlaybackService.mPlayerHandler != null) {
-                  MusicPlaybackService.mPlayerHandler.sendEmptyMessage(TRACK_WENT_TO_NEXT);
+                  MusicPlaybackService.mPlayerHandler
+                      .obtainMessage(TRACK_WENT_TO_NEXT, audioIdOf(mediaItem))
+                      .sendToTarget();
                 }
               } else if (movedToQueuedPrevious) {
                 LOG.info(
@@ -3160,7 +3230,9 @@ public class MusicPlaybackService extends MediaSessionService {
                 mCachedPosition = 0;
                 mCachedDuration = knownDuration(mExoPlayer.getDuration());
                 if (MusicPlaybackService.mPlayerHandler != null) {
-                  MusicPlaybackService.mPlayerHandler.sendEmptyMessage(TRACK_WENT_TO_PREVIOUS);
+                  MusicPlaybackService.mPlayerHandler
+                      .obtainMessage(TRACK_WENT_TO_PREVIOUS, audioIdOf(mediaItem))
+                      .sendToTarget();
                 }
               }
             }
