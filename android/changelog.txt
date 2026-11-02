@@ -1,4 +1,5 @@
 FrostWire 3.2.3 build 779 UNRELEASED
+  - fix:Music player: playlist, genre, Favorites and Last added headers and home-screen shortcuts show real album art instead of the default image, and an image cache that never cached anything is gone (#1461)
   - fix:Music player: the library tabs are kept with the music browser, and sorting, shuffling or refreshing a tab that isn't loaded yet no longer does nothing silently (#1456)
   - fix:Music player: creating a playlist with a name already in use no longer empties that playlist; the dialog suggests "Name 2" instead, and deleting a playlist another app owns now says so instead of doing nothing (#1449)
   - fix:Music player: changing the sort order twice in a row, or removing two favorites quickly, no longer leaves the list empty (#1461)
