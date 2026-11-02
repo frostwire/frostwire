@@ -1833,6 +1833,13 @@ public final class MusicUtils {
           () -> addToPlaylistInternal(context, ids, playlistid, showConfirmationMessage));
       return;
     }
+    // No playback service: still keep MediaStore off the main thread ("Add to this playlist").
+    if (SystemUtils.isUIThread()) {
+      SystemUtils.postToHandler(
+          SystemUtils.HandlerThreadName.MISC,
+          () -> addToPlaylistInternal(context, ids, playlistid, showConfirmationMessage));
+      return;
+    }
 
     long[] currentQueue = getQueue();
     long[] playlist = getSongListForPlaylist(context, playlistid);

@@ -53,6 +53,7 @@ public class MusicUtilsAddToPlaylistTest {
     static final List<long[]> members = new ArrayList<>(); // {audio id, play order}
     static final List<String> memberUris = new ArrayList<>();
     static boolean onlyLegacyVolumes;
+    static final List<Thread> threads = new java.util.concurrent.CopyOnWriteArrayList<>();
 
     @Override
     public boolean onCreate() {
@@ -61,6 +62,7 @@ public class MusicUtilsAddToPlaylistTest {
 
     private static boolean known(Uri uri) {
       memberUris.add(uri.getPath());
+      threads.add(Thread.currentThread());
       return !onlyLegacyVolumes || uri.getPathSegments().get(0).equals("external");
     }
 
@@ -127,6 +129,7 @@ public class MusicUtilsAddToPlaylistTest {
     FakeMediaProvider.members.clear();
     FakeMediaProvider.memberUris.clear();
     FakeMediaProvider.onlyLegacyVolumes = false;
+    FakeMediaProvider.threads.clear();
     Robolectric.setupContentProvider(FakeMediaProvider.class, MediaStore.AUTHORITY);
     Platforms.set(
         (Platform)
@@ -180,6 +183,24 @@ public class MusicUtilsAddToPlaylistTest {
       previous = member[1];
     }
     assertEquals(5, FakeMediaProvider.members.size());
+  }
+
+  /** "Add to this playlist" calls it from a menu click, with no playback service running. */
+  @Test
+  @Config(sdk = 34)
+  public void addingFromTheMainThreadReachesMediaStoreOffIt() throws Exception {
+    MusicUtils.addToPlaylistSilently(
+        ApplicationProvider.getApplicationContext(), new long[] {1}, PLAYLIST);
+    long deadline = System.currentTimeMillis() + 5_000;
+    while (FakeMediaProvider.members.isEmpty() && System.currentTimeMillis() < deadline) {
+      Thread.sleep(10);
+      ShadowLooper.idleMainLooper();
+    }
+
+    assertEquals(1, FakeMediaProvider.members.size());
+    for (Thread thread : FakeMediaProvider.threads) {
+      assertTrue("MediaStore reached on the main thread", thread != Thread.currentThread());
+    }
   }
 
   /** Adding to the playlist that is playing also queues the new songs, so they get played. */
