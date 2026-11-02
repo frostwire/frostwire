@@ -445,16 +445,26 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I> exte
   }
 
   private boolean onRemoveFromRecent() {
-    Activity activity = getLiveActivity();
-    if (activity == null) {
+    final Context context = getStableAppContext();
+    if (context == null) {
       return false;
     }
-    RecentStore recentStore = RecentStore.getInstance(activity);
-    if (recentStore != null) {
-      recentStore.removeItem(mSelectedId);
-    }
-    MusicUtils.refresh();
-    restartLoader(true);
+    final long songId = mSelectedId;
+    SystemUtils.postToHandler(
+        SystemUtils.HandlerThreadName.MISC,
+        () -> {
+          RecentStore recentStore = RecentStore.getInstance(context);
+          if (recentStore != null) {
+            recentStore.removeItem(songId);
+          }
+          MusicUtils.refresh();
+          SystemUtils.postToUIThread(
+              () -> {
+                if (isAdded()) {
+                  restartLoader(true);
+                }
+              });
+        });
     return true;
   }
 
@@ -568,11 +578,25 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I> exte
   private void onRemoveFromFavorites() {
     mAdapter.remove(mItem);
     mAdapter.notifyDataSetChanged();
-    FavoritesStore favoritesStore = FavoritesStore.getInstance(getActivity());
-    if (favoritesStore != null) {
-      favoritesStore.removeItem(mSelectedId);
+    final Context context = getStableAppContext();
+    if (context == null) {
+      return;
     }
-    refresh();
+    final long songId = mSelectedId;
+    SystemUtils.postToHandler(
+        SystemUtils.HandlerThreadName.MISC,
+        () -> {
+          FavoritesStore favoritesStore = FavoritesStore.getInstance(context);
+          if (favoritesStore != null) {
+            favoritesStore.removeItem(songId);
+          }
+          SystemUtils.postToUIThread(
+              () -> {
+                if (isAdded()) {
+                  refresh();
+                }
+              });
+        });
   }
 
   private void openMoreByArtist() {
