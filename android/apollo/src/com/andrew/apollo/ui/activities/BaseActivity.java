@@ -61,7 +61,7 @@ import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Objects;
+import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -443,47 +443,45 @@ public abstract class BaseActivity extends AbstractActivity {
 
     @Override
     public void onReceive(final Context context, final Intent intent) {
+      final BaseActivity activity = mReference.get();
       final String action = intent.getAction();
-      switch (Objects.requireNonNull(action)) {
+      if (activity == null || action == null) {
+        return;
+      }
+      switch (action) {
         case MusicPlaybackService.META_CHANGED -> {
           // Current info
-          mReference.get().updateBottomActionBarInfo();
+          activity.updateBottomActionBarInfo();
           // Update the favorites icon
-          mReference.get().invalidateOptionsMenu();
+          activity.invalidateOptionsMenu();
           // Let the listener know to the meta changed
-          for (final MusicStateListener listener : mReference.get().mMusicStateListener) {
-            if (listener != null) {
-              listener.onMetaChanged();
-            }
+          for (final MusicStateListener listener : activity.musicStateListeners()) {
+            listener.onMetaChanged();
           }
         }
         case MusicPlaybackService.PLAYSTATE_CHANGED -> {
           // Set the play and pause image
-          if (!MusicUtils.isStopped()
-              && mReference.get() != null
-              && mReference.get().mPlayPauseButton != null) {
-            mReference.get().mPlayPauseButton.updateState();
+          if (!MusicUtils.isStopped() && activity.mPlayPauseButton != null) {
+            activity.mPlayPauseButton.updateState();
           }
         }
         case MusicPlaybackService.REPEATMODE_CHANGED, MusicPlaybackService.SHUFFLEMODE_CHANGED -> {
           if (!MusicUtils.isStopped()
-              && mReference.get() != null
-              && mReference.get().mRepeatButton != null
-              && mReference.get().mShuffleButton != null) {
+              && activity.mRepeatButton != null
+              && activity.mShuffleButton != null) {
             // Set the repeat image
-            mReference.get().mRepeatButton.updateRepeatState();
+            activity.mRepeatButton.updateRepeatState();
             // Set the shuffle image
-            mReference.get().mShuffleButton.updateShuffleState();
+            activity.mShuffleButton.updateShuffleState();
           }
         }
         case MusicPlaybackService.REFRESH -> {
           // Let the listener know to update a list
-          for (final MusicStateListener listener : mReference.get().mMusicStateListener) {
-            if (listener != null) {
-              listener.restartLoader();
-            }
+          for (final MusicStateListener listener : activity.musicStateListeners()) {
+            listener.restartLoader();
           }
         }
+        default -> {}
       }
     }
   }
@@ -492,9 +490,20 @@ public abstract class BaseActivity extends AbstractActivity {
    * @param status The {@link MusicStateListener} to use
    */
   public void setMusicStateListenerListener(final MusicStateListener status) {
-    if (status != null) {
+    // A fragment re-attached to this screen registers again; keep it once (GitHub #1456).
+    if (status != null && !mMusicStateListener.contains(status)) {
       mMusicStateListener.add(status);
     }
+  }
+
+  /** Stops telling {@code status} about playback changes, e.g. when its fragment detaches. */
+  public void removeMusicStateListener(final MusicStateListener status) {
+    mMusicStateListener.remove(status);
+  }
+
+  /** A copy, so a listener can unregister itself while being told. */
+  private List<MusicStateListener> musicStateListeners() {
+    return new ArrayList<>(mMusicStateListener);
   }
 
   // TODO: review this method

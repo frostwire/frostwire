@@ -152,6 +152,15 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I> exte
   }
 
   @Override
+  public void onDetach() {
+    // Registered in onAttach; left in place, the screen kept reloading this detached fragment.
+    if (getActivity() instanceof BaseActivity) {
+      ((BaseActivity) getActivity()).removeMusicStateListener(this);
+    }
+    super.onDetach();
+  }
+
+  @Override
   public View onCreateView(
       final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
     // The View for the fragment's UI
