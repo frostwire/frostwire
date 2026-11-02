@@ -216,8 +216,8 @@ public abstract class AbstractActivity extends AppCompatActivity {
   }
 
   /**
-   * Returns the first fragment of type T (and with a non null tag) found in the internal fragment
-   * manager.
+   * Returns the first added fragment of type T in this activity, including fragments hosted by
+   * other fragments.
    *
    * <p>This method should cover 98% of the actual UI designs, if you ever get to have two fragments
    * of the same type in the activity, review the components design. If you present two different
@@ -228,11 +228,27 @@ public abstract class AbstractActivity extends AppCompatActivity {
    * @param <T> the type of the fragment to lookup
    * @return the first fragment of type T if found.
    */
-  @SuppressWarnings("unchecked")
   public final <T extends Fragment> T findFragment(Class<T> clazz) {
-    for (Fragment f : getFragments()) {
-      if (clazz.isInstance(f)) {
-        return (T) f;
+    return findFragment(getSupportFragmentManager(), clazz);
+  }
+
+  /**
+   * The first added fragment of type T in {@code manager} or, depth first, in an added fragment's
+   * child FragmentManager. Fragments hosted by another fragment (the music browser's tabs) live in
+   * its child FragmentManager, which a search of the activity's alone never finds
+   * (frostwire/frostwire#1456).
+   */
+  public static <T extends Fragment> T findFragment(FragmentManager manager, Class<T> clazz) {
+    for (Fragment fragment : manager.getFragments()) {
+      if (!fragment.isAdded()) {
+        continue;
+      }
+      if (clazz.isInstance(fragment)) {
+        return clazz.cast(fragment);
+      }
+      T child = findFragment(fragment.getChildFragmentManager(), clazz);
+      if (child != null) {
+        return child;
       }
     }
     return null;
