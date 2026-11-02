@@ -121,11 +121,14 @@ public class FavoritesStore extends SQLiteOpenHelper {
     values.put(
         FavoriteColumns.PLAYCOUNT, (playCount != null && playCount != 0) ? playCount + 1 : 1);
     writeableDatabase.beginTransaction();
-    writeableDatabase.delete(
-        FavoriteColumns.NAME, FavoriteColumns.ID + " = ?", new String[] {String.valueOf(songId)});
-    writeableDatabase.insert(FavoriteColumns.NAME, null, values);
-    writeableDatabase.setTransactionSuccessful();
-    writeableDatabase.endTransaction();
+    try {
+      writeableDatabase.delete(
+          FavoriteColumns.NAME, FavoriteColumns.ID + " = ?", new String[] {String.valueOf(songId)});
+      writeableDatabase.insert(FavoriteColumns.NAME, null, values);
+      writeableDatabase.setTransactionSuccessful();
+    } finally {
+      writeableDatabase.endTransaction();
+    }
   }
 
   /**

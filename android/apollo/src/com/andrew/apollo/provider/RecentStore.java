@@ -140,11 +140,14 @@ public final class RecentStore extends SQLiteOpenHelper {
       values.put(RecentStoreColumns.LAST_TIME_PLAYED, System.currentTimeMillis());
 
       writableDatabase.beginTransaction();
-      writableDatabase.delete(
-          TABLE_NAME, BaseColumns._ID + " = ?", new String[] {String.valueOf(songId)});
-      writableDatabase.insert(TABLE_NAME, null, values);
-      writableDatabase.setTransactionSuccessful();
-      writableDatabase.endTransaction();
+      try {
+        writableDatabase.delete(
+            TABLE_NAME, BaseColumns._ID + " = ?", new String[] {String.valueOf(songId)});
+        writableDatabase.insert(TABLE_NAME, null, values);
+        writableDatabase.setTransactionSuccessful();
+      } finally {
+        writableDatabase.endTransaction();
+      }
     } catch (Throwable e) {
       e.printStackTrace();
     }
