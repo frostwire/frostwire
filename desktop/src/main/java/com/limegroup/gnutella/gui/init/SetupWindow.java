@@ -239,9 +239,26 @@ abstract class SetupWindow extends JPanel {
    */
   void setSetupComponent(JComponent setupComponent) {
     setupComponent.setBorder(new EmptyBorder(20, 10, 10, 10));
+    // Before it joins the shown dialog, where each drop target would be registered right away.
+    removeDropTargets(setupComponent);
     add(setupComponent, BorderLayout.CENTER);
     invalidate();
     validate();
+  }
+
+  /**
+   * Removes the drop targets Swing gives text fields, lists and tables in {@code root}'s tree. The
+   * wizard has no use for drag-and-drop, and the first drop target in a window makes Windows
+   * register it for drag-and-drop, a native call that froze the wizard as it appeared
+   * (frostwire/frostwire#1464). Keyboard cut, copy and paste don't use drop targets.
+   */
+  static void removeDropTargets(Component root) {
+    root.setDropTarget(null);
+    if (root instanceof Container container) {
+      for (Component child : container.getComponents()) {
+        removeDropTargets(child);
+      }
+    }
   }
 
   static class MultiLineLabel extends JTextArea {
@@ -256,6 +273,8 @@ abstract class SetupWindow extends JPanel {
       setWrapStyleWord(true);
       setHighlighter(null);
       setText(s);
+      // A read-only label; added to the shown dialog when a later page is built (#1464).
+      setDropTarget(null);
     }
   }
 }
