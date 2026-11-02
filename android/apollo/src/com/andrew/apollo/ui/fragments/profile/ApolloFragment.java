@@ -42,7 +42,6 @@ import androidx.loader.content.Loader;
 import com.andrew.apollo.MusicStateListener;
 import com.andrew.apollo.adapters.ApolloFragmentAdapter;
 import com.andrew.apollo.loaders.PlaylistLoader;
-import com.andrew.apollo.menu.CreateNewPlaylist;
 import com.andrew.apollo.menu.DeleteDialog;
 import com.andrew.apollo.menu.FragmentMenuItems;
 import com.andrew.apollo.model.Album;
@@ -62,6 +61,7 @@ import com.andrew.apollo.widgets.ProfileTabCarousel;
 import com.andrew.apollo.widgets.VerticalScrollListener;
 import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.adapters.menu.CreateNewPlaylistMenuAction;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import java.util.List;
@@ -431,8 +431,8 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I> exte
         break;
       case FragmentMenuItems.NEW_PLAYLIST:
         if (!getParentFragmentManager().isStateSaved()) {
-          CreateNewPlaylist.getInstance(songList)
-              .show(getParentFragmentManager(), "CreatePlaylist");
+          CreateNewPlaylistMenuAction.CreateNewPlaylistDialog.newInstance(songList)
+              .show(getParentFragmentManager());
         }
         break;
       case FragmentMenuItems.PLAYLIST_SELECTED:

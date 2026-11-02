@@ -38,12 +38,12 @@ import com.andrew.apollo.dragdrop.DragSortListView.DropListener;
 import com.andrew.apollo.dragdrop.DragSortListView.RemoveListener;
 import com.andrew.apollo.loaders.NowPlayingCursor;
 import com.andrew.apollo.loaders.QueueLoader;
-import com.andrew.apollo.menu.CreateNewPlaylist;
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.adapters.menu.CreateNewPlaylistMenuAction;
 import com.frostwire.android.util.SystemUtils;
 import java.util.List;
 
@@ -137,7 +137,7 @@ public final class QueueFragment extends ApolloFragment<SongAdapter, Song>
     if (fragmentManager.isStateSaved()) {
       return;
     }
-    CreateNewPlaylist.getInstance(songList).show(fragmentManager, "CreatePlaylist");
+    CreateNewPlaylistMenuAction.CreateNewPlaylistDialog.newInstance(songList).show(fragmentManager);
   }
 
   @Override

@@ -32,7 +32,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import androidx.fragment.app.DialogFragment;
-import com.andrew.apollo.format.Capitalize;
 import com.andrew.apollo.ui.fragments.PlaylistFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
@@ -185,26 +184,8 @@ abstract class BasePlaylistDialog extends DialogFragment {
   }
 
   private void enableSaveButton(final String playlistName) {
-    if (playlistName.trim().length() == 0) {
-      mSaveButton.setEnabled(false);
-    } else {
-      mSaveButton.setEnabled(true);
-      // Check if activity is still available (fragment not detached)
-      if (mCachedActivity == null) {
-        LOG.warn("enableSaveButton: Activity is null, fragment may have been detached");
-        return;
-      }
-      SystemUtils.postToHandler(
-          SystemUtils.HandlerThreadName.MISC,
-          () -> {
-            int saveButtonResourceTextId =
-                MusicUtils.getIdForPlaylist(mCachedActivity, Capitalize.capitalize(playlistName))
-                        >= 0
-                    ? R.string.overwrite
-                    : R.string.save;
-            SystemUtils.postToUIThread(() -> mSaveButton.setText(saveButtonResourceTextId));
-          });
-    }
+    // Rename never replaces another playlist, so the button always reads "Save" (#1449).
+    mSaveButton.setEnabled(playlistName.trim().length() > 0);
   }
 
   /** Simple {@link TextWatcher} */
