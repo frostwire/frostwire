@@ -8,6 +8,7 @@
 package com.limegroup.gnutella.gui.options.panes;
 
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.search.relay.DisplayKarma;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.RemoteIndexFetcher;
 import com.frostwire.util.Hex;
@@ -43,7 +44,7 @@ public final class PeerDirectorySettingsPaneItem extends AbstractPaneItem {
     I18n.tr("Hostname"),
     I18n.tr("IceBridge"),
     I18n.tr("uTP Port"),
-    I18n.tr("Trust Score"),
+    I18n.tr("Karma"),
     I18n.tr("Verified"),
     I18n.tr("Spam"),
     I18n.tr("Endorsers"),
@@ -122,15 +123,15 @@ public final class PeerDirectorySettingsPaneItem extends AbstractPaneItem {
         () -> {
           try {
             List<PeerDirectory.PeerInfo> peers = directory.topByTrust(100);
-            List<Double> trustScores = new ArrayList<>(peers.size());
+            List<DisplayKarma> karma = new ArrayList<>(peers.size());
             for (PeerDirectory.PeerInfo peer : peers) {
-              trustScores.add(directory.trustScore(peer.peerPub()));
+              karma.add(DisplayKarma.forPeer(directory, peer.peerPub()));
             }
-            PeerRefresh refresh = new PeerRefresh(peers, trustScores, directory.size());
+            PeerRefresh refresh = new PeerRefresh(peers, karma, directory.size());
             GUIMediator.safeInvokeLater(
                 () -> {
                   REFRESH_BUTTON.setEnabled(true);
-                  TABLE_MODEL.setPeers(refresh.peers, refresh.trustScores);
+                  TABLE_MODEL.setPeers(refresh.peers, refresh.karma);
                   COUNT_LABEL.setText(
                       I18n.tr("Showing")
                           + " "
@@ -308,12 +309,12 @@ public final class PeerDirectorySettingsPaneItem extends AbstractPaneItem {
 
   private static final class PeerRefresh {
     final List<PeerDirectory.PeerInfo> peers;
-    final List<Double> trustScores;
+    final List<DisplayKarma> karma;
     final int total;
 
-    PeerRefresh(List<PeerDirectory.PeerInfo> peers, List<Double> trustScores, int total) {
+    PeerRefresh(List<PeerDirectory.PeerInfo> peers, List<DisplayKarma> karma, int total) {
       this.peers = peers;
-      this.trustScores = trustScores;
+      this.karma = karma;
       this.total = total;
     }
   }
@@ -364,20 +365,23 @@ public final class PeerDirectorySettingsPaneItem extends AbstractPaneItem {
 
   static final class PeerTableModel extends AbstractTableModel {
 
-    private final List<PeerDirectory.PeerInfo> rows = new ArrayList<>();
-    private final List<Double> trustScores = new ArrayList<>();
+    private static final int KARMA_COLUMN = 4;
 
-    void setPeers(List<PeerDirectory.PeerInfo> peers, List<Double> scores) {
+    private final List<PeerDirectory.PeerInfo> rows = new ArrayList<>();
+    private final List<DisplayKarma> karma = new ArrayList<>();
+
+    /** {@code karma} is read off the EDT with {@link PeerDirectory#displayKarma(byte[])}. */
+    void setPeers(List<PeerDirectory.PeerInfo> peers, List<DisplayKarma> peerKarma) {
       rows.clear();
-      trustScores.clear();
+      karma.clear();
       if (peers != null) {
         rows.addAll(peers);
       }
-      if (scores != null && scores.size() == rows.size()) {
-        trustScores.addAll(scores);
+      if (peerKarma != null && peerKarma.size() == rows.size()) {
+        karma.addAll(peerKarma);
       } else {
         for (int i = 0; i < rows.size(); i++) {
-          trustScores.add(0.0);
+          karma.add(DisplayKarma.of(0));
         }
       }
       fireTableDataChanged();
@@ -405,6 +409,12 @@ public final class PeerDirectorySettingsPaneItem extends AbstractPaneItem {
       return COLUMN_NAMES[column];
     }
 
+    /** Karma sorts by value, not as text ("10.00" before "2.00"). */
+    @Override
+    public Class<?> getColumnClass(int column) {
+      return column == KARMA_COLUMN ? DisplayKarma.class : Object.class;
+    }
+
     @Override
     public Object getValueAt(int row, int column) {
       PeerDirectory.PeerInfo p = rows.get(row);
@@ -419,8 +429,8 @@ public final class PeerDirectorySettingsPaneItem extends AbstractPaneItem {
           return (ib == null || ib.isBlank()) ? "-" : ib;
         case 3:
           return p.utpPort();
-        case 4:
-          return String.format("%.2f", trustScores.get(row));
+        case KARMA_COLUMN:
+          return karma.get(row);
         case 5:
           return p.isVerified() ? I18n.tr("Yes") : I18n.tr("No");
         case 6:
