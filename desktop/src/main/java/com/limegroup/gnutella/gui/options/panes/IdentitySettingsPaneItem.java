@@ -7,11 +7,11 @@
 
 package com.limegroup.gnutella.gui.options.panes;
 
+import com.frostwire.search.relay.DisplayKarma;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.IdentityLifecycle;
-import com.frostwire.search.relay.KarmaChainTable;
 import com.frostwire.search.relay.KarmaConstants;
-import com.frostwire.search.relay.PeerKarmaCache;
+import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.RelayConstants;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
@@ -20,6 +20,7 @@ import com.limegroup.gnutella.gui.FileChooserHandler;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.ShellFolderWarmUp;
+import com.limegroup.gnutella.gui.search.DistributedSearchEngineWire;
 import com.limegroup.gnutella.gui.search.SearchEngine;
 import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import java.awt.BorderLayout;
@@ -32,6 +33,9 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.io.File;
+import java.util.concurrent.Executor;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -40,6 +44,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.limewire.util.CommonUtils;
@@ -89,6 +94,8 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
   private final JButton COPY_FINGERPRINT_BUTTON = new JButton(I18n.tr("Copy"));
   private final JProgressBar GENERATE_PROGRESS = new JProgressBar();
   private volatile boolean generating;
+  // EDT only: drops a karma load that a later refresh superseded.
+  private int karmaGeneration;
 
   public IdentitySettingsPaneItem() {
     super(TITLE, LABEL);
@@ -207,7 +214,17 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
                 ? " (meets requirement)"
                 : " (below required " + KarmaConstants.IDENTITY_DIFFICULTY + ")"));
 
-    KARMA_LABEL.setText(getKarmaScore(identity) + " endorsements");
+    KARMA_LABEL.setText("—");
+    int generation = ++karmaGeneration;
+    loadLocalKarma(
+        pubRaw,
+        DistributedSearchEngineWire::getPeerDirectory,
+        DesktopParallelExecutor::execute,
+        text -> {
+          if (generation == karmaGeneration) {
+            KARMA_LABEL.setText(text);
+          }
+        });
     SHARED_COUNT_LABEL.setText(getSharedCount() + " torrents");
   }
 
@@ -285,25 +302,29 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
         });
   }
 
-  private long getKarmaScore(IdentityKeys identity) {
-    try {
-      File karmaDb = karmaDbFile(CommonUtils.getUserSettingsDir());
-      if (!karmaDb.exists()) {
-        return 0;
-      }
-      try (KarmaChainTable table = KarmaChainTable.open(karmaDb)) {
-        var chain = table.loadChain(identity.ed25519PubRaw());
-        return PeerKarmaCache.endorsementsGiven(chain.entries());
-      }
-    } catch (Throwable t) {
-      LOG.warn("Failed to read karma score", t);
-      return 0;
-    }
-  }
-
-  /** The database this pane reads the local karma chain from: the one the writer appends to. */
-  static File karmaDbFile(File userSettingsDir) {
-    return KarmaChainTable.defaultDbFile(userSettingsDir);
+  /**
+   * Reads the local identity's karma ({@link PeerDirectory#displayKarma}, what the network's
+   * indicators show for a peer) on {@code background}, never on the EDT, and passes its text to
+   * {@code show} on the EDT: "(not available)" while the distributed search stack is not running.
+   */
+  static void loadLocalKarma(
+      byte[] ownPub,
+      Supplier<PeerDirectory> directory,
+      Executor background,
+      Consumer<String> show) {
+    background.execute(
+        () -> {
+          String text;
+          try {
+            DisplayKarma karma = DisplayKarma.forPeer(directory.get(), ownPub);
+            text = karma != null ? karma.text() : I18n.tr("(not available)");
+          } catch (Throwable t) {
+            LOG.warn("Failed to read the local karma", t);
+            text = I18n.tr("(not available)");
+          }
+          String shown = text;
+          SwingUtilities.invokeLater(() -> show.accept(shown));
+        });
   }
 
   private int getSharedCount() {
