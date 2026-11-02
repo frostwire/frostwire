@@ -7093,4 +7093,4 @@ msgstr "Seneste 5 minutter: blå er modtaget, rød er sendt"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "Karma for den peer, der delte dette resultat"

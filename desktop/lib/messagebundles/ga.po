@@ -6919,4 +6919,4 @@ msgstr "Na 5 nóiméad deiridh: gorm = faighte, dearg = seolta"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "Karma of the peer that shared this result"

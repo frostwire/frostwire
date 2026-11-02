@@ -7158,4 +7158,4 @@ msgstr "5 minutat e fundit: bluja është e marra, e kuqja e dërguara"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "Karma e kolegut që ndau këtë rezultat"

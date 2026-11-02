@@ -7127,4 +7127,4 @@ msgstr "最近 5 分钟：蓝色为接收，红色为发送"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "分享此结果的节点的 Karma"

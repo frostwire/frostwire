@@ -7223,4 +7223,4 @@ msgstr "5 minit terakhir: biru ialah diterima, merah ialah dihantar"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "Karma rakan setara yang berkongsi hasil ini"

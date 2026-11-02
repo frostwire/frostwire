@@ -6909,4 +6909,4 @@ msgstr "Utolsó 5 perc: kék a fogadott, piros a küldött"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "Az eredményt megosztó partner karmája"

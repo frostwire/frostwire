@@ -6797,4 +6797,4 @@ msgstr "Posljednjih 5 minuta: plavo je primljeno, crveno je poslano"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "Karma peera koji je podijelio ovaj rezultat"

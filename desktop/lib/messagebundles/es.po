@@ -7301,4 +7301,4 @@ msgstr "Últimos 5 minutos: azul es lo recibido, rojo lo enviado"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "Karma del par que compartió este resultado"

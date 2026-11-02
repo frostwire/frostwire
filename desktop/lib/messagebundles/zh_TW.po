@@ -6862,4 +6862,4 @@ msgstr "最近 5 分鐘：藍色為接收，紅色為傳送"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "分享此結果的節點的 Karma"

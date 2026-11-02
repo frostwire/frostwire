@@ -6540,4 +6540,4 @@ msgstr "5 munutenn diwezhañ: glas eo ar pezh resevet, ruz ar pezh kaset"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "Karma of the peer that shared this result"

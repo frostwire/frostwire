@@ -6879,4 +6879,4 @@ msgstr "Viimeiset 5 minuuttia: sininen on vastaanotettu, punainen lähetetty"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "Tämän tuloksen jakaneen vertaisen karma"
