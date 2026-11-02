@@ -9,6 +9,7 @@ package com.frostwire.android.gui.adapters;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.robolectric.Shadows.shadowOf;
 
@@ -20,18 +21,22 @@ import android.widget.TextView;
 import androidx.test.core.app.ApplicationProvider;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.SearchEngine;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.Platform;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.CompositeFileSearchResult;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.relay.DisplayKarma;
 import com.frostwire.search.relay.DistributedSearchPerformer;
+import com.frostwire.search.relay.KarmaDisplayCache;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerKarmaCache;
 import com.frostwire.search.relay.RemoteKarmaChainFetcher;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 import org.junit.After;
@@ -44,7 +49,12 @@ import org.robolectric.annotation.Config;
 /**
  * frostwire/frostwire#1418: a distributed search result shows its peer's karma ({@link
  * PeerDirectory#displayKarma}) where torrents show seeds. Binding a row never walks the trust graph
- * on the main thread: the karma loads on the MISC handler thread and the list is redrawn after.
+ * on the main thread: the karma loads on a background thread (the MISC handler thread in the app)
+ * and the list is redrawn after.
+ *
+ * <p>The rows read a cache built like {@link com.frostwire.android.gui.RelaySearchWiring}'s but
+ * loading on a thread of the test's own: other tests' MainApplication start-up parks the shared
+ * MISC thread for 30 s each in this JVM (Engine.getPythonInstance), which made the timing flaky.
  */
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 34, application = Application.class)
@@ -57,6 +67,10 @@ public class SearchResultListAdapterKarmaTest {
   private final byte[] peer = new byte[32];
   private final AtomicInteger redraws = new AtomicInteger();
   private final Runnable redraw = redraws::incrementAndGet;
+  private final ExecutorService loader =
+      Executors.newSingleThreadExecutor(r -> new Thread(r, "karma-test-loader"));
+  private final KarmaDisplayCache karmaDisplay =
+      new KarmaDisplayCache(() -> directory, loader, SystemUtils::postToUIThread);
   private Context context;
   private SearchResultListAdapter adapter;
 
@@ -78,18 +92,31 @@ public class SearchResultListAdapterKarmaTest {
         new SearchResultListAdapter(context) {
           @Override
           protected void searchResultClicked(SearchResult sr) {}
+
+          @Override
+          protected KarmaDisplayCache karmaDisplay() {
+            return karmaDisplay;
+          }
         };
     peer[31] = 5;
     directory.upsert(peer, "peer.example", 6881);
     karmaCache.score = 2;
-    SearchEngine.DISTRIBUTED_WIRING.peerDirectory(directory);
-    SearchEngine.DISTRIBUTED_WIRING.karmaDisplay().addListener(redraw);
+    karmaDisplay.addListener(redraw);
   }
 
   @After
   public void tearDown() {
-    SearchEngine.DISTRIBUTED_WIRING.karmaDisplay().removeListener(redraw);
-    SearchEngine.DISTRIBUTED_WIRING.peerDirectory(null);
+    loader.shutdownNow();
+  }
+
+  @Test
+  public void rowsReadTheDistributedSearchWiringsCache() {
+    SearchResultListAdapter app =
+        new SearchResultListAdapter(context) {
+          @Override
+          protected void searchResultClicked(SearchResult sr) {}
+        };
+    assertSame(SearchEngine.DISTRIBUTED_WIRING.karmaDisplay(), app.karmaDisplay());
   }
 
   @Test
@@ -144,7 +171,7 @@ public class SearchResultListAdapterKarmaTest {
         .build();
   }
 
-  /** The karma loads on a real handler thread; the main looper is paused until idled here. */
+  /** The karma loads on a real thread; the main looper is paused until idled here. */
   private static void runMainLooperUntil(BooleanSupplier done) throws InterruptedException {
     long deadline = System.currentTimeMillis() + 10_000;
     while (!done.getAsBoolean() && System.currentTimeMillis() < deadline) {
