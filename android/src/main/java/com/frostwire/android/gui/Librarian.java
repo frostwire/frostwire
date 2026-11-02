@@ -19,7 +19,6 @@
 
 package com.frostwire.android.gui;
 
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -34,17 +33,14 @@ import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
 import android.system.Os;
 import androidx.annotation.RequiresApi;
-import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.AndroidPaths;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FWFileDescriptor;
-import com.frostwire.android.core.MediaType;
 import com.frostwire.android.core.player.EphemeralPlaylist;
 import com.frostwire.android.core.player.PlaylistItem;
 import com.frostwire.android.core.providers.TableFetcher;
 import com.frostwire.android.core.providers.TableFetchers;
 import com.frostwire.android.util.SystemUtils;
-import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 import com.frostwire.util.MimeDetector;
@@ -53,7 +49,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import okio.BufferedSink;
@@ -198,75 +193,6 @@ public final class Librarian {
       LOG.error("Failed to rename file: " + fd, e);
     }
     return null;
-  }
-
-  /**
-   * Deletes files. If the fileType is audio it'll use MusicUtils.deleteTracks and tell apollo to
-   * clean everything there, playslists, recents, etc.
-   */
-  public void deleteFiles(final Context context, byte fileType, Collection<FWFileDescriptor> fds) {
-    List<Integer> ids = new ArrayList<>(fds.size());
-    final int audioMediaType = MediaType.getAudioMediaType().getId();
-    if (fileType == audioMediaType) {
-      ArrayList<Long> trackIdsToDelete = new ArrayList<>();
-      for (FWFileDescriptor fd : fds) {
-        // just in case, as we had similar checks in other code
-        if (fd.fileType == audioMediaType) {
-          trackIdsToDelete.add((long) fd.id);
-          ids.add(fd.id);
-        }
-      }
-      // wish I could do just trackIdsToDelete.toArray(new long[0]) ...
-      long[] songsArray = new long[trackIdsToDelete.size()];
-      int i = 0;
-      for (Long l : trackIdsToDelete) {
-        songsArray[i++] = l;
-      }
-      try {
-        if (context instanceof Activity) {
-          MusicUtils.deleteTracks((Activity) context, songsArray, false, null);
-          return;
-        }
-        MusicUtils.deleteTracks(context, songsArray, false);
-        return;
-      } catch (Throwable t) {
-        LOG.error("Failed to delete audio files", t);
-        return;
-      }
-    } else {
-      for (FWFileDescriptor fd : fds) {
-        ids.add(fd.id);
-      }
-    }
-
-    try {
-      if (context != null) {
-        ContentResolver cr = context.getContentResolver();
-        TableFetcher fetcher = TableFetchers.getFetcher(fileType);
-
-        try {
-          if (fetcher != TableFetchers.UNKNOWN_TABLE_FETCHER
-              && fetcher.getExternalContentUri() != null) {
-            cr.delete(
-                fetcher.getExternalContentUri(), MediaColumns._ID + " IN " + buildSet(ids), null);
-          }
-        } catch (Throwable t) {
-          LOG.error(t.getMessage(), t);
-        }
-      } else {
-        LOG.error("Failed to delete files from media store, no context available");
-      }
-    } catch (Throwable e) {
-      LOG.error("Failed to delete files from media store", e);
-    }
-
-    FileSystem fs = Platforms.fileSystem();
-    for (FWFileDescriptor fd : fds) {
-      try {
-        fs.delete(new File(fd.filePath));
-      } catch (Throwable ignored) {
-      }
-    }
   }
 
   public EphemeralPlaylist createEphemeralPlaylist(final Context context, FWFileDescriptor fd) {

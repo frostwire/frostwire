@@ -2578,28 +2578,9 @@ public final class MusicUtils {
   }
 
   /**
-   * Permanently deletes item(s) from the user's device.
-   *
-   * @param activity The {@link Activity} that shows Android's delete confirmation and receives its
-   *     result in {@link #handleDeleteTracksActivityResult}.
-   * @param list The item(s) to delete.
-   */
-  public static void deleteTracks(
-      final Activity activity, final long[] list, final Runnable onDeleted) {
-    deleteTracks(activity, list, false, null, onDeleted);
-  }
-
-  public static void deleteTracks(
-      final Activity activity,
-      final long[] list,
-      boolean showNotification,
-      final Runnable onDeleted) {
-    deleteTracks(activity, list, showNotification, null, onDeleted);
-  }
-
-  /**
-   * Deletes {@code list} from the device. On Android 11 and later Android asks the user first; the
-   * tracks are looked up off the main thread, then its dialog is launched from {@code activity}.
+   * Permanently deletes {@code list} from the device. On Android 11 and later Android asks the user
+   * first: the tracks are looked up off the main thread, then its dialog is launched from {@code
+   * activity}, which receives the answer in {@link #handleDeleteTracksActivityResult}.
    *
    * @param onConfirmed runs on the main thread once the delete is certain to happen (right away
    *     before Android 11, when the user allows it after), so the caller can drop the rows. It
