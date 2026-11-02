@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:The window no longer freezes right after startup while the Transfers tab loads its animated seeding icon, or when a search tab first shows its spinner: those animated icons load at startup, in the background (#1470)
    - fix:The first right-click on the tray icon on Windows no longer freezes the window before the menu opens: the menu's system classes are prepared at startup (#1469)
    - fix:Opening a .torrent file, or one fetched from a magnet link or URL, no longer freezes the window while FrostWire reads it: the torrent is read once, in the background, before the file list appears (#1468)
    - fix:The Library no longer stops listing files when the Torrent Data folder setting isn't a path Windows accepts, such as one ending in a space (#1465)
