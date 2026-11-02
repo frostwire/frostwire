@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.frostwire.gui.theme.PlatformFonts;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
@@ -411,6 +412,24 @@ class JdkWarmUpTest {
     assertTrue(
         warmUpSource().replaceAll("\\s+", "").contains("(Fontfont:mainWindowPlatformFonts())"),
         "not rasterized by warmUp");
+  }
+
+  /**
+   * The donation buttons paint with bold 12 pt Dialog, a strike of its own the warm-up never
+   * rasterized, so the main window's first paint did it through GDI on the EDT (Icebase
+   * #53d09edfad4a, #05ccc2dc9c89, GitHub #1467). The buttons and the warm-up share one constant.
+   */
+  @Test
+  void warmUpRasterizesTheDonationButtonFont() throws Exception {
+    assertTrue(
+        JdkWarmUp.mainWindowPlatformFonts().contains(PlatformFonts.DIALOG_BOLD),
+        JdkWarmUp.mainWindowPlatformFonts()::toString);
+    String buttons =
+        java.nio.file.Files.readString(
+                java.nio.file.Path.of(
+                    "src/main/java/com/limegroup/gnutella/gui/DonationButtons.java"))
+            .replaceAll("\\s+", "");
+    assertTrue(buttons.contains("setFont(PlatformFonts.DIALOG_BOLD)"), "the buttons' font");
   }
 
   /**

@@ -395,7 +395,11 @@ public final class JdkWarmUp {
    * Each family, style and size is its own strike, so their glyphs are not the label font's.
    */
   static List<Font> mainWindowPlatformFonts() {
-    return List.of(PlatformFonts.sansSerif(Font.BOLD, 10), PlatformFonts.sansSerif(Font.PLAIN, 12));
+    return List.of(
+        PlatformFonts.sansSerif(Font.BOLD, 10),
+        PlatformFonts.sansSerif(Font.PLAIN, 12),
+        // The donation buttons (frostwire/frostwire#1467).
+        PlatformFonts.DIALOG_BOLD);
   }
 
   /**

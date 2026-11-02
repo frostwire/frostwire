@@ -26,6 +26,13 @@ import java.util.stream.Collectors;
  * {@link Font#MONOSPACED}...) are always safe.
  */
 public final class PlatformFonts {
+
+  /**
+   * The donation buttons' font, bold 12 pt Dialog. The startup warm-up rasterizes it (JdkWarmUp),
+   * or the main window's first paint did that on the EDT (frostwire/frostwire#1467).
+   */
+  public static final Font DIALOG_BOLD = new Font(Font.DIALOG, Font.BOLD, 12);
+
   /** Ships with every macOS; Windows and most Linux installs do not have it. */
   static final String MAC_SANS_SERIF = "Helvetica";
 

@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.gui.theme.PlatformFonts;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.util.OSUtils;
 import java.awt.*;
@@ -56,7 +57,7 @@ class DonationButtons extends JPanel {
       setContentAreaFilled(false);
       setOpaque(false);
       // Defer font loading to avoid EDT violation
-      SwingUtilities.invokeLater(() -> setFont(new Font("Dialog", Font.BOLD, 12)));
+      SwingUtilities.invokeLater(() -> setFont(PlatformFonts.DIALOG_BOLD));
       setForeground(isDarkTheme ? FONT_COLOR_DARK_THEME : FONT_COLOR);
       setBackground(isDarkTheme ? Color.darkGray : new Color(0xedf1f4));
       setText(text);
