@@ -38,6 +38,9 @@ import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Ref;
 import java.lang.ref.WeakReference;
+import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by gubatron on 12/18/14. Adapter in control of the List View shown when we're browsing
@@ -63,6 +66,46 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
   @Override
   public void onClick(Context context) {
     CreateNewPlaylistDialog.newInstance(fileDescriptors).show(getFragmentManager());
+  }
+
+  private static final Pattern NUMBERED = Pattern.compile("^(.*\\S) (\\d+)$");
+
+  /**
+   * {@code name} if no playlist has it, else the first free "name 2", "name 3"... A name that
+   * already ends in a number counts on from it ("Rock 2" to "Rock 3"). New playlists never replace
+   * one with the same name (frostwire/frostwire#1449); the user confirms the suggestion.
+   */
+  static String uniquePlaylistName(String name, Predicate<String> taken) {
+    if (!taken.test(name)) {
+      return name;
+    }
+    String base = name;
+    int number = 2;
+    Matcher numbered = NUMBERED.matcher(name);
+    if (numbered.matches()) {
+      base = numbered.group(1);
+      number = Integer.parseInt(numbered.group(2)) + 1;
+    }
+    while (taken.test(base + " " + number)) {
+      number++;
+    }
+    return base + " " + number;
+  }
+
+  /**
+   * Creates the playlist {@code name} and adds {@code songs} to it, off the main thread.
+   *
+   * @return the new playlist's id, or -1 when it could not be created (then nothing is added)
+   */
+  static long createAndFill(Context context, String name, long[] songs) {
+    long playlistId = MusicUtils.createPlaylist(context, name);
+    if (playlistId < 0) {
+      return -1;
+    }
+    if (songs != null && songs.length > 0) {
+      MusicUtils.addToPlaylist(context, songs, playlistId);
+    }
+    return playlistId;
   }
 
   public static class CreateNewPlaylistDialog extends AbstractDialog {
@@ -118,6 +161,7 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
 
     void updatePlaylistName(String playlistName) {
       playlistInput.setText(playlistName);
+      playlistInput.setSelection(playlistName.length());
     }
 
     @Override
@@ -132,12 +176,8 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
       SystemUtils.postToHandler(
           MISC,
           () -> {
-            long playlistId = MusicUtils.createPlaylist(ctx, text.toString());
+            createAndFill(ctx, text.toString(), fileDescriptors);
             MusicUtils.refresh();
-
-            if (fileDescriptors != null) {
-              MusicUtils.addToPlaylist(ctx, fileDescriptors, playlistId);
-            }
 
             SystemUtils.postToUIThread(
                 () -> {
@@ -166,7 +206,10 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
         if (!positive) {
           dismiss();
         } else {
-          final String playlistName = getPlaylistName();
+          final String playlistName = getPlaylistName().trim();
+          if (playlistName.isEmpty()) {
+            return;
+          }
           WeakReference<FragmentActivity> fragmentActivityWeakRef = Ref.weak(requireActivity());
           SystemUtils.postToHandler(
               MISC,
@@ -175,12 +218,16 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
                   return;
                 }
                 FragmentActivity fragmentActivity = fragmentActivityWeakRef.get();
-                final long playlistId = MusicUtils.getIdForPlaylist(fragmentActivity, playlistName);
+                // A taken name is never overwritten: suggest a free one for the user to confirm.
+                final String freeName =
+                    uniquePlaylistName(
+                        playlistName,
+                        name -> MusicUtils.getIdForPlaylist(fragmentActivity, name) >= 0);
 
                 SystemUtils.postToUIThread(
                     () -> {
-                      if (playlistId != -1) {
-                        updatePlaylistName(playlistName + "+");
+                      if (!freeName.equals(playlistName)) {
+                        updatePlaylistName(freeName);
                       } else {
                         onClickCreatePlaylistButton(playlistName);
                         dismiss();
