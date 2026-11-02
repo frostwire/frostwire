@@ -151,24 +151,13 @@ public class MainApplication extends Application {
     SystemUtils.postToHandler(
         SystemUtils.HandlerThreadName.SEARCH_PERFORMER, SearchMediator::instance);
 
-    // Pre-warm yt_dlp version so Settings > About shows it instantly (no 5s placeholder delay)
+    // Pre-warm yt_dlp's version, on its own thread, so Settings > About shows it instantly.
     TellurideCourier.ytDlpVersion(
-        v -> {
-          /* cached for AboutFragment */
-        });
+        version ->
+            LOG.info("MainApplication::initializeInBackground -> yt_dlp version: " + version));
 
     // Clean temp directory
     SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, MainApplication::cleanTemp);
-
-    // Query yt-dlp version
-    SystemUtils.postToHandler(
-        SystemUtils.HandlerThreadName.MISC,
-        () -> {
-          TellurideCourier.ytDlpVersion(
-              (version) ->
-                  LOG.info(
-                      "MainApplication::initializeInBackground -> yt_dlp version: " + version));
-        });
 
     LOG.info("MainApplication::initializeInBackground complete");
   }

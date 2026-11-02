@@ -33,6 +33,8 @@ import com.frostwire.util.Logger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public final class TellurideCourier {
   private static final Logger LOG = Logger.getLogger(TellurideCourier.class);
@@ -210,14 +212,36 @@ public final class TellurideCourier {
     void onVersion(String version);
   }
 
+  /**
+   * The single thread that looks yt-dlp's version up. The lookup waits up to 30 s for the Python
+   * runtime; done on the shared MISC thread at start-up, it held music commands, network-change
+   * handling and everything else on MISC behind it. One thread, so a second request finds the
+   * version the first one cached.
+   */
+  private static final ExecutorService VERSION_LOOKUP =
+      Executors.newSingleThreadExecutor(
+          runnable -> {
+            Thread thread = new Thread(runnable, "TellurideCourier-ytDlpVersion");
+            thread.setDaemon(true);
+            return thread;
+          });
+
+  /**
+   * Calls {@code callback} with yt-dlp's version: right away when it is cached, else from a
+   * background thread once Python answers ("&lt;unavailable&gt;" if it can't). Never blocks the
+   * calling thread.
+   */
   public static void ytDlpVersion(@NonNull OnYtDlpVersionCallback callback) {
-    if (SystemUtils.isUIThread()) {
-      SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> ytDlpVersion(callback));
+    final String cached = cachedYtDlpVersion;
+    if (cached != null) {
+      callback.onVersion(cached);
       return;
     }
-    SystemUtils.ensureBackgroundThreadOrCrash("TellurideCourier::ytDlpVersion");
+    VERSION_LOOKUP.execute(() -> lookUpYtDlpVersion(callback));
+  }
 
-    // Return cached value instantly if available
+  private static void lookUpYtDlpVersion(@NonNull OnYtDlpVersionCallback callback) {
+    // Cached by an earlier lookup while this one waited its turn.
     if (cachedYtDlpVersion != null) {
       callback.onVersion(cachedYtDlpVersion);
       return;
