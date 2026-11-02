@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -92,7 +93,15 @@ public final class BoundedFileWalker {
     if (root == null) {
       return true;
     }
-    Path start = root.toPath();
+    final Path start;
+    try {
+      start = root.toPath();
+    } catch (InvalidPathException e) {
+      // Not a path this platform can parse (on Windows, e.g. a folder setting ending in a space):
+      // nothing to walk, rather than an exception that stops the caller's scan (#1465).
+      LOG.warn("BoundedFileWalker: not a valid path, skipped: " + root + ": " + e.getMessage());
+      return true;
+    }
     if (!Files.isDirectory(start)) {
       return true;
     }

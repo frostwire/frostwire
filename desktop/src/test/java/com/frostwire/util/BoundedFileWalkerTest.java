@@ -195,4 +195,17 @@ class BoundedFileWalkerTest {
     assertEquals(Set.of(keep), found);
     assertTrue(BoundedFileWalker.walk(new File(tmp.toFile(), "missing"), (p, a) -> found.add(p)));
   }
+
+  /**
+   * A root that isn't a valid path (on Windows, a Torrent Data setting ending in a space) threw
+   * InvalidPathException out of walk and stopped the Library's scan (Icebase #853a6aa39394, GitHub
+   * #1465). It walks nothing instead.
+   */
+  @Test
+  void aRootThatIsNotAValidPathWalksNothing() {
+    Set<Path> found = new HashSet<>();
+
+    assertTrue(BoundedFileWalker.walk(new File("bad\0name"), (p, a) -> found.add(p)));
+    assertTrue(found.isEmpty());
+  }
 }
