@@ -239,9 +239,11 @@ public final class IdentityLifecycle {
     return keys;
   }
 
-  /** Multi-line identity summary for clipboard export. */
-  public static String summaryText(
-      IdentityKeys identity, long karmaEndorsements, int sharedTorrents) {
+  /**
+   * Multi-line identity summary for clipboard export. {@code karma} is the text the identity screen
+   * shows ({@link DisplayKarma#text()}).
+   */
+  public static String summaryText(IdentityKeys identity, String karma, int sharedTorrents) {
     Objects.requireNonNull(identity, "identity");
     return "Node ID: "
         + Hex.encode(identity.nodeId())
@@ -250,8 +252,7 @@ public final class IdentityLifecycle {
         + "\nPublic Key: "
         + Hex.encode(identity.ed25519PubRaw())
         + "\nKarma: "
-        + karmaEndorsements
-        + " endorsements"
+        + karma
         + "\nDifficulty: "
         + difficultyBits(identity)
         + " bits"

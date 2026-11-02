@@ -18,6 +18,7 @@
 
 package com.frostwire.android.gui;
 
+import com.frostwire.search.relay.DisplayKarma;
 import com.frostwire.search.relay.DistributedSearchTransport;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.KarmaChainWriter;
@@ -76,6 +77,15 @@ public final class RelaySearchWiring {
   public RelaySearchWiring identity(IdentityKeys identity) {
     this.identity = identity;
     return this;
+  }
+
+  /**
+   * The karma of the local identity ({@code ownPub}, its Ed25519 public key) as every karma
+   * indicator shows a peer: {@link PeerDirectory#displayKarma}. Null while the relay stack is not
+   * running. Walks the trust graph: call it off the main thread.
+   */
+  public DisplayKarma localKarma(byte[] ownPub) {
+    return DisplayKarma.forPeer(peerDirectory, ownPub);
   }
 
   public DistributedSearchTransport searchTransport() {

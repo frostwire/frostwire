@@ -642,7 +642,6 @@
     <string name="distributed_identity_loading">Завантаження збереженої ідентичності…</string>
     <string name="distributed_identity_loading_details">Loading…</string>
     <string name="distributed_identity_not_available">Недоступно</string>
-    <string name="distributed_identity_karma_score">Рекомендацій: %1$d</string>
     <string name="distributed_identity_shared_torrents">Торентів: %1$d</string>
     <string name="distributed_identity_tap_to_copy">Tap to copy</string>
     <string name="distributed_identity_copied">Скопійовано в буфер обміну</string>

@@ -642,7 +642,6 @@
     <string name="distributed_identity_loading">กำลังโหลดตัวตนที่บันทึกไว้…</string>
     <string name="distributed_identity_loading_details">Loading…</string>
     <string name="distributed_identity_not_available">ไม่พร้อมใช้งาน</string>
-    <string name="distributed_identity_karma_score">การรับรอง %1$d รายการ</string>
     <string name="distributed_identity_shared_torrents">%1$d ทอร์เรนต์</string>
     <string name="distributed_identity_tap_to_copy">Tap to copy</string>
     <string name="distributed_identity_copied">คัดลอกไปยังคลิปบอร์ดแล้ว</string>
