@@ -19,11 +19,13 @@
 package com.andrew.apollo.adapters;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.SparseArray;
 import android.view.ViewGroup;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import com.andrew.apollo.ui.fragments.AlbumFragment;
 import com.andrew.apollo.ui.fragments.ArtistFragment;
 import com.andrew.apollo.ui.fragments.LastAddedFragment;
@@ -46,17 +48,25 @@ public class PagerAdapter extends FragmentPagerAdapter {
 
   private final ArrayList<Holder> mHolderList = new ArrayList<>();
 
-  private final Activity mFragmentActivity;
+  private final Context mContext;
 
   /**
-   * Constructor of <code>PagerAdapter<code>
+   * A pager whose pages live in {@code fragmentActivity}'s FragmentManager.
    *
-   * @param fragmentActivity The {@link Activity} of the
-   *                         {@link Fragment}.
+   * @param fragmentActivity The {@link Activity} of the {@link Fragment}.
    */
   public PagerAdapter(final AppCompatActivity fragmentActivity) {
-    super(fragmentActivity.getSupportFragmentManager());
-    mFragmentActivity = fragmentActivity;
+    this(fragmentActivity, fragmentActivity.getSupportFragmentManager());
+  }
+
+  /**
+   * A pager whose pages live in {@code manager}: a fragment hosting a pager passes its child
+   * FragmentManager, so the pages are its children, saved and restored with it
+   * (frostwire/frostwire#1456).
+   */
+  public PagerAdapter(final Context context, final FragmentManager manager) {
+    super(manager);
+    mContext = context;
   }
 
   /**
@@ -132,7 +142,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
 
   @Override
   public CharSequence getPageTitle(final int position) {
-    return mFragmentActivity
+    return mContext
         .getResources()
         .getStringArray(R.array.page_titles)[position]
         .toUpperCase(Locale.getDefault());

@@ -28,7 +28,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
@@ -83,7 +82,8 @@ public final class MusicBrowserPhoneFragment extends Fragment {
         (ViewGroup) inflater.inflate(R.layout.fragment_music_browser_phone, container, false);
 
     // Initialize the adapter
-    mPagerAdapter = new PagerAdapter((AppCompatActivity) requireActivity());
+    // The tabs are this fragment's children, not the activity's (#1456).
+    mPagerAdapter = new PagerAdapter(requireContext(), getChildFragmentManager());
     final MusicFragments[] mFragments = MusicFragments.values();
     for (final MusicFragments mFragment : mFragments) {
       mPagerAdapter.add(mFragment.getFragmentClass(), null);
