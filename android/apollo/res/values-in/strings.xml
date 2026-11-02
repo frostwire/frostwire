@@ -88,4 +88,5 @@
   <string name="empty_last_added">Lagu-lagu yang telah Anda tambahkan selama satu bulan terakhir akan ditampilkan di sini.</string>
   <string name="empty_search">Hasil pencarian tidak ditemukan</string>
   <string name="empty_recent">Album yang telah anda dengar akan muncul di sini. Cobalah memainkan beberapa musik.</string>
+    <string name="playlist_belongs_to_another_app">Daftar putar ini milik aplikasi lain</string>
 </resources>

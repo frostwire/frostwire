@@ -53,4 +53,5 @@
     <string name="share_track_using">Mahnını paylaş:</string>
     <string name="no_effects_for_you">Ekvalayzer açıla bilmədi.</string>
   <string name="empty_music">Kompüterinizdən cihazınıza musiqi kopyalamaq üçün USB kabelindən istifadə edin.</string>
+    <string name="playlist_belongs_to_another_app">Bu pleylist başqa tətbiqə məxsusdur</string>
 </resources>

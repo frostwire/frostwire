@@ -88,4 +88,5 @@
   <string name="empty_last_added">Les cançons que has afegit durant el darrer mes es mostraran aquí.</string>
   <string name="empty_search">No s\'han trobat resultats</string>
     <string name="empty_recent">Els Àlbums que hagis escoltat es mostraran aquí. Prova de reproduir una mica de música.</string>
+    <string name="playlist_belongs_to_another_app">Aquesta llista de reproducció pertany a una altra aplicació</string>
 </resources>

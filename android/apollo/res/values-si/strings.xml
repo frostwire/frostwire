@@ -88,4 +88,5 @@
   <string name="empty_last_added">පසුගිය මාසය පුරාවට ඔබ එක් කල සිංදු මෙහි දිස්වනු ඇත.</string>
   <string name="empty_search">සෙවීම් ප්‍රතිඵල කිසිවක් නැත</string>
   <string name="empty_recent">ඔබ සවන්දී ඇති ඇල්බම මෙහි දිස්වනු ඇත. යම් සංගීතයක් ධාවනය කර අත්හදා බලන්න.</string>
+    <string name="playlist_belongs_to_another_app">මෙම ධාවන ලැයිස්තුව වෙනත් යෙදුමකට අයත් වේ</string>
 </resources>

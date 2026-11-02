@@ -94,4 +94,5 @@
   <string name="empty_playlist">Deze afspeellijst is leeg.\n\nKlik hier voor informatie over het toevoegen van nummers.</string>
   <string name="are_you_sure_delete_files_text">Weet je zeker dat je permanent wilt verwijderen van de geselecteerde bestanden van uw apparaat?</string>
   <string name="frostwire_player">FrostWire mediaspeler</string>
+    <string name="playlist_belongs_to_another_app">Deze afspeellijst is van een andere app</string>
 </resources>

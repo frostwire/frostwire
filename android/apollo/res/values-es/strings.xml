@@ -94,4 +94,5 @@
     <string name="empty_playlist">Esta lista de reproducción está vacía.\n\nHaz click aquí para saber cómo añadir nuevas canciones.</string>
     <string name="are_you_sure_delete_files_text">¿Estás seguro que deseas BORRAR PERMANENTEMENTE los archivos seleccionados de tu dispositivo?</string>
     <string name="frostwire_player">Reproductor de FrostWire</string>
+    <string name="playlist_belongs_to_another_app">Esta lista de reproducción pertenece a otra aplicación</string>
 </resources>

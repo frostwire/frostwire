@@ -94,4 +94,5 @@
   <string name="empty_playlist">Hierdie snitlys is leeg.\n\nKlik hier om te leer hoe om liedjies by te voeg.</string>
   <string name="are_you_sure_delete_files_text">Is jy seker jy wil die geselekteerde lêers permanent van die toestel verwyder?</string>
   <string name="frostwire_player">FrostWire Mediaspeler</string>
+    <string name="playlist_belongs_to_another_app">Hierdie snitlys behoort aan \'n ander app</string>
 </resources>

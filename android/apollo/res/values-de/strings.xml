@@ -94,4 +94,5 @@
     <string name="empty_playlist">Diese Playlist ist leer.\n\nKlicken Sie hier, um zu erfahren, wie Sie Songs hinzufügen können.</string>
     <string name="are_you_sure_delete_files_text">Sind Sie sicher, dass Sie die ausgewählten Dateien dauerhaft von Ihrem Gerät löschen möchten?</string>
     <string name="frostwire_player">Frostwire-Spieler</string>
+    <string name="playlist_belongs_to_another_app">Diese Playlist gehört zu einer anderen App</string>
 </resources>

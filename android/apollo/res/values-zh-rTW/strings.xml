@@ -88,4 +88,5 @@
   <string name="empty_last_added">您最近一個月加入的樂曲將會顯示在這裡。</string>
   <string name="empty_search">無搜尋結果</string>
     <string name="empty_recent">您曾聽過的專輯將會顯示在這裡。試著播放一些音樂。</string>
+    <string name="playlist_belongs_to_another_app">此播放清單屬於其他應用程式</string>
 </resources>

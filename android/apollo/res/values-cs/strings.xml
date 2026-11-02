@@ -94,4 +94,5 @@
   <string name="empty_playlist">Tento seznam skladeb je prázdný.\n\nKlepnutím sem se dozvíte, jak přidat skladby.</string>
   <string name="are_you_sure_delete_files_text">Opravdu chcete soubory ze zařízení trvale smazat?</string>
   <string name="frostwire_player">Přehrávač médií FrostWire</string>
+    <string name="playlist_belongs_to_another_app">Tento seznam skladeb patří jiné aplikaci</string>
 </resources>

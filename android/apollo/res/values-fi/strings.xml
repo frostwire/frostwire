@@ -94,4 +94,5 @@
   <string name="empty_playlist">Tämä soittolista on tyhjä.\n\nNapsauta tästä saadaksesi lisätietoja kappaleiden lisäämisestä.</string>
   <string name="are_you_sure_delete_files_text">Haluatko varmasti poistaa valitut tiedostot pysyvästi laitteestasi?</string>
   <string name="frostwire_player">FrostWire-mediasoitin</string>
+    <string name="playlist_belongs_to_another_app">Tämä soittolista kuuluu toiselle sovellukselle</string>
 </resources>

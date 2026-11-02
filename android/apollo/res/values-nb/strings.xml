@@ -88,4 +88,5 @@
   <string name="empty_last_added">Sanger du har lagt til den siste måneden vil bli vist her.</string>
   <string name="empty_search">Finner ingen resultater</string>
     <string name="empty_recent">Album du har hørt på vil dukke opp her. Prøv å lytt til litt musikk.</string>
+    <string name="playlist_belongs_to_another_app">Denne spillelisten tilhører en annen app</string>
 </resources>

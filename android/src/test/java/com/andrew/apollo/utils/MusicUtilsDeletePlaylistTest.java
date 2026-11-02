@@ -117,4 +117,24 @@ public class MusicUtilsDeletePlaylistTest {
   public void aPlaylistThatWasNotDeletedDoesNotRefreshTheList() throws Exception {
     assertEquals(0, deleteAndWait(404));
   }
+
+  /** Another app's playlist (Android 11+) deletes nothing: the user is told why. */
+  @Test
+  public void aPlaylistThatWasNotDeletedRunsTheNotDeletedCallback() throws Exception {
+    AtomicInteger deleted = new AtomicInteger();
+    AtomicInteger notDeleted = new AtomicInteger();
+    MusicUtils.deletePlaylistInBackground(
+        ApplicationProvider.getApplicationContext(),
+        404,
+        deleted::incrementAndGet,
+        notDeleted::incrementAndGet);
+    long deadline = System.currentTimeMillis() + 5_000;
+    while (notDeleted.get() == 0 && System.currentTimeMillis() < deadline) {
+      Thread.sleep(10);
+      ShadowLooper.idleMainLooper();
+    }
+
+    assertEquals(1, notDeleted.get());
+    assertEquals(0, deleted.get());
+  }
 }

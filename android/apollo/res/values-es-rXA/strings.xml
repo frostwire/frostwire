@@ -89,4 +89,5 @@
     <string name="empty_search">Nun hai resultaos qu\'amosar</string>
     <string name="empty_recent">Los álbumes que sentisti van apaecer equí.</string>
     <string name="analyzing_downloadable_files">Análizando URLs de archivos descargables</string>
+    <string name="playlist_belongs_to_another_app">Esta lista de reproducción pertenece a otra aplicación</string>
 </resources>

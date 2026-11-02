@@ -95,4 +95,5 @@
     <string name="are_you_sure_delete_files_text">Kas olete kindel, et soovite oma seadmest valitud failid püsivalt kustutada?</string>
     <string name="frostwire_player">FrostWire meediumipleier</string>
     <string name="manage_subscriptions">Tellimuste haldamine</string>
+    <string name="playlist_belongs_to_another_app">See esitusloend kuulub teisele rakendusele</string>
 </resources>

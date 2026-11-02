@@ -88,4 +88,5 @@
   <string name="empty_last_added">ئه‌و گۆرانیانه‌ی که‌ زیادکراون له‌ مانگی پێشوو لێره‌ نیشان ئه‌درێن.</string>
   <string name="empty_search">هیچ ئه‌نجامێکی گه‌ڕان نه‌دۆزرایه‌وه‌</string>
     <string name="empty_recent">ئه‌و ئه‌لبومانه‌ی که‌ گوێت لێگرتوون لێره‌ نیشان ئه‌درێن ، گۆرانی لێبده‌.</string>
+    <string name="playlist_belongs_to_another_app">Ev lîsteya lêdanê ya sepaneke din e</string>
 </resources>

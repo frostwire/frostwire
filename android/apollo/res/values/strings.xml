@@ -123,4 +123,5 @@
     <string name="empty_recent">Songs you have listened to will show up here. Try playing some music.</string>
     <string name="empty_playlist">This playlist is empty.\n\nClick here to learn how to add songs.</string>
     <string name="frostwire_player">FrostWire Player</string>
+    <string name="playlist_belongs_to_another_app">This playlist belongs to another app</string>
 </resources>

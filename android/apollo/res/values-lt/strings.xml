@@ -95,4 +95,5 @@
     <string name="are_you_sure_delete_files_text">Ar tikrai norite visada pašalinti pasirinktus failus iš savo įrenginio?</string>
     <string name="frostwire_player">FrostWire Medijos Leistuvas</string>
     <string name="includes_7_day_free_trial">Apima 7 dienų nemokamą bandomąją versiją. Rekomenduojamas</string>
+    <string name="playlist_belongs_to_another_app">Šis grojaraštis priklauso kitai programai</string>
 </resources>

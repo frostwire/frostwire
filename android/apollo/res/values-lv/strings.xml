@@ -89,4 +89,5 @@
     <string name="empty_search">Nekas netika atrasts</string>
     <string name="empty_recent">Albumi, kurus esat klausījies, tiks parādīti šeit. Pamēģiniet ko noklausīties.</string>
     <string name="manage_subscriptions">Pārvaldīt abonementus</string>
+    <string name="playlist_belongs_to_another_app">Šis atskaņošanas saraksts pieder citai lietotnei</string>
 </resources>

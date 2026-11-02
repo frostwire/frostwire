@@ -94,4 +94,5 @@
   <string name="empty_playlist">Questa playlist è vuota.\n\nClicca qui per sapere come aggiungere canzoni.</string>
   <string name="are_you_sure_delete_files_text">Sei sicuro di voler CANCELLARE PERMANENTEMENTE i file selezionati dal tuo dispositivo?</string>
   <string name="frostwire_player">Lettore FrostWire</string>
+    <string name="playlist_belongs_to_another_app">Questa playlist appartiene a un\'altra app</string>
 </resources>

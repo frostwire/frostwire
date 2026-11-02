@@ -23,4 +23,5 @@
     <string name="playlist_favorite">Favourite</string>
     <string name="playlist_favorites">Favourites</string>
     <string name="no_effects_for_you">The equaliser could not be opened.</string>
+    <string name="playlist_belongs_to_another_app">This playlist belongs to another app</string>
 </resources>

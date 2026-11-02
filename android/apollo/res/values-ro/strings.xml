@@ -93,4 +93,5 @@
   <string name="empty_playlist">Acest playlist este gol.\n\nFaceți clic aici pentru a afla cum să adăugați melodii.</string>
   <string name="are_you_sure_delete_files_text">Sigur doriți să DELETEȚI PERMANENT fișierele selectate de pe dispozitiv?</string>
   <string name="frostwire_player">FrostWire Player</string>
+    <string name="playlist_belongs_to_another_app">Această listă de redare aparține altei aplicații</string>
 </resources>

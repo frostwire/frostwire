@@ -88,4 +88,5 @@
   <string name="empty_last_added">เพลงที่คุณเพิ่มมาในเดือนที่แล้วจะแสดงที่นี่</string>
   <string name="empty_search">ไม่พบผลการค้นหา</string>
     <string name="empty_recent">อัลบั้มที่คุณฟังจะแสดงที่นี่ ลองเล่นบางเพลงดู</string>
+    <string name="playlist_belongs_to_another_app">เพลย์ลิสต์นี้เป็นของแอปอื่น</string>
 </resources>

@@ -17,4 +17,5 @@
 -->
 
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="playlist_belongs_to_another_app">இந்த பிளேலிஸ்ட் வேறொரு செயலிக்குச் சொந்தமானது</string>
 </resources>

@@ -94,4 +94,5 @@
   <string name="empty_playlist">此播放列表为空。\n\n单击此处了解如何添加歌曲。</string>
   <string name="are_you_sure_delete_files_text">您确定要永久删除设备中的所选文件吗？</string>
   <string name="frostwire_player">FrostWire媒体播放器</string>
+    <string name="playlist_belongs_to_another_app">此播放列表属于其他应用</string>
 </resources>

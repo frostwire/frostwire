@@ -93,4 +93,5 @@
   <string name="empty_playlist">Цей список відтворення порожній.\n\nНатисніть тут, щоб дізнатись, як додати пісні.</string>
   <string name="are_you_sure_delete_files_text">Ви впевнені, що хочете постійно видаляти обрані файли з вашого пристрою?</string>
   <string name="frostwire_player">Медіаплеєр FrostWire</string>
+    <string name="playlist_belongs_to_another_app">Цей список відтворення належить іншому застосунку</string>
 </resources>

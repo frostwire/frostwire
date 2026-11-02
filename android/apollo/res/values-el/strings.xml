@@ -94,4 +94,5 @@
   <string name="empty_playlist">Αυτή η λίστα αναπαραγωγής είναι κενή.\n\nΚάντε κλικ εδώ για να μάθετε πώς μπορείτε να προσθέσετε τραγούδια.</string>
   <string name="are_you_sure_delete_files_text">Είστε βέβαιοι ότι θέλετε να διαγράψετε οριστικά τα επιλεγμένα αρχεία από τη συσκευή σας;</string>
   <string name="frostwire_player">FrostWire αναπαραγωγής πολυμέσων</string>
+    <string name="playlist_belongs_to_another_app">Αυτή η λίστα αναπαραγωγής ανήκει σε άλλη εφαρμογή</string>
 </resources>

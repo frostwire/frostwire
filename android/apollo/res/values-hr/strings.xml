@@ -94,4 +94,5 @@
   <string name="empty_playlist">Popis za reprodukciju je prazan.\n\nKliknite ovdje da biste saznali kako dodati pjesme.</string>
   <string name="are_you_sure_delete_files_text">Jeste li sigurni da želite trajno izbrisati odabrane datoteke s uređaja?</string>
   <string name="frostwire_player">FrostWire igrač mediji</string>
+    <string name="playlist_belongs_to_another_app">Ovaj popis za reprodukciju pripada drugoj aplikaciji</string>
 </resources>

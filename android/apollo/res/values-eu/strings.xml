@@ -88,4 +88,5 @@
   <string name="empty_last_added">Azken hilabetean gehituriko abestiak hemen agertuko dira.</string>
   <string name="empty_search">Ez dago emaitzarik</string>
     <string name="empty_recent">Entzun dituzun albumak hemen agertuko dira.</string>
+    <string name="playlist_belongs_to_another_app">Erreprodukzio-zerrenda hau beste aplikazio batena da</string>
 </resources>

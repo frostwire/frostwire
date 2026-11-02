@@ -94,4 +94,5 @@
   <string name="empty_playlist">이 재생 목록은 비어 있습니다.\n\n노래를 추가하는 방법을 보려면 여기를 클릭하십시오.</string>
   <string name="are_you_sure_delete_files_text">장치에서 선택한 파일을 영구적으로 삭제 하시겠습니까?</string>
   <string name="frostwire_player">FrostWire 미디어 플레이어...</string>
+    <string name="playlist_belongs_to_another_app">이 재생목록은 다른 앱의 것입니다</string>
 </resources>

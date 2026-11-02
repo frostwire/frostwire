@@ -94,4 +94,5 @@
   <string name="sort_order_entry_filename">Fichiersnumm</string>
   <string name="could_not_be_pinned_to_home_screen"><xliff:g id="name">%s</xliff:g> konnt net op Ärer Heemechtsplaz gestach ginn</string>
     <string name="accessibility_repeat_all">Alles erëm</string>
+    <string name="playlist_belongs_to_another_app">Dës Playlist gehéiert enger anerer App</string>
 </resources>

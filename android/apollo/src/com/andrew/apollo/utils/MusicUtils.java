@@ -419,10 +419,23 @@ public final class MusicUtils {
 
   /**
    * Deletes a playlist from MediaStore on the MISC thread, then runs {@code onDeleted} on the main
-   * thread if it was deleted. On Android 11+ a playlist FrostWire doesn't own deletes nothing.
+   * thread if it was deleted.
    */
   public static void deletePlaylistInBackground(
       @NonNull final Context context, final long playlistId, final Runnable onDeleted) {
+    deletePlaylistInBackground(context, playlistId, onDeleted, null);
+  }
+
+  /**
+   * Like {@link #deletePlaylistInBackground(Context, long, Runnable)}, and runs {@code
+   * onNotDeleted} on the main thread when nothing was deleted: on Android 11+ that is a playlist
+   * another app owns, which FrostWire may not delete (frostwire/frostwire#1449).
+   */
+  public static void deletePlaylistInBackground(
+      @NonNull final Context context,
+      final long playlistId,
+      final Runnable onDeleted,
+      final Runnable onNotDeleted) {
     final Context appContext = getStableAppContext(context);
     SystemUtils.postToHandler(
         SystemUtils.HandlerThreadName.MISC,
@@ -441,6 +454,9 @@ public final class MusicUtils {
             }
           } else {
             LOG.warn("deletePlaylistInBackground: playlist " + playlistId + " was not deleted");
+            if (onNotDeleted != null) {
+              SystemUtils.postToUIThread(onNotDeleted);
+            }
           }
         });
   }

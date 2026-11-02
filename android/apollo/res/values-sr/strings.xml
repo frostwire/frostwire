@@ -93,4 +93,5 @@
     <string name="empty_playlist">Ова листа песама је празна.\n\nКликните овде да бисте сазнали како додати песме.</string>
     <string name="are_you_sure_delete_files_text">Да ли сте сигурни да желите трајно избрисати одабране датотеке са вашег уређаја?</string>
     <string name="frostwire_player">ФростВире медиа плаиер</string>
+    <string name="playlist_belongs_to_another_app">Ова листа песама припада другој апликацији</string>
 </resources>

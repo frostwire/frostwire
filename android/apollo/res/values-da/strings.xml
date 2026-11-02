@@ -94,4 +94,5 @@
   <string name="empty_playlist">Denne afspilningsliste er tom.\n\nKlik her for at lære at tilføje sange.</string>
   <string name="are_you_sure_delete_files_text">Er du sikker på, at du vil slette de valgte filer permanent fra din enhed?</string>
   <string name="frostwire_player">FrostWire Medieafspiller</string>
+    <string name="playlist_belongs_to_another_app">Denne playliste tilhører en anden app</string>
 </resources>

@@ -52,6 +52,7 @@ import com.andrew.apollo.ui.activities.ProfileActivity;
 import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
+import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
@@ -305,6 +306,15 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
           if (isAdded()) {
             restartLoader(true);
             refresh();
+          }
+        },
+        () -> {
+          if (isAdded() && getActivity() != null) {
+            AppMsg.makeText(
+                    getActivity(),
+                    getString(R.string.playlist_belongs_to_another_app),
+                    AppMsg.STYLE_ALERT)
+                .show();
           }
         });
   }
