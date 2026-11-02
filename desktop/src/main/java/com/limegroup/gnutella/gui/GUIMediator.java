@@ -65,6 +65,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Supplier;
 import javax.swing.*;
@@ -121,6 +122,8 @@ public final class GUIMediator {
 
   /** The shell association manager. */
   private static ShellAssociationManager ASSOCIATION_MANAGER;
+
+  private static final Object ASSOCIATION_MANAGER_LOCK = new Object();
 
   /** Flag for whether the app has ever been made visible during this session. */
   private static boolean _visibleOnce = false;
@@ -233,11 +236,12 @@ public final class GUIMediator {
   private static void showDialogsForFirstVisibility() {
     if (_displayedMessage) return;
     _displayedMessage = true;
-    // Registry I/O off the EDT; only the question to the user runs on it
-    // (frostwire/frostwire#1378).
-    getAssociationManager()
-        .checkAndGrabInBackground(
-            BackgroundQueuedExecutorService::schedule, GUIMediator::safeInvokeLater);
+    // Building the manager and the registry I/O off the EDT; only the question to the user runs on
+    // it (frostwire/frostwire#1378, #1463).
+    checkAssociationsInBackground(
+        GUIMediator::getAssociationManager,
+        BackgroundQueuedExecutorService::schedule,
+        GUIMediator::safeInvokeLater);
     if (TipOfTheDayMessages.hasLocalizedMessages() && StartupSettings.SHOW_TOTD.getValue()) {
       ThreadExecutor.startThread(
           () -> {
@@ -252,6 +256,17 @@ public final class GUIMediator {
           },
           "TOTD");
     }
+  }
+
+  /**
+   * Builds the file-association manager on {@code background} and checks the associations there.
+   * Building it loads the platform's association service from the jar, which froze the main window
+   * as it first appeared when it ran on the EDT (frostwire/frostwire#1463). Only the question to
+   * the user, when another program holds an association, runs on {@code edt}.
+   */
+  static void checkAssociationsInBackground(
+      Supplier<ShellAssociationManager> manager, Executor background, Executor edt) {
+    background.execute(() -> manager.get().checkAndGrabInBackground(background, edt));
   }
 
   /**
@@ -340,11 +355,15 @@ public final class GUIMediator {
    * @return the `ShellAssociationManager` instance.
    */
   public static ShellAssociationManager getAssociationManager() {
-    if (ASSOCIATION_MANAGER == null) {
-      ASSOCIATION_MANAGER =
-          new ShellAssociationManager(FrostAssociations.getSupportedAssociations());
+    // Its own lock, not GUIMediator.class: building it is slow, and the EDT takes the class lock in
+    // instance(). Built from the background queue and the setup wizard's page thread (#1463).
+    synchronized (ASSOCIATION_MANAGER_LOCK) {
+      if (ASSOCIATION_MANAGER == null) {
+        ASSOCIATION_MANAGER =
+            new ShellAssociationManager(FrostAssociations.getSupportedAssociations());
+      }
+      return ASSOCIATION_MANAGER;
     }
-    return ASSOCIATION_MANAGER;
   }
 
   /** Determines whether or not the PlaylistMediator is being used this session. */
