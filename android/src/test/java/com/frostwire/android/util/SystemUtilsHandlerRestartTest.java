@@ -65,6 +65,37 @@ public class SystemUtilsHandlerRestartTest {
     assertTrue("the task was dropped", second.await(5, TimeUnit.SECONDS));
   }
 
+  /**
+   * A task that throws kills its HandlerThread without quitting the looper, so post() still says
+   * yes and every later task on that name was silently dropped: one uncaught exception in a MISC
+   * task stopped all MISC work for the rest of the process.
+   */
+  @Test
+  public void aTaskPostedAfterTheHandlerThreadDiedStillRuns() throws Exception {
+    CountDownLatch first = new CountDownLatch(1);
+    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.SEARCH_PERFORMER, first::countDown);
+    assertTrue(first.await(5, TimeUnit.SECONDS));
+    HandlerThread thread = findThread("SystemUtils::HandlerThread - SEARCH_PERFORMER");
+    assertNotNull(thread);
+    Thread.UncaughtExceptionHandler previous = thread.getUncaughtExceptionHandler();
+    thread.setUncaughtExceptionHandler((t, e) -> {}); // keep the test log quiet
+    try {
+      SystemUtils.postToHandler(
+          SystemUtils.HandlerThreadName.SEARCH_PERFORMER,
+          () -> {
+            throw new IllegalStateException("a task that crashes its thread");
+          });
+      thread.join(5_000);
+      assertTrue("the thread died", !thread.isAlive());
+
+      CountDownLatch second = new CountDownLatch(1);
+      SystemUtils.postToHandler(SystemUtils.HandlerThreadName.SEARCH_PERFORMER, second::countDown);
+      assertTrue("the task was dropped", second.await(5, TimeUnit.SECONDS));
+    } finally {
+      thread.setUncaughtExceptionHandler(previous);
+    }
+  }
+
   private static HandlerThread findThread(String name) {
     for (Thread t : Thread.getAllStackTraces().keySet()) {
       if (name.equals(t.getName()) && t instanceof HandlerThread && t.isAlive()) {

@@ -279,9 +279,10 @@ public final class SystemUtils {
 
     public static void postTo(final HandlerThreadName threadName, final Runnable r) {
       try {
-        // post returns false when the looper has quit: the task would be dropped.
+        // post returns false when the looper has quit; a thread an uncaught exception killed
+        // still says true, and drops the task. Either way a new thread takes over.
         Handler handler = get(threadName.name());
-        if (!handler.post(r)) {
+        if (!isAlive(handler) || !handler.post(r)) {
           replace(threadName.name(), handler).post(r);
         }
       } catch (Throwable t) {
@@ -293,12 +294,21 @@ public final class SystemUtils {
         final HandlerThreadName threadName, final Runnable r, long delayMillis) {
       try {
         Handler handler = get(threadName.name());
-        if (!handler.postDelayed(r, delayMillis)) {
+        if (!isAlive(handler) || !handler.postDelayed(r, delayMillis)) {
           replace(threadName.name(), handler).postDelayed(r, delayMillis);
         }
       } catch (Throwable t) {
         LOG.error(t.getMessage(), t);
       }
+    }
+
+    /**
+     * Whether {@code handler}'s thread still runs tasks. An uncaught exception in a task ends the
+     * thread without quitting its looper, so post() keeps accepting tasks that never run: one
+     * crashing MISC task stopped all MISC work for the rest of the process.
+     */
+    private static boolean isAlive(Handler handler) {
+      return handler.getLooper().getThread().isAlive();
     }
 
     private static synchronized Handler get(@NonNull final String threadName) {
