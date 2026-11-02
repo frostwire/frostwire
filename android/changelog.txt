@@ -1,4 +1,5 @@
 FrostWire 3.2.3 build 779 UNRELEASED
+  - fix:Music player: changing the sort order twice in a row, or removing two favorites quickly, no longer leaves the list empty (#1461)
   - fix:Music player screens no longer keep reloading in the background, no longer reload more often each time you return to them, can no longer be made to reload by other apps, and no longer crash on a playback update that arrives after they close (#1456)
   - fix:Music player: adding to a playlist with nothing playing, adding an album or artist to Favorites, and removing songs from Favorites or Recent no longer stall the screen, and a failed Favorites or Recent write no longer stops later ones from being saved (#1455)
   - fix:Music player: skipping songs quickly no longer leaves the screen, widget and lock screen on an earlier song, and quick queue edits are no longer lost when Android closes the app (#1453)
