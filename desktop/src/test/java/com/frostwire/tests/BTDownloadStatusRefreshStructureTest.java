@@ -33,6 +33,6 @@ class BTDownloadStatusRefreshStructureTest {
 
     assertTrue(body.contains("STATUS_REFRESH_EXECUTOR.execute("));
     assertFalse(body.contains("startThread("));
-    assertTrue(source.contains("ExecutorsHelper.newFixedSizeUnboundedThreadPool(2,"));
+    assertTrue(source.contains("ExecutorsHelper.newWarmFixedThreadPool(2,"));
   }
 }
