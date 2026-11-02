@@ -18,9 +18,11 @@
 
 package com.frostwire.android.gui;
 
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.relay.DistributedSearchTransport;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.KarmaChainWriter;
+import com.frostwire.search.relay.KarmaDisplayCache;
 import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerKarmaCache;
@@ -41,6 +43,14 @@ public final class RelaySearchWiring {
   private volatile IdentityKeys identity;
   private volatile DistributedSearchTransport searchTransport;
   private volatile KarmaChainWriter karmaChainWriter;
+
+  // Karma of the peers behind distributed results, for the search list: loaded on the MISC
+  // handler thread, listeners on the main thread.
+  private final KarmaDisplayCache karmaDisplay =
+      new KarmaDisplayCache(
+          this::peerDirectory,
+          r -> SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, r),
+          SystemUtils::postToUIThread);
 
   public LocalIndex localIndex() {
     return localIndex;
@@ -64,9 +74,21 @@ public final class RelaySearchWiring {
     return peerDirectory;
   }
 
+  /** Also forgets the karma read from the previous directory. */
   public RelaySearchWiring peerDirectory(PeerDirectory peerDirectory) {
-    this.peerDirectory = peerDirectory;
+    if (this.peerDirectory != peerDirectory) {
+      this.peerDirectory = peerDirectory;
+      karmaDisplay.clear();
+    }
     return this;
+  }
+
+  /**
+   * The karma shown on distributed search results. {@code get} never blocks the main thread: it
+   * loads {@link PeerDirectory#displayKarma} on the MISC handler thread.
+   */
+  public KarmaDisplayCache karmaDisplay() {
+    return karmaDisplay;
   }
 
   public IdentityKeys identity() {
