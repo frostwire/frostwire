@@ -139,8 +139,19 @@ public class MusicUtilsAddToPlaylistTest {
                         : null));
   }
 
+  /** Adds from a worker thread, as the app's callers do, and waits for it. */
   private static void add(long... ids) {
-    MusicUtils.addToPlaylistSilently(ApplicationProvider.getApplicationContext(), ids, PLAYLIST);
+    Thread worker =
+        new Thread(
+            () ->
+                MusicUtils.addToPlaylistSilently(
+                    ApplicationProvider.getApplicationContext(), ids, PLAYLIST));
+    worker.start();
+    try {
+      worker.join(5_000);
+    } catch (InterruptedException e) {
+      throw new AssertionError(e);
+    }
   }
 
   @Test
