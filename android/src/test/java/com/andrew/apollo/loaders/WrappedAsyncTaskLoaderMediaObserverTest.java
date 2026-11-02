@@ -13,6 +13,7 @@ import static org.robolectric.Shadows.shadowOf;
 
 import android.app.Application;
 import android.content.ContentResolver;
+import android.net.Uri;
 import android.os.Looper;
 import android.provider.MediaStore;
 import androidx.test.core.app.ApplicationProvider;
@@ -24,8 +25,9 @@ import org.robolectric.annotation.Config;
 
 /**
  * The music loaders never re-queried: a song scanned into MediaStore after the screen loaded (a
- * finished download) didn't show until the screen was recreated (GitHub #1445). They now reload
- * when MediaStore's audio changes.
+ * finished download) didn't show until the screen was recreated (GitHub #1445), and a renamed or
+ * deleted playlist kept its old row (GitHub #1449). They now reload when MediaStore's audio or
+ * playlists change.
  */
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 34, application = Application.class)
@@ -62,6 +64,21 @@ public class WrappedAsyncTaskLoaderMediaObserverTest {
     resolver.notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null);
     shadowOf(Looper.getMainLooper()).idle();
     assertEquals("a new song in MediaStore reloads the list", 2, loader.loads);
+  }
+
+  /** Renaming, deleting or editing a playlist changes no song, so it needs its own observer. */
+  @Test
+  @SuppressWarnings("deprecation")
+  public void aPlaylistChangeReloadsAStartedLoader() {
+    ContentResolver resolver = ApplicationProvider.getApplicationContext().getContentResolver();
+    CountingLoader loader = new CountingLoader();
+    loader.startLoading();
+    loader.deliverResult(List.of("playlist"));
+
+    resolver.notifyChange(
+        Uri.withAppendedPath(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, "5"), null);
+    shadowOf(Looper.getMainLooper()).idle();
+    assertEquals("a renamed or deleted playlist reloads the list", 2, loader.loads);
   }
 
   @Test
