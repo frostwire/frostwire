@@ -113,6 +113,8 @@ public final class SearchFragment extends AbstractFragment
   private static SearchFragment lastInstance = null;
 
   private SearchResultListAdapter adapter;
+  // Redraws the rows when a distributed result's karma has loaded (on the main thread).
+  private final Runnable karmaListener = this::onKarmaChanged;
   private List<Slide> slides;
   private SearchInputView searchInput;
   private ProgressBar deepSearchProgress;
@@ -223,6 +225,7 @@ public final class SearchFragment extends AbstractFragment
     }
     ConfigurationManager CM = ConfigurationManager.instance();
     setupAdapter();
+    SearchEngine.DISTRIBUTED_WIRING.karmaDisplay().addListener(karmaListener);
     if (adapter != null && (adapter.getCount() > 0 || adapter.getTotalCount() > 0)) {
       refreshFileTypeCounters(true, fileTypeCounter.fsr);
       searchInput.selectTabByMediaType((byte) CM.getLastMediaTypeFilter());
@@ -256,6 +259,7 @@ public final class SearchFragment extends AbstractFragment
   @Override
   public void onDestroy() {
     SearchMediator.instance().setSearchListener(null);
+    SearchEngine.DISTRIBUTED_WIRING.karmaDisplay().removeListener(karmaListener);
     destroyHeaderBanner();
     destroyPromotionsBanner();
     super.onDestroy();
@@ -407,6 +411,12 @@ public final class SearchFragment extends AbstractFragment
         .downloadTorrent(
             magnet,
             new HandpickedTorrentDownloadDialogOnFetch((AppCompatActivity) getActivity(), false));
+  }
+
+  private void onKarmaChanged() {
+    if (adapter != null && adapter.getCount() > 0) {
+      adapter.safeNotifyDataSetChanged();
+    }
   }
 
   private void setupAdapter() {
