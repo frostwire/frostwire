@@ -965,6 +965,7 @@ test {
         includeTestsMatching "com.frostwire.tests.*"
         includeTestsMatching "com.frostwire.crypto.*"
         includeTestsMatching "com.frostwire.bittorrent.*"
+        includeTestsMatching "com.frostwire.concurrent.*"
         includeTestsMatching "com.frostwire.mcp.*"
         includeTestsMatching "com.limegroup.gnutella.gui.search.*"
         includeTestsMatching "com.limegroup.gnutella.gui.icebridge.*"

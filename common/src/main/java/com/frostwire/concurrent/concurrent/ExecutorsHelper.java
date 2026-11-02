@@ -117,6 +117,24 @@ public class ExecutorsHelper {
   }
 
   /**
+   * A pool of {@code size} daemon workers named {@code name}, all started now and never timed out,
+   * with an unbounded queue. Submitting a task never starts a thread, which matters for tasks
+   * submitted from a UI thread: starting a thread waits on GC safepoints, and pools that let idle
+   * threads time out started one after every pause (frostwire/frostwire#1466).
+   */
+  public static ExecutorService newWarmFixedThreadPool(int size, String name) {
+    return newWarmFixedThreadPool(size, daemonThreadFactory(name));
+  }
+
+  static ExecutorService newWarmFixedThreadPool(int size, ThreadFactory factory) {
+    ThreadPoolExecutor tpe =
+        new ThreadPoolExecutor(
+            size, size, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), factory);
+    tpe.prestartAllCoreThreads();
+    return Executors.unconfigurableExecutorService(tpe);
+  }
+
+  /**
    * Creates a new ThreadPool with at most {@code size} threads whose waiting queue is unbounded:
    * items added while all threads are busy wait their turn instead of being rejected. Idle threads
    * time out after 5 seconds.

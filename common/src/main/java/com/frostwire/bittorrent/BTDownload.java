@@ -50,10 +50,11 @@ public final class BTDownload implements BittorrentDownload {
    * Shared workers for status cache refreshes. Each transfer keeps at most one refresh in flight
    * (statusRefreshScheduled), so the queue is bounded by the number of transfers; a new thread per
    * refresh meant a native thread creation per transfer every second, started from UI callers of
-   * the cached getters.
+   * the cached getters. The workers are kept warm: a pool whose idle threads timed out still
+   * started one from the EDT after every pause (#1466).
    */
   static final ExecutorService STATUS_REFRESH_EXECUTOR =
-      ExecutorsHelper.newFixedSizeUnboundedThreadPool(2, "BTDownload-StatusRefresh");
+      ExecutorsHelper.newWarmFixedThreadPool(2, "BTDownload-StatusRefresh");
 
   /** The alerts a download handles, routed to it by {@link BTEngine}. */
   static final int[] ALERT_TYPES = {
