@@ -18,7 +18,6 @@
 
 package com.andrew.apollo.ui.activities;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
@@ -28,7 +27,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -41,6 +39,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.SearchView.OnQueryTextListener;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import com.andrew.apollo.Config;
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.MusicStateListener;
@@ -233,18 +232,11 @@ public abstract class BaseActivity extends AbstractActivity {
     super.onActivityResult(requestCode, resultCode, data);
   }
 
-  @SuppressLint("UnspecifiedRegisterReceiverFlag")
   @Override
   protected void onStart() {
     super.onStart();
-    final IntentFilter filter = getIntentFilter();
-
     try {
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        registerReceiver(mPlaybackStatus, filter, RECEIVER_EXPORTED);
-      } else {
-        registerReceiver(mPlaybackStatus, filter);
-      }
+      registerPlaybackStatus(this, mPlaybackStatus);
     } catch (Throwable t) {
       LOG.error("BaseActivity(" + getClass().getSimpleName() + ") " + t.getMessage(), t);
     }
@@ -272,9 +264,30 @@ public abstract class BaseActivity extends AbstractActivity {
     return filter;
   }
 
+  /**
+   * Listens for the playback service's broadcasts while the screen is started. Only this app's
+   * broadcasts: exported, any app could make the music screens reload (GitHub #1456).
+   */
+  static void registerPlaybackStatus(final Context context, final BroadcastReceiver receiver) {
+    ContextCompat.registerReceiver(
+        context, receiver, getIntentFilter(), ContextCompat.RECEIVER_NOT_EXPORTED);
+  }
+
+  /** Stops listening; harmless if the receiver isn't registered. */
+  static void unregisterPlaybackStatus(final Context context, final BroadcastReceiver receiver) {
+    try {
+      context.unregisterReceiver(receiver);
+    } catch (IllegalArgumentException notRegistered) {
+      // already unregistered
+    }
+  }
+
   @Override
   protected void onStop() {
     super.onStop();
+    // Registered in onStart: a stopped screen shouldn't reload on every broadcast, and each restart
+    // registered again (GitHub #1456).
+    unregisterPlaybackStatus(this, mPlaybackStatus);
     MusicUtils.notifyForegroundStateChanged(this, false);
   }
 
@@ -282,12 +295,6 @@ public abstract class BaseActivity extends AbstractActivity {
   protected void onDestroy() {
     super.onDestroy();
     HeaderBanner.destroy(headerBanner);
-    // Unregister the receiver
-    try {
-      unregisterReceiver(mPlaybackStatus);
-    } catch (final Throwable e) {
-      // $FALL-THROUGH$
-    }
 
     // Remove any music status listeners
     mMusicStateListener.clear();
