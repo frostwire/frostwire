@@ -236,9 +236,16 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
    */
   private String karmaText(SearchResult sr) {
     String peer = KarmaDisplayCache.sourcePeerHex(sr);
-    DisplayKarma karma =
-        peer != null ? SearchEngine.DISTRIBUTED_WIRING.karmaDisplay().get(peer) : null;
+    DisplayKarma karma = peer != null ? karmaDisplay().get(peer) : null;
     return karma != null ? getContext().getString(R.string.search_result_karma, karma.text()) : "";
+  }
+
+  /**
+   * Where rows read karma: the distributed search wiring's cache, which loads on the MISC handler
+   * thread. A test replaces it, since other tests' start-up work can park that shared thread.
+   */
+  protected KarmaDisplayCache karmaDisplay() {
+    return SearchEngine.DISTRIBUTED_WIRING.karmaDisplay();
   }
 
   private void populateThumbnail(View view, SearchResult sr) {
