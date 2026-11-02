@@ -1698,7 +1698,9 @@ public class MusicPlaybackService extends MediaSessionService {
       recentsStoreAddSongIdTask(musicPlaybackService);
     } else if (QUEUE_CHANGED.equals(change)) {
       musicPlaybackService.saveQueue(true);
-      if (isPlaying) {
+      // Re-queue the next song while paused too: resuming played the one queued before the change
+      // (GitHub #1452). Stopped, ExoPlayer has no current song and the next would become it.
+      if (!isStopped) {
         musicPlaybackService.setNextTrack();
       }
     } else {

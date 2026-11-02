@@ -8,6 +8,8 @@
 package com.andrew.apollo;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import android.app.Application;
 import android.net.Uri;
@@ -17,6 +19,9 @@ import com.frostwire.platform.Platform;
 import com.frostwire.platform.Platforms;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -87,6 +92,23 @@ public class MusicPlaybackServiceTransitionTest {
             MediaItem.fromUri(Uri.parse("content://media/external_primary/audio/media/42"))));
     assertEquals(-1L, MusicPlaybackService.audioIdOf(MediaItem.fromUri("file:///music/a.mp3")));
     assertEquals(-1L, MusicPlaybackService.audioIdOf(null));
+  }
+
+  /**
+   * A queue change while paused re-queues the next song, or resuming plays the one queued before
+   * the change. Source check: the notification task needs a prepared ExoPlayer.
+   */
+  @Test
+  public void aQueueChangeWhilePausedRequeuesTheNextSong() throws Exception {
+    String source =
+        new String(
+                Files.readAllBytes(
+                    Path.of(System.getProperty("user.dir"))
+                        .resolve("apollo/src/com/andrew/apollo/MusicPlaybackService.java")),
+                StandardCharsets.UTF_8)
+            .replaceAll("\\s+", "");
+    assertTrue(source.contains("if(!isStopped){musicPlaybackService.setNextTrack();}"));
+    assertFalse(source.contains("if(isPlaying){musicPlaybackService.setNextTrack();}"));
   }
 
   private void set(String name, Object value) throws Exception {
