@@ -7095,4 +7095,4 @@ msgstr "पिछले 5 मिनट: नीला प्राप्त, ल�
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "इस परिणाम को साझा करने वाले पीयर का कर्म"

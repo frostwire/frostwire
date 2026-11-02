@@ -7074,4 +7074,4 @@ msgstr "최근 5분: 파란색은 받은 양, 빨간색은 보낸 양"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "이 결과를 공유한 피어의 카르마"

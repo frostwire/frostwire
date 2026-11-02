@@ -7188,4 +7188,4 @@ msgstr "Τελευταία 5 λεπτά: μπλε τα ληφθέντα, κόκ�
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "Κάρμα του ομότιμου που μοιράστηκε αυτό το αποτέλεσμα"

@@ -7129,4 +7129,4 @@ msgstr "Последните 5 минути: синьото е получено,
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "Карма на партньора, споделил този резултат"

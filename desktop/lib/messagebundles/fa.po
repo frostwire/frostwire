@@ -6502,4 +6502,4 @@ msgstr "۵ دقیقه اخیر: آبی دریافتی، قرمز ارسالی"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "کارمای همتایی که این نتیجه را به اشتراک گذاشت"

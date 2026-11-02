@@ -7242,4 +7242,4 @@ msgstr "Huling 5 minuto: asul ang natanggap, pula ang naipadala"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "Karma ng peer na nagbahagi ng resultang ito"

@@ -7145,4 +7145,4 @@ msgstr "5 phút gần nhất: xanh là đã nhận, đỏ là đã gửi"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "Karma của máy ngang hàng đã chia sẻ kết quả này"

@@ -7178,4 +7178,4 @@ msgstr "Останні 5 хвилин: синім — отримано, черв
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "Карма вузла, який поділився цим результатом"

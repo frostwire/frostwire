@@ -7189,4 +7189,4 @@ msgstr "Senaste 5 minuterna: blått är mottaget, rött är skickat"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "Karma för noden som delade detta resultat"

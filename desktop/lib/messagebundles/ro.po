@@ -7260,4 +7260,4 @@ msgstr "Ultimele 5 minute: albastru este primit, roșu este trimis"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "Karma partenerului care a partajat acest rezultat"

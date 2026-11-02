@@ -7102,4 +7102,4 @@ msgstr "5 นาทีล่าสุด: สีน้ำเงินคือ�
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "Karma ของเพียร์ที่แชร์ผลลัพธ์นี้"

@@ -7275,4 +7275,4 @@ msgstr "Ultimi 5 minuti: blu i dati ricevuti, rosso quelli inviati"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "Karma del peer che ha condiviso questo risultato"

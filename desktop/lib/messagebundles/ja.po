@@ -7148,4 +7148,4 @@ msgstr "直近 5 分間: 青は受信、赤は送信"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "この結果を共有したピアのカルマ"

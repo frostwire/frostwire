@@ -6777,4 +6777,4 @@ msgstr "Síðustu 5 mínútur: blátt er móttekið, rautt er sent"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "Karma jafningjans sem deildi þessari niðurstöðu"

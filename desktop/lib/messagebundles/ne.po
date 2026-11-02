@@ -6935,4 +6935,4 @@ msgstr "पछिल्लो ५ मिनेट: नीलो प्राप�
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "यो नतिजा साझा गर्ने पियरको कर्मा"

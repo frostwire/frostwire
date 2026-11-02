@@ -6490,4 +6490,4 @@ msgstr "5 הדקות האחרונות: כחול הוא מה שהתקבל, אדו
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
-msgstr ""
+msgstr "הקארמה של העמית ששיתף את התוצאה הזו"
