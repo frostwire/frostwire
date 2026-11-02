@@ -927,15 +927,38 @@ public class MusicPlaybackService extends MediaSessionService {
   }
 
   public void stopSimplePlayer() {
-    if (mSimplePlayer != null) {
-      try {
-        mSimplePlayer.stop();
-        mSimplePlayer.release();
-      } catch (Throwable ignored) {
-      }
-      notifySimpleStopped(mSimplePlayerPlayingFile);
-      mSimplePlayer = null;
-      mSimplePlayerPlayingFile = null;
+    final ExoPlayer preview = mSimplePlayer;
+    if (preview == null) {
+      return;
+    }
+    final String file = mSimplePlayerPlayingFile;
+    mSimplePlayer = null;
+    mSimplePlayerPlayingFile = null;
+    stopAndRelease(preview);
+    notifySimpleStopped(file);
+  }
+
+  /**
+   * Stops and releases {@code player} on the thread it was built on, which ExoPlayer requires. The
+   * preview player is built on the main thread, but play() stops it from the player thread: called
+   * there, stop() threw, the error was swallowed and release() never ran, so the preview kept
+   * playing over the music and leaked (frostwire/frostwire#1452).
+   */
+  static void stopAndRelease(final ExoPlayer player) {
+    final Runnable release =
+        () -> {
+          try {
+            player.stop();
+            player.release();
+          } catch (Throwable t) {
+            LOG.warn("stopAndRelease: " + t.getMessage());
+          }
+        };
+    final Looper looper = player.getApplicationLooper();
+    if (Looper.myLooper() == looper) {
+      release.run();
+    } else {
+      new Handler(looper).post(release);
     }
   }
 
