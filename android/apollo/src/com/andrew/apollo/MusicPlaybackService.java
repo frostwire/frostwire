@@ -1170,12 +1170,10 @@ public class MusicPlaybackService extends MediaSessionService {
    * @return the number of tracks deleted
    */
   private int removeTracksInternal(int first, int last) {
+    first = Math.max(first, 0);
+    last = Math.min(last, mPlayListLen - 1);
     if (last < first) {
       return 0;
-    } else if (first < 0) {
-      first = 0;
-    } else if (last >= mPlayListLen) {
-      last = mPlayListLen - 1;
     }
 
     boolean gotonext = false;
@@ -1195,24 +1193,23 @@ public class MusicPlaybackService extends MediaSessionService {
       mPlayListLen = 0;
     }
 
-    if (gotonext && !playAfterRemovingCurrent()) {
-      return 0;
+    if (gotonext) {
+      // Stops playback when the queue is now empty; the songs were removed either way.
+      playAfterRemovingCurrent();
     }
     return last - first + 1;
   }
 
   /**
    * Opens the track now at {@code mPlayPos} after the playing one left the queue, and keeps playing
-   * if it was. Stops the service when the queue is now empty.
-   *
-   * @return false when the queue is empty and playback stopped
+   * if it was. Stops playback and the service when the queue is now empty.
    */
-  private boolean playAfterRemovingCurrent() {
+  private void playAfterRemovingCurrent() {
     if (mPlayListLen == 0) {
       mPlayPos = -1;
       stop(true);
       MusicUtils.requestMusicPlaybackServiceShutdown(this);
-      return false;
+      return;
     }
     if (mShuffleEnabled) {
       mPlayPos = getNextPosition(true, isShuffleEnabled());
@@ -1227,7 +1224,6 @@ public class MusicPlaybackService extends MediaSessionService {
       }
     }
     notifyChange(META_CHANGED);
-    return true;
   }
 
   /** What {@link #compactQueue} left: the queue's new length and position. */

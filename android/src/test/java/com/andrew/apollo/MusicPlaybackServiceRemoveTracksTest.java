@@ -96,6 +96,30 @@ public class MusicPlaybackServiceRemoveTracksTest {
     assertEquals(1, service.getQueuePosition());
   }
 
+  @Test
+  public void aRangeStartingBeforeTheQueueIsClampedAtBothEnds() throws Exception {
+    MusicPlaybackService service =
+        Robolectric.buildService(MusicPlaybackService.class).create().get();
+    set(service, "mPlayList", new long[] {7, 8, 9});
+    set(service, "mPlayListLen", 3);
+    set(service, "mPlayPos", -1);
+
+    assertEquals("the three queued songs", 3, service.removeTracks(-1, 10));
+    assertArrayEquals(new long[0], service.getQueue());
+  }
+
+  @Test
+  public void removingTheOnlySongCountsIt() throws Exception {
+    MusicPlaybackService service =
+        Robolectric.buildService(MusicPlaybackService.class).create().get();
+    set(service, "mPlayList", new long[] {7});
+    set(service, "mPlayListLen", 1);
+    set(service, "mPlayPos", 0);
+
+    assertEquals("one removed, so listeners hear the queue changed", 1, service.removeTrack(7));
+    assertArrayEquals(new long[0], service.getQueue());
+  }
+
   private static void set(Object target, String name, Object value) throws Exception {
     Field field = MusicPlaybackService.class.getDeclaredField(name);
     field.setAccessible(true);
