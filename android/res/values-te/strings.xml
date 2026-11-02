@@ -642,7 +642,6 @@
     <string name="distributed_identity_loading">సేవ్ చేసిన ఐడెంటిటీని లోడ్ చేస్తోంది…</string>
     <string name="distributed_identity_loading_details">Loading…</string>
     <string name="distributed_identity_not_available">అందుబాటులో లేదు</string>
-    <string name="distributed_identity_karma_score">%1$d ఆమోదాలు</string>
     <string name="distributed_identity_shared_torrents">%1$d టొరెంట్‌లు</string>
     <string name="distributed_identity_tap_to_copy">Tap to copy</string>
     <string name="distributed_identity_copied">క్లిప్‌బోర్డ్‌కు కాపీ చేయబడింది</string>

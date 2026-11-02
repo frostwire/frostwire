@@ -33,17 +33,15 @@ import com.frostwire.android.gui.services.EngineForegroundService;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 import com.frostwire.android.gui.views.preference.ButtonActionPreference;
-import com.frostwire.android.search.AndroidKarmaChainStore;
-import com.frostwire.android.search.AndroidLocalIndex;
 import com.frostwire.android.search.AndroidRelayStack;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.platform.Platforms;
+import com.frostwire.search.relay.DisplayKarma;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.IdentityLifecycle;
 import com.frostwire.search.relay.KarmaConstants;
 import com.frostwire.search.relay.PeerDirectory;
-import com.frostwire.search.relay.PeerKarmaCache;
 import com.frostwire.search.relay.RelayConstants;
 import com.frostwire.search.relay.icebridge.IceBridgeHostCache;
 import com.frostwire.search.relay.icebridge.IceBridgeServer;
@@ -336,7 +334,7 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
     // Instant paint from wiring if already preloaded — no flash of empty state.
     IdentityKeys live = SearchEngine.DISTRIBUTED_WIRING.identity();
     if (live != null) {
-      applyIdentityToUi(live, -1, -1);
+      applyIdentityToUi(live, null, -1);
     } else {
       // Never show "Not initialized" until disk has been checked.
       showIdentityLoadingState();
@@ -351,14 +349,17 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
             SearchEngine.DISTRIBUTED_WIRING.identity(identity);
           }
           final boolean filePresent = identityFilePresent();
-          final long karma = identity != null ? readKarmaScore(identity) : -1;
+          final DisplayKarma karma =
+              identity != null
+                  ? SearchEngine.DISTRIBUTED_WIRING.localKarma(identity.ed25519PubRaw())
+                  : null;
           final int shared = identity != null ? readSharedCount() : -1;
           final IdentityKeys result = identity;
           SystemUtils.postToUIThread(
               () -> {
                 if (result != null) {
                   identityPathRetries = 0;
-                  applyIdentityToUi(result, karma, shared);
+                  applyIdentityToUi(result, karmaSummary(karma), shared);
                 } else if (filePresent) {
                   // File exists but load failed — still not "missing identity".
                   showIdentityLoadingState();
@@ -370,7 +371,7 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
                   SystemUtils.postToUIThreadDelayed(this::refreshIdentityInfo, 300);
                 } else {
                   identityPathRetries = 0;
-                  applyIdentityToUi(null, -1, -1);
+                  applyIdentityToUi(null, null, -1);
                 }
               });
         });
@@ -381,10 +382,11 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
    * keys so the screen updates even if a concurrent stack restart has not yet re-wired {@link
    * SearchEngine#DISTRIBUTED_WIRING}.
    *
-   * @param karma endorsements, or {@code < 0} to show a loading placeholder
+   * @param karma the karma row's summary ({@link #karmaSummary}), or null to show a loading
+   *     placeholder
    * @param shared torrent count, or {@code < 0} to show a loading placeholder
    */
-  private void applyIdentityToUi(IdentityKeys identity, long karma, int shared) {
+  private void applyIdentityToUi(IdentityKeys identity, String karma, int shared) {
     if (!isAdded()) {
       return;
     }
@@ -421,7 +423,18 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
     }
   }
 
-  private void updateIdentityRows(IdentityKeys identity, long karma, int shared) {
+  /**
+   * The karma row: the local identity's {@link DisplayKarma} (what every karma indicator shows for
+   * a peer, frostwire/frostwire#1418), or "not available" while the relay stack is not running.
+   * Call on the main thread.
+   */
+  private String karmaSummary(DisplayKarma karma) {
+    return karma != null
+        ? karma.text() + "\n" + getString(R.string.distributed_identity_tap_to_copy)
+        : getString(R.string.distributed_identity_not_available);
+  }
+
+  private void updateIdentityRows(IdentityKeys identity, String karma, int shared) {
     Preference nodeIdPref = findPreference("frostwire.prefs.distributed.identity.node_id");
     Preference fingerprintPref = findPreference("frostwire.prefs.distributed.identity.fingerprint");
     Preference pubkeyPref = findPreference("frostwire.prefs.distributed.identity.public_key");
@@ -452,11 +465,10 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
       pubkeyPref.setSummary(pubHex + "\n" + tap);
     }
     if (karmaPref != null) {
-      if (karma < 0) {
+      if (karma == null) {
         karmaPref.setSummary(R.string.distributed_identity_loading_details);
       } else {
-        karmaPref.setSummary(
-            getString(R.string.distributed_identity_karma_score, karma) + "\n" + tap);
+        karmaPref.setSummary(karma);
       }
     }
     if (difficultyPref != null) {
@@ -478,23 +490,6 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
       } else {
         sharedPref.setSummary(getString(R.string.distributed_identity_shared_torrents, shared));
       }
-    }
-  }
-
-  private long readKarmaScore(IdentityKeys identity) {
-    try {
-      Context ctx = getContext();
-      if (ctx == null) {
-        return 0;
-      }
-      try (AndroidKarmaChainStore store =
-          new AndroidKarmaChainStore(ctx, AndroidLocalIndex.DEFAULT_DB_NAME)) {
-        return PeerKarmaCache.endorsementsGiven(
-            store.loadChain(identity.ed25519PubRaw()).entries());
-      }
-    } catch (Throwable t) {
-      LOG.warn("Failed to read karma score", t);
-      return 0;
     }
   }
 
@@ -567,7 +562,7 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
                   dismiss(progress);
                   busy = false;
                   toast(R.string.distributed_identity_init_ok);
-                  applyIdentityToUi(installed, 0, shared);
+                  applyIdentityToUi(installed, null, shared);
                 });
             // Reload IceBridge with the new identity file (best-effort),
             // then refresh karma / peers / stack status.
@@ -646,7 +641,7 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
             SystemUtils.postToUIThread(
                 () -> {
                   toast(R.string.distributed_identity_restore_ok);
-                  applyIdentityToUi(installed, 0, readSharedCount());
+                  applyIdentityToUi(installed, null, readSharedCount());
                   restartRelayStack(this::refreshAll);
                 });
           } catch (Throwable t) {
@@ -728,7 +723,7 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
             SystemUtils.postToUIThread(
                 () -> {
                   toast(R.string.distributed_identity_import_ok);
-                  applyIdentityToUi(keys, 0, readSharedCount());
+                  applyIdentityToUi(keys, null, readSharedCount());
                   restartRelayStack(this::refreshAll);
                 });
           } catch (Throwable t) {
@@ -745,12 +740,15 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
       toast(R.string.distributed_identity_no_identity);
       return;
     }
+    String notAvailable = getString(R.string.distributed_identity_not_available);
     SystemUtils.postToHandler(
         SystemUtils.HandlerThreadName.MISC,
         () -> {
-          long karma = readKarmaScore(identity);
+          DisplayKarma karma = SearchEngine.DISTRIBUTED_WIRING.localKarma(identity.ed25519PubRaw());
           int shared = readSharedCount();
-          String summary = IdentityLifecycle.summaryText(identity, karma, shared);
+          String summary =
+              IdentityLifecycle.summaryText(
+                  identity, karma != null ? karma.text() : notAvailable, shared);
           if (getActivity() != null) {
             getActivity().runOnUiThread(() -> copyToClipboard(summary));
           }

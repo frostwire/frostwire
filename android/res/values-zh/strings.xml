@@ -642,7 +642,6 @@
     <string name="distributed_identity_loading">正在加载已保存的身份…</string>
     <string name="distributed_identity_loading_details">Loading…</string>
     <string name="distributed_identity_not_available">不可用</string>
-    <string name="distributed_identity_karma_score">%1$d 项认可</string>
     <string name="distributed_identity_shared_torrents">%1$d 个种子</string>
     <string name="distributed_identity_tap_to_copy">Tap to copy</string>
     <string name="distributed_identity_copied">已复制到剪贴板</string>

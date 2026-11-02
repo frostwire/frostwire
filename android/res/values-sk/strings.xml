@@ -642,7 +642,6 @@
     <string name="distributed_identity_loading">Načítava sa uložená identita…</string>
     <string name="distributed_identity_loading_details">Loading…</string>
     <string name="distributed_identity_not_available">Nedostupné</string>
-    <string name="distributed_identity_karma_score">Odporúčaní: %1$d</string>
     <string name="distributed_identity_shared_torrents">Torrentov: %1$d</string>
     <string name="distributed_identity_tap_to_copy">Tap to copy</string>
     <string name="distributed_identity_copied">Skopírované do schránky</string>
