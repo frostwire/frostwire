@@ -35,6 +35,7 @@ import android.widget.HorizontalScrollView;
 import com.andrew.apollo.ui.activities.ProfileActivity;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.frostwire.android.R;
+import java.util.function.Supplier;
 
 /**
  * A custom {@link HorizontalScrollView} that displays up to two "tabs" in the {@link
@@ -403,15 +404,17 @@ public class ProfileTabCarousel extends HorizontalScrollView implements OnTouchL
   }
 
   /**
-   * Sets the playlist or genre image header
+   * Sets the header of a playlist, genre, Favorites or Last added: the album art of its first song
+   * on an album.
    *
    * @param context The {@link Activity} to use
-   * @param profileName The key used to find the cached image for a playlist or genre
+   * @param songs the list's songs; read on a background thread
    */
-  public void setPlaylistOrGenreProfileHeader(final Activity context, final String profileName) {
+  public void setPlaylistOrGenreProfileHeader(
+      final Activity context, final Supplier<long[]> songs) {
     mFirstTab.setDefault(context);
     mFirstTab.setLabel(getResources().getString(R.string.page_songs));
-    mFirstTab.setPlaylistOrGenrePhoto(context, profileName);
+    mFirstTab.setSongsPhoto(context, songs);
     mSecondTab.setVisibility(View.GONE);
     mEnableSwipe = false;
   }

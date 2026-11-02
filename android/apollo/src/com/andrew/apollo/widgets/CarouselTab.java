@@ -31,9 +31,11 @@ import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.BitmapUtils;
 import com.andrew.apollo.utils.MusicUtils;
+import com.andrew.apollo.utils.SongArtwork;
 import com.frostwire.android.R;
 import com.frostwire.android.util.FWImageLoader;
 import com.frostwire.android.util.SystemUtils;
+import java.util.function.Supplier;
 
 /**
  * @author Andrew Neal (andrewdneal@gmail.com)
@@ -211,22 +213,29 @@ public class CarouselTab extends FrameLayoutWithOverlay {
   }
 
   /**
-   * Used to set the header image for playlists and genres.
+   * Sets the header image of a playlist, genre, Favorites or Last added: the album art of the first
+   * of its {@code songs} on an album, or the default. It looked the image up by name in a cache
+   * nothing ever wrote, so the default always showed (frostwire/frostwire#1461).
    *
-   * @param context The {@link Context} to use.
-   * @param profileName The key used to fetch the image.
+   * @param songs the list's songs; read on a background thread
    */
-  public void setPlaylistOrGenrePhoto(final Activity context, final String profileName) {
-    if (!TextUtils.isEmpty(profileName)) {
-      final Bitmap image = mFetcher.getCachedBitmap(profileName);
-      if (image != null) {
-        mPhoto.setImageBitmap(image);
-      } else {
-        setDefault(context);
-      }
-    } else {
-      setDefault(context);
-    }
+  public void setSongsPhoto(final Activity context, final Supplier<long[]> songs) {
+    SystemUtils.postToHandler(
+        SystemUtils.HandlerThreadName.MISC,
+        () -> {
+          final long albumId =
+              SongArtwork.firstAlbumId(
+                  songs.get(), songId -> MusicUtils.getAlbumIdForSong(context, songId));
+          SystemUtils.postToUIThread(
+              () -> {
+                if (albumId < 0) {
+                  setDefault(context);
+                  return;
+                }
+                FWImageLoader.getInstance(context)
+                    .load(FWImageLoader.getAlbumArtUri(albumId), mPhoto, R.drawable.header_temp);
+              });
+        });
   }
 
   /**

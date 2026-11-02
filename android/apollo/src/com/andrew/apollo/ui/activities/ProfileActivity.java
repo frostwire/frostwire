@@ -151,7 +151,8 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
     } else if (isFavorites()) { // Set up the favorites profile
       profileHandled = true;
       // Add the carousel images
-      mTabCarousel.setPlaylistOrGenreProfileHeader(this, mProfileName);
+      mTabCarousel.setPlaylistOrGenreProfileHeader(
+          this, () -> MusicUtils.getSongListForFavorites(this));
       // Favorite fragment
       mPagerAdapter.add(FavoriteFragment.class, null);
       // Action bar title = Favorites
@@ -159,7 +160,8 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
     } else if (isLastAdded()) { // Set up the last added profile
       profileHandled = true;
       // Add the carousel images
-      mTabCarousel.setPlaylistOrGenreProfileHeader(this, mProfileName);
+      mTabCarousel.setPlaylistOrGenreProfileHeader(
+          this, () -> MusicUtils.getSongListForLastAdded(this));
       // Last added fragment
       mPagerAdapter.add(LastAddedFragment.class, null);
       // Action bar title = Last added
@@ -167,7 +169,8 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
     } else if (isPlaylist()) { // Set up the user playlist profile
       profileHandled = true;
       // Add the carousel images
-      mTabCarousel.setPlaylistOrGenreProfileHeader(this, mProfileName);
+      mTabCarousel.setPlaylistOrGenreProfileHeader(
+          this, () -> MusicUtils.getSongListForPlaylist(this, mArguments.getLong(Config.ID)));
       // Playlist profile fragments
       mPagerAdapter.add(PlaylistSongFragment.class, mArguments);
       // Action bar title = playlist name
@@ -175,7 +178,8 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
     } else if (isGenre()) { // Set up the genre profile
       profileHandled = true;
       // Add the carousel images
-      mTabCarousel.setPlaylistOrGenreProfileHeader(this, mProfileName);
+      mTabCarousel.setPlaylistOrGenreProfileHeader(
+          this, () -> MusicUtils.getSongListForGenre(this, mArguments.getLong(Config.ID)));
       // Genre profile fragments
       mPagerAdapter.add(GenreSongFragment.class, mArguments);
       // Action bar title = playlist name
