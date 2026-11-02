@@ -720,29 +720,30 @@ public class MusicPlaybackService extends MediaSessionService {
     return false;
   }
 
+  /**
+   * Handles a command intent (media button, notification action, foreground-state change, shutdown)
+   * on the player thread, after {@link #initService()}: the player thread runs its tasks in order,
+   * so a command posted after initService runs once the service is ready. It used to move to the
+   * shared MISC thread and wait there up to 4 s for initialization, holding up everything else on
+   * MISC (frostwire/frostwire#1376).
+   */
   public void handleCommandIntent(Intent intent) {
-    if (SystemUtils.isUIThread()) {
-      SystemUtils.postToHandler(
-          SystemUtils.HandlerThreadName.MISC, () -> handleCommandIntent(intent));
-      return;
-    }
-
-    SystemUtils.ensureBackgroundThreadOrCrash("MusicPlaybackService.handleCommandIntent");
-
-    if (!serviceInitialized.get()) {
-      SystemUtils.exceptionSafePost(mPlayerHandler, this::initService);
-    }
-
     Asserts.checkNotNull(intent);
-    LOG.info("MusicPlaybackService::handleCommandIntent waiting for initServiceLatch...", true);
-    try {
-      initServiceLatch.await(4, TimeUnit.SECONDS);
-    } catch (InterruptedException e) {
-      LOG.error("handleCommandIntent aborted: " + e.getMessage(), e);
+    final MusicPlayerHandler handler = mPlayerHandler;
+    if (handler == null) {
+      LOG.warn(
+          "handleCommandIntent: the service isn't initialized (no permission?), dropping "
+              + intent);
       return;
     }
-    LOG.info("MusicPlaybackService::handleCommandIntent done waiting for initServiceLatch", true);
+    if (!serviceInitialized.get()) {
+      SystemUtils.exceptionSafePost(handler, this::initService);
+    }
+    SystemUtils.exceptionSafePost(handler, () -> handleCommand(intent));
+  }
 
+  /** {@link #handleCommandIntent(Intent)}'s work; on the player thread, after initService. */
+  private void handleCommand(Intent intent) {
     final String action = intent.getAction();
     final String command = SERVICECMD.equals(action) ? intent.getStringExtra(CMDNAME) : null;
 
