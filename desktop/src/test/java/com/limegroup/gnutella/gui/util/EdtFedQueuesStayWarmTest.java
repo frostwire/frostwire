@@ -58,6 +58,20 @@ class EdtFedQueuesStayWarmTest {
     }
   }
 
+  /**
+   * The clipboard parser is fed on every window activation. Source check: the listener's class
+   * reads the system clipboard when it loads, which a headless test JVM can't.
+   */
+  @Test
+  void theClipboardParserKeepsItsWorker() throws Exception {
+    String source =
+        java.nio.file.Files.readString(
+                java.nio.file.Path.of(
+                    "src/main/java/com/limegroup/gnutella/gui/search/MagnetClipboardListener.java"))
+            .replaceAll("\\s+", "");
+    assertTrue(source.contains("clipboardParser=WarmExecutors.serialQueue(\"clipboardparser\")"));
+  }
+
   private static Object staticMethod(String className, String name) throws Exception {
     Method method = Class.forName(className).getDeclaredMethod(name);
     method.setAccessible(true);

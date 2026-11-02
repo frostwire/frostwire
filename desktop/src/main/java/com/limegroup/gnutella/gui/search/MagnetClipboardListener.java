@@ -18,13 +18,13 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.MagnetOptions;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
+import com.limegroup.gnutella.gui.util.WarmExecutors;
 import com.limegroup.gnutella.util.QueryUtils;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -45,9 +45,12 @@ public class MagnetClipboardListener extends WindowAdapter {
   // dummy clipboard content
   private final StringSelection empty = new StringSelection("");
 
-  /** a thread which parses the clipboard and launches magnet downloads. */
-  private final ExecutorService clipboardParser =
-      ExecutorsHelper.newProcessingQueue("clipboard parser");
+  /**
+   * Parses the clipboard and launches magnet downloads. Fed from the EDT on every window
+   * activation, so its worker stays warm: a queue whose thread timed out started one from the EDT
+   * each time the user came back to FrostWire (#1314, frostwire/frostwire#1466).
+   */
+  private final ExecutorService clipboardParser = WarmExecutors.serialQueue("clipboard parser");
 
   private volatile String copiedText;
   private final Runnable parser = this::parseAndLaunch;
