@@ -309,6 +309,18 @@ public final class PeerDirectory {
     return Math.max(-1.0, transitive + karma);
   }
 
+  /**
+   * The karma FrostWire shows for a peer: in search results, the Peer Directory and the identity
+   * screens. Every karma indicator reads this one method, so a scoring change lands in one place.
+   *
+   * <p>Currently the trust score ({@link #trustScore(byte[])}); frostwire/frostwire#1417 will
+   * switch it to the karma the peer received. It never waits on the network, but it walks the trust
+   * graph, so UI code reads it through {@link KarmaDisplayCache} or from a background thread.
+   */
+  public double displayKarma(byte[] peerPub) {
+    return trustScore(peerPub);
+  }
+
   private double transitiveTrust(byte[] peerPub, int depth, java.util.Set<String> visited) {
     // BFS over the trust graph: each level contributes 1.0 per
     // newly-seen peer, weighted by DECAY^level. Cycles are
