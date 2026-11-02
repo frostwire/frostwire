@@ -1,4 +1,5 @@
 FrostWire 3.2.3 build 779 UNRELEASED
+  - fix:Playing a song from the music player no longer leaves a My Files preview playing over it, and car, watch and Android Auto screens show the titles of every song in the queue (#1452)
   - new:Distributed search results show the karma of the peer that shared them (#1418)
   - fix:Music player: the queue is now the player's own playlist, so the app, Bluetooth, the lock screen, Android Auto and Wear see the whole queue and agree on next and previous; the player no longer piles up one entry per song played, and the saved queue is restored after a restart (#1452)
   - fix:Music player: playlist, genre, Favorites and Last added headers and home-screen shortcuts show real album art instead of the default image, and an image cache that never cached anything is gone (#1461)
