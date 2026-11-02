@@ -22,12 +22,10 @@ import com.frostwire.concurrent.concurrent.ThreadExecutor;
 import com.frostwire.gui.HideExitDialog;
 import com.frostwire.gui.bittorrent.BTDownload;
 import com.frostwire.gui.bittorrent.BTDownloadMediator;
-import com.frostwire.gui.bittorrent.TorrentUtil;
 import com.frostwire.gui.components.slides.Slide;
 import com.frostwire.gui.library.LibraryMediator;
 import com.frostwire.gui.tabs.Tab;
 import com.frostwire.gui.tabs.TransfersTab;
-import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.service.ErrorService;
@@ -67,6 +65,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import javax.swing.*;
 import org.limewire.setting.IntSetting;
@@ -1176,18 +1175,17 @@ public final class GUIMediator {
     }
     BTDownloadMediator btDownloadMediator = getBTDownloadMediator();
     List<BTDownload> downloads = getBTDownloadMediator().getDownloads();
-    Runnable onOpenRunnable =
-        () -> {
+    // The mediator parses the file off the EDT and hands over its info-hash (#1468).
+    Consumer<String> onOpened =
+        torrentHash -> {
           showTransfers(TransfersTab.FilterMode.ALL);
-          TorrentInfo ti = new TorrentInfo(torrentFile);
-          String torrentHash = TorrentUtil.getInfoHashString(ti);
           for (BTDownload btDownload : downloads) {
             if (torrentHash != null && btDownload.getHash().equals(torrentHash)) {
               btDownloadMediator.selectBTDownload(btDownload);
             }
           }
         };
-    btDownloadMediator.openTorrentFile(torrentFile, partialSelection, onOpenRunnable);
+    btDownloadMediator.openTorrentFile(torrentFile, partialSelection, onOpened);
   }
 
   public void openTorrentForSeed(File torrentFile, File saveDir) {

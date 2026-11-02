@@ -31,6 +31,7 @@ import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.gui.theme.SkinMenu;
 import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
+import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.mp4.Mp4Demuxer;
 import com.frostwire.mp4.Mp4Info;
 import com.frostwire.search.relay.KarmaChainWriter;
@@ -67,6 +68,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -910,51 +912,96 @@ public final class BTDownloadMediator
     BTDownloadDataLine.SEEDING_COLUMN.setCellEditor(new GenericCellEditor(getSeedingRenderer()));
   }
 
+  /**
+   * Opens a .torrent file the user picked or dropped. Reading and bdecoding the file (and looking
+   * for its seed data next to it) is disk and JNI work, so it happens once, on the background queue
+   * (frostwire/frostwire#1468); the file selection dialog and {@code onOpenedForUIThread}, which
+   * receives the torrent's info-hash, then run on the EDT.
+   */
   public void openTorrentFile(
       final File torrentFile,
       final boolean partialDownload,
-      final Runnable onOpenRunnableForUIThread) {
+      final Consumer<String> onOpenedForUIThread) {
     if (VPNDropGuard.canUseBitTorrent()) {
-      SwingUtilities.invokeLater(
-          () -> {
-            try {
-              boolean[] filesSelection = null;
-              File saveDirFromDialog = null;
-              if (partialDownload) {
-                PartialFilesDialog dlg =
-                    new PartialFilesDialog(GUIMediator.getAppFrame(), torrentFile);
-                dlg.setVisible(true);
-                filesSelection = dlg.getFilesSelection();
-                if (filesSelection == null) {
-                  return;
-                }
-                saveDirFromDialog = dlg.getSaveFolder();
-              }
-              if (onOpenRunnableForUIThread != null) {
-                onOpenRunnableForUIThread.run();
-              }
-              File saveDir = null;
-              // Check if there's a file named like the torrent in the same folder
-              // then that means the user wants to seed
-              String seedDataFilename = FilenameUtils.removeExtension(torrentFile.getName());
-              File seedDataFile = new File(torrentFile.getParentFile(), seedDataFilename);
-              if (seedDataFile.exists()) {
-                saveDir = torrentFile.getParentFile();
-              }
-              // Copying the .torrent and adding it to the session are disk and libtorrent work,
-              // and getting the engine waits until startup has set it up: never on the EDT
-              // (Icebase #57095c0f3115).
-              final File finalSaveDir = saveDir;
-              final File finalSaveDirFromDialog = saveDirFromDialog;
-              final boolean[] finalFilesSelection = filesSelection;
-              BackgroundQueuedExecutorService.schedule(
-                  () ->
-                      addOpenedTorrentFile(
-                          torrentFile, finalSaveDir, finalSaveDirFromDialog, finalFilesSelection));
-            } catch (Exception e) {
-              reportTorrentOpenFailure(torrentFile, e);
-            }
-          });
+      readThenShow(
+          () -> readTorrentFile(torrentFile),
+          BackgroundQueuedExecutorService::schedule,
+          GUIMediator::safeInvokeLater,
+          opened ->
+              showOpenedTorrentFile(torrentFile, partialDownload, opened, onOpenedForUIThread),
+          e -> reportTorrentOpenFailure(torrentFile, e));
+    }
+  }
+
+  /** What {@link #openTorrentFile} reads from the disk before it shows anything. */
+  record OpenedTorrentFile(TorrentInfo info, String hash, boolean seedDataNextToIt) {}
+
+  /** Parses {@code torrentFile} and looks for its seed data next to it. Not on the EDT. */
+  private static OpenedTorrentFile readTorrentFile(File torrentFile) {
+    TorrentInfo info = new TorrentInfo(torrentFile);
+    // A file named like the torrent in the same folder means the user wants to seed it.
+    File seedData =
+        new File(torrentFile.getParentFile(), FilenameUtils.removeExtension(torrentFile.getName()));
+    return new OpenedTorrentFile(info, TorrentUtil.getInfoHashString(info), seedData.exists());
+  }
+
+  /**
+   * Runs {@code read} on {@code background}, then hands its result to {@code show} on {@code ui},
+   * or the exception it threw to {@code onFailure} on {@code ui}.
+   */
+  static <T> void readThenShow(
+      Callable<T> read,
+      Executor background,
+      Consumer<Runnable> ui,
+      Consumer<T> show,
+      Consumer<Exception> onFailure) {
+    background.execute(
+        () -> {
+          T result;
+          try {
+            result = read.call();
+          } catch (Exception e) {
+            ui.accept(() -> onFailure.accept(e));
+            return;
+          }
+          ui.accept(() -> show.accept(result));
+        });
+  }
+
+  /** EDT half of {@link #openTorrentFile}, with the file already parsed. */
+  private void showOpenedTorrentFile(
+      File torrentFile,
+      boolean partialDownload,
+      OpenedTorrentFile opened,
+      Consumer<String> onOpenedForUIThread) {
+    try {
+      boolean[] filesSelection = null;
+      File saveDirFromDialog = null;
+      if (partialDownload) {
+        PartialFilesDialog dlg =
+            new PartialFilesDialog(GUIMediator.getAppFrame(), opened.info(), torrentFile.getName());
+        dlg.setVisible(true);
+        filesSelection = dlg.getFilesSelection();
+        if (filesSelection == null) {
+          return;
+        }
+        saveDirFromDialog = dlg.getSaveFolder();
+      }
+      if (onOpenedForUIThread != null) {
+        onOpenedForUIThread.accept(opened.hash());
+      }
+      final File finalSaveDir = opened.seedDataNextToIt() ? torrentFile.getParentFile() : null;
+      // Copying the .torrent and adding it to the session are disk and libtorrent work, and
+      // getting the engine waits until startup has set it up: never on the EDT (Icebase
+      // #57095c0f3115).
+      final File finalSaveDirFromDialog = saveDirFromDialog;
+      final boolean[] finalFilesSelection = filesSelection;
+      BackgroundQueuedExecutorService.schedule(
+          () ->
+              addOpenedTorrentFile(
+                  torrentFile, finalSaveDir, finalSaveDirFromDialog, finalFilesSelection));
+    } catch (Exception e) {
+      reportTorrentOpenFailure(torrentFile, e);
     }
   }
 

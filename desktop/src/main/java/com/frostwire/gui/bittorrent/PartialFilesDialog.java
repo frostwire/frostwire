@@ -73,15 +73,12 @@ class PartialFilesDialog extends JDialog {
   private JButton buttonResetFolder;
   private final File defaultSaveFolder = SharingSettings.TORRENT_DATA_DIR_SETTING.getValue();
 
-  PartialFilesDialog(JFrame frame, File torrentFile) {
-    this(frame, new TorrentInfo(torrentFile), torrentFile.getName());
-  }
-
   PartialFilesDialog(JFrame frame, byte[] bytes, String name) {
     this(frame, TorrentInfo.bdecode(bytes), name);
   }
 
-  private PartialFilesDialog(JFrame frame, TorrentInfo torrent, String name) {
+  /** {@code torrent} is parsed by the caller, off the EDT (frostwire/frostwire#1468). */
+  PartialFilesDialog(JFrame frame, TorrentInfo torrent, String name) {
     super(frame, I18n.tr("Select files to download"));
     this.torrent = torrent;
     this.name = name;
