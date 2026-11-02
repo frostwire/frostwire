@@ -33,7 +33,6 @@ import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
 import android.system.Os;
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.AndroidPaths;
@@ -55,10 +54,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.Stack;
 import java.util.concurrent.atomic.AtomicReference;
 import okio.BufferedSink;
 import okio.Okio;
@@ -421,30 +417,6 @@ public final class Librarian {
     return false;
   }
 
-  private void scan(final Context context, @NonNull File file, Set<File> ignorableFiles) {
-    // if we just have a single file, do it the old way
-    if (file.isFile()) {
-      if (ignorableFiles.contains(file)) {
-        return;
-      }
-      if (!SystemUtils.hasAndroid10OrNewer()) {
-        new UniversalScanner(context).scan(file.getAbsolutePath());
-      }
-    } else if (file.isDirectory() && file.canRead()) {
-      Collection<File> flattenedFiles = getAllFolderFiles(file, null);
-
-      if (ignorableFiles != null && !ignorableFiles.isEmpty()) {
-        flattenedFiles.removeAll(ignorableFiles);
-      }
-
-      if (!flattenedFiles.isEmpty()) {
-        if (!SystemUtils.hasAndroid10OrNewer()) {
-          new UniversalScanner(context).scan(flattenedFiles);
-        }
-      }
-    }
-  }
-
   /**
    * This method assumes you did the logic to determine the target location in Downloads. Meaning,
    * "destInDownloads" doesn't exist yet, but this is where you'd like it to be saved at.
@@ -688,51 +660,6 @@ public final class Librarian {
         new HandlerThread("Librarian::handler", android.os.Process.THREAD_PRIORITY_BACKGROUND);
     handlerThread.start();
     handler = new Handler(handlerThread.getLooper());
-  }
-
-  /**
-   * Given a folder path it'll return all the files contained within it and it's subfolders as a
-   * flat set of Files.
-   *
-   * <p>Non-recursive implementation, up to 20% faster in tests than recursive implementation. :)
-   *
-   * @param extensions If you only need certain files filtered by their extensions, use this string
-   *     array (without the "."). or set to null if you want all files. e.g. ["txt","jpg"] if you
-   *     only want text files and jpegs.
-   * @return The set of files.
-   * @author gubatron
-   */
-  private static Collection<File> getAllFolderFiles(File folder, String[] extensions) {
-    Set<File> results = new HashSet<>();
-    Stack<File> subFolders = new Stack<>();
-    File currentFolder = folder;
-    while (currentFolder != null && currentFolder.isDirectory() && currentFolder.canRead()) {
-      File[] fs = null;
-      try {
-        fs = currentFolder.listFiles();
-      } catch (SecurityException e) {
-        LOG.error(e.getMessage(), e);
-      }
-
-      if (fs != null && fs.length > 0) {
-        for (File f : fs) {
-          if (!f.isDirectory()) {
-            if (extensions == null || FilenameUtils.isExtension(f.getName(), extensions)) {
-              results.add(f);
-            }
-          } else {
-            subFolders.push(f);
-          }
-        }
-      }
-
-      if (!subFolders.isEmpty()) {
-        currentFolder = subFolders.pop();
-      } else {
-        currentFolder = null;
-      }
-    }
-    return results;
   }
 
   private static String buildSet(List<?> list) {
