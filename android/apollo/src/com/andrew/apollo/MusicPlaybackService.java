@@ -86,17 +86,23 @@ import java.net.URLDecoder;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.IntSupplier;
+import java.util.function.ToIntFunction;
 
 /**
  * A background {@link Service} used to keep music playing between activities and when the user
  * moves Apollo into the background.
  *
- * <p>TODO: - assertInMusicPlayerHandlerThread()
+ * <p>The queue is ExoPlayer's playlist ({@link PlaybackQueue}). Threading: ExoPlayer and the queue
+ * are only used on the player thread ({@code mPlayerHandler}). Methods that change them run at once
+ * when called there, else they are posted to it; the queue's getters read a snapshot that thread
+ * publishes, so any thread may call them.
  */
 public class MusicPlaybackService extends MediaSessionService {
   private final Object cursorLock = new Object();
@@ -235,15 +241,18 @@ public class MusicPlaybackService extends MediaSessionService {
   public static final int REPEAT_CURRENT = 1;
   public static final int REPEAT_ALL = 2;
 
-  private static final int TRACK_ENDED = 1;
-  private static final int TRACK_WENT_TO_NEXT = 2;
-  private static final int RELEASE_WAKELOCK = 3;
   private static final int SERVER_DIED = 4;
-  private static final int FOCUS_CHANGE = 5;
   private static final int FADE_DOWN = 6;
   private static final int FADE_UP = 7;
-  private static final int TRACK_WENT_TO_PREVIOUS = 8;
+
+  /** "Previous" later than this into a song restarts it instead. */
   private static final long REWIND_INSTEAD_PREVIOUS_THRESHOLD = 3000;
+
+  /** Songs in a row that may fail to play before playback stops instead of skipping on. */
+  private static final int MAX_FAILED_SONGS_SKIPPED = 10;
+
+  /** How long a caller off the main thread waits for the player thread to change the queue. */
+  private static final long QUEUE_CHANGE_TIMEOUT_MS = 2000;
 
   private static final String AUDIO_ID_COLUMN_NAME =
       (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ? "_id" : "audio._id AS _id";
@@ -273,11 +282,13 @@ public class MusicPlaybackService extends MediaSessionService {
   private static final String[] SIMPLE_PROJECTION =
       new String[] {"_id", MediaStore.Audio.Media.DATA};
 
-  private static final ArrayDeque<Integer> mHistory = new ArrayDeque<>();
   private static final char[] HEX_DIGITS =
       new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
-  private MultiPlayer mPlayer;
+  // Both made on the player thread in initService, and only used there, except for the
+  // thread-safe reads they document.
+  private volatile MultiPlayer mPlayer;
+  private volatile PlaybackQueue mQueue;
   // SimplePlayer wraps a lightweight ExoPlayer for single-file preview playback
   // (distinct from the queued MultiPlayer used for full music playback).
   private ExoPlayer mSimplePlayer;
@@ -291,31 +302,26 @@ public class MusicPlaybackService extends MediaSessionService {
   private volatile AudioManager mAudioManager;
   private DataStore<Preferences> serviceDataStore;
   private boolean mServiceInUse = false;
-  private boolean mIsSupposedToBePlaying = false;
+  private volatile boolean mIsSupposedToBePlaying = false;
   private boolean mQueueIsSaveable = true;
   private boolean mPausedByTransientLossOfFocus = false;
   private boolean musicPlaybackActivityInForeground = false;
   MediaSession mMediaSession;
   private int mCardId;
-  private volatile int mPlayListLen = 0;
-  private volatile int mPlayPos = -1;
-  private int mNextPlayPos = -1;
-  private int mOpenFailedCounter = 0;
-  private int mNearEndAutoAdvanceDepth = 0;
+  private int mFailedSongsInARow = 0; // player thread
   private int mMediaMountedCount = 0;
-  private boolean mShuffleEnabled = false;
-  private int mRepeatMode = REPEAT_ALL;
+  // The modes the user picked, readable at once by the button that changed them; ExoPlayer gets
+  // them on the player thread, and a controller changing them there writes them back.
+  private volatile boolean mShuffleEnabled = false;
+  private volatile int mRepeatMode = REPEAT_ALL;
   private int mServiceStartId = -1;
-  private long[] mPlayList = null;
   private static volatile MusicPlayerHandler mPlayerHandler;
   private BroadcastReceiver mUnmountReceiver = null;
   private ImageFetcher mImageFetcher;
   private RecentStore mRecentsCache;
   private FavoritesStore mFavoritesCache;
-  private boolean launchPlayerActivity;
   private boolean mForegroundNotificationStarted;
   private RememberingMediaNotificationProvider mNotificationProvider;
-  private final Random r = new Random();
 
   private static final HashMap<String, Long> notifyChangeIntervals = new HashMap<>();
 
@@ -350,15 +356,13 @@ public class MusicPlaybackService extends MediaSessionService {
 
   // mediaButtonLock removed — no longer manually registering media button receiver.
 
+  /**
+   * The player thread, made once: ExoPlayer is bound to it for good, so a second onCreate()
+   * (HomeActivity's onCreateSafe() after a permission grant) must not replace it under the player.
+   */
   private static MusicPlayerHandler setupMPlayerHandler() {
-    if (mPlayerHandler != null) {
-      try {
-        mPlayerHandler.removeCallbacksAndMessages(null);
-        HandlerThread oldThread = (HandlerThread) mPlayerHandler.getLooper().getThread();
-        oldThread.quitSafely();
-        mPlayerHandler = null;
-      } catch (Throwable ignore) {
-      }
+    if (mPlayerHandler != null && mPlayerHandler.getLooper().getThread().isAlive()) {
+      return mPlayerHandler;
     }
 
     final HandlerThread handlerThread =
@@ -437,7 +441,7 @@ public class MusicPlaybackService extends MediaSessionService {
   @Nullable
   @Override
   public MediaSession onGetSession(@NonNull MediaSession.ControllerInfo controllerInfo) {
-    if (mMediaSession == null && mPlayer != null && mPlayer.mExoPlayer != null) {
+    if (mMediaSession == null) {
       setUpMediaSession();
     }
     return mMediaSession;
@@ -753,12 +757,13 @@ public class MusicPlaybackService extends MediaSessionService {
 
     if (SHUTDOWN_ACTION.equals(action)) {
       boolean exiting = intent.hasExtra("force");
-      releaseServiceUiAndStop(exiting);
+      // On the player thread, so stopping the player runs at once instead of being posted.
+      runOnPlayerThread(() -> releaseServiceUiAndStop(exiting));
       return;
     }
 
     if (CMDNEXT.equals(command) || NEXT_ACTION.equals(action)) {
-      gotoNext(true);
+      gotoNext();
     } else if (CMDPREVIOUS.equals(command) || PREVIOUS_ACTION.equals(action)) {
       gotoPrev();
     } else if (CMDTOGGLEPAUSE.equals(command) || TOGGLEPAUSE_ACTION.equals(action)) {
@@ -774,10 +779,14 @@ public class MusicPlaybackService extends MediaSessionService {
     } else if (CMDPLAY.equals(command)) {
       play();
     } else if (CMDSTOP.equals(command) || STOP_ACTION.equals(action)) {
-      pause();
-      mPausedByTransientLossOfFocus = false;
-      seek(0);
-      releaseServiceUiAndStop(false);
+      // On the player thread, so no player event can mark it playing again before the check.
+      runOnPlayerThread(
+          () -> {
+            pause();
+            mPausedByTransientLossOfFocus = false;
+            seek(0);
+            releaseServiceUiAndStop(false);
+          });
     } else if (REPEAT_ACTION.equals(action)) {
       cycleRepeat();
     }
@@ -806,8 +815,8 @@ public class MusicPlaybackService extends MediaSessionService {
       mPlayerHandler.removeCallbacksAndMessages(null);
     }
 
+    mQueue = null;
     if (mPlayer != null) {
-      mPlayer.stop();
       mPlayer.release();
       mPlayer = null;
     }
@@ -865,12 +874,13 @@ public class MusicPlaybackService extends MediaSessionService {
     }
   }
 
-  /** Stops the player, not the foreground service */
-  public void stopPlayer() {
-    if (mPlayer != null && mPlayer.isInitialized()) {
-      LOG.info("stopPlayer()");
-      mPlayer.stop();
-      mIsSupposedToBePlaying = false;
+  /** Stops the player, not the foreground service; the queue stays. */
+  private void stopPlayer() {
+    LOG.info("stopPlayer()");
+    mIsSupposedToBePlaying = false;
+    final MultiPlayer player = mPlayer;
+    if (player != null) {
+      player.stop();
     }
   }
 
@@ -931,13 +941,14 @@ public class MusicPlaybackService extends MediaSessionService {
     if (mMediaSession != null) {
       return;
     }
-    if (mPlayer == null || mPlayer.mExoPlayer == null) {
+    final MultiPlayer player = mPlayer;
+    if (player == null) {
       LOG.warn("setUpMediaSession() called before ExoPlayer is ready — deferring");
       return;
     }
     try {
       mMediaSession =
-          new MediaSession.Builder(this, mPlayer.mExoPlayer)
+          new MediaSession.Builder(this, player.mExoPlayer)
               .setId("FrostWireApollo")
               .setSessionActivity(AudioPlayerNotificationActivity.createPendingIntent(this))
               .build();
@@ -949,10 +960,7 @@ public class MusicPlaybackService extends MediaSessionService {
   }
 
   private void releaseServiceUiAndStop(boolean force) {
-    if (mPlayerHandler == null
-        || (!force && isPlaying())
-        || mPausedByTransientLossOfFocus
-        || (mPlayerHandler.hasMessages(TRACK_ENDED))) {
+    if (mPlayerHandler == null || (!force && isPlaying()) || mPausedByTransientLossOfFocus) {
       LOG.info("releaseServiceUiAndStop(force=" + force + ") aborted: isPlaying()=" + isPlaying());
       return;
     }
@@ -969,11 +977,16 @@ public class MusicPlaybackService extends MediaSessionService {
       stopSelf(mServiceStartId);
       stop(false);
     }
-    if (force) {
+    if (force && serviceDataStore != null) {
       DataStoreManager.putInt(serviceDataStore, "curpos", -1);
     }
-    if (mPlayerHandler != null) {
-      mPlayerHandler.removeCallbacksAndMessages(null);
+    // Only the player's own messages: removing every callback also dropped posted queue changes
+    // and the change notifications ChangeCoalescer waits for, which then never went out again.
+    final Handler handler = mPlayerHandler;
+    if (handler != null) {
+      handler.removeMessages(FADE_UP);
+      handler.removeMessages(FADE_DOWN);
+      handler.removeMessages(SERVER_DIED);
     }
   }
 
@@ -996,6 +1009,10 @@ public class MusicPlaybackService extends MediaSessionService {
     if (mPlayerHandler == null) {
       throw new RuntimeException("check your logic, can't init service without mPlayerHandler.");
     }
+    if (serviceInitialized.get()) {
+      // onCreate() and handleCommandIntent() can both post this; one player is enough.
+      return;
+    }
     LOG.info("initService() invoked", true);
 
     mFavoritesCache = FavoritesStore.getInstance(this);
@@ -1005,16 +1022,13 @@ public class MusicPlaybackService extends MediaSessionService {
 
     mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
-    // MediaSession setup deferred until ExoPlayer is ready (called from setCurrentDataSource)
-    // setUpMediaSession() is called after mPlayer is initialized in reloadQueue/openCurrentAndNext
-
     serviceDataStore = DataStoreManager.getServiceDataStore();
     mCardId = getCardId();
 
     registerExternalStorageListener();
 
-    mPlayer = new MultiPlayer();
-    MusicPlaybackService.initRepeatModeAndShuffleTask(this);
+    attachPlayer(MultiPlayer.buildExoPlayer(this, mPlayerHandler.getLooper()));
+    setUpMediaSession();
 
     final IntentFilter filter = new IntentFilter();
     filter.addAction(SERVICECMD);
@@ -1043,7 +1057,7 @@ public class MusicPlaybackService extends MediaSessionService {
 
     // WakeLock initialization removed — ExoPlayer handles it via WAKE_MODE_LOCAL.
 
-    reloadQueue();
+    restoreQueue();
     notifyChange(QUEUE_CHANGED);
     notifyChange(META_CHANGED);
 
@@ -1051,6 +1065,16 @@ public class MusicPlaybackService extends MediaSessionService {
     serviceInitialized.set(true);
     initServiceLatch.countDown();
     flushPendingSafePosts();
+  }
+
+  /**
+   * On the player thread at start: the saved queue, then the repeat and shuffle preferences. In
+   * this order: setting a mode saves the queue position, which before the reload is none, and every
+   * restart forgot where the user was.
+   */
+  private void restoreQueue() {
+    reloadQueue();
+    MusicPlaybackService.initRepeatModeAndShuffleTask(this);
   }
 
   /**
@@ -1093,19 +1117,29 @@ public class MusicPlaybackService extends MediaSessionService {
             @Override
             public void onReceive(final Context context, final Intent intent) {
               final String action = intent.getAction();
-              if (action != null) {
-                if (action.equals(Intent.ACTION_MEDIA_EJECT)) {
-                  saveQueue(true);
-                  mQueueIsSaveable = false;
-                  closeExternalStorageFiles();
-                } else if (action.equals(Intent.ACTION_MEDIA_MOUNTED)) {
-                  mMediaMountedCount++;
-                  mCardId = getCardId();
-                  reloadQueue();
-                  mQueueIsSaveable = true;
-                  notifyChange(QUEUE_CHANGED);
-                  notifyChange(META_CHANGED);
-                }
+              if (action == null) {
+                return;
+              }
+              // The queue is ExoPlayer's, so it is only touched on the player thread.
+              if (action.equals(Intent.ACTION_MEDIA_EJECT)) {
+                runOnPlayerThread(
+                    () -> {
+                      saveQueue(true);
+                      mQueueIsSaveable = false;
+                      closeExternalStorageFiles();
+                    });
+              } else if (action.equals(Intent.ACTION_MEDIA_MOUNTED)) {
+                runOnPlayerThread(
+                    () -> {
+                      mMediaMountedCount++;
+                      mCardId = getCardId();
+                      if (queueSnapshot().size() == 0) {
+                        reloadQueue();
+                      }
+                      mQueueIsSaveable = true;
+                      notifyChange(QUEUE_CHANGED);
+                      notifyChange(META_CHANGED);
+                    });
               }
             }
           };
@@ -1127,185 +1161,131 @@ public class MusicPlaybackService extends MediaSessionService {
     }
   }
 
-  /** Stops playback and the service if removeNotification=true */
+  /** Stops playback; the queue stays, and playing again resumes it. */
   private void stop(final boolean removeNotification) {
     if (D) LOG.info("Stopping playback, removeNotification = " + removeNotification);
     stopPlayer();
-    closeCursor();
+  }
+
+  /** True on the player thread, the only thread that uses ExoPlayer and changes the queue. */
+  private static boolean onPlayerThread() {
+    final Handler handler = mPlayerHandler;
+    return handler != null && handler.getLooper().isCurrentThread();
+  }
+
+  /** Runs {@code task} on the player thread: now when called there, else after what's posted. */
+  static void runOnPlayerThread(Runnable task) {
+    if (onPlayerThread()) {
+      task.run();
+    } else {
+      safePost(task);
+    }
   }
 
   /**
-   * Removes every instance of the tracks in {@code ids} from the queue at once. When the playing
-   * track is among them, playback moves straight to the first track that stays, instead of opening
-   * each removed track on the way, and listeners get one queue change.
-   *
-   * @return how many queue entries were removed
+   * Runs a queue change that returns a count on the player thread. A caller off the main thread
+   * waits for it, at most {@link #QUEUE_CHANGE_TIMEOUT_MS}, so what it reads next shows the change
+   * (NowPlayingCursor reads the queue right after removing songs). The main thread must not wait:
+   * it gets {@code estimate}, worked out from the queue's snapshot before the change.
    */
-  public int removeTracks(final long[] ids) {
-    final int removed;
-    synchronized (this) {
-      final QueueRemoval removal = compactQueue(mPlayList, mPlayListLen, mPlayPos, ids);
-      removed = removal.removed;
-      if (removed == 0) {
-        return 0;
-      }
-      mPlayListLen = removal.length;
-      mPlayPos = removal.position;
-      if (removal.playingRemoved) {
-        playAfterRemovingCurrent();
+  private int changeQueue(IntSupplier change, IntSupplier estimate) {
+    if (onPlayerThread()) {
+      return change.getAsInt();
+    }
+    final int expected = estimate.getAsInt();
+    final FutureTask<Integer> task = new FutureTask<>(change::getAsInt);
+    safePost(task);
+    if (SystemUtils.isUIThread()) {
+      return expected;
+    }
+    try {
+      return task.get(QUEUE_CHANGE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    } catch (ExecutionException | TimeoutException e) {
+      LOG.warn("changeQueue() did not finish on the player thread: " + e);
+    }
+    return expected;
+  }
+
+  /** What the queue holds now; any thread. */
+  private PlaybackQueue.Snapshot queueSnapshot() {
+    final PlaybackQueue queue = mQueue;
+    return queue != null ? queue.snapshot() : PlaybackQueue.Snapshot.EMPTY;
+  }
+
+  /**
+   * Makes {@code exoPlayer} the service's player and its playlist the queue. On the player thread,
+   * which must be {@code exoPlayer}'s application thread.
+   */
+  void attachPlayer(ExoPlayer exoPlayer) {
+    mPlayer = new MultiPlayer(exoPlayer);
+    mQueue =
+        new PlaybackQueue(
+            exoPlayer,
+            new PlaybackQueue.Listener() {
+              @Override
+              public void onQueueChanged() {
+                notifyChange(QUEUE_CHANGED);
+              }
+
+              @Override
+              public void onSongChanged(long audioId) {
+                songChanged(audioId);
+              }
+            });
+  }
+
+  /** On the player thread: another song is current, so its metadata, Recent and notification. */
+  private void songChanged(long audioId) {
+    if (audioId >= 0) {
+      mCurrentFilePath = null;
+      updateCursor(audioId);
+    } else {
+      closeCursor();
+      if (queueSnapshot().size() == 0) {
+        mCurrentFilePath = null;
       }
     }
-    notifyChange(QUEUE_CHANGED);
+    notifyChange(META_CHANGED);
+    updateNotification();
+  }
+
+  /**
+   * On the player thread: removes songs from the queue, and stops playback when none are left. A
+   * stopped player with nothing queued takes Media3's notification and the foreground state away.
+   */
+  private int removeFromQueue(ToIntFunction<PlaybackQueue> removal) {
+    final PlaybackQueue queue = mQueue;
+    if (queue == null) {
+      return 0;
+    }
+    final int removed = removal.applyAsInt(queue);
+    if (removed > 0 && queue.snapshot().size() == 0) {
+      stop(true);
+    }
     return removed;
   }
 
   /**
-   * Removes the range of tracks specified from the play list. If a file within the range is the
-   * file currently being played, playback will move to the next file after the range.
+   * Removes every instance of the tracks in {@code ids} from the queue at once. When the playing
+   * track is among them, playback moves straight to the first track that stays, and listeners get
+   * one queue change. Waits for the player thread unless called on the main thread; see {@link
+   * #changeQueue}.
    *
-   * @param first The first file to be removed
-   * @param last The last file to be removed
-   * @return the number of tracks deleted
+   * @return how many queue entries were removed
    */
-  private int removeTracksInternal(int first, int last) {
-    first = Math.max(first, 0);
-    last = Math.min(last, mPlayListLen - 1);
-    if (last < first) {
-      return 0;
-    }
-
-    boolean gotonext = false;
-    if (first <= mPlayPos && mPlayPos <= last) {
-      mPlayPos = first;
-      gotonext = true;
-    } else if (mPlayPos > last) {
-      mPlayPos -= last - first + 1;
-    }
-    final int num = mPlayListLen - last - 1;
-    for (int i = 0; i < num; i++) {
-      mPlayList[first + i] = mPlayList[last + 1 + i];
-    }
-    mPlayListLen -= last - first + 1;
-
-    if (mPlayListLen < 0) {
-      mPlayListLen = 0;
-    }
-
-    if (gotonext) {
-      // Stops playback when the queue is now empty; the songs were removed either way.
-      playAfterRemovingCurrent();
-    }
-    return last - first + 1;
+  public int removeTracks(final long[] ids) {
+    return changeQueue(
+        () -> removeFromQueue(queue -> queue.remove(ids)), () -> queueSnapshot().count(ids));
   }
 
   /**
-   * Opens the track now at {@code mPlayPos} after the playing one left the queue, and keeps playing
-   * if it was. Stops playback and the service when the queue is now empty.
+   * Removes every song but the playing one from the queue; the playing song keeps playing. Posted
+   * to the player thread.
    */
-  private void playAfterRemovingCurrent() {
-    if (mPlayListLen == 0) {
-      mPlayPos = -1;
-      stop(true);
-      MusicUtils.requestMusicPlaybackServiceShutdown(this);
-      return;
-    }
-    if (mShuffleEnabled) {
-      mPlayPos = getNextPosition(true, isShuffleEnabled());
-    } else if (mPlayPos >= mPlayListLen) {
-      mPlayPos = 0;
-    }
-    final boolean wasPlaying = isPlaying();
-    stop(false);
-    if (openCurrentAndNext()) {
-      if (wasPlaying) {
-        play();
-      }
-    }
-    notifyChange(META_CHANGED);
-  }
-
-  /** What {@link #compactQueue} left: the queue's new length and position. */
-  static final class QueueRemoval {
-    final int removed;
-    final int length;
-    final int position;
-    final boolean playingRemoved;
-
-    QueueRemoval(int removed, int length, int position, boolean playingRemoved) {
-      this.removed = removed;
-      this.length = length;
-      this.position = position;
-      this.playingRemoved = playingRemoved;
-    }
-  }
-
-  /**
-   * Removes every entry of {@code ids} from the first {@code length} entries of {@code queue}, in
-   * place, keeping the order of the rest. When the playing entry is removed, the position moves to
-   * the first entry after it that stays (which may equal the new length).
-   */
-  static QueueRemoval compactQueue(long[] queue, int length, int position, long[] ids) {
-    if (queue == null || length <= 0 || ids == null || ids.length == 0) {
-      return new QueueRemoval(0, Math.max(length, 0), position, false);
-    }
-    final long[] sortedIds = Arrays.copyOf(ids, ids.length);
-    Arrays.sort(sortedIds);
-    int kept = 0;
-    int newPosition = position;
-    boolean playingRemoved = false;
-    for (int i = 0; i < length; i++) {
-      if (Arrays.binarySearch(sortedIds, queue[i]) < 0) {
-        queue[kept++] = queue[i];
-      } else if (i < position) {
-        newPosition--;
-      } else if (i == position) {
-        playingRemoved = true;
-      }
-    }
-    return new QueueRemoval(length - kept, kept, newPosition, playingRemoved);
-  }
-
-  /**
-   * Adds a list to the playlist
-   *
-   * @param list The list to add
-   * @param position The position to place the tracks
-   */
-  private void addToPlayList(final long[] list, int position) {
-    final int addlen = list.length;
-    if (position < 0) {
-      mPlayListLen = 0;
-      position = 0;
-    }
-    ensurePlayListCapacity(mPlayListLen + addlen);
-    if (position > mPlayListLen) {
-      position = mPlayListLen;
-    }
-
-    if (mPlayList != null && mPlayList.length > 0) {
-      final int tailsize = mPlayListLen - position;
-      for (int i = tailsize; i > 0; i--) {
-        if (checkBounds(position + i, mPlayList.length)
-            && checkBounds(position + i - addlen, mPlayList.length)) {
-          mPlayList[position + i] = mPlayList[position + i - addlen];
-        }
-      }
-      for (int i = 0; i < addlen; i++) {
-        if (checkBounds(position + i, mPlayList.length) && checkBounds(i, list.length)) {
-          mPlayList[position + i] = list[i];
-        }
-      }
-      mPlayListLen += addlen;
-    }
-
-    if (mPlayListLen == 0) {
-      closeCursor();
-      notifyChange(META_CHANGED);
-    }
-  }
-
-  private boolean checkBounds(int i, int arrayLen) {
-    return i >= 0 && i < arrayLen;
+  public void clearQueue() {
+    runOnPlayerThread(() -> removeFromQueue(PlaybackQueue::removeAllButCurrent));
   }
 
   /**
@@ -1386,256 +1366,6 @@ public class MusicPlaybackService extends MediaSessionService {
     }
   }
 
-  private boolean openCurrentAndNext() {
-    return openCurrentAndMaybeNext(true);
-  }
-
-  /**
-   * Called to open a new file as the current track and prepare the next for playback
-   *
-   * @param openNext True to prepare the next track for playback, false otherwise.
-   */
-  private boolean openCurrentAndMaybeNext(final boolean openNext) {
-    closeCursor();
-    if (mPlayListLen == 0 || mPlayList == null) {
-      return false;
-    }
-
-    long trackId;
-    synchronized (mPlayList) {
-      mPlayPos = Math.min(mPlayPos, mPlayList.length - 1);
-      try {
-        trackId = mPlayList[mPlayPos];
-      } catch (ArrayIndexOutOfBoundsException t) {
-        LOG.warn("Aborting openCurrentAndMaybeNext(openNext=" + openNext + ")");
-        LOG.error(t.getMessage(), t);
-        return false;
-      }
-    }
-    LOG.info(
-        "openCurrentAndMaybeNext(openNext="
-            + openNext
-            + ") playPos="
-            + mPlayPos
-            + " queueLen="
-            + mPlayListLen
-            + " trackId="
-            + trackId
-            + " isSupposedToBePlaying="
-            + mIsSupposedToBePlaying);
-    updateCursor(trackId);
-
-    boolean hasOpenCursor = mCursor != null && !mCursor.isClosed();
-    if (!hasOpenCursor) {
-      if (openNext) {
-        setNextTrack();
-      }
-    } else {
-      long fileId = mCursor.getLong(IDCOLIDX);
-      String contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI.toString();
-      if (SystemUtils.hasAndroid10OrNewer()) {
-        contentUri =
-            MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY).toString();
-      }
-      final String path = String.format("%s/%d", contentUri, fileId);
-      LOG.info("openCurrentAndMaybeNext(openNext=" + openNext + ") path=" + path);
-      if (openFile(path) > 0) {
-        if (openNext) {
-          setNextTrack();
-        }
-        return true;
-      } else {
-        // on !openFile(path)
-        // if we get here then opening the file failed. We can close the
-        // cursor now, because
-        // we're either going to create a new one next, or stop trying
-        closeCursor();
-        if (mPlayListLen > 1 && mOpenFailedCounter < 10) {
-          final int pos = getNextPosition(false, isShuffleEnabled());
-
-          if (invalidPosition(pos)) return false;
-
-          mPlayPos = pos;
-          stopPlayer();
-          mPlayPos = pos;
-          updateCursor(mPlayList[mPlayPos]);
-          hasOpenCursor = mCursor != null && !mCursor.isClosed();
-          if (!hasOpenCursor) {
-            if (openNext) {
-              setNextTrack();
-            }
-          } else {
-            if (openFile(path) > 0) {
-              // should do something on positive?
-              // there used to be some sort of recursive callback
-              LOG.info("openCurrentAndMaybeNext(): openFile(path=" + path + ") succeeded");
-            } else {
-              // do something on negative?
-              LOG.error("openCurrentAndMaybeNext(): openFile(path=" + path + ") failed!");
-            }
-          }
-        } else {
-          mOpenFailedCounter = 0;
-          LOG.warn("Failed to open file for playback");
-          if (mIsSupposedToBePlaying) {
-            mIsSupposedToBePlaying = false;
-            notifyChange(PLAYSTATE_CHANGED);
-          }
-        }
-      }
-    }
-    return false;
-  }
-
-  /**
-   * @param force True to force the player onto the track next, false otherwise.
-   * @return The next position to play.
-   */
-  private int getNextPosition(final boolean force, final boolean shuffleEnabled) {
-    if (!force && mRepeatMode == REPEAT_CURRENT) {
-      return Math.max(mPlayPos, 0);
-    } else if (shuffleEnabled) {
-      if (mPlayListLen <= 0) {
-        return -1;
-      }
-      return r.nextInt(mPlayListLen);
-    } else {
-      if (mPlayPos >= mPlayListLen - 1) {
-        if (mRepeatMode == REPEAT_NONE && !force) {
-          return -1;
-        } else if (mRepeatMode == REPEAT_ALL || force) {
-          return 0;
-        }
-        return -1;
-      } else {
-        return mPlayPos + 1;
-      }
-    }
-  }
-
-  /** Sets the track track to be played */
-  /**
-   * The queue position after ExoPlayer moved on to its queued next item, the song {@code audioId}:
-   * where that song is in the queue, nearest the position queued as next, which can be stale after
-   * the queue changed (GitHub #1452). Without the id, the queued position.
-   */
-  int positionAfterNext(final long audioId) {
-    final int expected = mNextPlayPos == -1 ? 0 : mNextPlayPos;
-    final int found = queuePositionOf(mPlayList, mPlayListLen, audioId, expected);
-    return found >= 0 ? found : expected;
-  }
-
-  /**
-   * The queue position after ExoPlayer went back to its previous item, the song {@code audioId}.
-   * ExoPlayer goes back to the song it played before, so with repeat on, going back from the first
-   * song plays the last one (GitHub #1452).
-   */
-  int positionAfterPrevious(final long audioId) {
-    int expected = mPlayPos;
-    if (mShuffleEnabled) {
-      synchronized (mHistory) {
-        if (!mHistory.isEmpty()) {
-          mHistory.pop();
-        }
-        if (!mHistory.isEmpty()) {
-          expected = mHistory.peek();
-        }
-      }
-    } else if (mPlayPos > 0) {
-      expected = mPlayPos - 1;
-    } else if (mRepeatMode == REPEAT_ALL && mPlayListLen > 0) {
-      expected = mPlayListLen - 1;
-    } else {
-      expected = 0;
-    }
-    final int found = queuePositionOf(mPlayList, mPlayListLen, audioId, expected);
-    return found >= 0 ? found : expected;
-  }
-
-  /**
-   * The position of {@code audioId} among the first {@code length} entries of {@code queue}: {@code
-   * expected} if it is there, else the nearest one; -1 if it isn't queued.
-   */
-  static int queuePositionOf(long[] queue, int length, long audioId, int expected) {
-    if (queue == null || audioId < 0) {
-      return -1;
-    }
-    final int end = Math.min(length, queue.length);
-    for (int distance = 0; distance < end; distance++) {
-      final int after = expected + distance;
-      if (after >= 0 && after < end && queue[after] == audioId) {
-        return after;
-      }
-      final int before = expected - distance;
-      if (before >= 0 && before < end && queue[before] == audioId) {
-        return before;
-      }
-    }
-    return -1;
-  }
-
-  /** The song id of a MediaStore audio item ({@code .../audio/media/<id>}), else -1. */
-  static long audioIdOf(@Nullable final MediaItem mediaItem) {
-    if (mediaItem == null || mediaItem.localConfiguration == null) {
-      return -1;
-    }
-    final Uri uri = mediaItem.localConfiguration.uri;
-    final List<String> segments = uri.getPathSegments();
-    if (!"content".equals(uri.getScheme())
-        || segments.size() < 2
-        || !"media".equals(segments.get(segments.size() - 2))) {
-      return -1;
-    }
-    try {
-      return Long.parseLong(uri.getLastPathSegment());
-    } catch (NumberFormatException e) {
-      return -1;
-    }
-  }
-
-  private static long audioIdOf(final Message msg) {
-    return msg.obj instanceof Long ? (Long) msg.obj : -1;
-  }
-
-  private void setNextTrack() {
-    mNextPlayPos = getNextPosition(false, isShuffleEnabled());
-    if (D) LOG.info("setNextTrack: next play position = " + mNextPlayPos);
-
-    if (mPlayer != null) {
-      if (mNextPlayPos >= 0
-          && mPlayList != null
-          && mPlayList.length > 0
-          && mPlayPos < mPlayList.length) {
-        final long id = mPlayList[mNextPlayPos];
-        mPlayer.setNextDataSource(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI + "/" + id);
-      } else {
-        mPlayer.setNextDataSource(null);
-      }
-    } else {
-      LOG.warn("setNextTrack() -> no mPlayer instance available.");
-    }
-  }
-
-  /**
-   * Makes sure the playlist has enough space to hold all of the songs
-   *
-   * @param size The size of the playlist
-   */
-  private void ensurePlayListCapacity(final int size) {
-    if (mPlayList == null || size > mPlayList.length) {
-      // reallocate at 2x requested size so we don't
-      // need to grow and copy the array for every
-      // insert
-      final int len = mPlayList != null ? mPlayList.length : mPlayListLen;
-      long[] newlist = new long[size * 2];
-
-      if (mPlayList != null) {
-        System.arraycopy(mPlayList, 0, newlist, 0, len);
-      }
-      mPlayList = newlist;
-    }
-  }
-
   /** Notify the change-receivers that something has changed. */
   private void notifyChange(final String change) {
     LOG.info("notifyChange(" + change + ") trying...");
@@ -1690,7 +1420,6 @@ public class MusicPlaybackService extends MediaSessionService {
     String albumName = musicPlaybackService.getAlbumName();
     String trackName = musicPlaybackService.getTrackName();
     boolean isPlaying = musicPlaybackService.isPlaying();
-    boolean isStopped = musicPlaybackService.isStopped();
     boolean favorite = musicPlaybackService.isFavorite();
     intent.putExtra("id", audioId);
     intent.putExtra("artist", artistName);
@@ -1703,6 +1432,9 @@ public class MusicPlaybackService extends MediaSessionService {
     musicIntent.setAction(change.replace(APOLLO_PACKAGE_NAME, MUSIC_PACKAGE_NAME));
     musicPlaybackService.sendBroadcast(musicIntent);
     if (META_CHANGED.equals(change)) {
+      if (audioId < 0) {
+        return; // the queue emptied, or a file MediaStore doesn't know
+      }
       // Increase the play count for favorite songs.
       if (musicPlaybackService.mFavoritesCache != null
           && musicPlaybackService.mFavoritesCache.getSongId(audioId) != null) {
@@ -1712,11 +1444,6 @@ public class MusicPlaybackService extends MediaSessionService {
       recentsStoreAddSongIdTask(musicPlaybackService);
     } else if (QUEUE_CHANGED.equals(change)) {
       musicPlaybackService.saveQueue(true);
-      // Re-queue the next song while paused too: resuming played the one queued before the change
-      // (GitHub #1452). Stopped, ExoPlayer has no current song and the next would become it.
-      if (!isStopped) {
-        musicPlaybackService.setNextTrack();
-      }
     } else {
       musicPlaybackService.saveQueue(false);
     }
@@ -1816,10 +1543,12 @@ public class MusicPlaybackService extends MediaSessionService {
    * screen and Bluetooth devices receive it automatically.
    */
   private void updateMediaSessionMetadata() {
-    if (mMediaSession == null || mPlayer == null || mPlayer.mExoPlayer == null) return;
+    final MultiPlayer player = mPlayer;
+    if (mMediaSession == null || player == null) return;
     try {
+      final MediaItem current = player.mExoPlayer.getCurrentMediaItem();
       String path = getPath();
-      if (path == null) return;
+      if (current == null || path == null) return;
       long albumId = getAlbumId();
       androidx.media3.common.MediaMetadata.Builder metaBuilder =
           new androidx.media3.common.MediaMetadata.Builder()
@@ -1842,13 +1571,14 @@ public class MusicPlaybackService extends MediaSessionService {
       if (artworkUri != null) {
         metaBuilder.setArtworkUri(artworkUri);
       }
-      MediaItem updatedItem =
-          new MediaItem.Builder()
-              .setUri(MultiPlayer.resolveUri(path))
-              .setMediaMetadata(metaBuilder.build())
-              .build();
-      mPlayer.mExoPlayer.replaceMediaItem(
-          mPlayer.mExoPlayer.getCurrentMediaItemIndex(), updatedItem);
+      final androidx.media3.common.MediaMetadata metadata = metaBuilder.build();
+      if (metadata.equals(current.mediaMetadata)) {
+        return; // a replace re-sends the whole queue to every controller
+      }
+      // Same URI and media id: ExoPlayer keeps playing it, and it stays the same queue entry.
+      player.mExoPlayer.replaceMediaItem(
+          player.mExoPlayer.getCurrentMediaItemIndex(),
+          current.buildUpon().setMediaMetadata(metadata).build());
       LOG.info("updateMediaSessionMetadata() pushed metadata for: " + getTrackName());
     } catch (Throwable t) {
       LOG.error("updateMediaSessionMetadata() error: " + t.getMessage(), t);
@@ -1856,49 +1586,92 @@ public class MusicPlaybackService extends MediaSessionService {
   }
 
   /**
-   * Saves the queue
+   * Saves the queue, from its snapshot, in the format Apollo always used: "queue" holds the audio
+   * ids, "curpos" the current song's position in it.
    *
-   * @param full True if the queue is full
+   * @param full True to save the songs too, not only the position and modes
    */
   private void saveQueue(final boolean full) {
     if (!mQueueIsSaveable || serviceDataStore == null) {
       return;
     }
-
+    final PlaybackQueue.Snapshot queue = queueSnapshot();
     if (full) {
-      final StringBuilder q = new StringBuilder();
-      int len = mPlayListLen;
-      for (int i = 0; i < len; i++) {
-        long n = mPlayList[i];
-        if (n == 0) {
-          q.append("0;");
-        } else {
-          while (n != 0) {
-            final int digit = (int) (n & 0xf);
-            n >>>= 4;
-            q.append(HEX_DIGITS[digit]);
-          }
-          q.append(";");
-        }
-      }
-      DataStoreManager.putString(serviceDataStore, "queue", q.toString());
+      DataStoreManager.putString(serviceDataStore, "queue", encodeQueue(queue.ids()));
       DataStoreManager.putInt(serviceDataStore, "cardid", mCardId);
     }
-    DataStoreManager.putInt(serviceDataStore, "curpos", mPlayPos);
-    if (mPlayer != null && mPlayer.isInitialized()) {
-      try {
-        final long pos = mPlayer.position();
-        DataStoreManager.putLong(serviceDataStore, "seekpos", pos);
-      } catch (Throwable e) {
-      }
+    DataStoreManager.putInt(serviceDataStore, "curpos", queue.index());
+    final MultiPlayer player = mPlayer;
+    if (player != null) {
+      DataStoreManager.putLong(serviceDataStore, "seekpos", player.position());
     }
     DataStoreManager.putInt(serviceDataStore, "repeatmode", mRepeatMode);
     DataStoreManager.putBoolean(serviceDataStore, "shufflemode", mShuffleEnabled);
   }
 
-  /** Reloads the queue as the user left it the last time they stopped using Apollo */
+  /**
+   * Each id as hexadecimal digits, lowest digit first, then ';'. A queue with a file MediaStore
+   * doesn't know (id -1) can't be restored, so it saves as no queue.
+   */
+  static String encodeQueue(long[] ids) {
+    final StringBuilder q = new StringBuilder();
+    for (long n : ids) {
+      if (n < 0) {
+        return "";
+      }
+      if (n == 0) {
+        q.append('0');
+      }
+      while (n != 0) {
+        q.append(HEX_DIGITS[(int) (n & 0xf)]);
+        n >>>= 4;
+      }
+      q.append(';');
+    }
+    return q.toString();
+  }
+
+  /**
+   * The ids {@link #encodeQueue} wrote; none if anything else is in there, or a negative id:
+   * earlier versions saved a file MediaStore doesn't know as -1, which can't be played again.
+   */
+  static long[] decodeQueue(@Nullable String q) {
+    if (q == null || q.length() < 2) {
+      return new long[0];
+    }
+    final long[] ids = new long[q.length() / 2];
+    int count = 0;
+    long n = 0;
+    int shift = 0;
+    for (int i = 0; i < q.length(); i++) {
+      final char c = q.charAt(i);
+      if (c == ';') {
+        if (n < 0) {
+          return new long[0];
+        }
+        ids[count++] = n;
+        n = 0;
+        shift = 0;
+      } else if (c >= '0' && c <= '9') {
+        n += (long) (c - '0') << shift;
+        shift += 4;
+      } else if (c >= 'a' && c <= 'f') {
+        n += (long) (10 + c - 'a') << shift;
+        shift += 4;
+      } else {
+        return new long[0];
+      }
+    }
+    return Arrays.copyOf(ids, count);
+  }
+
+  /**
+   * Reloads the queue as the user left it the last time they stopped using Apollo, paused at the
+   * song and position they were at. On the player thread.
+   */
   private void reloadQueue() {
-    if (serviceDataStore == null) {
+    final PlaybackQueue queue = mQueue;
+    if (serviceDataStore == null || queue == null) {
       return;
     }
     String q = null;
@@ -1909,82 +1682,28 @@ public class MusicPlaybackService extends MediaSessionService {
     if (id == mCardId) {
       q = DataStoreManager.getString(serviceDataStore, "queue", "");
     }
-    int qlen = q != null ? q.length() : 0;
-    if (qlen > 1) {
-      int plen = 0;
-      int n = 0;
-      int shift = 0;
-      for (int i = 0; i < qlen; i++) {
-        final char c = q.charAt(i);
-        if (c == ';') {
-          ensurePlayListCapacity(plen + 1);
-          mPlayList[plen] = n;
-          plen++;
-          n = 0;
-          shift = 0;
-        } else {
-          if (c >= '0' && c <= '9') {
-            n += c - '0' << shift;
-          } else if (c >= 'a' && c <= 'f') {
-            n += 10 + c - 'a' << shift;
-          } else {
-            plen = 0;
-            break;
-          }
-          shift += 4;
-        }
-      }
-      mPlayListLen = plen;
-      final int pos = DataStoreManager.getInt(serviceDataStore, "curpos", 0);
-      if (pos < 0 || pos >= mPlayListLen) {
-        mPlayListLen = 0;
-        return;
-      }
-      mPlayPos = pos;
-      updateCursor(mPlayList[mPlayPos]);
-      if (mCursor == null) {
-        try {
-          Thread.sleep(500);
-          updateCursor(mPlayList[mPlayPos]);
-        } catch (InterruptedException e) {
-          return;
-        } catch (ArrayIndexOutOfBoundsException e) {
-          return;
-        }
-      }
-      closeCursor();
-      mOpenFailedCounter = 20;
-      openCurrentAndNext();
-
-      if (mPlayer == null || !mPlayer.isInitialized()) {
-        mPlayListLen = 0;
-        return;
-      }
-
-      final long seekpos = DataStoreManager.getLong(serviceDataStore, "seekpos", 0);
-      seek(seekpos >= 0 && seekpos < duration() ? seekpos : 0);
-
-      if (D) {
-        LOG.info(
-            "restored queue, currently at position "
-                + position()
-                + "/"
-                + duration()
-                + " (requested "
-                + seekpos
-                + ")");
-      }
-
-      int repmode = DataStoreManager.getInt(serviceDataStore, "repeatmode", REPEAT_NONE);
-      if (repmode != REPEAT_ALL && repmode != REPEAT_CURRENT) {
-        repmode = REPEAT_NONE;
-      }
-      mRepeatMode = repmode;
+    final long[] ids = decodeQueue(q);
+    final int pos = DataStoreManager.getInt(serviceDataStore, "curpos", 0);
+    if (pos < 0 || pos >= ids.length) {
+      return;
     }
-  }
+    final long seekpos = DataStoreManager.getLong(serviceDataStore, "seekpos", 0);
+    // The repeat and shuffle modes come from the preferences right after (initService).
+    queue.open(ids, pos, Math.max(seekpos, 0));
+    if (D) LOG.info("restored queue of " + ids.length + " at " + pos + ", " + seekpos + " ms");
 
-  interface OpenFileResultCallback {
-    void openFileResult(boolean result);
+    if (mCursor == null) {
+      // MediaStore may not be ready this early after boot; ask again for the song's details.
+      mPlayerHandler.postDelayed(
+          () -> {
+            final long audioId = getAudioId();
+            if (mCursor == null && audioId >= 0) {
+              updateCursor(audioId);
+              notifyChange(META_CHANGED);
+            }
+          },
+          500);
+    }
   }
 
   long getIdFromContextUri(String path) {
@@ -1999,25 +1718,39 @@ public class MusicPlaybackService extends MediaSessionService {
   }
 
   /**
-   * Opens a file and prepares it for playback
-   *
-   * @param path The path of the file to open
+   * Plays a file another app or a download handed over: as its MediaStore song when it has one,
+   * else as a queue of only that file. On the player thread.
    */
-  public long openFile(String path) {
-    if (D) LOG.info("MusicPlaybackService::openFile: path = " + path);
-    if (path == null) {
-      return -1;
+  private void openTransientFile(String path) {
+    final PlaybackQueue queue = mQueue;
+    if (queue == null) {
+      return;
     }
-
-    long id = -1;
-
     // content://com.frostwire.android.fileprovider/external/Download/FrostWire/...audiofile.ext
     if (path.startsWith("content://com.frostwire.android.fileprovider/external")) {
       path =
           path.replace(
               "content://com.frostwire.android.fileprovider/external", "/storage/emulated/0");
     }
+    final long id = audioIdForPath(path);
+    if (id != -1) {
+      open(new long[] {id}, 0);
+      play();
+      return;
+    }
+    if (path.startsWith("/storage")) {
+      path = UrlUtils.decode(path);
+      LOG.info("MusicPlaybackService.openTransientFile decoded path -> " + path);
+    }
+    mCurrentFilePath = path;
+    queue.openUri(MultiPlayer.resolveUri(path));
+    notifyChange(META_CHANGED);
+    play();
+  }
 
+  /** The MediaStore audio id of a file handed over by path or content URI, or -1. */
+  private long audioIdForPath(String path) {
+    long id = -1;
     if (path.startsWith("content://com.android.providers.downloads.documents/document/raw")) {
       try {
         id = MusicUtils.getFileIdFromComAndroidProvidersDownloadsDocumentsPath(this, path);
@@ -2049,87 +1782,31 @@ public class MusicPlaybackService extends MediaSessionService {
     // OnePlus File Explorer (content://com.oneplus.filemanager/.../storage/emulated/...)
     // Paths can be /root/storage/ or /storage
     if (id == -1 && path.startsWith("content://") && path.contains("/storage/emulated/0/")) {
-      // debugPrintAllFilesInDownloads();
       String prefix = path.substring(0, path.indexOf("/storage"));
-      LOG.info("MusicPlaybackService::openFile prefix=" + prefix, true);
+      LOG.info("MusicPlaybackService::audioIdForPath prefix=" + prefix, true);
       String fixedPath = path.replace(prefix, "");
       try {
         fixedPath = URLDecoder.decode(fixedPath, "UTF-8");
       } catch (UnsupportedEncodingException e) {
-        LOG.error("MusicPlaybackService::openFile decoding error " + e.getMessage(), e, true);
+        LOG.error("MusicPlaybackService::audioIdForPath decoding error " + e.getMessage(), e, true);
       }
-      LOG.info("MusicPlaybackService::openFile - updated path -> " + fixedPath);
+      LOG.info("MusicPlaybackService::audioIdForPath - updated path -> " + fixedPath);
       id = getFileIdFromPath(fixedPath, Uri.parse("content://media/external/downloads"), false);
       if (id == -1) {
         id = getFileIdFromPath(fixedPath, Uri.parse("content://media/internal/downloads"), false);
-        if (id != -1) {
-          LOG.info("MusicPlaybackService::openFile got an ID from media internal URI, id = " + id);
-        }
       }
-      LOG.info("MusicPlaybackService::openFile got an ID? id = " + id);
+      LOG.info("MusicPlaybackService::audioIdForPath got an ID? id = " + id);
     }
 
-    // Are we talking about a regular file path?
-    if (path.startsWith("/storage") || path.startsWith("content://")) {
-      if (path.startsWith("/storage")) {
-        path = UrlUtils.decode(path);
-        LOG.info("MusicPlaybackService.openFile decoded path -> " + path);
-      }
-      mCurrentFilePath = path;
-      mPlayer.setCurrentDataSource(path);
-      ensurePlayListCapacity(1);
-      if (mPlayer != null && mPlayer.isInitialized()) {
-        mOpenFailedCounter = 0;
-      } else {
-        mOpenFailedCounter++;
-        stopPlayer();
-      }
-      return id;
-    }
-    // If mCursor is null, try to associate path with a database cursor
-    else if (mCursor == null) {
-      if (id != -1 && path.startsWith(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI.toString())) {
-        Uri uri = Uri.parse(path);
-        updateCursor(uri);
-      } else if (id != -1
-          && path.startsWith(MediaStore.Files.getContentUri("external").toString())) {
-        updateCursor(id);
-      } else {
-        String where = MediaStore.Audio.Media.DATA + "=?";
-        String[] selectionArgs = new String[] {path};
-        updateCursor(where, selectionArgs);
-      }
+    // Any other path: a file MediaStore may know by its path.
+    if (id == -1 && !path.startsWith("/storage") && !path.startsWith("content://")) {
       try {
-        if (mCursor != null) {
-          ensurePlayListCapacity(1);
-          mPlayListLen = 1;
-          mPlayList[0] = mCursor.getLong(IDCOLIDX);
-          mPlayPos = 0;
-        }
-      } catch (UnsupportedOperationException e) {
-        LOG.error("Error while opening file for play", e);
-        return -1;
-      } catch (StaleDataException | IllegalStateException e) {
-        LOG.error("Error with database cursor while opening file for play", e);
-        return -1;
+        id = getFileIdFromPath(path, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
+      } catch (Throwable t) {
+        LOG.error("MusicPlaybackService::audioIdForPath MediaStore lookup failed", t);
       }
     }
-
-    if (mPlayerHandler == null) {
-      throw new RuntimeException("check your logic, mPlayerHandler can't be null");
-    }
-    if (mPlayer == null) {
-      mPlayer = new MultiPlayer();
-    }
-    mPlayer.setCurrentDataSource(path);
-    if (mPlayer != null && mPlayer.isInitialized()) {
-      mOpenFailedCounter = 0;
-      return id;
-    } else {
-      mOpenFailedCounter++;
-      stopPlayer();
-      return id;
-    }
+    return id;
   }
 
   /**
@@ -2172,52 +1849,39 @@ public class MusicPlaybackService extends MediaSessionService {
   }
 
   /**
-   * Removes all instances of the track with the given ID from the playlist.
+   * Removes all instances of the track with the given ID from the queue, as {@link
+   * #removeTracks(long[])}.
    *
    * @param id The id to be removed
    * @return how many instances of the track were removed
    */
   public int removeTrack(final long id) {
-    int numremoved = 0;
-    synchronized (this) {
-      for (int i = 0; i < mPlayListLen; i++) {
-        if (mPlayList[i] == id) {
-          numremoved += removeTracksInternal(i, i);
-          i--;
-        }
-      }
-    }
-    if (numremoved > 0) {
-      notifyChange(QUEUE_CHANGED);
-    }
-    return numremoved;
+    return removeTracks(new long[] {id});
   }
 
   /**
-   * Removes the range of tracks specified from the play list. If a file within the range is the
-   * file currently being played, playback will move to the next file after the range.
+   * Removes the queue entries {@code first..last}, clamped to the queue. If the playing song is
+   * among them, playback moves to the first song after them. Waits for the player thread unless
+   * called on the main thread; see {@link #changeQueue}.
    *
    * @param first The first file to be removed
    * @param last The last file to be removed
    * @return the number of tracks deleted
    */
   public int removeTracks(final int first, final int last) {
-    final int numremoved = removeTracksInternal(first, last);
-    if (numremoved > 0) {
-      notifyChange(QUEUE_CHANGED);
-    }
-    return numremoved;
+    return changeQueue(
+        () -> removeFromQueue(queue -> queue.removeRange(first, last)),
+        () -> queueSnapshot().countRange(first, last));
   }
 
   /**
    * Returns the position in the queue
    *
-   * @return the current position in the queue
+   * @return the current position in the queue, or -1 when it is empty; from its snapshot, so any
+   *     thread
    */
   public int getQueuePosition() {
-    synchronized (this) {
-      return mPlayPos;
-    }
+    return queueSnapshot().index();
   }
 
   /**
@@ -2353,21 +2017,10 @@ public class MusicPlaybackService extends MediaSessionService {
   /**
    * Returns the current audio ID
    *
-   * @return The current track ID
+   * @return The current track ID, or -1; from the queue's snapshot, so any thread
    */
   public long getAudioId() {
-    if (mPlayList != null
-        && mPlayPos >= 0
-        && mPlayPos < mPlayList.length
-        && mPlayer != null
-        && mPlayer.isInitialized()) {
-      try {
-        return mPlayList[mPlayPos];
-      } catch (IndexOutOfBoundsException ioob) {
-        return -1;
-      }
-    }
-    return -1;
+    return queueSnapshot().audioId();
   }
 
   /**
@@ -2453,20 +2106,18 @@ public class MusicPlaybackService extends MediaSessionService {
    * Seeks the current track to a specific time
    *
    * @param position The time to seek to
-   * @return The time to play the track at
+   * @return The time to play the track at, or -1 when nothing is queued
    */
   public long seek(long position) {
-    if (mPlayer != null && mPlayer.isInitialized()) {
-      if (position < 0) {
-        position = 0;
-      } else if (position > mPlayer.duration()) {
-        position = mPlayer.duration();
-      }
-      long result = mPlayer.seek(position);
-      notifyChange(POSITION_CHANGED);
-      return result;
+    final MultiPlayer player = mPlayer;
+    if (player == null || queueSnapshot().size() == 0) {
+      return -1;
     }
-    return -1;
+    final long duration = player.duration();
+    final long target = Math.max(0, duration > 0 ? Math.min(position, duration) : position);
+    player.seek(target);
+    notifyChange(POSITION_CHANGED);
+    return target;
   }
 
   /**
@@ -2475,38 +2126,27 @@ public class MusicPlaybackService extends MediaSessionService {
    * @return The current playback position in milliseconds
    */
   public long position() {
-    if (mPlayer != null && mPlayer.isInitialized()) {
-      return mPlayer.position();
-    }
-    return -1;
+    final MultiPlayer player = mPlayer;
+    return player != null && queueSnapshot().size() > 0 ? player.position() : -1;
   }
 
   /**
-   * Expensive method, do not use in main thread.
+   * Returns the full duration of the current track
    *
-   * <p>Returns the full duration of the current track
-   *
-   * @return The duration of the current track in milliseconds
+   * @return The duration of the current track in milliseconds, or -1 while unknown
    */
   public long duration() {
-    if (mPlayer != null && mPlayer.isInitialized()) {
-      return mPlayer.duration();
-    }
-    return -1;
+    final MultiPlayer player = mPlayer;
+    return player != null && queueSnapshot().size() > 0 ? player.duration() : -1;
   }
 
   /**
    * Returns the queue
    *
-   * @return The queue as a long[]
+   * @return The queue as a long[]; from its snapshot, so any thread
    */
   public long[] getQueue() {
-    if (mPlayList == null) {
-      return new long[0];
-    }
-    final long[] list = new long[mPlayListLen];
-    System.arraycopy(mPlayList, 0, list, 0, mPlayListLen);
-    return list;
+    return queueSnapshot().ids();
   }
 
   /**
@@ -2519,61 +2159,53 @@ public class MusicPlaybackService extends MediaSessionService {
   /**
    * This is not the same as being paused. This means there's no track loaded.
    *
-   * @return True if there's no track loaded.
+   * @return True if nothing is queued, or the player is stopped or failed
    */
   public boolean isStopped() {
-    return mPlayer == null || (!mPlayer.isInitialized() && !mPlayer.isPlaying());
-    // return mCursor == null || mCursor.isClosed();
+    final MultiPlayer player = mPlayer;
+    return player == null || queueSnapshot().size() == 0 || player.isIdle();
   }
 
   /** True if the current track is a "favorite", false otherwise */
   public boolean isFavorite() {
     if (mFavoritesCache != null) {
-      // synchronized (mFavoritesCacheLock) {
       final Long id = mFavoritesCache.getSongId(getAudioId());
       return id != null;
-      // }
     }
     return false;
   }
 
   /**
-   * Opens a list for playback
+   * Makes {@code list} the queue and plays it from {@code position}, or from the first song in
+   * playback order when {@code position} is -1. Posted to the player thread.
    *
    * @param list The list of tracks to open
    * @param position The position to start playback at
    */
   public void open(final long[] list, final int position) {
     LOG.info("MusicPlaybackService.open at position=" + position, true);
-    launchPlayerActivity = true;
-    final long oldId = getAudioId();
-    final int listlength = list.length;
-    boolean newlist = true;
-    if (mPlayListLen == listlength) {
-      newlist = false;
-      for (int i = 0; i < listlength; i++) {
-        if (list[i] != mPlayList[i]) {
-          newlist = true;
-          break;
-        }
-      }
-    }
-    if (newlist) {
-      addToPlayList(list, -1);
-      notifyChange(QUEUE_CHANGED);
-    }
-    if (position == -1) {
-      mPlayPos = 0;
-    }
-    if (position >= 0) {
-      mPlayPos = position;
-    }
-    synchronized (mHistory) {
-      mHistory.clear();
-    }
-    if (openCurrentAndNext() && oldId != getAudioId()) {
-      play();
-      notifyChange(META_CHANGED);
+    runOnPlayerThread(
+        () -> {
+          final PlaybackQueue queue = mQueue;
+          if (queue == null) {
+            return;
+          }
+          final long oldId = queue.snapshot().audioId();
+          queue.open(list, position, 0);
+          launchPlayerActivity();
+          if (queue.snapshot().audioId() != oldId) {
+            play();
+          }
+        });
+  }
+
+  private void launchPlayerActivity() {
+    try {
+      Intent i = new Intent(this, AudioPlayerActivity.class);
+      i.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+      startActivity(i);
+    } catch (Throwable t) {
+      LOG.error("launchPlayerActivity() failed: " + t.getMessage(), t);
     }
   }
 
@@ -2584,226 +2216,94 @@ public class MusicPlaybackService extends MediaSessionService {
     stop(true);
   }
 
-  /** Starts playback. */
+  /**
+   * Starts playback, from the first song again when the queue had finished. Posted to the player
+   * thread.
+   */
   public void play() {
     stopSimplePlayer();
-    // Audio focus and media button routing handled by ExoPlayer + MediaSession.
-    if (mPlayer != null && mPlayer.isInitialized()) {
-      setNextTrack();
-      synchronized (mHistory) {
-        if (mShuffleEnabled && (mHistory.isEmpty() || mHistory.peek() != mPlayPos)) {
-          mHistory.push(mPlayPos);
-        }
-      }
-      // it may happen that the service is destroyed between the NPE check above and the following
-      // block, so we'll ask again, and make sure we don't assign mPlayer to null when we try to
-      // start playback
-      if (mPlayer != null) {
-        long duration;
-        duration = mPlayer.duration();
-        if (mRepeatMode != REPEAT_CURRENT
-            && duration > 2000
-            && mPlayer.position() >= duration - 2000) {
-          if (mNearEndAutoAdvanceDepth < 3) {
-            mNearEndAutoAdvanceDepth++;
-            try {
-              gotoNext(true);
-            } finally {
-              mNearEndAutoAdvanceDepth--;
-            }
-          } else {
-            LOG.warn("MusicPlaybackService.play: near-end auto-advance recursion limit reached");
+    runOnPlayerThread(
+        () -> {
+          final MultiPlayer player = mPlayer;
+          final PlaybackQueue queue = mQueue;
+          if (player == null || queue == null || queue.snapshot().size() == 0) {
+            return;
           }
-          return;
-        }
-        mPlayer.start();
-      }
-      if (mPlayerHandler != null) {
-        mPlayerHandler.removeMessages(FADE_DOWN);
-        mPlayerHandler.sendEmptyMessage(FADE_UP);
-      }
-      mIsSupposedToBePlaying = true;
-      notifyChange(PLAYSTATE_CHANGED);
-      updateNotification();
-    }
+          queue.restartIfEnded();
+          player.start();
+          final Handler handler = mPlayerHandler;
+          if (handler != null) {
+            handler.removeMessages(FADE_DOWN);
+            handler.sendEmptyMessage(FADE_UP);
+          }
+          mIsSupposedToBePlaying = true;
+          notifyChange(PLAYSTATE_CHANGED);
+          updateNotification();
+        });
   }
 
+  /**
+   * Plays a file another app or a download handed over. Posted to the player thread.
+   *
+   * @return false without a path
+   */
   public boolean playTransientFile(String path) {
     if (path == null) {
       return false;
     }
-
-    stopPlayer();
-    closeCursor();
-    synchronized (this) {
-      ensurePlayListCapacity(1);
-      mPlayListLen = 1;
-      mPlayPos = 0;
-      mPlayList[0] = -1;
-    }
-    synchronized (mHistory) {
-      mHistory.clear();
-    }
-
-    long fileId = openFile(path);
-    if (mPlayer == null || !mPlayer.isInitialized()) {
-      return false;
-    }
-
-    if (fileId != -1) {
-      open(new long[] {fileId}, 0);
-      return true;
-    }
-
-    notifyChange(META_CHANGED);
-    play();
+    runOnPlayerThread(() -> openTransientFile(path));
     return true;
   }
 
   /** Temporarily pauses playback. */
   public void pause() {
     if (D) LOG.info("Pausing playback");
-    // synchronized (this) {
-    if (mPlayerHandler != null) {
-      mPlayerHandler.removeMessages(FADE_UP);
-    }
-    if (mIsSupposedToBePlaying && mPlayer != null) {
-      mPlayer.pause();
-      mIsSupposedToBePlaying = false;
-      notifyChange(PLAYSTATE_CHANGED);
-    }
-    // }
-  }
-
-  public void resume() {
-    if (mPlayer != null) {
-      mPlayer.start();
-      mIsSupposedToBePlaying = true;
-      updateMediaSessionState(PLAYSTATE_CHANGED);
-      notifyChange(PLAYSTATE_CHANGED);
-    }
-  }
-
-  /**
-   * Changes from the current track to the next track
-   *
-   * @param force -> set to true when gotoNext is invoked by an user action
-   */
-  public void gotoNext(final boolean force) {
-    if (D) LOG.info("Going to next track");
-
-    int currentRepeatMode = mRepeatMode;
-    if (force && mRepeatMode == REPEAT_CURRENT) {
-      setRepeatMode(REPEAT_ALL);
-    }
-
-    if (mPlayListLen <= 0) {
-      if (D) LOG.info("No play queue");
-      return;
-    }
-    final int pos = getNextPosition(force, isShuffleEnabled());
-    if (invalidPosition(pos)) return;
-    mNextPlayPos = pos;
-    LOG.info(
-        "gotoNext(force="
-            + force
-            + ") currentPos="
-            + mPlayPos
-            + " nextPos="
-            + mNextPlayPos
-            + " hasNextInTimeline="
-            + (mPlayer != null && mPlayer.hasNextInTimeline())
-            + " queueLen="
-            + mPlayListLen);
-    if (mPlayer != null && mPlayer.hasNextInTimeline()) {
-      mPlayer.seekToNextInTimeline();
-      if (force) {
-        setRepeatMode(currentRepeatMode);
-      }
-      return;
-    }
-    mPlayPos = pos;
-    if (openCurrentAndNext()) {
-      play();
-      if (force) {
-        // make sure repeat mode is restored
-        setRepeatMode(currentRepeatMode);
-      }
-      notifyChange(META_CHANGED);
-    }
-  }
-
-  public void gotoPrev() {
-    long position = position();
-    LOG.info(
-        "gotoPrev() position="
-            + position
-            + " currentPos="
-            + mPlayPos
-            + " hasPreviousInTimeline="
-            + (mPlayer != null && mPlayer.hasPreviousInTimeline()));
-    if (position < REWIND_INSTEAD_PREVIOUS_THRESHOLD) {
-      if (mPlayer != null && mPlayer.hasPreviousInTimeline()) {
-        mPlayer.seekToPreviousInTimeline();
-        return;
-      }
-      prev();
-    } else {
-      seek(0);
-      play();
-    }
-  }
-
-  private boolean invalidPosition(int pos) {
-    if (pos < 0) { // this looks funky
-      if (mIsSupposedToBePlaying) {
-        mIsSupposedToBePlaying = false;
-        notifyChange(PLAYSTATE_CHANGED);
-      }
-      return true;
-    }
-    return false;
-  }
-
-  /** Changes from the current track to the previous played track */
-  private void prev() {
-    if (D) LOG.info("Going to previous track");
-
-    if (mRepeatMode == REPEAT_CURRENT) {
-      setRepeatMode(REPEAT_ALL);
-    }
-
-    synchronized (this) {
-      if (!mShuffleEnabled) {
-        if (mPlayPos > 0) {
-          mPlayPos--;
-        } else {
-          mPlayPos = mPlayListLen - 1;
-        }
-      } else {
-        synchronized (mHistory) {
-          if (!mHistory.isEmpty()) {
-            mHistory.pop();
-            if (!mHistory.isEmpty()) {
-              mPlayPos = mHistory.peek();
-            }
+    // At once: a stop that follows reads it (releaseServiceUiAndStop).
+    mIsSupposedToBePlaying = false;
+    runOnPlayerThread(
+        () -> {
+          final Handler handler = mPlayerHandler;
+          if (handler != null) {
+            handler.removeMessages(FADE_UP);
           }
-        }
-      }
-    }
-
-    openCurrent();
-    play();
-    notifyChange(META_CHANGED);
+          final MultiPlayer player = mPlayer;
+          if (player != null) {
+            player.pause();
+          }
+          notifyChange(PLAYSTATE_CHANGED);
+        });
   }
 
   /**
-   * We don't want to open the current and next track when the user is using the {@code #prev()}
-   * method because they won't be able to travel back to the previously listened track if they're
-   * shuffling.
+   * Goes to the next song exactly as a Bluetooth headset's or the lock screen's "next" does: in
+   * shuffle order when shuffling, wrapping with repeat-all, nothing at the end without repeat.
+   * Doesn't start or pause playback. Posted to the player thread.
    */
-  private void openCurrent() {
-    openCurrentAndMaybeNext(false);
+  public void gotoNext() {
+    if (D) LOG.info("Going to next track");
+    runOnPlayerThread(
+        () -> {
+          final PlaybackQueue queue = mQueue;
+          if (queue != null) {
+            queue.next();
+          }
+        });
+  }
+
+  /**
+   * Goes to the previous song exactly as a controller's "previous" does; after the first {@link
+   * #REWIND_INSTEAD_PREVIOUS_THRESHOLD} ms of a song it restarts the song instead. Doesn't start or
+   * pause playback. Posted to the player thread.
+   */
+  public void gotoPrev() {
+    if (D) LOG.info("Going to previous track");
+    runOnPlayerThread(
+        () -> {
+          final PlaybackQueue queue = mQueue;
+          if (queue != null) {
+            queue.previous();
+          }
+        });
   }
 
   /** Toggles the current song as a favorite. */
@@ -2816,57 +2316,38 @@ public class MusicPlaybackService extends MediaSessionService {
   }
 
   /**
-   * Moves an item in the queue from one position to another
+   * Moves an item in the queue from one position to another; the playing song keeps playing. Posted
+   * to the player thread.
    *
    * @param from The position the item is currently at
    * @param to The position the item is being moved to
    */
-  public void moveQueueItem(int from, int to) {
-    synchronized (this) {
-      if (from >= mPlayListLen) {
-        from = mPlayListLen - 1;
-      }
-      if (to >= mPlayListLen) {
-        to = mPlayListLen - 1;
-      }
-      if (from < to) {
-        final long tmp = mPlayList[from];
-        System.arraycopy(mPlayList, from + 1, mPlayList, from, to - from);
-        //                for (int i = from; i < to; i++) {
-        //                    mPlayList[i] = mPlayList[i + 1];
-        //                }
-        mPlayList[to] = tmp;
-        if (mPlayPos == from) {
-          mPlayPos = to;
-        } else if (mPlayPos >= from && mPlayPos <= to) {
-          mPlayPos--;
-        }
-      } else if (to < from) {
-        final long tmp = mPlayList[from];
-        //noinspection ManualArrayCopy
-        for (int i = from; i > to; i--) {
-          mPlayList[i] = mPlayList[i - 1];
-        }
-        mPlayList[to] = tmp;
-        if (mPlayPos == from) {
-          mPlayPos = to;
-        } else if (mPlayPos >= to && mPlayPos <= from) {
-          mPlayPos++;
-        }
-      }
-      notifyChange(QUEUE_CHANGED);
-    }
+  public void moveQueueItem(final int from, final int to) {
+    runOnPlayerThread(
+        () -> {
+          final PlaybackQueue queue = mQueue;
+          if (queue != null) {
+            queue.move(from, to);
+          }
+        });
   }
 
   /**
-   * Sets the repeat mode
+   * Sets the repeat mode. {@link #getRepeatMode()} returns it at once; ExoPlayer gets it on the
+   * player thread.
    *
    * @param repeatMode The repeat mode to use
    */
   public void setRepeatMode(final int repeatMode) {
     mRepeatMode = repeatMode;
-    setNextTrack();
-    saveQueue(false);
+    runOnPlayerThread(
+        () -> {
+          final PlaybackQueue queue = mQueue;
+          if (queue != null) {
+            queue.setRepeatMode(repeatMode);
+          }
+          saveQueue(false);
+        });
     notifyChange(REPEATMODE_CHANGED);
     SystemUtils.exceptionSafePost(mPlayerHandler, () -> saveLastRepeatStateAsync(repeatMode));
   }
@@ -2877,12 +2358,20 @@ public class MusicPlaybackService extends MediaSessionService {
   }
 
   /**
-   * Sets the shuffle mode
+   * Sets the shuffle mode; the playing song keeps playing. {@link #isShuffleEnabled()} returns it
+   * at once; ExoPlayer gets it on the player thread.
    *
    * @param on The shuffle mode to use
    */
   public void enableShuffle(boolean on) {
     mShuffleEnabled = on;
+    runOnPlayerThread(
+        () -> {
+          final PlaybackQueue queue = mQueue;
+          if (queue != null) {
+            queue.setShuffle(on);
+          }
+        });
     SystemUtils.exceptionSafePost(mPlayerHandler, () -> saveLastShuffleStateAsync(on));
     notifyChange(SHUFFLEMODE_CHANGED);
   }
@@ -2893,53 +2382,59 @@ public class MusicPlaybackService extends MediaSessionService {
   }
 
   /**
-   * Sets the position of a track in the queue
+   * On the player thread: a controller (Bluetooth, Android Auto, Wear) changed shuffle or repeat on
+   * ExoPlayer; the app shows and keeps what it chose.
+   */
+  private void modesChangedByPlayer(boolean shuffle, int repeatMode) {
+    if (shuffle != mShuffleEnabled) {
+      mShuffleEnabled = shuffle;
+      SystemUtils.exceptionSafePost(mPlayerHandler, () -> saveLastShuffleStateAsync(shuffle));
+      notifyChange(SHUFFLEMODE_CHANGED);
+    }
+    if (repeatMode != mRepeatMode) {
+      mRepeatMode = repeatMode;
+      SystemUtils.exceptionSafePost(mPlayerHandler, () -> saveLastRepeatStateAsync(repeatMode));
+      notifyChange(REPEATMODE_CHANGED);
+    }
+  }
+
+  /**
+   * Plays the song at {@code index} in the queue from its start. Posted to the player thread.
    *
    * @param index The position to place the track
    */
   public void setQueuePosition(final int index) {
-    // synchronized (this) {
-    stopPlayer();
-    mPlayPos = index;
-    if (openCurrentAndNext()) {
-      play();
-      notifyChange(META_CHANGED);
-    }
-    // }
+    runOnPlayerThread(
+        () -> {
+          final PlaybackQueue queue = mQueue;
+          if (queue != null) {
+            queue.seekTo(index);
+            play();
+          }
+        });
   }
 
   /**
-   * Queues a new list for playback
+   * Queues a new list for playback: {@link #NEXT} after the playing song, {@link #LAST} at the end,
+   * {@link #NOW} at the end and playing the first of them now. Added to an empty queue, the first
+   * song loads paused. Posted to the player thread.
    *
    * @param list The list to queue
    * @param action The action to take
    */
   public void enqueue(final long[] list, final int action) {
-    synchronized (this) {
-      if (action == NEXT && mPlayPos + 1 < mPlayListLen) {
-        addToPlayList(list, mPlayPos + 1);
-        notifyChange(QUEUE_CHANGED);
-      } else {
-        addToPlayList(list, Integer.MAX_VALUE);
-        notifyChange(QUEUE_CHANGED);
-        if (action == NOW) {
-          mPlayPos = mPlayListLen - list.length;
-          if (openCurrentAndNext()) {
-            play();
-            notifyChange(META_CHANGED);
+    runOnPlayerThread(
+        () -> {
+          final PlaybackQueue queue = mQueue;
+          if (queue == null) {
+            return;
           }
-          return;
-        }
-      }
-      if (mPlayPos < 0) {
-        mPlayPos = 0;
-      }
-      if (!isPlaying() && openCurrentAndNext()) {
-        play();
-        pause(); // don't auto start playback after enqueing a track
-        notifyChange(META_CHANGED);
-      }
-    }
+          final int first = queue.add(list, action == NEXT);
+          if (action == NOW && first >= 0) {
+            queue.seekTo(first);
+            play();
+          }
+        });
   }
 
   /** Cycles through the different repeat modes */
@@ -2951,6 +2446,33 @@ public class MusicPlaybackService extends MediaSessionService {
     } else {
       setRepeatMode(REPEAT_NONE);
     }
+  }
+
+  /**
+   * On the player thread, after ExoPlayer failed to play a song: playing, it skips to the next
+   * song, paused, it loads the song again; after {@link #MAX_FAILED_SONGS_SKIPPED} failures in a
+   * row (or every song once) it stops.
+   */
+  private void recoverFromPlayerError() {
+    final MultiPlayer player = mPlayer;
+    final PlaybackQueue queue = mQueue;
+    if (player == null
+        || queue == null
+        || queue.snapshot().size() == 0
+        || player.mExoPlayer.getPlayerError() == null) {
+      return; // nothing left to recover from: another song was opened since the error
+    }
+    if (++mFailedSongsInARow > Math.min(MAX_FAILED_SONGS_SKIPPED, queue.snapshot().size())) {
+      LOG.warn("Failed to open file for playback");
+      mFailedSongsInARow = 0;
+      stopPlayer();
+      notifyChange(PLAYSTATE_CHANGED);
+      return;
+    }
+    if (isPlaying()) {
+      queue.next();
+    }
+    player.prepare();
   }
 
   /**
@@ -2972,11 +2494,6 @@ public class MusicPlaybackService extends MediaSessionService {
   /** Called when one of the lists should refresh or requery. */
   public void refresh() {
     notifyChange(REFRESH);
-  }
-
-  public void shutdown() {
-    mPlayPos = -1;
-    MusicUtils.requestMusicPlaybackServiceShutdown(this);
   }
 
   // MediaPlayerAction, mediaPlayerAction, and mediaPlayerAsyncAction removed —
@@ -3006,6 +2523,7 @@ public class MusicPlaybackService extends MediaSessionService {
         return;
       }
 
+      final MultiPlayer player = service.mPlayer;
       switch (msg.what) {
         case FADE_DOWN:
           mCurrentVolume -= .05f;
@@ -3014,7 +2532,9 @@ public class MusicPlaybackService extends MediaSessionService {
           } else {
             mCurrentVolume = .2f;
           }
-          service.mPlayer.setVolume(mCurrentVolume);
+          if (player != null) {
+            player.setVolume(mCurrentVolume);
+          }
           break;
         case FADE_UP:
           mCurrentVolume += .01f;
@@ -3023,67 +2543,13 @@ public class MusicPlaybackService extends MediaSessionService {
           } else {
             mCurrentVolume = 1.0f;
           }
-          service.mPlayer.setVolume(mCurrentVolume);
+          if (player != null) {
+            player.setVolume(mCurrentVolume);
+          }
           break;
         case SERVER_DIED:
-          if (service.isPlaying()) {
-            service.gotoNext(true);
-          } else {
-            service.openCurrentAndNext();
-          }
+          service.recoverFromPlayerError();
           break;
-        case TRACK_WENT_TO_NEXT:
-          LOG.info(
-              "MusicPlayerHandler: TRACK_WENT_TO_NEXT currentPos="
-                  + service.mPlayPos
-                  + " nextPlayPos="
-                  + service.mNextPlayPos
-                  + " queueLen="
-                  + service.mPlayListLen);
-          service.mPlayPos = service.positionAfterNext(audioIdOf(msg));
-          if (service.mCursor != null) {
-            service.mCursor.close();
-          }
-
-          if (service.mPlayPos < service.mPlayListLen) {
-            service.updateCursor(service.mPlayList[service.mPlayPos]);
-            service.notifyChange(META_CHANGED);
-            service.updateNotification();
-            service.setNextTrack();
-          }
-          break;
-        case TRACK_WENT_TO_PREVIOUS:
-          LOG.info(
-              "MusicPlayerHandler: TRACK_WENT_TO_PREVIOUS currentPos="
-                  + service.mPlayPos
-                  + " queueLen="
-                  + service.mPlayListLen);
-          if (service.mCursor != null) {
-            service.mCursor.close();
-          }
-          service.mPlayPos = service.positionAfterPrevious(audioIdOf(msg));
-
-          if (service.mPlayPos >= 0 && service.mPlayPos < service.mPlayListLen) {
-            service.updateCursor(service.mPlayList[service.mPlayPos]);
-            service.notifyChange(META_CHANGED);
-            service.updateNotification();
-            service.setNextTrack();
-          }
-          break;
-        case TRACK_ENDED:
-          LOG.info(
-              "MusicPlayerHandler: TRACK_ENDED currentPos="
-                  + service.mPlayPos
-                  + " queueLen="
-                  + service.mPlayListLen);
-          if (service.mRepeatMode == REPEAT_CURRENT) {
-            service.seek(1);
-          } else {
-            service.gotoNext(false);
-          }
-          break;
-        // RELEASE_WAKELOCK and FOCUS_CHANGE removed —
-        // ExoPlayer handles wake lock and audio focus internally.
         default:
           break;
       }
@@ -3091,95 +2557,85 @@ public class MusicPlaybackService extends MediaSessionService {
   }
 
   /**
-   * MultiPlayer wraps a single ExoPlayer instance. ExoPlayer handles gapless playback, audio focus,
-   * wake mode, and audio-becoming-noisy natively — removing the entire dual-MediaPlayer swap and
-   * manual WakeLock management from the original implementation.
+   * The ExoPlayer that plays the queue, and what other threads may read of it. ExoPlayer handles
+   * gapless playback, audio focus, wake mode and audio becoming noisy; its playlist is the queue,
+   * which {@link PlaybackQueue} keeps.
    *
-   * <p>Threading: ExoPlayer is built on mPlayerHandler (HandlerThread) and must only be called from
-   * that thread. All state-changing calls are posted to mPlayerHandler. Reads (position, duration,
-   * isPlaying) use volatile cached fields updated from the HandlerThread via Player.Listener
-   * callbacks and a periodic position poller.
+   * <p>Threading: ExoPlayer is built on mPlayerHandler's thread and only used there. The methods
+   * that use it run at once when called on that thread, else they are posted to it. Position,
+   * duration, playing and idle are volatile values its listener and a position poller keep, so any
+   * thread may read them.
    */
   static final class MultiPlayer {
     private static final Logger LOG = Logger.getLogger(MultiPlayer.class);
-    ExoPlayer mExoPlayer; // package-private for MediaSession metadata updates in outer class
-    private volatile boolean mIsInitialized = false;
+    final ExoPlayer mExoPlayer; // player thread only
 
-    // Volatile caches so position/duration/isPlaying can be read from any thread safely.
     volatile long mCachedPosition = 0;
     volatile long mCachedDuration = -1;
     volatile boolean mCachedIsPlaying = false;
-    volatile int mCachedCurrentMediaItemIndex = 0;
-    volatile int mCachedMediaItemCount = 0;
+    private volatile boolean mIdle = true;
+    private volatile int mAudioSessionId;
 
-    // Polls getCurrentPosition() on the HandlerThread every 500 ms while playing.
+    // Polls getCurrentPosition() on the player thread every 500 ms while playing.
     private final Runnable mPositionPoller =
         new Runnable() {
           @Override
           public void run() {
-            if (mExoPlayer != null && mCachedIsPlaying) {
+            if (mCachedIsPlaying) {
               mCachedPosition = mExoPlayer.getCurrentPosition();
-              if (MusicPlaybackService.mPlayerHandler != null) {
-                MusicPlaybackService.mPlayerHandler.postDelayed(mPositionPoller, 500);
-              }
+              postDelayed(this, 500);
             }
           }
         };
 
-    MultiPlayer() {
-      // ExoPlayer is built lazily on first setCurrentDataSource call
-      // so that MusicPlaybackService.INSTANCE is guaranteed non-null.
-    }
-
-    private void ensurePlayer() {
-      if (mExoPlayer != null) return;
-      if (MusicPlaybackService.INSTANCE == null) return;
-      if (MusicPlaybackService.mPlayerHandler == null) return;
-      mExoPlayer =
-          new ExoPlayer.Builder(MusicPlaybackService.INSTANCE)
+    /** Builds the queue's ExoPlayer, bound to {@code looper}'s thread. */
+    static ExoPlayer buildExoPlayer(Context context, Looper looper) {
+      final ExoPlayer exoPlayer =
+          new ExoPlayer.Builder(context)
               .setHandleAudioBecomingNoisy(true)
               .setWakeMode(C.WAKE_MODE_LOCAL)
-              .setLooper(MusicPlaybackService.mPlayerHandler.getLooper())
+              .setLooper(looper)
+              .setMaxSeekToPreviousPositionMs(REWIND_INSTEAD_PREVIOUS_THRESHOLD)
               .build();
-      mExoPlayer.setAudioAttributes(
+      exoPlayer.setAudioAttributes(
           new AudioAttributes.Builder()
               .setUsage(C.USAGE_MEDIA)
               .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
               .build(),
           true /* handleAudioFocus — ExoPlayer manages focus internally */);
-      mExoPlayer.addListener(
+      return exoPlayer;
+    }
+
+    /** On {@code exoPlayer}'s application thread. */
+    MultiPlayer(ExoPlayer exoPlayer) {
+      mExoPlayer = exoPlayer;
+      mAudioSessionId = exoPlayer.getAudioSessionId();
+      exoPlayer.addListener(
           new Player.Listener() {
             @Override
             public void onPlaybackStateChanged(int state) {
-              LOG.info(
-                  "MultiPlayer: onPlaybackStateChanged state="
-                      + state
-                      + " currentIndex="
-                      + mCachedCurrentMediaItemIndex
-                      + " itemCount="
-                      + mCachedMediaItemCount
-                      + " cachedIsPlaying="
-                      + mCachedIsPlaying);
+              LOG.info("MultiPlayer: onPlaybackStateChanged state=" + state);
+              mIdle = state == Player.STATE_IDLE;
+              final MusicPlaybackService service = MusicPlaybackService.getInstance();
               if (state == Player.STATE_ENDED) {
-                LOG.info("MultiPlayer: onPlaybackStateChanged STATE_ENDED — track complete");
+                LOG.info("MultiPlayer: onPlaybackStateChanged STATE_ENDED — the queue finished");
                 mCachedIsPlaying = false;
-                if (MusicPlaybackService.mPlayerHandler != null) {
-                  MusicPlaybackService.mPlayerHandler.removeCallbacks(mPositionPoller);
-                  MusicPlaybackService.mPlayerHandler.sendEmptyMessage(TRACK_ENDED);
-                }
+                removeCallbacks(mPositionPoller);
               } else if (state == Player.STATE_READY) {
                 mCachedDuration = knownDuration(mExoPlayer.getDuration());
-                refreshTimelineCache();
-                // Start position polling on the HandlerThread.
-                if (MusicPlaybackService.mPlayerHandler != null) {
-                  MusicPlaybackService.mPlayerHandler.removeCallbacks(mPositionPoller);
-                  MusicPlaybackService.mPlayerHandler.post(mPositionPoller);
-                }
-                MusicPlaybackService svc = MusicPlaybackService.getInstance();
-                if (svc != null) {
-                  svc.updateNotification();
+                removeCallbacks(mPositionPoller);
+                post(mPositionPoller);
+                if (service != null) {
+                  service.mFailedSongsInARow = 0;
+                  service.updateNotification();
                 }
               }
+              syncPlaying(service);
+            }
+
+            @Override
+            public void onPlayWhenReadyChanged(boolean playWhenReady, int reason) {
+              syncPlaying(MusicPlaybackService.getInstance());
             }
 
             @Override
@@ -3192,76 +2648,34 @@ public class MusicPlaybackService extends MediaSessionService {
 
             @Override
             public void onMediaItemTransition(@Nullable MediaItem mediaItem, int reason) {
-              int previousIndex = mCachedCurrentMediaItemIndex;
-              refreshTimelineCache();
-              int currentIndex = mCachedCurrentMediaItemIndex;
               LOG.info(
                   "MultiPlayer: onMediaItemTransition reason="
                       + reason
-                      + " previousIndex="
-                      + previousIndex
-                      + " currentIndex="
-                      + currentIndex
+                      + " index="
+                      + mExoPlayer.getCurrentMediaItemIndex()
                       + " itemCount="
-                      + mCachedMediaItemCount
-                      + " mediaItem="
-                      + mediaItem);
-              boolean movedToQueuedNext =
-                  reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO
-                      || (reason == Player.MEDIA_ITEM_TRANSITION_REASON_SEEK
-                          && currentIndex > previousIndex);
-              boolean movedToQueuedPrevious =
-                  reason == Player.MEDIA_ITEM_TRANSITION_REASON_SEEK
-                      && currentIndex < previousIndex;
-              if (movedToQueuedNext) {
-                LOG.info(
-                    "MultiPlayer: onMediaItemTransition reason="
-                        + reason
-                        + " currentIndex="
-                        + currentIndex
-                        + " previousIndex="
-                        + previousIndex
-                        + " — advancing service state");
-                mCachedPosition = 0;
-                // A gapless transition stays READY, so onPlaybackStateChanged won't set it.
-                mCachedDuration = knownDuration(mExoPlayer.getDuration());
-                if (MusicPlaybackService.mPlayerHandler != null) {
-                  MusicPlaybackService.mPlayerHandler
-                      .obtainMessage(TRACK_WENT_TO_NEXT, audioIdOf(mediaItem))
-                      .sendToTarget();
-                }
-              } else if (movedToQueuedPrevious) {
-                LOG.info(
-                    "MultiPlayer: onMediaItemTransition reason="
-                        + reason
-                        + " currentIndex="
-                        + currentIndex
-                        + " previousIndex="
-                        + previousIndex
-                        + " — rewinding service state");
-                mCachedPosition = 0;
-                mCachedDuration = knownDuration(mExoPlayer.getDuration());
-                if (MusicPlaybackService.mPlayerHandler != null) {
-                  MusicPlaybackService.mPlayerHandler
-                      .obtainMessage(TRACK_WENT_TO_PREVIOUS, audioIdOf(mediaItem))
-                      .sendToTarget();
-                }
-              }
+                      + mExoPlayer.getMediaItemCount());
+              mCachedPosition = mExoPlayer.getCurrentPosition();
+              // A gapless transition stays READY, so onPlaybackStateChanged won't set it.
+              mCachedDuration = knownDuration(mExoPlayer.getDuration());
+            }
+
+            @Override
+            public void onPositionDiscontinuity(
+                @NonNull Player.PositionInfo oldPosition,
+                @NonNull Player.PositionInfo newPosition,
+                int reason) {
+              // Also a seek from the lock screen or a headset while paused, when nothing polls.
+              mCachedPosition = mExoPlayer.getCurrentPosition();
             }
 
             @Override
             public void onIsPlayingChanged(boolean isPlaying) {
-              LOG.info(
-                  "MultiPlayer: onIsPlayingChanged isPlaying="
-                      + isPlaying
-                      + " currentIndex="
-                      + mCachedCurrentMediaItemIndex
-                      + " itemCount="
-                      + mCachedMediaItemCount);
+              LOG.info("MultiPlayer: onIsPlayingChanged isPlaying=" + isPlaying);
               mCachedIsPlaying = isPlaying;
-              if (isPlaying && MusicPlaybackService.mPlayerHandler != null) {
-                MusicPlaybackService.mPlayerHandler.removeCallbacks(mPositionPoller);
-                MusicPlaybackService.mPlayerHandler.post(mPositionPoller);
+              if (isPlaying) {
+                removeCallbacks(mPositionPoller);
+                post(mPositionPoller);
               }
               MusicPlaybackService svc = MusicPlaybackService.getInstance();
               if (svc != null) {
@@ -3273,17 +2687,74 @@ public class MusicPlaybackService extends MediaSessionService {
             }
 
             @Override
+            public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
+              modesChanged();
+            }
+
+            @Override
+            public void onRepeatModeChanged(int repeatMode) {
+              modesChanged();
+            }
+
+            @Override
+            public void onAudioSessionIdChanged(int audioSessionId) {
+              mAudioSessionId = audioSessionId;
+            }
+
+            @Override
             public void onPlayerError(@NonNull PlaybackException error) {
               LOG.error("MultiPlayer: onPlayerError: " + error.getMessage(), error);
-              mIsInitialized = false;
               mCachedIsPlaying = false;
-              if (MusicPlaybackService.mPlayerHandler != null) {
-                MusicPlaybackService.mPlayerHandler.removeCallbacks(mPositionPoller);
-                MusicPlaybackService.mPlayerHandler.sendMessageDelayed(
-                    MusicPlaybackService.mPlayerHandler.obtainMessage(SERVER_DIED), 2000);
+              final Handler handler = MusicPlaybackService.mPlayerHandler;
+              if (handler != null) {
+                handler.removeCallbacks(mPositionPoller);
+                handler.sendMessageDelayed(handler.obtainMessage(SERVER_DIED), 2000);
               }
             }
           });
+    }
+
+    /**
+     * The service plays while ExoPlayer is to play and hasn't finished the queue, also when a
+     * Bluetooth headset or the lock screen started or paused it.
+     */
+    private void syncPlaying(@Nullable MusicPlaybackService service) {
+      final boolean playing =
+          mExoPlayer.getPlayWhenReady() && mExoPlayer.getPlaybackState() != Player.STATE_ENDED;
+      if (service != null && service.mIsSupposedToBePlaying != playing) {
+        service.mIsSupposedToBePlaying = playing;
+        service.notifyChange(PLAYSTATE_CHANGED);
+      }
+    }
+
+    private void modesChanged() {
+      final MusicPlaybackService service = MusicPlaybackService.getInstance();
+      if (service != null) {
+        service.modesChangedByPlayer(
+            mExoPlayer.getShuffleModeEnabled(),
+            PlaybackQueue.toApolloRepeatMode(mExoPlayer.getRepeatMode()));
+      }
+    }
+
+    private static void post(Runnable task) {
+      final Handler handler = MusicPlaybackService.mPlayerHandler;
+      if (handler != null) {
+        handler.post(task);
+      }
+    }
+
+    private static void postDelayed(Runnable task, long delayMillis) {
+      final Handler handler = MusicPlaybackService.mPlayerHandler;
+      if (handler != null) {
+        handler.postDelayed(task, delayMillis);
+      }
+    }
+
+    private static void removeCallbacks(Runnable task) {
+      final Handler handler = MusicPlaybackService.mPlayerHandler;
+      if (handler != null) {
+        handler.removeCallbacks(task);
+      }
     }
 
     /**
@@ -3294,187 +2765,51 @@ public class MusicPlaybackService extends MediaSessionService {
       return Uri.parse(MusicUriUtils.resolveUriString(path));
     }
 
-    /**
-     * Opens the given path as the current track and prepares for playback. The setMediaItem/prepare
-     * calls are posted to mPlayerHandler so they are always enqueued AFTER any previously posted
-     * stop()/clearMediaItems() calls, preventing the race condition where stop() wipes a newly
-     * loaded track.
-     */
-    void setCurrentDataSource(final String path) {
-      if (MusicPlaybackService.INSTANCE == null) {
-        LOG.warn("MultiPlayer::setCurrentDataSource() aborted, INSTANCE is null");
-        mIsInitialized = false;
-        return;
-      }
-      String permission =
-          SystemUtils.hasAndroid13OrNewer()
-              ? Manifest.permission.READ_MEDIA_AUDIO
-              : Manifest.permission.READ_EXTERNAL_STORAGE;
-      if (PackageManager.PERMISSION_GRANTED
-          != ContextCompat.checkSelfPermission(MusicPlaybackService.INSTANCE, permission)) {
-        LOG.error("MultiPlayer::setCurrentDataSource failed, " + permission + " not granted");
-        mIsInitialized = false;
-        return;
-      }
-      ensurePlayer();
-      if (mExoPlayer == null || MusicPlaybackService.mPlayerHandler == null) {
-        mIsInitialized = false;
-        return;
-      }
-      // Lazily set up MediaSession now that ExoPlayer exists
-      MusicPlaybackService.INSTANCE.setUpMediaSession();
-      // Mark initialized optimistically; reset to false on error in the posted task
-      mIsInitialized = true;
-      // Post setMediaItem/prepare to the HandlerThread so they execute after any
-      // previously posted stop()/clearMediaItems() calls in the queue.
-      final MediaItem mediaItem = MediaItem.fromUri(resolveUri(path));
-      MusicPlaybackService.mPlayerHandler.post(
+    /** True while stopped, failed, or not prepared yet: no song is loaded. */
+    boolean isIdle() {
+      return mIdle;
+    }
+
+    /** Starts or resumes playback; prepares the player first when it was stopped. */
+    void start() {
+      runOnPlayerThread(
           () -> {
-            if (mExoPlayer == null) return;
-            try {
-              LOG.info("MultiPlayer::setCurrentDataSource() path=" + path);
-              mExoPlayer.setMediaItem(mediaItem);
-              mCachedCurrentMediaItemIndex = 0;
-              mCachedMediaItemCount = 1;
+            if (mExoPlayer.getPlaybackState() == Player.STATE_IDLE) {
               mExoPlayer.prepare();
-              // Launch AudioPlayerActivity when the player is ready if requested
-              if (MusicPlaybackService.INSTANCE != null
-                  && MusicPlaybackService.INSTANCE.launchPlayerActivity) {
-                MusicPlaybackService.INSTANCE.launchPlayerActivity = false;
-                LOG.info("MultiPlayer::setCurrentDataSource() launching AudioPlayerActivity");
-                Intent i = new Intent(MusicPlaybackService.INSTANCE, AudioPlayerActivity.class);
-                i.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                MusicPlaybackService.INSTANCE.startActivity(i);
-              }
-            } catch (Throwable e) {
-              LOG.error("MultiPlayer::setCurrentDataSource() error: " + e.getMessage(), e);
-              mIsInitialized = false;
             }
+            mExoPlayer.play();
           });
     }
 
-    /**
-     * Enqueues the next track for gapless playback. ExoPlayer's built-in queue handles the seamless
-     * transition. Posted to mPlayerHandler to ensure ExoPlayer is called on its application thread.
-     */
-    void setNextDataSource(final String path) {
-      if (mExoPlayer == null || MusicPlaybackService.mPlayerHandler == null) return;
-      MusicPlaybackService.mPlayerHandler.post(
-          () -> {
-            if (mExoPlayer == null) return;
-            try {
-              int currentIdx = mExoPlayer.getCurrentMediaItemIndex();
-              int originalItemCount = mExoPlayer.getMediaItemCount();
-              // Remove any previously queued next item beyond the current one
-              int itemCount = mExoPlayer.getMediaItemCount();
-              if (itemCount > currentIdx + 1) {
-                mExoPlayer.removeMediaItems(currentIdx + 1, itemCount);
-              }
-              if (path != null) {
-                mExoPlayer.addMediaItem(MediaItem.fromUri(resolveUri(path)));
-                LOG.info(
-                    "MultiPlayer::setNextDataSource() queued next track successfully path="
-                        + path
-                        + " previousIndex="
-                        + currentIdx
-                        + " originalItemCount="
-                        + originalItemCount
-                        + " newItemCount="
-                        + mExoPlayer.getMediaItemCount());
-              }
-              refreshTimelineCache();
-            } catch (Throwable e) {
-              LOG.error("MultiPlayer::setNextDataSource() error: " + e.getMessage(), e);
-            }
-          });
+    /** Loads the current song again, after it failed; keeps playing or paused. */
+    void prepare() {
+      runOnPlayerThread(mExoPlayer::prepare);
     }
 
-    /**
-     * @return True if the player is ready to go, false otherwise
-     */
-    boolean isInitialized() {
-      return mIsInitialized;
-    }
-
-    /** Starts or resumes playback (posted to HandlerThread for ExoPlayer thread safety). */
-    public void start() {
-      if (mExoPlayer != null && MusicPlaybackService.mPlayerHandler != null) {
-        MusicPlaybackService.mPlayerHandler.post(
-            () -> {
-              if (mExoPlayer != null) {
-                try {
-                  mExoPlayer.play();
-                } catch (Throwable ignored) {
-                }
-              }
-            });
-      }
-    }
-
-    /** Stops playback and resets the player to an uninitialized state. */
-    public void stop() {
-      mIsInitialized = false;
+    /** Stops playback and lets go of the song's resources; the queue stays. */
+    void stop() {
       mCachedIsPlaying = false;
-      mCachedCurrentMediaItemIndex = 0;
-      mCachedMediaItemCount = 0;
-      LOG.info("MultiPlayer::stop() clearing current timeline");
-      if (MusicPlaybackService.mPlayerHandler != null) {
-        MusicPlaybackService.mPlayerHandler.removeCallbacks(mPositionPoller);
-      }
-      if (mExoPlayer != null && MusicPlaybackService.mPlayerHandler != null) {
-        MusicPlaybackService.mPlayerHandler.post(
-            () -> {
-              if (mExoPlayer != null) {
-                try {
-                  mExoPlayer.stop();
-                  mExoPlayer.clearMediaItems();
-                } catch (Throwable ignored) {
-                }
-              }
-            });
-      }
+      removeCallbacks(mPositionPoller);
+      runOnPlayerThread(
+          () -> {
+            mExoPlayer.pause();
+            mExoPlayer.stop();
+          });
     }
 
     /** Releases all ExoPlayer resources. */
-    public void release() {
-      ExoPlayer playerToRelease = mExoPlayer;
-      mExoPlayer = null;
-      mIsInitialized = false;
+    void release() {
       mCachedIsPlaying = false;
-      if (MusicPlaybackService.mPlayerHandler != null) {
-        MusicPlaybackService.mPlayerHandler.removeCallbacks(mPositionPoller);
-      }
-      if (playerToRelease != null) {
-        if (MusicPlaybackService.mPlayerHandler != null) {
-          MusicPlaybackService.mPlayerHandler.post(
-              () -> {
-                try {
-                  playerToRelease.release();
-                } catch (Throwable ignored) {
-                }
-              });
-        } else {
-          try {
-            playerToRelease.release();
-          } catch (Throwable ignored) {
-          }
-        }
+      removeCallbacks(mPositionPoller);
+      final Handler handler = MusicPlaybackService.mPlayerHandler;
+      if (handler == null || !handler.post(mExoPlayer::release)) {
+        LOG.warn("MultiPlayer::release() the player thread is gone; ExoPlayer not released");
       }
     }
 
-    /** Pauses playback (posted to HandlerThread for ExoPlayer thread safety). */
-    public void pause() {
-      if (mExoPlayer != null && MusicPlaybackService.mPlayerHandler != null) {
-        MusicPlaybackService.mPlayerHandler.post(
-            () -> {
-              if (mExoPlayer != null) {
-                try {
-                  mExoPlayer.pause();
-                } catch (Throwable ignored) {
-                }
-              }
-            });
-      }
+    /** Pauses playback. */
+    void pause() {
+      runOnPlayerThread(mExoPlayer::pause);
     }
 
     /** ExoPlayer's duration in milliseconds, or -1 while it isn't known. */
@@ -3485,122 +2820,38 @@ public class MusicPlaybackService extends MediaSessionService {
     /**
      * @return The duration of the current track in milliseconds, or -1.
      */
-    public long duration() {
+    long duration() {
       return mCachedDuration;
     }
 
     /**
      * @return The current playback position in milliseconds.
      */
-    public long position() {
+    long position() {
       return mCachedPosition;
     }
 
-    /**
-     * Seeks to the given position in milliseconds. The seek is posted to the HandlerThread; the
-     * target position is returned immediately.
-     */
-    long seek(final long whereto) {
-      if (mExoPlayer != null && MusicPlaybackService.mPlayerHandler != null) {
-        mCachedPosition = whereto;
-        MusicPlaybackService.mPlayerHandler.post(
-            () -> {
-              if (mExoPlayer != null) {
-                try {
-                  mExoPlayer.seekTo(whereto);
-                } catch (Throwable ignored) {
-                }
-              }
-            });
-      }
-      return whereto;
+    /** Seeks within the current song; {@link #position()} returns {@code whereto} at once. */
+    void seek(final long whereto) {
+      mCachedPosition = whereto;
+      runOnPlayerThread(() -> mExoPlayer.seekTo(whereto));
     }
 
-    /** Sets the playback volume (0.0–1.0), posted to HandlerThread. */
-    public void setVolume(final float vol) {
-      if (mExoPlayer != null && MusicPlaybackService.mPlayerHandler != null) {
-        MusicPlaybackService.mPlayerHandler.post(
-            () -> {
-              if (mExoPlayer != null) {
-                try {
-                  mExoPlayer.setVolume(vol);
-                } catch (Throwable ignored) {
-                }
-              }
-            });
-      }
+    /** Sets the playback volume (0.0–1.0). */
+    void setVolume(final float vol) {
+      runOnPlayerThread(() -> mExoPlayer.setVolume(vol));
     }
 
     /**
      * @return True if the player is currently playing. Uses cached value for thread safety.
      */
-    public boolean isPlaying() {
+    boolean isPlaying() {
       return mCachedIsPlaying;
     }
 
-    boolean hasNextInTimeline() {
-      return mCachedMediaItemCount > mCachedCurrentMediaItemIndex + 1;
-    }
-
-    boolean hasPreviousInTimeline() {
-      return mCachedCurrentMediaItemIndex > 0;
-    }
-
-    void seekToNextInTimeline() {
-      if (mExoPlayer != null && MusicPlaybackService.mPlayerHandler != null) {
-        MusicPlaybackService.mPlayerHandler.post(
-            () -> {
-              if (mExoPlayer != null) {
-                try {
-                  mExoPlayer.seekToNextMediaItem();
-                } catch (Throwable ignored) {
-                }
-              }
-            });
-      }
-    }
-
-    void seekToPreviousInTimeline() {
-      if (mExoPlayer != null && MusicPlaybackService.mPlayerHandler != null) {
-        MusicPlaybackService.mPlayerHandler.post(
-            () -> {
-              if (mExoPlayer != null) {
-                try {
-                  mExoPlayer.seekToPreviousMediaItem();
-                } catch (Throwable ignored) {
-                }
-              }
-            });
-      }
-    }
-
-    private void refreshTimelineCache() {
-      if (mExoPlayer == null) {
-        mCachedCurrentMediaItemIndex = 0;
-        mCachedMediaItemCount = 0;
-        return;
-      }
-      try {
-        mCachedCurrentMediaItemIndex = Math.max(mExoPlayer.getCurrentMediaItemIndex(), 0);
-        mCachedMediaItemCount = Math.max(mExoPlayer.getMediaItemCount(), 0);
-      } catch (Throwable ignored) {
-      }
-    }
-
-    /** Returns the audio session ID for equalizer / AudioEffect integration. */
+    /** Returns the audio session ID for equalizer / AudioEffect integration; any thread. */
     int getAudioSessionId() {
-      if (mExoPlayer != null) {
-        try {
-          return mExoPlayer.getAudioSessionId();
-        } catch (Throwable ignored) {
-        }
-      }
-      return 0;
-    }
-
-    /** No-op stubs kept for call-site compatibility during transition. */
-    public void setAudioSessionId(final int sessionId) {
-      // ExoPlayer manages its own audio session; this is a no-op.
+      return mAudioSessionId;
     }
   }
 }

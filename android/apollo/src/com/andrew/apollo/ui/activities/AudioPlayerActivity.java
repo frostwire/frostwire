@@ -482,6 +482,8 @@ public final class AudioPlayerActivity extends AbstractActivity
     filter.addAction(MusicPlaybackService.REPEATMODE_CHANGED);
     // Track changes
     filter.addAction(MusicPlaybackService.META_CHANGED);
+    // Songs added, removed or moved
+    filter.addAction(MusicPlaybackService.QUEUE_CHANGED);
     // Update a list, probably the playlist fragment's
     filter.addAction(MusicPlaybackService.REFRESH);
     safeRegisterReceiver(filter);
@@ -1457,6 +1459,11 @@ public final class AudioPlayerActivity extends AbstractActivity
         return;
       }
       switch (action) {
+        case MusicPlaybackService.QUEUE_CHANGED:
+          // Also when a queue change was posted to the player thread after the screen asked,
+          // or Android Auto or Wear changed the queue.
+          activity.runOnUiThread(activity::refreshQueueFragment);
+          break;
         case MusicPlaybackService.META_CHANGED:
           activity.runOnUiThread(
               () -> {

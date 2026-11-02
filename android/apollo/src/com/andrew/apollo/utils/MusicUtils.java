@@ -597,21 +597,22 @@ public final class MusicUtils {
     return String.format(durationFormat, hours, mins, secs);
   }
 
-  /** Changes to the next track */
+  /** Changes to the next track, as a headset's "next" does, and plays it. */
   public static void next() {
     MusicPlaybackService.safePost(
         () -> {
           try {
             MusicPlaybackService svc = getService();
             if (svc != null) {
-              svc.stopPlayer();
-              svc.gotoNext(true);
+              svc.gotoNext();
+              svc.play();
             }
           } catch (final Throwable ignored) {
           }
         });
   }
 
+  /** Changes to the previous track, as a headset's "previous" does, and plays it. */
   public static void previous() {
     MusicPlaybackService.safePost(
         () -> {
@@ -619,6 +620,7 @@ public final class MusicUtils {
             MusicPlaybackService svc = getService();
             if (svc != null) {
               svc.gotoPrev();
+              svc.play();
             }
           } catch (final Throwable ignored) {
           }
@@ -632,17 +634,11 @@ public final class MusicUtils {
           try {
             MusicPlaybackService svc = getService();
             if (svc != null) {
-              // PAUSED
-              if (!svc.isPlaying() && !svc.isStopped()) {
-                svc.resume();
-              }
-              // STOPPED or UNSTARTED
-              else if (svc.isStopped()) {
-                svc.play();
-              }
-              // PLAYING
-              else if (svc.isPlaying()) {
+              if (svc.isPlaying()) {
                 svc.pause();
+              } else {
+                // Paused, stopped or not started yet.
+                svc.play();
               }
             }
           } catch (final Exception ignored) {
@@ -2582,12 +2578,12 @@ public final class MusicUtils {
     }
   }
 
-  /** Clears the queue. */
+  /** Clears the queue but the playing song, which keeps playing. */
   public static void clearQueue() {
     try {
       MusicPlaybackService svc = getService();
       if (svc != null) {
-        svc.removeTracks(0, Integer.MAX_VALUE);
+        svc.clearQueue();
       }
     } catch (final Throwable ignored) {
     }

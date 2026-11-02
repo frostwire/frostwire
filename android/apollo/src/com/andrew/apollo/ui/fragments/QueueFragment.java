@@ -101,9 +101,7 @@ public final class QueueFragment extends ApolloFragment<SongAdapter, Song>
                   }
                   return true;
                 } else if (itemId == R.id.menu_player_clear_queue) {
-                  long currentAudioId = MusicUtils.getCurrentAudioId();
                   MusicUtils.clearQueue();
-                  MusicUtils.playFDs(new long[] {currentAudioId}, 0, MusicUtils.isShuffleEnabled());
                   refreshQueue();
                   return true;
                 }

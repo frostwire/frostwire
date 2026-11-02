@@ -7,8 +7,10 @@
 
 package com.andrew.apollo.utils;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.robolectric.Shadows.shadowOf;
 
 import android.app.Application;
 import android.content.ContentProvider;
@@ -16,14 +18,25 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Looper;
 import android.provider.MediaStore;
+import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.test.utils.FakeMediaSourceFactory;
+import androidx.media3.test.utils.TestExoPlayerBuilder;
 import androidx.test.core.app.ApplicationProvider;
+import com.andrew.apollo.MusicPlaybackService;
 import com.frostwire.platform.Platform;
 import com.frostwire.platform.Platforms;
+import java.lang.ref.WeakReference;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -196,6 +209,68 @@ public class MusicUtilsAddToPlaylistTest {
     assertEquals(1, FakeMediaProvider.members.size());
     for (Thread thread : FakeMediaProvider.threads) {
       assertTrue("MediaStore reached on the main thread", thread != Thread.currentThread());
+    }
+  }
+
+  /** Adding to the playlist that is playing also queues the new songs, so they get played. */
+  @Test
+  @Config(sdk = 34)
+  public void songsAddedToThePlayingPlaylistJoinTheQueue() throws Exception {
+    FakeMediaProvider.members.add(new long[] {1, 0});
+    FakeMediaProvider.members.add(new long[] {2, 1});
+    MusicPlaybackService service =
+        Robolectric.buildService(MusicPlaybackService.class).create().get();
+    // A player thread with a real ExoPlayer playing fake media, as the service makes in the app.
+    HandlerThread playerThread = new HandlerThread("test-player");
+    playerThread.start();
+    Looper looper = playerThread.getLooper();
+    Constructor<?> newHandler =
+        Class.forName("com.andrew.apollo.MusicPlaybackService$MusicPlayerHandler")
+            .getDeclaredConstructor(Looper.class);
+    newHandler.setAccessible(true);
+    Field playerHandler = MusicPlaybackService.class.getDeclaredField("mPlayerHandler");
+    playerHandler.setAccessible(true);
+    playerHandler.set(null, newHandler.newInstance(looper));
+    Method attachPlayer =
+        MusicPlaybackService.class.getDeclaredMethod("attachPlayer", ExoPlayer.class);
+    attachPlayer.setAccessible(true);
+    AtomicReference<ExoPlayer> player = new AtomicReference<>();
+    new Handler(looper)
+        .post(
+            () -> {
+              player.set(
+                  new TestExoPlayerBuilder(ApplicationProvider.getApplicationContext())
+                      .setMediaSourceFactory(new FakeMediaSourceFactory())
+                      .setLooper(looper)
+                      .build());
+              try {
+                attachPlayer.invoke(service, player.get());
+              } catch (ReflectiveOperationException e) {
+                throw new AssertionError(e);
+              }
+            });
+    shadowOf(looper).idle();
+    Field ref = MusicUtils.class.getDeclaredField("musicPlaybackServiceRef");
+    ref.setAccessible(true);
+    ref.set(null, new WeakReference<>(service));
+    try {
+      service.open(new long[] {1, 2, 3}, 0);
+      shadowOf(looper).idle();
+
+      add(9);
+      long deadline = System.currentTimeMillis() + 5_000;
+      while (service.getQueue().length < 4 && System.currentTimeMillis() < deadline) {
+        Thread.sleep(10);
+        shadowOf(looper).idle();
+      }
+
+      assertArrayEquals(new long[] {1, 2, 3, 9}, service.getQueue());
+    } finally {
+      ref.set(null, null);
+      new Handler(looper).post(() -> player.get().release());
+      shadowOf(looper).idle();
+      playerHandler.set(null, (Handler) null);
+      playerThread.quitSafely();
     }
   }
 }
