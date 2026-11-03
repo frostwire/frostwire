@@ -1,17 +1,33 @@
 FrostWire 3.2.3 build 779 UNRELEASED
-  - fix:Playing a song from the music player no longer leaves a My Files preview playing over it, and car, watch and Android Auto screens show the titles of every song in the queue (#1452)
   - fix:Music player: the queue is now the player's own playlist, so the app, Bluetooth, the lock screen, Android Auto and Wear see the whole queue and agree on next and previous; the player no longer piles up one entry per song played, and the saved queue is restored after a restart (#1452)
+  - fix:Playing a song from the music player no longer leaves a My Files preview playing over it, and car, watch and Android Auto screens show the titles of every song in the queue (#1452)
+  - fix:Music playback no longer crashes the app when it starts as you leave FrostWire, or after pausing — the player always tells Android it is running in the foreground when started (#1371)
+  - fix:Searching no longer crashes the app with "did not set the measured dimension" (a crash seen for years under DrawerLayout and other names) — search results now update the screen only from the main thread (#1384)
+  - fix:FrostWire no longer crash-loops in the background on a few devices with "too many scheduled jobs" — the unused WorkManager is gone and the jobs older versions left behind are cleaned up (#1388)
+  - fix:FrostWire no longer crashes on Android 12 when your network changes while it is starting — the torrent engine waits until it is fully started before stopping (#1387)
+  - fix:FrostWire with thousands of transfers no longer crashes with a stack overflow, and every transfer update does far less work: torrent events reach their transfer through one lookup instead of every transfer checking each one (#1441)
+  - fix:Torrents that use only the new BitTorrent v2 format no longer disappear from Transfers after a restart: their saved copy now keeps the v2 piece hashes (#1383)
+  - jlibtorrent: updated to 2.0.15.3 (3.2.2 shipped 2.0.12.9): libtorrent RC_2_0 with the fixes of libtorrent 2.0.13, 2.0.14, 2.0.15 and the unreleased 2.0.16 (123 commits), and OpenSSL 3.6.0 → 4.1.0
+  - jlibtorrent: BitTorrent memory leaks: every torrent, magnet, resume-data and DHT message it decoded leaked a native copy of its input (100,000 parses of a 13.5 KB torrent leaked 1.7 GB; now flat), and identity secret keys no longer stay behind in leaked native memory
+  - fix:Music player: creating a playlist with a name already in use no longer empties that playlist; the dialog suggests "Name 2" instead, and deleting a playlist another app owns now says so instead of doing nothing (#1449)
+  - fix:Music player playlists: granting storage access no longer duplicates every playlist with a trailing space (Android 8 to 10) or copies other apps' playlists (Android 11+); "Save as playlist" with an existing name in different case saves into that playlist instead of creating a duplicate; renamed and deleted playlists update the list right away, and deleting one no longer stalls the screen (#1449)
+  - fix:Cancelling Android's "Allow FrostWire to delete?" prompt in the music player no longer hides the songs as if they were deleted, and deleting many songs cleans up playlists, Recent and Favorites much faster, even if Android closed the app while the prompt was up (#1450)
+  - fix:Karma: your karma chain can no longer be lost: each entry is saved before it is used, never signed at an older Bitcoin block, and a chain that fails verification is kept aside instead of overwritten; Endorse source no longer checks the chain on the UI thread (#1413)
+  - fix:SoundCloud search and downloads support downloadable HLS AAC tracks, saving segmented audio as M4A while retaining progressive MP3 support
+  - fix:The app icon is sharp on every launcher — it is now an adaptive icon rendered from the vector logo at each screen density, instead of a small bitmap the launcher shrank into its own shape (#1209)
+  - fix:Karma: a download that finishes from a distributed-search peer now endorses that peer automatically, once per peer and torrent (#1414)
+  - fix:Hashes and other hex values from peers and block explorers must be plain ASCII hex: look-alike digits from other scripts are rejected instead of decoding to the same bytes (#1431)
+  - fix:Distributed search rejects karma chains with forged epochs or energy that got around the endorsement limit (#1415)
+  - fix:Distributed search no longer accepts a peer's karma chain that declares an invalid energy value to endorse other peers without the per-epoch limit (#1401)
+  - jlibtorrent: libtorrent fixes: a data corruption bug in memory-mapped storage, trackers stuck after a pause, DNS leaks of peer and tracker host names, web seeds for single-file torrents, wrong seeding/active/finished times, external IP not reported with UPnP/NAT-PMP, a race removing an auto-managed torrent, and move-storage rollback
   - fix:Music player: playlist, genre, Favorites and Last added headers and home-screen shortcuts show real album art instead of the default image, and an image cache that never cached anything is gone (#1461)
   - fix:Music player: the library tabs are kept with the music browser, and sorting, shuffling or refreshing a tab that isn't loaded yet no longer does nothing silently (#1456)
-  - fix:Music player: creating a playlist with a name already in use no longer empties that playlist; the dialog suggests "Name 2" instead, and deleting a playlist another app owns now says so instead of doing nothing (#1449)
   - fix:Music player: changing the sort order twice in a row, or removing two favorites quickly, no longer leaves the list empty (#1461)
   - fix:Music player screens no longer keep reloading in the background, no longer reload more often each time you return to them, can no longer be made to reload by other apps, and no longer crash on a playback update that arrives after they close (#1456)
   - fix:Music player: adding to a playlist with nothing playing, adding an album or artist to Favorites, and removing songs from Favorites or Recent no longer stall the screen, and a failed Favorites or Recent write no longer stops later ones from being saved (#1455)
   - fix:Music player: skipping songs quickly no longer leaves the screen, widget and lock screen on an earlier song, and quick queue edits are no longer lost when Android closes the app (#1453)
   - fix:Music player: the title, notification and lock screen show the right song after going back from the first song with repeat on, after skipping from headphones or the lock screen once the queue was edited, and after resuming when the next song was removed or moved while paused (#1452)
-  - fix:Music player playlists: granting storage access no longer duplicates every playlist with a trailing space (Android 8 to 10) or copies other apps' playlists (Android 11+); "Save as playlist" with an existing name in different case saves into that playlist instead of creating a duplicate; renamed and deleted playlists update the list right away, and deleting one no longer stalls the screen (#1449)
   - fix:Music player playlists: "Add to playlist" works on Android 8 and 9, added songs stay in the order you added them, songs added to the playlist you're playing join the queue, songs never go into another app's playlist with the same name, and dragging or removing a song changes that song only, even when it is in the playlist twice (#1448)
-  - fix:Cancelling Android's "Allow FrostWire to delete?" prompt in the music player no longer hides the songs as if they were deleted, and deleting many songs cleans up playlists, Recent and Favorites much faster, even if Android closed the app while the prompt was up (#1450)
   - fix:When the music player moves to the next song on its own, the seek bar and time work again, and the song is added to Recent (#1451)
   - fix:Tapping the album art in the music player's bottom bar opens the playing album with its own songs, not another album's (#1454)
   - fix:Opening one of your playlists in the music player shows its songs right away, instead of "empty playlist" when nothing was playing (#1447)
@@ -20,63 +36,45 @@ FrostWire 3.2.3 build 779 UNRELEASED
   - fix:The music player's Albums, Artists, Genres, Playlists and Recent lists no longer come back empty after switching away from the app and back (#1444)
   - fix:The music player's Recent list is no longer wiped when the media library can't be read yet, and freshly downloaded songs no longer drop out of it (#1443)
   - fix:Delete, Play, Add to queue and the playlist actions on an album, artist, genre or playlist in the music player now act on that item's songs. Picking the action right after long-pressing could use the previous item's songs, or delete a song you never chose (#1442)
+  - fix:Music home screen shortcuts (artist, album, genre, playlist) and asking your assistant to play music on FrostWire work again instead of crashing (#1404)
+  - fix:Album art and thumbnails no longer download again every time you switch away from FrostWire and back — the image disk cache is kept, capped at 50 MB (#1389)
   - fix:The search mesh no longer fails to start now and then because another app took its local port first (#1424)
-  - fix:Torrents that use only the new BitTorrent v2 format no longer disappear from Transfers after a restart: their saved copy now keeps the v2 piece hashes (#1383)
-  - fix:FrostWire with thousands of transfers no longer crashes with a stack overflow, and every transfer update does far less work: torrent events reach their transfer through one lookup instead of every transfer checking each one (#1441)
   - fix:Pasting a SoundCloud link whose answer holds an empty track now downloads the other tracks instead of doing nothing (#1433)
   - fix:Cloud video links whose details come back empty no longer crash the app (#1434)
   - fix:Cloud video and playlist results without an upload date no longer crash or show another result's date (#1435)
   - fix:An Internet Archive search answer with one empty entry no longer hides all Internet Archive results (#1432)
   - fix:A torrent with a malformed license or payment-options section no longer loses both: the bad section is ignored and the other still shows (#1430)
-  - fix:Hashes and other hex values from peers and block explorers must be plain ASCII hex: look-alike digits from other scripts are rejected instead of decoding to the same bytes (#1431)
   - jlibtorrent: the copies of the libtorrent library that older versions left in the temp folder on every start (13-30 MB each) are deleted
-  - jlibtorrent: updated to 2.0.15.3 (3.2.2 shipped 2.0.12.9): libtorrent RC_2_0 with the fixes of libtorrent 2.0.13, 2.0.14, 2.0.15 and the unreleased 2.0.16 (123 commits), and OpenSSL 3.6.0 → 4.1.0
   - jlibtorrent: App start no longer copies the 13.4 MB libtorrent library out of the app into its cache on every start (the copies were never deleted); Android loads it where it is installed (#1382)
   - jlibtorrent: a programming mistake that uses a libtorrent object after freeing it now shows up as an error instead of closing the app
   - jlibtorrent: libtorrent objects FrostWire no longer uses (torrent info, status, entries, lists) are freed automatically instead of leaking native memory for as long as the app runs
   - jlibtorrent: now built from the single jlibtorrent Android library (AAR), which carries its own R8 rules and native libraries for every ABI (#327)
-  - jlibtorrent: BitTorrent memory leaks: every torrent, magnet, resume-data and DHT message it decoded leaked a native copy of its input (100,000 parses of a 13.5 KB torrent leaked 1.7 GB; now flat), and identity secret keys no longer stay behind in leaked native memory
   - jlibtorrent: Fewer JNI calls: data moves between Java and libtorrent in one call instead of one call per byte (1 MB: 6 ms → 0.4 ms into libtorrent, 3-4 ms → 0.1 ms back), so reading torrents, resume data and DHT items is faster and uses less battery
   - jlibtorrent: Torrents whose file names have emoji or other characters outside the basic plane download with the right names, and text that isn't valid UTF-8 no longer aborts the app in libtorrent's JNI layer
-  - jlibtorrent: libtorrent fixes: a data corruption bug in memory-mapped storage, trackers stuck after a pause, DNS leaks of peer and tracker host names, web seeds for single-file torrents, wrong seeding/active/finished times, external IP not reported with UPnP/NAT-PMP, a race removing an auto-managed torrent, and move-storage rollback
   - jlibtorrent: The Android emulator on Apple M4 Macs no longer crashes while loading libtorrent (OpenSSL ran an SVE instruction the emulator doesn't support)
-  - fix:Karma: a download that finishes from a distributed-search peer now endorses that peer automatically, once per peer and torrent (#1414)
-  - fix:Karma: your karma chain can no longer be lost: each entry is saved before it is used, never signed at an older Bitcoin block, and a chain that fails verification is kept aside instead of overwritten; Endorse source no longer checks the chain on the UI thread (#1413)
-  - fix:Distributed search rejects karma chains with forged epochs or energy that got around the endorsement limit (#1415)
   - fix:App start no longer waits behind other background work while it looks up its files folder
   - fix:MP3 tags read correctly in more files: UTF-16 comments and picture descriptions, tags with an extended header, and a short last tag field (#1409)
   - fix:Every valid magnet link form (base32 hash, parameters in any order, upper-case MAGNET:) is checked against the torrent it downloads (#1408)
-  - fix:Music home screen shortcuts (artist, album, genre, playlist) and asking your assistant to play music on FrostWire work again instead of crashing (#1404)
-  - fix:Album art and thumbnails no longer download again every time you switch away from FrostWire and back — the image disk cache is kept, capped at 50 MB (#1389)
-  - fix:Distributed search no longer accepts a peer's karma chain that declares an invalid energy value to endorse other peers without the per-epoch limit (#1401)
   - fix:Distributed search (IceBridge) no longer uses Android 13-only APIs when it creates its identity, stores its access token and caches block headers, which could stop it from working on Android 8 to 12 (#1400)
   - fix:IceBridge answers a malformed request on its local control port with an error instead of logging a stack trace and dropping the connection (#1396)
-  - fix:Opening search no longer freezes on phones with slow storage — the image cache folder is set up in the background (#1389)
-  - fix:FrostWire no longer crash-loops in the background on a few devices with "too many scheduled jobs" — the unused WorkManager is gone and the jobs older versions left behind are cleaned up (#1388)
-  - fix:FrostWire no longer crashes on Android 12 when your network changes while it is starting — the torrent engine waits until it is fully started before stopping (#1387)
-  - fix:Removing or updating a transfer no longer freezes the app while the torrent engine is busy — transfer lists no longer wait on the engine while locked (#1386)
-  - fix:Search results no longer freeze for almost half a second every time you stop scrolling (#1385)
-  - fix:Searching no longer crashes the app with "did not set the measured dimension" (a crash seen for years under DrawerLayout and other names) — search results now update the screen only from the main thread (#1384)
   - fix:Confirming "cancel transfer" or "delete files" no longer crashes the app when Android had closed it in the background while the dialog was open — the stale dialog now closes instead (#1381)
-  - fix:Less work on the main thread while scrolling and loading images — background tasks no longer take a stack trace of the screen's thread each time they are queued (#1375)
-  - fix:Opening the music player, now-playing or music search screens no longer freezes while the system's search service is slow to answer (#1374)
-  - fix:Opening a transfer's details and its Trackers or Peers tabs no longer freezes the app while the torrent engine is busy — tracker and peer lists load in the background (#1373)
   - fix:Messages like "added to playlist" no longer crash the app when shown from a background task (#1372)
-  - fix:Music playback no longer crashes the app when it starts as you leave FrostWire, or after pausing — the player always tells Android it is running in the foreground when started (#1371)
-  - update:OkHttp 5.3.2 -> 5.5.1, the HTTP client behind searches and downloads
-  - update:Spotless 7.0.4 -> 8.10.4, the code formatter check (developers only)
-  - update:Netty 4.2.18 -> 4.2.19, the networking library behind IceBridge
-  - update:BouncyCastle 1.83 -> 1.86, the cryptography behind IceBridge peer identities
-  - update:Gson 2.13.2 -> 2.15.0, the JSON library behind search results and settings
   - fix:Opening a magnet link that was cut short, or that uses the older 32-character hash format, no longer fails to start the download (#1367)
-  - fix:The app icon is sharp on every launcher — it is now an adaptive icon rendered from the vector logo at each screen density, instead of a small bitmap the launcher shrank into its own shape (#1209)
   - fix:Transfers no longer start a new thread every second each to refresh their status — refreshes share a small background pool
-  - fix:SoundCloud search and downloads support downloadable HLS AAC tracks, saving segmented audio as M4A while retaining progressive MP3 support
   - fix:Completed downloads count toward peer trust again — karma endorsements are signed with the same software key provider used everywhere else instead of being discarded
   - fix:Starting distributed search no longer spams the log with connection warnings while the local relay server boots — readiness is polled quietly with backoff
   - fix:Distributed Search writes its list of known IceBridge servers to storage at most every 5 minutes (and when it stops) instead of once per server it contacts, saving flash writes and battery, and a crash can no longer leave the list truncated
-  - update:Android Gradle Plugin 9.0.1 -> 9.5.0 and Gradle 9.1.0 -> 9.8.1 (build tooling only)
-  - update:groovy-swing 5.0.5 -> 5.1.3 (build script only, used by the release signing prompt)
+  - fix:Opening search no longer freezes on phones with slow storage — the image cache folder is set up in the background (#1389)
+  - fix:Removing or updating a transfer no longer freezes the app while the torrent engine is busy — transfer lists no longer wait on the engine while locked (#1386)
+  - fix:Search results no longer freeze for almost half a second every time you stop scrolling (#1385)
+  - fix:Less work on the main thread while scrolling and loading images — background tasks no longer take a stack trace of the screen's thread each time they are queued (#1375)
+  - fix:Opening the music player, now-playing or music search screens no longer freezes while the system's search service is slow to answer (#1374)
+  - fix:Opening a transfer's details and its Trackers or Peers tabs no longer freezes the app while the torrent engine is busy — tracker and peer lists load in the background (#1373)
+  - update:Media3 1.10.0 -> 1.11.1 (music player: foreground service crash fixes for the playback notification, sharper notification artwork, HLS stream fixes)
+  - update:OkHttp 5.3.2 -> 5.5.1, the HTTP client behind searches and downloads
+  - update:Netty 4.2.18 -> 4.2.19, the networking library behind IceBridge
+  - update:BouncyCastle 1.83 -> 1.86, the cryptography behind IceBridge peer identities
+  - update:Gson 2.13.2 -> 2.15.0, the JSON library behind search results and settings
   - update:androidx.appcompat 1.7.1 -> 1.8.0 (accessibility title on dialogs, toolbar height and font-variation fixes)
   - update:androidx.core 1.18.0 -> 1.19.1
   - update:androidx.lifecycle 2.10.0 -> 2.11.0
@@ -85,13 +83,15 @@ FrostWire 3.2.3 build 779 UNRELEASED
   - update:Coil 3.4.0 -> 3.6.3 (fixes image requests hanging when a duplicate request is cancelled, and partial-image decoding control)
   - update:WorkManager 2.11.2 -> 2.12.0 (retried background work schedules reliably, fewer startup stalls, a memory leak fix)
   - update:DataStore 1.2.1 -> 1.3.0 (fixes a race where a settings reader could miss a concurrent update, and a temp-file rename failure)
-  - update:Media3 1.10.0 -> 1.11.1 (music player: foreground service crash fixes for the playback notification, sharper notification artwork, HLS stream fixes)
+  - update:Firebase BoM 34.12.0 -> 35.1.0 (Crashlytics 21.0.1 records correct ANR timestamps, Analytics 24.0.0)
+  - update:Chaquopy 17.0.0 -> 17.2.0 (embedded Python 3.13.9 -> 3.13.16, fresher CA certificates for yt-dlp downloads)
+  - update:Spotless 7.0.4 -> 8.10.4, the code formatter check (developers only)
+  - update:Android Gradle Plugin 9.0.1 -> 9.5.0 and Gradle 9.1.0 -> 9.8.1 (build tooling only)
+  - update:groovy-swing 5.0.5 -> 5.1.3 (build script only, used by the release signing prompt)
   - update:Robolectric 4.16.1 -> 4.17 (tests only)
   - update:Mockito 5.14.2 -> 5.24.0 (tests only)
-  - update:Firebase BoM 34.12.0 -> 35.1.0 (Crashlytics 21.0.1 records correct ANR timestamps, Analytics 24.0.0)
   - update:Google services Gradle plugin 4.4.4 -> 4.5.0 (build tooling only)
   - update:Firebase Crashlytics Gradle plugin 3.0.7 -> 3.0.8 (build tooling only)
-  - update:Chaquopy 17.0.0 -> 17.2.0 (embedded Python 3.13.9 -> 3.13.16, fresher CA certificates for yt-dlp downloads)
 
 FrostWire 3.2.2 build 778 OCT/09/2026
   - fix:Peers are now verified over rUDP instead of a TCP identity port, so a peer behind NAT that can be reached over UDP can be found; the DHT announces the rUDP port, phones and servers no longer need an open TCP port, and the "identity port" setting is gone (peers on older versions that only announce a TCP port are not discovered)
