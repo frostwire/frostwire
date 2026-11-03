@@ -19,6 +19,7 @@
 package com.frostwire.gui.theme;
 
 import com.frostwire.util.OSUtils;
+import com.limegroup.gnutella.gui.DropTargets;
 import com.limegroup.gnutella.gui.I18n;
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -107,6 +108,8 @@ public final class FrostwireInputDialog extends JDialog {
     contentPane.add(messageLabel, "growx, gap 10 10 15 5, wrap");
     contentPane.add(textView, "growx, gap 10 10 0 5, wrap, height 24!");
     contentPane.add(buttonPanel, "gapright 5, align right");
+    // Takes no drops: no drag-and-drop registration with the OS when realized (#1471).
+    DropTargets.removeAll(this);
     pack();
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     setBounds(

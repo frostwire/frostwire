@@ -36,6 +36,8 @@ public class LanguageWindow extends JDialog {
     initializeButtons();
     initializeWindow();
     updateLabels(currentLocale);
+    // Takes no drops: no drag-and-drop registration with the OS when realized (#1471).
+    DropTargets.removeAll(this);
     pack();
     if (getWidth() < MIN_DIALOG_WIDTH) {
       setSize(350, getHeight());

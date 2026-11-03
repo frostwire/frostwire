@@ -141,6 +141,9 @@ public class SendFeedbackDialog {
     cancelButton = new JButton(I18n.tr("Cancel"));
     cancelButton.addActionListener(GUIUtils.getDisposeAction());
     feedbackPanel.add(cancelButton, "alignx right");
+    // Takes no drops. The dialog is already packed, so each component is realized as it is added:
+    // remove the drop targets first, or the window registers for drag-and-drop (#1471).
+    DropTargets.removeAll(feedbackPanel);
     baseContentPane.add(feedbackPanel, "grow, wrap");
   }
 

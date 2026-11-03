@@ -304,6 +304,8 @@ public final class TipOfTheDayMediator {
     contentPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     contentPanel.add(centerPanel, BorderLayout.CENTER);
     contentPanel.add(navigation, BorderLayout.SOUTH);
+    // Takes no drops: no drag-and-drop registration with the OS when realized (#1471).
+    DropTargets.removeAll(contentPanel);
     dialog.setContentPane(contentPanel);
     GUIUtils.addHideAction((JComponent) dialog.getContentPane());
     try {

@@ -22,6 +22,7 @@ import static com.frostwire.gui.theme.ThemeMediator.fixKeyStrokes;
 
 import com.frostwire.regex.Pattern;
 import com.frostwire.util.Logger;
+import com.limegroup.gnutella.gui.DropTargets;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.options.panes.IPFilterPaneItem;
 import java.awt.*;
@@ -89,6 +90,8 @@ public class AddRangeManuallyDialog extends JDialog {
     setContentPane(panel);
     setResizable(false);
     setLocationRelativeTo(getParent());
+    // Takes no drops: no drag-and-drop registration with the OS when realized (#1471).
+    DropTargets.removeAll(this);
     pack();
   }
 

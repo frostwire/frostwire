@@ -46,6 +46,8 @@ public class FramedDialog extends LimeJFrame {
     toFront();
     setVisible(true);
     dialog.toFront();
+    // Takes no drops: no drag-and-drop registration with the OS when realized (#1471).
+    DropTargets.removeAll(dialog);
     dialog.pack();
     SwingUtilities.invokeLater(
         () -> {

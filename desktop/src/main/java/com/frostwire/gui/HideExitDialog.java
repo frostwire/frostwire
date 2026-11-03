@@ -18,6 +18,7 @@
 
 package com.frostwire.gui;
 
+import com.limegroup.gnutella.gui.DropTargets;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.ApplicationSettings;
@@ -96,6 +97,8 @@ public class HideExitDialog extends JDialog {
     c.anchor = GridBagConstraints.EAST;
     c.ipadx = 18;
     getContentPane().add(_buttonExit, c);
+    // Takes no drops: no drag-and-drop registration with the OS when realized (#1471).
+    DropTargets.removeAll(this);
     pack();
     setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
     setModalityType(ModalityType.APPLICATION_MODAL);

@@ -80,6 +80,8 @@ class ShutdownWindow extends JDialog {
     backgroundPanel.add(bar);
     bar.setBounds(55 + insets.left, 428 + insets.top, 680, 30);
     getContentPane().setPreferredSize(new Dimension(800, 500));
+    // Takes no drops: no drag-and-drop registration with the OS when realized (#1471).
+    DropTargets.removeAll(this);
     pack();
     // Inflating and decoding the JPEG on the EDT stalled it while the window closed.
     decodeOffEdt(

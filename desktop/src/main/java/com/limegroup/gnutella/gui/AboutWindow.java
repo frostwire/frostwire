@@ -316,6 +316,8 @@ final class AboutWindow {
   /** Displays the "About" dialog window to the user. */
   void showDialog() {
     GUIUtils.centerOnScreen(DIALOG);
+    // Takes no drops: no drag-and-drop registration with the OS when realized (#1471).
+    DropTargets.removeAll(DIALOG);
     DIALOG.pack();
     DIALOG.setSize(new Dimension(800, 600));
     DIALOG.setVisible(true);

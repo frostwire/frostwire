@@ -25,6 +25,7 @@
 
 package com.frostwire.gui.updates;
 
+import com.limegroup.gnutella.gui.DropTargets;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -340,6 +341,8 @@ class ProgressMonitor implements Accessible {
       Container contentPane = dialog.getContentPane();
       contentPane.setLayout(new BorderLayout());
       contentPane.add(this, BorderLayout.CENTER);
+      // Takes no drops: no drag-and-drop registration with the OS when realized (#1471).
+      DropTargets.removeAll(dialog);
       dialog.pack();
       dialog.setLocationRelativeTo(parentComponent);
       dialog.addWindowListener(
