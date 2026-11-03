@@ -974,6 +974,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.ResourceManagerAnimatedImagePreloadTest"
         includeTestsMatching "com.limegroup.gnutella.gui.DropTargetsTest"
         includeTestsMatching "com.limegroup.gnutella.gui.ReadOnlyLabelsTakeNoDropsTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.WindowsTakeNoDropsTest"
         includeTestsMatching "com.limegroup.gnutella.gui.NativeFileIconControllerTest"
         includeTestsMatching "com.limegroup.gnutella.gui.IconManagerNativeInitTest"
         includeTestsMatching "com.limegroup.gnutella.gui.NativeUiChooserTest"
