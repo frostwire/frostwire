@@ -24,6 +24,7 @@ import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
+import com.limegroup.gnutella.gui.DropTargets;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
@@ -384,6 +385,8 @@ final class BTDownloadMediatorAdvancedMenuFactory {
       super(frame);
       this.dm = dm;
       setupUI();
+      // Takes no drops: no drag-and-drop registration with the OS when realized (#1471).
+      DropTargets.removeAll(this);
       pack();
       setLocationRelativeTo(frame);
     }
@@ -496,6 +499,8 @@ final class BTDownloadMediatorAdvancedMenuFactory {
       super(frame);
       this.dm = dm;
       setupUI();
+      // Takes no drops: no drag-and-drop registration with the OS when realized (#1471).
+      DropTargets.removeAll(this);
       pack();
       setLocationRelativeTo(frame);
     }

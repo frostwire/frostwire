@@ -160,6 +160,8 @@ public class CreateTorrentDialog extends JDialog {
     initTorrentContents();
     initTorrentTracking();
     buildListeners();
+    // Takes no drops: no drag-and-drop registration with the OS when realized (#1471).
+    DropTargets.removeAll(this);
     pack();
     setMinimumSize(getSize());
   }

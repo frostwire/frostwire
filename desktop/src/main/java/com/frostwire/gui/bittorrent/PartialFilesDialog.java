@@ -113,6 +113,8 @@ class PartialFilesDialog extends JDialog {
     // cancel button
     setupCancelButton();
     getContentPane().add(panel);
+    // Takes no drops: no drag-and-drop registration with the OS when realized (#1471).
+    DropTargets.removeAll(this);
     pack();
     setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
     setModalityType(ModalityType.APPLICATION_MODAL);

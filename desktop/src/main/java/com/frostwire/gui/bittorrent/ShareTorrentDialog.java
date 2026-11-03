@@ -28,6 +28,7 @@ import com.frostwire.util.UserAgentGenerator;
 import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.http.HttpClient.HttpClientListenerAdapter;
 import com.limegroup.gnutella.gui.ButtonRow;
+import com.limegroup.gnutella.gui.DropTargets;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
@@ -209,6 +210,8 @@ public class ShareTorrentDialog extends JDialog {
     feedbackLabel.setBounds(100, 100, 300, 20);
     addEscapeKeyListener();
     GUIUtils.addHideAction((JComponent) getContentPane());
+    // Takes no drops: no drag-and-drop registration with the OS when realized (#1471).
+    DropTargets.removeAll(this);
     pack();
   }
 

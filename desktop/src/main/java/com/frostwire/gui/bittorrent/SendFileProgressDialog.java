@@ -21,6 +21,7 @@ package com.frostwire.gui.bittorrent;
 import com.frostwire.concurrent.concurrent.ThreadExecutor;
 import com.frostwire.jlibtorrent.swig.error_code;
 import com.frostwire.util.Logger;
+import com.limegroup.gnutella.gui.DropTargets;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
@@ -49,6 +50,8 @@ public class SendFileProgressDialog extends JDialog {
   public SendFileProgressDialog(JFrame frame) {
     super(frame);
     setupUI();
+    // Takes no drops: no drag-and-drop registration with the OS when realized (#1471).
+    DropTargets.removeAll(this);
     pack();
     setLocationRelativeTo(frame);
     torrentMakerListener = new TorrentMakerListener();
