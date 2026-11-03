@@ -128,6 +128,19 @@ class JdkWarmUpTest {
     assertTrue(JdkWarmUp.CLASSES_TO_INITIALIZE.contains("sun.awt.image.ImagingLib"));
   }
 
+  /**
+   * The main window's first text field initialized Swing's text classes (BasicTextUI and its
+   * DefaultEditorKit) on the EDT (Icebase #a105a117d60a, frostwire/frostwire#1480).
+   */
+  @Test
+  void theTextComponentUiIsInitializedByTheWarmUpAndItsNestedClassesLoaded() throws Exception {
+    assertTrue(JdkWarmUp.CLASSES_TO_INITIALIZE.contains("javax.swing.plaf.basic.BasicTextUI"));
+    String source =
+        Files.readString(Path.of("src/main/java/com/frostwire/util/JdkWarmUp.java"))
+            .replaceAll("\\s+", "");
+    assertTrue(source.contains("Class.forName(className).getDeclaredClasses();"));
+  }
+
   @Test
   void everyClassToInitializeExistsAndLoads() {
     for (String className : JdkWarmUp.CLASSES_TO_INITIALIZE) {

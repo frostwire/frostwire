@@ -154,7 +154,12 @@ public final class JdkWarmUp {
           // The dark theme brightens icons with a RescaleOp, whose first use loads the native
           // mlib_image library here; it did so on the EDT as the Library opened (Icebase
           // #7150ddfe3582, frostwire/frostwire#1475).
-          "sun.awt.image.ImagingLib");
+          "sun.awt.image.ImagingLib",
+          // The main window's first text field (the File menu's Open Magnet field) ran its static
+          // initializer on the EDT: a text cursor, DefaultEditorKit and its ~50 editor actions, and
+          // the text TransferHandler, none of them a component (Icebase #a105a117d60a,
+          // frostwire/frostwire#1480).
+          "javax.swing.plaf.basic.BasicTextUI");
 
   /**
    * Windows-only JDK classes initialized like {@link #CLASSES_TO_INITIALIZE}. The first right-click
@@ -323,7 +328,9 @@ public final class JdkWarmUp {
     }
     for (String className : classesToInitialize(OSUtils.isWindows())) {
       try {
-        Class.forName(className);
+        // Nested classes are loaded too (not initialized): the first instance creates some of
+        // them, e.g. BasicTextUI's RootView and UpdateHandler.
+        Class.forName(className).getDeclaredClasses();
       } catch (Throwable t) {
         LOG.warn("Warm-up of " + className + " failed: " + t.getMessage(), t);
       }
