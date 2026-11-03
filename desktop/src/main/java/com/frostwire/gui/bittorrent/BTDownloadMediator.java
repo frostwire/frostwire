@@ -934,7 +934,8 @@ public final class BTDownloadMediator
   }
 
   /** What {@link #openTorrentFile} reads from the disk before it shows anything. */
-  record OpenedTorrentFile(TorrentInfo info, String hash, boolean seedDataNextToIt) {}
+  record OpenedTorrentFile(
+      PartialFilesDialog.Contents contents, String hash, boolean seedDataNextToIt) {}
 
   /** Parses {@code torrentFile} and looks for its seed data next to it. Not on the EDT. */
   private static OpenedTorrentFile readTorrentFile(File torrentFile) {
@@ -942,7 +943,10 @@ public final class BTDownloadMediator
     // A file named like the torrent in the same folder means the user wants to seed it.
     File seedData =
         new File(torrentFile.getParentFile(), FilenameUtils.removeExtension(torrentFile.getName()));
-    return new OpenedTorrentFile(info, TorrentUtil.getInfoHashString(info), seedData.exists());
+    return new OpenedTorrentFile(
+        PartialFilesDialog.contentsOf(info),
+        TorrentUtil.getInfoHashString(info),
+        seedData.exists());
   }
 
   /**
@@ -979,7 +983,8 @@ public final class BTDownloadMediator
       File saveDirFromDialog = null;
       if (partialDownload) {
         PartialFilesDialog dlg =
-            new PartialFilesDialog(GUIMediator.getAppFrame(), opened.info(), torrentFile.getName());
+            new PartialFilesDialog(
+                GUIMediator.getAppFrame(), opened.contents(), torrentFile.getName());
         dlg.setVisible(true);
         filesSelection = dlg.getFilesSelection();
         if (filesSelection == null) {

@@ -276,6 +276,9 @@ public class TorrentFetcherDownload implements BTDownload {
           LOG.error("Error downloading torrent", e);
         }
       } else {
+        // The dialog's title and file list, read here too: a JNI call per file (#1473).
+        final PartialFilesDialog.Contents contents =
+            partial ? PartialFilesDialog.contentsOf(ti) : null;
         GUIMediator.safeInvokeLater(
             () -> {
               try {
@@ -283,7 +286,7 @@ public class TorrentFetcherDownload implements BTDownload {
                 File saveFolder = null;
                 if (partial) {
                   PartialFilesDialog dlg =
-                      new PartialFilesDialog(GUIMediator.getAppFrame(), ti, displayName);
+                      new PartialFilesDialog(GUIMediator.getAppFrame(), contents, displayName);
                   dlg.setVisible(true);
                   selection = dlg.getFilesSelection();
                   if (selection == null) {

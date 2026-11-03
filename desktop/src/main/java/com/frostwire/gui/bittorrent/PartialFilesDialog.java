@@ -34,7 +34,6 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableRowSorter;
 import org.apache.commons.io.FilenameUtils;
-import org.limewire.util.StringUtils;
 
 /**
  * @author gubatron
@@ -42,7 +41,7 @@ import org.limewire.util.StringUtils;
  */
 class PartialFilesDialog extends JDialog {
   private static final Logger LOG = Logger.getLogger(PartialFilesDialog.class);
-  private final TorrentInfo torrent;
+  private final Contents contents;
   private final String name;
   private final TorrentTableModel model;
   // getValueAt runs while painting on the EDT; on Windows an uncached file-type icon is a shell COM
@@ -73,12 +72,30 @@ class PartialFilesDialog extends JDialog {
   private JButton buttonResetFolder;
   private final File defaultSaveFolder = SharingSettings.TORRENT_DATA_DIR_SETTING.getValue();
 
-  /** {@code torrent} is parsed by the caller, off the EDT (frostwire/frostwire#1468). */
-  PartialFilesDialog(JFrame frame, TorrentInfo torrent, String name) {
+  /** What the dialog shows of a torrent: its title (null if it has none) and its files. */
+  record Contents(String title, TorrentFileInfo[] files) {}
+
+  /**
+   * Reads {@code torrent}'s title and file list through jlibtorrent: a JNI call per file and field.
+   * Not on the EDT. The dialog used to read them itself, as it was built and on every table row
+   * count, which froze the window for torrents with many files (Icebase #d83c2b866deb,
+   * frostwire/frostwire#1473).
+   */
+  static Contents contentsOf(TorrentInfo torrent) {
+    FileStorage fs = torrent.files();
+    TorrentFileInfo[] files = new TorrentFileInfo[fs.numFiles()];
+    for (int i = 0; i < files.length; i++) {
+      files[i] = new TorrentFileInfo(fs.filePath(i), fs.fileSize(i), true);
+    }
+    return new Contents(torrent.name(), files);
+  }
+
+  /** {@code contents} are read by the caller, off the EDT ({@link #contentsOf}). */
+  PartialFilesDialog(JFrame frame, Contents contents, String name) {
     super(frame, I18n.tr("Select files to download"));
-    this.torrent = torrent;
+    this.contents = contents;
     this.name = name;
-    model = new TorrentTableModel(this.torrent);
+    model = new TorrentTableModel(contents.files());
     addWindowListener(
         new WindowAdapter() {
           @Override
@@ -336,13 +353,9 @@ class PartialFilesDialog extends JDialog {
 
   private void setupTitle() {
     GridBagConstraints c;
-    String title = torrent.name();
+    String title = contents.title();
     if (title == null) {
-      if (torrent.name() != null) {
-        title = StringUtils.getUTF8String(torrent.name().getBytes());
-      } else {
-        title = name.replace("_", " ").replace(".torrent", "").replace("&quot;", "\"");
-      }
+      title = name.replace("_", " ").replace(".torrent", "").replace("&quot;", "\"");
     }
     JLabel labelTitle = new JLabel(title);
     // Defer font loading to avoid EDT violation
@@ -495,21 +508,15 @@ class PartialFilesDialog extends JDialog {
   }
 
   private final class TorrentTableModel extends AbstractTableModel {
-    private final TorrentInfo _torrent;
     private final TorrentFileInfo[] _fileInfos;
 
-    TorrentTableModel(TorrentInfo torrent) {
-      _torrent = torrent;
-      _fileInfos = new TorrentFileInfo[torrent.numFiles()];
-      FileStorage fs = torrent.files();
-      for (int i = 0; i < _fileInfos.length; i++) {
-        _fileInfos[i] = new TorrentFileInfo(fs.filePath(i), fs.fileSize(i), true);
-      }
+    TorrentTableModel(TorrentFileInfo[] files) {
+      _fileInfos = files;
     }
 
     @Override
     public int getRowCount() {
-      return _torrent.numFiles();
+      return _fileInfos.length;
     }
 
     @Override
