@@ -74,6 +74,8 @@ public final class MessageService {
           optionPane.setMessage(editorPane);
           optionPane.setOpaque(ThemeMediator.isLightThemeOn());
           JDialog dialog = optionPane.createDialog(getParentComponent(), I18n.tr("Error"));
+          // The message is an editor pane, which the look and feel gives a drop target (#1471).
+          DropTargets.removeAll(dialog);
           dialog.setVisible(true);
         });
   }
@@ -234,6 +236,7 @@ public final class MessageService {
               if (ignore != null) component = doNotDisplayAgainLabel(message, ignore);
               JOptionPane pane = new JOptionPane(component, msgType);
               JDialog dialog = pane.createDialog(getParentComponent(), finalTitle);
+              DropTargets.removeAll(dialog);
               dialog.setModal(true);
               _disposableMessageMap.put(dialogKey, dialog);
               dialog.setVisible(true);
@@ -552,19 +555,6 @@ public final class MessageService {
         && ret != DialogOption.CANCEL) defValue.setValue(ret.toInt());
     else defValue.setValue(FORGET_ANSWER);
     return ret;
-  }
-
-  /**
-   * Display a standardly formatted question message with the specified String and optionally an
-   * inital input value.
-   *
-   * @param message the message to display to the user
-   * @param initialValue the initial value of the input, can be null.
-   * @return a String containing the user input
-   */
-  final String showInputMessage(String message, String initialValue) {
-    if (initialValue == null) return JOptionPane.showInputDialog(getParentComponent(), message);
-    else return JOptionPane.showInputDialog(getParentComponent(), message, initialValue);
   }
 
   private JComponent getLabel(String message) {
