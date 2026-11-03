@@ -7195,3 +7195,27 @@ msgstr ""
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "One tracker per line, a blank line starts a new tier"
 msgstr ""
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
+msgid "Store file modification times"
+msgstr ""
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
+msgid "Saves each file's last-modified time in the .torrent, so the files downloaded get the same dates."
+msgstr ""
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
+msgid "Keep symbolic links as links"
+msgstr ""
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
+msgid "Stores symbolic links in the .torrent as links, instead of the files they point to."
+msgstr ""
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
+msgid "Leave out file attributes"
+msgstr ""
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
+msgid "Doesn't store whether each file is hidden or executable."
+msgstr ""

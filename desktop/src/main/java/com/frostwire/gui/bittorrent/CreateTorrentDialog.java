@@ -72,6 +72,7 @@ public class CreateTorrentDialog extends JDialog {
   private final JPanel basicTorrentPane;
   private final JPanel licensesPane;
   private final JPanel paymentsPane;
+  private final JPanel advancedPane;
   private final CopyrightLicenseSelectorPanel licenseSelectorPanel;
   private final PaymentOptionsPanel paymentOptionsPanel;
   private final Dimension MINIMUM_DIALOG_DIMENSIONS = new Dimension(942, 750);
@@ -93,6 +94,10 @@ public class CreateTorrentDialog extends JDialog {
   private JCheckBox checkUseDHT;
   private JCheckBox checkPrivate;
   private LimeTextField textComment;
+  private JCheckBox checkModificationTimes;
+  private JCheckBox checkSymlinks;
+  private JCheckBox checkNoAttributes;
+  private create_flags_t creationFlags;
   // Read on the EDT when Save is clicked, for the thread that makes the torrent.
   private boolean makePrivate;
   private String comment;
@@ -118,6 +123,7 @@ public class CreateTorrentDialog extends JDialog {
     basicTorrentPane = new JPanel();
     licensesPane = new JPanel();
     paymentsPane = new JPanel();
+    advancedPane = new JPanel();
     licenseSelectorPanel = new CopyrightLicenseSelectorPanel();
     paymentOptionsPanel = new PaymentOptionsPanel();
     initContainersLayouts();
@@ -157,6 +163,7 @@ public class CreateTorrentDialog extends JDialog {
     basicTorrentPane.setLayout(new MigLayout("fill"));
     licensesPane.setLayout(new MigLayout("fill"));
     paymentsPane.setLayout(new MigLayout("fill"));
+    advancedPane.setLayout(new MigLayout("fillx, wrap 1", "[]", "[]8[]8[]push"));
   }
 
   private void initTabbedPane() {
@@ -166,6 +173,7 @@ public class CreateTorrentDialog extends JDialog {
     tabbedPane.addTab("1. " + I18n.tr("Contents and Tracking"), basicTorrentPane);
     tabbedPane.addTab("2. " + I18n.tr("Copyright License"), licensesPane);
     tabbedPane.addTab("3. " + I18n.tr("Payments/Tips"), paymentsPane);
+    tabbedPane.addTab("4. " + I18n.tr("Advanced"), advancedPane);
   }
 
   private void initComponents() {
@@ -175,6 +183,7 @@ public class CreateTorrentDialog extends JDialog {
     initSaveCloseButtons();
     initTorrentContents();
     initTorrentTracking();
+    initAdvancedOptions();
     buildListeners();
     // Its components take no drops (#1471); the dialog itself takes a dropped file or folder as
     // the torrent's content (#1474). Set after removeAll, which would clear it.
@@ -310,6 +319,50 @@ public class CreateTorrentDialog extends JDialog {
     // suggest DHT by default
     updateTrackerRelatedControlsAvailability(true);
     basicTorrentPane.add(torrentTrackingPanel, "grow, push");
+  }
+
+  /** libtorrent 2's creation flags that change what the .torrent stores about the files. */
+  private void initAdvancedOptions() {
+    checkModificationTimes = new JCheckBox(I18n.tr("Store file modification times"), false);
+    checkModificationTimes.setToolTipText(
+        I18n.tr(
+            "Saves each file's last-modified time in the .torrent, so the files downloaded get the"
+                + " same dates."));
+    checkSymlinks = new JCheckBox(I18n.tr("Keep symbolic links as links"), false);
+    checkSymlinks.setToolTipText(
+        I18n.tr(
+            "Stores symbolic links in the .torrent as links, instead of the files they point to."));
+    checkNoAttributes = new JCheckBox(I18n.tr("Leave out file attributes"), false);
+    checkNoAttributes.setToolTipText(
+        I18n.tr("Doesn't store whether each file is hidden or executable."));
+    advancedPane.add(checkModificationTimes, "gapleft 5, gaptop 10");
+    advancedPane.add(checkSymlinks, "gapleft 5");
+    advancedPane.add(checkNoAttributes, "gapleft 5");
+  }
+
+  /**
+   * The libtorrent creation flags for a torrent type and the Advanced options. {@code add_files}
+   * reads the symlink and modification time flags as it lists the content, and {@code
+   * create_torrent} reads them all.
+   */
+  static create_flags_t creationFlags(
+      TorrentType type, boolean modificationTimes, boolean symlinks, boolean noAttributes) {
+    create_flags_t flags = new create_flags_t();
+    if (type == TorrentType.V1_ONLY) {
+      flags = flags.or_(create_torrent.v1_only);
+    } else if (type == TorrentType.V2_ONLY) {
+      flags = flags.or_(create_torrent.v2_only);
+    }
+    if (modificationTimes) {
+      flags = flags.or_(create_torrent.modification_time);
+    }
+    if (symlinks) {
+      flags = flags.or_(create_torrent.symlinks);
+    }
+    if (noAttributes) {
+      flags = flags.or_(create_torrent.no_attributes);
+    }
+    return flags;
   }
 
   private void initSaveCloseButtons() {
@@ -593,6 +646,12 @@ public class CreateTorrentDialog extends JDialog {
     // Whether or not to start seeding this torrent right away
     autoOpen = checkStartSeeding.isSelected();
     makePrivate = checkPrivate.isSelected();
+    creationFlags =
+        creationFlags(
+            selectedTorrentType,
+            checkModificationTimes.isSelected(),
+            checkSymlinks.isSelected(),
+            checkNoAttributes.isSelected());
     comment = textComment.getText().trim();
     // show save as dialog
     if (!showSaveAsDialog()) {
@@ -712,8 +771,8 @@ public class CreateTorrentDialog extends JDialog {
     try {
       file_storage fs = new file_storage();
       reportCurrentTask(I18n.tr("Adding files..."));
-      libtorrent.add_files(fs, f.getPath());
-      create_torrent torrent = createTorrentWithType(fs, pieceSize, selectedTorrentType);
+      libtorrent.add_files(fs, f.getPath(), creationFlags);
+      create_torrent torrent = new create_torrent(fs, pieceSize, creationFlags);
       torrent.set_priv(makePrivate);
       if (comment != null && !comment.isEmpty()) {
         torrent.set_comment(comment);
@@ -954,31 +1013,6 @@ public class CreateTorrentDialog extends JDialog {
         onPercent.accept(percent);
       }
     };
-  }
-
-  private create_torrent createTorrentWithType(
-      file_storage fs, int pieceSize, TorrentType torrentType) {
-    create_torrent torrent;
-
-    switch (torrentType) {
-      case V1_ONLY:
-        // Create v1-only torrent - use legacy format
-        torrent = new create_torrent(fs, pieceSize, create_torrent.v1_only);
-        break;
-
-      case V2_ONLY:
-        // Create v2-only torrent - use modern format with v2 features only
-        torrent = new create_torrent(fs, pieceSize, create_torrent.v2_only);
-        break;
-
-      case HYBRID:
-      default:
-        // Create hybrid torrent - supports both v1 and v2 protocols (default)
-        torrent = new create_torrent(fs, pieceSize);
-        break;
-    }
-
-    return torrent;
   }
 
   enum PieceSize {
