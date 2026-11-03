@@ -28,6 +28,7 @@ import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.TorrentStatus;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.SafeText;
+import com.limegroup.gnutella.gui.DropTargets;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
@@ -449,15 +450,12 @@ public final class TransferDetailGeneral extends JPanel
     }
     int currentKBps = btDownload.getDownloadRateLimit() / 1024;
     String input =
-        (String)
-            JOptionPane.showInputDialog(
-                this,
-                I18n.tr("Enter download speed limit in KB/s (0 = unlimited):"),
-                I18n.tr("Download Speed Limit"),
-                JOptionPane.PLAIN_MESSAGE,
-                null,
-                null,
-                currentKBps);
+        DropTargets.showInputDialog(
+            this,
+            I18n.tr("Enter download speed limit in KB/s (0 = unlimited):"),
+            I18n.tr("Download Speed Limit"),
+            JOptionPane.PLAIN_MESSAGE,
+            currentKBps);
     if (input != null) {
       try {
         int kbps = Integer.parseInt(input.trim());
@@ -476,15 +474,12 @@ public final class TransferDetailGeneral extends JPanel
     }
     int currentKBps = btDownload.getUploadRateLimit() / 1024;
     String input =
-        (String)
-            JOptionPane.showInputDialog(
-                this,
-                I18n.tr("Enter upload speed limit in KB/s (0 = unlimited):"),
-                I18n.tr("Upload Speed Limit"),
-                JOptionPane.PLAIN_MESSAGE,
-                null,
-                null,
-                currentKBps);
+        DropTargets.showInputDialog(
+            this,
+            I18n.tr("Enter upload speed limit in KB/s (0 = unlimited):"),
+            I18n.tr("Upload Speed Limit"),
+            JOptionPane.PLAIN_MESSAGE,
+            currentKBps);
     if (input != null) {
       try {
         int kbps = Integer.parseInt(input.trim());

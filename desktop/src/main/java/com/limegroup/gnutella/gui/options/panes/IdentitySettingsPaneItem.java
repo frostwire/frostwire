@@ -15,6 +15,7 @@ import com.frostwire.search.relay.PeerKarmaCache;
 import com.frostwire.search.relay.RelayConstants;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
+import com.limegroup.gnutella.gui.DropTargets;
 import com.limegroup.gnutella.gui.FileChooserHandler;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
@@ -386,13 +387,14 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
     }
 
     String mnemonic =
-        JOptionPane.showInputDialog(
+        DropTargets.showInputDialog(
             GUIMediator.getAppFrame(),
             I18n.tr(
                 "Enter your 24-word seed phrase. Words may be separated by spaces, commas, or line"
                     + " breaks. Uppercase letters are accepted."),
             I18n.tr("Restore Identity"),
-            JOptionPane.PLAIN_MESSAGE);
+            JOptionPane.PLAIN_MESSAGE,
+            null);
     if (mnemonic == null || mnemonic.trim().isEmpty()) {
       return;
     }
