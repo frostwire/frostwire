@@ -1,4 +1,4 @@
-FrostWire 3.2.3 build 779 UNRELEASED
+FrostWire 3.2.3 build 779 NOV/03/2026
   - fix:Music player: the queue is now the player's own playlist, so the app, Bluetooth, the lock screen, Android Auto and Wear see the whole queue and agree on next and previous; the player no longer piles up one entry per song played, and the saved queue is restored after a restart (#1452)
   - fix:Playing a song from the music player no longer leaves a My Files preview playing over it, and car, watch and Android Auto screens show the titles of every song in the queue (#1452)
   - fix:Music playback no longer crashes the app when it starts as you leave FrostWire, or after pausing — the player always tells Android it is running in the foreground when started (#1371)
