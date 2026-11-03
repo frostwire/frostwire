@@ -75,6 +75,7 @@ FrostWire 7.1.3 build 335 UNRELEASED
    - fix:With the dark theme, opening the Library for the first time no longer freezes the window while Java loads its image library: it loads at startup, in the background (#1475)
    - fix:Pausing or resuming a transfer no longer freezes the window: the call into the torrent engine runs in the background (#1476)
    - fix:Tables no longer do extra Unicode work on every repaint: plain names are shown as they are, and the Unicode data for other names loads at startup, in the background (#1477)
+   - fix:Startup no longer pauses while Java sets up its text fields for the first time: that setup now runs in the background with the other startup preparation (#1480)
    - fix:Choosing which files to download from a torrent or magnet link no longer freezes the window as the file list opens, even for torrents with many files: the list is read in the background (#1473)
    - fix:The first Library folder you open no longer freezes while its file dates are shown for the first time: the time zone names they need load at startup, in the background (#1472)
    - fix:Dialogs and windows other than the main window (Options, About, message and error dialogs, file choosers, Create and Share Torrent, IceBridge windows and more) no longer set up drag-and-drop with Windows when they open, which could freeze them on slow machines; only the main window, which takes dropped torrents and files, still does (#1471)
