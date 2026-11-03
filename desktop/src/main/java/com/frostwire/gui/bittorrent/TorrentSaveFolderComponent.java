@@ -68,7 +68,7 @@ public class TorrentSaveFolderComponent extends JPanel {
     add(buttonRow, gbc);
     // Browse opens a JFileChooser, which waits on the Windows shell on the EDT; warm it up now
     // (frostwire/frostwire#1411).
-    ShellFolderWarmUp.warmUpForDirectoryChooser(FileChooserHandler.getLastInputDirectory());
+    ShellFolderWarmUp.warmUpForDirectoryChooser();
   }
 
   /**

@@ -28,7 +28,9 @@ class EdtThreadStartsTest {
         "com/frostwire/gui/components/slides/MultimediaSlideshowPanel.java",
         "com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java",
         "com/frostwire/gui/bittorrent/TransferDetailFilesActionsRenderer.java",
-        "com/frostwire/gui/components/transfers/TransferDetailFiles.java"
+        "com/frostwire/gui/components/transfers/TransferDetailFiles.java",
+        // Its warm-up is started from component constructors on the EDT (#1411).
+        "com/limegroup/gnutella/gui/ShellFolderWarmUp.java"
       })
   void edtCodeDoesNotStartThreads(String file) throws Exception {
     String source =

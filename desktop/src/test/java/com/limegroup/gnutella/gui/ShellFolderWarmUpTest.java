@@ -60,7 +60,16 @@ class ShellFolderWarmUpTest {
     List<Runnable> background = new ArrayList<>();
     ShellFolderWarmUp warmUp = new ShellFolderWarmUp(background::add, () -> view);
 
-    assertTrue(warmUp.warmUp(new File("/a/b/c"), 1_000L));
+    AtomicInteger startFolderLookups = new AtomicInteger();
+    assertTrue(
+        warmUp.warmUp(
+            () -> {
+              startFolderLookups.incrementAndGet();
+              return new File("/a/b/c");
+            },
+            1_000L));
+    // Looking up the start folder checks the disk, so it waits for the background too.
+    assertEquals(0, startFolderLookups.get(), "the start folder was looked up on the caller");
     assertEquals(0, view.comboBoxFiles.get(), "the shell was asked on the caller's thread");
 
     background.forEach(Runnable::run);
@@ -77,9 +86,9 @@ class ShellFolderWarmUpTest {
     List<Runnable> background = new ArrayList<>();
     ShellFolderWarmUp warmUp = new ShellFolderWarmUp(background::add, () -> view);
 
-    assertTrue(warmUp.warmUp(null, 10_000L));
-    assertFalse(warmUp.warmUp(null, 10_000L + ShellFolderWarmUp.REFRESH_MILLIS - 1));
-    assertTrue(warmUp.warmUp(null, 10_000L + ShellFolderWarmUp.REFRESH_MILLIS));
+    assertTrue(warmUp.warmUp(() -> null, 10_000L));
+    assertFalse(warmUp.warmUp(() -> null, 10_000L + ShellFolderWarmUp.REFRESH_MILLIS - 1));
+    assertTrue(warmUp.warmUp(() -> null, 10_000L + ShellFolderWarmUp.REFRESH_MILLIS));
     assertEquals(2, background.size());
   }
 
@@ -91,6 +100,6 @@ class ShellFolderWarmUpTest {
             () -> {
               throw new IllegalStateException("COM failed");
             });
-    assertTrue(warmUp.warmUp(new File("/a"), 1L));
+    assertTrue(warmUp.warmUp(() -> new File("/a"), 1L));
   }
 }

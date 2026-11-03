@@ -355,6 +355,9 @@ final class Initializer {
     // spinner, the search tab's spinner), and the status bar's icons are first set from refreshes
     // on the EDT.
     ResourceManager.preloadStartupThemeImages();
+    // The first folder chooser's shell setup, and the warm-up's worker thread, start here rather
+    // than when the first component with a Browse button is built on the EDT (#1411).
+    ShellFolderWarmUp.warmUpForDirectoryChooser();
 
     // Load up the HTML engine (DTD, default style sheet) on this thread: parsing the DTD for a
     // throwaway HTML label on the EDT stalled it for seconds on slow machines.

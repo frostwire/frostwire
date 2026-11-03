@@ -9,6 +9,7 @@ package com.limegroup.gnutella.gui;
 
 import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
+import com.limegroup.gnutella.gui.util.WarmExecutors;
 import java.io.File;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
@@ -25,7 +26,9 @@ import javax.swing.filechooser.FileSystemView;
  * namespace. With slow, network or cloud-synced drives, clicking Browse froze FrostWire for seconds
  * (frostwire/frostwire#1411). The JDK doesn't cache those answers, but the one-time setup and much
  * of what Windows looks up stay warm, so making the same calls when a component with a Browse
- * button is created takes most of that wait off the click.
+ * button is created takes most of that wait off the click. Every class that opens a {@link
+ * FileChooserHandler} chooser starts one when it is built, and the startup thread starts the first,
+ * so the one-time shell setup is done before any click.
  */
 public final class ShellFolderWarmUp {
   private static final Logger LOG = Logger.getLogger(ShellFolderWarmUp.class);
@@ -38,13 +41,10 @@ public final class ShellFolderWarmUp {
 
   private static final ShellFolderWarmUp INSTANCE =
       new ShellFolderWarmUp(
-          task -> {
-            // Its own thread: a slow shell must not hold up BackgroundExecutorService's queue.
-            Thread thread = new Thread(task, "ShellFolderWarmUp");
-            thread.setDaemon(true);
-            thread.start();
-          },
-          FileSystemView::getFileSystemView);
+          // Its own worker, so a slow shell doesn't hold up BackgroundExecutorService's queue, and
+          // one that is always running: the components that start a warm-up are built on the EDT,
+          // which must not start a thread.
+          WarmExecutors.serialQueue("ShellFolderWarmUp"), FileSystemView::getFileSystemView);
 
   private final Executor executor;
   private final Supplier<FileSystemView> view;
@@ -58,17 +58,19 @@ public final class ShellFolderWarmUp {
   }
 
   /**
-   * On Windows, starts a background warm-up for a folder chooser opening at {@code startDirectory}
-   * (null for the default), unless one ran in the last {@link #REFRESH_MILLIS}. Returns at once.
+   * On Windows, starts a background warm-up for a chooser opening at {@link
+   * FileChooserHandler#getLastInputDirectory()}, unless one ran in the last {@link
+   * #REFRESH_MILLIS}. Returns at once: that folder is looked up on the warm-up thread, since
+   * checking it touches the disk.
    */
-  public static void warmUpForDirectoryChooser(File startDirectory) {
+  public static void warmUpForDirectoryChooser() {
     if (OSUtils.isWindows()) {
-      INSTANCE.warmUp(startDirectory, System.currentTimeMillis());
+      INSTANCE.warmUp(FileChooserHandler::getLastInputDirectory, System.currentTimeMillis());
     }
   }
 
-  /** Whether a warm-up was started. */
-  boolean warmUp(File startDirectory, long nowMillis) {
+  /** Whether a warm-up was started; {@code startDirectory} is read on the executor. */
+  boolean warmUp(Supplier<File> startDirectory, long nowMillis) {
     long last = lastWarmUp.get();
     if (last != 0 && nowMillis - last < REFRESH_MILLIS) {
       return false;
@@ -80,11 +82,11 @@ public final class ShellFolderWarmUp {
     return true;
   }
 
-  private void run(File startDirectory) {
+  private void run(Supplier<File> startDirectory) {
     try {
       FileSystemView fsv = view.get();
       fsv.getChooserComboBoxFiles();
-      File folder = startDirectory;
+      File folder = startDirectory.get();
       for (int depth = 0; folder != null && depth < MAX_DEPTH; depth++) {
         fsv.getSystemDisplayName(folder);
         folder = fsv.getParentDirectory(folder);
