@@ -203,7 +203,7 @@ class PartialFilesDialog extends JDialog {
   }
 
   private void onChangeFolder() {
-    JFileChooser chooser = new JFileChooser(saveFolder);
+    JFileChooser chooser = new NoDropFileChooser(saveFolder);
     chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
     chooser.setDialogTitle(I18n.tr("Select Download Folder"));
     if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {

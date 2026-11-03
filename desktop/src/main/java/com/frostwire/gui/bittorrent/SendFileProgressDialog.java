@@ -25,6 +25,7 @@ import com.limegroup.gnutella.gui.DropTargets;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.NoDropFileChooser;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -123,7 +124,7 @@ public class SendFileProgressDialog extends JDialog {
   }
 
   private void chooseFile() {
-    JFileChooser fileChooser = new JFileChooser();
+    JFileChooser fileChooser = new NoDropFileChooser();
     fileChooser.setMultiSelectionEnabled(false);
     fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
     fileChooser.setDialogTitle(I18n.tr("Select the content you want to send"));

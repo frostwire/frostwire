@@ -369,26 +369,26 @@ public final class FileChooserHandler {
     JFileChooser chooser;
     if (directory == null) directory = getLastInputDirectory();
     if (directory == null) {
-      chooser = new JFileChooser();
+      chooser = new NoDropFileChooser();
     } else {
       try {
-        chooser = new JFileChooser(directory);
+        chooser = new NoDropFileChooser(directory);
       } catch (NullPointerException e) {
         // Workaround for JRE bug 4711700. A NullPointer is thrown
         // sometimes on the first construction under XP look and feel,
         // but construction succeeds on successive attempts.
         try {
-          chooser = new JFileChooser(directory);
+          chooser = new NoDropFileChooser(directory);
         } catch (NullPointerException npe) {
           // ok, now we use the metal file chooser, takes a long time to load
           // but the user can still use the program
           UIManager.getDefaults().put("FileChooserUI", "javax.swing.plaf.metal.MetalFileChooserUI");
-          chooser = new JFileChooser(directory);
+          chooser = new NoDropFileChooser(directory);
         }
       } catch (ArrayIndexOutOfBoundsException ie) {
         // workaround for Windows XP, not sure if second try succeeds
         // then
-        chooser = new JFileChooser(directory);
+        chooser = new NoDropFileChooser(directory);
       }
     }
     prepareForWindowEvents(chooser);

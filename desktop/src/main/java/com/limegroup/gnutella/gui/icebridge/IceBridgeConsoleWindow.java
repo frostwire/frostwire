@@ -17,6 +17,7 @@ import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.DropTargets;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.NoDropFileChooser;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -413,7 +414,7 @@ public final class IceBridgeConsoleWindow {
   }
 
   private void saveToFile() {
-    JFileChooser chooser = new JFileChooser();
+    JFileChooser chooser = new NoDropFileChooser();
     chooser.setDialogTitle(I18n.tr("Save IceBridge Console"));
     chooser.setFileFilter(new FileNameExtensionFilter(I18n.tr("Log files"), "log", "txt"));
     if (chooser.showSaveDialog(frame) != JFileChooser.APPROVE_OPTION) {

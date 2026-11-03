@@ -1845,6 +1845,9 @@ public class FilePane extends JPanel implements PropertyChangeListener {
         TransferHandler th2 = table.getTransferHandler();
         if (th1 != th2) {
           table.setTransferHandler(th1);
+          // That gives the shown table a drop target, and the file chooser takes no drops: it would
+          // register the dialog with the OS for drag-and-drop (frostwire/frostwire#1471).
+          table.setDropTarget(null);
         }
         boolean dragEnabled = getFileChooser().getDragEnabled();
         if (dragEnabled != table.getDragEnabled()) {
