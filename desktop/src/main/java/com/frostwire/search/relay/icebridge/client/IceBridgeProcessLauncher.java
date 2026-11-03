@@ -7,10 +7,11 @@
 
 package com.frostwire.search.relay.icebridge.client;
 
+import com.frostwire.search.relay.icebridge.IceBridgeControlPortAnnouncement;
 import com.frostwire.util.Logger;
 import java.io.File;
 import java.io.IOException;
-import java.net.ServerSocket;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.AclEntry;
@@ -27,8 +28,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * Starts and stops the IceBridge daemon as an external process for the FrostWire desktop client.
  *
- * <p>The launcher picks free ports if none are supplied, builds the command line for {@code
- * icebridge.jar}, and exposes a ready-to-use {@link IceBridgeClient} pointing at the control port.
+ * <p>The launcher lets the child's own binds pick the ports that are not supplied, builds the
+ * command line for {@code icebridge.jar}, and exposes a ready-to-use {@link IceBridgeClient}
+ * pointing at the control port.
  */
 public final class IceBridgeProcessLauncher implements AutoCloseable {
 
@@ -36,7 +38,11 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
 
   private final File jarPath;
   private final File identityFile;
-  private final int controlHttpPort;
+
+  /** The caller's control port, or 0 for the port the child's bind picks on each start. */
+  private final int requestedControlPort;
+
+  private volatile int controlHttpPort;
   private volatile int rudpPort;
   private final int relayPort;
   private final String role;
@@ -86,7 +92,14 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
     }
     this.jarPath = jarPath;
     this.identityFile = identityFile;
-    this.controlHttpPort = controlHttpPort <= 0 ? freePort() : controlHttpPort;
+    if (controlHttpPort > 65535) {
+      throw new IllegalArgumentException("controlHttpPort must be at most 65535");
+    }
+    // Let the child bind the control port and announce it: a port probed here and released can be
+    // taken by another process before the child binds it, on every respawn
+    // (frostwire/frostwire#1478).
+    this.requestedControlPort = Math.max(0, controlHttpPort);
+    this.controlHttpPort = requestedControlPort;
     if (rudpPort < 0 || rudpPort > 65535) {
       throw new IllegalArgumentException("rudpPort must be between 0 and 65535");
     }
@@ -112,6 +125,12 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
     return client;
   }
 
+  /**
+   * The control port of the current child. A caller-supplied port is returned as given. With an
+   * automatic port this is 0 until {@link #start()} has read the port the child announced, then
+   * that port; a respawned child announces its own port, and it is 0 again once the child is
+   * stopped.
+   */
   public int controlPort() {
     return controlHttpPort;
   }
@@ -172,7 +191,7 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
     command.add("--relay-port");
     command.add(String.valueOf(relayPort));
     command.add("--control-http-port");
-    command.add(String.valueOf(controlHttpPort));
+    command.add(String.valueOf(requestedControlPort));
     command.add("--role");
     command.add(role);
     command.add("--host");
@@ -189,7 +208,7 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
     command.add("--parent-pid");
     command.add(String.valueOf(ProcessHandle.current().pid()));
 
-    logDir = Files.createTempDirectory("icebridge-launcher-" + controlHttpPort).toFile();
+    logDir = Files.createTempDirectory("icebridge-launcher-").toFile();
     try {
       tokenFile = createTokenFile(logDir.toPath());
       if (Thread.currentThread().isInterrupted() || deadline - System.nanoTime() <= 0) {
@@ -214,14 +233,72 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
       Path launchTokenFile = tokenFile;
       process.onExit().thenRun(() -> deleteTokenFile(launchTokenFile));
       writePidFile(process.pid());
+      int port =
+          requestedControlPort > 0
+              ? requestedControlPort
+              : awaitAnnouncedControlPort(process, stdout.toPath(), stderr.toPath(), deadline);
+      controlHttpPort = port;
       if (client == null) {
-        client = new IceBridgeClient(controlHttpPort);
+        client = new IceBridgeClient(port);
         client.setAuthToken(authToken);
+      } else {
+        // The transport and registry sync keep this client across respawns.
+        client.setControlPort(port);
       }
     } catch (IOException | RuntimeException e) {
       stopProcess();
       throw e;
     }
+  }
+
+  /**
+   * Wait for the child's control port announcement on its stdout. Fails as soon as the child exits
+   * without one, and when the startup deadline passes or the thread is interrupted.
+   */
+  private static int awaitAnnouncedControlPort(
+      Process child, Path stdout, Path stderr, long deadline) throws IOException {
+    while (true) {
+      // Check liveness before reading: a child that announced and then exited must not be
+      // reported as never having announced.
+      boolean exited = !child.isAlive();
+      int port = IceBridgeControlPortAnnouncement.parse(readLog(stdout));
+      if (port > 0) {
+        return port;
+      }
+      if (exited) {
+        throw new IOException(
+            "IceBridge child exited with status "
+                + child.exitValue()
+                + " before announcing its control port; stderr: "
+                + tail(readLog(stderr)));
+      }
+      long remaining = deadline - System.nanoTime();
+      if (Thread.currentThread().isInterrupted() || remaining <= 0) {
+        throw new java.io.InterruptedIOException(
+            "IceBridge startup cancelled or timed out before the child announced its control port");
+      }
+      try {
+        TimeUnit.NANOSECONDS.sleep(Math.min(TimeUnit.MILLISECONDS.toNanos(20), remaining));
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new java.io.InterruptedIOException(
+            "IceBridge startup cancelled before the child announced its control port");
+      }
+    }
+  }
+
+  /**
+   * The child's log so far; ISO-8859-1 maps every byte, so a half-written character cannot fail.
+   */
+  private static String readLog(Path log) throws IOException {
+    return Files.isRegularFile(log)
+        ? new String(Files.readAllBytes(log), StandardCharsets.ISO_8859_1)
+        : "";
+  }
+
+  private static String tail(String log) {
+    String trimmed = log.trim();
+    return trimmed.length() <= 2000 ? trimmed : "..." + trimmed.substring(trimmed.length() - 2000);
   }
 
   /**
@@ -400,6 +477,7 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
       }
     }
     process = null;
+    controlHttpPort = requestedControlPort;
     deleteTokenFile(tokenFile);
     tokenFile = null;
     clearPidFile();
@@ -628,13 +706,5 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
 
   public File logDir() {
     return logDir;
-  }
-
-  private static int freePort() {
-    try (ServerSocket s = new ServerSocket(0)) {
-      return s.getLocalPort();
-    } catch (IOException e) {
-      throw new IllegalStateException("No free port available", e);
-    }
   }
 }

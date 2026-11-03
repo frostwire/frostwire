@@ -26,6 +26,8 @@ class DesktopPackagedRuntimeTest {
   private static final String TRANSPORT =
       "com.frostwire.search.relay.icebridge.client.IceBridgeSearchTransport";
   private static final String SEARCH_ENGINE = "com.limegroup.gnutella.gui.search.SearchEngine";
+  private static final String ANNOUNCEMENT =
+      "com.frostwire.search.relay.icebridge.IceBridgeControlPortAnnouncement";
 
   @Test
   void packagedStartupCanConstructMetricsAndWireTransportWithoutDaemon() throws Exception {
@@ -72,6 +74,23 @@ class DesktopPackagedRuntimeTest {
           searchEngine.getMethod("setDistributedTransportMetrics", metrics).getReturnType());
       assertSame(metrics, searchEngine.getMethod("getDistributedTransportMetrics").getReturnType());
       assertSame(metrics, searchEngine.getDeclaredField("transportMetrics").getType());
+    }
+  }
+
+  /**
+   * frostwire/frostwire#1478: the in-process launcher reads the child's control port with this
+   * class, so it must not be packed only into icebridge.jar with the daemon classes.
+   */
+  @Test
+  void packagedLauncherCanReadTheChildsControlPortAnnouncement() throws Exception {
+    try (URLClassLoader loader = packagedLoader()) {
+      Class<?> announcement = loader.loadClass(ANNOUNCEMENT);
+      assertFromApplicationJar(announcement, loader);
+      assertEquals(
+          4321,
+          announcement
+              .getMethod("parse", CharSequence.class)
+              .invoke(null, "ICEBRIDGE_CONTROL_PORT=4321\n"));
     }
   }
 

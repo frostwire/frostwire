@@ -65,8 +65,11 @@ public final class IceBridgeClient implements AutoCloseable {
   private static final long CALL_TIMEOUT_SEC = 10;
   private static final int MAX_RESPONSE_BYTES = 16 * 1024 * 1024;
 
+  private static final String LOOPBACK_CONTROL_URL = "http://127.0.0.1:";
+
   private final OkHttpClient http;
-  private final String baseUrl;
+  private volatile String baseUrl;
+  private final boolean localControlPort;
   private volatile String authToken;
 
   /** Own Ed25519 pub for multi-client /poll demux (set on successful register). */
@@ -76,10 +79,15 @@ public final class IceBridgeClient implements AutoCloseable {
   private volatile boolean closed;
 
   public IceBridgeClient(int controlPort) {
-    this("http://127.0.0.1:" + controlPort);
+    this(LOOPBACK_CONTROL_URL + controlPort, true);
   }
 
   public IceBridgeClient(String baseUrl) {
+    this(baseUrl, false);
+  }
+
+  private IceBridgeClient(String baseUrl, boolean localControlPort) {
+    this.localControlPort = localControlPort;
     HttpUrl url = HttpUrl.get(baseUrl);
     String host = url.host();
     boolean loopback =
@@ -105,6 +113,21 @@ public final class IceBridgeClient implements AutoCloseable {
             .followRedirects(false)
             .followSslRedirects(false)
             .build();
+  }
+
+  /**
+   * Point this client at another local control port. A launcher whose child binds its own control
+   * port learns a new port on every respawn, while the transport and registry sync keep using this
+   * client (frostwire/frostwire#1478). Only for clients built with {@link #IceBridgeClient(int)}.
+   */
+  public void setControlPort(int controlPort) {
+    if (!localControlPort) {
+      throw new IllegalStateException("only a local control port client can change its port");
+    }
+    if (controlPort <= 0 || controlPort > 65535) {
+      throw new IllegalArgumentException("controlPort must be between 1 and 65535");
+    }
+    baseUrl = LOOPBACK_CONTROL_URL + controlPort;
   }
 
   /**
