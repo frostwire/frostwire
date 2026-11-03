@@ -302,7 +302,7 @@ public final class SetupManager {
     try {
       JDialog dialog = dialogFrame.getDialog();
       // No drag-and-drop in the wizard, so pack() doesn't register its window for it (#1464).
-      SetupWindow.removeDropTargets(dialog.getContentPane());
+      DropTargets.removeAll(dialog.getContentPane());
       // Pack the dialog to realize components and trigger native initialization
       dialog.pack();
       SplashWindow.instance().setVisible(false);

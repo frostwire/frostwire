@@ -9,6 +9,7 @@ package com.limegroup.gnutella.gui.init;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.limegroup.gnutella.gui.DropTargets;
 import java.awt.Component;
 import java.awt.dnd.DropTarget;
 import java.nio.charset.StandardCharsets;
@@ -65,7 +66,7 @@ class SetupWizardDropTargetTest {
           root.add(outer);
           root.add(inner);
 
-          SetupWindow.removeDropTargets(root);
+          DropTargets.removeAll(root);
 
           assertTrue(CLEARED.contains(outer));
           assertTrue(CLEARED.contains(nested), "nested components too");
@@ -88,13 +89,13 @@ class SetupWizardDropTargetTest {
     String manager = strip("SetupManager.java");
     String pack = manager.substring(manager.indexOf("privatevoidpackAndShowDialog()"));
     assertTrue(
-        pack.indexOf("SetupWindow.removeDropTargets(") >= 0
-            && pack.indexOf("SetupWindow.removeDropTargets(") < pack.indexOf("dialog.pack()"),
+        pack.indexOf("DropTargets.removeAll(") >= 0
+            && pack.indexOf("DropTargets.removeAll(") < pack.indexOf("dialog.pack()"),
         "the dialog's components lose their drop targets before pack()");
     String window = strip("SetupWindow.java");
     String setSetupComponent = window.substring(window.indexOf("voidsetSetupComponent("));
     assertTrue(
-        setSetupComponent.indexOf("removeDropTargets(setupComponent)")
+        setSetupComponent.indexOf("DropTargets.removeAll(setupComponent)")
             < setSetupComponent.indexOf("add(setupComponent"),
         "each page's content loses its drop targets before it joins the shown dialog");
   }
