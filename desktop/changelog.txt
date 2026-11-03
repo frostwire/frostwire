@@ -106,7 +106,7 @@ FrostWire 7.1.3 build 335 UNRELEASED
    - fix:The first-run setup wizard no longer freezes before it appears while it creates the default download folders: they are created during startup instead (#1421)
    - fix:Dragging files or folders over the Library no longer freezes the window on Windows: FrostWire no longer asks for the dragged files on every mouse move, only when you drop (#1420)
    - fix:The first search no longer freezes the window on slow machines while the size and seeds sliders are built: their look-and-feel painters are prepared at startup (#1419)
-   - fix:On Windows, Browse for the save folder opens faster: FrostWire prepares the Windows folder list in the background first (#1411)
+   - fix:On Windows, every Browse button and file chooser (save and torrent folders, Create Torrent, Add Library folder, Open torrent, identity and IP filter files) opens without freezing the window: FrostWire prepares the Windows folder list in the background, starting at launch (#1411)
    - fix:Windows with a search box lay out faster: the search field no longer re-measures its prompt text on every size check (#1410)
    - fix:Exiting FrostWire on Windows no longer stalls in a file check before the shutdown window shows (#1406)
    - fix:Pressing Play or selecting a file in the Library no longer freezes FrostWire while it checks every file in the folder on disk (#1402)
