@@ -17,4 +17,15 @@ public class HTMLLabel extends JEditorPane {
     setFont(
         new Font(label.getFont().getName(), label.getFont().getStyle(), label.getFont().getSize()));
   }
+
+  /**
+   * A read-only label takes no drops. The look and feel gives editor panes a drop target when it
+   * installs their UI, at construction and on a theme change, and it would make the window register
+   * with the OS for drag-and-drop (frostwire/frostwire#1471).
+   */
+  @Override
+  public void updateUI() {
+    super.updateUI();
+    setDropTarget(null);
+  }
 }

@@ -155,6 +155,9 @@ public class MultiLineLabel extends JTextArea {
     setWrapStyleWord(true);
     setHighlighter(null);
     setEditable(false);
+    // A read-only label takes no drops. The look and feel gives text areas a drop target, and it
+    // would make the window register with the OS for drag-and-drop (frostwire/frostwire#1471).
+    setDropTarget(null);
     LookAndFeel.installBorder(this, "Label.border");
     LookAndFeel.installColorsAndFont(this, "Label.background", "Label.foreground", "Label.font");
     if (resizeHandler != null) {
