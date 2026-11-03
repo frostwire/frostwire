@@ -146,7 +146,11 @@ public final class BTEngine extends SessionManager {
     return s.replaceAll("[\\\\/:*?\"<>|\\[\\]]+", "_");
   }
 
-  private static String dhtBootstrapNodes() {
+  /**
+   * The DHT routers the session bootstraps from, as {@code host:port} separated by commas. Created
+   * trackerless torrents embed them as their {@code nodes} (BEP 5).
+   */
+  public static String dhtBootstrapNodes() {
     return "dht.libtorrent.org:25401"
         + ","
         + "router.bittorrent.com:6881"

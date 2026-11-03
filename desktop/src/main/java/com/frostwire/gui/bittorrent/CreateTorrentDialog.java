@@ -18,6 +18,7 @@
 
 package com.frostwire.gui.bittorrent;
 
+import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.CopyrightLicenseBroker;
 import com.frostwire.bittorrent.DefaultTrackers;
 import com.frostwire.bittorrent.PaymentOptions;
@@ -675,6 +676,11 @@ public class CreateTorrentDialog extends JDialog {
         for (String trackerUrl : trackers) {
           torrent.add_tracker(trackerUrl, 0);
         }
+      } else {
+        // Trackerless: give clients that start with an empty DHT somewhere to start (BEP 5).
+        for (Map.Entry<String, Integer> node : dhtNodes(BTEngine.dhtBootstrapNodes())) {
+          torrent.add_node(new string_int_pair(node.getKey(), node.getValue()));
+        }
       }
       if (addAvailableWebSeeds(torrent, create_from_dir)) {
         reportCurrentTask(I18n.tr("Calculating piece hashes..."));
@@ -848,6 +854,26 @@ public class CreateTorrentDialog extends JDialog {
 
   private void reportCurrentTask(final String task_description) {
     SwingUtilities.invokeLater(() -> progressBar.setString(task_description));
+  }
+
+  /** {@code host:port} entries separated by commas, as pairs; malformed entries are skipped. */
+  static List<Map.Entry<String, Integer>> dhtNodes(String hostPorts) {
+    List<Map.Entry<String, Integer>> nodes = new ArrayList<>();
+    for (String hostPort : hostPorts.split(",")) {
+      int colon = hostPort.lastIndexOf(':');
+      if (colon <= 0 || colon == hostPort.length() - 1) {
+        continue;
+      }
+      try {
+        int port = Integer.parseInt(hostPort.substring(colon + 1).trim());
+        if (port > 0 && port <= 65535) {
+          nodes.add(Map.entry(hostPort.substring(0, colon).trim(), port));
+        }
+      } catch (NumberFormatException ignored) {
+        // Not a port.
+      }
+    }
+    return nodes;
   }
 
   /** Shows how much of the content has been hashed; called from the hashing thread. */
