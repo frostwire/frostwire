@@ -32,6 +32,7 @@ import com.frostwire.search.relay.SearchResponseVerifier;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
+import com.limegroup.gnutella.gui.DropTargets;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
@@ -479,6 +480,8 @@ public final class IceBridgeUrlHandler {
             panel.add(new JLabel(message), BorderLayout.NORTH);
             panel.add(bar, BorderLayout.CENTER);
             dialog.setContentPane(panel);
+            // Takes no drops: no drag-and-drop registration with the OS when realized (#1471).
+            DropTargets.removeAll(dialog);
             dialog.pack();
             dialog.setLocationRelativeTo(GUIMediator.getAppFrame());
             dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);

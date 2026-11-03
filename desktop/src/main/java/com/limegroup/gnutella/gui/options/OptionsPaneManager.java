@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui.options;
 
+import com.limegroup.gnutella.gui.DropTargets;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.SettingsWarningManager;
@@ -151,6 +152,9 @@ public final class OptionsPaneManager {
    * @param pane the <code>OptionsPane</code> to add
    */
   private void addPane(final OptionsPane pane) {
+    // Panes are built lazily, into the shown Options window, where each component is realized as it
+    // is added: remove their drop targets first (#1471).
+    DropTargets.removeAll(pane.getContainer());
     MAIN_PANEL.add(pane.getContainer(), pane.getName());
     OPTIONS_PANE_LIST.add(pane);
   }

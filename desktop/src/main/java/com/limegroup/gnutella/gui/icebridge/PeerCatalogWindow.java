@@ -19,6 +19,7 @@ import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 import com.frostwire.util.UrlUtils;
+import com.limegroup.gnutella.gui.DropTargets;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
@@ -117,6 +118,8 @@ public final class PeerCatalogWindow {
     }
     if (instance == null) {
       instance = new PeerCatalogWindow();
+      // Takes no drops: no drag-and-drop registration with the OS when realized (#1471).
+      DropTargets.removeAll(instance.frame);
     }
     instance.setPeer(peerPub);
     instance.frame.setVisible(true);

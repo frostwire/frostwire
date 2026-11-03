@@ -1,6 +1,7 @@
 package com.limegroup.gnutella.gui.bugs;
 
 import com.limegroup.gnutella.gui.CrashReportSpooler;
+import com.limegroup.gnutella.gui.DropTargets;
 import com.limegroup.gnutella.gui.Finalizer;
 import com.limegroup.gnutella.gui.LimeWireModule;
 import com.limegroup.gnutella.gui.LocalClientInfoFactory;
@@ -102,6 +103,8 @@ public final class FatalBugManager {
   }
 
   public static void prepareDialog(JDialog dialog) {
+    // Takes no drops: no drag-and-drop registration with the OS when realized (#1471).
+    DropTargets.removeAll(dialog);
     dialog.pack();
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     Dimension dialogSize = dialog.getSize();

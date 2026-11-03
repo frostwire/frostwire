@@ -12,6 +12,7 @@ import com.frostwire.search.LibTorrentMagnetDownloader;
 import com.frostwire.search.relay.NodeCapabilities;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.util.Hex;
+import com.limegroup.gnutella.gui.DropTargets;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.icebridge.PeerCatalogWindow;
@@ -120,6 +121,8 @@ final class DistributedSearchResultDetailsWindow {
     dialog.add(south, BorderLayout.SOUTH);
     dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
     dialog.getRootPane().setDefaultButton(close);
+    // Takes no drops: no drag-and-drop registration with the OS when realized (#1471).
+    DropTargets.removeAll(dialog);
     dialog.pack();
     dialog.setResizable(false);
     dialog.setLocationRelativeTo(GUIMediator.getAppFrame());

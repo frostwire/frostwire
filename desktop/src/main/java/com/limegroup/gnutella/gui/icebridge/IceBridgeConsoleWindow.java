@@ -14,6 +14,7 @@ import com.frostwire.search.relay.icebridge.IceBridgeTrafficMeter;
 import com.frostwire.search.relay.icebridge.client.IceBridgeClient;
 import com.frostwire.search.relay.icebridge.client.IceBridgeSearchTransport;
 import com.frostwire.util.Logger;
+import com.limegroup.gnutella.gui.DropTargets;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import java.awt.BorderLayout;
@@ -141,6 +142,8 @@ public final class IceBridgeConsoleWindow {
   public static void showConsole() {
     if (instance == null) {
       instance = new IceBridgeConsoleWindow();
+      // Takes no drops: no drag-and-drop registration with the OS when realized (#1471).
+      DropTargets.removeAll(instance.frame);
     }
     instance.frame.setVisible(true);
     instance.frame.toFront();

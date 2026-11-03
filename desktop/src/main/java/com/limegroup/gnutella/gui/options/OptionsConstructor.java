@@ -383,6 +383,8 @@ public final class OptionsConstructor {
       OptionsMediator.instance().disposeOptions();
     } else {
       GUIUtils.centerOnScreen(DIALOG);
+      // Takes no drops: no drag-and-drop registration with the OS when realized (#1471).
+      DropTargets.removeAll(DIALOG);
       DIALOG.pack();
       DIALOG.setSize(
           UISettings.UI_OPTIONS_DIALOG_WIDTH.getValue(),

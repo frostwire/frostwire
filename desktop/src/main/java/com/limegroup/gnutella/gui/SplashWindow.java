@@ -99,6 +99,8 @@ public final class SplashWindow {
       splashLabel.setIcon(new ImageIcon(splashImage));
       splashWindow.getContentPane().add(splashLabel, BorderLayout.CENTER);
       splashWindow.setGlassPane(glassPane);
+      // Takes no drops, like every window but the main one (#1471).
+      DropTargets.removeAll(splashWindow);
       splashWindow.pack();
     }
   }

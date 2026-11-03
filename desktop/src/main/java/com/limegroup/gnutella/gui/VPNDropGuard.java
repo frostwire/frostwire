@@ -122,6 +122,8 @@ public class VPNDropGuard implements VPNStatusRefresher.VPNStatusListener {
           // Add it to the dialog
           dialog.add(panel);
           dialog.setPreferredSize(new Dimension(700, 225));
+          // Takes no drops: no drag-and-drop registration with the OS when realized (#1471).
+          DropTargets.removeAll(dialog);
           dialog.pack();
           dialog.setLocationRelativeTo(
               GUIMediator.getAppFrame()); // centers dialog with respect to parent frame
