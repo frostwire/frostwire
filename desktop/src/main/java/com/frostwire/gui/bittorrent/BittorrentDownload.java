@@ -28,6 +28,7 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.PlaybackUtil;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
+import com.limegroup.gnutella.gui.util.WarmExecutors;
 import com.limegroup.gnutella.settings.SharingSettings;
 import java.io.File;
 import java.io.IOException;
@@ -36,6 +37,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
@@ -46,6 +48,15 @@ import java.util.function.Supplier;
  */
 public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownload {
   private static final Logger LOG = Logger.getLogger(BittorrentDownload.class);
+
+  /**
+   * Pause and resume call into libtorrent and start the thread that saves resume data. Every
+   * toolbar, menu, renderer and dialog action calls them on the EDT, so they run here instead
+   * (frostwire/frostwire#1476). One worker keeps a pause followed by a resume in order.
+   */
+  private static final ExecutorService TORRENT_CONTROL =
+      WarmExecutors.serialQueue("TorrentControl");
+
   private final com.frostwire.bittorrent.BTDownload dl;
   private String displayName;
   private long size;
@@ -156,7 +167,7 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
 
   @Override
   public void pause() {
-    dl.pause();
+    control(dl::pause);
   }
 
   @Override
@@ -175,7 +186,17 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
 
   @Override
   public void resume() {
-    dl.resume();
+    control(dl::resume);
+  }
+
+  /** Runs a pause or resume on the torrent control worker, after the ones queued before it. */
+  static void control(Runnable libtorrentCall) {
+    TORRENT_CONTROL.execute(libtorrentCall);
+  }
+
+  /** Runs {@code onEdt} on the EDT once every pause and resume queued so far has run. */
+  static void afterQueuedControls(Runnable onEdt) {
+    control(() -> GUIMediator.safeInvokeLater(onEdt));
   }
 
   @Override

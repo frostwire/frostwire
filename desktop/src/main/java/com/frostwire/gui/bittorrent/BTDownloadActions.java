@@ -134,10 +134,7 @@ final class BTDownloadActions {
         lastSelectedDownload = downloaders[0];
       }
       TorrentUtil.askForPermissionToSeedAndSeedDownloads(downloaders);
-      BTDownloadMediator.instance().updateTableFilters();
-      if (lastSelectedDownload != null) {
-        BTDownloadMediator.instance().selectBTDownload(lastSelectedDownload);
-      }
+      updateFiltersAndSelectionAfterQueuedControls(lastSelectedDownload);
     }
   }
 
@@ -158,11 +155,22 @@ final class BTDownloadActions {
       for (BTDownload downloader : downloaders) {
         downloader.pause();
       }
-      BTDownloadMediator.instance().updateTableFilters();
-      if (lastSelectedDownload != null) {
-        BTDownloadMediator.instance().selectBTDownload(lastSelectedDownload);
-      }
+      updateFiltersAndSelectionAfterQueuedControls(lastSelectedDownload);
     }
+  }
+
+  /**
+   * Torrent pauses and resumes run on a background worker ({@link BittorrentDownload#pause()}), so
+   * the table's filters are updated once they have run.
+   */
+  private static void updateFiltersAndSelectionAfterQueuedControls(BTDownload lastSelected) {
+    BittorrentDownload.afterQueuedControls(
+        () -> {
+          BTDownloadMediator.instance().updateTableFilters();
+          if (lastSelected != null) {
+            BTDownloadMediator.instance().selectBTDownload(lastSelected);
+          }
+        });
   }
 
   public static class RetryAction extends com.limegroup.gnutella.gui.actions.AbstractAction {
