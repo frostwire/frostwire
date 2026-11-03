@@ -1,15 +1,85 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:Security: on macOS, "Show in Finder" passes the file path to its script as an argument, so a crafted file name can no longer inject AppleScript
+   - windows-launcher: DLLs in the folder FrostWire is started from are no longer loaded: the current folder is out of the DLL search order and Java's jvm.dll is loaded by its full path
+   - windows-launcher: FrostWire no longer starts if it can't open its own folder, instead of loading Java and its files from wherever it was started, and Reinstall runs the installer from FrostWire's folder only
+   - windows-launcher: built with Control Flow Guard, CET shadow stack and Spectre mitigations
+   - jlibtorrent: libtorrent fixes: a data corruption bug in memory-mapped storage, short disk reads on Windows, trackers stuck after a pause, DNS leaks of peer and tracker host names, web seeds for single-file torrents, wrong seeding/active/finished times, external IP not reported with UPnP/NAT-PMP, a race removing an auto-managed torrent, and move-storage rollback
+   - fix:A corrupt or malicious MP4/M4A file in your downloads can no longer make FrostWire run out of memory when the Library reads its tags or you extract its audio — entry counts in the file are checked against its size before anything is allocated
+   - fix:A SoundCloud MP3 with a corrupt ID3 tag can no longer make FrostWire allocate gigabytes of memory while re-tagging it — frame lengths are checked against the tag before anything is copied
+   - fix:Hashes and other hex values from peers and block explorers must be plain ASCII hex: look-alike digits from other scripts are rejected instead of decoding to the same bytes (#1431)
+   - fix:Distributed search rejects karma chains with forged epochs or energy that got around the endorsement limit (#1415)
+   - fix:Distributed search no longer accepts a peer's karma chain that declares an invalid energy value to endorse other peers without the per-epoch limit (#1401)
    - new:Create Torrent: drop a file or a folder on the dialog to pick it as the torrent's content, then fine-tune it: private torrents, a comment, tracker tiers (a blank line between trackers), an Advanced tab for file modification times, symbolic links and file attributes, DHT nodes in trackerless torrents, and a progress bar while pieces are hashed; picking a large folder no longer freezes the dialog (#1474)
+   - new:Distributed search results are ranked by the karma of the peer that shared them (after seeds), and a new Karma column, hidden by default, shows that karma; the Peer Directory's Trust Score column is now Karma (same number, now sorted by value) (#1418)
+   - new:The IceBridge Console shows IceBridge network traffic in its status bar: download (blue) and upload (red) speeds, a graph of the last 5 minutes in the same colors, and the total received, sent and combined since IceBridge started
+   - new:Double-clicking a folder or media type in the Library's left-hand tree refreshes it, like F5 does
+   - update:FrostWire uses up to a quarter of your computer's memory instead of a fixed 512 MB (never less than 512 MB, at most 4 GB), so computers with more memory get fewer slowdowns and pauses
+   - jlibtorrent: updated 2.0.12.9 → 2.0.15.3: libtorrent RC_2_0 with the fixes of libtorrent 2.0.13, 2.0.14, 2.0.15 and the unreleased 2.0.16 (123 commits), and OpenSSL 3.6.0 → 4.1.0
+   - update:Telluride build 48 with yt-dlp 2026.10.26, for downloads from YouTube and other sites that changed since build 47
+   - fix:FrostWire with thousands of transfers no longer crashes with a stack overflow, and every transfer update does far less work: torrent events reach their transfer through one lookup instead of every transfer checking each one (#1441)
+   - fix:Torrents that use only the new BitTorrent v2 format no longer disappear from Transfers after a restart: their saved copy now keeps the v2 piece hashes (#1383)
+   - fix:Karma: your karma chain can no longer be lost: each entry is saved before it is used, never signed at an older Bitcoin block, and a chain that fails verification is kept aside instead of overwritten (#1413)
+   - jlibtorrent: BitTorrent memory leaks: every torrent, magnet, resume-data and DHT message it decoded leaked a native copy of its input (100,000 parses of a 13.5 KB torrent leaked 1.7 GB; now flat), and identity secret keys no longer stay behind in leaked native memory
+   - fix:Errors on the UI thread no longer freeze the app for seconds, and they are now reported — FrostWire installs a real uncaught-exception handler (the old one was ignored by current Java) and files reports in the background
+   - fix:Fragmented MP4/M4A files (such as downloaded YouTube audio) open again: a stricter check from an earlier fix rejected their sample runs (#1354)
+   - windows-launcher: Java can use IPv6 again, so peers and servers on IPv6-only networks are reachable (IPv4 is still preferred where both exist)
+   - fix:The Library no longer runs out of memory or hangs on folders with symlink loops (also Library search, Create Torrent's size count and the MCP library tools), and Options → Apply no longer checks the save folder on disk when it didn't change or crashes when ProgramFiles isn't set — one bounded, non-recursive folder walker that follows symlinked subfolders but enters each real folder once
+   - fix:The Pieces tab no longer uses hundreds of MB for torrents with many pieces (UI freezes, possible out-of-memory), and stops redrawing itself nonstop while open — it now keeps only the visible rows in memory
+   - fix:The Library no longer stops listing files when the Torrent Data folder setting isn't a path Windows accepts, such as one ending in a space (#1465)
+   - fix:Switching Library folders quickly no longer mixes the previous folder's files into the one you opened
+   - fix:Opening a magnet link while FrostWire is already running no longer changes its name or trackers — the forwarded link was decoded twice, turning + into spaces and %25 into a bare %
+   - fix:Opening a magnet link whose name contains a lone % (like "50% off") no longer fails — a % that isn't part of an escape is kept as is, the way browsers do
+   - fix:Search results from TPB, 1337x, Torrentz2 and Nyaa no longer show a size of 0 for files of a terabyte or more, or negative sizes from a broken page — all engines parse sizes in one place
+   - fix:The Pirate Bay results with base32 or reordered magnet links get their correct info hash (#1408)
+   - fix:On computers set to Turkish or Azeri, Nyaa search results show their sizes again, IceBridge client mode is respected and distributed search finds the same peers as everyone else (#1407)
+   - fix:Corrupt MP4/M4A files no longer break reading the tags and cover art of the files after them, or make Extract audio fail with an internal error — every box size is checked against its parent and the file before it is read, and an empty box no longer hides the rest of the file
+   - fix:A SoundCloud MP3 with an invalid text encoding in its ID3 tag is re-tagged without errors — the bad frame is skipped when the tag is read
+   - fix:A SoundCloud MP3 with a cut-short ID3 frame (empty title, truncated cover art) is re-tagged without errors — frames shorter than their fields are skipped
+   - fix:MP3 tags read correctly in more files: UTF-16 comments and picture descriptions are no longer empty, tags with an extended header are read, and a short last tag field is no longer dropped (#1409)
+   - fix:An Internet Archive search answer with one empty entry no longer hides all Internet Archive results (#1432)
+   - fix:Pasting a SoundCloud link whose answer holds an empty track now downloads the other tracks instead of doing nothing (#1433)
+   - fix:Cloud video links whose details come back empty no longer throw an error: they show no results (#1434)
+   - fix:Cloud video and playlist results without an upload date no longer fail or show another result's date (#1435)
+   - fix:A 1337x results page with broken tags can no longer tie up a search for minutes: link text is cleaned in linear time (#1436)
+   - fix:A torrent with a malformed license or payment-options section no longer loses both: the bad section is ignored and the other still shows (#1430)
+   - fix:A search engine whose server drops the connection once (archive.org does this now and then) is asked again instead of returning no results
+   - fix:Archive.org searches no longer come back empty when archive.org is slow: it gets 15 seconds to answer instead of 5
+   - fix:Search results no longer switch the file type tab (to Video, typically) while they come in: the tab only changes when you click one, and the next search opens on the tab you clicked last (Torrents until you pick one)
+   - fix:Karma: a download that finishes from a distributed-search peer now endorses that peer automatically, once per peer and torrent (#1414)
+   - fix:Karma: Options shows your karma and endorsements from the right database instead of "missing" or 0 (#1412)
+   - windows-launcher: fixed a crash when Windows runs out of memory while reading the command line, and other memory-handling mistakes
+   - windows-launcher: the "download FrostWire again" link in the startup error dialog reports your installed version (it always said "unknown") and can no longer crash the dialog when the version is long or unusual
+   - fix:Transfers without a .torrent file (magnets still fetching metadata, or moved .torrents) no longer re-read their resume data several times a second — the lookup is retried every 30 seconds
+   - update:The Library lists up to 100,000 files per folder scan (was 250,000), so a huge Torrent Data folder can't use up the memory of older computers
+   - jlibtorrent: libtorrent objects FrostWire no longer uses (torrent info, status, entries, lists) are freed automatically instead of leaking native memory for as long as the app runs
+   - jlibtorrent: Torrents whose file names have emoji or other characters outside the basic plane download with the right names, and text that isn't valid UTF-8 can no longer corrupt libtorrent's JNI layer
+   - jlibtorrent: a programming mistake that uses a libtorrent object after freeing it now shows up as an error instead of closing the app
+   - jlibtorrent: the copies of the libtorrent library that older versions left in the temp folder on every start (13-30 MB each) are deleted
+   - jlibtorrent: the native library is extracted once and reused instead of copied out on every start (#1382)
+   - jlibtorrent: Fewer JNI calls: data moves between Java and libtorrent in one call instead of one call per byte (1 MB: 6 ms → 0.4 ms into libtorrent, 3-4 ms → 0.1 ms back), so reading torrents, resume data and DHT items is faster and lighter
+   - fix:The Pieces tab no longer cuts off the rightmost cube of every other row at some window widths, or the outline of the outermost cubes — the hive is sized by whichever row ends further right, border included
+   - fix:The "Transfer Detail" title lines up on the left with the labels below it (such as "Total Pieces") in the Transfers tab
+   - fix:Resizing the window no longer makes the Transfer Detail > Pieces hive flash white or reshuffle on every step of the drag: the pieces stay put while you drag and re-wrap once when you stop
+   - update:The main window can be resized down to 1000x650, or to the screen size on smaller displays, and with "minimize to tray" on but no tray available the close button now minimizes the window instead of doing nothing
+   - fix:Opening a Library folder, a media type or a Library search no longer freezes the window on slow, network or sleeping drives — file paths are resolved in the background and rows are added in batches instead of one by one
+   - fix:The Transfers table no longer freezes when removing, re-sorting or filtering transfers, and a removed transfer is no longer removed twice — transfers are removed once in the background, tables sort a snapshot outside their lock, and re-filtering does one sort and one update
+   - fix:Pressing Enter to search no longer freezes the UI, nor do icon paints, file choosers or library selections after a few idle seconds — the background workers they hand work to stay alive, so the UI thread never has to start a new thread
+   - fix:The first-run setup wizard no longer freezes on slow Windows PCs, and the main window and BitTorrent engine no longer start behind it before you have finished choosing your settings — startup now waits for the wizard to close
+   - fix:The setup wizard no longer freezes for seconds before it appears on first run or after an update — each page is built when you reach it instead of all of them up front, the wizard no longer writes the settings file while opening, scaled icons are reused, and the language list is checked in the background
+   - fix:Opening a web page, showing a download in Explorer/Finder or opening a folder no longer freezes FrostWire — the system call and file checks run in the background
+   - fix:Closing the main window, applying Options or closing Tip of the Day no longer freezes FrostWire while settings are saved, and resizing the window no longer snaps it back to 1200x700 — settings, the tray icon removal and the shutdown image are handled in the background, and settings are now saved exactly once on every exit path
+   - fix:Changing a search filter no longer freezes the window when there are thousands of results, and opening a torrent's file list no longer makes the window wait while it sorts — filtered results are rebuilt in one step, and the file list is sorted outside its lock
+   - fix:Windows: the UI no longer freezes at startup or while the Library, Search and Transfers tables show file icons — native file-type icons are now looked up in the background and appear once loaded, instead of FrostWire waiting on the Windows shell for each one
+   - fix:The UI no longer freezes for seconds while the status bar refreshes the transfer counts or the VPN status — FrostWire's background task threads stay alive instead of expiring after 5 idle seconds, so the UI thread never has to start a new thread to hand off work (#1314)
+   - fix:No more freezes on the first tooltip, the first table showing Arabic, Hebrew, Indic, Thai or CJK names, the main window's first paint, or the splash's progress bar and OS icons — the startup warm-up prepares those fonts, text layout and painters in the background
    - fix:Choosing which files to download from a torrent or magnet link no longer freezes the window as the file list opens, even for torrents with many files: the list is read in the background (#1473)
    - fix:The first Library folder you open no longer freezes while its file dates are shown for the first time: the time zone names they need load at startup, in the background (#1472)
    - fix:Dialogs and windows other than the main window (Options, About, message and error dialogs, file choosers, Create and Share Torrent, IceBridge windows and more) no longer set up drag-and-drop with Windows when they open, which could freeze them on slow machines; only the main window, which takes dropped torrents and files, still does (#1471)
    - fix:The window no longer freezes right after startup while the Transfers tab loads its animated seeding icon, or when a search tab first shows its spinner: those animated icons load at startup, in the background (#1470)
    - fix:The first right-click on the tray icon on Windows no longer freezes the window before the menu opens: the menu's system classes are prepared at startup (#1469)
    - fix:Opening a .torrent file, or one fetched from a magnet link or URL, no longer freezes the window while FrostWire reads it: the torrent is read once, in the background, before the file list appears (#1468)
-   - fix:The Library no longer stops listing files when the Torrent Data folder setting isn't a path Windows accepts, such as one ending in a space (#1465)
    - fix:The main window no longer freezes on Windows during its first paint while the donation buttons prepare their font: it is prepared at startup with the others (#1467)
    - fix:Transfers and switching back to FrostWire no longer freeze the window now and then while a background worker has to start again: those workers stay ready (#1466)
-   - new:Distributed search results are ranked by the karma of the peer that shared them (after seeds), and a new Karma column, hidden by default, shows that karma; the Peer Directory's Trust Score column is now Karma (same number, now sorted by value) (#1418)
    - fix:The first-run setup wizard no longer freezes on Windows as it appears: it no longer sets up drag-and-drop, which it never used (#1464)
    - fix:The main window no longer freezes on Windows as it first appears while FrostWire loads its file-association support — that now happens in the background (#1463)
    - fix:The window no longer freezes right after startup while Tip of the Day loads its icon — the icon is decoded in the background before the dialog is built (#1462)
@@ -17,127 +87,44 @@ FrostWire 7.1.3 build 335 UNRELEASED
    - fix:Starting to drag a transfer no longer freezes the window while its folders are scanned: the drag image shows the transfer's folder, and its files are listed only when dropped (#1459)
    - fix:Sharing a transfer (its share button or Send to friend) no longer freezes the window while the torrent is read: it is read in the background before the dialog opens (#1458)
    - fix:Opening a search tab, the transfer menu's Scrape Tracker and Check Local Data, and sharing a file from a transfer's Files tab no longer freeze the window while a new thread starts: they use background workers that are already running (#1457)
-   - fix:Torrents that use only the new BitTorrent v2 format no longer disappear from Transfers after a restart: their saved copy now keeps the v2 piece hashes (#1383)
-   - fix:Freeze reports no longer include stalls inside Windows' own touch-keyboard check on mouse clicks, which FrostWire can't change (#1438)
-   - fix:FrostWire with thousands of transfers no longer crashes with a stack overflow, and every transfer update does far less work: torrent events reach their transfer through one lookup instead of every transfer checking each one (#1441)
    - fix:The first right-click on a transfer no longer freezes while Java prepares the menus' internals: that work now happens at startup, in the background (#1439)
    - fix:Cancelling the first-run setup wizard, or quitting from the fatal error window, no longer freezes the window while FrostWire exits (#1437)
-   - fix:An Internet Archive search answer with one empty entry no longer hides all Internet Archive results (#1432)
-   - fix:Pasting a SoundCloud link whose answer holds an empty track now downloads the other tracks instead of doing nothing (#1433)
-   - fix:Cloud video links whose details come back empty no longer throw an error: they show no results (#1434)
-   - fix:Cloud video and playlist results without an upload date no longer fail or show another result's date (#1435)
-   - fix:A 1337x results page with broken tags can no longer tie up a search for minutes: link text is cleaned in linear time (#1436)
-   - fix:A torrent with a malformed license or payment-options section no longer loses both: the bad section is ignored and the other still shows (#1430)
-   - fix:Hashes and other hex values from peers and block explorers must be plain ASCII hex: look-alike digits from other scripts are rejected instead of decoding to the same bytes (#1431)
    - fix:The first tooltip no longer stalls while Java sets up its popup code: it is prepared at startup (#1429)
    - fix:File choosers no longer freeze on Windows while they load each file's icon: icons appear as they load (#1428)
    - fix:The setup wizard's "Join us" page no longer freezes slow computers while it scales its icons: they are drawn with a much faster method (#1427)
    - fix:The first drag of a transfer or file out of a table no longer stalls while FrostWire loads its drag-and-drop code: it is loaded at startup (#1426)
    - fix:The first right-click on a transfer no longer freezes on systems whose number and date formats differ from the display language: startup prepares the formats for the right region (#1425)
-   - fix:A search engine whose server drops the connection once (archive.org does this now and then) is asked again instead of returning no results
-   - maintenance:The Windows installer no longer installs a separate, unused jlibtorrent.dll and removes the one older versions left behind
-   - fix:Search results no longer switch the file type tab (to Video, typically) while they come in: the tab only changes when you click one, and the next search opens on the tab you clicked last (Torrents until you pick one)
    - fix:Adding a transfer no longer freezes the window while FrostWire reads the torrent's license details: they load in the background and show up on the row a moment later (#1423)
-   - new:Double-clicking a folder or media type in the Library's left-hand tree refreshes it, like F5 does
-   - fix:Archive.org searches no longer come back empty when archive.org is slow: it gets 15 seconds to answer instead of 5
    - fix:Showing a multi-line tooltip in a table no longer builds and throws away a themed text box first, so the first tooltip no longer freezes slow machines (#1422)
    - fix:The first-run setup wizard no longer freezes before it appears while it creates the default download folders: they are created during startup instead (#1421)
-   - fix:The "Transfer Detail" title lines up on the left with the labels below it (such as "Total Pieces") in the Transfers tab
-   - fix:Resizing the window no longer makes the Transfer Detail > Pieces hive flash white or reshuffle on every step of the drag: the pieces stay put while you drag and re-wrap once when you stop
    - fix:Dragging files or folders over the Library no longer freezes the window on Windows: FrostWire no longer asks for the dragged files on every mouse move, only when you drop (#1420)
-   - jlibtorrent: the copies of the libtorrent library that older versions left in the temp folder on every start (13-30 MB each) are deleted
-   - jlibtorrent: updated 2.0.12.9 → 2.0.15.3: libtorrent RC_2_0 with the fixes of libtorrent 2.0.13, 2.0.14, 2.0.15 and the unreleased 2.0.16 (123 commits), and OpenSSL 3.6.0 → 4.1.0
-   - jlibtorrent: a programming mistake that uses a libtorrent object after freeing it now shows up as an error instead of closing the app
-   - jlibtorrent: libtorrent objects FrostWire no longer uses (torrent info, status, entries, lists) are freed automatically instead of leaking native memory for as long as the app runs
-   - jlibtorrent: BitTorrent memory leaks: every torrent, magnet, resume-data and DHT message it decoded leaked a native copy of its input (100,000 parses of a 13.5 KB torrent leaked 1.7 GB; now flat), and identity secret keys no longer stay behind in leaked native memory
-   - jlibtorrent: Fewer JNI calls: data moves between Java and libtorrent in one call instead of one call per byte (1 MB: 6 ms → 0.4 ms into libtorrent, 3-4 ms → 0.1 ms back), so reading torrents, resume data and DHT items is faster and lighter
-   - jlibtorrent: Torrents whose file names have emoji or other characters outside the basic plane download with the right names, and text that isn't valid UTF-8 can no longer corrupt libtorrent's JNI layer
-   - jlibtorrent: libtorrent fixes: a data corruption bug in memory-mapped storage, short disk reads on Windows, trackers stuck after a pause, DNS leaks of peer and tracker host names, web seeds for single-file torrents, wrong seeding/active/finished times, external IP not reported with UPnP/NAT-PMP, a race removing an auto-managed torrent, and move-storage rollback
-   - jlibtorrent: the native library is extracted once and reused instead of copied out on every start (#1382)
-   - windows-launcher: FrostWire no longer starts if it can't open its own folder, instead of loading Java and its files from wherever it was started, and Reinstall runs the installer from FrostWire's folder only
-   - windows-launcher: DLLs in the folder FrostWire is started from are no longer loaded: the current folder is out of the DLL search order and Java's jvm.dll is loaded by its full path
-   - windows-launcher: built with Control Flow Guard, CET shadow stack and Spectre mitigations
-   - windows-launcher: the "download FrostWire again" link in the startup error dialog reports your installed version (it always said "unknown") and can no longer crash the dialog when the version is long or unusual
-   - windows-launcher: FrostWire.exe --debug shows its log in the console it was started from (or a new one)
-   - windows-launcher: Java can use IPv6 again, so peers and servers on IPv6-only networks are reachable (IPv4 is still preferred where both exist)
-   - windows-launcher: fixed a crash when Windows runs out of memory while reading the command line, and other memory-handling mistakes
-   - fix:Karma: a download that finishes from a distributed-search peer now endorses that peer automatically, once per peer and torrent (#1414)
-   - fix:Karma: Options shows your karma and endorsements from the right database instead of "missing" or 0 (#1412)
-   - fix:Karma: your karma chain can no longer be lost: each entry is saved before it is used, never signed at an older Bitcoin block, and a chain that fails verification is kept aside instead of overwritten (#1413)
-   - fix:Distributed search rejects karma chains with forged epochs or energy that got around the endorsement limit (#1415)
    - fix:The first search no longer freezes the window on slow machines while the size and seeds sliders are built: their look-and-feel painters are prepared at startup (#1419)
    - fix:On Windows, Browse for the save folder opens faster: FrostWire prepares the Windows folder list in the background first (#1411)
-   - fix:MP3 tags read correctly in more files: UTF-16 comments and picture descriptions are no longer empty, tags with an extended header are read, and a short last tag field is no longer dropped (#1409)
-   - fix:The Pirate Bay results with base32 or reordered magnet links get their correct info hash (#1408)
    - fix:Windows with a search box lay out faster: the search field no longer re-measures its prompt text on every size check (#1410)
-   - fix:Fragmented MP4/M4A files (such as downloaded YouTube audio) open again: a stricter check from an earlier fix rejected their sample runs (#1354)
-   - fix:On computers set to Turkish or Azeri, Nyaa search results show their sizes again, IceBridge client mode is respected and distributed search finds the same peers as everyone else (#1407)
    - fix:Exiting FrostWire on Windows no longer stalls in a file check before the shutdown window shows (#1406)
-   - improvement:Crash and freeze reports include how many threads FrostWire runs, the largest groups of threads by kind and the memory they use, to diagnose "unable to create native thread" crashes (#1393)
    - fix:Pressing Play or selecting a file in the Library no longer freezes FrostWire while it checks every file in the folder on disk (#1402)
-   - fix:Distributed search no longer accepts a peer's karma chain that declares an invalid energy value to endorse other peers without the per-epoch limit (#1401)
    - fix:IceBridge answers a malformed request on its local control port with an error instead of logging a stack trace and dropping the connection (#1396)
    - fix:Sending a test report from the About window no longer freezes FrostWire, and crash and freeze reports are now put together in the background (#1395)
    - fix:Closing the FrostWire window no longer freezes before the "Do you want to hide FrostWire?" dialog appears — its message is plain text instead of HTML (#1394)
    - fix:The Transfers list no longer does extra work on every repaint for cloud downloads and torrents still fetching their details — their Seeds value is worked out once per update
    - fix:Resizing the window or opening an item in the Library no longer freezes the UI while the graphics driver catches up — the cover art no longer waits for the GPU to finish drawing
    - fix:The main window no longer freezes right after it first appears on Windows while FrostWire re-registers its .torrent and magnet: associations, and opening or applying the file association options no longer waits on the registry — the registry work runs in the background
-   - update:Crash reports name the class Java couldn't load when FrostWire is missing one, and reports from development builds are kept apart from users' reports
    - fix:Building the main window at startup no longer stalls while Java sets up drag and drop — its data-transfer service is looked up in the background at startup
    - fix:Starting FrostWire on Windows no longer freezes while the tray icon is added, nor does hiding the window to the tray — the tray icon is added and removed in the background
-   - update:Gradle 9.8.1 -> 9.8.2 for building FrostWire (developers only)
-   - update:Spotless 7.0.4 -> 8.10.4, the code formatter check (developers only)
-   - update:JUnit 5.13.4 -> 5.14.4 for the test suites (developers only)
-   - update:OkHttp 4.12.0 -> 5.5.1, the HTTP client behind searches and downloads, now the same major version Android uses
-   - update:FlatLaf 3.7.1 -> 3.7.2, the dark theme's look and feel
-   - update:Netty 4.2.18 -> 4.2.19, the networking library behind IceBridge
-   - update:BouncyCastle 1.83 -> 1.86, the cryptography behind IceBridge peer identities
-   - update:SQLite JDBC 3.51.3.0 -> 3.53.4.0, the database behind the local search index
-   - update:Gson 2.13.2 -> 2.15.0, the JSON library behind search results and settings
-   - update:Telluride build 48 with yt-dlp 2026.10.26, for downloads from YouTube and other sites that changed since build 47
    - fix:The first multi-line tooltip no longer freezes the window for a moment — the text-wrapping rules it needs are loaded in the background at startup
    - fix:Startup no longer pauses while building the main window's layout for the first time — the layout library's one-time setup now runs in the background with the other startup preparation
    - fix:Opening a search tab no longer stalls on slow computers while it redraws the media-type button icons — they are prepared once in the background at startup and reused for every tab
    - fix:Starting a video, audio, SoundCloud or slide download no longer freezes the window on slow or network drives — the download is prepared in the background while it picks a free file name
-   - update:FrostWire uses up to a quarter of your computer's memory instead of a fixed 512 MB (never less than 512 MB, at most 4 GB), so computers with more memory get fewer slowdowns and pauses
-   - new:The IceBridge Console shows IceBridge network traffic in its status bar: download (blue) and upload (red) speeds, a graph of the last 5 minutes in the same colors, and the total received, sent and combined since IceBridge started
-   - fix:Opening a magnet link while FrostWire is already running no longer changes its name or trackers — the forwarded link was decoded twice, turning + into spaces and %25 into a bare %
-   - fix:Search results from TPB, 1337x, Torrentz2 and Nyaa no longer show a size of 0 for files of a terabyte or more, or negative sizes from a broken page — all engines parse sizes in one place
-   - fix:Opening a magnet link whose name contains a lone % (like "50% off") no longer fails — a % that isn't part of an escape is kept as is, the way browsers do
-   - fix:A SoundCloud MP3 with an invalid text encoding in its ID3 tag is re-tagged without errors — the bad frame is skipped when the tag is read
-   - fix:A SoundCloud MP3 with a cut-short ID3 frame (empty title, truncated cover art) is re-tagged without errors — frames shorter than their fields are skipped
-   - fix:Corrupt MP4/M4A files no longer break reading the tags and cover art of the files after them, or make Extract audio fail with an internal error — every box size is checked against its parent and the file before it is read, and an empty box no longer hides the rest of the file
    - fix:The transfer details panel no longer does extra work every second to show the completion percentage and piece counts — they are plain bold text instead of HTML that had to be parsed and laid out on every update
    - fix:Startup on macOS no longer freezes while FrostWire prepares native file icons — the native icon support is built in the background, so slow or sleeping drives above your home folder can't stall the window
-   - fix:A SoundCloud MP3 with a corrupt ID3 tag can no longer make FrostWire allocate gigabytes of memory while re-tagging it — frame lengths are checked against the tag before anything is copied
-   - fix:A corrupt or malicious MP4/M4A file in your downloads can no longer make FrostWire run out of memory when the Library reads its tags or you extract its audio — entry counts in the file are checked against its size before anything is allocated
-   - update:Anonymous crash and freeze reports now say how much memory was in use, how much of a freeze was garbage collection and what ran out in an out-of-memory error; they keep full stack traces for repeated errors, and they now cover errors in all of FrostWire's own code, including out-of-memory errors
-   - update:The Library lists up to 100,000 files per folder scan (was 250,000), so a huge Torrent Data folder can't use up the memory of older computers
-   - fix:Switching Library folders quickly no longer mixes the previous folder's files into the one you opened
-   - fix:Transfers without a .torrent file (magnets still fetching metadata, or moved .torrents) no longer re-read their resume data several times a second — the lookup is retried every 30 seconds
    - fix:File → Open .Torrent, Magnet or Video URL no longer freezes when another application holds the clipboard — the dialog opens at once and the clipboard's link is filled in when it arrives
    - fix:Switching to a FlatLaf theme freezes the window for less time — FlatLaf's interface classes are loaded in the background before the theme is applied
    - fix:The search tabs, the header search field and the search home screen no longer re-measure hidden panels on every layout — only the panel on show is measured
    - fix:Typing a search in a non-Latin language and showing tables with non-Latin file names or a custom table font size no longer freeze the window the first time — those glyphs are prepared in the background at startup
-   - fix:Opening a Library folder, a media type or a Library search no longer freezes the window on slow, network or sleeping drives — file paths are resolved in the background and rows are added in batches instead of one by one
-   - fix:Changing a search filter no longer freezes the window when there are thousands of results, and opening a torrent's file list no longer makes the window wait while it sorts — filtered results are rebuilt in one step, and the file list is sorted outside its lock
-   - fix:The Pieces tab no longer cuts off the rightmost cube of every other row at some window widths, or the outline of the outermost cubes — the hive is sized by whichever row ends further right, border included
-   - update:The main window can be resized down to 1000x650, or to the screen size on smaller displays, and with "minimize to tray" on but no tray available the close button now minimizes the window instead of doing nothing
-   - fix:The Library no longer runs out of memory or hangs on folders with symlink loops (also Library search, Create Torrent's size count and the MCP library tools), and Options → Apply no longer checks the save folder on disk when it didn't change or crashes when ProgramFiles isn't set — one bounded, non-recursive folder walker that follows symlinked subfolders but enters each real folder once
    - fix:FrostWire no longer stutters while transfers refresh or search results arrive — per-second labels and result counters ask for a new layout only when their size changes, and the main tabs and transfer details are sized from the tab on show
-   - fix:The Transfers table no longer freezes when removing, re-sorting or filtering transfers, and a removed transfer is no longer removed twice — transfers are removed once in the background, tables sort a snapshot outside their lock, and re-filtering does one sort and one update
-   - fix:Closing the main window, applying Options or closing Tip of the Day no longer freezes FrostWire while settings are saved, and resizing the window no longer snaps it back to 1200x700 — settings, the tray icon removal and the shutdown image are handled in the background, and settings are now saved exactly once on every exit path
-   - fix:Opening a web page, showing a download in Explorer/Finder or opening a folder no longer freezes FrostWire — the system call and file checks run in the background
-   - fix:Security: on macOS, "Show in Finder" passes the file path to its script as an argument, so a crafted file name can no longer inject AppleScript
-   - fix:Errors on the UI thread no longer freeze the app for seconds, and they are now reported — FrostWire installs a real uncaught-exception handler (the old one was ignored by current Java) and files reports in the background
-   - fix:No more freezes on the first tooltip, the first table showing Arabic, Hebrew, Indic, Thai or CJK names, the main window's first paint, or the splash's progress bar and OS icons — the startup warm-up prepares those fonts, text layout and painters in the background
-   - fix:The Pieces tab no longer uses hundreds of MB for torrents with many pieces (UI freezes, possible out-of-memory), and stops redrawing itself nonstop while open — it now keeps only the visible rows in memory
-   - update:Freeze reports keep a useful stack more often — when a freeze ends just as it is sampled, the report carries a sample taken halfway through it instead of an empty one
-   - update:Freeze reports are no longer sent for Windows-only stalls FrostWire can't fix (cursor updates, native window resizes) — less upload, and the report budget goes to real freezes
    - fix:Less chance of a startup freeze while the splash screen appears on 2-CPU machines — the background warm-up now waits for the splash to show before loading app classes
    - fix:Startup no longer freezes before the first-run setup wizard appears — the wizard decides its pages (intent file, settings, file associations) on the startup thread, and saves the intent file in the background
    - fix:No more startup freezes on Windows while fonts load for the first time (setup wizard; main window in Japanese, Korean, Chinese, Hebrew or Thai) — the startup warm-up now covers the look and feel's own fonts, and a language's Windows font is used only if it is installed
-   - fix:Pressing Enter to search no longer freezes the UI, nor do icon paints, file choosers or library selections after a few idle seconds — the background workers they hand work to stay alive, so the UI thread never has to start a new thread
    - fix:No multi-second freeze while the setup wizard, the main window or its tabs first appear, or on the first status-bar speed update — their classes are preloaded and the JVM's first generated string concatenation is linked in the background
    - fix:Hovering the status bar's bandwidth indicators no longer freezes the UI — the tooltip is a plain label grid instead of an HTML table
    - fix:Switching to a Flat theme from Tools → Switch Theme no longer freezes the window on Windows — FlatLaf and its native library now load in the background before the theme is applied
@@ -147,22 +134,35 @@ FrostWire 7.1.3 build 335 UNRELEASED
    - fix:Opening a folder chooser (e.g. Browse for the torrent save folder) no longer freezes while checking every parent folder on disk, worst on network or removable drives — folder names and icons in the "Look in" box are looked up once, in the background
    - fix:macOS: the Library no longer freezes while fetching file icons from the system — native icons load in the background on every platform and are cached with the icon itself
    - fix:Options → Apply no longer freezes the window while the BitTorrent engine saves its session state — the state is saved in the background, once per Apply; moving torrents to a new save folder also runs in the background
-   - fix:The first-run setup wizard no longer freezes on slow Windows PCs, and the main window and BitTorrent engine no longer start behind it before you have finished choosing your settings — startup now waits for the wizard to close
    - fix:The Transfers table no longer freezes when an HTTP download finishes — its state is read without waiting for the lock held while the file is moved into place
    - fix:The first Options open no longer freezes while the dialog's classes load from the jar — they now load in the background at startup
-   - fix:Windows: the UI no longer freezes at startup or while the Library, Search and Transfers tables show file icons — native file-type icons are now looked up in the background and appear once loaded, instead of FrostWire waiting on the Windows shell for each one
-   - fix:The setup wizard no longer freezes for seconds before it appears on first run or after an update — each page is built when you reach it instead of all of them up front, the wizard no longer writes the settings file while opening, scaled icons are reused, and the language list is checked in the background
    - fix:Dragging or resizing table columns no longer writes the column settings file on the UI thread for every column crossed — the save runs in the background, once per drag
    - fix:The splash screen no longer freezes on slow machines while FrostWire prepares its HTML engine, string sorting and date formats — the HTML engine loads in the background, and the sorting rules and date format are built only when a table first needs them
    - fix:Building the main window at startup no longer freezes the UI while the layout library inspects its own classes and the File menu builds a text field for a dialog that is not open — both were dropped
    - fix:Opening the Search, Library and Transfers tabs for the first time after starting FrostWire no longer freezes the UI on slow machines while Java loads their code — it is loaded in the background during startup, along with the number, date and sorting data the tables use
    - fix:Linux: opening FrostWire no longer freezes the UI while Java searches every installed font file — the Transfers tab asked for Helvetica (fixed with #1310) and the Tip of the Day for Arial, which most Linux systems do not have; the tip now uses the system sans serif font (#1313)
-   - fix:The UI no longer freezes for seconds while the status bar refreshes the transfer counts or the VPN status — FrostWire's background task threads stay alive instead of expiring after 5 idle seconds, so the UI thread never has to start a new thread to hand off work (#1314)
    - fix:Opening FrostWire on Windows no longer freezes the UI while the Transfers tab is laid out — its buttons, the header and a few labels asked for the Helvetica font, which Windows does not have, and Java opened every installed font file looking for it; they now use the system sans serif font outside macOS (#1310)
    - fix:The splash screen no longer freezes on slow machines while Java reads the UI fonts from disk for the first time — the font warm-up now starts as soon as the theme is applied instead of after the splash screen is shown (#1308)
    - fix:Building the main window at startup no longer freezes the UI on slow machines while Java loads the classes that draw menus, tabs, tables and other components — they are loaded in the background while the splash screen is up (#1311, #1309)
    - fix:Opening the Search tab no longer freezes the UI while the promotional slideshow downloads its images — slide images are now loaded from disk or the network in the background and appear when ready (#1316)
    - fix:Opening a .torrent file or link while FrostWire is still starting no longer freezes the UI until the BitTorrent engine is up — the status bar shows its connection indicator without waiting for the engine, and opened .torrent files are added to the engine in the background
+   - update:Anonymous crash and freeze reports now say how much memory was in use, how much of a freeze was garbage collection and what ran out in an out-of-memory error; they keep full stack traces for repeated errors, and they now cover errors in all of FrostWire's own code, including out-of-memory errors
+   - improvement:Crash and freeze reports include how many threads FrostWire runs, the largest groups of threads by kind and the memory they use, to diagnose "unable to create native thread" crashes (#1393)
+   - update:Crash reports name the class Java couldn't load when FrostWire is missing one, and reports from development builds are kept apart from users' reports
+   - update:Freeze reports keep a useful stack more often — when a freeze ends just as it is sampled, the report carries a sample taken halfway through it instead of an empty one
+   - update:Freeze reports are no longer sent for Windows-only stalls FrostWire can't fix (cursor updates, native window resizes) — less upload, and the report budget goes to real freezes
+   - fix:Freeze reports no longer include stalls inside Windows' own touch-keyboard check on mouse clicks, which FrostWire can't change (#1438)
+   - windows-launcher: FrostWire.exe --debug shows its log in the console it was started from (or a new one)
+   - maintenance:The Windows installer no longer installs a separate, unused jlibtorrent.dll and removes the one older versions left behind
+   - update:OkHttp 4.12.0 -> 5.5.1, the HTTP client behind searches and downloads, now the same major version Android uses
+   - update:FlatLaf 3.7.1 -> 3.7.2, the dark theme's look and feel
+   - update:Netty 4.2.18 -> 4.2.19, the networking library behind IceBridge
+   - update:BouncyCastle 1.83 -> 1.86, the cryptography behind IceBridge peer identities
+   - update:SQLite JDBC 3.51.3.0 -> 3.53.4.0, the database behind the local search index
+   - update:Gson 2.13.2 -> 2.15.0, the JSON library behind search results and settings
+   - update:Gradle 9.8.1 -> 9.8.2 for building FrostWire (developers only)
+   - update:Spotless 7.0.4 -> 8.10.4, the code formatter check (developers only)
+   - update:JUnit 5.13.4 -> 5.14.4 for the test suites (developers only)
 FrostWire 7.1.2 OCT/25/2026
    - update:The Java runtime bundled with the Windows, macOS and Linux installers is updated from OpenJDK 27 to 27.0.1.0.3, which fixes the vulnerabilities in this week's severe Oracle Java security advisory
    - fix:Windows: text is no longer blurry at display scaling above 100% — FrostWire.exe now declares per-monitor DPI awareness, so Windows no longer stretches the whole window as a bitmap (#1243, #1300)
