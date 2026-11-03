@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.*;
@@ -96,6 +97,9 @@ public class CreateTorrentDialog extends JDialog {
   private int pieceSize;
   private JComboBox<TorrentType> torrentTypeComboBox;
   private TorrentType selectedTorrentType = TorrentType.HYBRID;
+  private boolean chosenFolderIsEmpty;
+  // Only the latest content choice is shown, if several are read at once.
+  private final AtomicInteger contentChoices = new AtomicInteger();
 
   public CreateTorrentDialog(JFrame frame) {
     super(frame);
@@ -351,20 +355,6 @@ public class CreateTorrentDialog extends JDialog {
     labelTrackers.setForeground(useDHT ? Color.GRAY : Color.BLACK);
   }
 
-  private void recommendPieceSizeForSelectedContent() {
-    try {
-      File contentFile = create_from_dir ? new File(directoryPath) : new File(singlePath);
-      long totalSize = calculateTotalSize(contentFile);
-      PieceSize recommended = PieceSize.recommendForSize(totalSize);
-      if (recommended != PieceSize.AUTO_DETECT) {
-        pieceSizeComboBox.setSelectedItem(recommended);
-        pieceSize = recommended.bytes();
-      }
-    } catch (Exception e) {
-      LOG.warn("Failed to recommend piece size: " + e.getMessage());
-    }
-  }
-
   /**
    * Size of {@code file}, or of the files under it. Bounded by {@link BoundedFileWalker}, so a
    * symlink loop in the chosen folder can't recurse until the stack overflows.
@@ -425,47 +415,81 @@ public class CreateTorrentDialog extends JDialog {
     }
   }
 
+  /**
+   * What choosing a file or folder found on disk, read off the EDT by {@link #readChosenContent}.
+   */
+  record ChosenContent(
+      File file,
+      boolean readable,
+      boolean directory,
+      boolean emptyFolder,
+      PieceSize recommendedPieceSize) {}
+
+  /**
+   * Picks {@code chosenFile} as the torrent's content: what it is on disk, and the piece size its
+   * total size suggests, are read off the EDT. That reads every file under a folder, which froze
+   * the dialog for large folders (frostwire/frostwire#1474).
+   *
+   * @param fileChoosingMode a JFileChooser mode; DIRECTORIES_ONLY turns a file into its folder
+   */
   public void setChosenContent(File chosenFile, int fileChoosingMode) {
-    // if we don't have read permissions on that file/folder...
+    int choice = contentChoices.incrementAndGet();
+    BTDownloadMediator.readThenShow(
+        () -> readChosenContent(chosenFile, fileChoosingMode),
+        BackgroundQueuedExecutorService::schedule,
+        GUIMediator::safeInvokeLater,
+        content -> {
+          if (choice == contentChoices.get()) {
+            showChosenContent(content);
+          }
+        },
+        e -> LOG.warn("Could not read the chosen content " + chosenFile, e));
+  }
+
+  /** Reads what {@code chosenFile} is on disk. Disk I/O: not on the EDT. */
+  static ChosenContent readChosenContent(File chosenFile, int fileChoosingMode) {
     if (!chosenFile.canRead()) {
+      return new ChosenContent(chosenFile, false, false, false, PieceSize.AUTO_DETECT);
+    }
+    File file =
+        fileChoosingMode == JFileChooser.DIRECTORIES_ONLY && chosenFile.isFile()
+            ? chosenFile.getParentFile()
+            : chosenFile;
+    File canonical;
+    try {
+      canonical = file.getCanonicalFile();
+    } catch (IOException e) {
+      canonical = file;
+    }
+    boolean directory = canonical.isDirectory();
+    if (!directory && !canonical.isFile()) {
+      return new ChosenContent(file, false, false, false, PieceSize.AUTO_DETECT);
+    }
+    String[] children = directory ? canonical.list() : null;
+    boolean emptyFolder = children != null && children.length == 0;
+    return new ChosenContent(
+        file,
+        true,
+        directory,
+        emptyFolder,
+        PieceSize.recommendForSize(calculateTotalSize(canonical)));
+  }
+
+  private void showChosenContent(ChosenContent content) {
+    if (!content.readable()) {
       textSelectedContent.setText(I18n.tr("Error: You can't read on that file/folder."));
       return;
     }
-    chosenFile = correctFileSelectionMode(chosenFile, fileChoosingMode);
-    setTorrentPathFromChosenFile(chosenFile);
-    displayChosenContent(chosenFile);
-  }
-
-  private void displayChosenContent(File chosenFile) {
-    String prefix = (chosenFile.isFile()) ? "[file] " : "[folder] ";
-    textSelectedContent.setText(prefix + chosenFile.getAbsolutePath());
-  }
-
-  private void setTorrentPathFromChosenFile(File chosenFile) {
-    File canonicalFile;
-    try {
-      canonicalFile = chosenFile.getCanonicalFile();
-      if (canonicalFile.isFile()) {
-        create_from_dir = false;
-        directoryPath = null;
-        singlePath = chosenFile.getAbsolutePath();
-      } else if (canonicalFile.isDirectory()) {
-        create_from_dir = true;
-        directoryPath = chosenFile.getAbsolutePath();
-        singlePath = null;
-      }
-      recommendPieceSizeForSelectedContent();
-    } catch (Throwable e) {
-      e.printStackTrace();
+    String path = content.file().getAbsolutePath();
+    create_from_dir = content.directory();
+    directoryPath = content.directory() ? path : null;
+    singlePath = content.directory() ? null : path;
+    chosenFolderIsEmpty = content.emptyFolder();
+    if (content.recommendedPieceSize() != PieceSize.AUTO_DETECT) {
+      pieceSizeComboBox.setSelectedItem(content.recommendedPieceSize());
+      pieceSize = content.recommendedPieceSize().bytes();
     }
-  }
-
-  private File correctFileSelectionMode(File chosenFile, int fileSelectionMode) {
-    if (fileSelectionMode == JFileChooser.DIRECTORIES_ONLY && chosenFile.isFile()) {
-      chosenFile = chosenFile.getParentFile();
-    }
-    create_from_dir = chosenFile.isDirectory();
-    return chosenFile;
+    textSelectedContent.setText((content.directory() ? "[folder] " : "[file] ") + path);
   }
 
   /**
@@ -478,8 +502,7 @@ public class CreateTorrentDialog extends JDialog {
       return;
     }
     tabbedPane.setSelectedIndex(0);
-    setChosenContent(
-        dropped, dropped.isDirectory() ? JFileChooser.DIRECTORIES_ONLY : JFileChooser.FILES_ONLY);
+    setChosenContent(dropped, JFileChooser.FILES_AND_DIRECTORIES);
     revertSaveCloseButtons();
   }
 
@@ -508,11 +531,8 @@ public class CreateTorrentDialog extends JDialog {
       tabbedPane.setSelectedIndex(0);
       return;
     }
-    // if user chose a folder that's empty
-    File[] fileArray;
-    if (directoryPath != null
-        && ((fileArray = new File(directoryPath).listFiles()) != null)
-        && fileArray.length == 0) {
+    // if user chose a folder that's empty (read with the content, off the EDT)
+    if (directoryPath != null && chosenFolderIsEmpty) {
       JOptionPane.showMessageDialog(
           this,
           I18n.tr("The folder you selected is empty."),
@@ -848,7 +868,7 @@ public class CreateTorrentDialog extends JDialog {
     return torrent;
   }
 
-  private enum PieceSize {
+  enum PieceSize {
     AUTO_DETECT(0, "(" + I18n.tr("Auto Detect") + ")"),
     _16KB(16),
     _32KB(32),
