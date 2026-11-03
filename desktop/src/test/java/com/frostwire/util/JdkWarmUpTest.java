@@ -10,6 +10,7 @@ package com.frostwire.util;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -40,6 +41,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.stream.Collectors;
+import javax.swing.InputMap;
+import javax.swing.KeyStroke;
 import javax.swing.LookAndFeel;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
@@ -139,6 +142,36 @@ class JdkWarmUpTest {
         Files.readString(Path.of("src/main/java/com/frostwire/util/JdkWarmUp.java"))
             .replaceAll("\\s+", "");
     assertTrue(source.contains("Class.forName(className).getDeclaredClasses();"));
+  }
+
+  /**
+   * The main window's root pane parsed the look and feel's key bindings on the EDT, looking up each
+   * key code by reflection (Icebase #2aac34fbc637, frostwire/frostwire#1482).
+   */
+  @Test
+  void theWarmUpBuildsTheLookAndFeelsKeyBindingMaps() throws Exception {
+    UIDefaults defaults = new UIDefaults();
+    defaults.put(
+        "RootPane.ancestorInputMap",
+        new UIDefaults.LazyInputMap(new Object[] {"ctrl C", "copy", "shift F10", "postPopup"}));
+    defaults.put("Label.font", "not an input map");
+
+    JdkWarmUp.resolveInputMaps(defaults);
+
+    Object stored =
+        defaults.entrySet().stream()
+            .filter(e -> e.getKey().equals("RootPane.ancestorInputMap"))
+            .findFirst()
+            .orElseThrow()
+            .getValue();
+    InputMap built = assertInstanceOf(InputMap.class, stored, "the binding map is still lazy");
+    assertEquals("copy", built.get(KeyStroke.getKeyStroke("ctrl C")));
+    String source =
+        Files.readString(Path.of("src/main/java/com/frostwire/util/JdkWarmUp.java"))
+            .replaceAll("\\s+", "");
+    assertTrue(
+        source.contains("resolveInputMaps(UIManager.getLookAndFeelDefaults());"),
+        "the startup warm-up calls it");
   }
 
   @Test

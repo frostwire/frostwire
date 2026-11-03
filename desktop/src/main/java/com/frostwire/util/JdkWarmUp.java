@@ -326,6 +326,11 @@ public final class JdkWarmUp {
     } catch (Throwable t) {
       LOG.warn("UI delegate warm-up failed: " + t.getMessage(), t);
     }
+    try {
+      resolveInputMaps(UIManager.getLookAndFeelDefaults());
+    } catch (Throwable t) {
+      LOG.warn("Key binding warm-up failed: " + t.getMessage(), t);
+    }
     for (String className : classesToInitialize(OSUtils.isWindows())) {
       try {
         // Nested classes are loaded too (not initialized): the first instance creates some of
@@ -733,6 +738,23 @@ public final class JdkWarmUp {
       }
     }
     return classNames;
+  }
+
+  /**
+   * Builds the look and feel's key binding maps (its {@code *InputMap} entries, lazy until first
+   * read). The main window's root pane read the first of them on the EDT, parsing each binding into
+   * a KeyStroke, whose key code AWTKeyStroke looks up by reflection on KeyEvent (Icebase
+   * #2aac34fbc637, frostwire/frostwire#1482). An InputMap is not a component, and UIDefaults
+   * replaces each lazy value with what it built, so the EDT reads the built map.
+   */
+  static void resolveInputMaps(UIDefaults defaults) {
+    for (Map.Entry<?, ?> entry : List.copyOf(defaults.entrySet())) {
+      if (entry.getKey() instanceof String key
+          && key.endsWith("InputMap")
+          && entry.getValue() instanceof UIDefaults.LazyInputMap) {
+        defaults.get(key);
+      }
+    }
   }
 
   /**
