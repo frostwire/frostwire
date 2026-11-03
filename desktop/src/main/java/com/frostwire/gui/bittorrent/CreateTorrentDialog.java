@@ -29,10 +29,13 @@ import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
 import com.frostwire.util.http.HttpClient;
 import com.limegroup.gnutella.gui.*;
+import com.limegroup.gnutella.gui.dnd.FileOrFolderTransferHandler;
+import com.limegroup.gnutella.gui.dnd.TransferHandlerDropTargetListener;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import java.awt.*;
+import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -160,8 +163,13 @@ public class CreateTorrentDialog extends JDialog {
     initTorrentContents();
     initTorrentTracking();
     buildListeners();
-    // Takes no drops: no drag-and-drop registration with the OS when realized (#1471).
+    // Its components take no drops (#1471); the dialog itself takes a dropped file or folder as
+    // the torrent's content (#1474). Set after removeAll, which would clear it.
     DropTargets.removeAll(this);
+    new DropTarget(
+        this,
+        new TransferHandlerDropTargetListener(
+            new FileOrFolderTransferHandler(this::onContentDropped)));
     pack();
     setMinimumSize(getSize());
   }
@@ -458,6 +466,21 @@ public class CreateTorrentDialog extends JDialog {
     }
     create_from_dir = chosenFile.isDirectory();
     return chosenFile;
+  }
+
+  /**
+   * A file or folder dropped on the dialog becomes the torrent's content, as with Select File or
+   * Select Folder. Nothing is built: the dialog stays open for the rest of the settings. Ignored
+   * while a torrent is being made.
+   */
+  private void onContentDropped(File dropped) {
+    if (!buttonSaveAs.isEnabled()) {
+      return;
+    }
+    tabbedPane.setSelectedIndex(0);
+    setChosenContent(
+        dropped, dropped.isDirectory() ? JFileChooser.DIRECTORIES_ONLY : JFileChooser.FILES_ONLY);
+    revertSaveCloseButtons();
   }
 
   private void onContentSelectionButton(int onContentSelectionButton) {
