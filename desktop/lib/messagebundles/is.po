@@ -6778,3 +6778,19 @@ msgstr "Síðustu 5 mínútur: blátt er móttekið, rautt er sent"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultDataLine.java
 msgid "Karma of the peer that shared this result"
 msgstr "Karma jafningjans sem deildi þessari niðurstöðu"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
+msgid "Private torrent"
+msgstr ""
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
+msgid "Peers come only from the trackers listed here: no DHT and no peer exchange. A private torrent needs at least one tracker."
+msgstr ""
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
+msgid "A note stored in the .torrent. Most BitTorrent clients show it."
+msgstr ""
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
+msgid "One tracker per line, a blank line starts a new tier"
+msgstr ""

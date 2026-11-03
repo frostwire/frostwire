@@ -50,7 +50,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntConsumer;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -64,7 +63,10 @@ import net.miginfocom.swing.MigLayout;
 public class CreateTorrentDialog extends JDialog {
   private static final PieceSize[] values = PieceSize.values();
   private static final Logger LOG = Logger.getLogger(CreateTorrentDialog.class);
-  private final List<String> trackers;
+
+  /** Tracker URLs with their tier, from the last validation. */
+  private final List<Map.Entry<String, Integer>> trackers;
+
   private final Container container;
   private final JTabbedPane tabbedPane;
   private final JPanel basicTorrentPane;
@@ -89,6 +91,11 @@ public class CreateTorrentDialog extends JDialog {
   private JTextArea textTrackers;
   private JCheckBox checkStartSeeding;
   private JCheckBox checkUseDHT;
+  private JCheckBox checkPrivate;
+  private LimeTextField textComment;
+  // Read on the EDT when Save is clicked, for the thread that makes the torrent.
+  private boolean makePrivate;
+  private String comment;
   private JTextArea textWebSeeds;
   private JButton buttonSaveAs;
   private JProgressBar progressBar;
@@ -235,12 +242,18 @@ public class CreateTorrentDialog extends JDialog {
                 + " created.\n"
                 + "If nobody is seeding the torrent, it won't work. (Recommended)"));
     torrentTrackingPanel.add(checkStartSeeding, "align right, gapright 10, wrap");
+    checkPrivate = new JCheckBox(I18n.tr("Private torrent"), false);
+    checkPrivate.setToolTipText(
+        I18n.tr(
+            "Peers come only from the trackers listed here: no DHT and no peer exchange. A private"
+                + " torrent needs at least one tracker."));
+    torrentTrackingPanel.add(checkPrivate, "align left, gapleft 5, wrap");
     labelTrackers =
         new JLabel(
             "<html><p>"
                 + I18n.tr("Tracker Announce URLs")
                 + "</p><p>("
-                + I18n.tr("One tracker per line")
+                + I18n.tr("One tracker per line, a blank line starts a new tier")
                 + ")</p></html>");
     labelTrackers.setToolTipText(
         I18n.tr(
@@ -284,7 +297,15 @@ public class CreateTorrentDialog extends JDialog {
     torrentTypeComboBox.setSelectedItem(TorrentType.HYBRID); // Default to hybrid
     torrentTypeComboBox.setToolTipText(
         I18n.tr("Hybrid torrents support both v1 and v2 protocols and are recommended"));
-    torrentTrackingPanel.add(torrentTypeComboBox, "gapright 5, gapleft 80, width 175px");
+    torrentTrackingPanel.add(torrentTypeComboBox, "gapright 5, gapleft 80, width 175px, wrap");
+
+    JLabel labelComment = new JLabel(I18n.tr("Comment"));
+    labelComment.setToolTipText(
+        I18n.tr("A note stored in the .torrent. Most BitTorrent clients show it."));
+    torrentTrackingPanel.add(labelComment, "aligny top, gapleft 5, gapright 10, wmin 150px");
+    textComment = new LimeTextField();
+    textComment.setToolTipText(labelComment.getToolTipText());
+    torrentTrackingPanel.add(textComment, "gapright 5, gapleft 80, growx");
 
     // suggest DHT by default
     updateTrackerRelatedControlsAvailability(true);
@@ -314,6 +335,15 @@ public class CreateTorrentDialog extends JDialog {
     buttonSelectFolder.addActionListener(e -> onButtonSelectFolder());
     buttonClose.addActionListener(this::onButtonClose);
     buttonSaveAs.addActionListener(arg0 -> onButtonSaveAs());
+    checkPrivate.addItemListener(
+        e -> {
+          // A private torrent's peers come from its trackers only: it can't be trackerless.
+          boolean isPrivate = checkPrivate.isSelected();
+          if (isPrivate) {
+            checkUseDHT.setSelected(false);
+          }
+          checkUseDHT.setEnabled(!isPrivate);
+        });
     checkUseDHT.addChangeListener(
         arg0 -> {
           boolean useDHT = checkUseDHT.isSelected();
@@ -562,6 +592,8 @@ public class CreateTorrentDialog extends JDialog {
     }
     // Whether or not to start seeding this torrent right away
     autoOpen = checkStartSeeding.isSelected();
+    makePrivate = checkPrivate.isSelected();
+    comment = textComment.getText().trim();
     // show save as dialog
     if (!showSaveAsDialog()) {
       return;
@@ -612,48 +644,65 @@ public class CreateTorrentDialog extends JDialog {
   }
 
   private boolean validateAndFixTrackerURLS() {
-    String trackersText = textTrackers.getText();
-    if (trackersText == null || trackersText.length() == 0) {
+    ParsedTrackers parsed = parseTrackers(textTrackers.getText());
+    if (parsed.invalid() != null) {
+      invalidTrackerURL = parsed.invalid();
       return false;
     }
-    String patternStr = "^(https?|udp)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
-    Pattern pattern = Pattern.compile(patternStr);
-    String[] tracker_urls = trackersText.split("\n");
-    List<String> valid_tracker_urls = new ArrayList<>();
-    for (String tracker_url : tracker_urls) {
-      if (tracker_url.trim().equals("")) {
-        continue;
-      }
-      // assume http if the user does not specify it
-      if (!tracker_url.startsWith("http://")
-          && !tracker_url.startsWith("https://")
-          && !tracker_url.startsWith("udp://")) {
-        tracker_url = "http://" + tracker_url.trim();
-      }
-      Matcher matcher = pattern.matcher(tracker_url.trim());
-      if (!matcher.matches()) {
-        invalidTrackerURL = tracker_url.trim();
-        return false;
-      } else {
-        valid_tracker_urls.add(tracker_url.trim());
-      }
-    }
-    fixValidTrackers(valid_tracker_urls);
-    // update the trackers list of lists
+    textTrackers.setText(formatTrackers(parsed.trackers()));
     trackers.clear();
-    trackers.addAll(valid_tracker_urls);
+    trackers.addAll(parsed.trackers());
     invalidTrackerURL = null;
     return true;
   }
 
-  private void fixValidTrackers(List<String> valid_tracker_urls) {
-    // re-write the tracker's text area with corrections
-    StringBuilder builder = new StringBuilder();
-    for (String valid_tracker_url : valid_tracker_urls) {
-      builder.append(valid_tracker_url);
-      builder.append("\n");
+  /** Tracker URLs with their tiers, or the first one that isn't valid ("" when there are none). */
+  record ParsedTrackers(List<Map.Entry<String, Integer>> trackers, String invalid) {}
+
+  private static final Pattern TRACKER_URL =
+      Pattern.compile("^(https?|udp)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
+
+  /**
+   * Reads the trackers typed one per line. A blank line starts the next tier: clients try a tier's
+   * trackers before the next tier's. A URL without a scheme gets {@code http://}.
+   */
+  static ParsedTrackers parseTrackers(String text) {
+    List<Map.Entry<String, Integer>> parsed = new ArrayList<>();
+    int tier = 0;
+    boolean tierHasTrackers = false;
+    for (String line : (text == null ? "" : text).split("\n", -1)) {
+      String url = line.trim();
+      if (url.isEmpty()) {
+        if (tierHasTrackers) {
+          tier++;
+          tierHasTrackers = false;
+        }
+        continue;
+      }
+      if (!url.startsWith("http://") && !url.startsWith("https://") && !url.startsWith("udp://")) {
+        url = "http://" + url;
+      }
+      if (!TRACKER_URL.matcher(url).matches()) {
+        return new ParsedTrackers(List.of(), url);
+      }
+      parsed.add(Map.entry(url, tier));
+      tierHasTrackers = true;
     }
-    textTrackers.setText(builder.toString());
+    return parsed.isEmpty() ? new ParsedTrackers(List.of(), "") : new ParsedTrackers(parsed, null);
+  }
+
+  /** The trackers one per line, with a blank line between tiers. */
+  static String formatTrackers(List<Map.Entry<String, Integer>> trackers) {
+    StringBuilder text = new StringBuilder();
+    Integer tier = null;
+    for (Map.Entry<String, Integer> tracker : trackers) {
+      if (tier != null && !tier.equals(tracker.getValue())) {
+        text.append('\n');
+      }
+      tier = tracker.getValue();
+      text.append(tracker.getKey()).append('\n');
+    }
+    return text.toString();
   }
 
   private boolean makeTorrent() {
@@ -665,7 +714,10 @@ public class CreateTorrentDialog extends JDialog {
       reportCurrentTask(I18n.tr("Adding files..."));
       libtorrent.add_files(fs, f.getPath());
       create_torrent torrent = createTorrentWithType(fs, pieceSize, selectedTorrentType);
-      torrent.set_priv(false);
+      torrent.set_priv(makePrivate);
+      if (comment != null && !comment.isEmpty()) {
+        torrent.set_comment(comment);
+      }
       torrent.set_creator(
           "FrostWire "
               + FrostWireUtils.getFrostWireVersion()
@@ -673,8 +725,8 @@ public class CreateTorrentDialog extends JDialog {
               + FrostWireUtils.getBuildNumber());
       if (trackers != null && !trackers.isEmpty()) {
         reportCurrentTask(I18n.tr("Adding trackers..."));
-        for (String trackerUrl : trackers) {
-          torrent.add_tracker(trackerUrl, 0);
+        for (Map.Entry<String, Integer> tracker : trackers) {
+          torrent.add_tracker(tracker.getKey(), tracker.getValue());
         }
       } else {
         // Trackerless: give clients that start with an empty DHT somewhere to start (BEP 5).
