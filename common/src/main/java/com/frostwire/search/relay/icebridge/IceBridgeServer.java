@@ -148,6 +148,9 @@ public final class IceBridgeServer implements AutoCloseable {
               && config.relayPort() > 0
               && searchAppEnabled();
       server.start(sharedConsumer);
+      // A launcher that passed --control-http-port 0 learns the bound port from this line.
+      System.out.println(IceBridgeControlPortAnnouncement.line(server.controlPort()));
+      System.out.flush();
       com.frostwire.search.relay.SearchRelayApp searchApp = null;
       try {
         // Embedder mode (relayPort=0): the parent FrostWire process owns Protocol #1
@@ -598,9 +601,10 @@ public final class IceBridgeServer implements AutoCloseable {
           break;
         case "--control-http-port":
           int controlPort = parseInt(next(args, ++i, "--control-http-port"));
-          if (controlPort <= 0) {
+          // 0 binds a free port and announces it on stdout (IceBridgeControlPortAnnouncement).
+          if (controlPort < 0 || controlPort > 65535) {
             throw new IllegalArgumentException(
-                "--control-http-port must be > 0 (HTTP control is required)");
+                "--control-http-port must be between 0 and 65535 (0 = any free port)");
           }
           overrides.put("ICEBRIDGE_CONTROL_HTTP_PORT", Integer.toString(controlPort));
           break;
@@ -684,7 +688,10 @@ public final class IceBridgeServer implements AutoCloseable {
         "  --relay-port PORT          ignored by peer verification (rUDP); non-zero selects"
             + " standalone forwarder mode (default 6888)");
     System.out.println(
-        "  --control-http-port PORT   HTTP control port on 127.0.0.1 (required, must be > 0)");
+        "  --control-http-port PORT   HTTP control port on 127.0.0.1 (0 = any free port; the"
+            + " bound port is printed as "
+            + IceBridgeControlPortAnnouncement.PREFIX
+            + "<port>)");
     System.out.println("  --role ROLE                FORWARDER, CLIENT, or BOTH");
     System.out.println("  --identity-file PATH       Ed25519 identity file");
     System.out.println("  --max-peers N              Maximum tracked peers");

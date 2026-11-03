@@ -23,20 +23,35 @@ class IceBridgeServerParseArgsTest {
     IceBridgeTopology.get().resetToDefaults();
   }
 
+  /**
+   * frostwire/frostwire#1478: the launcher passes 0 so the child's bind picks the port, which the
+   * child then announces on stdout.
+   */
   @Test
-  void parseArgsRejectsZeroControlHttpPort() {
+  void parseArgsAcceptsZeroControlHttpPortToBindAnyFreePort() {
+    IceBridgeConfig config =
+        IceBridgeServer.parseArgs(
+            new String[] {
+              "--control-http-port", "0",
+              "--role", "BOTH"
+            });
+    assertEquals(0, config.controlHttpPort());
+  }
+
+  @Test
+  void parseArgsRejectsNegativeControlHttpPort() {
     IllegalArgumentException ex =
         assertThrows(
             IllegalArgumentException.class,
             () ->
                 IceBridgeServer.parseArgs(
                     new String[] {
-                      "--control-http-port", "0",
+                      "--control-http-port", "-1",
                       "--role", "BOTH"
                     }));
     assertTrue(
         ex.getMessage().contains("control-http-port"),
-        "expected clear error for --control-http-port 0, got: " + ex.getMessage());
+        "expected clear error for --control-http-port -1, got: " + ex.getMessage());
   }
 
   @Test

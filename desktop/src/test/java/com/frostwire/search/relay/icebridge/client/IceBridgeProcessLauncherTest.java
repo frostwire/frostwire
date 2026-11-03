@@ -234,6 +234,75 @@ class IceBridgeProcessLauncherTest {
   }
 
   /**
+   * frostwire/frostwire#1478: the real child accepts {@code --control-http-port 0}, binds a free
+   * port, and announces the port that answers its control API.
+   */
+  @Test
+  void childBindsAFreeControlPortAndAnnouncesIt() throws Exception {
+    File jar = new File(System.getProperty("user.dir"), "build/libs/icebridge.jar");
+    assertTrue(jar.isFile(), "icebridge.jar must be built first (run icebridgeJar)");
+
+    Path tmp = Files.createTempDirectory("icebridge-test-control-port");
+    File identityFile = new File(tmp.toFile(), "identity.dat");
+    IdentityKeys.save(IdentityKeys.generate(0), identityFile);
+    File tokens = new File(tmp.toFile(), "tokens.txt");
+    Files.writeString(tokens.toPath(), "test-token\n");
+    File stdout = new File(tmp.toFile(), "stdout.log");
+    File stderr = new File(tmp.toFile(), "stderr.log");
+
+    ProcessBuilder builder =
+        new ProcessBuilder(
+                IceBridgeProcessLauncher.resolveJavaBinary(),
+                "-jar",
+                jar.getAbsolutePath(),
+                "--rudp-port",
+                "0",
+                "--relay-port",
+                "0",
+                "--control-http-port",
+                "0",
+                "--role",
+                "CLIENT",
+                "--host",
+                "127.0.0.1",
+                "--identity-file",
+                identityFile.getAbsolutePath(),
+                "--no-dht",
+                "--auth-tokens-file",
+                tokens.getAbsolutePath(),
+                "--parent-pid",
+                String.valueOf(ProcessHandle.current().pid()))
+            .redirectOutput(stdout)
+            .redirectError(stderr);
+    builder.environment().put("ICEBRIDGE_SEARCH_APP", "false");
+    Process child = builder.start();
+    try {
+      int announced = 0;
+      long deadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(30);
+      while (announced == 0 && child.isAlive() && System.nanoTime() < deadline) {
+        Thread.sleep(50);
+        // Bytewise: the log can end in a half-written multibyte character.
+        announced =
+            com.frostwire.search.relay.icebridge.IceBridgeControlPortAnnouncement.parse(
+                new String(
+                    Files.readAllBytes(stdout.toPath()),
+                    java.nio.charset.StandardCharsets.ISO_8859_1));
+      }
+      assertTrue(
+          announced > 0,
+          "child did not announce its control port: "
+              + new String(Files.readAllBytes(stdout.toPath()))
+              + new String(Files.readAllBytes(stderr.toPath())));
+      try (IceBridgeClient client = new IceBridgeClient(announced)) {
+        assertTrue(client.health(5_000), "the announced port must answer the control API");
+      }
+    } finally {
+      child.destroyForcibly();
+      child.waitFor(5, java.util.concurrent.TimeUnit.SECONDS);
+    }
+  }
+
+  /**
    * Supervision: when the child dies at runtime, the supervisor respawns a healthy replacement
    * without any caller action — the self-heal that makes restart-orphan scenarios impossible to
    * notice.
