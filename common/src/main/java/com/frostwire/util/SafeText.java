@@ -24,8 +24,13 @@ public final class SafeText {
 
   private SafeText() {}
 
+  /**
+   * Table renderers call this on every paint of every cell (frostwire/frostwire#1477), and most
+   * names are plain ASCII: NFC leaves them as they are and every printable ASCII char is kept, so
+   * they are returned without normalizing or copying.
+   */
   public static String sanitize(String text) {
-    if (text == null || text.isEmpty()) {
+    if (text == null || text.isEmpty() || isPrintableAscii(text)) {
       return text;
     }
     String normalized = Normalizer.normalize(text, Normalizer.Form.NFC);
@@ -52,6 +57,16 @@ public final class SafeText {
       i++;
     }
     return sb.toString();
+  }
+
+  private static boolean isPrintableAscii(String text) {
+    for (int i = 0, n = text.length(); i < n; i++) {
+      char c = text.charAt(i);
+      if ((c < ' ' && c != '\n' && c != '\t' && c != '\r') || c > '~') {
+        return false;
+      }
+    }
+    return true;
   }
 
   private static boolean isSafeBMP(char c) {
