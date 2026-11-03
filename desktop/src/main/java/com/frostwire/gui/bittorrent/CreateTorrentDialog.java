@@ -48,6 +48,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.IntConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.*;
@@ -679,11 +680,17 @@ public class CreateTorrentDialog extends JDialog {
         reportCurrentTask(I18n.tr("Calculating piece hashes..."));
         saveDir = f.getParentFile();
         error_code ec = new error_code();
-        // DO NOT PASS NULL LISTENERS TO THE HASH LISTENER, JLIBTORRENT 2.0.12.3 WILL CRASH,
-        // 2.0.12.4 FIXED IT
-        set_piece_hashes_listener no_op_listener = new set_piece_hashes_listener();
+        // Never pass a null listener: jlibtorrent 2.0.12.3 crashed on it.
+        IntConsumer hashed = hashingPercentReporter(torrent.num_pieces(), this::reportHashing);
+        set_piece_hashes_listener progressListener =
+            new set_piece_hashes_listener() {
+              @Override
+              public void progress(int pieceIndex) {
+                hashed.accept(pieceIndex);
+              }
+            };
         libtorrent.set_piece_hashes_posix_disk_io(
-            torrent, saveDir.getAbsolutePath(), no_op_listener, ec);
+            torrent, saveDir.getAbsolutePath(), progressListener, ec);
         reportCurrentTask(I18n.tr("Generating torrent entry..."));
         Entry entry = new Entry(torrent.generate());
         Map<String, Entry> entryMap = entry.dictionary();
@@ -841,6 +848,34 @@ public class CreateTorrentDialog extends JDialog {
 
   private void reportCurrentTask(final String task_description) {
     SwingUtilities.invokeLater(() -> progressBar.setString(task_description));
+  }
+
+  /** Shows how much of the content has been hashed; called from the hashing thread. */
+  private void reportHashing(int percent) {
+    SwingUtilities.invokeLater(
+        () -> {
+          progressBar.setValue(percent);
+          progressBar.setString(I18n.tr("Calculating piece hashes...") + " " + percent + "%");
+        });
+  }
+
+  /**
+   * Turns libtorrent's hashing progress (the index of each piece hashed) into percentages for
+   * {@code onPercent}, called only when the percentage changes: content with many pieces would
+   * otherwise post one EDT update per piece.
+   */
+  static IntConsumer hashingPercentReporter(int numPieces, IntConsumer onPercent) {
+    int[] last = {-1};
+    return pieceIndex -> {
+      if (numPieces <= 0) {
+        return;
+      }
+      int percent = (int) Math.min(100, (pieceIndex + 1L) * 100 / numPieces);
+      if (percent != last[0]) {
+        last[0] = percent;
+        onPercent.accept(percent);
+      }
+    };
   }
 
   private create_torrent createTorrentWithType(
