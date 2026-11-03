@@ -135,15 +135,36 @@ public final class ResourceManager {
       List.of("indeterminate_small_progress", "downloading");
 
   /**
-   * Loads {@link #ANIMATED_THEME_IMAGES} into the theme-image cache. Call it off the EDT, at
-   * startup before the main window is built, so the EDT finds them cached.
+   * The status bar's icons. StatusLine and VPNStatusButton set them from refreshes on the EDT, and
+   * the first time each state showed, its icon was read from the jar and decoded there (Icebase
+   * #f6b720eb10bf, frostwire/frostwire#1481).
    */
-  static void preloadAnimatedThemeImages() {
-    for (String name : ANIMATED_THEME_IMAGES) {
-      try {
-        getThemeImage(name);
-      } catch (RuntimeException e) {
-        LOG.warn("Could not preload theme image " + name, e);
+  static final List<String> STATUS_BAR_THEME_IMAGES =
+      List.of(
+          "vpn_on",
+          "vpn_off",
+          "seeding_small",
+          "not_seeding_small",
+          "connect_small_0",
+          "connect_small_6",
+          "downloading_small",
+          "uploading_small",
+          "firewall",
+          "firewall_no");
+
+  /**
+   * Loads {@link #ANIMATED_THEME_IMAGES} and {@link #STATUS_BAR_THEME_IMAGES} into the theme-image
+   * cache. Call it off the EDT, at startup before the main window is built, so the EDT finds them
+   * cached.
+   */
+  static void preloadStartupThemeImages() {
+    for (List<String> names : List.of(ANIMATED_THEME_IMAGES, STATUS_BAR_THEME_IMAGES)) {
+      for (String name : names) {
+        try {
+          getThemeImage(name);
+        } catch (RuntimeException e) {
+          LOG.warn("Could not preload theme image " + name, e);
+        }
       }
     }
   }

@@ -73,13 +73,53 @@ class ResourceManagerAnimatedImagePreloadTest {
         "GIF theme images not preloaded at startup: " + gifs);
   }
 
+  /** Whether {@code name} is a theme image getThemeImage can load (an exact, PNG or GIF file). */
+  private static boolean isThemeImage(String name) {
+    ClassLoader loader = ResourceManager.class.getClassLoader();
+    String base = "org/limewire/gui/images/" + name;
+    return !name.isEmpty()
+        && !name.contains("/")
+        && (loader.getResource(base + ".png") != null || loader.getResource(base + ".gif") != null);
+  }
+
+  /**
+   * The status bar sets its icons from refreshes on the EDT, and each first use read the image from
+   * the jar there (Icebase #f6b720eb10bf, frostwire/frostwire#1481). Every string literal in these
+   * classes that names a theme image is preloaded, whether it is passed to getThemeImage directly
+   * or chosen through a variable or a conditional.
+   */
+  @Test
+  void everyStatusBarThemeImageIsPreloaded() throws IOException {
+    Pattern literal = Pattern.compile("\"([a-z0-9_]+)\"");
+    Set<String> icons = new TreeSet<>();
+    for (String file : new String[] {"StatusLine.java", "VPNStatusButton.java"}) {
+      Matcher m =
+          literal.matcher(
+              Files.readString(
+                  Path.of("src/main/java/com/limegroup/gnutella/gui").resolve(file),
+                  StandardCharsets.UTF_8));
+      while (m.find()) {
+        if (isThemeImage(m.group(1))) {
+          icons.add(m.group(1));
+        }
+      }
+    }
+    assertTrue(icons.contains("vpn_on"), "the scan found no status bar icons: " + icons);
+    icons.removeAll(ResourceManager.STATUS_BAR_THEME_IMAGES);
+    assertTrue(icons.isEmpty(), "status bar icons not preloaded at startup: " + icons);
+  }
+
   @Test
   void thePreloadCachesEachAnimatedImageOffTheEdt() throws Exception {
-    Thread worker = new Thread(ResourceManager::preloadAnimatedThemeImages, "startup");
+    Thread worker = new Thread(ResourceManager::preloadStartupThemeImages, "startup");
     worker.start();
     worker.join(30_000);
 
-    for (String name : ResourceManager.ANIMATED_THEME_IMAGES) {
+    for (String name :
+        Stream.concat(
+                ResourceManager.ANIMATED_THEME_IMAGES.stream(),
+                ResourceManager.STATUS_BAR_THEME_IMAGES.stream())
+            .toList()) {
       ImageIcon preloaded = ResourceManager.getThemeImage(name);
       assertSame(preloaded, ResourceManager.getThemeImage(name), name + " is not cached");
     }
@@ -95,7 +135,7 @@ class ResourceManagerAnimatedImagePreloadTest {
     String earlyUi = source.substring(source.indexOf("privatevoidinitializeEarlyUI()"));
     earlyUi = earlyUi.substring(0, earlyUi.indexOf("BugManager.instance()"));
     assertTrue(
-        earlyUi.contains("ResourceManager.preloadAnimatedThemeImages();"),
+        earlyUi.contains("ResourceManager.preloadStartupThemeImages();"),
         "initializeEarlyUI does not preload the animated theme images");
   }
 }

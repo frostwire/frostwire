@@ -352,8 +352,9 @@ final class Initializer {
     // MainFrame construction
     ApplicationHeader.preloadImages();
     // The animated GIF icons wait for the image fetcher thread too (the Transfers tab's seeding
-    // spinner, the search tab's spinner).
-    ResourceManager.preloadAnimatedThemeImages();
+    // spinner, the search tab's spinner), and the status bar's icons are first set from refreshes
+    // on the EDT.
+    ResourceManager.preloadStartupThemeImages();
 
     // Load up the HTML engine (DTD, default style sheet) on this thread: parsing the DTD for a
     // throwaway HTML label on the EDT stalled it for seconds on slow machines.
