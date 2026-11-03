@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:The first Library folder you open no longer freezes while its file dates are shown for the first time: the time zone names they need load at startup, in the background (#1472)
    - fix:Dialogs and windows other than the main window (Options, About, message and error dialogs, file choosers, Create and Share Torrent, IceBridge windows and more) no longer set up drag-and-drop with Windows when they open, which could freeze them on slow machines; only the main window, which takes dropped torrents and files, still does (#1471)
    - fix:The window no longer freezes right after startup while the Transfers tab loads its animated seeding icon, or when a search tab first shows its spinner: those animated icons load at startup, in the background (#1470)
    - fix:The first right-click on the tray icon on Windows no longer freezes the window before the menu opens: the menu's system classes are prepared at startup (#1469)
