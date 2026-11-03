@@ -23,6 +23,7 @@ import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.ButtonRow;
 import com.limegroup.gnutella.gui.FileChooserHandler;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.ShellFolderWarmUp;
 import com.limegroup.gnutella.settings.SharingSettings;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -39,6 +40,9 @@ public final class TorrentFilesFolderComponent extends JPanel {
   private final JTextField folderTextField;
 
   public TorrentFilesFolderComponent(boolean border) {
+    // Its Browse button opens a JFileChooser, which waits on the Windows shell on the EDT
+    // (frostwire/frostwire#1411).
+    ShellFolderWarmUp.warmUpForDirectoryChooser();
     folderTextField = new JTextField(SharingSettings.TORRENTS_DIR_SETTING.getValueAsString());
     setLayout(new GridBagLayout());
     if (border) {

@@ -12,9 +12,17 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import javax.swing.filechooser.FileSystemView;
 import org.junit.jupiter.api.Test;
 
@@ -101,5 +109,39 @@ class ShellFolderWarmUpTest {
               throw new IllegalStateException("COM failed");
             });
     assertTrue(warmUp.warmUp(() -> new File("/a"), 1L));
+  }
+
+  /**
+   * Icebase #2a52f998a1ec: the warm-up only ran for the save folder's Browse button, and the
+   * torrent files folder's Browse froze on the same shell call. Every class that opens a
+   * FileChooserHandler chooser starts the warm-up when it is built, and the startup thread starts
+   * the first one, so its worker isn't started on the EDT either.
+   */
+  @Test
+  void everyClassThatOpensAChooserWarmsUpTheShell() throws IOException {
+    Pattern opensChooser = Pattern.compile("FileChooserHandler\\.(getInput\\w*|getSaveAsFile)\\(");
+    Set<String> missing = new TreeSet<>();
+    int choosers = 0;
+    try (Stream<Path> files = Files.walk(Path.of("src/main/java"))) {
+      for (Path file :
+          (Iterable<Path>) files.filter(p -> p.toString().endsWith(".java"))::iterator) {
+        if (file.endsWith("FileChooserHandler.java")) {
+          continue;
+        }
+        String source = Files.readString(file, StandardCharsets.UTF_8);
+        if (opensChooser.matcher(source).find()) {
+          choosers++;
+          if (!source.contains("ShellFolderWarmUp.warmUpForDirectoryChooser();")) {
+            missing.add(file.getFileName().toString());
+          }
+        }
+      }
+    }
+    assertTrue(choosers >= 7, "the scan found only " + choosers + " classes opening a chooser");
+    assertTrue(missing.isEmpty(), "open a chooser without warming up the shell: " + missing);
+    String initializer =
+        Files.readString(Path.of("src/main/java/com/limegroup/gnutella/gui/Initializer.java"))
+            .replaceAll("\\s+", "");
+    assertTrue(initializer.contains("ShellFolderWarmUp.warmUpForDirectoryChooser();"));
   }
 }

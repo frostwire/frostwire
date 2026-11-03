@@ -20,6 +20,7 @@ package com.frostwire.gui.library;
 
 import com.limegroup.gnutella.gui.FileChooserHandler;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.ShellFolderWarmUp;
 import com.limegroup.gnutella.gui.actions.AbstractAction;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -41,6 +42,9 @@ public class AddLibraryDirectoryAction extends AbstractAction {
     super(I18n.tr("Add") + "...");
     this.recursiveSharingPanel = recursiveSharingPanel;
     this.parent = parent;
+    // It opens a JFileChooser, which waits on the Windows shell on the EDT
+    // (frostwire/frostwire#1411).
+    ShellFolderWarmUp.warmUpForDirectoryChooser();
   }
 
   public void actionPerformed(ActionEvent ae) {

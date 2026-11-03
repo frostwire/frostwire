@@ -34,6 +34,7 @@ import com.limegroup.gnutella.gui.FileChooserHandler;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.IconButton;
+import com.limegroup.gnutella.gui.ShellFolderWarmUp;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.AddRangeManuallyDialog;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.CidrFilterInputStreamReader;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.HostsFilterInputStreamReader;
@@ -85,6 +86,9 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     super(TITLE, LABEL);
     ipFilterTable = null;
     httpExecutor = ExecutorsHelper.newProcessingQueue("IPFilterPanelItem-http");
+    // Importing a filter file opens a JFileChooser, which waits on the Windows shell on the EDT
+    // (frostwire/frostwire#1411).
+    ShellFolderWarmUp.warmUpForDirectoryChooser();
   }
 
   private static boolean isGZipped(File f) throws IOException {

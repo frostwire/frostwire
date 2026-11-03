@@ -117,6 +117,9 @@ public class CreateTorrentDialog extends JDialog {
 
   public CreateTorrentDialog(JFrame frame) {
     super(frame);
+    // Choosing the content and saving the .torrent open a JFileChooser, which waits on the Windows
+    // shell on the EDT (frostwire/frostwire#1411).
+    ShellFolderWarmUp.warmUpForDirectoryChooser();
     trackers = new ArrayList<>();
     container = getContentPane();
     tabbedPane = new JTabbedPane();

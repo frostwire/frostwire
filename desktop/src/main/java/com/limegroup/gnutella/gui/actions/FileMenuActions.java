@@ -241,6 +241,9 @@ public final class FileMenuActions {
     private class BrowseAction extends AbstractAction {
       BrowseAction() {
         super(I18n.tr("Browse..."));
+        // Browse opens a JFileChooser, which waits on the Windows shell on the EDT
+        // (frostwire/frostwire#1411).
+        ShellFolderWarmUp.warmUpForDirectoryChooser();
       }
 
       public void actionPerformed(ActionEvent a) {

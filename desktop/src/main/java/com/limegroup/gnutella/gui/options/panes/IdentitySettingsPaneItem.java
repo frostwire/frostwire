@@ -19,6 +19,7 @@ import com.limegroup.gnutella.gui.DropTargets;
 import com.limegroup.gnutella.gui.FileChooserHandler;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.ShellFolderWarmUp;
 import com.limegroup.gnutella.gui.search.SearchEngine;
 import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import java.awt.BorderLayout;
@@ -91,6 +92,9 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
 
   public IdentitySettingsPaneItem() {
     super(TITLE, LABEL);
+    // Exporting and importing the identity open a JFileChooser, which waits on the Windows shell on
+    // the EDT (frostwire/frostwire#1411).
+    ShellFolderWarmUp.warmUpForDirectoryChooser();
 
     add(buildInfoPanel());
     add(getHorizontalSeparator());
