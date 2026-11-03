@@ -889,4 +889,19 @@ class JdkWarmUpTest {
     assertTrue(
         source.contains("warmUpDateFormatAndCollation(formatLocale(),Locale.getDefault());"));
   }
+
+  /**
+   * Date.toString's time zone field loaded the JDK's time zone names on the EDT, for the first
+   * Library date cell (Icebase #b310fd108906, frostwire/frostwire#1472).
+   */
+  @Test
+  void theWarmUpFormatsADateWithItsTimeZoneName() throws Exception {
+    String text = JdkWarmUp.warmUpDateToString();
+    assertFalse(text.isBlank());
+    assertTrue(text.contains("19"), "Date(0) is in 1969 or 1970: " + text);
+    String source =
+        Files.readString(Path.of("src/main/java/com/frostwire/util/JdkWarmUp.java"))
+            .replaceAll("\\s+", "");
+    assertTrue(source.contains("warmUpDateToString();"), "the startup warm-up calls it");
+  }
 }

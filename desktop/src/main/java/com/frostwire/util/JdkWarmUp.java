@@ -375,6 +375,7 @@ public final class JdkWarmUp {
     }
     try {
       warmUpDateFormatAndCollation(formatLocale(), Locale.getDefault());
+      warmUpDateToString();
     } catch (Throwable t) {
       LOG.warn("Date format and collation warm-up failed: " + t.getMessage(), t);
     }
@@ -620,6 +621,16 @@ public final class JdkWarmUp {
     Collator collator = Collator.getInstance(collationLocale);
     collator.setDecomposition(Collator.FULL_DECOMPOSITION);
     collator.compare("FrostWire", "frostwire");
+  }
+
+  /**
+   * Date.toString, which Library rows use for their modified-time cell. Its time zone field loads
+   * the JDK's time zone display names on the first call, which the date format warm-up above
+   * doesn't (no zone in its pattern); the first Library date cell did it on the EDT (Icebase
+   * #b310fd108906, frostwire/frostwire#1472).
+   */
+  static String warmUpDateToString() {
+    return new Date(0).toString();
   }
 
   /**
