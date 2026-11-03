@@ -6922,40 +6922,40 @@ msgstr "分享此結果的節點的 Karma"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Private torrent"
-msgstr ""
+msgstr "私人種子"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Peers come only from the trackers listed here: no DHT and no peer exchange. A private torrent needs at least one tracker."
-msgstr ""
+msgstr "Peer 只來自此處列出的 Tracker：不使用 DHT，亦不進行 Peer 交換。私人種子至少需要一個 Tracker。"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "A note stored in the .torrent. Most BitTorrent clients show it."
-msgstr ""
+msgstr "儲存在 .torrent 內的備註。大部分 BitTorrent 客戶端都會顯示。"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "One tracker per line, a blank line starts a new tier"
-msgstr ""
+msgstr "每行一個 Tracker，空白行會開始新的層級"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Store file modification times"
-msgstr ""
+msgstr "儲存檔案修改時間"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Saves each file's last-modified time in the .torrent, so the files downloaded get the same dates."
-msgstr ""
+msgstr "將每個檔案的最後修改時間儲存在 .torrent 內，令下載的檔案有相同的日期。"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Keep symbolic links as links"
-msgstr ""
+msgstr "將符號連結保留為連結"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Stores symbolic links in the .torrent as links, instead of the files they point to."
-msgstr ""
+msgstr "將符號連結以連結形式儲存在 .torrent 內，而不是其指向的檔案。"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Leave out file attributes"
-msgstr ""
+msgstr "略過檔案屬性"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Doesn't store whether each file is hidden or executable."
-msgstr ""
+msgstr "不儲存各檔案是否為隱藏或可執行檔案。"

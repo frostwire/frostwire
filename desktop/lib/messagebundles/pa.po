@@ -6685,40 +6685,40 @@ msgstr "Karma of the peer that shared this result"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Private torrent"
-msgstr ""
+msgstr "ਨਿੱਜੀ ਟੋਰੈਂਟ"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Peers come only from the trackers listed here: no DHT and no peer exchange. A private torrent needs at least one tracker."
-msgstr ""
+msgstr "ਪੀਅਰ ਸਿਰਫ਼ ਇੱਥੇ ਸੂਚੀਬੱਧ ਟਰੈਕਰਾਂ ਤੋਂ ਆਉਂਦੇ ਹਨ: ਕੋਈ DHT ਨਹੀਂ ਅਤੇ ਕੋਈ ਪੀਅਰ ਐਕਸਚੇਂਜ ਨਹੀਂ। ਨਿੱਜੀ ਟੋਰੈਂਟ ਲਈ ਘੱਟੋ-ਘੱਟ ਇੱਕ ਟਰੈਕਰ ਲੋੜੀਂਦਾ ਹੈ।"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "A note stored in the .torrent. Most BitTorrent clients show it."
-msgstr ""
+msgstr ".torrent ਵਿੱਚ ਸਟੋਰ ਕੀਤਾ ਇੱਕ ਨੋਟ। ਜ਼ਿਆਦਾਤਰ BitTorrent ਕਲਾਇੰਟ ਇਸਨੂੰ ਦਿਖਾਉਂਦੇ ਹਨ।"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "One tracker per line, a blank line starts a new tier"
-msgstr ""
+msgstr "ਹਰ ਲਾਈਨ ਵਿੱਚ ਇੱਕ ਟਰੈਕਰ, ਖਾਲੀ ਲਾਈਨ ਨਵਾਂ ਪੱਧਰ ਸ਼ੁਰੂ ਕਰਦੀ ਹੈ"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Store file modification times"
-msgstr ""
+msgstr "ਫ਼ਾਈਲ ਸੋਧ ਸਮੇਂ ਸਟੋਰ ਕਰੋ"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Saves each file's last-modified time in the .torrent, so the files downloaded get the same dates."
-msgstr ""
+msgstr "ਹਰ ਫ਼ਾਈਲ ਦਾ ਆਖਰੀ ਸੋਧ ਸਮਾਂ .torrent ਵਿੱਚ ਸੰਭਾਲਦਾ ਹੈ, ਤਾਂ ਜੋ ਡਾਊਨਲੋਡ ਕੀਤੀਆਂ ਫ਼ਾਈਲਾਂ ਨੂੰ ਉਹੀ ਤਾਰੀਖਾਂ ਮਿਲਣ।"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Keep symbolic links as links"
-msgstr ""
+msgstr "ਸਿੰਬੋਲਿਕ ਲਿੰਕਾਂ ਨੂੰ ਲਿੰਕਾਂ ਵਜੋਂ ਰੱਖੋ"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Stores symbolic links in the .torrent as links, instead of the files they point to."
-msgstr ""
+msgstr "ਸਿੰਬੋਲਿਕ ਲਿੰਕਾਂ ਨੂੰ, ਉਹਨਾਂ ਦੁਆਰਾ ਦਰਸਾਈਆਂ ਫ਼ਾਈਲਾਂ ਦੀ ਬਜਾਏ, ਲਿੰਕਾਂ ਵਜੋਂ .torrent ਵਿੱਚ ਸਟੋਰ ਕਰਦਾ ਹੈ।"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Leave out file attributes"
-msgstr ""
+msgstr "ਫ਼ਾਈਲ ਗੁਣ ਛੱਡੋ"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Doesn't store whether each file is hidden or executable."
-msgstr ""
+msgstr "ਇਹ ਸਟੋਰ ਨਹੀਂ ਕਰਦਾ ਕਿ ਹਰ ਫ਼ਾਈਲ ਲੁਕੀ ਹੋਈ ਹੈ ਜਾਂ ਚੱਲਣਯੋਗ।"

@@ -6506,40 +6506,40 @@ msgstr "کارمای همتایی که این نتیجه را به اشتراک 
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Private torrent"
-msgstr ""
+msgstr "تورنت خصوصی"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Peers come only from the trackers listed here: no DHT and no peer exchange. A private torrent needs at least one tracker."
-msgstr ""
+msgstr "همتاها فقط از ترکرهای فهرست‌شده در اینجا می‌آیند: بدون DHT و بدون تبادل همتا. یک تورنت خصوصی دست‌کم به یک ترکر نیاز دارد."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "A note stored in the .torrent. Most BitTorrent clients show it."
-msgstr ""
+msgstr "یادداشتی که در .torrent ذخیره می‌شود. بیشتر کلاینت‌های BitTorrent آن را نمایش می‌دهند."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "One tracker per line, a blank line starts a new tier"
-msgstr ""
+msgstr "در هر خط یک ترکر، یک خط خالی ردهٔ جدیدی را آغاز می‌کند"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Store file modification times"
-msgstr ""
+msgstr "ذخیرهٔ زمان‌های تغییر فایل‌ها"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Saves each file's last-modified time in the .torrent, so the files downloaded get the same dates."
-msgstr ""
+msgstr "زمان آخرین تغییر هر فایل را در .torrent ذخیره می‌کند تا فایل‌های دانلودشده همان تاریخ‌ها را بگیرند."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Keep symbolic links as links"
-msgstr ""
+msgstr "نگه داشتن پیوندهای نمادین به‌صورت پیوند"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Stores symbolic links in the .torrent as links, instead of the files they point to."
-msgstr ""
+msgstr "پیوندهای نمادین را به‌جای فایل‌هایی که به آن‌ها اشاره می‌کنند، به‌صورت پیوند در .torrent ذخیره می‌کند."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Leave out file attributes"
-msgstr ""
+msgstr "کنار گذاشتن ویژگی‌های فایل"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Doesn't store whether each file is hidden or executable."
-msgstr ""
+msgstr "مخفی یا اجرایی بودن هر فایل را ذخیره نمی‌کند."
