@@ -913,4 +913,17 @@ class JdkWarmUpTest {
             .replaceAll("\\s+", "");
     assertTrue(source.contains("warmUpDateToString();"), "the startup warm-up calls it");
   }
+
+  /**
+   * SafeText normalizes table cell text that isn't plain ASCII, and the first normalization loaded
+   * the JDK's ICU data on the EDT (Icebase #a2fec79d2180, frostwire/frostwire#1477).
+   */
+  @Test
+  void theWarmUpNormalizesNonAsciiText() throws Exception {
+    assertEquals("caf\u00E9", JdkWarmUp.warmUpNormalizer());
+    String source =
+        Files.readString(Path.of("src/main/java/com/frostwire/util/JdkWarmUp.java"))
+            .replaceAll("\\s+", "");
+    assertTrue(source.contains("warmUpNormalizer();"), "the startup warm-up calls it");
+  }
 }

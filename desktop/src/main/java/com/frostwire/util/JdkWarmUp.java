@@ -26,6 +26,7 @@ import java.security.CodeSource;
 import java.text.AttributedString;
 import java.text.BreakIterator;
 import java.text.Collator;
+import java.text.Normalizer;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -380,6 +381,7 @@ public final class JdkWarmUp {
     try {
       warmUpDateFormatAndCollation(formatLocale(), Locale.getDefault());
       warmUpDateToString();
+      warmUpNormalizer();
     } catch (Throwable t) {
       LOG.warn("Date format and collation warm-up failed: " + t.getMessage(), t);
     }
@@ -635,6 +637,15 @@ public final class JdkWarmUp {
    */
   static String warmUpDateToString() {
     return new Date(0).toString();
+  }
+
+  /**
+   * NFC normalization, which SafeText applies to table cell text that isn't plain ASCII. The first
+   * call loads the JDK's ICU normalization data; the first such cell did it on the EDT (Icebase
+   * #a2fec79d2180, frostwire/frostwire#1477).
+   */
+  static String warmUpNormalizer() {
+    return Normalizer.normalize("cafe\u0301", Normalizer.Form.NFC);
   }
 
   /**
