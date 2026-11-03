@@ -119,6 +119,15 @@ class JdkWarmUpTest {
     assertTrue(JdkWarmUp.CLASSES_TO_INITIALIZE.contains("javax.swing.PopupFactory"));
   }
 
+  /**
+   * The dark theme's first icon brightening (RescaleOp) loaded the native imaging library on the
+   * EDT as the Library opened (Icebase #7150ddfe3582, frostwire/frostwire#1475).
+   */
+  @Test
+  void theNativeImagingLibraryIsInitializedByTheWarmUp() {
+    assertTrue(JdkWarmUp.CLASSES_TO_INITIALIZE.contains("sun.awt.image.ImagingLib"));
+  }
+
   @Test
   void everyClassToInitializeExistsAndLoads() {
     for (String className : JdkWarmUp.CLASSES_TO_INITIALIZE) {

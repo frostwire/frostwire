@@ -149,7 +149,11 @@ public final class JdkWarmUp {
           "net.miginfocom.layout.PlatformDefaults",
           // ToolTipManager.showTipWindow initialized it on the EDT for the first tooltip (Icebase
           // #5749af9dee1c).
-          "javax.swing.PopupFactory");
+          "javax.swing.PopupFactory",
+          // The dark theme brightens icons with a RescaleOp, whose first use loads the native
+          // mlib_image library here; it did so on the EDT as the Library opened (Icebase
+          // #7150ddfe3582, frostwire/frostwire#1475).
+          "sun.awt.image.ImagingLib");
 
   /**
    * Windows-only JDK classes initialized like {@link #CLASSES_TO_INITIALIZE}. The first right-click
