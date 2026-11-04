@@ -292,6 +292,38 @@ class RelayToolsTest {
   }
 
   @Test
+  void hostCacheAddValidatesTheHostAndPortBeforeTouchingTheCache() {
+    HostCacheAddTool tool = new HostCacheAddTool();
+    assertEquals("Missing required parameter: host", tool.execute(null).get("error").getAsString());
+    assertEquals(
+        "Missing required parameter: host",
+        tool.execute(host(" ", null)).get("error").getAsString());
+    assertEquals(
+        "Missing required parameter: port",
+        tool.execute(host("relay.example", null)).get("error").getAsString());
+    assertEquals(
+        "port must be an integer",
+        tool.execute(host("relay.example", "http")).get("error").getAsString());
+    assertEquals(
+        "port must be between 1 and 65535",
+        tool.execute(host("relay.example", 0)).get("error").getAsString());
+    assertEquals(
+        "port must be between 1 and 65535",
+        tool.execute(host("relay.example", 65536)).get("error").getAsString());
+  }
+
+  private static JsonObject host(String host, Object port) {
+    JsonObject args = new JsonObject();
+    args.addProperty("host", host);
+    if (port instanceof Number number) {
+      args.addProperty("port", number);
+    } else if (port != null) {
+      args.addProperty("port", port.toString());
+    }
+    return args;
+  }
+
+  @Test
   void argumentHelpersFallBackToDefaults() {
     JsonObject args = new JsonObject();
     args.addProperty("n", "many");
