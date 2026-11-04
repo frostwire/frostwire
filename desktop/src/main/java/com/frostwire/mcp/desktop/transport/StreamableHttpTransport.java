@@ -1,5 +1,7 @@
 package com.frostwire.mcp.desktop.transport;
 
+import com.frostwire.mcp.MCPConstants;
+import com.frostwire.mcp.MCPJsonRpc;
 import com.frostwire.mcp.transport.MCPTransport;
 import com.frostwire.mcp.transport.MCPTransportHandler;
 import com.frostwire.util.Logger;
@@ -8,6 +10,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -258,7 +261,17 @@ public class StreamableHttpTransport implements MCPTransport {
       boolean wantsSSE = acceptHeader != null && acceptHeader.contains("text/event-stream");
 
       String body = readRequestBody(exchange);
-      JsonElement parsed = JsonParser.parseString(body);
+      JsonElement parsed;
+      try {
+        parsed = JsonParser.parseString(body);
+      } catch (JsonParseException e) {
+        // Answer instead of letting the exception drop the connection without a response.
+        JsonObject error =
+            MCPJsonRpc.errorResponse(
+                null, MCPConstants.ERROR_PARSE, "Parse error: " + e.getMessage());
+        sendJsonResponse(exchange, 400, GSON.toJson(error));
+        return;
+      }
 
       // Special handling for "notifications/initialized" to satisfy Grok's client (and other
       // streamable-http clients).

@@ -200,6 +200,26 @@ class StreamableHttpTransportProtocolTest {
   }
 
   @Test
+  void malformedJsonGetsAParseError() throws Exception {
+    start();
+
+    HttpResponse<String> response = post(null, "application/json", "{not json");
+
+    // MCP: input the server can't accept gets an HTTP error status and a JSON-RPC error.
+    assertEquals(400, response.statusCode());
+    JsonObject error = json(response.body());
+    assertEquals(-32700, error.getAsJsonObject("error").get("code").getAsInt());
+    assertTrue(error.get("id").isJsonNull());
+    assertTrue(
+        error.getAsJsonObject("error").get("message").getAsString().startsWith("Parse error"));
+
+    assertEquals(
+        1,
+        json(post(null, "application/json", rpc(1, "ping")).body()).get("id").getAsInt(),
+        "the server keeps answering");
+  }
+
+  @Test
   void postAskingForEventsWithoutAStreamGetsTheAnswerAsAOneShotStream() throws Exception {
     start();
     HttpResponse<String> single = post(null, "text/event-stream", rpc(5, "tools/list"));
