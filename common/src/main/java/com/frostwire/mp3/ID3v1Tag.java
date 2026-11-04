@@ -63,7 +63,8 @@ public class ID3v1Tag implements ID3v1 {
       comment =
           BufferTools.trimStringRight(
               BufferTools.byteBufferToString(bytes, COMMENT_OFFSET, COMMENT_LENGTH_V1_1));
-      int trackInt = bytes[TRACK_OFFSET];
+      // An unsigned byte, like the genre. Read signed, tracks 128 to 255 came out negative.
+      int trackInt = bytes[TRACK_OFFSET] & 0xFF;
       if (trackInt == 0) {
         track = "";
       } else {
