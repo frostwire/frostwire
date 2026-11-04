@@ -154,6 +154,29 @@ class SettingsToolsTest {
   }
 
   @Test
+  void setStoresTextValuesAsTheyWereSent() {
+    String host = ConnectionSettings.I2P_HOSTNAME.getValue();
+    int port = ConnectionSettings.I2P_PORT.getValue();
+    boolean mixed = ConnectionSettings.I2P_ALLOW_MIXED.getValue();
+    try {
+      JsonObject text = set("I2P_HOSTNAME", "10.0.0.7");
+      assertTrue(text.get("updated").getAsBoolean());
+      assertEquals("10.0.0.7", ConnectionSettings.I2P_HOSTNAME.getValue(), "no JSON quotes");
+      assertEquals("10.0.0.7", text.get("value").getAsString());
+
+      // Clients may send numbers and booleans as strings too.
+      assertTrue(set("I2P_PORT", String.valueOf(port + 2)).get("updated").getAsBoolean());
+      assertEquals(port + 2, ConnectionSettings.I2P_PORT.getValue());
+      assertTrue(set("I2P_ALLOW_MIXED", String.valueOf(!mixed)).get("updated").getAsBoolean());
+      assertEquals(!mixed, ConnectionSettings.I2P_ALLOW_MIXED.getValue());
+    } finally {
+      ConnectionSettings.I2P_HOSTNAME.setValue(host);
+      ConnectionSettings.I2P_PORT.setValue(port);
+      ConnectionSettings.I2P_ALLOW_MIXED.setValue(mixed);
+    }
+  }
+
+  @Test
   void setReportsAValueThatDoesNotFitTheSetting() {
     int port = ConnectionSettings.I2P_PORT.getValue();
     JsonObject args = new JsonObject();

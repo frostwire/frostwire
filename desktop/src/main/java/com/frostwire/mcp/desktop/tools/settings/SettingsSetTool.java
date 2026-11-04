@@ -10,6 +10,7 @@ package com.frostwire.mcp.desktop.tools.settings;
 import com.frostwire.mcp.MCPTool;
 import com.frostwire.mcp.desktop.adapters.SettingsAdapter;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class SettingsSetTool implements MCPTool {
@@ -94,7 +95,9 @@ public class SettingsSetTool implements MCPTool {
     }
 
     Object previousValue = SettingsAdapter.getSettingValue(key);
-    Object newValue = arguments.get("value");
+    // A JSON string's toString() keeps its quotes; the setting wants the text itself.
+    JsonElement value = arguments.get("value");
+    Object newValue = value != null && value.isJsonPrimitive() ? value.getAsString() : value;
     boolean success = SettingsAdapter.setSetting(key, newValue);
 
     JsonObject result = new JsonObject();
