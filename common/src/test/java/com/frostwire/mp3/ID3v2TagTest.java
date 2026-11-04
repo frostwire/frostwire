@@ -8,11 +8,16 @@
 package com.frostwire.mp3;
 
 import static com.frostwire.mp3.Id3Bytes.bytes;
+import static com.frostwire.mp3.Id3Bytes.synchsafe;
 import static com.frostwire.mp3.Id3Bytes.tag;
 import static com.frostwire.mp3.Id3Bytes.v23Frame;
+import static com.frostwire.mp3.Id3Bytes.v24Frame;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
 /** ID3v2 tags as callers use them: the getters on parsed tags and the setters on written ones. */
@@ -43,5 +48,30 @@ class ID3v2TagTest {
     tag = ID3v2TagFactory.createTag(tag(3, 0, utf16));
     assertEquals("Hi", tag.getComment());
     assertNull(tag.getItunesComment());
+  }
+
+  /**
+   * ID3v2.4 footers: the header's size counts the extended header, frames and padding but not the
+   * footer, which follows them and repeats the header with "3DI" in place of "ID3". The size used
+   * to include the footer, so a footer where the spec puts it was rejected as invalid, and a
+   * written footer had version 0.0 and was counted in the size.
+   */
+  @Test
+  void v24FootersFollowTheFramesAndRepeatTheHeader() throws Exception {
+    byte[] frames = v24Frame("TIT2", bytes(0, "Title"));
+    byte[] header = tag(4, 0x10, new byte[0]);
+    header = bytes(Arrays.copyOf(header, 6), synchsafe(frames.length));
+    byte[] footer = bytes("3DI", Arrays.copyOfRange(header, 3, 10));
+    byte[] spec = bytes(header, frames, footer);
+
+    AbstractID3v2Tag read = ID3v2TagFactory.createTag(spec);
+    assertTrue(read.hasFooter());
+    assertEquals("Title", read.getTitle());
+
+    ID3v24Tag written = new ID3v24Tag();
+    written.setFooter(true);
+    written.setTitle("Title");
+    assertArrayEquals(spec, written.toBytes());
+    assertEquals(spec.length, written.getLength());
   }
 }

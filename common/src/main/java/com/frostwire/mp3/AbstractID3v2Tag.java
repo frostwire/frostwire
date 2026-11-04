@@ -82,11 +82,11 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
       if (extendedHeader) {
         offset = unpackExtendedHeader(bytes, offset);
       }
-      int framesLength = dataLength;
-      if (footer) framesLength -= 10;
-      offset = unpackFrames(bytes, offset, framesLength);
+      // The size in the header doesn't count the footer, which follows the frames and padding.
+      // Counting it rejected footers where the spec puts them as invalid.
+      offset = unpackFrames(bytes, offset, dataLength);
       if (footer) {
-        offset = unpackFooter(bytes, dataLength);
+        offset = unpackFooter(bytes, HEADER_LENGTH + dataLength);
       }
     } catch (ArrayIndexOutOfBoundsException e) {
       throw new InvalidDataException("Premature end of tag", e);
@@ -206,7 +206,7 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
     }
     offset = packFrames(bytes, offset);
     if (footer) {
-      offset = packFooter(bytes, dataLength);
+      offset = packFooter(bytes, HEADER_LENGTH + getDataLength());
     }
   }
 
@@ -270,13 +270,14 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
 
   private int packFooter(byte[] bytes, int offset) {
     BufferTools.stringIntoByteBuffer(FOOTER_TAG, 0, FOOTER_TAG.length(), bytes, offset);
-    String[] s = version.split(".");
+    // As in the header: split(".") took "." as a regex and wrote the footer as version 0.0.
+    String[] s = version.split("\\.");
     if (s.length > 0) {
       byte majorVersion = Byte.parseByte(s[0]);
       bytes[offset + MAJOR_VERSION_OFFSET] = majorVersion;
     }
     if (s.length > 1) {
-      byte minorVersion = Byte.parseByte(s[0]);
+      byte minorVersion = Byte.parseByte(s[1]);
       bytes[offset + MINOR_VERSION_OFFSET] = minorVersion;
     }
     packFlags(bytes, offset);
@@ -287,8 +288,8 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
   private int calculateDataLength() {
     int length = 0;
     if (extendedHeader) length += extendedHeaderLength;
-    if (footer) length += FOOTER_LENGTH;
-    else if (padding) length += PADDING_LENGTH;
+    // A tag with a footer has no padding, and the footer isn't part of the size.
+    if (!footer && padding) length += PADDING_LENGTH;
     for (ID3v2FrameSet frameSet : frameSets.values()) {
       for (ID3v2Frame frame : frameSet.getFrames()) {
         length += frame.getLength();
@@ -317,7 +318,7 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
   }
 
   public int getLength() {
-    return getDataLength() + HEADER_LENGTH;
+    return getDataLength() + HEADER_LENGTH + (footer ? FOOTER_LENGTH : 0);
   }
 
   public Map<String, ID3v2FrameSet> getFrameSets() {
