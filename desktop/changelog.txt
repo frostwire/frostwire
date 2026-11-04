@@ -1,5 +1,6 @@
 FrostWire 7.1.3 build 335 UNRELEASED
    - fix:Security: on macOS, "Show in Finder" passes the file path to its script as an argument, so a crafted file name can no longer inject AppleScript
+   - fix:macOS: FrostWire starts and works on a Mac where the Lucida Grande font is missing or disabled (it crashed at the splash screen); its fonts and Java's built-in fonts fall back to Helvetica Neue (#1484)
    - windows-launcher: DLLs in the folder FrostWire is started from are no longer loaded: the current folder is out of the DLL search order and Java's jvm.dll is loaded by its full path
    - windows-launcher: FrostWire no longer starts if it can't open its own folder, instead of loading Java and its files from wherever it was started, and Reinstall runs the installer from FrostWire's folder only
    - windows-launcher: built with Control Flow Guard, CET shadow stack and Spectre mitigations
