@@ -112,7 +112,7 @@ public class CopyrightLicenseBroker implements Mappable<String, Map<String, Stri
         innerMap = Collections.emptyMap();
       }
       String licenseUrl = Bencode.asString(innerMap.get("licenseUrl"));
-      this.license = urlToLicense.get(licenseUrl);
+      this.license = licenseAt(licenseUrl);
       this.attributionTitle = Bencode.asString(innerMap.get("attributionTitle"));
       this.attributionAuthor = Bencode.asString(innerMap.get("attributionAuthor"));
       this.attributionUrl = Bencode.asString(innerMap.get("attributionUrl"));
@@ -135,6 +135,18 @@ public class CopyrightLicenseBroker implements Mappable<String, Map<String, Stri
     this.attributionTitle = title;
     this.attributionAuthor = author;
     this.attributionUrl = attributionUrl;
+  }
+
+  /**
+   * The license whose URL is {@code url}, or null. Torrents made before the Creative Commons URLs
+   * moved to https name the http ones.
+   */
+  private static License licenseAt(String url) {
+    License license = urlToLicense.get(url);
+    if (license == null && url != null && url.startsWith("http://creativecommons.org/")) {
+      license = urlToLicense.get("https://" + url.substring("http://".length()));
+    }
+    return license;
   }
 
   private static boolean isInvalidLicense(String licenseStr) {
@@ -163,7 +175,7 @@ public class CopyrightLicenseBroker implements Mappable<String, Map<String, Stri
     if (licenseShortCode.endsWith("-")) {
       licenseShortCode = licenseShortCode.substring(0, licenseShortCode.length() - 1);
     }
-    return "http://creativecommons.org/licenses/" + licenseShortCode + "/" + "4.0" + "/";
+    return "https://creativecommons.org/licenses/" + licenseShortCode + "/" + "4.0" + "/";
   }
 
   public Map<String, Map<String, String>> asMap() {
