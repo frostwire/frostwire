@@ -409,6 +409,26 @@ class ID3v2TagTest {
     assertEquals(b.length, tag.getLength());
   }
 
+  /**
+   * An extended header must fit its own four-byte size field and stay within the tag. A v2.3 size
+   * of 0xfffffffc wraps around to 0 once its four bytes are added, and is rejected too.
+   */
+  @ParameterizedTest
+  @CsvSource({"3, ''", "3, fffffffc", "3, ffffffff", "4, 00000002", "4, 00000000"})
+  void extendedHeadersTooShortForTheirSizeAreInvalid(int majorVersion, String extendedHex) {
+    byte[] b = tag(majorVersion, 0x40, HexFormat.of().parseHex(extendedHex + "00"));
+    InvalidDataException e =
+        assertThrows(InvalidDataException.class, () -> ID3v2TagFactory.createTag(b));
+    assertEquals("Extended header runs past the end of the tag", e.getMessage());
+  }
+
+  /** The URL of a WXXX frame ends at a zero byte, if there is one before the end of the frame. */
+  @Test
+  void aUrlEndsAtAZeroByte() throws Exception {
+    byte[] wxxx = v23Frame("WXXX", bytes(0, "home", 0, "https://example.org/", 0, "junk"));
+    assertEquals("https://example.org/", ID3v2TagFactory.createTag(tag(3, 0, wxxx)).getUrl());
+  }
+
   @Test
   void experimentalFlagRoundTrips() throws Exception {
     byte[] b = tag(4, 0x20, v24Frame("TIT2", bytes(0, "Title")));

@@ -8,6 +8,7 @@
 package com.frostwire.mp3;
 
 import static com.frostwire.mp3.Id3Bytes.bytes;
+import static com.frostwire.mp3.MpegFrameTest.LAYER_II;
 import static com.frostwire.mp3.MpegFrameTest.LAYER_III;
 import static com.frostwire.mp3.MpegFrameTest.MPEG_1;
 import static com.frostwire.mp3.MpegFrameTest.MPEG_2;
@@ -184,12 +185,18 @@ class Mp3FileTest {
     assertFalse(file.hasCustomTag());
   }
 
-  /** What looks like a frame header but isn't followed by another frame is skipped. */
+  /**
+   * What looks like a frame header but isn't followed by another frame is skipped, as are 0xFF
+   * bytes that start like a frame sync but aren't a valid header.
+   */
   @Test
   void aFalseSyncBeforeTheFramesIsSkipped() throws Exception {
     byte[] audio = frames(HEADER_128, 417, 10);
-    Mp3File file = new Mp3File(write("a.mp3", bytes(HEADER_128, new byte[20], audio)).toString());
-    assertEquals(24, file.getStartOffset());
+    byte[] junk = new byte[16];
+    Arrays.fill(junk, (byte) 0xff);
+    Mp3File file =
+        new Mp3File(write("a.mp3", bytes(junk, HEADER_128, new byte[20], audio)).toString());
+    assertEquals(40, file.getStartOffset());
     assertEquals(10, file.getFrameCount());
     assertFalse(file.hasId3v2Tag());
   }
@@ -204,14 +211,17 @@ class Mp3FileTest {
     assertArrayEquals(cut, file.getCustomTag());
   }
 
-  /** Frames of another sample rate after the audio aren't part of it. */
+  /** Frames of another sample rate or layer after the audio aren't part of it. */
   @Test
   void anInconsistentFrameEndsTheAudio() throws Exception {
     byte[] audio = frames(HEADER_128, 417, 10);
-    byte[] other = frames(MpegFrameTest.header(MPEG_1, LAYER_III, 9, 1, 0, 0), 384, 3);
-    Mp3File file = new Mp3File(write("a.mp3", bytes(audio, other)).toString());
-    assertEquals(10, file.getFrameCount());
-    assertArrayEquals(other, file.getCustomTag());
+    byte[] otherRate = frames(MpegFrameTest.header(MPEG_1, LAYER_III, 9, 1, 0, 0), 384, 3);
+    byte[] otherLayer = frames(MpegFrameTest.header(MPEG_1, LAYER_II, 9, 0, 0, 0), 522, 3);
+    for (byte[] other : new byte[][] {otherRate, otherLayer}) {
+      Mp3File file = new Mp3File(write("a.mp3", bytes(audio, other)).toString());
+      assertEquals(10, file.getFrameCount());
+      assertArrayEquals(other, file.getCustomTag());
+    }
   }
 
   @Test
