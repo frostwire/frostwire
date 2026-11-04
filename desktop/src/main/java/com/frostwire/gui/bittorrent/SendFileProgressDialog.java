@@ -26,6 +26,7 @@ import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.NoDropFileChooser;
+import com.limegroup.gnutella.gui.ShellFolderWarmUp;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -50,6 +51,9 @@ public class SendFileProgressDialog extends JDialog {
 
   public SendFileProgressDialog(JFrame frame) {
     super(frame);
+    // Its Browse button opens a JFileChooser, which waits on the Windows shell on the EDT
+    // (frostwire/frostwire#1411).
+    ShellFolderWarmUp.warmUpForDirectoryChooser();
     setupUI();
     // Takes no drops: no drag-and-drop registration with the OS when realized (#1471).
     DropTargets.removeAll(this);

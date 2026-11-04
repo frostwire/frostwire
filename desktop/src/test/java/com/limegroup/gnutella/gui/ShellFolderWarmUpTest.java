@@ -119,7 +119,10 @@ class ShellFolderWarmUpTest {
    */
   @Test
   void everyClassThatOpensAChooserWarmsUpTheShell() throws IOException {
-    Pattern opensChooser = Pattern.compile("FileChooserHandler\\.(getInput\\w*|getSaveAsFile)\\(");
+    // Through FileChooserHandler, or by building a chooser directly (Icebase #ef39066da729).
+    Pattern opensChooser =
+        Pattern.compile(
+            "FileChooserHandler\\.(getInput\\w*|getSaveAsFile)\\(|new (NoDrop|J)FileChooser\\(");
     Set<String> missing = new TreeSet<>();
     int choosers = 0;
     try (Stream<Path> files = Files.walk(Path.of("src/main/java"))) {
@@ -137,7 +140,7 @@ class ShellFolderWarmUpTest {
         }
       }
     }
-    assertTrue(choosers >= 7, "the scan found only " + choosers + " classes opening a chooser");
+    assertTrue(choosers >= 10, "the scan found only " + choosers + " classes opening a chooser");
     assertTrue(missing.isEmpty(), "open a chooser without warming up the shell: " + missing);
     String initializer =
         Files.readString(Path.of("src/main/java/com/limegroup/gnutella/gui/Initializer.java"))

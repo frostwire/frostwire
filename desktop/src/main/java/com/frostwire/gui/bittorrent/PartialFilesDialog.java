@@ -93,6 +93,9 @@ class PartialFilesDialog extends JDialog {
   /** {@code contents} are read by the caller, off the EDT ({@link #contentsOf}). */
   PartialFilesDialog(JFrame frame, Contents contents, String name) {
     super(frame, I18n.tr("Select files to download"));
+    // Its Change Folder button opens a JFileChooser, which waits on the Windows shell on the EDT
+    // (frostwire/frostwire#1411).
+    ShellFolderWarmUp.warmUpForDirectoryChooser();
     this.contents = contents;
     this.name = name;
     model = new TorrentTableModel(contents.files());

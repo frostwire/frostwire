@@ -18,6 +18,7 @@ import com.limegroup.gnutella.gui.DropTargets;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.NoDropFileChooser;
+import com.limegroup.gnutella.gui.ShellFolderWarmUp;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -123,6 +124,9 @@ public final class IceBridgeConsoleWindow {
   private boolean paused;
 
   private IceBridgeConsoleWindow() {
+    // Its Save log button opens a JFileChooser, which waits on the Windows shell on the EDT
+    // (frostwire/frostwire#1411).
+    ShellFolderWarmUp.warmUpForDirectoryChooser();
     buildUi();
     seedFromLog();
     IceBridgeEventLog.instance().addListener(listener);
