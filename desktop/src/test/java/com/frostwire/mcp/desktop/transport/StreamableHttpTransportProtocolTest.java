@@ -30,14 +30,17 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
+import java.util.Locale;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509ExtendedTrustManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
  * The parts of the streamable HTTP transport the handshake tests don't reach: CORS, sessions,
@@ -335,6 +338,57 @@ class StreamableHttpTransportProtocolTest {
   }
 
   @Test
+  void tlsUsesTheConfiguredKeystore(@TempDir Path dir) throws Exception {
+    Path keystore = dir.resolve("mcp.jks");
+    Process keytool =
+        new ProcessBuilder(
+                Path.of(System.getProperty("java.home"), "bin", keytoolName()).toString(),
+                "-genkeypair",
+                "-keystore",
+                keystore.toString(),
+                "-storetype",
+                "JKS",
+                "-storepass",
+                "changeit",
+                "-keypass",
+                "changeit",
+                "-alias",
+                "mcp",
+                "-keyalg",
+                "RSA",
+                "-dname",
+                "CN=frostwire-test",
+                "-validity",
+                "2")
+            .redirectErrorStream(true)
+            .start();
+    keytool.getInputStream().readAllBytes();
+    assertEquals(0, keytool.waitFor(), "keytool made the keystore");
+    port = freePort();
+    transport =
+        new StreamableHttpTransport(
+            "127.0.0.1", port, new TlsConfig(true, keystore.toString(), "changeit", false));
+    transport.start(echoHandler);
+
+    HttpResponse<String> response =
+        HttpClient.newBuilder()
+            .sslContext(trustAll())
+            .connectTimeout(TIMEOUT)
+            .build()
+            .send(
+                HttpRequest.newBuilder(URI.create("https://127.0.0.1:" + port + "/mcp"))
+                    .timeout(TIMEOUT)
+                    .POST(HttpRequest.BodyPublishers.ofString(rpc(3, "ping")))
+                    .build(),
+                HttpResponse.BodyHandlers.ofString());
+
+    assertEquals(3, json(response.body()).get("id").getAsInt());
+    X509Certificate certificate =
+        (X509Certificate) response.sslSession().orElseThrow().getPeerCertificates()[0];
+    assertEquals("CN=frostwire-test", certificate.getSubjectX500Principal().getName());
+  }
+
+  @Test
   void tlsWithoutAKeystoreOrGeneratedCertificateFailsToStart() throws IOException {
     port = freePort();
     StreamableHttpTransport noCert =
@@ -432,6 +486,12 @@ class StreamableHttpTransportProtocolTest {
           }
           throw new AssertionError("stream ended without an event");
         });
+  }
+
+  private static String keytoolName() {
+    return System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("win")
+        ? "keytool.exe"
+        : "keytool";
   }
 
   private static int freePort() throws IOException {

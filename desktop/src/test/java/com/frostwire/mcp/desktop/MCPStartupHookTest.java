@@ -171,6 +171,25 @@ class MCPStartupHookTest {
   }
 
   @Test
+  void restartWaitsForThePortAndReportsWhenItStaysTaken() throws IOException {
+    try (ServerSocket taken = new ServerSocket()) {
+      taken.bind(new java.net.InetSocketAddress("127.0.0.1", 0));
+      MCPSettings.MCP_SERVER_PORT.setValue(taken.getLocalPort());
+
+      long start = System.nanoTime();
+      JsonObject out = new McpControlTool().execute(action("restart"));
+
+      assertTrue(
+          System.nanoTime() - start >= Duration.ofSeconds(3).toNanos(),
+          "it gives the port three seconds to come free");
+      assertEquals("restart", out.get("action").getAsString());
+      assertTrue(
+          out.get("error").getAsString().contains("Failed to start MCP server"), out.toString());
+      assertFalse(MCPStartupHook.isRunning());
+    }
+  }
+
+  @Test
   void statusToolReportsTheServerSettings() throws Exception {
     MCPSettings.MCP_SERVER_ENABLED.setValue(true);
     MCPSettings.MCP_SERVER_AUTO_START.setValue(false);
