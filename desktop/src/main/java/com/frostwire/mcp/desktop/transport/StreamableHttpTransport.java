@@ -325,8 +325,10 @@ public class StreamableHttpTransport implements MCPTransport {
           // library from treating the POST response body as the final result (or complaining
           // about missing/None content type).
           exchange.getResponseHeaders().set("Content-Type", "application/json");
-          exchange.sendResponseHeaders(202, 0);
-          // no body on this exchange; real data on main SSE with matching id
+          // -1: no body. A length of 0 would start a chunked body that nothing ever ends, so the
+          // client's POST would never complete. Real data goes on the main SSE stream.
+          exchange.sendResponseHeaders(202, -1);
+          exchange.close();
         } else {
           responseSessionId = "mcp-session-" + sessionCounter.incrementAndGet();
           exchange.getResponseHeaders().set("Content-Type", "text/event-stream");

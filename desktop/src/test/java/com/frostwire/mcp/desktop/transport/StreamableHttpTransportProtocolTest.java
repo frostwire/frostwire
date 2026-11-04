@@ -21,12 +21,14 @@ import com.google.gson.JsonParser;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import javax.net.ssl.SSLContext;
@@ -204,6 +206,42 @@ class StreamableHttpTransportProtocolTest {
     HttpResponse<String> unanswered =
         post(null, "text/event-stream", "{\"jsonrpc\":\"2.0\",\"method\":\"note\"}");
     assertEquals("", unanswered.body(), "nothing to stream for a notification");
+  }
+
+  @Test
+  void answersAndNotificationsGoToTheOpenStreamOfTheSession() throws Exception {
+    start();
+    HttpResponse<InputStream> stream =
+        http.send(
+            request().header("Accept", "text/event-stream").GET().build(),
+            HttpResponse.BodyHandlers.ofInputStream());
+    String session = stream.headers().firstValue("Mcp-Session-Id").orElseThrow();
+    try (BufferedReader events =
+        new BufferedReader(new InputStreamReader(stream.body(), StandardCharsets.UTF_8))) {
+
+      HttpResponse<String> accepted = post(session, "text/event-stream", rpc(9, "tools/list"));
+      assertEquals(202, accepted.statusCode(), "the answer comes on the open stream");
+      assertEquals(session, accepted.headers().firstValue("Mcp-Session-Id").orElse(""));
+      assertEquals(9, json(nextData(events)).get("id").getAsInt());
+
+      JsonObject notification = new JsonObject();
+      notification.addProperty("jsonrpc", "2.0");
+      notification.addProperty("method", "notifications/transfer_progress");
+      transport.sendNotification(notification);
+      assertEquals(
+          "notifications/transfer_progress", json(nextData(events)).get("method").getAsString());
+
+      HttpResponse<String> closed = send(request().header("Mcp-Session-Id", session).DELETE());
+      assertEquals(200, closed.statusCode());
+      assertEquals("{}", closed.body());
+      assertTimeoutPreemptively(
+          TIMEOUT,
+          () -> {
+            while (events.readLine() != null) {
+              // drain until the server ends the stream it closed
+            }
+          });
+    }
   }
 
   @Test
