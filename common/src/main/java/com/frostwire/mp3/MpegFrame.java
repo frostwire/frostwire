@@ -545,13 +545,20 @@ public class MpegFrame {
     }
   }
 
+  /**
+   * Samples per frame over 8, times bitrate over sample rate, plus padding. Layer I frames are 384
+   * samples in whole 4-byte slots. Layer III frames are 1152 samples in MPEG-1 but 576 in MPEG-2
+   * and 2.5: measuring those as 1152 made a scan skip into the middle of the next frame.
+   */
   public int getLengthInBytes() {
     long length;
     int pad;
     if (padding) pad = 1;
     else pad = 0;
     if (layer == 1) {
-      length = ((48000 * bitrate) / sampleRate) + (pad * 4);
+      length = (((12000 * bitrate) / sampleRate) + pad) * 4;
+    } else if (layer == 3 && !MPEG_VERSION_1_0.equals(version)) {
+      length = ((72000 * bitrate) / sampleRate) + pad;
     } else {
       length = ((144000 * bitrate) / sampleRate) + pad;
     }
