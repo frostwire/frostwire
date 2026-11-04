@@ -51,13 +51,11 @@ class BTDownloadTransferTest {
 
   @TempDir Path dir;
   private LocalEngine local;
-  private BTEngine engine;
   private SessionManager seeder;
 
   @BeforeEach
   void startEngine() throws Exception {
     local = LocalEngine.start(dir);
-    engine = local.engine;
   }
 
   @AfterEach
@@ -76,14 +74,14 @@ class BTDownloadTransferTest {
     File saveDir = dir.resolve("save").toFile();
     Recorder recorder = new Recorder();
     // Paused, so the recorder is in place before the transfer can finish.
-    engine.pause();
-    engine.download(ti, saveDir, null, peers(seeder), true);
+    local.engine.pause();
+    local.engine.download(ti, saveDir, null, peers(seeder), true);
     BTDownload dl = Events.next(local.events.added, "song");
     dl.setListener(recorder);
     assertSame(recorder, dl.getListener());
     assertEquals(TransferState.PAUSED, dl.getState());
 
-    engine.resume();
+    local.engine.resume();
 
     assertSame(dl, poll(recorder.finished), "the download's listener heard it finish");
     Events.next(local.events.finished, "song");
@@ -114,14 +112,14 @@ class BTDownloadTransferTest {
           Files.readAllBytes(item.getFile().toPath()));
     }
     String hash = ti.infoHashV1().toHex();
-    await(() -> saveDir.equals(engine.readSavePath(hash)), "the resume data has the folder");
+    await(() -> saveDir.equals(local.engine.readSavePath(hash)), "the resume data has the folder");
     assertEquals(new File(local.ctx.torrentsDir, "song.torrent"), dl.getTorrentFile());
   }
 
   @Test
   void aPolicyPauseIsNotRememberedAsTheUsersChoice() throws Exception {
     TorrentInfo ti = album("policy");
-    engine.download(ti, dir.resolve("save").toFile(), null, null);
+    local.engine.download(ti, dir.resolve("save").toFile(), null, null);
     BTDownload dl = Events.next(local.events.added, "policy");
 
     dl.pauseForPolicy();
@@ -136,8 +134,8 @@ class BTDownloadTransferTest {
     TorrentInfo second = album("second");
     File firstDir = dir.resolve("save-1").toFile();
     File secondDir = dir.resolve("save-2").toFile();
-    engine.download(first, firstDir, null, null);
-    engine.download(second, secondDir, null, null);
+    local.engine.download(first, firstDir, null, null);
+    local.engine.download(second, secondDir, null, null);
     Events.next(local.events.added, "first");
     Events.next(local.events.added, "second");
     awaitResume(first);
@@ -146,7 +144,7 @@ class BTDownloadTransferTest {
     Files.write(new File(local.ctx.homeDir, "notes.txt").toPath(), new byte[] {'x'});
 
     local.restart();
-    engine.restoreDownloads();
+    local.engine.restoreDownloads();
 
     assertEquals(firstDir, Events.next(local.events.added, "first").getSavePath());
     assertEquals(secondDir, Events.next(local.events.added, "second").getSavePath());
@@ -156,16 +154,16 @@ class BTDownloadTransferTest {
   void aTransferWhoseFolderIsGoneIsRestoredToTheDataFolder() throws Exception {
     TorrentInfo ti = album("moved");
     Path saveDir = dir.resolve("removable");
-    engine.download(ti, saveDir.toFile(), null, null);
+    local.engine.download(ti, saveDir.toFile(), null, null);
     Events.next(local.events.added, "moved");
     awaitResume(ti);
-    local.engine.stop();
-    // The folder is now a file, as when a drive is unplugged and something else takes its place.
-    deleteTree(saveDir);
-    Files.write(saveDir, new byte[] {1});
-
-    local.engine.start();
-    engine.restoreDownloads();
+    local.restart(
+        () -> {
+          // The folder is now a file, as when a drive is unplugged and something else is there.
+          deleteTree(saveDir);
+          Files.write(saveDir, new byte[] {1});
+        });
+    local.engine.restoreDownloads();
 
     assertEquals(local.ctx.dataDir, Events.next(local.events.added, "moved").getSavePath());
   }
@@ -174,17 +172,17 @@ class BTDownloadTransferTest {
   void aV2TransferSavedUnderItsOldResumeNameIsRestoredToItsFolder() throws Exception {
     TorrentInfo ti = album(dir.resolve("content"), "legacy", TorrentBuilder.V2_ONLY);
     File saveDir = dir.resolve("legacy-save").toFile();
-    engine.download(ti, saveDir, null, null);
+    local.engine.download(ti, saveDir, null, null);
     Events.next(local.events.added, "legacy");
     String v2 = ti.infoHashV2().toHex();
-    await(() -> engine.resumeDataFile(v2).isFile(), "the resume data was saved");
-    local.engine.stop();
+    await(() -> local.engine.resumeDataFile(v2).isFile(), "the resume data was saved");
     // Before the naming was unified, the resume file of a v2 torrent had the truncated hash.
-    Files.move(
-        engine.resumeDataFile(v2).toPath(), engine.resumeDataFile(v2.substring(0, 40)).toPath());
-
-    local.engine.start();
-    engine.restoreDownloads();
+    local.restart(
+        () ->
+            Files.move(
+                local.engine.resumeDataFile(v2).toPath(),
+                local.engine.resumeDataFile(v2.substring(0, 40)).toPath()));
+    local.engine.restoreDownloads();
 
     assertEquals(saveDir, Events.next(local.events.added, "legacy").getSavePath());
   }
@@ -193,22 +191,22 @@ class BTDownloadTransferTest {
   void movingTheStorageMovesUnfinishedTransfersAndRemembersTheNewFolder() throws Exception {
     TorrentInfo ti = album("moving");
     File saveDir = dir.resolve("save").toFile();
-    engine.download(ti, saveDir, null, null);
+    local.engine.download(ti, saveDir, null, null);
     BTDownload dl = Events.next(local.events.added, "moving");
     String hash = ti.infoHashV1().toHex();
     awaitResume(ti);
     File elsewhere = Files.createDirectories(dir.resolve("elsewhere")).toFile();
 
-    engine.moveStorage(elsewhere);
+    local.engine.moveStorage(elsewhere);
 
-    await(() -> elsewhere.equals(engine.readSavePath(hash)), "the new folder was saved");
+    await(() -> elsewhere.equals(local.engine.readSavePath(hash)), "the new folder was saved");
     assertEquals(elsewhere.getAbsolutePath(), dl.getTorrentHandle().savePath());
   }
 
   @Test
   void replacedTrackersAreKeptAcrossARestart() throws Exception {
     TorrentInfo ti = album("tracked");
-    engine.download(ti, dir.resolve("save").toFile(), null, null);
+    local.engine.download(ti, dir.resolve("save").toFile(), null, null);
     BTDownload dl = Events.next(local.events.added, "tracked");
     Set<String> trackers = Set.of("udp://127.0.0.1:65530/announce");
 
@@ -218,7 +216,7 @@ class BTDownloadTransferTest {
     dl.requestTrackerScrape();
 
     assertEquals(trackers, dl.trackers());
-    File resume = engine.resumeDataFile(ti.infoHashV1().toHex());
+    File resume = local.engine.resumeDataFile(ti.infoHashV1().toHex());
     await(
         () -> {
           try {
@@ -230,14 +228,14 @@ class BTDownloadTransferTest {
         },
         "the trackers were saved");
     local.restart();
-    engine.restoreDownloads();
+    local.engine.restoreDownloads();
     assertEquals(trackers, Events.next(local.events.added, "tracked").trackers());
   }
 
   @Test
   void rateLimitsAndSequentialDownloadApplyToTheTorrent() throws Exception {
     TorrentInfo ti = album("limits");
-    engine.download(ti, dir.resolve("save").toFile(), null, null);
+    local.engine.download(ti, dir.resolve("save").toFile(), null, null);
     BTDownload dl = Events.next(local.events.added, "limits");
 
     dl.setDownloadRateLimit(50_000);
@@ -257,7 +255,7 @@ class BTDownloadTransferTest {
   @Test
   void aRecheckIsReportedAsAStateChange() throws Exception {
     TorrentInfo ti = album("rechecked");
-    engine.download(ti, dir.resolve("content").toFile(), null, null);
+    local.engine.download(ti, dir.resolve("content").toFile(), null, null);
     BTDownload dl = Events.next(local.events.added, "rechecked");
     await(() -> dl.isFinished(true), "the data was checked");
     Recorder recorder = new Recorder();
@@ -281,7 +279,7 @@ class BTDownloadTransferTest {
 
   private void awaitResume(TorrentInfo ti) {
     String hash = ti.infoHashV1().toHex();
-    await(() -> engine.resumeDataFile(hash).isFile(), "the resume data of " + ti.name());
+    await(() -> local.engine.resumeDataFile(hash).isFile(), "the resume data of " + ti.name());
   }
 
   private TorrentInfo album(String name) throws Exception {

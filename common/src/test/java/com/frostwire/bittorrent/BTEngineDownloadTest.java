@@ -50,12 +50,10 @@ class BTEngineDownloadTest {
 
   @TempDir Path dir;
   private LocalEngine local;
-  private BTEngine engine;
 
   @BeforeEach
   void startEngine() throws Exception {
     local = LocalEngine.start(dir);
-    engine = local.engine;
   }
 
   @AfterEach
@@ -69,7 +67,7 @@ class BTEngineDownloadTest {
     File torrent = torrentFile(ti, dir.resolve("in/album.torrent"));
     File saveDir = dir.resolve("save").toFile();
 
-    engine.download(torrent, saveDir, null);
+    local.engine.download(torrent, saveDir, null);
 
     BTDownload dl = Events.next(local.events.added, "album");
     String hash = ti.infoHashV1().toHex();
@@ -80,12 +78,12 @@ class BTEngineDownloadTest {
     assertFalse(dl.isPartial());
     assertEquals(new File(saveDir, "album"), dl.getContentSavePath());
     assertEquals(new File(saveDir, "." + hash + ".parts"), dl.partsFile());
-    File sessionCopy = engine.resumeTorrentFile(hash);
+    File sessionCopy = local.engine.resumeTorrentFile(hash);
     assertTrue(sessionCopy.isFile(), "the session copy of the torrent was written");
     assertEquals(
         hash, TorrentInfo.bdecode(Files.readAllBytes(sessionCopy.toPath())).infoHashV1().toHex());
-    assertEquals(engine.torrentFile("album"), engine.readTorrentPath(hash));
-    await(() -> saveDir.equals(engine.readSavePath(hash)), "the resume data has the folder");
+    assertEquals(local.engine.torrentFile("album"), local.engine.readTorrentPath(hash));
+    await(() -> saveDir.equals(local.engine.readSavePath(hash)), "the resume data has the folder");
   }
 
   @Test
@@ -94,7 +92,7 @@ class BTEngineDownloadTest {
     File torrent = torrentFile(ti, dir.resolve("in/picked.torrent"));
     File saveDir = dir.resolve("save").toFile();
 
-    engine.download(torrent, saveDir, new boolean[] {false, true});
+    local.engine.download(torrent, saveDir, new boolean[] {false, true});
 
     BTDownload dl = Events.next(local.events.added, "picked");
     TorrentHandle th = dl.getTorrentHandle();
@@ -108,7 +106,7 @@ class BTEngineDownloadTest {
     assertTrue(items.get(0).isSkipped());
     assertFalse(items.get(1).isSkipped());
 
-    engine.download(torrent, saveDir, new boolean[] {true, true});
+    local.engine.download(torrent, saveDir, new boolean[] {true, true});
 
     Events.next(local.events.updated, "picked");
     await(() -> !dl.isPartial(), "both files are wanted");
@@ -119,7 +117,7 @@ class BTEngineDownloadTest {
   void aSearchResultsTorrentIsSavedUnderAFileNameEveryFileSystemAccepts() throws Exception {
     TorrentInfo ti = album("live [2024] a|b");
 
-    engine.download(ti, dir.resolve("save").toFile(), null, null, true);
+    local.engine.download(ti, dir.resolve("save").toFile(), null, null, true);
 
     Events.next(local.events.added, "live [2024] a|b");
     File saved = new File(local.ctx.torrentsDir, "live _2024_ a_b.torrent");
@@ -155,7 +153,7 @@ class BTEngineDownloadTest {
         };
     log.addHandler(holdAfterAdding);
     try {
-      engine.download(torrent, dir.resolve("save").toFile(), new boolean[] {true, false});
+      local.engine.download(torrent, dir.resolve("save").toFile(), new boolean[] {true, false});
     } finally {
       log.removeHandler(holdAfterAdding);
     }
@@ -170,7 +168,8 @@ class BTEngineDownloadTest {
     assertFalse(LocalEngine.isPaused(dl), "the transfer starts once its files are picked");
     assertNull(dl.getV1InfoHash(), "a v2-only torrent has no v1 hash");
     String v2 = ti.infoHashV2().toHex();
-    assertTrue(engine.resumeTorrentFile(v2).isFile(), "the session copy is named by its v2 hash");
+    assertTrue(
+        local.engine.resumeTorrentFile(v2).isFile(), "the session copy is named by its v2 hash");
   }
 
   @Test
@@ -179,15 +178,15 @@ class BTEngineDownloadTest {
     String magnet = ti.makeMagnetUri();
     File saveDir = dir.resolve("save").toFile();
 
-    engine.download(magnet, saveDir, new torrent_flags_t());
+    local.engine.download(magnet, saveDir, new torrent_flags_t());
 
     BTDownload dl = Events.next(local.events.added, "magnet");
-    assertNotNull(engine.find(ti.infoHashV1()), "the magnet's transfer is in the session");
+    assertNotNull(local.engine.find(ti.infoHashV1()), "the magnet's transfer is in the session");
     dl.pause();
     await(() -> LocalEngine.isPaused(dl), "the transfer paused");
 
     // A peer in the link is connected to; ports under 1024 are filtered, so this one never is.
-    engine.download(magnet + "&x.pe=127.0.0.1:1", saveDir, new torrent_flags_t());
+    local.engine.download(magnet + "&x.pe=127.0.0.1:1", saveDir, new torrent_flags_t());
 
     BTDownload update = Events.next(local.events.updated, "magnet");
     assertEquals(dl.getInfoHash(), update.getInfoHash());
@@ -199,7 +198,7 @@ class BTEngineDownloadTest {
     TorrentInfo ti = album("crawled");
     File saveDir = dir.resolve("save").toFile();
 
-    engine.download(crawled(ti, 1), saveDir);
+    local.engine.download(crawled(ti, 1), saveDir);
 
     BTDownload dl = Events.next(local.events.added, "crawled");
     await(
@@ -210,7 +209,7 @@ class BTEngineDownloadTest {
         "only the crawled file is wanted");
     assertTrue(new File(local.ctx.torrentsDir, "crawled.torrent").isFile());
 
-    engine.download(crawled(ti, 0), saveDir, true);
+    local.engine.download(crawled(ti, 0), saveDir, true);
 
     Events.next(local.events.updated, "crawled");
     await(() -> !dl.isPartial(), "the second result's file is wanted too");
@@ -220,7 +219,7 @@ class BTEngineDownloadTest {
   void withoutASaveFolderDownloadsGoToTheDataFolder() throws Exception {
     TorrentInfo ti = album("default-folder");
 
-    engine.download(torrentFile(ti, dir.resolve("in/d.torrent")), null, null);
+    local.engine.download(torrentFile(ti, dir.resolve("in/d.torrent")), null, null);
 
     BTDownload dl = Events.next(local.events.added, "default-folder");
     assertEquals(local.ctx.dataDir, dl.getSavePath());
@@ -233,17 +232,17 @@ class BTEngineDownloadTest {
     TorrentInfo lost = album("lost");
     TorrentInfo kept = album("kept");
 
-    engine.download(torrentFile(lost, dir.resolve("in/lost.torrent")), impossible, null);
-    engine.download(lost, impossible, null, null, true);
-    engine.download(lost.makeMagnetUri(), impossible, new torrent_flags_t());
-    engine.download(crawled(lost, 0), impossible);
-    engine.download(kept, dir.resolve("save").toFile(), null, null);
+    local.engine.download(torrentFile(lost, dir.resolve("in/lost.torrent")), impossible, null);
+    local.engine.download(lost, impossible, null, null, true);
+    local.engine.download(lost.makeMagnetUri(), impossible, new torrent_flags_t());
+    local.engine.download(crawled(lost, 0), impossible);
+    local.engine.download(kept, dir.resolve("save").toFile(), null, null);
 
     // Alerts arrive in order: once the later download is in, the earlier ones would have been too.
     Events.next(local.events.added, "kept");
     assertTrue(local.events.added.isEmpty(), "nothing else was added");
-    assertNull(engine.find(lost.infoHashV1()));
-    assertFalse(engine.resumeTorrentFile(lost.infoHashV1().toHex()).exists());
+    assertNull(local.engine.find(lost.infoHashV1()));
+    assertFalse(local.engine.resumeTorrentFile(lost.infoHashV1().toHex()).exists());
   }
 
   private TorrentInfo album(String name) throws Exception {

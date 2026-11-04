@@ -52,7 +52,10 @@ final class LocalEngine implements AutoCloseable {
   static final long TIMEOUT_SECONDS = 30;
 
   final BTContext ctx;
-  final BTEngine engine;
+
+  /** The running engine; {@link #restart()} replaces it, as a new run of the app does. */
+  BTEngine engine;
+
   final Events events = new Events();
 
   private LocalEngine(BTContext ctx, BTEngine engine) {
@@ -95,12 +98,27 @@ final class LocalEngine implements AutoCloseable {
     return constructor.newInstance();
   }
 
-  /** Stops the session and starts it again on the same folders, as a restart of the app does. */
+  /**
+   * Stops the engine and starts a new one on the same folders, as quitting and opening the app
+   * again does: nothing carries over but the files.
+   */
   void restart() throws Exception {
+    restart(() -> {});
+  }
+
+  /** {@link #restart()}, doing {@code whileStopped} between quitting and opening the app. */
+  void restart(ThrowingRunnable whileStopped) throws Exception {
     engine.stop();
+    whileStopped.run();
     events.clear();
+    engine = newEngine();
+    engine.setListener(events);
     engine.start();
     awaitStarted();
+  }
+
+  interface ThrowingRunnable {
+    void run() throws Exception;
   }
 
   private void awaitStarted() {

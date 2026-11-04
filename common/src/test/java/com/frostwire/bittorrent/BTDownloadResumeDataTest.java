@@ -37,12 +37,10 @@ class BTDownloadResumeDataTest {
 
   @TempDir Path dir;
   private LocalEngine local;
-  private BTEngine engine;
 
   @BeforeEach
   void startEngine() throws Exception {
     local = LocalEngine.start(dir);
-    engine = local.engine;
   }
 
   @AfterEach
@@ -54,7 +52,7 @@ class BTDownloadResumeDataTest {
   void aPausedTransferIsStillPausedAfterARestart() throws Exception {
     TorrentInfo ti = album("paused");
     File saveDir = dir.resolve("save").toFile();
-    engine.download(ti, saveDir, null, null);
+    local.engine.download(ti, saveDir, null, null);
     BTDownload dl = Events.next(local.events.added, "paused");
     BTDownload update = Events.next(local.events.updated, "paused");
 
@@ -66,7 +64,7 @@ class BTDownloadResumeDataTest {
     await(() -> "true".equals(extraOf(hash).get("was_paused")), "the pause was saved");
 
     local.restart();
-    engine.restoreDownloads();
+    local.engine.restoreDownloads();
 
     BTDownload restored = Events.next(local.events.added, "paused");
     assertTrue(restored.wasPaused());
@@ -75,7 +73,12 @@ class BTDownloadResumeDataTest {
     restored.resume();
 
     assertFalse(restored.wasPaused());
-    await(() -> "false".equals(extraOf(hash).get("was_paused")), "the resume was saved");
+    await(
+        () ->
+            "false"
+                .equals(
+                    LocalEngine.resumeExtra(local.engine.resumeDataFile(hash)).get("was_paused")),
+        "the resume was saved");
   }
 
   @Test
@@ -84,7 +87,7 @@ class BTDownloadResumeDataTest {
     byte[] source = new byte[32];
     Arrays.fill(source, (byte) 7);
 
-    engine.download(ti, dir.resolve("save").toFile(), null, null, false, source);
+    local.engine.download(ti, dir.resolve("save").toFile(), null, null, false, source);
 
     BTDownload dl = Events.next(local.events.added, "sourced");
     assertArrayEquals(source, dl.getDistributedSourcePeerPub());
@@ -94,7 +97,7 @@ class BTDownloadResumeDataTest {
         "the source was saved with the resume data");
 
     local.restart();
-    engine.restoreDownloads();
+    local.engine.restoreDownloads();
 
     assertArrayEquals(
         source, Events.next(local.events.added, "sourced").getDistributedSourcePeerPub());
@@ -108,10 +111,10 @@ class BTDownloadResumeDataTest {
     Arrays.fill(first, (byte) 1);
     Arrays.fill(second, (byte) 2);
     File saveDir = dir.resolve("save").toFile();
-    engine.download(ti, saveDir, null, null, false, first);
+    local.engine.download(ti, saveDir, null, null, false, first);
     BTDownload dl = Events.next(local.events.added, "first-source");
 
-    engine.download(ti, saveDir, null, null, false, second);
+    local.engine.download(ti, saveDir, null, null, false, second);
 
     Events.next(local.events.updated, "first-source");
     BTDownload update = Events.next(local.events.updated, "first-source");
@@ -125,7 +128,7 @@ class BTDownloadResumeDataTest {
   }
 
   private Map<String, String> extraOf(String hash) {
-    return LocalEngine.resumeExtra(engine.resumeDataFile(hash));
+    return LocalEngine.resumeExtra(local.engine.resumeDataFile(hash));
   }
 
   private TorrentInfo album(String name) throws Exception {

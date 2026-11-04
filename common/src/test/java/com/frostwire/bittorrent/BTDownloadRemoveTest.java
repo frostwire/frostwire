@@ -41,12 +41,10 @@ class BTDownloadRemoveTest {
 
   @TempDir Path dir;
   private LocalEngine local;
-  private BTEngine engine;
 
   @BeforeEach
   void startEngine() throws Exception {
     local = LocalEngine.start(dir);
-    engine = local.engine;
   }
 
   @AfterEach
@@ -67,7 +65,7 @@ class BTDownloadRemoveTest {
       bytes[i] = 0;
     }
     Files.write(two.toPath(), bytes);
-    engine.download(ti, dir.resolve("content").toFile(), null, null);
+    local.engine.download(ti, dir.resolve("content").toFile(), null, null);
     BTDownload dl = Events.next(local.events.added, "partial");
     Recorder recorder = new Recorder(dl);
     await(() -> dl.getTorrentHandle().status(true).progress() > 0, "the data was checked");
@@ -87,12 +85,12 @@ class BTDownloadRemoveTest {
     content(folder.resolve("one.mp3"), 64 * 1024, 1);
     TorrentInfo ti = torrent(folder.toFile(), null);
     // Already has its data: it checks complete and seeds.
-    engine.download(ti, dir.resolve("content").toFile(), null, null, true);
+    local.engine.download(ti, dir.resolve("content").toFile(), null, null, true);
     BTDownload dl = Events.next(local.events.added, "gone");
     Recorder recorder = new Recorder(dl);
     String hash = ti.infoHashV1().toHex();
     await(() -> dl.isFinished(true), "the data was checked");
-    await(() -> engine.resumeDataFile(hash).isFile(), "the resume data was saved");
+    await(() -> local.engine.resumeDataFile(hash).isFile(), "the resume data was saved");
     File torrentCopy = new File(local.ctx.torrentsDir, "gone.torrent");
     assertTrue(torrentCopy.isFile());
 
@@ -100,8 +98,8 @@ class BTDownloadRemoveTest {
 
     assertSame(dl, recorder.next());
     assertTrue(recorder.incompleteFiles.isEmpty(), "a complete transfer has no partial files");
-    assertFalse(engine.resumeDataFile(hash).exists(), "the resume data was deleted");
-    assertFalse(engine.resumeTorrentFile(hash).exists(), "the session copy was deleted");
+    assertFalse(local.engine.resumeDataFile(hash).exists(), "the resume data was deleted");
+    assertFalse(local.engine.resumeTorrentFile(hash).exists(), "the session copy was deleted");
     assertFalse(torrentCopy.exists(), "the saved .torrent was deleted");
     await(() -> !folder.resolve("one.mp3").toFile().exists(), "the data was deleted");
     assertFalse(dl.getTorrentHandle().isValid());
@@ -116,11 +114,11 @@ class BTDownloadRemoveTest {
     content(folder.resolve("one.mp3"), 64 * 1024, 1);
     TorrentInfo ti = torrent(folder.toFile(), null);
     File saveDir = dir.resolve("save").toFile();
-    engine.download(ti, saveDir, null, null);
+    local.engine.download(ti, saveDir, null, null);
     BTDownload dl = Events.next(local.events.added, "updated");
     Recorder recorder = new Recorder(dl);
     // Opening the torrent again makes a newer BTDownload; the transfers list keeps the first.
-    engine.download(ti, saveDir, null, null);
+    local.engine.download(ti, saveDir, null, null);
     Events.next(local.events.updated, "updated");
 
     dl.remove();
