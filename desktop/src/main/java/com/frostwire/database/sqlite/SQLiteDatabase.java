@@ -25,7 +25,6 @@ import com.frostwire.util.Logger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.lang3.StringUtils;
 
@@ -206,8 +205,6 @@ public class SQLiteDatabase {
   public void close() {
     if (open.compareAndSet(true, false)) {
       try {
-        Statement statement = connection.createStatement();
-        statement.execute("SHUTDOWN");
         connection.close();
       } catch (Throwable e) {
         LOG.warn("Error closing the smart search database", e);

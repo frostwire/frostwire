@@ -220,6 +220,13 @@ class SQLiteDatabaseTest {
   }
 
   @Test
+  void closeReleasesTheSqliteConnection() throws Exception {
+    db.close();
+
+    assertTrue(connection.isClosed());
+  }
+
+  @Test
   void closingTwiceIsHarmless() {
     db.close();
 
