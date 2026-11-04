@@ -579,13 +579,15 @@ public final class BTDownload implements BittorrentDownload {
     incompleteFilesToRemove = getIncompleteFiles();
     // prevent any further resume serialization during removal
     removing = true;
-    engine.removeDownloadListener(innerListener);
-    if (th.isValid()) {
+    if (th.isValid() && engine.isRunning()) {
+      // Keeps listening: torrentRemoved() stops on TORRENT_REMOVED, after telling the listener.
       if (deleteData) {
         engine.remove(th, SessionHandle.DELETE_FILES);
       } else {
         engine.remove(th);
       }
+    } else {
+      engine.removeDownloadListener(innerListener);
     }
     if (deleteTorrent) {
       File torrent = engine.readTorrentPath(infoHash);
