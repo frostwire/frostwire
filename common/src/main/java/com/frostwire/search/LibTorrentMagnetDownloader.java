@@ -112,6 +112,10 @@ public class LibTorrentMagnetDownloader implements MagnetDownloader {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    return fwDummy.getParentFile();
+    File tempDir = fwDummy.getParentFile();
+    // The file only finds the temp folder; left there, every magnet fetch added one.
+    //noinspection ResultOfMethodCallIgnored
+    fwDummy.delete();
+    return tempDir;
   }
 }

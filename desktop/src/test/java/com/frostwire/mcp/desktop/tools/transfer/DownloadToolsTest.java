@@ -24,7 +24,11 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -98,6 +102,29 @@ class DownloadToolsTest {
         "Failed to download .torrent file from URL",
         new DownloadTorrentTool().execute(source("url", url)).get("error").getAsString(),
         "the server answers 404");
+  }
+
+  @Test
+  void aMagnetWithoutASessionGetsNoMetadataAndLeavesNoTempFiles() throws Exception {
+    Path temp = Path.of(System.getProperty("java.io.tmpdir"));
+    Set<Path> before = probeFiles(temp);
+    String magnet = "magnet:?xt=urn:btih:" + expectedId() + "&dn=iso";
+
+    JsonObject out = new DownloadTorrentTool().execute(source("magnet", magnet));
+
+    assertEquals(
+        "Failed to fetch torrent metadata from magnet URI", out.get("error").getAsString());
+    Set<Path> left = probeFiles(temp);
+    left.removeAll(before);
+    assertEquals(Set.of(), left, "finding the temp folder must not leave a file in it");
+  }
+
+  private static Set<Path> probeFiles(Path temp) throws java.io.IOException {
+    try (Stream<Path> files = Files.list(temp)) {
+      return files
+          .filter(p -> p.getFileName().toString().startsWith("fw_dummy_"))
+          .collect(Collectors.toCollection(HashSet::new));
+    }
   }
 
   @Test
