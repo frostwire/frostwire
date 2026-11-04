@@ -117,6 +117,7 @@ class BTEngineDownloadTest {
   @Test
   void aSearchResultsTorrentIsSavedUnderAFileNameEveryFileSystemAccepts() throws Exception {
     TorrentInfo ti = album("live [2024] a|b");
+    Files.delete(local.ctx.torrentsDir.toPath()); // made again when needed
 
     local.engine.download(ti, dir.resolve("save").toFile(), null, null, true);
 

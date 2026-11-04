@@ -75,6 +75,24 @@ class BTEngineSessionTest {
   }
 
   @Test
+  void aListenerNeedNotHandleDownloadsAndThereMayBeNone() throws Exception {
+    local = LocalEngine.start(dir);
+    TorrentInfo first = album("first");
+    TorrentInfo second = album("second");
+    File content = dir.resolve("content").toFile(); // has the data: they check and finish
+
+    local.engine.setListener(new BTEngineAdapter());
+    local.engine.download(first, content, null, null);
+    awaitFinished(first);
+    local.engine.setListener(null);
+    local.engine.download(second, content, null, null);
+    awaitFinished(second);
+
+    assertNull(local.engine.getListener());
+    assertTrue(local.events.added.isEmpty(), "the replaced listener heard nothing");
+  }
+
+  @Test
   void theSessionIdentifiesItselfAsThisFrostWireVersion() throws Exception {
     local = LocalEngine.start(dir);
 
@@ -313,6 +331,21 @@ class BTEngineSessionTest {
     } finally {
       BTEngine.ctx = saved;
     }
+  }
+
+  private void awaitFinished(TorrentInfo ti) {
+    await(
+        () -> {
+          var th = local.engine.find(ti);
+          return th != null && th.isValid() && th.status(true).isFinished();
+        },
+        ti.name() + " finished");
+  }
+
+  private TorrentInfo album(String name) throws Exception {
+    Path folder = dir.resolve("content").resolve(name);
+    LocalEngine.content(folder.resolve("one.mp3"), 64 * 1024, name.hashCode());
+    return LocalEngine.torrent(folder.toFile(), null);
   }
 
   private static String stateVersion(File settings) throws Exception {

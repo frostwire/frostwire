@@ -22,7 +22,10 @@ import com.frostwire.bittorrent.LocalEngine.Events;
 import com.frostwire.jlibtorrent.SessionManager;
 import com.frostwire.jlibtorrent.TorrentBuilder;
 import com.frostwire.jlibtorrent.TorrentInfo;
+import com.frostwire.jlibtorrent.TorrentStatus;
+import com.frostwire.jlibtorrent.Vectors;
 import com.frostwire.jlibtorrent.swig.create_flags_t;
+import com.frostwire.jlibtorrent.swig.entry;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
 import java.io.File;
@@ -188,6 +191,29 @@ class BTDownloadTransferTest {
   }
 
   @Test
+  void aTransferWhoseFilesWereDeletedWhileTheAppWasClosedStartsOver() throws Exception {
+    TorrentInfo ti = album("deleted");
+    Path saveDir = dir.resolve("content");
+    local.engine.download(ti, saveDir.toFile(), null, null);
+    BTDownload dl = Events.next(local.events.added, "deleted");
+    await(() -> dl.isFinished(true), "the data was checked");
+    File resume = local.engine.resumeDataFile(ti.infoHashV1().toHex());
+    await(() -> hasEveryPiece(resume, ti.numPieces()), "the resume data has every piece");
+
+    local.restart(() -> deleteTree(saveDir.resolve("deleted")));
+    local.engine.restoreDownloads();
+
+    BTDownload restored = Events.next(local.events.added, "deleted");
+    await(
+        () -> {
+          var status = restored.getTorrentHandle().status(true);
+          return status.state() == TorrentStatus.State.DOWNLOADING && status.progress() == 0f;
+        },
+        "it was checked again and has nothing");
+    assertFalse(restored.isFinished(true));
+  }
+
+  @Test
   void movingTheStorageMovesUnfinishedTransfersAndRemembersTheNewFolder() throws Exception {
     TorrentInfo ti = album("moving");
     File saveDir = dir.resolve("save").toFile();
@@ -291,6 +317,17 @@ class BTDownloadTransferTest {
     content(folder.resolve("one.mp3"), 64 * 1024, 1);
     content(folder.resolve("two.flac"), 128 * 1024, 2);
     return torrent(folder.toFile(), flags);
+  }
+
+  /** Whether the resume file says every piece is on disk. */
+  private static boolean hasEveryPiece(File resume, int pieces) {
+    try {
+      entry e = entry.bdecode(Vectors.bytes2byte_vector(Files.readAllBytes(resume.toPath())));
+      String have = e.dict().get("pieces").string();
+      return have.length() == pieces && have.chars().allMatch(c -> (c & 1) == 1);
+    } catch (Exception notSavedYet) {
+      return false;
+    }
   }
 
   private static void deleteTree(Path path) throws Exception {
