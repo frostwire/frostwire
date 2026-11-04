@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.frostwire.bittorrent.LocalEngine.Events;
 import com.frostwire.jlibtorrent.Priority;
+import com.frostwire.jlibtorrent.TorrentBuilder;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.swig.torrent_flags_t;
@@ -29,6 +30,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -121,6 +125,52 @@ class BTEngineDownloadTest {
     File saved = new File(local.ctx.torrentsDir, "live _2024_ a_b.torrent");
     assertTrue(saved.isFile(), "the torrent was saved to the torrents folder");
     assertEquals(ti.infoHashV1(), new TorrentInfo(saved).infoHashV1());
+  }
+
+  @Test
+  void aV2OnlyTorrentDownloadsOnlyThePickedFilesAndIsStoredUnderItsV2Hash() throws Exception {
+    TorrentInfo ti = album("v2album", TorrentBuilder.V2_ONLY);
+    File torrent = torrentFile(ti, dir.resolve("in/v2album.torrent"));
+    // A v2-only torrent's pick is applied on its ADD_TORRENT alert. Hold the adding thread right
+    // after it adds the torrent until that alert has been handled, as a busy machine can.
+    java.util.logging.Logger log = java.util.logging.Logger.getLogger("BTEngine");
+    Handler holdAfterAdding =
+        new Handler() {
+          @Override
+          public void publish(LogRecord record) {
+            String message = record.getMessage();
+            if (message != null && message.contains("new v2-only torrent added")) {
+              long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+              while (local.events.added.isEmpty() && System.nanoTime() < deadline) {
+                Thread.onSpinWait();
+              }
+            }
+          }
+
+          @Override
+          public void flush() {}
+
+          @Override
+          public void close() {}
+        };
+    log.addHandler(holdAfterAdding);
+    try {
+      engine.download(torrent, dir.resolve("save").toFile(), new boolean[] {true, false});
+    } finally {
+      log.removeHandler(holdAfterAdding);
+    }
+
+    BTDownload dl = Events.next(local.events.added, "v2album");
+    await(
+        () ->
+            Arrays.equals(
+                new Priority[] {Priority.NORMAL, Priority.IGNORE},
+                dl.getTorrentHandle().filePriorities()),
+        "only the first file is wanted");
+    assertFalse(LocalEngine.isPaused(dl), "the transfer starts once its files are picked");
+    assertNull(dl.getV1InfoHash(), "a v2-only torrent has no v1 hash");
+    String v2 = ti.infoHashV2().toHex();
+    assertTrue(engine.resumeTorrentFile(v2).isFile(), "the session copy is named by its v2 hash");
   }
 
   @Test

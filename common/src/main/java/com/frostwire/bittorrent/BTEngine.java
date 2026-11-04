@@ -1219,6 +1219,22 @@ public final class BTEngine extends SessionManager {
       fireDownloadUpdate(th);
       th.resume();
     } else { // new Download (including v2-only torrents)
+      if (infoHashV1 == null && priorities != null) {
+        // Stored before adding: the ADD_TORRENT alert that applies them can fire before
+        // download() returns, and then the torrent stayed paused with every file wanted.
+        try {
+          Sha256Hash v2Hash = ti.infoHashV2();
+          if (v2Hash != null && !v2Hash.isAllZeros()) {
+            String hashKey = v2Hash.toString();
+            synchronized (pendingV2TorrentPriorities) {
+              pendingV2TorrentPriorities.put(hashKey, priorities.clone());
+            }
+            LOG.info("BTEngine.download() - stored priorities for v2-only torrent: " + hashKey);
+          }
+        } catch (Throwable t) {
+          LOG.warn("BTEngine.download() - unable to store priorities for v2-only torrent", t);
+        }
+      }
       // Adds paused to avoid the race where default priorities are used
       download(ti, saveDir, resumeFile, priorities, peers, TorrentFlags.PAUSED);
 
@@ -1248,21 +1264,6 @@ public final class BTEngine extends SessionManager {
           LOG.info(
               "BTEngine.download() - new v2-only torrent added, will be handled by torrent_added"
                   + " alert");
-          // Store priorities for V2-only torrents to apply them when the ADD_TORRENT alert fires
-          if (priorities != null) {
-            try {
-              Sha256Hash v2Hash = ti.infoHashV2();
-              if (v2Hash != null && !v2Hash.isAllZeros()) {
-                String hashKey = v2Hash.toString();
-                synchronized (pendingV2TorrentPriorities) {
-                  pendingV2TorrentPriorities.put(hashKey, priorities.clone());
-                }
-                LOG.info("BTEngine.download() - stored priorities for v2-only torrent: " + hashKey);
-              }
-            } catch (Throwable t) {
-              LOG.warn("BTEngine.download() - unable to store priorities for v2-only torrent", t);
-            }
-          }
         } else {
           LOG.warn(
               "BTEngine.download() - new download: torrent was not successfully added, torrent"
