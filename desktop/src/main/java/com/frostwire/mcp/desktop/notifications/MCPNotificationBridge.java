@@ -17,6 +17,7 @@ import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchManager;
 import com.frostwire.search.SearchResult;
+import com.frostwire.search.relay.BTEngineListenerChain;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.Logger;
 import com.google.gson.JsonArray;
@@ -41,7 +42,6 @@ public class MCPNotificationBridge implements BTEngineListener, SearchListener {
   private static final long VPN_POLL_INTERVAL_MS = 20000;
 
   private volatile MCPServer server;
-  private BTEngineListener delegateBTEngineListener;
   private SearchListener delegateSearchListener;
   private final Map<String, TransferState> lastStates = new ConcurrentHashMap<>();
   private final Map<String, Long> lastProgressTime = new ConcurrentHashMap<>();
@@ -73,12 +73,15 @@ public class MCPNotificationBridge implements BTEngineListener, SearchListener {
 
   private void registerListeners() {
     try {
-      BTEngine engine = BTEngine.getInstance();
-      delegateBTEngineListener = engine.getListener();
-      engine.setListener(this);
+      // Joins the engine's listeners instead of standing in front of them: listeners added later
+      // (the download manager's, at startup) chain this bridge, so wrapping them again on a restart
+      // would make it call itself.
+      BTEngineListenerChain.install(BTEngine.getInstance(), this);
 
+      // The SearchManager has a single listener; never take this bridge for the one it wraps.
       SearchManager searchManager = SearchManager.getInstance();
-      delegateSearchListener = searchManager.getListener();
+      SearchListener searchListener = searchManager.getListener();
+      delegateSearchListener = searchListener != this ? searchListener : null;
       searchManager.setListener(this);
 
       lastKnownVpnStatus = VPNs.isVPNActive();
@@ -102,13 +105,11 @@ public class MCPNotificationBridge implements BTEngineListener, SearchListener {
         vpnPollTask = null;
       }
 
-      BTEngine engine = BTEngine.getInstance();
-      if (delegateBTEngineListener != null) {
-        engine.setListener(delegateBTEngineListener);
-      }
+      BTEngineListenerChain.remove(BTEngine.getInstance(), this);
 
+      // Put back what was there, even none, unless someone has replaced the bridge since.
       SearchManager searchManager = SearchManager.getInstance();
-      if (delegateSearchListener != null) {
+      if (searchManager.getListener() == this) {
         searchManager.setListener(delegateSearchListener);
       }
 
@@ -144,19 +145,12 @@ public class MCPNotificationBridge implements BTEngineListener, SearchListener {
   }
 
   @Override
-  public void started(BTEngine engine) {
-    if (delegateBTEngineListener != null) {
-      delegateBTEngineListener.started(engine);
-    }
-  }
+  public void started(BTEngine engine) {}
 
   @Override
   public void stopped(BTEngine engine) {
     lastStates.clear();
     lastProgressTime.clear();
-    if (delegateBTEngineListener != null) {
-      delegateBTEngineListener.stopped(engine);
-    }
   }
 
   @Override
@@ -167,9 +161,6 @@ public class MCPNotificationBridge implements BTEngineListener, SearchListener {
           new TransferStateNotification(
               dl.getInfoHash(), "UNKNOWN", dl.getState().name(), dl.getProgress());
       sendNotification(notif.method(), notif.payload());
-    }
-    if (delegateBTEngineListener != null) {
-      delegateBTEngineListener.downloadAdded(engine, dl);
     }
   }
 
@@ -206,18 +197,6 @@ public class MCPNotificationBridge implements BTEngineListener, SearchListener {
           lastProgressTime.put(dl.getInfoHash(), now);
         }
       }
-    }
-    if (delegateBTEngineListener != null) {
-      delegateBTEngineListener.downloadUpdate(engine, dl);
-    }
-  }
-
-  /** Passes completion on to the listener this bridge wraps (karma endorsement listens). */
-  @Override
-  public void downloadFinished(BTEngine engine, BTDownload dl) {
-    BTEngineListener delegate = delegateBTEngineListener;
-    if (delegate != null) {
-      delegate.downloadFinished(engine, dl);
     }
   }
 

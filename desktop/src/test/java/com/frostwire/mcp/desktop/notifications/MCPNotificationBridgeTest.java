@@ -9,6 +9,7 @@ package com.frostwire.mcp.desktop.notifications;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -19,6 +20,8 @@ import com.frostwire.mcp.MCPServer;
 import com.frostwire.mcp.desktop.EngineContext;
 import com.frostwire.mcp.desktop.adapters.TestTransfers;
 import com.frostwire.mcp.desktop.adapters.TestTransfers.Download;
+import com.frostwire.mcp.desktop.state.SearchSessionManager;
+import com.frostwire.mcp.desktop.tools.search.SearchTool;
 import com.frostwire.mcp.transport.MCPTransport;
 import com.frostwire.mcp.transport.MCPTransportHandler;
 import com.frostwire.search.HttpSearchResult;
@@ -26,6 +29,7 @@ import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchManager;
 import com.frostwire.search.SearchResult;
+import com.frostwire.search.relay.BTEngineListenerChain;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import java.nio.file.Path;
@@ -78,8 +82,8 @@ class MCPNotificationBridgeTest {
   }
 
   @Test
-  void theBridgeStandsInFrontOfTheEngineAndSearchListenersUntilRemoved() {
-    assertSame(bridge, engine.getListener());
+  void theBridgeJoinsTheEngineListenersAndStandsInFrontOfTheSearchListenerUntilRemoved() {
+    assertTrue(engine.getListener() instanceof BTEngineListenerChain, "both engine listeners");
     assertSame(bridge, SearchManager.getInstance().getListener());
 
     bridge.setServer(null);
@@ -89,12 +93,14 @@ class MCPNotificationBridgeTest {
   }
 
   @Test
-  void transferEventsBecomeStateNotificationsAndArePassedOn() throws Exception {
+  void transferEventsBecomeStateNotificationsAndStillReachTheOtherListeners() throws Exception {
     Download download = TestTransfers.download(TestTransfers.torrent(dir, "album", 1_000), dir);
     BTDownload dl = download.download();
 
-    bridge.started(engine);
-    bridge.downloadAdded(engine, dl);
+    // The engine calls whatever listener it has: the chain the bridge joined.
+    BTEngineListener listeners = engine.getListener();
+    listeners.started(engine);
+    listeners.downloadAdded(engine, dl);
 
     JsonObject added = transport.only("notifications/transfer_state_changed");
     assertEquals(download.id(), added.get("downloadId").getAsString());
@@ -102,17 +108,17 @@ class MCPNotificationBridgeTest {
     assertEquals("STOPPED", added.get("newState").getAsString());
     assertEquals(0, added.get("progress").getAsInt());
 
-    bridge.downloadUpdate(engine, dl);
+    listeners.downloadUpdate(engine, dl);
     assertTrue(transport.sent.isEmpty(), "same state, nothing to tell");
 
-    bridge.stopped(engine);
-    bridge.downloadUpdate(engine, dl);
+    listeners.stopped(engine);
+    listeners.downloadUpdate(engine, dl);
     JsonObject afterRestart = transport.only("notifications/transfer_state_changed");
     assertEquals("UNKNOWN", afterRestart.get("oldState").getAsString(), "stopping forgets states");
 
-    bridge.downloadFinished(engine, dl);
-    bridge.downloadAdded(engine, null);
-    bridge.downloadUpdate(engine, null);
+    listeners.downloadFinished(engine, dl);
+    listeners.downloadAdded(engine, null);
+    listeners.downloadUpdate(engine, null);
     assertTrue(transport.sent.isEmpty());
 
     assertEquals(
@@ -157,6 +163,59 @@ class MCPNotificationBridgeTest {
   }
 
   @Test
+  void restartingTheServerWithNoOtherListenersLeavesNoneAndNeverWrapsItself() {
+    bridge.setServer(null);
+    engine.setListener(null);
+    SearchManager.getInstance().setListener(null);
+    MCPServer server = new MCPServer("test");
+    server.setTransport(transport);
+
+    bridge.setServer(server);
+    bridge.setServer(null);
+    assertNull(engine.getListener(), "the engine had no listener before");
+    assertNull(SearchManager.getInstance().getListener(), "the search manager had none either");
+
+    // Started again, the bridge must not take itself for the listener it stands in front of: it
+    // would call itself until the stack overflowed, delivering each event over and over.
+    bridge.setServer(server);
+    assertSame(bridge, engine.getListener(), "the only engine listener");
+    JsonObject args = new JsonObject();
+    args.addProperty("keywords", "loop");
+    JsonArray engines = new JsonArray();
+    engines.add("NO_SUCH_ENGINE_ID");
+    args.add("engines", engines);
+    long token = Long.parseLong(new SearchTool().execute(args).get("token").getAsString());
+
+    SearchManager.getInstance().getListener().onResults(token, List.of(new CloudResult("a.mp3")));
+
+    assertEquals(1, SearchSessionManager.instance().getSession(token).getResults().size());
+  }
+
+  @Test
+  void aListenerAddedAfterTheBridgeKeepsItsEventsAcrossAServerRestart() throws Exception {
+    // At startup the MCP server starts before the download manager adds its engine listener.
+    List<String> later = new ArrayList<>();
+    BTEngineListener downloadManager =
+        new RecordingEngineListener() {
+          @Override
+          public void started(BTEngine engine) {
+            later.add("started");
+          }
+        };
+    BTEngineListenerChain.install(engine, downloadManager);
+    MCPServer server = new MCPServer("test");
+    server.setTransport(transport);
+
+    bridge.setServer(null);
+    bridge.setServer(server);
+    engine.getListener().started(engine);
+
+    assertEquals(List.of("started"), later, "once, and not dropped by the restart");
+    assertEquals(List.of("started"), engineEvents);
+    BTEngineListenerChain.remove(engine, downloadManager);
+  }
+
+  @Test
   void nothingIsSentWithoutAServer() {
     bridge.setServer(null);
     transport.sent.clear();
@@ -196,7 +255,7 @@ class MCPNotificationBridgeTest {
     assertEquals("notifications/search_completed", new SearchCompletedNotification("1").method());
   }
 
-  private final class RecordingEngineListener implements BTEngineListener {
+  private class RecordingEngineListener implements BTEngineListener {
     @Override
     public void started(BTEngine engine) {
       engineEvents.add("started");
