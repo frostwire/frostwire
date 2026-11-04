@@ -224,6 +224,20 @@ class BTEngineDownloadTest {
   }
 
   @Test
+  void aHybridMagnetFromADistributedSearchKeepsItsSource() throws Exception {
+    TorrentInfo ti = album("hybrid-magnet");
+    byte[] source = new byte[32];
+    Arrays.fill(source, (byte) 6);
+    String magnet = ti.makeMagnetUri();
+    assertTrue(magnet.contains("urn:btmh:"), magnet);
+
+    local.engine.download(magnet, dir.resolve("save").toFile(), new torrent_flags_t(), source);
+
+    assertArrayEquals(
+        source, Events.next(local.events.added, "hybrid-magnet").getDistributedSourcePeerPub());
+  }
+
+  @Test
   void aSourceThatIsNotAPeerKeyIsIgnored() throws Exception {
     TorrentInfo ti = album("bad-source");
 

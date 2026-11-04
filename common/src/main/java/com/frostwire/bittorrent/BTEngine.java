@@ -875,6 +875,18 @@ public final class BTEngine extends SessionManager {
           // The canonical hash above is the normal path.
         }
       }
+      if (source == null) {
+        // Without metadata (a magnet) both hashes above are the handle's best one: for a hybrid
+        // magnet that is its truncated v2 hash, which no source is remembered under.
+        try {
+          String hashes = canonicalInfoHash(new InfoHash(handle.swig().info_hashes()));
+          if (hashes != null) {
+            source = pendingSourcePeers.remove(hashes);
+          }
+        } catch (Throwable ignored) {
+          // A handle whose torrent is gone has no hashes to look up.
+        }
+      }
       if (source != null) {
         PendingSourcePeer consumed = source;
         pendingSourcePeers.entrySet().removeIf(entry -> entry.getValue() == consumed);
