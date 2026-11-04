@@ -250,6 +250,15 @@ public final class JdkWarmUp {
    */
   static final List<String> SEARCH_OPTIONS_PAINTER_KEY_PREFIXES = List.of("Slider", "CheckBox[");
 
+  /**
+   * Painters of the menu bar and its menus, built with the main window: each menu item's first
+   * style lookup loaded its Nimbus painter class by reflection on the EDT (Icebase #c8a58fd2e059,
+   * frostwire/frostwire#1483).
+   */
+  static final List<String> MENU_PAINTER_KEY_PREFIXES =
+      List.of(
+          "MenuBar", "Menu[", "MenuItem", "RadioButtonMenuItem", "CheckBoxMenuItem", "PopupMenu");
+
   private static final String PAINTER_KEY_SUFFIX = "Painter";
 
   /**
@@ -330,6 +339,13 @@ public final class JdkWarmUp {
       resolveInputMaps(UIManager.getLookAndFeelDefaults());
     } catch (Throwable t) {
       LOG.warn("Key binding warm-up failed: " + t.getMessage(), t);
+    }
+    try {
+      for (String prefix : MENU_PAINTER_KEY_PREFIXES) {
+        createPainters(UIManager.getDefaults(), prefix);
+      }
+    } catch (Throwable t) {
+      LOG.warn("Menu painter warm-up failed: " + t.getMessage(), t);
     }
     for (String className : classesToInitialize(OSUtils.isWindows())) {
       try {

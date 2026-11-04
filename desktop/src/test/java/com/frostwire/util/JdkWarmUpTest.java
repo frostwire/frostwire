@@ -457,6 +457,25 @@ class JdkWarmUpTest {
   }
 
   /**
+   * Building the main window's menu bar loaded each menu item's Nimbus painter class by reflection
+   * on the EDT (Icebase #c8a58fd2e059, frostwire/frostwire#1483).
+   */
+  @Test
+  void warmUpCreatesTheMenusNimbusPainters() throws Exception {
+    javax.swing.UIDefaults nimbus = new NimbusLookAndFeel().getDefaults();
+    for (String prefix : JdkWarmUp.MENU_PAINTER_KEY_PREFIXES) {
+      assertTrue(JdkWarmUp.createPainters(nimbus, prefix) > 0, prefix);
+    }
+    assertTrue(JdkWarmUp.MENU_PAINTER_KEY_PREFIXES.contains("RadioButtonMenuItem"));
+    assertTrue(
+        warmUpSource()
+            .replaceAll("\\s+", "")
+            .contains(
+                "for(Stringprefix:MENU_PAINTER_KEY_PREFIXES){createPainters(UIManager.getDefaults(),prefix);}"),
+        "not called by warmUp");
+  }
+
+  /**
    * The first search built Nimbus's Slider painters by reflection on the EDT, for the search
    * options panel's range sliders (Icebase #8a8cc233ad87, GitHub #1419). The same panel shows a
    * checkbox per search engine.
