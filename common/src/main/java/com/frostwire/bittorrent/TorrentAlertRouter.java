@@ -15,8 +15,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Routes a torrent alert to the listener registered for its torrent, so the engine needs one
- * session listener for all downloads.
+ * Routes a torrent alert to the listeners registered for its torrent, so the engine needs one
+ * session listener for all downloads. A torrent can have several: the engine makes a new {@link
+ * BTDownload} for it on each update, and the transfers list keeps listening to the first one.
  *
  * <p>Each download used to register its own session listener and drop the other torrents' alerts.
  * With N transfers every alert made N listener calls and N JNI handle comparisons, and jlibtorrent
@@ -76,7 +77,8 @@ final class TorrentAlertRouter<H> {
   }
 
   private final Handles<H> handles;
-  private final Map<Long, Route<H>> byId = new ConcurrentHashMap<>();
+  // A torrent can have several downloads: the engine makes a new one on each update.
+  private final Map<Long, Set<Route<H>>> byId = new ConcurrentHashMap<>();
   private final Set<Route<H>> routes = ConcurrentHashMap.newKeySet();
 
   TorrentAlertRouter(Handles<H> handles) {
@@ -89,7 +91,13 @@ final class TorrentAlertRouter<H> {
     Route<H> route = new Route<>(handle, id, listener);
     routes.add(route);
     if (id != 0) {
-      byId.put(id, route);
+      byId.compute(
+          id,
+          (k, sameId) -> {
+            Set<Route<H>> routesOfId = sameId != null ? sameId : ConcurrentHashMap.newKeySet();
+            routesOfId.add(route);
+            return routesOfId;
+          });
     }
   }
 
@@ -99,18 +107,31 @@ final class TorrentAlertRouter<H> {
       if (route.listener == listener) {
         routes.remove(route);
         if (route.id != 0) {
-          byId.remove(route.id, route);
+          byId.computeIfPresent(
+              route.id,
+              (id, sameId) -> {
+                sameId.remove(route);
+                return sameId.isEmpty() ? null : sameId;
+              });
         }
       }
     }
   }
 
-  /** Delivers {@code alert}, raised for {@code handle}, to the listener of that torrent. */
+  /** Delivers {@code alert}, raised for {@code handle}, to the listeners of that torrent. */
   void dispatch(H handle, Alert<?> alert) {
     long id = handles.id(handle);
-    Route<H> route = id != 0 ? byId.get(id) : null;
-    if (route != null && handles.same(route.handle, handle)) {
-      route.listener.alert(alert);
+    Set<Route<H>> sameId = id != 0 ? byId.get(id) : null;
+    boolean delivered = false;
+    if (sameId != null) {
+      for (Route<H> route : sameId) {
+        if (handles.same(route.handle, handle)) {
+          route.listener.alert(alert);
+          delivered = true;
+        }
+      }
+    }
+    if (delivered) {
       return;
     }
     for (Route<H> candidate : routes) {

@@ -134,6 +134,30 @@ class TorrentAlertRouterTest {
   }
 
   @Test
+  void everyDownloadOfATorrentGetsItsAlerts() {
+    // The engine makes a new BTDownload for a torrent on each update (more of its files picked,
+    // its magnet opened again), while the transfers list keeps listening to the first one.
+    TorrentAlertRouter<FakeHandle> router = new TorrentAlertRouter<>(HANDLES);
+    Object torrent = new Object();
+    Counting first = new Counting();
+    Counting update = new Counting();
+    router.add(new FakeHandle(5, torrent), first);
+    router.add(new FakeHandle(5, torrent), update);
+
+    router.dispatch(new FakeHandle(5, torrent), null);
+    router.dispatch(new FakeHandle(0, torrent), null);
+
+    assertEquals(2, first.alerts.get());
+    assertEquals(2, update.alerts.get());
+
+    router.remove(update);
+    router.dispatch(new FakeHandle(5, torrent), null);
+
+    assertEquals(3, first.alerts.get(), "removing one download keeps the other routed");
+    assertEquals(2, update.alerts.get());
+  }
+
+  @Test
   void removedDownloadsGetNoMoreAlerts() {
     TorrentAlertRouter<FakeHandle> router = new TorrentAlertRouter<>(HANDLES);
     Object torrent = new Object();
