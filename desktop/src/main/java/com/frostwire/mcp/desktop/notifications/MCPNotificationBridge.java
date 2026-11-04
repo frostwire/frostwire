@@ -12,6 +12,7 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.BTEngineListener;
 import com.frostwire.mcp.MCPServer;
 import com.frostwire.mcp.desktop.adapters.SearchAdapter;
+import com.frostwire.mcp.desktop.state.SearchSessionManager;
 import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchManager;
@@ -222,6 +223,8 @@ public class MCPNotificationBridge implements BTEngineListener, SearchListener {
 
   @Override
   public void onResults(long token, List<? extends SearchResult> results) {
+    // The SearchManager has one listener, this bridge: MCP searches get their results through it.
+    SearchSessionManager.instance().onResults(token, results);
     if (server != null && !results.isEmpty()) {
       JsonArray preview = new JsonArray();
       int limit = Math.min(results.size(), 5);
@@ -239,6 +242,7 @@ public class MCPNotificationBridge implements BTEngineListener, SearchListener {
 
   @Override
   public void onStopped(long token) {
+    SearchSessionManager.instance().onStopped(token);
     if (server != null) {
       SearchCompletedNotification notif = new SearchCompletedNotification(String.valueOf(token));
       sendNotification(notif.method(), notif.payload());
@@ -250,6 +254,7 @@ public class MCPNotificationBridge implements BTEngineListener, SearchListener {
 
   @Override
   public void onError(long token, SearchError error) {
+    SearchSessionManager.instance().onError(token, error);
     if (delegateSearchListener != null) {
       delegateSearchListener.onError(token, error);
     }

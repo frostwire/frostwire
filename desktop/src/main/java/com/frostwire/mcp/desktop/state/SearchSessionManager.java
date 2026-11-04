@@ -72,10 +72,14 @@ public class SearchSessionManager implements SearchListener {
     }
   }
 
+  /**
+   * The SearchManager calls this when no task of the search is left running. Its performers don't
+   * mark themselves stopped when they finish (only stop() does), so this is when the search ends.
+   */
   @Override
   public void onStopped(long token) {
     SearchSession session = sessions.get(token);
-    if (session != null && session.allPerformersStopped()) {
+    if (session != null) {
       session.setComplete();
     }
   }
