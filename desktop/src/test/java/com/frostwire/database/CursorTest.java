@@ -109,6 +109,32 @@ class CursorTest {
   }
 
   @Test
+  void anEmptyResultCountsZeroRows() throws SQLException {
+    Cursor c = query("SELECT * FROM songs WHERE id > 100");
+
+    assertEquals(0, c.getCount());
+    c.close();
+  }
+
+  @Test
+  void aClosedCursorCountsZeroRows() throws SQLException {
+    Cursor c = query("SELECT * FROM songs");
+    c.close();
+
+    assertEquals(0, c.getCount());
+  }
+
+  @Test
+  void aFailingDriverReadsAsNoRows() throws SQLException {
+    PreparedStatement statement = connection.prepareStatement("SELECT * FROM songs");
+    Cursor c = new Cursor(statement, failingOn("next", ResultSet.class));
+
+    assertFalse(c.moveToNext());
+    assertEquals(0, c.getCount());
+    statement.close();
+  }
+
+  @Test
   void closeReleasesTheResultSetAndItsStatement() throws SQLException {
     PreparedStatement statement = connection.prepareStatement("SELECT * FROM songs");
     ResultSet rs = statement.executeQuery();
@@ -139,7 +165,7 @@ class CursorTest {
   @Test
   void closeStillClosesTheStatementWhenTheResultSetFailsToClose() throws SQLException {
     PreparedStatement statement = connection.prepareStatement("SELECT * FROM songs");
-    ResultSet failingResultSet = failingOnClose(ResultSet.class);
+    ResultSet failingResultSet = failingOn("close", ResultSet.class);
     Cursor c = new Cursor(statement, failingResultSet);
 
     assertDoesNotThrow(c::close);
@@ -150,19 +176,19 @@ class CursorTest {
   void closeSwallowsAStatementThatFailsToClose() throws SQLException {
     PreparedStatement real = connection.prepareStatement("SELECT * FROM songs");
     ResultSet rs = real.executeQuery();
-    Cursor c = new Cursor(failingOnClose(Statement.class), rs);
+    Cursor c = new Cursor(failingOn("close", Statement.class), rs);
 
     assertDoesNotThrow(c::close);
     assertTrue(rs.isClosed());
     real.close();
   }
 
-  /** A JDBC object whose close() throws, standing in for a driver that fails to release it. */
-  private static <T> T failingOnClose(Class<T> type) {
+  /** A JDBC object whose {@code failing} method throws, as a driver error would. */
+  private static <T> T failingOn(String failing, Class<T> type) {
     InvocationHandler handler =
         (proxy, method, args) -> {
-          if (method.getName().equals("close")) {
-            throw new SQLException("close failed");
+          if (method.getName().equals(failing)) {
+            throw new SQLException(failing + " failed");
           }
           throw new UnsupportedOperationException(method.getName());
         };

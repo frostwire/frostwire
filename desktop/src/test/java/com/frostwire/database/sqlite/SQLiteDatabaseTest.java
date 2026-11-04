@@ -17,9 +17,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.frostwire.content.ContentValues;
 import com.frostwire.database.Cursor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -137,6 +143,22 @@ class SQLiteDatabaseTest {
   }
 
   @Test
+  void updateSetsEveryGivenColumnOfTheMatchingRows() {
+    insertAbc();
+
+    assertEquals(
+        1, db.update("cache_data", row("z", new byte[] {9}, 99), "key = ?", new String[] {"b"}));
+
+    Cursor c =
+        db.rawQueryWithFactory("SELECT data, date_added FROM cache_data WHERE key = 'z'", null);
+    assertTrue(c.moveToNext());
+    assertArrayEquals(new byte[] {9}, c.getBytes(1));
+    assertEquals(99, c.getLong(2));
+    c.close();
+    assertEquals(List.of("a", "z", "c"), keys(null));
+  }
+
+  @Test
   void updateWithoutWhereChangesEveryRow() {
     insertAbc();
     ContentValues values = new ContentValues();
@@ -238,6 +260,39 @@ class SQLiteDatabaseTest {
   }
 
   @Test
+  void closeMarksTheDatabaseClosedEvenWhenTheDriverFailsToClose() {
+    SQLiteDatabase failing =
+        new SQLiteDatabase(path, failingOn("close", connection, Connection.class));
+
+    assertDoesNotThrow(failing::close);
+    assertThrows(IllegalStateException.class, () -> failing.delete("cache_data", null, null));
+  }
+
+  @Test
+  void insertReportsMinusOneWhenTheNewRowIdCannotBeRead() {
+    SQLiteDatabase failing =
+        new SQLiteDatabase(path, failingOn("createStatement", connection, Connection.class));
+
+    assertEquals(-1, failing.insert("cache_data", null, row("a", null, 1)));
+  }
+
+  @Test
+  void aStatementThatFailsToCloseDoesNotFailTheWrite() {
+    insertAbc();
+    InvocationHandler handler =
+        (proxy, method, args) -> {
+          Object result = invoke(connection, method, args);
+          return result instanceof PreparedStatement
+              ? failingOn("close", (PreparedStatement) result, PreparedStatement.class)
+              : result;
+        };
+    SQLiteDatabase leaky = new SQLiteDatabase(path, proxy(Connection.class, handler));
+
+    assertEquals(1, leaky.delete("cache_data", "key = ?", new String[] {"a"}));
+    assertEquals(List.of("b", "c"), keys(null));
+  }
+
+  @Test
   void closingTwiceIsHarmless() {
     db.close();
 
@@ -249,5 +304,29 @@ class SQLiteDatabaseTest {
     RuntimeException e = new SQLiteException();
 
     assertTrue(e instanceof com.frostwire.database.SQLException);
+  }
+
+  /** The real JDBC object, except that {@code failing} throws as a driver error would. */
+  private static <T> T failingOn(String failing, T real, Class<T> type) {
+    return proxy(
+        type,
+        (proxy, method, args) -> {
+          if (method.getName().equals(failing)) {
+            throw new SQLException(failing + " failed");
+          }
+          return invoke(real, method, args);
+        });
+  }
+
+  private static <T> T proxy(Class<T> type, InvocationHandler handler) {
+    return type.cast(Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[] {type}, handler));
+  }
+
+  private static Object invoke(Object target, Method method, Object[] args) throws Throwable {
+    try {
+      return method.invoke(target, args);
+    } catch (InvocationTargetException e) {
+      throw e.getCause();
+    }
   }
 }
