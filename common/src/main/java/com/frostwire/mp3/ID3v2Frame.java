@@ -110,10 +110,11 @@ public class ID3v2Frame {
     BufferTools.copyIntoByteBuffer(data, 0, data.length, bytes, offset + HEADER_LENGTH);
   }
 
-  private void packHeader(byte[] bytes, int i) {
-    BufferTools.stringIntoByteBuffer(id, 0, id.length(), bytes, 0);
-    BufferTools.copyIntoByteBuffer(packDataLength(), 0, 4, bytes, 4);
-    BufferTools.copyIntoByteBuffer(packFlags(), 0, 2, bytes, 8);
+  /** Writes the header at {@code offset}; it was written at 0 whatever the offset. */
+  private void packHeader(byte[] bytes, int offset) {
+    BufferTools.stringIntoByteBuffer(id, 0, id.length(), bytes, offset);
+    BufferTools.copyIntoByteBuffer(packDataLength(), 0, 4, bytes, offset + DATA_LENGTH_OFFSET);
+    BufferTools.copyIntoByteBuffer(packFlags(), 0, 2, bytes, offset + FLAGS1_OFFSET);
   }
 
   protected byte[] packDataLength() {
