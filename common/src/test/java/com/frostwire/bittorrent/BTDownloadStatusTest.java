@@ -155,7 +155,17 @@ class BTDownloadStatusTest {
     assertEquals(0, dl.getUploadSpeed());
     assertEquals(0, dl.getETA());
     assertEquals(0, dl.getBytesReceived());
+    assertEquals(0, dl.getTotalBytesReceived());
+    assertEquals(0, dl.getBytesSent());
+    assertEquals(0, dl.getTotalBytesSent());
     assertEquals(0, dl.getConnectedPeers());
+    assertEquals(0, dl.getTotalPeers());
+    assertEquals(0, dl.getConnectedSeeds());
+    assertEquals(0, dl.getTotalSeeds());
+    assertEquals(0, dl.getActiveDuration());
+    assertEquals(0, dl.getSeedingDuration());
+    assertFalse(dl.isAnnouncingToDht());
+    assertFalse(dl.isAnnouncingToLsd());
     assertNull(dl.getContentSavePath());
     assertNull(dl.getV1InfoHash());
     assertTrue(dl.trackers().isEmpty());
@@ -262,6 +272,7 @@ class BTDownloadStatusTest {
               s.setAll_time_download(7000);
               s.setTotal_upload(300);
               s.setAll_time_upload(900);
+              s.setAdded_time(1_700_000_000L);
             });
 
     assertEquals(3, dl.getConnectedPeers());
@@ -276,6 +287,7 @@ class BTDownloadStatusTest {
     assertEquals(7000, dl.getTotalBytesReceived());
     assertEquals(300, dl.getBytesSent());
     assertEquals(900, dl.getTotalBytesSent());
+    assertEquals(new java.util.Date(1_700_000_000_000L), dl.getCreated());
   }
 
   @Test
@@ -314,16 +326,17 @@ class BTDownloadStatusTest {
   @Test
   void thePredominantExtensionIsTheOneWithTheMostBytes() throws Exception {
     Path folder = dir.resolve("mixed");
-    content(folder.resolve("a.mp3"), 64 * 1024, 1);
-    content(folder.resolve("b.mp3"), 64 * 1024, 2);
+    content(folder.resolve("a.mp3"), 32 * 1024, 1);
+    content(folder.resolve("b.mp3"), 32 * 1024, 2);
     content(folder.resolve("c.flac"), 96 * 1024, 3);
-    content(folder.resolve("README"), 160 * 1024, 4);
+    content(folder.resolve("d.jpg"), 16 * 1024, 4);
+    content(folder.resolve("README"), 160 * 1024, 5);
     FakeTorrentHandle handle = new FakeTorrentHandle(torrent(folder.toFile(), null));
     handle.status.setSave_path(dir.toString());
 
     BTDownload dl = new BTDownload(local.engine, new TorrentHandle(handle));
 
-    assertEquals("mp3", dl.getPredominantFileExtension());
+    assertEquals("flac", dl.getPredominantFileExtension(), "not the most files: the most bytes");
   }
 
   @Test

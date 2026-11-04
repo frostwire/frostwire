@@ -72,7 +72,7 @@ class BTDownloadRemoveTest {
     // The transfer wrote two.flac (libtorrent writes the pieces it downloads).
     assertTrue(two.setLastModified(System.currentTimeMillis() + 60_000));
 
-    dl.remove();
+    dl.remove(false);
 
     assertSame(dl, recorder.next(), "the download's listener heard it was removed");
     assertEquals(Set.of(two), recorder.incompleteFiles);
