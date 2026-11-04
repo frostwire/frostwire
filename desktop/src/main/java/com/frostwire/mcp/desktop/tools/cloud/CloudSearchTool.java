@@ -9,12 +9,10 @@ package com.frostwire.mcp.desktop.tools.cloud;
 
 import com.frostwire.mcp.MCPTool;
 import com.frostwire.search.telluride.TellurideAbstractListener;
-import com.frostwire.search.telluride.TellurideLauncher;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.limegroup.gnutella.util.FrostWireUtils;
 import java.io.File;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -23,6 +21,17 @@ import java.util.concurrent.atomic.AtomicReference;
 public final class CloudSearchTool implements MCPTool {
 
   private static final long TIMEOUT_SECONDS = 60;
+
+  private final TellurideRunner telluride;
+
+  public CloudSearchTool() {
+    this(TellurideRunner.INSTALLED);
+  }
+
+  /** Test seam: runs {@code telluride} instead of the installed executable. */
+  CloudSearchTool(TellurideRunner telluride) {
+    this.telluride = telluride;
+  }
 
   @Override
   public String name() {
@@ -59,7 +68,7 @@ public final class CloudSearchTool implements MCPTool {
     if (url == null || url.isEmpty()) {
       return errorResult("url parameter must not be empty");
     }
-    File executable = FrostWireUtils.getTellurideLauncherFile();
+    File executable = telluride.executable();
     if (executable == null || !executable.exists()) {
       return errorResult("Telluride executable not found");
     }
@@ -85,7 +94,7 @@ public final class CloudSearchTool implements MCPTool {
             latch.countDown();
           }
         };
-    TellurideLauncher.launch(executable, url, null, false, true, false, false, listener);
+    telluride.launch(executable, url, null, false, true, listener);
     try {
       boolean completed = latch.await(TIMEOUT_SECONDS, TimeUnit.SECONDS);
       if (!completed) {

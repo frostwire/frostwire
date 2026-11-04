@@ -9,11 +9,9 @@ package com.frostwire.mcp.desktop.tools.cloud;
 
 import com.frostwire.mcp.MCPTool;
 import com.frostwire.search.telluride.TellurideAbstractListener;
-import com.frostwire.search.telluride.TellurideLauncher;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.limegroup.gnutella.settings.SharingSettings;
-import com.limegroup.gnutella.util.FrostWireUtils;
 import java.io.File;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
@@ -23,6 +21,17 @@ import java.util.concurrent.atomic.AtomicReference;
 public final class CloudDownloadTool implements MCPTool {
 
   private static final long TIMEOUT_SECONDS = 300;
+
+  private final TellurideRunner telluride;
+
+  public CloudDownloadTool() {
+    this(TellurideRunner.INSTALLED);
+  }
+
+  /** Test seam: runs {@code telluride} instead of the installed executable. */
+  CloudDownloadTool(TellurideRunner telluride) {
+    this.telluride = telluride;
+  }
 
   @Override
   public String name() {
@@ -73,7 +82,7 @@ public final class CloudDownloadTool implements MCPTool {
       return errorResult("url parameter must not be empty");
     }
     boolean audioOnly = arguments.has("audioOnly") && arguments.get("audioOnly").getAsBoolean();
-    File executable = FrostWireUtils.getTellurideLauncherFile();
+    File executable = telluride.executable();
     if (executable == null || !executable.exists()) {
       return errorResult("Telluride executable not found");
     }
@@ -107,7 +116,7 @@ public final class CloudDownloadTool implements MCPTool {
             latch.countDown();
           }
         };
-    TellurideLauncher.launch(executable, url, saveDir, audioOnly, false, false, false, listener);
+    telluride.launch(executable, url, saveDir, audioOnly, false, listener);
     JsonObject result = new JsonObject();
     result.addProperty("downloadId", downloadId);
     result.addProperty("state", "downloading");
