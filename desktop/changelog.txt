@@ -7,6 +7,7 @@ FrostWire 7.1.3 build 335 UNRELEASED
    - jlibtorrent: libtorrent fixes: a data corruption bug in memory-mapped storage, short disk reads on Windows, trackers stuck after a pause, DNS leaks of peer and tracker host names, web seeds for single-file torrents, wrong seeding/active/finished times, external IP not reported with UPnP/NAT-PMP, a race removing an auto-managed torrent, and move-storage rollback
    - fix:A corrupt or malicious MP4/M4A file in your downloads can no longer make FrostWire run out of memory when the Library reads its tags or you extract its audio — entry counts in the file are checked against its size before anything is allocated
    - fix:A SoundCloud MP3 with a corrupt ID3 tag can no longer make FrostWire allocate gigabytes of memory while re-tagging it — frame lengths are checked against the tag before anything is copied
+   - fix:Re-tagging a low-bitrate MP3 (MPEG-2 or 2.5, 24 kHz and below) no longer cuts its audio down to a single frame, and its duration and ID3v2 tag are read correctly
    - fix:Hashes and other hex values from peers and block explorers must be plain ASCII hex: look-alike digits from other scripts are rejected instead of decoding to the same bytes (#1431)
    - fix:Distributed search rejects karma chains with forged epochs or energy that got around the endorsement limit (#1415)
    - fix:Distributed search no longer accepts a peer's karma chain that declares an invalid energy value to endorse other peers without the per-epoch limit (#1401)
