@@ -45,7 +45,7 @@ public class SearchManagerPerformanceTest {
     final AtomicInteger resultsReceived = new AtomicInteger(0);
 
     // Set up listener to count results
-    manager.setListener(
+    SearchListener counter =
         new SearchListener() {
           @Override
           public void onResults(long token, List<? extends SearchResult> results) {
@@ -61,7 +61,8 @@ public class SearchManagerPerformanceTest {
           public void onStopped(long token) {
             completionLatch.countDown();
           }
-        });
+        };
+    manager.addListener(counter);
 
     // Measure execution time
     long startTime = System.nanoTime();
@@ -70,6 +71,7 @@ public class SearchManagerPerformanceTest {
 
     // Wait for completion (max 30 seconds)
     boolean completed = completionLatch.await(30, TimeUnit.SECONDS);
+    manager.removeListener(counter);
 
     long totalTime = System.nanoTime() - startTime;
     double totalTimeMs = totalTime / 1_000_000.0;

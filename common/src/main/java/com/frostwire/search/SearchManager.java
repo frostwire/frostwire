@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -46,7 +47,8 @@ public final class SearchManager {
 
   private final List<SearchTask> tasks;
   private final List<WeakReference<SearchTable>> tables;
-  private SearchListener listener;
+  // Each listener hears every search: the search UI and, on desktop, the MCP server at once.
+  private final CopyOnWriteArrayList<SearchListener> listeners = new CopyOnWriteArrayList<>();
 
   private SearchManager(int instantResultsThreads, int crawlResultsThreads) {
     LOG.info(
@@ -123,12 +125,15 @@ public final class SearchManager {
     // new HTTP requests. In-flight requests will complete or time out.
   }
 
-  public SearchListener getListener() {
-    return listener;
+  /** Adds a listener for every search's results, errors and end; adding it again does nothing. */
+  public void addListener(SearchListener listener) {
+    if (listener != null) {
+      listeners.addIfAbsent(listener);
+    }
   }
 
-  public void setListener(SearchListener listener) {
-    this.listener = listener;
+  public void removeListener(SearchListener listener) {
+    listeners.remove(listener);
   }
 
   /** True while a task of the search {@code token} is queued or running. */
@@ -171,10 +176,16 @@ public final class SearchManager {
   }
 
   private void onResults(long token, List<? extends SearchResult> results) {
-    try {
-      if (results != null && listener != null) {
-        listener.onResults(token, results);
+    if (results != null) {
+      for (SearchListener listener : listeners) {
+        try {
+          listener.onResults(token, results);
+        } catch (Throwable e) {
+          LOG.warn("Error sending results to listener: " + e.getMessage(), e);
+        }
       }
+    }
+    try {
       synchronized (tables) {
         Iterator<WeakReference<SearchTable>> it = tables.iterator();
         while (it.hasNext()) {
@@ -187,27 +198,30 @@ public final class SearchManager {
         }
       }
     } catch (Throwable e) {
-      LOG.warn("Error sending results to listener: " + e.getMessage(), e);
+      LOG.warn("Error sending results to search tables: " + e.getMessage(), e);
     }
   }
 
   private void onError(long token, SearchError error) {
-    try {
-      if (error != null && listener != null) {
+    if (error == null) {
+      return;
+    }
+    for (SearchListener listener : listeners) {
+      try {
         listener.onError(token, error);
+      } catch (Throwable e) {
+        LOG.warn("Error sending search error to listener: " + e.getMessage(), e);
       }
-    } catch (Throwable e) {
-      LOG.warn("Error sending search error to listener: " + e.getMessage(), e);
     }
   }
 
   private void onStopped(long token) {
-    try {
-      if (listener != null) {
+    for (SearchListener listener : listeners) {
+      try {
         listener.onStopped(token);
+      } catch (Throwable e) {
+        LOG.warn("Error sending stopped signal to listener: " + e.getMessage(), e);
       }
-    } catch (Throwable e) {
-      LOG.warn("Error sending stopped signal to listener: " + e.getMessage(), e);
     }
   }
 

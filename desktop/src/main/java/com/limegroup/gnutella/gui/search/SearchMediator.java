@@ -150,7 +150,7 @@ public final class SearchMediator {
         .start();
     CrawlCacheManager.setMagnetDownloader(new LibTorrentMagnetDownloader());
     this.manager = SearchManager.getInstance();
-    this.manager.setListener(
+    this.manager.addListener(
         new SearchListener() {
           @Override
           public void onResults(long token, List<? extends SearchResult> results) {

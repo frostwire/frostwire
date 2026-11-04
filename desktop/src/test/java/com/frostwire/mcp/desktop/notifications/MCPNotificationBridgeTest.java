@@ -24,7 +24,9 @@ import com.frostwire.mcp.desktop.state.SearchSessionManager;
 import com.frostwire.mcp.desktop.tools.search.SearchTool;
 import com.frostwire.mcp.transport.MCPTransport;
 import com.frostwire.mcp.transport.MCPTransportHandler;
+import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.HttpSearchResult;
+import com.frostwire.search.ISearchPerformer;
 import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchManager;
@@ -52,11 +54,9 @@ class MCPNotificationBridgeTest {
 
   private final MCPNotificationBridge bridge = MCPNotificationBridge.instance();
   private final List<String> engineEvents = new ArrayList<>();
-  private final List<String> searchEvents = new ArrayList<>();
   private final RecordingTransport transport = new RecordingTransport();
   private EngineContext context;
   private BTEngineListener originalEngineListener;
-  private SearchListener originalSearchListener;
   private BTEngine engine;
 
   @BeforeEach
@@ -64,9 +64,7 @@ class MCPNotificationBridgeTest {
     context = EngineContext.install(dir.toFile());
     engine = BTEngine.getInstance();
     originalEngineListener = engine.getListener();
-    originalSearchListener = SearchManager.getInstance().getListener();
     engine.setListener(new RecordingEngineListener());
-    SearchManager.getInstance().setListener(new RecordingSearchListener());
 
     MCPServer server = new MCPServer("test");
     server.setTransport(transport);
@@ -77,19 +75,33 @@ class MCPNotificationBridgeTest {
   void removeTheBridge() {
     bridge.setServer(null);
     engine.setListener(originalEngineListener);
-    SearchManager.getInstance().setListener(originalSearchListener);
     context.close();
   }
 
   @Test
-  void theBridgeJoinsTheEngineListenersAndStandsInFrontOfTheSearchListenerUntilRemoved() {
+  void theBridgeJoinsTheEngineListenersUntilRemoved() {
     assertTrue(engine.getListener() instanceof BTEngineListenerChain, "both engine listeners");
-    assertSame(bridge, SearchManager.getInstance().getListener());
 
     bridge.setServer(null);
 
     assertTrue(engine.getListener() instanceof RecordingEngineListener);
-    assertTrue(SearchManager.getInstance().getListener() instanceof RecordingSearchListener);
+  }
+
+  @Test
+  void theBridgeHearsSearchesOnlyWhileTheServerIsSet() throws InterruptedException {
+    long token = System.nanoTime() & Long.MAX_VALUE;
+    SearchManager.getInstance().perform(new OneResultPerformer(token));
+    awaitNotification("notifications/search_completed");
+    assertEquals(
+        String.valueOf(token),
+        transport.only("notifications/search_result").get("token").getAsString());
+    transport.sent.clear();
+
+    bridge.setServer(null);
+    SearchManager.getInstance().perform(new OneResultPerformer(token + 1));
+    Thread.sleep(300);
+
+    assertTrue(transport.sent.isEmpty(), "a stopped server is told nothing");
   }
 
   @Test
@@ -157,36 +169,34 @@ class MCPNotificationBridgeTest {
     assertEquals("42", transport.only("notifications/search_completed").get("token").getAsString());
 
     bridge.onError(42, new SearchError(500, "boom"));
-    assertTrue(transport.sent.isEmpty(), "errors are only passed on");
-
-    assertEquals(List.of("results 7", "results 0", "stopped", "error boom"), searchEvents);
+    assertTrue(transport.sent.isEmpty(), "errors aren't notified");
   }
 
   @Test
-  void restartingTheServerWithNoOtherListenersLeavesNoneAndNeverWrapsItself() {
+  void restartingTheServerLeavesNoEngineListenerBehindAndDeliversSearchesOnce()
+      throws InterruptedException {
     bridge.setServer(null);
     engine.setListener(null);
-    SearchManager.getInstance().setListener(null);
     MCPServer server = new MCPServer("test");
     server.setTransport(transport);
 
     bridge.setServer(server);
     bridge.setServer(null);
     assertNull(engine.getListener(), "the engine had no listener before");
-    assertNull(SearchManager.getInstance().getListener(), "the search manager had none either");
 
-    // Started again, the bridge must not take itself for the listener it stands in front of: it
-    // would call itself until the stack overflowed, delivering each event over and over.
+    // Started again (twice), the bridge must hear each search once.
+    bridge.setServer(server);
     bridge.setServer(server);
     assertSame(bridge, engine.getListener(), "the only engine listener");
     JsonObject args = new JsonObject();
-    args.addProperty("keywords", "loop");
+    args.addProperty("keywords", "once");
     JsonArray engines = new JsonArray();
     engines.add("NO_SUCH_ENGINE_ID");
     args.add("engines", engines);
     long token = Long.parseLong(new SearchTool().execute(args).get("token").getAsString());
 
-    SearchManager.getInstance().getListener().onResults(token, List.of(new CloudResult("a.mp3")));
+    SearchManager.getInstance().perform(new OneResultPerformer(token));
+    awaitNotification("notifications/search_completed");
 
     assertEquals(1, SearchSessionManager.instance().getSession(token).getResults().size());
   }
@@ -282,26 +292,77 @@ class MCPNotificationBridgeTest {
     }
   }
 
-  private final class RecordingSearchListener implements SearchListener {
-    @Override
-    public void onResults(long token, List<? extends SearchResult> results) {
-      searchEvents.add("results " + results.size());
+  /** Waits until the transport has been asked to send {@code method}. */
+  private void awaitNotification(String method) throws InterruptedException {
+    long deadline = System.currentTimeMillis() + 10_000;
+    while (System.currentTimeMillis() < deadline) {
+      synchronized (transport.sent) {
+        for (JsonObject sent : transport.sent) {
+          if (method.equals(sent.get("method").getAsString())) {
+            transport.sent.remove(sent);
+            return;
+          }
+        }
+      }
+      Thread.sleep(20);
+    }
+    throw new AssertionError("no " + method + " in " + transport.sent);
+  }
+
+  /** Finds one result, through the SearchManager like an engine's performer. */
+  private static final class OneResultPerformer implements ISearchPerformer {
+    private final long token;
+    private volatile SearchListener listener;
+
+    OneResultPerformer(long token) {
+      this.token = token;
     }
 
     @Override
-    public void onError(long token, SearchError error) {
-      searchEvents.add("error " + error.message());
+    public long getToken() {
+      return token;
     }
 
     @Override
-    public void onStopped(long token) {
-      searchEvents.add("stopped");
+    public void perform() {
+      listener.onResults(token, List.of(new CloudResult("found.mp3")));
+    }
+
+    @Override
+    public void crawl(CrawlableSearchResult sr) {}
+
+    @Override
+    public void stop() {}
+
+    @Override
+    public boolean isStopped() {
+      return false;
+    }
+
+    @Override
+    public SearchListener getListener() {
+      return listener;
+    }
+
+    @Override
+    public void setListener(SearchListener listener) {
+      this.listener = listener;
+    }
+
+    @Override
+    public boolean isDDOSProtectionActive() {
+      return false;
+    }
+
+    @Override
+    public boolean isCrawler() {
+      return false;
     }
   }
 
   /** Keeps the notifications the server sends. */
   private static final class RecordingTransport implements MCPTransport {
-    private final List<JsonObject> sent = new ArrayList<>();
+    private final List<JsonObject> sent = java.util.Collections.synchronizedList(new ArrayList<>());
 
     /** The one notification sent since the last call, which must be {@code method}; its params. */
     JsonObject only(String method) {

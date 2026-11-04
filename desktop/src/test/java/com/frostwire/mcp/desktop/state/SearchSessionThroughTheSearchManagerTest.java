@@ -20,6 +20,7 @@ import com.frostwire.mcp.transport.MCPTransport;
 import com.frostwire.mcp.transport.MCPTransportHandler;
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.ISearchPerformer;
+import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchManager;
 import com.frostwire.search.SearchResult;
@@ -28,6 +29,7 @@ import com.google.gson.JsonObject;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterEach;
@@ -49,12 +51,10 @@ class SearchSessionThroughTheSearchManagerTest {
   @TempDir Path dir;
 
   private EngineContext engine;
-  private SearchListener previousListener;
 
   @BeforeEach
   void installTheBridge() {
     engine = EngineContext.install(dir.toFile());
-    previousListener = SearchManager.getInstance().getListener();
     MCPServer server = new MCPServer("test");
     server.setTransport(new SilentTransport());
     MCPNotificationBridge.instance().setServer(server);
@@ -63,7 +63,6 @@ class SearchSessionThroughTheSearchManagerTest {
   @AfterEach
   void restore() {
     MCPNotificationBridge.instance().setServer(null);
-    SearchManager.getInstance().setListener(previousListener);
     engine.close();
   }
 
@@ -88,6 +87,42 @@ class SearchSessionThroughTheSearchManagerTest {
         new SearchResultsTool().execute(token(session.getToken())).getAsJsonArray("results");
     assertEquals(
         "Ubuntu 24.04 desktop", results.get(0).getAsJsonObject().get("displayName").getAsString());
+  }
+
+  @Test
+  void theMcpServerStillHearsSearchesAfterTheSearchWindowStartsListening()
+      throws InterruptedException {
+    // At launch the MCP server starts first; the search window starts listening afterwards.
+    List<String> window = new CopyOnWriteArrayList<>();
+    SearchListener searchWindow =
+        new SearchListener() {
+          @Override
+          public void onResults(long token, List<? extends SearchResult> results) {
+            window.add("results " + results.size());
+          }
+
+          @Override
+          public void onError(long token, SearchError error) {}
+
+          @Override
+          public void onStopped(long token) {}
+        };
+    SearchManager.getInstance().addListener(searchWindow);
+    try {
+      SearchSession session =
+          SearchSessionManager.instance()
+              .startSearch(
+                  "debian",
+                  token -> List.of(new MemoryPerformer(token, List.of(new Result("Debian 13")))));
+
+      JsonObject status = waitUntilComplete(session.getToken());
+
+      assertEquals("complete", status.get("status").getAsString(), status.toString());
+      assertEquals(1, status.get("resultCount").getAsInt(), "the MCP session got the result");
+      assertEquals(List.of("results 1"), window, "and so did the search window");
+    } finally {
+      SearchManager.getInstance().removeListener(searchWindow);
+    }
   }
 
   @Test

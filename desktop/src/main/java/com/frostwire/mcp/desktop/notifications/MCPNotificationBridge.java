@@ -42,7 +42,6 @@ public class MCPNotificationBridge implements BTEngineListener, SearchListener {
   private static final long VPN_POLL_INTERVAL_MS = 20000;
 
   private volatile MCPServer server;
-  private SearchListener delegateSearchListener;
   private final Map<String, TransferState> lastStates = new ConcurrentHashMap<>();
   private final Map<String, Long> lastProgressTime = new ConcurrentHashMap<>();
   private volatile boolean registered;
@@ -78,11 +77,7 @@ public class MCPNotificationBridge implements BTEngineListener, SearchListener {
       // would make it call itself.
       BTEngineListenerChain.install(BTEngine.getInstance(), this);
 
-      // The SearchManager has a single listener; never take this bridge for the one it wraps.
-      SearchManager searchManager = SearchManager.getInstance();
-      SearchListener searchListener = searchManager.getListener();
-      delegateSearchListener = searchListener != this ? searchListener : null;
-      searchManager.setListener(this);
+      SearchManager.getInstance().addListener(this);
 
       lastKnownVpnStatus = VPNs.isVPNActive();
       vpnPollTask =
@@ -107,11 +102,7 @@ public class MCPNotificationBridge implements BTEngineListener, SearchListener {
 
       BTEngineListenerChain.remove(BTEngine.getInstance(), this);
 
-      // Put back what was there, even none, unless someone has replaced the bridge since.
-      SearchManager searchManager = SearchManager.getInstance();
-      if (searchManager.getListener() == this) {
-        searchManager.setListener(delegateSearchListener);
-      }
+      SearchManager.getInstance().removeListener(this);
 
       registered = false;
     } catch (Throwable e) {
@@ -202,7 +193,7 @@ public class MCPNotificationBridge implements BTEngineListener, SearchListener {
 
   @Override
   public void onResults(long token, List<? extends SearchResult> results) {
-    // The SearchManager has one listener, this bridge: MCP searches get their results through it.
+    // MCP searches get their results through this bridge, one of the SearchManager's listeners.
     SearchSessionManager.instance().onResults(token, results);
     if (server != null && !results.isEmpty()) {
       JsonArray preview = new JsonArray();
@@ -214,9 +205,6 @@ public class MCPNotificationBridge implements BTEngineListener, SearchListener {
           new SearchResultNotification(String.valueOf(token), results.size(), preview);
       sendNotification(notif.method(), notif.payload());
     }
-    if (delegateSearchListener != null) {
-      delegateSearchListener.onResults(token, results);
-    }
   }
 
   @Override
@@ -226,16 +214,10 @@ public class MCPNotificationBridge implements BTEngineListener, SearchListener {
       SearchCompletedNotification notif = new SearchCompletedNotification(String.valueOf(token));
       sendNotification(notif.method(), notif.payload());
     }
-    if (delegateSearchListener != null) {
-      delegateSearchListener.onStopped(token);
-    }
   }
 
   @Override
   public void onError(long token, SearchError error) {
     SearchSessionManager.instance().onError(token, error);
-    if (delegateSearchListener != null) {
-      delegateSearchListener.onError(token, error);
-    }
   }
 }

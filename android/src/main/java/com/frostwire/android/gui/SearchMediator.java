@@ -66,7 +66,7 @@ public final class SearchMediator {
 
   private SearchMediator() {
     this.manager = SearchManager.getInstance();
-    this.manager.setListener(
+    this.manager.addListener(
         new SearchListener() {
           @Override
           public void onResults(long token, List<? extends SearchResult> results) {
