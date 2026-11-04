@@ -1,3 +1,12 @@
+FrostWire Android UNRELEASED
+  - fix:Transfers again show when a torrent finishes, changes state or is removed after you pick more of its files or open its magnet or search result again; since 3.2.3 only the newest copy of the transfer heard about it (#1441)
+  - fix:Removing an unfinished transfer deletes its partial files again instead of leaving them in the download folder
+  - fix:A transfer you paused stays paused after a restart; before, it often started downloading again
+  - fix:Files you uncheck in a torrent that uses only the new BitTorrent v2 format are no longer downloaded anyway
+  - fix:Transfers no longer briefly show their previous state right after it changes, or an old status when the current one can't be read
+  - fix:Downloads opened from a distributed search result with a hybrid (v1 and v2) magnet keep the peer that shared them, so that peer gets its karma credit
+  - fix:Fetching a magnet's metadata no longer leaves an empty fw_dummy file in the app's temporary folder each time
+
 FrostWire 3.2.3 build 779 NOV/03/2026
   - fix:Music player: the queue is now the player's own playlist, so the app, Bluetooth, the lock screen, Android Auto and Wear see the whole queue and agree on next and previous; the player no longer piles up one entry per song played, and the saved queue is restored after a restart (#1452)
   - fix:Playing a song from the music player no longer leaves a My Files preview playing over it, and car, watch and Android Auto screens show the titles of every song in the queue (#1452)
