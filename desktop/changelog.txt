@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:Downloading a magnet link no longer leaves an empty fw_dummy file in your temp folder each time
    - fix:MCP: AI agents that check tool definitions no longer reject the relay status, relay metrics and clear-logs tools
    - fix:MCP: error replies to requests without an id carry "id": null, as JSON-RPC requires, so strict AI agents can read them
    - fix:MCP: malformed JSON sent to the MCP server gets a parse error back instead of a dropped connection
