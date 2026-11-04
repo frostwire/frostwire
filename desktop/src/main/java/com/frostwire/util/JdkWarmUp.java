@@ -259,6 +259,15 @@ public final class JdkWarmUp {
       List.of(
           "MenuBar", "Menu[", "MenuItem", "RadioButtonMenuItem", "CheckBoxMenuItem", "PopupMenu");
 
+  /**
+   * Every painter key: after the ones above, which are created first because they are needed first,
+   * one pass creates all the others. Each component type loaded its Nimbus painter class by
+   * reflection on the EDT the first time it was styled, the menus and then the Library's scroll
+   * pane among them (Icebase #a4b1ace3e68c, frostwire/frostwire#1483); Nimbus has a few dozen
+   * painter classes, and loading them all takes milliseconds.
+   */
+  static final String ALL_PAINTER_KEYS = "";
+
   private static final String PAINTER_KEY_SUFFIX = "Painter";
 
   /**
@@ -346,6 +355,11 @@ public final class JdkWarmUp {
       }
     } catch (Throwable t) {
       LOG.warn("Menu painter warm-up failed: " + t.getMessage(), t);
+    }
+    try {
+      createPainters(UIManager.getDefaults(), ALL_PAINTER_KEYS);
+    } catch (Throwable t) {
+      LOG.warn("Painter warm-up failed: " + t.getMessage(), t);
     }
     for (String className : classesToInitialize(OSUtils.isWindows())) {
       try {

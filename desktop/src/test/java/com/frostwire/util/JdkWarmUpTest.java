@@ -476,6 +476,33 @@ class JdkWarmUpTest {
   }
 
   /**
+   * Each component type loaded its Nimbus painter class by reflection on the EDT the first time it
+   * was styled: after the menus, the Library's scroll pane (Icebase #a4b1ace3e68c,
+   * frostwire/frostwire#1483). The warm-up creates every lazy painter, not only the families a
+   * report named.
+   */
+  @Test
+  void warmUpCreatesEveryLazyNimbusPainter() throws Exception {
+    javax.swing.UIDefaults nimbus = new NimbusLookAndFeel().getDefaults();
+    long lazyPainters =
+        nimbus.entrySet().stream()
+            .filter(
+                e ->
+                    e.getKey() instanceof String key
+                        && key.endsWith("Painter")
+                        && e.getValue() instanceof javax.swing.UIDefaults.LazyValue)
+            .count();
+    assertTrue(lazyPainters > 100, "Nimbus lists " + lazyPainters + " lazy painters");
+    assertEquals(lazyPainters, JdkWarmUp.createPainters(nimbus, JdkWarmUp.ALL_PAINTER_KEYS));
+    assertTrue(JdkWarmUp.createPainters(nimbus, "ScrollPane[") > 0, "no ScrollPane painters");
+    assertTrue(
+        warmUpSource()
+            .replaceAll("\\s+", "")
+            .contains("createPainters(UIManager.getDefaults(),ALL_PAINTER_KEYS);"),
+        "not called by warmUp");
+  }
+
+  /**
    * The first search built Nimbus's Slider painters by reflection on the EDT, for the search
    * options panel's range sliders (Icebase #8a8cc233ad87, GitHub #1419). The same panel shows a
    * checkbox per search engine.
