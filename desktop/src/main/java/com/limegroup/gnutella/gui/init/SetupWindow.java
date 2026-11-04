@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui.init;
 
+import com.frostwire.gui.theme.PlatformFonts;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.limegroup.gnutella.gui.DropTargets;
 import com.limegroup.gnutella.gui.I18n;
@@ -95,7 +96,7 @@ abstract class SetupWindow extends JPanel {
     JLabel jlTitle = new JLabel(I18n.tr(_key));
     jlTitle.setBorder(BorderFactory.createEmptyBorder(5, 8, 5, 5));
     // Defer font loading to avoid EDT violation
-    SwingUtilities.invokeLater(() -> jlTitle.setFont(new Font("Dialog", Font.BOLD, 16)));
+    SwingUtilities.invokeLater(() -> jlTitle.setFont(PlatformFonts.dialog(Font.BOLD, 16)));
     // jlTitle.setForeground(Color.black);
     jlTitle.setOpaque(false);
     jpTitle.add(jlTitle, BorderLayout.NORTH);
@@ -105,7 +106,7 @@ abstract class SetupWindow extends JPanel {
     // jtaDescription.setForeground(Color.black);
     jtaDescription.setBackground(jpTitle.getBackground());
     // Defer font loading to avoid EDT violation
-    SwingUtilities.invokeLater(() -> jtaDescription.setFont(new Font("Dialog", Font.PLAIN, 12)));
+    SwingUtilities.invokeLater(() -> jtaDescription.setFont(PlatformFonts.dialog(Font.PLAIN, 12)));
     jpTitle.add(jtaDescription, BorderLayout.CENTER);
     if (_moreInfoURL != null) {
       JLabel jlURL = new URLLabel(_moreInfoURL, I18n.tr("Learn more about this option..."));

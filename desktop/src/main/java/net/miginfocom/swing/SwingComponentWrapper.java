@@ -34,6 +34,7 @@ package net.miginfocom.swing;
  *         Date: 2006-sep-08
  */
 
+import com.frostwire.gui.theme.PlatformFonts;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.lang.reflect.Method;
@@ -52,7 +53,7 @@ public class SwingComponentWrapper implements ComponentWrapper {
   /** Cache. */
   private static final IdentityHashMap<FontMetrics, Point.Float> FM_MAP = new IdentityHashMap<>(4);
 
-  private static final Font SUBST_FONT = new Font("sansserif", Font.PLAIN, 11);
+  private static final Font SUBST_FONT = PlatformFonts.dialog(Font.PLAIN, 11);
 
   /** Cached method used for getting base line with reflection. */
   private static Method BL_METHOD = null;

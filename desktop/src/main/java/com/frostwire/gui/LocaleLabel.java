@@ -18,6 +18,7 @@
 
 package com.frostwire.gui;
 
+import com.frostwire.gui.theme.PlatformFonts;
 import com.frostwire.util.OSUtils;
 import com.frostwire.util.SafeText;
 import java.awt.*;
@@ -28,7 +29,7 @@ import javax.swing.*;
  * @author aldenml
  */
 public class LocaleLabel extends JLabel {
-  private static final Font SAFE_FONT = new Font(Font.DIALOG, Font.PLAIN, 12);
+  private static final Font SAFE_FONT = PlatformFonts.dialog(Font.PLAIN, 12);
 
   public void setText(LocaleString text) {
     Font f = getParent() != null ? getParent().getFont() : SAFE_FONT;

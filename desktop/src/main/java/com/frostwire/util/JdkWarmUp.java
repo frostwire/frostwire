@@ -304,7 +304,7 @@ public final class JdkWarmUp {
     }
     try {
       char[] text = SHAPING_SAMPLE.toCharArray();
-      new Font(Font.DIALOG, Font.PLAIN, 12)
+      PlatformFonts.dialog(Font.PLAIN, 12)
           .layoutGlyphVector(
               new FontRenderContext(null, true, true),
               text,
@@ -483,7 +483,7 @@ public final class JdkWarmUp {
         fonts.add(font);
       }
     }
-    fonts.add(new Font(Font.DIALOG, Font.PLAIN, 12));
+    fonts.add(PlatformFonts.dialog(Font.PLAIN, 12));
     return fonts;
   }
 

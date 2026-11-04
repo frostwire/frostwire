@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui.options.panes;
 
+import com.frostwire.gui.theme.PlatformFonts;
 import com.limegroup.gnutella.gui.DialogOption;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
@@ -40,7 +41,7 @@ public final class SmartSearchDBPaneItem extends AbstractPaneItem {
   /** The constructor constructs all of the elements of this `AbstractPaneItem`. */
   public SmartSearchDBPaneItem() {
     super(TITLE, LABEL);
-    Font font = new Font("dialog", Font.BOLD, 12);
+    Font font = PlatformFonts.dialog(Font.BOLD, 12);
     _numTorrentsLabel = new JLabel();
     _numTorrentsLabel.setFont(font);
     smartSearchEnabled =

@@ -9,9 +9,17 @@ package com.frostwire.gui.theme;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Font;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 class PlatformFontsTest {
@@ -66,5 +74,43 @@ class PlatformFontsTest {
     Font font = PlatformFonts.sansSerif(Font.BOLD, 13);
     assertEquals(Font.BOLD, font.getStyle());
     assertEquals(13, font.getSize());
+  }
+
+  @Test
+  void frostWiresOwnDialogFontIsAnInstalledFamilyOnAMacWithoutLucidaGrande() {
+    Set<String> withoutLucida = Set.of("helvetica neue", "helvetica", "arial", "menlo");
+    assertEquals("Helvetica Neue", PlatformFonts.dialogFamily(true, withoutLucida));
+    assertEquals("Arial", PlatformFonts.dialogFamily(true, Set.of("arial")));
+    // Nothing better installed: keep the logical name rather than invent a family.
+    assertEquals(Font.DIALOG, PlatformFonts.dialogFamily(true, Set.of("menlo")));
+    // A normal Mac, and every other system, keep the logical Dialog font.
+    assertEquals(Font.DIALOG, PlatformFonts.dialogFamily(true, Set.of("lucida grande", "arial")));
+    assertEquals(Font.DIALOG, PlatformFonts.dialogFamily(false, withoutLucida));
+  }
+
+  /**
+   * FrostWire's own fonts never name a logical family that depends on Lucida Grande, so they still
+   * work where the logical fonts could not be rebuilt (a launcher without access to sun.font).
+   */
+  @Test
+  void frostWireCreatesNoLucidaGrandeBackedLogicalFonts() throws IOException {
+    Pattern logicalFont =
+        Pattern.compile(
+            "new\\s+Font\\(\\s*(Font\\.(DIALOG|SANS_SERIF|DIALOG_INPUT)|\"(?i:dialog|sansserif|sans-serif|dialoginput)\")\\s*,");
+    Set<String> offenders = new TreeSet<>();
+    try (Stream<Path> files = Files.walk(Path.of("src/main/java"))) {
+      for (Path file :
+          (Iterable<Path>) files.filter(f -> f.toString().endsWith(".java"))::iterator) {
+        if (file.endsWith("PlatformFonts.java")) {
+          continue;
+        }
+        for (String line : Files.readAllLines(file, StandardCharsets.UTF_8)) {
+          if (!line.strip().startsWith("//") && logicalFont.matcher(line).find()) {
+            offenders.add(file.getFileName() + ": " + line.strip());
+          }
+        }
+      }
+    }
+    assertTrue(offenders.isEmpty(), "use PlatformFonts.dialog(style, size): " + offenders);
   }
 }

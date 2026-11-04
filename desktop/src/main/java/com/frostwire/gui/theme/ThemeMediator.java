@@ -52,7 +52,7 @@ import javax.swing.text.JTextComponent;
  * @author aldenml
  */
 public final class ThemeMediator {
-  public static final Font DIALOG_FONT = new Font(Font.DIALOG, Font.PLAIN, 12);
+  public static final Font DIALOG_FONT = PlatformFonts.dialog(Font.PLAIN, 12);
   public static final Color LIGHT_BORDER_COLOR = SkinColors.GENERAL_BORDER_COLOR;
   public static final Color APP_REALLY_DARK_COLOR =
       SkinColors.APPLICATION_HEADER_DARK_MODE_GRADIENT_COLOR_BOTTOM;
@@ -636,7 +636,12 @@ public final class ThemeMediator {
         font = new FontUIResource(recommendedFont);
       }
     } else if (OSUtils.isMacOSX()) {
-      font = AquaFonts.getControlTextFont();
+      // Aqua's control font is Lucida Grande; without it, use the installed family FrostWire's own
+      // fonts use (frostwire/frostwire#1484).
+      font =
+          PlatformFonts.dialogIsSubstituted()
+              ? new FontUIResource(PlatformFonts.dialog(Font.PLAIN, 13))
+              : AquaFonts.getControlTextFont();
     } else if (OSUtils.isLinux()) {
       Font recommendedFont = fixLinuxOSFont();
       if (recommendedFont != null) {

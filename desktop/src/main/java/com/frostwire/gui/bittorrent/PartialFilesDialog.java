@@ -18,6 +18,7 @@
 
 package com.frostwire.gui.bittorrent;
 
+import com.frostwire.gui.theme.PlatformFonts;
 import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.util.Logger;
@@ -362,7 +363,7 @@ class PartialFilesDialog extends JDialog {
     }
     JLabel labelTitle = new JLabel(title);
     // Defer font loading to avoid EDT violation
-    SwingUtilities.invokeLater(() -> labelTitle.setFont(new Font("Dialog", Font.BOLD, 18)));
+    SwingUtilities.invokeLater(() -> labelTitle.setFont(PlatformFonts.dialog(Font.BOLD, 18)));
     labelTitle.setHorizontalAlignment(SwingConstants.LEFT);
     c = new GridBagConstraints();
     c.gridx = 0;

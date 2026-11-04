@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.gui.theme.PlatformFonts;
 import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
@@ -49,7 +50,7 @@ public class LanguageUtils {
   private static volatile Locale[] cachedLocales = null;
 
   /** Font of the language pickers (setup wizard and language window). */
-  public static final Font LANGUAGE_PICKER_FONT = new Font("Dialog", Font.PLAIN, 11);
+  public static final Font LANGUAGE_PICKER_FONT = PlatformFonts.dialog(Font.PLAIN, 11);
 
   /**
    * Locales whose names a font can display, by font. Checking a name in a script the font lacks

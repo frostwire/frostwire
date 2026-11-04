@@ -114,7 +114,7 @@ public class ShareTorrentDialog extends JDialog {
                 : String.format(
                     I18n.tr("Use the following text to share the \"%s\" file"), torrent_name));
     // Defer font loading to avoid EDT violation
-    SwingUtilities.invokeLater(() -> _introLabel.setFont(new Font("Dialog", Font.BOLD, 13)));
+    SwingUtilities.invokeLater(() -> _introLabel.setFont(PlatformFonts.dialog(Font.BOLD, 13)));
     container.add(_introLabel, c);
     // TEXT AREA
     c = new GridBagConstraints();
@@ -128,7 +128,7 @@ public class ShareTorrentDialog extends JDialog {
     textArea.setEditable(false);
     updateTextArea();
     // Defer font loading to avoid EDT violation
-    SwingUtilities.invokeLater(() -> textArea.setFont(new Font("Dialog", Font.PLAIN, 14)));
+    SwingUtilities.invokeLater(() -> textArea.setFont(PlatformFonts.dialog(Font.PLAIN, 14)));
     textArea.setMargin(new Insets(10, 10, 10, 10));
     textArea.setBorder(BorderFactory.createEtchedBorder());
     textArea.addFocusListener(
@@ -193,7 +193,7 @@ public class ShareTorrentDialog extends JDialog {
                     "<strong>Your files can be discovered by others.</strong> Once you share this link and you seed the files they will be available to everybody on the BitTorrent network.")
                 + "</p></html>");
     // Defer font loading to avoid EDT violation
-    SwingUtilities.invokeLater(() -> _tipsLabel.setFont(new Font("Dialog", Font.PLAIN, 14)));
+    SwingUtilities.invokeLater(() -> _tipsLabel.setFont(PlatformFonts.dialog(Font.PLAIN, 14)));
     Border tipsBorder = BorderFactory.createSoftBevelBorder(BevelBorder.LOWERED);
     tipsBorder.getBorderInsets(_tipsLabel).set(20, 20, 20, 20);
     _tipsLabel.setBorder(tipsBorder);

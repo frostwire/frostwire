@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.gui.theme.PlatformFonts;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
@@ -257,7 +258,7 @@ public final class TipOfTheDayMediator {
             BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeMediator.LIGHT_BORDER_COLOR),
             BorderFactory.createEmptyBorder(10, 10, 10, 10)));
     Font titleFont =
-        new Font("Dialog", titleLabel.getFont().getStyle(), titleLabel.getFont().getSize() + 5);
+        PlatformFonts.dialog(titleLabel.getFont().getStyle(), titleLabel.getFont().getSize() + 5);
     titleLabel.setFont(titleFont);
     tipPanel.add(titleLabel, BorderLayout.NORTH);
     // THE HTML ENGINE TAKES TOO LONG TO LOAD, SO WE MUST LOAD AS TEXT.
@@ -265,7 +266,7 @@ public final class TipOfTheDayMediator {
     tipPane.setEditable(false);
     // tipPane.setBackground(tipPanel.getBackground());
     Font tipFont =
-        new Font("Dialog", tipPane.getFont().getStyle(), tipPane.getFont().getSize() + 2);
+        PlatformFonts.dialog(tipPane.getFont().getStyle(), tipPane.getFont().getSize() + 2);
     tipPane.setFont(tipFont);
     tipPane.addHyperlinkListener(GUIUtils.getHyperlinkListener());
     tipPane.setText(I18n.tr("Loading tips..."));

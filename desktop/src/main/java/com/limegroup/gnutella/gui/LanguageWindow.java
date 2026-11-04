@@ -1,5 +1,6 @@
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.gui.theme.PlatformFonts;
 import com.limegroup.gnutella.gui.actions.AbstractAction;
 import com.limegroup.gnutella.settings.StatusBarSettings;
 import java.awt.*;
@@ -27,7 +28,7 @@ public class LanguageWindow extends JDialog {
     super(GUIMediator.getAppFrame());
     this.currentLocale = GUIMediator.getLocale();
     initializeWindow();
-    dialogFont = new Font("Dialog", Font.PLAIN, 11);
+    dialogFont = PlatformFonts.dialog(Font.PLAIN, 11);
     Locale[] locales = LanguageUtils.getLocales(dialogFont);
     mainPanel = new JPanel(new BorderLayout());
     mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
