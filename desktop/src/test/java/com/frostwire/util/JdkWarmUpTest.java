@@ -29,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -142,6 +143,25 @@ class JdkWarmUpTest {
         Files.readString(Path.of("src/main/java/com/frostwire/util/JdkWarmUp.java"))
             .replaceAll("\\s+", "");
     assertTrue(source.contains("Class.forName(className).getDeclaredClasses();"));
+  }
+
+  /**
+   * The first text field's highlighter and the splash window's root pane loaded nested JDK classes
+   * on the EDT (Icebase #aeedf97b8f8a, #2550522ba4dc). The warm-up loads each listed class's nested
+   * classes, so listing the outer class covers them.
+   */
+  @Test
+  void theHighlighterAndRootPaneInputMapClassesAreLoadedByTheWarmUp() throws Exception {
+    assertNestedClassIsWarmedUp("javax.swing.text.DefaultHighlighter", "SafeDamager");
+    assertNestedClassIsWarmedUp("javax.swing.plaf.basic.BasicRootPaneUI", "RootPaneInputMap");
+  }
+
+  private static void assertNestedClassIsWarmedUp(String outer, String nested) throws Exception {
+    assertTrue(JdkWarmUp.CLASSES_TO_INITIALIZE.contains(outer), outer + " is not warmed up");
+    assertTrue(
+        Arrays.stream(Class.forName(outer).getDeclaredClasses())
+            .anyMatch(c -> c.getSimpleName().equals(nested)),
+        nested + " is not a nested class of " + outer + " on this JDK");
   }
 
   /**

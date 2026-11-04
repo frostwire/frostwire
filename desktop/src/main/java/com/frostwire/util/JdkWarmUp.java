@@ -159,7 +159,13 @@ public final class JdkWarmUp {
           // initializer on the EDT: a text cursor, DefaultEditorKit and its ~50 editor actions, and
           // the text TransferHandler, none of them a component (Icebase #a105a117d60a,
           // frostwire/frostwire#1480).
-          "javax.swing.plaf.basic.BasicTextUI");
+          "javax.swing.plaf.basic.BasicTextUI",
+          // The same text field's highlighter: its first instance loads DefaultHighlighter and
+          // its nested SafeDamager on the EDT (Icebase #aeedf97b8f8a, frostwire/frostwire#1480).
+          "javax.swing.text.DefaultHighlighter",
+          // Every root pane's UI creates a BasicRootPaneUI.RootPaneInputMap; the splash window's
+          // was the first, on the EDT (Icebase #2550522ba4dc).
+          "javax.swing.plaf.basic.BasicRootPaneUI");
 
   /**
    * Windows-only JDK classes initialized like {@link #CLASSES_TO_INITIALIZE}. The first right-click
