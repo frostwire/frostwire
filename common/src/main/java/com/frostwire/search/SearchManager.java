@@ -131,6 +131,18 @@ public final class SearchManager {
     this.listener = listener;
   }
 
+  /** True while a task of the search {@code token} is queued or running. */
+  public boolean isSearching(long token) {
+    synchronized (tasks) {
+      for (SearchTask task : tasks) {
+        if (task.token() == token && !task.stopped()) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   private void submitSimpleSearchTask(SearchTask task, ExecutorService executor) {
     synchronized (tasks) {
       tasks.add(task);

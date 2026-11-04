@@ -19,6 +19,7 @@ public class SearchSession {
   private final List<ISearchPerformer> performers;
   private final List<SearchResult> results = Collections.synchronizedList(new ArrayList<>());
   private volatile boolean complete;
+  private volatile boolean submitted;
   private volatile String error;
   private final long createdAt;
 
@@ -35,6 +36,15 @@ public class SearchSession {
 
   public void setComplete() {
     this.complete = true;
+  }
+
+  /** Every performer of the search has been handed to the SearchManager. */
+  void setSubmitted() {
+    this.submitted = true;
+  }
+
+  boolean isSubmitted() {
+    return submitted;
   }
 
   public void setError(String error) {

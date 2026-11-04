@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.LongFunction;
 
 public class SearchSessionManager implements SearchListener {
   private static final SearchSessionManager INSTANCE = new SearchSessionManager();
@@ -33,29 +34,47 @@ public class SearchSessionManager implements SearchListener {
   }
 
   public SearchSession createSearch(String keywords, List<String> engineIds) {
-    long token = tokenCounter.getAndIncrement();
-    List<SearchEngine> engines = SearchEngine.getEngines();
-    List<ISearchPerformer> performers = new ArrayList<>();
     boolean filterEngines = engineIds != null && !engineIds.isEmpty();
-    for (SearchEngine engine : engines) {
-      if (filterEngines && !engineIds.contains(engine.getId().name())) {
-        continue;
-      }
-      if (!engine.isEnabled()) {
-        continue;
-      }
-      try {
-        ISearchPerformer performer = engine.getPerformer(token, keywords);
-        performer.setListener(this);
-        performers.add(performer);
-      } catch (Exception e) {
-        // skip engines that fail to create performers (e.g. not ready)
-      }
-    }
+    return startSearch(
+        keywords,
+        token -> {
+          List<ISearchPerformer> performers = new ArrayList<>();
+          for (SearchEngine engine : SearchEngine.getEngines()) {
+            if (filterEngines && !engineIds.contains(engine.getId().name())) {
+              continue;
+            }
+            if (!engine.isEnabled()) {
+              continue;
+            }
+            try {
+              performers.add(engine.getPerformer(token, keywords));
+            } catch (Exception e) {
+              // skip engines that fail to create performers (e.g. not ready)
+            }
+          }
+          return performers;
+        });
+  }
+
+  /**
+   * Starts a search run by the performers {@code performersFor} makes for its token.
+   * Package-private so tests can run a search on performers of their own.
+   */
+  SearchSession startSearch(String keywords, LongFunction<List<ISearchPerformer>> performersFor) {
+    long token = tokenCounter.getAndIncrement();
+    List<ISearchPerformer> performers = performersFor.apply(token);
     SearchSession session = new SearchSession(token, keywords, performers);
     sessions.put(token, session);
+    SearchManager searchManager = SearchManager.getInstance();
     for (ISearchPerformer performer : performers) {
-      SearchManager.getInstance().perform(performer);
+      searchManager.perform(performer);
+    }
+    // The SearchManager reports a search stopped whenever none of its tasks is left, which can
+    // happen while later performers are still being handed to it. Only reports after every
+    // performer was handed over count; if all of them finished before that, the search is done.
+    session.setSubmitted();
+    if (!searchManager.isSearching(token)) {
+      session.setComplete();
     }
     return session;
   }
@@ -74,12 +93,13 @@ public class SearchSessionManager implements SearchListener {
 
   /**
    * The SearchManager calls this when no task of the search is left running. Its performers don't
-   * mark themselves stopped when they finish (only stop() does), so this is when the search ends.
+   * mark themselves stopped when they finish (only stop() does), so this is when the search ends,
+   * once all of its performers were handed to the SearchManager.
    */
   @Override
   public void onStopped(long token) {
     SearchSession session = sessions.get(token);
-    if (session != null) {
+    if (session != null && session.isSubmitted()) {
       session.setComplete();
     }
   }

@@ -53,7 +53,7 @@ class SearchToolsTest {
     SearchSession session = session(started);
     assertEquals("ubuntu iso", session.getKeywords());
     assertTrue(session.getResults().isEmpty());
-    assertFalse(session.isComplete());
+    assertTrue(session.isComplete(), "no engine matched, so there is nothing to wait for");
     assertTrue(session.getCreatedAt() <= System.currentTimeMillis());
 
     JsonObject other = new SearchTool().execute(search("debian"));
@@ -64,22 +64,21 @@ class SearchToolsTest {
   }
 
   @Test
-  void statusReportsRunningCompleteAndErrorStates() {
+  void statusReportsCompleteAndErrorStates() {
+    // The running state, while performers work, is covered by
+    // SearchSessionThroughTheSearchManagerTest.
     JsonObject started = new SearchTool().execute(search("linux"));
     String token = started.get("token").getAsString();
     long id = Long.parseLong(token);
     SearchSessionManager manager = SearchSessionManager.instance();
 
-    JsonObject running = new SearchStatusTool().execute(token(token));
-    assertEquals("running", running.get("status").getAsString());
-    assertEquals(0, running.get("resultCount").getAsInt());
-    assertEquals("linux", running.get("keywords").getAsString());
+    JsonObject complete = new SearchStatusTool().execute(token(token));
+    assertEquals("complete", complete.get("status").getAsString(), "no engine to run");
+    assertEquals(0, complete.get("resultCount").getAsInt());
+    assertEquals("linux", complete.get("keywords").getAsString());
 
     manager.onResults(id, List.of(torrent("a", 1, 1, "tpb", 1)));
-    manager.onStopped(id);
-    JsonObject complete = new SearchStatusTool().execute(token(token));
-    assertEquals("complete", complete.get("status").getAsString(), "no performer is left running");
-    assertEquals(1, complete.get("resultCount").getAsInt());
+    assertEquals(1, new SearchStatusTool().execute(token(token)).get("resultCount").getAsInt());
 
     manager.onError(id, new SearchError(503, "engine unavailable"));
     JsonObject failed = new SearchStatusTool().execute(token(token));
