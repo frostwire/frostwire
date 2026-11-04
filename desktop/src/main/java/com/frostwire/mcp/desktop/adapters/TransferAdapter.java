@@ -19,6 +19,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 import javax.swing.SwingUtilities;
 
 public final class TransferAdapter {
@@ -153,7 +154,23 @@ public final class TransferAdapter {
     return null;
   }
 
+  /**
+   * Where {@link #getAllDownloads()} reads the transfers from: the Swing transfer table. Tests swap
+   * it with {@link #setDownloadsSource}, since that table can't be built without a display.
+   */
+  private static volatile Supplier<List<BTDownload>> downloadsSource =
+      TransferAdapter::downloadsInTransferTable;
+
   public static List<BTDownload> getAllDownloads() {
+    return downloadsSource.get();
+  }
+
+  /** Test seam: reads the transfers from {@code source}, or from the transfer table if null. */
+  static void setDownloadsSource(Supplier<List<BTDownload>> source) {
+    downloadsSource = source != null ? source : TransferAdapter::downloadsInTransferTable;
+  }
+
+  private static List<BTDownload> downloadsInTransferTable() {
     List<com.frostwire.gui.bittorrent.BTDownload> guiDownloads = snapshotGuiDownloads();
     List<BTDownload> result = new ArrayList<>(guiDownloads.size());
     for (com.frostwire.gui.bittorrent.BTDownload btDownload : guiDownloads) {
