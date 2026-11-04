@@ -15,7 +15,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.ServerSocket;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -68,9 +67,11 @@ class StreamableHttpTransportTest {
 
   @BeforeEach
   void setUp() throws IOException {
-    port = freePort();
-    transport = new StreamableHttpTransport("127.0.0.1", port, new TlsConfig());
+    // Port 0: the system picks a free one; a port found free first could be taken by a parallel
+    // test JVM before the server binds it.
+    transport = new StreamableHttpTransport("127.0.0.1", 0, new TlsConfig());
     transport.start(dummyHandler);
+    port = transport.getPort();
     httpClient = HttpClient.newHttpClient();
     sessionId = null;
   }
@@ -79,12 +80,6 @@ class StreamableHttpTransportTest {
   void tearDown() {
     if (transport != null) {
       transport.stop();
-    }
-  }
-
-  private int freePort() throws IOException {
-    try (ServerSocket s = new ServerSocket(0)) {
-      return s.getLocalPort();
     }
   }
 

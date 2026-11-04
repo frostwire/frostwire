@@ -108,8 +108,13 @@ public class StreamableHttpTransport implements MCPTransport {
     return host;
   }
 
+  /**
+   * The port it listens on once started (the one picked when configured as 0), else the configured
+   * one.
+   */
   public int getPort() {
-    return port;
+    HttpServer server = httpServer;
+    return running && server != null ? server.getAddress().getPort() : port;
   }
 
   private void startKeepAlive() {

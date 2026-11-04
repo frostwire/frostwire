@@ -78,15 +78,17 @@ class StreamableHttpTransportProtocolTest {
   }
 
   @Test
-  void startAndStopReportTheRunningStateHostAndPort() throws IOException {
-    port = freePort();
-    transport = new StreamableHttpTransport("127.0.0.1", port);
+  void startAndStopReportTheRunningStateHostAndPort() throws Exception {
+    transport = new StreamableHttpTransport("127.0.0.1", 0);
     assertFalse(transport.isRunning());
     assertEquals("127.0.0.1", transport.getHost());
-    assertEquals(port, transport.getPort());
+    assertEquals(0, transport.getPort(), "the configured port before it starts");
 
     transport.start(echoHandler);
     assertTrue(transport.isRunning());
+    port = transport.getPort();
+    assertTrue(port > 0, "the port the system picked");
+    assertEquals(200, send(request().method("OPTIONS", none())).statusCode());
 
     transport.stop();
     assertFalse(transport.isRunning());
@@ -191,9 +193,9 @@ class StreamableHttpTransportProtocolTest {
 
   @Test
   void errorsForRequestsWithoutAnIdCarryANullId() throws Exception {
-    port = freePort();
-    transport = new StreamableHttpTransport("127.0.0.1", port, new TlsConfig());
+    transport = new StreamableHttpTransport("127.0.0.1", 0, new TlsConfig());
     transport.start(new MCPServer("test")::handleRequest);
+    port = transport.getPort();
 
     JsonObject error = json(post(null, "application/json", "{\"jsonrpc\":\"2.0\"}").body());
 
@@ -313,10 +315,9 @@ class StreamableHttpTransportProtocolTest {
 
   @Test
   void tlsWithAGeneratedCertificateServesLocalhost() throws Exception {
-    port = freePort();
-    transport =
-        new StreamableHttpTransport("127.0.0.1", port, new TlsConfig(true, null, null, true));
+    transport = new StreamableHttpTransport("127.0.0.1", 0, new TlsConfig(true, null, null, true));
     transport.start(echoHandler);
+    port = transport.getPort();
     HttpClient tls = HttpClient.newBuilder().sslContext(trustAll()).connectTimeout(TIMEOUT).build();
 
     HttpResponse<String> response =
@@ -364,11 +365,11 @@ class StreamableHttpTransportProtocolTest {
             .start();
     keytool.getInputStream().readAllBytes();
     assertEquals(0, keytool.waitFor(), "keytool made the keystore");
-    port = freePort();
     transport =
         new StreamableHttpTransport(
-            "127.0.0.1", port, new TlsConfig(true, keystore.toString(), "changeit", false));
+            "127.0.0.1", 0, new TlsConfig(true, keystore.toString(), "changeit", false));
     transport.start(echoHandler);
+    port = transport.getPort();
 
     HttpResponse<String> response =
         HttpClient.newBuilder()
@@ -430,10 +431,11 @@ class StreamableHttpTransportProtocolTest {
     assertEquals("TLS", named.getProtocol());
   }
 
+  /** Starts on a port the system picks, so parallel test JVMs can't take it in between. */
   private void start() throws IOException {
-    port = freePort();
-    transport = new StreamableHttpTransport("127.0.0.1", port, new TlsConfig());
+    transport = new StreamableHttpTransport("127.0.0.1", 0, new TlsConfig());
     transport.start(echoHandler);
+    port = transport.getPort();
   }
 
   private HttpRequest.Builder request() {
