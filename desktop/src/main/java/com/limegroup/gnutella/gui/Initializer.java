@@ -20,6 +20,7 @@ package com.limegroup.gnutella.gui;
 
 import com.frostwire.bittorrent.BTContext;
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.gui.theme.MacLogicalFonts;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.search.relay.BTEngineListenerChain;
 import com.frostwire.search.relay.BlockHeaderSource;
@@ -134,6 +135,10 @@ final class Initializer {
       UISettings.UI_THEME.setValue(saved.name());
     }
     System.out.println("Initializer.initialize() applying theme: " + saved);
+    // On a Mac whose Lucida Grande font is missing or disabled the JDK has no logical fonts, and
+    // the first text measured would crash (frostwire/frostwire#1484); rebuild them before the look
+    // and feel and the splash use any font.
+    MacLogicalFonts.repairIfMissing();
     ThemeMediator.loadThemeAtStartup(saved);
     // Pay the JDK's one-time costs (font files and character maps read from disk, HarfBuzz shaper
     // init, drag-and-drop cursors) off the EDT as soon as the look and feel's fonts are known; on
