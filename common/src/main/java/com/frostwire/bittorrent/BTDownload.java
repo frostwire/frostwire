@@ -697,6 +697,7 @@ public final class BTDownload implements BittorrentDownload {
 
   private void torrentRemoved() {
     engine.removeDownloadListener(innerListener);
+    engine.forgetDownloadExtra(extra);
     if (parts != null) {
       //noinspection ResultOfMethodCallIgnored
       parts.delete();
@@ -993,10 +994,19 @@ public final class BTDownload implements BittorrentDownload {
     }
   }
 
+  /**
+   * The torrent's extra data, shared with its other BTDownloads: the engine makes a new one on each
+   * update, and each saves its extra data to the same resume file, so separate copies overwrote
+   * each other's changes (a pause was lost after a restart).
+   */
   private Map<String, String> createExtra() {
-    Map<String, String> map = new HashMap<>();
+    String infoHash = engine.canonicalInfoHash(th);
+    return engine.downloadExtra(infoHash, () -> loadExtra(infoHash));
+  }
+
+  private Map<String, String> loadExtra(String infoHash) {
+    Map<String, String> map = Collections.synchronizedMap(new HashMap<>());
     try {
-      String infoHash = engine.canonicalInfoHash(th);
       File file = engine.resumeDataFile(infoHash);
       if (file.exists()) {
         byte[] arr = FileUtils.readFileToByteArray(file);

@@ -33,7 +33,9 @@ import com.frostwire.util.OSUtils;
 import com.frostwire.util.StaleJlibtorrentCopies;
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Supplier;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
@@ -69,6 +71,9 @@ public final class BTEngine extends SessionManager {
   /** Routes torrent alerts to their download, through one session listener (GitHub #1441). */
   private final TorrentAlertRouter<torrent_handle> downloadAlerts =
       new TorrentAlertRouter<>(TorrentAlertRouter.NATIVE_HANDLES);
+
+  /** Each torrent's extra data by canonical hash, shared by all of its BTDownloads. */
+  private final Map<String, Map<String, String>> downloadExtras = new ConcurrentHashMap<>();
 
   private final Queue<RestoreDownloadTask> restoreDownloadsQueue;
   private volatile BTEngineListener listener;
@@ -107,6 +112,21 @@ public final class BTEngine extends SessionManager {
 
   void removeDownloadListener(AlertListener listener) {
     downloadAlerts.remove(listener);
+  }
+
+  /**
+   * The extra data of the torrent with canonical hash {@code infoHash}, the same map for all of its
+   * downloads; {@code load} reads it the first time. Without a hash it can't be shared.
+   */
+  Map<String, String> downloadExtra(String infoHash, Supplier<Map<String, String>> load) {
+    return infoHash == null
+        ? load.get()
+        : downloadExtras.computeIfAbsent(infoHash, h -> load.get());
+  }
+
+  /** Drops a removed torrent's extra data, so adding it again starts from its resume file. */
+  void forgetDownloadExtra(Map<String, String> extra) {
+    downloadExtras.values().removeIf(shared -> shared == extra);
   }
 
   /**
