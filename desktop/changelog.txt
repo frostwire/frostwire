@@ -2,6 +2,7 @@ FrostWire 7.1.3 build 335 UNRELEASED
    - fix:Torrents that use only the new BitTorrent v2 format download only the files you picked; sometimes all of their files downloaded
    - fix:A transfer you paused stays paused after restarting FrostWire; the pause was often forgotten and the transfer started again
    - fix:MCP: an AI agent that opens the event stream gets its session right away instead of waiting about 30 seconds
+   - fix:MCP: requests an AI agent sends while it holds an event stream no longer hang until they time out; the answer arrives on the stream and the request completes
    - fix:Removing an unfinished transfer deletes the partial files it downloaded again, instead of leaving them and its .parts file in the save folder
    - fix:Create Torrent: picking a Creative Commons license works again instead of failing with an error, and torrents made with one by older FrostWire versions show their license again
    - fix:MCP: text settings changed with frostwire_settings_set, such as the IceBridge remote URL, are saved as sent instead of wrapped in quotes, and numbers or true/false sent as text are accepted
