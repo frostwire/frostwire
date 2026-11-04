@@ -499,7 +499,7 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
       String text = frameData.getText().toString();
       if (text != null && text.length() > 0) {
         String description = extractGenreDescription(text);
-        if (description != null & description.length() > 0) {
+        if (description != null && description.length() > 0) {
           return description;
         }
       }
@@ -729,10 +729,12 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
         ID3v2CommentFrameData frameData;
         try {
           frameData = new ID3v2CommentFrameData(useFrameUnsynchronisation(), frame.getData());
-          if (!itunes && frameData.getDescription().toString().startsWith("iTun")) {
+          // null when the description's bytes don't decode: not an iTunes comment then.
+          String description = frameData.getDescription().toString();
+          if (!itunes && description != null && description.startsWith("iTun")) {
             continue;
           }
-          if (itunes && ITUNES_COMMENT_DESCRIPTION.equals(frameData.getDescription().toString())) {
+          if (itunes && ITUNES_COMMENT_DESCRIPTION.equals(description)) {
             return frameData;
           } else if (!itunes) {
             return frameData;
