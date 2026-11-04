@@ -23,7 +23,26 @@ final class IPFilterTableAccess {
 
   private static final int IMPORT_BATCH_SIZE = 128;
 
+  /** The rows the tools read and change, when not the Swing table. */
+  interface Table {
+    List<IPRange> snapshot();
+
+    void add(List<IPRange> ranges);
+
+    void clear();
+  }
+
+  /** Test seam: a stand-in for the Swing table, which can't be built without a display. */
+  private static volatile Table standIn;
+
   private IPFilterTableAccess() {}
+
+  /**
+   * Test seam: the tools use {@code table} instead of the Swing table, or the Swing table if null.
+   */
+  static void setStandIn(Table table) {
+    standIn = table;
+  }
 
   static <T> T onEdt(Callable<T> operation) {
     if (SwingUtilities.isEventDispatchThread()) {
@@ -51,6 +70,10 @@ final class IPFilterTableAccess {
   }
 
   static List<IPRange> snapshot() {
+    Table table = standIn;
+    if (table != null) {
+      return table.snapshot();
+    }
     return onEdt(
         () -> {
           DataLineModel<IPFilterTableMediator.IPFilterDataLine, IPRange> model =
@@ -72,6 +95,11 @@ final class IPFilterTableAccess {
   }
 
   static void add(List<IPRange> ranges) {
+    Table table = standIn;
+    if (table != null) {
+      table.add(ranges);
+      return;
+    }
     for (int start = 0; start < ranges.size(); start += IMPORT_BATCH_SIZE) {
       int from = start;
       int to = Math.min(start + IMPORT_BATCH_SIZE, ranges.size());
@@ -92,6 +120,11 @@ final class IPFilterTableAccess {
   }
 
   static void clear() {
+    Table table = standIn;
+    if (table != null) {
+      table.clear();
+      return;
+    }
     onEdt(
         () -> {
           IPFilterTableMediator.getInstance().clearTable();
