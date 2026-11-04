@@ -32,6 +32,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -389,24 +390,49 @@ class BTDownloadStatusTest {
   }
 
   @Test
-  void aStaleStatusIsRefreshedInTheBackgroundAndAFailedRefreshIsNotShown() throws Exception {
+  void aStaleStatusShowsWhileItIsRefreshedInTheBackground() throws Exception {
     FakeTorrentHandle handle = handle("stale", s -> s.setNum_peers(1));
     BTDownload dl = new BTDownload(local.engine, new TorrentHandle(handle));
     FakeStatus fresh = new FakeStatus();
     fresh.setNum_peers(7);
     handle.status = fresh;
+    CountDownLatch release = new CountDownLatch(1);
+    handle.statusGate = release;
 
-    // Past the download's one-second status cache (and the handle's half-second one).
+    // Ages the download's one-second status cache; the refresh then waits for release.
     Thread.sleep(1100);
 
     assertEquals(1, dl.getConnectedPeers(), "the stale status shows while it refreshes");
+    release.countDown();
     await(() -> dl.getConnectedPeers() == 7, "the refreshed status shows");
+  }
 
-    handle.statusFailure = new IllegalStateException("torrent gone");
-    Thread.sleep(600);
+  @Test
+  void aRefreshReadsTheTorrentsStatusNowNotTheHandlesLastCopy() throws Exception {
+    // A state change refreshes right away (Android does on each one), but TorrentHandle hands out
+    // the status it read in the last half second.
+    FakeTorrentHandle handle = handle("changed", s -> s.setNum_peers(1));
+    BTDownload dl = new BTDownload(local.engine, new TorrentHandle(handle));
+    FakeStatus changed = new FakeStatus();
+    changed.setNum_peers(7);
+    handle.status = changed;
+
     dl.refreshStatusCache();
 
+    assertEquals(7, dl.getConnectedPeers());
+  }
+
+  @Test
+  void aStatusThatCannotBeReadIsNotShownAsTheLastOne() throws Exception {
+    FakeTorrentHandle handle = handle("unreadable", s -> s.setNum_peers(1));
+    BTDownload dl = new BTDownload(local.engine, new TorrentHandle(handle));
+    handle.statusFailure = new IllegalStateException("std::bad_alloc");
+
+    dl.refreshStatusCache();
+
+    // Also after the background refresh this schedules, which fails the same way.
     assertEquals(0, dl.getConnectedPeers(), "no status rather than a stale one");
+    assertEquals(0, dl.getConnectedPeers());
   }
 
   @Test

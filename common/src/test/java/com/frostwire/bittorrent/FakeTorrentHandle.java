@@ -23,6 +23,8 @@ import com.frostwire.jlibtorrent.swig.torrent_info;
 import com.frostwire.jlibtorrent.swig.torrent_status;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -34,6 +36,10 @@ final class FakeTorrentHandle extends torrent_handle {
   volatile boolean valid = true;
   volatile FakeStatus status = new FakeStatus();
   volatile RuntimeException statusFailure;
+
+  /** When set, reading the status waits until it is released. */
+  volatile CountDownLatch statusGate;
+
   final TorrentInfo metadata;
   String hash = "0123456789abcdef0123456789abcdef01234567";
   RuntimeException hashFailure;
@@ -66,6 +72,14 @@ final class FakeTorrentHandle extends torrent_handle {
 
   @Override
   public torrent_status status(status_flags_t flags) {
+    CountDownLatch gate = statusGate;
+    if (gate != null) {
+      try {
+        gate.await(LocalEngine.TIMEOUT_SECONDS, TimeUnit.SECONDS);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+    }
     if (statusFailure != null) {
       throw statusFailure;
     }

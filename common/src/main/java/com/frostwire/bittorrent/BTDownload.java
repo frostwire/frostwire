@@ -416,7 +416,9 @@ public final class BTDownload implements BittorrentDownload {
         return;
       }
       try {
-        cachedStatus = th.status();
+        // Forced: TorrentHandle hands out the status it read in the last half second, even
+        // after that read failed, so a refresh showed the old status instead of the new one.
+        cachedStatus = th.status(true);
         lastStatusUpdateTime = System.currentTimeMillis();
       } catch (Throwable t) {
         invalidateStatusCache();
