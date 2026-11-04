@@ -401,10 +401,15 @@ class StreamableHttpTransportProtocolTest {
 
     StreamableHttpTransport missingKeystore =
         new StreamableHttpTransport(
-            "127.0.0.1", freePort(), new TlsConfig(true, "/no/such/keystore.jks", "pw", false));
+            "127.0.0.1", port, new TlsConfig(true, "/no/such/keystore.jks", "pw", false));
     RuntimeException missing =
         assertThrows(RuntimeException.class, () -> missingKeystore.start(echoHandler));
     assertTrue(missing.getMessage().startsWith("Failed to configure SSL: "), missing.getMessage());
+
+    // A failed start must let go of the port, so the server can start once TLS is fixed.
+    transport = new StreamableHttpTransport("127.0.0.1", port, new TlsConfig());
+    transport.start(echoHandler);
+    assertTrue(transport.isRunning());
   }
 
   @Test

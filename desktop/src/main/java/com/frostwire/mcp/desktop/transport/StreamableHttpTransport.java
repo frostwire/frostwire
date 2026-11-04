@@ -59,8 +59,11 @@ public class StreamableHttpTransport implements MCPTransport {
     this.handler = handler;
     try {
       if (tlsConfig != null && tlsConfig.isEnabled()) {
-        HttpsServer httpsServer = HttpsServer.create(new InetSocketAddress(host, port), 0);
+        // Bound only once TLS is set up: a server bound first kept the port when TLS failed,
+        // so starting again after fixing TLS found the port in use.
+        HttpsServer httpsServer = HttpsServer.create();
         configureSSL(httpsServer);
+        httpsServer.bind(new InetSocketAddress(host, port), 0);
         this.httpServer = httpsServer;
       } else {
         this.httpServer = HttpServer.create(new InetSocketAddress(host, port), 0);
