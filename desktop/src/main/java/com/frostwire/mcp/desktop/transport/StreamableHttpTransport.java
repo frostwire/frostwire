@@ -211,6 +211,9 @@ public class StreamableHttpTransport implements MCPTransport {
       exchange.sendResponseHeaders(200, 0);
 
       OutputStream os = exchange.getResponseBody();
+      // The server holds the headers back until the body is flushed. Flushing an empty chunked
+      // body sends them, with the session id, without sending any data.
+      os.flush();
       SSEConnection conn = new SSEConnection(sessionId, os);
       activeSSEConnections.put(sessionId, conn);
 

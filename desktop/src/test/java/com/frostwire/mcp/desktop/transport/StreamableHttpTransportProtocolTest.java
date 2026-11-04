@@ -20,6 +20,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URI;
@@ -203,6 +204,28 @@ class StreamableHttpTransportProtocolTest {
     HttpResponse<String> unanswered =
         post(null, "text/event-stream", "{\"jsonrpc\":\"2.0\",\"method\":\"note\"}");
     assertEquals("", unanswered.body(), "nothing to stream for a notification");
+  }
+
+  @Test
+  void anEventStreamAnswersWithItsSessionRightAway() throws Exception {
+    start();
+    // The request times out long before the first 30-second keep-alive could push the headers out.
+    HttpResponse<InputStream> stream =
+        http.send(
+            request()
+                .timeout(Duration.ofSeconds(5))
+                .header("Accept", "text/event-stream")
+                .GET()
+                .build(),
+            HttpResponse.BodyHandlers.ofInputStream());
+    try {
+      assertEquals(200, stream.statusCode());
+      assertEquals("text/event-stream", stream.headers().firstValue("Content-Type").orElse(""));
+      assertTrue(
+          stream.headers().firstValue("Mcp-Session-Id").orElse("").startsWith("mcp-session-"));
+    } finally {
+      stream.body().close();
+    }
   }
 
   @Test
