@@ -11,6 +11,7 @@ import static com.frostwire.bittorrent.LocalEngine.await;
 import static com.frostwire.bittorrent.LocalEngine.content;
 import static com.frostwire.bittorrent.LocalEngine.torrent;
 import static com.frostwire.bittorrent.LocalEngine.torrentFile;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -191,6 +192,45 @@ class BTEngineDownloadTest {
     BTDownload update = Events.next(local.events.updated, "magnet");
     assertEquals(dl.getInfoHash(), update.getInfoHash());
     await(() -> !LocalEngine.isPaused(dl), "the transfer resumed");
+  }
+
+  @Test
+  void aMagnetStillFetchingItsMetadataIsReplacedByItsTorrent() throws Exception {
+    TorrentInfo ti = album("zombie");
+    File saveDir = dir.resolve("save").toFile();
+    // No peers: it never gets its metadata.
+    local.engine.download(ti.makeMagnetUri(), saveDir, new torrent_flags_t());
+    BTDownload magnet = Events.next(local.events.added, "zombie");
+    assertEquals(0, magnet.getSize(), "no metadata yet");
+
+    local.engine.download(ti, saveDir, null, null);
+
+    BTDownload full = Events.next(local.events.added, "zombie");
+    assertEquals(ti.totalSize(), full.getSize());
+    assertEquals(2, full.getItems().size());
+  }
+
+  @Test
+  void aV1MagnetFromADistributedSearchKeepsItsSource() throws Exception {
+    TorrentInfo ti = album("v1-magnet", TorrentBuilder.V1_ONLY);
+    byte[] source = new byte[32];
+    Arrays.fill(source, (byte) 5);
+
+    local.engine.download(
+        ti.makeMagnetUri(), dir.resolve("save").toFile(), new torrent_flags_t(), source);
+
+    assertArrayEquals(
+        source, Events.next(local.events.added, "v1-magnet").getDistributedSourcePeerPub());
+  }
+
+  @Test
+  void aSourceThatIsNotAPeerKeyIsIgnored() throws Exception {
+    TorrentInfo ti = album("bad-source");
+
+    local.engine.download(
+        ti.makeMagnetUri(), dir.resolve("save").toFile(), new torrent_flags_t(), new byte[16]);
+
+    assertNull(Events.next(local.events.added, "bad-source").getDistributedSourcePeerPub());
   }
 
   @Test
