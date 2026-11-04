@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.frostwire.mcp.MCPServer;
 import com.frostwire.mcp.transport.MCPTransportHandler;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -183,6 +184,19 @@ class StreamableHttpTransportProtocolTest {
     assertEquals(
         "{}", post(null, "application/json", "{\"jsonrpc\":\"2.0\",\"method\":\"note\"}").body());
     assertEquals("{}", post(null, "application/json", "42").body(), "not a JSON-RPC message");
+  }
+
+  @Test
+  void errorsForRequestsWithoutAnIdCarryANullId() throws Exception {
+    port = freePort();
+    transport = new StreamableHttpTransport("127.0.0.1", port, new TlsConfig());
+    transport.start(new MCPServer("test")::handleRequest);
+
+    JsonObject error = json(post(null, "application/json", "{\"jsonrpc\":\"2.0\"}").body());
+
+    assertEquals(-32600, error.getAsJsonObject("error").get("code").getAsInt());
+    assertTrue(error.has("id"), "JSON-RPC requires the id, null when the request has none");
+    assertTrue(error.get("id").isJsonNull());
   }
 
   @Test

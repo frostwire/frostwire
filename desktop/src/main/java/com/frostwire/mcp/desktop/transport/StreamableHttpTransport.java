@@ -4,6 +4,7 @@ import com.frostwire.mcp.transport.MCPTransport;
 import com.frostwire.mcp.transport.MCPTransportHandler;
 import com.frostwire.util.Logger;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -37,6 +38,8 @@ public class StreamableHttpTransport implements MCPTransport {
   private Thread keepAliveThread;
 
   private static final Logger LOG = Logger.getLogger(StreamableHttpTransport.class);
+  // Keeps JSON nulls: JSON-RPC requires "id": null on errors for requests without a readable id.
+  private static final Gson GSON = new GsonBuilder().serializeNulls().create();
 
   public StreamableHttpTransport(String host, int port) {
     this(host, port, new TlsConfig());
@@ -86,7 +89,7 @@ public class StreamableHttpTransport implements MCPTransport {
 
   @Override
   public void sendNotification(JsonObject notification) {
-    String json = new Gson().toJson(notification);
+    String json = GSON.toJson(notification);
     String sseEvent = "event: message\ndata: " + json + "\n\n";
     for (SSEConnection conn : activeSSEConnections.values()) {
       conn.send(sseEvent);
@@ -347,7 +350,7 @@ public class StreamableHttpTransport implements MCPTransport {
               JsonObject response = handler.handleRequest(request);
               if (response != null) {
                 LOG.info("MCP: sending batch response via SSE");
-                targetConn.send("event: message\ndata: " + new Gson().toJson(response) + "\n\n");
+                targetConn.send("event: message\ndata: " + GSON.toJson(response) + "\n\n");
               }
             }
           } else if (parsed.isJsonObject()) {
@@ -362,7 +365,7 @@ public class StreamableHttpTransport implements MCPTransport {
               targetConn.send("event: message\ndata: \"accepted\"\n\n");
             } else if (response != null) {
               LOG.info("MCP: sending response via SSE for method=" + method);
-              targetConn.send("event: message\ndata: " + new Gson().toJson(response) + "\n\n");
+              targetConn.send("event: message\ndata: " + GSON.toJson(response) + "\n\n");
             }
           }
         } finally {
@@ -397,7 +400,7 @@ public class StreamableHttpTransport implements MCPTransport {
         } else {
           resultElement = new JsonObject();
         }
-        String responseJson = new Gson().toJson(resultElement);
+        String responseJson = GSON.toJson(resultElement);
         if (sessionId == null) {
           sessionId = "mcp-session-" + sessionCounter.incrementAndGet();
         }

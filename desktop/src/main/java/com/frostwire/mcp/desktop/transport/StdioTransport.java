@@ -3,12 +3,16 @@ package com.frostwire.mcp.desktop.transport;
 import com.frostwire.mcp.transport.MCPTransport;
 import com.frostwire.mcp.transport.MCPTransportHandler;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 public class StdioTransport implements MCPTransport {
+
+  // Keeps JSON nulls: JSON-RPC requires "id": null on errors for requests without a readable id.
+  private static final Gson GSON = new GsonBuilder().serializeNulls().create();
 
   private volatile boolean running;
   private MCPTransportHandler handler;
@@ -42,7 +46,7 @@ public class StdioTransport implements MCPTransport {
           JsonObject response = handler.handleRequest(request);
           if (response != null) {
             synchronized (writer) {
-              writer.println(new Gson().toJson(response));
+              writer.println(GSON.toJson(response));
               writer.flush();
             }
           }
@@ -55,7 +59,7 @@ public class StdioTransport implements MCPTransport {
           error.addProperty("message", "Parse error: " + e.getMessage());
           errorResponse.add("error", error);
           synchronized (writer) {
-            writer.println(new Gson().toJson(errorResponse));
+            writer.println(GSON.toJson(errorResponse));
             writer.flush();
           }
         }
@@ -78,7 +82,7 @@ public class StdioTransport implements MCPTransport {
   @Override
   public void sendNotification(JsonObject notification) {
     synchronized (writer) {
-      writer.println(new Gson().toJson(notification));
+      writer.println(GSON.toJson(notification));
       writer.flush();
     }
   }

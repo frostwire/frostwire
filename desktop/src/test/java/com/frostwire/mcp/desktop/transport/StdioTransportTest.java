@@ -97,6 +97,8 @@ class StdioTransportTest {
 
     JsonObject error = JsonParser.parseString(answers.readLine()).getAsJsonObject();
     assertEquals("2.0", error.get("jsonrpc").getAsString());
+    assertTrue(error.has("id"), "JSON-RPC requires the id, null when the request was unreadable");
+    assertTrue(error.get("id").isJsonNull());
     assertEquals(-32700, error.getAsJsonObject("error").get("code").getAsInt());
     assertTrue(
         error.getAsJsonObject("error").get("message").getAsString().startsWith("Parse error: "));
