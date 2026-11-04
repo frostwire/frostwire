@@ -34,8 +34,11 @@ public class RelayMetricsTool implements MCPTool {
 
   @Override
   public JsonObject inputSchema() {
-    // no args
-    return new JsonObject();
+    // No arguments, but MCP requires an object schema: clients reject a tool without one.
+    JsonObject schema = new JsonObject();
+    schema.addProperty("type", "object");
+    schema.add("properties", new JsonObject());
+    return schema;
   }
 
   @Override
