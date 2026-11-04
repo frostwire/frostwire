@@ -8,6 +8,7 @@ FrostWire 7.1.3 build 335 UNRELEASED
    - fix:A corrupt or malicious MP4/M4A file in your downloads can no longer make FrostWire run out of memory when the Library reads its tags or you extract its audio — entry counts in the file are checked against its size before anything is allocated
    - fix:A SoundCloud MP3 with a corrupt ID3 tag can no longer make FrostWire allocate gigabytes of memory while re-tagging it — frame lengths are checked against the tag before anything is copied
    - fix:Re-tagging a low-bitrate MP3 (MPEG-2 or 2.5, 24 kHz and below) no longer cuts its audio down to a single frame, and its duration and ID3v2 tag are read correctly
+   - fix:MP3s whose ID3v1 track number is 128 or higher show that number instead of a negative one
    - fix:Hashes and other hex values from peers and block explorers must be plain ASCII hex: look-alike digits from other scripts are rejected instead of decoding to the same bytes (#1431)
    - fix:Distributed search rejects karma chains with forged epochs or energy that got around the endorsement limit (#1415)
    - fix:Distributed search no longer accepts a peer's karma chain that declares an invalid energy value to endorse other peers without the per-epoch limit (#1401)
