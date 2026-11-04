@@ -74,4 +74,26 @@ class ID3v2TagTest {
     assertArrayEquals(spec, written.toBytes());
     assertEquals(spec.length, written.getLength());
   }
+
+  /**
+   * The comment and the iTunes comment share the COMM frame set, told apart by their description.
+   * setItunesComment wrote "iTunNORM" as the language, so getItunesComment never found it, and each
+   * setter replaced the whole set, so setting the comment dropped the iTunes one.
+   */
+  @Test
+  void theCommentAndTheItunesCommentAreSetIndependently() throws Exception {
+    ID3v23Tag written = new ID3v23Tag();
+    written.setComment("Comment");
+    written.setItunesComment("0000 0001");
+    written.setComment("New comment");
+    AbstractID3v2Tag read = ID3v2TagFactory.createTag(written.toBytes());
+    assertEquals("New comment", read.getComment());
+    assertEquals("0000 0001", read.getItunesComment());
+    assertEquals(2, read.getFrameSets().get("COMM").getFrames().size());
+
+    read.setItunesComment("0000 0002");
+    assertEquals("New comment", read.getComment());
+    assertEquals("0000 0002", read.getItunesComment());
+    assertEquals(2, read.getFrameSets().get("COMM").getFrames().size());
+  }
 }

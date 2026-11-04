@@ -550,7 +550,7 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
       ID3v2CommentFrameData frameData =
           new ID3v2CommentFrameData(
               useFrameUnsynchronisation(), "eng", null, new EncodedText((byte) 0, comment));
-      addFrame(createFrame(ID_COMMENT, frameData.toBytes()), true);
+      replaceCommentFrame(frameData, false);
     }
   }
 
@@ -569,10 +569,10 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
       ID3v2CommentFrameData frameData =
           new ID3v2CommentFrameData(
               useFrameUnsynchronisation(),
-              ITUNES_COMMENT_DESCRIPTION,
-              null,
+              "eng",
+              new EncodedText((byte) 0, ITUNES_COMMENT_DESCRIPTION),
               new EncodedText((byte) 0, itunesComment));
-      addFrame(createFrame(ID_COMMENT, frameData.toBytes()), true);
+      replaceCommentFrame(frameData, true);
     }
   }
 
@@ -727,25 +727,42 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
     ID3v2FrameSet frameSet = frameSets.get(id);
     if (frameSet != null) {
       for (ID3v2Frame frame : frameSet.getFrames()) {
-        ID3v2CommentFrameData frameData;
-        try {
-          frameData = new ID3v2CommentFrameData(useFrameUnsynchronisation(), frame.getData());
-          // null when the description's bytes don't decode: not an iTunes comment then.
-          String description = frameData.getDescription().toString();
-          if (!itunes && description != null && description.startsWith("iTun")) {
-            continue;
-          }
-          if (itunes && ITUNES_COMMENT_DESCRIPTION.equals(description)) {
-            return frameData;
-          } else if (!itunes) {
-            return frameData;
-          }
-        } catch (InvalidDataException e) {
-          // Do nothing
-        }
+        ID3v2CommentFrameData frameData = commentFrameData(frame, itunes);
+        if (frameData != null) return frameData;
       }
     }
     return null;
+  }
+
+  /**
+   * The frame's comment if it is the kind asked for, else null: the iTunes comment is described
+   * "iTunNORM", and the comment is any whose description doesn't start with "iTun".
+   */
+  private ID3v2CommentFrameData commentFrameData(ID3v2Frame frame, boolean itunes) {
+    ID3v2CommentFrameData frameData;
+    try {
+      frameData = new ID3v2CommentFrameData(useFrameUnsynchronisation(), frame.getData());
+    } catch (InvalidDataException e) {
+      return null;
+    }
+    // null when the description's bytes don't decode: not an iTunes comment then.
+    String description = frameData.getDescription().toString();
+    if (itunes) {
+      return ITUNES_COMMENT_DESCRIPTION.equals(description) ? frameData : null;
+    }
+    return description != null && description.startsWith("iTun") ? null : frameData;
+  }
+
+  /**
+   * Replaces the comment, or the iTunes comment, and keeps the other. Both are COMM frames, so
+   * replacing the whole frame set made each setter delete what the other had set.
+   */
+  private void replaceCommentFrame(ID3v2CommentFrameData frameData, boolean itunes) {
+    ID3v2FrameSet frameSet = frameSets.get(ID_COMMENT);
+    if (frameSet != null) {
+      frameSet.getFrames().removeIf(frame -> commentFrameData(frame, itunes) != null);
+    }
+    addFrame(createFrame(ID_COMMENT, frameData.toBytes()), false);
   }
 
   private ID3v2PictureFrameData createPictureFrameData(String id) {
