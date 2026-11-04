@@ -99,6 +99,17 @@ class SQLiteDatabaseTest {
   }
 
   @Test
+  void insertReturnsTheRowIdOfTheNewRow() {
+    assertEquals(1, db.insert("cache_data", null, row("a", null, 1)));
+    assertEquals(2, db.insert("cache_data", null, row("b", null, 2)));
+
+    ContentValues explicitId = row("c", null, 3);
+    explicitId.put("id", 42L);
+    assertEquals(42, db.insert("cache_data", null, explicitId));
+    assertEquals(43, db.insert("cache_data", "key", new ContentValues()));
+  }
+
+  @Test
   void insertWithoutValuesAddsARowThroughTheNullColumnHack() {
     db.insert("cache_data", "key", new ContentValues());
     db.insert("cache_data", "key", null);

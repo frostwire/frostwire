@@ -25,6 +25,7 @@ import com.frostwire.util.Logger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.lang3.StringUtils;
 
@@ -134,7 +135,7 @@ public class SQLiteDatabase {
       sql.append(nullColumnHack).append(") VALUES (NULL");
     }
     sql.append(')');
-    return executeSql(sql.toString(), bindArgs);
+    return executeInsert(sql.toString(), bindArgs);
   }
 
   /**
@@ -228,6 +229,22 @@ public class SQLiteDatabase {
           statement.close();
         } catch (Throwable ignored) {
         }
+      }
+    }
+  }
+
+  private long executeInsert(String sql, Object[] bindArgs) {
+    // Same lock as executeSql, so last_insert_rowid() is the id of this insert.
+    synchronized (connection) {
+      if (executeSql(sql, bindArgs) < 1) {
+        return -1;
+      }
+      try (Statement statement = connection.createStatement();
+          ResultSet rs = statement.executeQuery("SELECT last_insert_rowid()")) {
+        return rs.next() ? rs.getLong(1) : -1;
+      } catch (Throwable e) {
+        LOG.warn("Error reading the row id inserted by: " + sql, e);
+        return -1;
       }
     }
   }
