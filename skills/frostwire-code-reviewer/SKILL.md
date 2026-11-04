@@ -192,6 +192,22 @@ Each item maps to a `frostwire-engineer` §1 mantra. Grep the diff for the smell
 - [ ] **Shape, not site** — did the fix search every caller, sibling class and OS branch with the same pattern? Ask for the grep.
 - [ ] **Tests prove behavior** — a test that reads production source text is a last resort; is a behavioral test possible? Does a desktop JVM test claim to cover Android behavior? Live-network tests and `freePort()`-then-bind are flaky by design.
 
+### Coverage-push checklist (2026-11)
+
+Each item maps to a `frostwire-engineer` §1 coverage-push mantra; 24 bugs found on 2026-11-04 had these shapes.
+
+- [ ] **Per-torrent state** — is anything keyed per torrent (routes, resume extra data, sources, flags) held per `BTDownload` instead? The engine makes a new `BTDownload` on every update.
+- [ ] **Listener order** — does the code unregister, close or clear before the last event it needs (removal, completion) has arrived?
+- [ ] **Store before trigger** — is the state a callback reads stored before the call that can fire it, and is "done" decided only after every part was handed over?
+- [ ] **Cached native reads** — `th.status()` (up to 500 ms old, also after a failure) where the caller needs the current value; use `status(true)`.
+- [ ] **Single listener slots** — `setListener` plus "wrap the previous listener"; ask for a listener list with add/remove, each delivered in isolation.
+- [ ] **Failure-path release** — ports bound, connections opened, temp files created before a step that can fail: released in `finally`, and a test for the failure path.
+- [ ] **Outside facts** — URLs, ids, credentials or formats owned by someone else: does reading accept the old form as well as the new one?
+- [ ] **Writers** — does a round-trip test (write, read back, compare bytes) cover every new or changed writer? Do getters and setters that share a storage slot use the same predicate?
+- [ ] **Soft-failing decoders** — every caller handles the `null`/empty result; no `&` where `&&` was meant. Sizes from input checked for lower bound and overflow, not only the upper limit.
+- [ ] **Expected values** — do the test's expected numbers come from the spec, the javadoc or a probe of the real driver, and not from the implementation under test? Does the test depend on debug-only code (`BuildConfig.DEBUG` engines)?
+
+
 ---
 
 ## 3. Security
@@ -343,6 +359,8 @@ All new code must be tested. Bug fixes must include regression tests.
 - [ ] **Test compile check** — `./gradlew compilePlus1DebugUnitTestJavaWithJavac` (Android) or `./gradlew compileTestJava` (desktop) passes.
 - [ ] **Test execution** — at least the affected test class runs and passes. Don't claim "all tests pass" without running them.
 - [ ] **Behavior, not labels** — inspect assertions and production wiring. A test name, mocked codec, regex/source-string assertion, or green suite cannot establish behavior it never executes. Prefer focused JUnit 5 behavior tests where established; use the existing Android runner where needed.
+- [ ] **Concurrency tests are deterministic** — synchronization by latch or a controlled executor, never `sleep`; the author ran the new test about 20 times alone and with its package. A test that fails only on CI is a race or an environment difference until proven otherwise, and often a product bug.
+- [ ] **Real dependencies, locally** — engine tests use a local libtorrent session (127.0.0.1, no DHT/LSD/UPnP/NAT-PMP), database tests a real embedded database in `@TempDir`; mocks only to inject one failure.
 
 ### Regression test pattern for bug fixes
 

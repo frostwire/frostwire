@@ -104,6 +104,26 @@ Mined from 2,284 fix commits (Icebase, Crashlytics, fuzzing, reviews; 2026-03 �
 | **"The network and the clock are not fixtures"** | Live-site tests fail CI when the site is slow; `freePort()` releases a port before the server binds it (#1424). Record responses as fixtures; bind port 0 and read it back. |
 | **"Sample the stall while it is happening"** | A freeze sample in a cheap frame (`Container.add`, a constructor) means the time went earlier in the same event, or into a GC pause on a small heap; look there before calling it fixed. |
 
+### Mantras from the 2026-11 coverage push
+
+Four agents raised `com.frostwire.bittorrent`, `com.frostwire.mcp`, `com.frostwire.database` and `com.frostwire.mp3` from 0–23% to 90–97% line coverage in one day (2026-11-04) and found 24 real bugs on the way. Each row is a mistake those bugs had in common.
+
+| Mantra | The mistake it prevents |
+|--------|------------------------|
+| **"Coverage finds bugs; take expected values from the contract"** | Expected values come from the spec, the javadoc and the real driver or library, never from reading the implementation: a test written from the code encodes its bugs. MPEG-2 Layer III frames were measured at double length (befdf8246), an ID3v1.1 track byte was read signed (24173a0b2), `SQLiteDatabase.insert` returned the row count instead of the row id (eac70686b). |
+| **"Probe the real thing before asserting"** | Run a short probe against the real driver, native session or server first. Code ported from Android or H2 carries that platform's contract and SQL: `close()` ran H2's `SHUTDOWN`, SQLite rejected it and the connection stayed open (a2f02d8f8). Mocks agree with a wrong javadoc. |
+| **"A torrent's state belongs to the torrent, not to one `BTDownload`"** | The engine makes a new `BTDownload` for a torrent on every update (more files picked, magnet or result opened again). Anything kept per torrent must be shared, or the newest copy wins: alerts reached only the newest one (f27b1512f), each copy saved its own paused flag to the same resume file (78466e376). |
+| **"Stop listening after the last event you need"** | `BTDownload.remove()` unregistered before libtorrent sent `TORRENT_REMOVED`, so partial files were never deleted (3aab0582a). |
+| **"Store before you trigger"** | State an asynchronous callback reads must exist before the call that triggers it: a v2-only torrent's file pick was stored after the add, so a fast `ADD_TORRENT` found none and every file downloaded (f7d71a464); an MCP search completed before its last engine was handed over (1c901af51). |
+| **"Ask for fresh when fresh matters"** | jlibtorrent's `TorrentHandle.status()` hands back a read up to 500 ms old, even after a failed read. Use `status(true)` where the value must be current (23e270b16). |
+| **"Listeners are a list"** | A single `setListener` slot invites "wrap whatever was there" chains, which drop listeners or wrap themselves on restart (ad6737e91). Give the source `addListener`/`removeListener` and deliver to each listener in isolation (d4e811452). |
+| **"Release on the failure path too"** | A port bound before a TLS setup that failed stayed bound until exit (80c6d99c4); a temp file made to find the temp folder was never deleted (2d738cbd3). Acquire last, release in `finally`, and test the failure path. |
+| **"Read the old and the new form of an outside fact"** | Creative Commons URLs moved to https: writing http broke Create Torrent, reading only https hid older torrents' licenses (3806cd2f3). |
+| **"Round-trip what you write"** | Write, read back, compare exact bytes: readers forgive writer bugs. Found a footer written as version 0.0, a frame header packed at offset 0 and a setter whose getter can't find its value (2cbdb6765, ee8b9218e, 2f3c05352). Fields that share one storage slot (comment and iTunes comment are both COMM frames) need one rule to tell entries apart. |
+| **"A decoder that can return null makes every caller a crash site"** | Check every caller's use of a soft-failing decode, including `&` written for `&&` (66595edc7). Sizes from input need a lower bound and an overflow check too: `0xfffffffc + 4` wraps to 0 (f1cdf3bec). |
+| **"A CI-only failure is a race or an environment difference, and often a product bug"** | `BTDownloadStatusTest` failed only on CI because the product showed a stale status (23e270b16). A test passed locally only because an `.idea` folder made the build DEBUG and enabled a debug-only search engine (64df7383b). |
+| **"When every commit fails the same live test, look outside the repo"** | Every push failed the SoundCloud test because an OTA edit left `update.frostwire.com/android` invalid JSON: no update offer and no SoundCloud credentials for any user (frostwire-cloud f044bb38). Validate a hand-edited JSON endpoint before deploying it. |
+
 ---
 
 ## 2. Core Philosophies (Non-Negotiable)
@@ -502,6 +522,17 @@ Never batch failed tests into a "fix later" commit. Never commit `desktop/GROK_R
 - **Compiler warnings fail the build** — both builds compile with `-Xlint:all -Werror` (off on purpose: serial, this-escape, restricted; Android also classfile). Fix the warning; a `@SuppressWarnings` must be as narrow as possible and say why.
 - **Coverage only goes up** — CI measures JaCoCo coverage on every push (desktop+common: `jacocoTestCoverageVerification`; Android: `coverage_summary.py --fail-under-line`). Every fix adds tests; raise the minimums when coverage rises. The goal is 100%.
 
+### Testing Engine, Native and Database Code
+
+- **A real libtorrent session, kept local** — tests use a separate engine (`LocalEngine` in `common/src/test/java/com/frostwire/bittorrent/`), never the app's singleton: 127.0.0.1 only, DHT, local discovery, UPnP and NAT-PMP off, a second local session as the seeder. "Restart" starts a new engine on the same folders, so restore tests read what was saved to disk.
+- **Exact states without timing** — a test-only handle (`FakeTorrentHandle`) sets a torrent's status exactly; background work is held on a latch, not raced. A sleep may only age a cache that has no injectable clock, never synchronize threads.
+- **A real embedded database** in `@TempDir`; a small delegating `java.lang.reflect.Proxy` injects a driver failure on one named method so error branches run. Mock-only database tests miss SQL and binding bugs.
+- **Singletons and startup latches** — add small, documented, package-private seams (`TransferAdapter.setDownloadsSource`, a `TellurideRunner` interface). Set `BTEngine.ctx` for one test and restore it; never release a global latch for good, it changes every later test in the JVM.
+- **Headless Swing poisons the JVM** — building `UISettings`/`ThemeMediator` without a display throws in static initializers and leaves those classes unusable for every later test in the fork. Keep logic out of Swing classes, or put a seam in front of `GUIMediator`.
+- **A constructor that calls an abstract hook** (`SQLiteOpenHelper` calling `onCreate`) runs before the subclass's fields are set: record what the test observes in static or external state.
+- **When the documented behavior can't be implemented** (`Cursor.getCount()` on a forward-only result set), test the cases that match the documentation and report the rest. A test that pins the buggy result enshrines the bug.
+- **Prove a new concurrency test** — run it 20 times on its own and with its whole package before pushing.
+
 ### Benchmarks & Simulations
 
 - **Common random numbers** — every candidate in a comparative run gets the SAME seed(s) so the parameter is the only variable. Per-candidate seeds put each candidate on a different random network and the winner becomes seed luck (TopologyAutoResearch, 2026-07).
@@ -516,6 +547,17 @@ Never batch failed tests into a "fix later" commit. Never commit `desktop/GROK_R
 - **One logical change per commit, only when authorized.** Example: "remove `ip_filter.db` persistence" and "move JNI calls off EDT" were split into two separate commits even though they were done together (and because they were split, the persistence removal could later be reverted on its own when it turned out wrong). Keep tightly-coupled edits in one buildable commit rather than splitting arbitrarily.
 - A branch with 35+ granular commits is normal for a major sweep. Squashing cosmetic / WIP commits requires explicit history-rewrite permission; never do it automatically before pushing.
 - Typical mesh security sweep review order: protocol primitive → manager policy → wire version → tests → changelog. This is not a mandate to split dependent changes into broken commits.
+
+### Parallel Agents on One Branch
+
+Learned from four coverage agents pushing to `master` at once (2026-11-04).
+
+- **Gates, then commit, then push at once.** A commit never waits locally for its gate; at most one unpushed commit at any time.
+- **Push `origin` first** (on rejection: fetch, rebase onto `origin/master`, push again), **then `gubatron` from that same HEAD.** Never push while a rebase is stopped: check `git status` for a rebase in progress or a detached HEAD. An agent once pushed its pre-rebase commits to `gubatron`, which diverged from `origin`; the fix needed the maintainer's OK for a `--force-with-lease` push.
+- **Pipefail gate chains:** a filter that can match nothing (`grep -v …`) exits 1 and silently skips the `&& git commit` that follows. Send gate output to a log instead.
+- **One scratch folder per agent.** Generic script names (`push.sh`, `gate.sh`) collided in the shared scratchpad, and one agent ran another's gate against the wrong worktree.
+- **Check long gates yourself.** Two agents waited three hours on a 7-minute suite whose completion notice never arrived. Read the log's tail on a timer.
+- **The full suite runs before the last push,** not after it.
 
 ### Commit Message Format
 
