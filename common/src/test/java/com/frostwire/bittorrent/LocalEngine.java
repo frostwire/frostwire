@@ -16,6 +16,7 @@ import com.frostwire.jlibtorrent.SessionParams;
 import com.frostwire.jlibtorrent.SettingsPack;
 import com.frostwire.jlibtorrent.TcpEndpoint;
 import com.frostwire.jlibtorrent.TorrentBuilder;
+import com.frostwire.jlibtorrent.TorrentFlags;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.Vectors;
 import com.frostwire.jlibtorrent.swig.create_flags_t;
@@ -187,6 +188,11 @@ final class LocalEngine implements AutoCloseable {
     Files.createDirectories(file.getParent());
     Files.write(file, ti.bencode());
     return file.toFile();
+  }
+
+  /** Whether libtorrent has {@code dl}'s torrent paused right now, not as last cached. */
+  static boolean isPaused(BTDownload dl) {
+    return dl.getTorrentHandle().status(true).flags().and_(TorrentFlags.PAUSED).nonZero();
   }
 
   /** The extra data FrostWire keeps in a resume file, or an empty map without one. */
