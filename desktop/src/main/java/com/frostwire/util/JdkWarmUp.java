@@ -241,10 +241,21 @@ public final class JdkWarmUp {
           "com.limegroup.gnutella.gui.search",
           // Library tab: LibraryMediator, its tree and its table mediators.
           "com.frostwire.gui.library",
+          // Only classes directly in a listed package load, not its subpackages. The Library's
+          // cover art panel names TagsReader in a method signature, and every component's
+          // constructor reflects over its methods (Icebase #56dff5196bea, GitHub #1489).
+          "com.frostwire.gui.library.tags",
+          // Background executors and launch helpers the transfer and search panes call.
+          "com.limegroup.gnutella.gui.util",
+          // Search results' "Browse Shared Torrents" action (PeerCatalogWindow).
+          "com.limegroup.gnutella.gui.icebridge",
           // Options dialog, built on the first click: OptionsConstructor and the tree manager,
           // and every pane item class the tree names (it reads their label constants).
           "com.limegroup.gnutella.gui.options",
           "com.limegroup.gnutella.gui.options.panes",
+          // Their subpackages: the options tree's model and the IP filter pane.
+          "com.limegroup.gnutella.gui.trees",
+          "com.limegroup.gnutella.gui.options.panes.ipfilter",
           // Drag and drop, built on the first drag out of a table: LimeTransferHandler, the drag
           // gesture listener and FileTransferable (Icebase #3315b9f6e6e7).
           "com.limegroup.gnutella.gui.dnd");

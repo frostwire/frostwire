@@ -282,6 +282,29 @@ class JdkWarmUpTest {
     }
   }
 
+  /**
+   * The app preload loads only classes directly in each listed package. A component's constructor
+   * reflects over its methods, so a class it names in a signature from an unlisted subpackage was
+   * read from the jar on the EDT: the Library's cover art panel and TagsReader (Icebase
+   * #56dff5196bea, frostwire/frostwire#1489). The subpackages the preloaded screens use are listed
+   * too.
+   */
+  @Test
+  void theAppPreloadCoversTheSubpackagesThePreloadedScreensUse() throws Exception {
+    List<String> classNames =
+        JdkWarmUp.classNamesIn(
+            JdkWarmUp.codeSourceOf(JdkWarmUp.class), JdkWarmUp.APP_PACKAGES_TO_LOAD);
+    for (String className :
+        List.of(
+            "com.frostwire.gui.library.tags.TagsReader",
+            "com.limegroup.gnutella.gui.trees.FilteredTreeModel",
+            "com.limegroup.gnutella.gui.options.panes.ipfilter.IPRange",
+            "com.limegroup.gnutella.gui.icebridge.PeerCatalogWindow",
+            "com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService")) {
+      assertTrue(classNames.contains(className), className + " is not preloaded");
+    }
+  }
+
   @Test
   void everySplashPackageToLoadHasClasses() throws Exception {
     Path build = JdkWarmUp.codeSourceOf(JdkWarmUp.class);
