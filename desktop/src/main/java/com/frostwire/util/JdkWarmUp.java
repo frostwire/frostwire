@@ -7,6 +7,7 @@
 
 package com.frostwire.util;
 
+import com.formdev.flatlaf.FlatLaf;
 import com.frostwire.gui.theme.PlatformFonts;
 import com.frostwire.gui.theme.SkinMenu;
 import java.awt.Font;
@@ -45,6 +46,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.IntStream;
+import javax.swing.LookAndFeel;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.text.Document;
@@ -185,6 +187,16 @@ public final class JdkWarmUp {
     classes.addAll(WINDOWS_CLASSES_TO_INITIALIZE);
     return classes;
   }
+
+  /**
+   * FlatLaf's UI packages: its component UI delegates and the borders, utilities, layout helpers
+   * and icons they use. The UI delegate step loads only the delegates the defaults name, so with a
+   * FlatLaf theme the rest was read from the jar on the EDT as the main window and its tabs were
+   * built (Icebase #e05de8f17909, frostwire/frostwire#1488: FlatButtonBorder's helper classes for
+   * the Library's buttons). A theme switch loads the same packages, see ThemeSwitcher.
+   */
+  public static final List<String> FLATLAF_PACKAGES =
+      List.of("com.formdev.flatlaf.ui", "com.formdev.flatlaf.icons");
 
   /**
    * FrostWire packages whose classes the splash window paints with, loaded before it shows like the
@@ -349,6 +361,11 @@ public final class JdkWarmUp {
           uiDelegateClassNames(UIManager.getDefaults()), JdkWarmUp.class.getClassLoader());
     } catch (Throwable t) {
       LOG.warn("UI delegate warm-up failed: " + t.getMessage(), t);
+    }
+    try {
+      loadLookAndFeelPackages(UIManager.getLookAndFeel());
+    } catch (Throwable t) {
+      LOG.warn("Look and feel class warm-up failed: " + t.getMessage(), t);
     }
     try {
       resolveInputMaps(UIManager.getLookAndFeelDefaults());
@@ -804,6 +821,16 @@ public final class JdkWarmUp {
       } catch (ClassNotFoundException | LinkageError e) {
         // Not on this look and feel or platform; the EDT loads (or fails) it as it would have.
       }
+    }
+  }
+
+  /**
+   * With a FlatLaf look and feel installed, loads {@link #FLATLAF_PACKAGES} without initializing
+   * them; other looks and feels need nothing beyond their UI delegates.
+   */
+  static void loadLookAndFeelPackages(LookAndFeel lookAndFeel) throws IOException {
+    if (lookAndFeel instanceof FlatLaf) {
+      loadPackagesOf(FlatLaf.class, FLATLAF_PACKAGES);
     }
   }
 

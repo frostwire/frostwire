@@ -66,8 +66,7 @@ final class ThemeSwitcher {
    * delegate per component type, and each class was read from the jar on the EDT the first time
    * (Icebase #54e4eb98d3ef, GitHub #1348).
    */
-  static final List<String> FLATLAF_PACKAGES_TO_LOAD =
-      List.of("com.formdev.flatlaf.ui", "com.formdev.flatlaf.icons");
+  static final List<String> FLATLAF_PACKAGES_TO_LOAD = JdkWarmUp.FLATLAF_PACKAGES;
 
   /**
    * Initializes the FlatLaf classes {@code theme} needs, loading FlatLaf's native library, and

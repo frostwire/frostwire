@@ -1038,4 +1038,65 @@ class JdkWarmUpTest {
             .replaceAll("\\s+", "");
     assertTrue(source.contains("warmUpNormalizer();"), "the startup warm-up calls it");
   }
+
+  /**
+   * frostwire/frostwire#1488 (Icebase #e05de8f17909): with a FlatLaf theme, building the Library's
+   * buttons read FlatLaf helper classes (here MigLayoutVisualPadding, which FlatButtonUI installs)
+   * from the jar on the EDT, because the startup warm-up loaded only the delegates the defaults
+   * name. In a fresh JVM with FlatLaf installed, the look-and-feel step loads that helper; without
+   * the step it stays unloaded.
+   */
+  @Test
+  void withFlatLafTheLookAndFeelStepLoadsFlatLafsHelperClasses() throws Exception {
+    String helper = "com.formdev.flatlaf.ui.MigLayoutVisualPadding ";
+    assertFalse(
+        flatLafProbe(false).contains(helper), "installing FlatLaf alone already loads the helper");
+    assertTrue(flatLafProbe(true).contains(helper), "the warm-up step did not load the helper");
+  }
+
+  @Test
+  void theLookAndFeelStepLoadsNothingForOtherLooksAndFeels() {
+    assertDoesNotThrow(() -> JdkWarmUp.loadLookAndFeelPackages(null));
+    assertDoesNotThrow(
+        () -> JdkWarmUp.loadLookAndFeelPackages(new javax.swing.plaf.metal.MetalLookAndFeel()));
+  }
+
+  @Test
+  void theStartupWarmUpRunsTheLookAndFeelStep() throws IOException {
+    String source =
+        Files.readString(Path.of("src/main/java/com/frostwire/util/JdkWarmUp.java"))
+            .replaceAll("\\s+", "");
+    assertTrue(
+        source.contains("loadLookAndFeelPackages(UIManager.getLookAndFeel());"),
+        "the startup warm-up does not load the look and feel's packages");
+  }
+
+  /** Runs {@link FlatLafProbe} in a fresh JVM with class-load logging and returns its output. */
+  private static String flatLafProbe(boolean warmUp) throws Exception {
+    Process probe =
+        new ProcessBuilder(
+                Path.of(System.getProperty("java.home"), "bin", "java").toString(),
+                "-Xlog:class+load=info",
+                "-Djava.awt.headless=true",
+                "-cp",
+                System.getProperty("java.class.path"),
+                FlatLafProbe.class.getName(),
+                Boolean.toString(warmUp))
+            .redirectErrorStream(true)
+            .start();
+    String log = new String(probe.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+    assertTrue(probe.waitFor(120, TimeUnit.SECONDS), "probe timed out");
+    assertEquals(0, probe.exitValue(), log);
+    return log;
+  }
+
+  /** Installs FlatLaf Dark and, when asked, runs the warm-up's look-and-feel step. */
+  static final class FlatLafProbe {
+    public static void main(String[] args) throws Exception {
+      UIManager.setLookAndFeel(new com.formdev.flatlaf.FlatDarkLaf());
+      if (Boolean.parseBoolean(args[0])) {
+        JdkWarmUp.loadLookAndFeelPackages(UIManager.getLookAndFeel());
+      }
+    }
+  }
 }
