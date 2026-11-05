@@ -11,7 +11,7 @@ Angel Leon — FrostWire · November 2026
 
 ## Abstract
 
-IceBridge is the peer-to-peer network that FrostWire 7.1 uses for distributed torrent search, catalog browsing and torrent metadata transfer. It has two parts. The BitTorrent Mainline DHT is the directory: nodes publish signed identity records and index manifests as BEP 44 mutable items, and announce themselves on well-known BEP 5 topics. IceBridge proper is a transport and service mesh: a reliable UDP protocol (“rUDP”) whose sessions are bound to Ed25519 identities, a bounded multi-hop relay, and an application envelope that carries any protocol identified by a 16-bit number. Distributed search is one such protocol. A node answers searches only from the torrents it is actively sharing, and every answer is signed by the node that holds the torrent. This paper describes the problem IceBridge solves, the design, and the wire formats, constants and procedures of the Java implementation as of FrostWire 7.1.3 (IceBridge software version 1.1.0, rUDP protocol version 2). It is written so that an independent implementation, such as the planned Rust one, can interoperate. Where the code and earlier design documents disagree, this paper follows the code and records the difference. One difference matters more than the others: rUDP version 2 authenticates every packet but does not encrypt anything. Payloads, including search keywords and results, travel in clear text.
+IceBridge is the peer-to-peer network that FrostWire for desktop 7.1 and FrostWire for Android 3.2 use for distributed torrent search, catalog browsing and torrent metadata transfer. It has two parts. The BitTorrent Mainline DHT is the directory: nodes publish signed identity records and index manifests as BEP 44 mutable items, and announce themselves on well-known BEP 5 topics. IceBridge proper is a transport and service mesh: a reliable UDP protocol (“rUDP”) whose sessions are bound to Ed25519 identities, a bounded multi-hop relay, and an application envelope that carries any protocol identified by a 16-bit number. Distributed search is one such protocol. A node answers searches only from the torrents it is actively sharing, and every answer is signed by the node that holds the torrent. This paper describes the problem IceBridge solves, the design, and the wire formats, constants and procedures of the Java implementation shared by FrostWire 7.1.3 for desktop and FrostWire 3.2.3 for Android (IceBridge software version 1.1.0, rUDP protocol version 2). It is written so that an independent implementation, such as the planned Rust one, can interoperate. Where the code and earlier design documents disagree, this paper follows the code and records the difference. One difference matters more than the others: rUDP version 2 authenticates every packet but does not encrypt anything. Payloads, including search keywords and results, travel in clear text.
 
 ## 1 Problem
 
@@ -104,7 +104,7 @@ Protocols carried in the IBP1 envelope: search, catalog, metadata, digests and n
 
 - **Desktop.** FrostWire launches `icebridge.jar` as a child JVM with `--no-dht`. The parent process owns the DHT through its BitTorrent session, owns the local index, and answers searches. The child owns the UDP socket and the mesh.
 
-- **Android.** The IceBridge node runs inside the app process. There is no child process and no loopback HTTP hop.
+- **Android.** FrostWire for Android implements IceBridge since version 3.2.0 (September 2026); the current release is 3.2.3. Phones and tablets are full IceBridge nodes that speak the same wire protocol as desktops and forwarders, so they search, answer searches, relay, and browse catalogs across the same mesh. The IceBridge server runs inside the app process rather than as a child JVM, with an automatically chosen rUDP port, a registry of up to 500 peers and a 180 s peer TTL. The app still talks to it through the same control API on an automatically chosen loopback port. The node’s role defaults to `BOTH`; users can choose `CLIENT`, and the role profile of Table 9 is applied. The app’s own BitTorrent session publishes the identity record and index manifest and announces on the DHT. On Wi-Fi the app holds Android’s multicast lock while IceBridge runs, so that it can send and receive LAN beacons. Discovery and announces run every 300 s. A phone can instead use a *remote* IceBridge node (an HTTPS URL and token), in which case it runs no node of its own and announces nothing.
 
 - **Standalone forwarder.** `icebridge.jar` runs alone, for example on a cloud host such as `virginia1.frostwire.com`. It starts a minimal libtorrent session with only the DHT enabled, so that it can announce itself and be found without any FrostWire GUI.
 
@@ -535,7 +535,7 @@ IceBridge borrows the two-tier shape of Gnutella with ultrapeers. Ultrapeers kee
 | soft max (hops + TTL) | 3 | 7 | 7 | 7 |
 | leaf uplinks | 3 | 6 | 6 | 16 |
 
-*Table 9: Topology parameters (`IceBridgeTopology`). Servers built in code without `fromEnv` (such as the Android in-process node) keep the compiled defaults.*
+*Table 9: Topology parameters (`IceBridgeTopology`). The standalone daemon, the desktop and Android apply the role profile; a server built in code that does not apply it keeps the compiled defaults.*
 
 **Peer registry sync.** On a FrostWire node, `PeerRegistrySync` runs every 30 s and keeps the daemon’s registry and the application’s peer directory consistent:
 
@@ -812,7 +812,7 @@ The following points are easy to get wrong when writing an implementation in ano
 
 ### 12.3 Compatibility checklist
 
-An implementation that interoperates with FrostWire 7.1.3 must:
+An implementation that interoperates with FrostWire 7.1.3 for desktop and FrostWire 3.2.3 for Android must:
 
 1.  Derive Ed25519 keys from 32-byte seeds per RFC 8032, and export and import the seed as a 24-word BIP39 mnemonic with no PBKDF2.
 
@@ -838,7 +838,7 @@ An implementation that interoperates with FrostWire 7.1.3 must:
 
 ## 13 Status and future work
 
-IceBridge shipped in FrostWire 7.1.0 and was hardened in 7.1.1–7.1.3. Desktop, Android and standalone forwarders interoperate. Work that the code or documents identify as open:
+IceBridge shipped in FrostWire 7.1.0 for desktop, hardened in 7.1.1–7.1.3, and in FrostWire 3.2.0 for Android, hardened in 3.2.1–3.2.3. Desktops, phones and standalone forwarders run the same protocol and interoperate. Work that the code or documents identify as open:
 
 - **Confidentiality.** End-to-end encryption of application payloads with the X25519 keys already in identity records, and transport encryption with forward secrecy. This changes the wire format and needs a new rUDP version.
 
