@@ -119,6 +119,41 @@ class BTDownloadTransferTest {
     assertEquals(new File(local.ctx.torrentsDir, "song.torrent"), dl.getTorrentFile());
   }
 
+  /**
+   * The add alert's backfill ({@code ensureResumeTorrentFile}, on the alert thread) found no
+   * session copy, and then the thread that added the transfer wrote the full one, with the saved
+   * .torrent's path, before the backfill wrote its own: the transfer lost its .torrent ({@code
+   * getTorrentFile()} null). Seen on CI as aTransferFromAPeerFinishesAndSeeds failing.
+   */
+  @Test
+  void theAddAlertNeverReplacesTheSessionCopyThatNamesTheSavedTorrent() throws Exception {
+    TorrentInfo ti = album("race");
+    local.engine.download(ti, dir.resolve("save").toFile(), null, null, true);
+    BTDownload dl = Events.next(local.events.added, "race");
+    String hash = local.engine.canonicalInfoHash(ti);
+    File saved = new File(local.ctx.torrentsDir, "race.torrent");
+    assertEquals(saved, local.engine.readTorrentPath(hash));
+    // As when the alert thread looks before the adding thread has written anything.
+    assertTrue(local.engine.resumeTorrentFile(hash).delete());
+    Thread[] adder = new Thread[1];
+    local.engine.beforeResumeTorrentBackfill =
+        () -> {
+          // The adding thread writes its full copy while the backfill is about to write.
+          adder[0] = new Thread(() -> local.engine.saveResumeTorrent(ti), "adder");
+          adder[0].start();
+          await(
+              () -> adder[0].getState() == Thread.State.BLOCKED || !adder[0].isAlive(),
+              "the adding thread wrote its copy or waits to");
+        };
+
+    local.engine.ensureResumeTorrentFile(dl.getTorrentHandle());
+    adder[0].join(10_000);
+
+    assertFalse(adder[0].isAlive());
+    assertEquals(saved, local.engine.readTorrentPath(hash), "the session copy names the .torrent");
+    assertEquals(saved, dl.getTorrentFile());
+  }
+
   @Test
   void aPolicyPauseIsNotRememberedAsTheUsersChoice() throws Exception {
     TorrentInfo ti = album("policy");

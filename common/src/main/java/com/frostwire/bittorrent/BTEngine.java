@@ -75,6 +75,12 @@ public final class BTEngine extends SessionManager {
   /** Each torrent's extra data by canonical hash, shared by all of its BTDownloads. */
   private final Map<String, Map<String, String>> downloadExtras = new ConcurrentHashMap<>();
 
+  /** Guards the session .torrent files, see {@link #ensureResumeTorrentFile}. */
+  private final Object resumeTorrentLock = new Object();
+
+  /** Runs just before {@link #ensureResumeTorrentFile} writes; tests interleave a writer here. */
+  Runnable beforeResumeTorrentBackfill = () -> {};
+
   private final Queue<RestoreDownloadTask> restoreDownloadsQueue;
   private volatile BTEngineListener listener;
 
@@ -714,6 +720,11 @@ public final class BTEngine extends SessionManager {
    * Ensures the session .torrent file exists for a handle, using the same hash naming the resume
    * backfill and serializer use. Magnet-origin torrents never go through a .torrent-saving download
    * path, so without this the restore scan cannot see them on the next launch.
+   *
+   * <p>It runs on the alert thread when a transfer is added, while the thread that added it writes
+   * the full copy ({@link #saveResumeTorrent}, with the saved .torrent's path). Both write under
+   * {@link #resumeTorrentLock}, and this one checks for the file under it too, so it never replaces
+   * the full copy with one that has no path.
    */
   void ensureResumeTorrentFile(TorrentHandle th) {
     try {
@@ -721,14 +732,20 @@ public final class BTEngine extends SessionManager {
         return;
       }
       String hash = canonicalInfoHash(th);
-      if (hash == null || resumeTorrentFile(hash).exists()) {
+      if (hash == null) {
         return;
       }
-      byte[] bytes = sessionTorrentBytes(th);
-      if (bytes == null) {
-        return;
+      synchronized (resumeTorrentLock) {
+        if (resumeTorrentFile(hash).exists()) {
+          return;
+        }
+        byte[] bytes = sessionTorrentBytes(th);
+        if (bytes == null) {
+          return;
+        }
+        beforeResumeTorrentBackfill.run();
+        FileUtils.writeByteArrayToFile(resumeTorrentFile(hash), bytes);
       }
-      FileUtils.writeByteArrayToFile(resumeTorrentFile(hash), bytes);
     } catch (Throwable t) {
       LOG.warn("Error ensuring resume torrent file", t);
     }
@@ -996,7 +1013,11 @@ public final class BTEngine extends SessionManager {
     }
   }
 
-  private void saveResumeTorrent(TorrentInfo ti) {
+  /**
+   * Writes the session copy of {@code ti} with the path of its saved .torrent, replacing a copy
+   * {@link #ensureResumeTorrentFile} may have written without it.
+   */
+  void saveResumeTorrent(TorrentInfo ti) {
     try {
       String name = getEscapedFilename(ti);
       entry e = ti.toEntry().swig();
@@ -1004,7 +1025,9 @@ public final class BTEngine extends SessionManager {
       byte[] arr = Vectors.byte_vector2bytes(e.bencode());
       String hash = canonicalInfoHash(ti);
       if (hash != null) {
-        FileUtils.writeByteArrayToFile(resumeTorrentFile(hash), arr);
+        synchronized (resumeTorrentLock) {
+          FileUtils.writeByteArrayToFile(resumeTorrentFile(hash), arr);
+        }
       } else {
         LOG.warn("Cannot save session torrent - no usable info hash");
       }

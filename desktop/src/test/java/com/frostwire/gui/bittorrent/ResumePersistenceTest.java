@@ -27,7 +27,7 @@ class ResumePersistenceTest {
         engine.contains("String canonicalInfoHash(TorrentInfo ti)"),
         "BTEngine must define one canonical hash for persistence naming");
     // session .torrent naming
-    int srt = engine.indexOf("private void saveResumeTorrent(TorrentInfo ti)");
+    int srt = engine.indexOf("void saveResumeTorrent(TorrentInfo ti)");
     assertTrue(srt >= 0, "saveResumeTorrent not found");
     String srtBody =
         engine.substring(srt, engine.indexOf("private String getEscapedFilename", srt));
