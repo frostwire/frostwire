@@ -37,6 +37,7 @@ import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -133,23 +134,29 @@ class BTDownloadTransferTest {
     String hash = local.engine.canonicalInfoHash(ti);
     File saved = new File(local.ctx.torrentsDir, "race.torrent");
     assertEquals(saved, local.engine.readTorrentPath(hash));
-    // As when the alert thread looks before the adding thread has written anything.
-    assertTrue(local.engine.resumeTorrentFile(hash).delete());
-    Thread[] adder = new Thread[1];
+    AtomicReference<Thread> adder = new AtomicReference<>();
+    // The engine's own resume saves also backfill, on its threads; whichever backfill writes first
+    // gets the interleaving.
     local.engine.beforeResumeTorrentBackfill =
         () -> {
           // The adding thread writes its full copy while the backfill is about to write.
-          adder[0] = new Thread(() -> local.engine.saveResumeTorrent(ti), "adder");
-          adder[0].start();
+          Thread thread = new Thread(() -> local.engine.saveResumeTorrent(ti), "adder");
+          if (!adder.compareAndSet(null, thread)) {
+            return;
+          }
+          thread.start();
           await(
-              () -> adder[0].getState() == Thread.State.BLOCKED || !adder[0].isAlive(),
+              () -> thread.getState() == Thread.State.BLOCKED || !thread.isAlive(),
               "the adding thread wrote its copy or waits to");
         };
+    // As when the alert thread looks before the adding thread has written anything.
+    assertTrue(local.engine.resumeTorrentFile(hash).delete());
 
     local.engine.ensureResumeTorrentFile(dl.getTorrentHandle());
-    adder[0].join(10_000);
+    await(() -> adder.get() != null, "a backfill wrote the session copy");
+    adder.get().join(10_000);
 
-    assertFalse(adder[0].isAlive());
+    assertFalse(adder.get().isAlive());
     assertEquals(saved, local.engine.readTorrentPath(hash), "the session copy names the .torrent");
     assertEquals(saved, dl.getTorrentFile());
   }

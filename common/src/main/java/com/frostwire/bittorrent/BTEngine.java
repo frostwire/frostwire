@@ -79,7 +79,7 @@ public final class BTEngine extends SessionManager {
   private final Object resumeTorrentLock = new Object();
 
   /** Runs just before {@link #ensureResumeTorrentFile} writes; tests interleave a writer here. */
-  Runnable beforeResumeTorrentBackfill = () -> {};
+  volatile Runnable beforeResumeTorrentBackfill = () -> {};
 
   private final Queue<RestoreDownloadTask> restoreDownloadsQueue;
   private volatile BTEngineListener listener;
