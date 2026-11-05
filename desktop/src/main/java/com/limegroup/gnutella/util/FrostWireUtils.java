@@ -36,7 +36,7 @@ public final class FrostWireUtils {
   private static final String FROSTWIRE_VERSION = "7.1.3";
 
   /** Build number for the current version, gets reset to 1 on every version bump */
-  private static final int BUILD_NUMBER = 335;
+  private static final int BUILD_NUMBER = 336;
 
   private static final boolean IS_RUNNING_FROM_SOURCE = new File("README.md").exists();
 
