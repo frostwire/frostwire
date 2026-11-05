@@ -632,7 +632,7 @@ Signed bytes:
           | SHA-256( for each row: lp(ih hex) | lp(UTF-8 name) | i64 size | i32 file count )
           | nonce (32) | i32 page | i32 pages
 
-The browser checks that `pub` equals the target, that the nonce matches, and the signature. It returns what it has when the timeout expires (8 s in the UI). It does not check the timestamp. When mesh browsing fails, the UI falls back to the DHT index manifest (Section 6.7).
+The signature covers the `pub` Base64 text exactly as sent. Current holders write it without padding; the test fixtures pad it. Verify over the received text, do not re-encode it. The browser checks that `pub` equals the target, that the nonce matches, and the signature. It returns what it has when the timeout expires (8 s in the UI). It does not check the timestamp. When mesh browsing fails, the UI falls back to the DHT index manifest (Section 6.7).
 
 ### 8.3 Torrent metadata fetch (protocol 3, `TORRENT_FETCH`)
 
@@ -961,7 +961,39 @@ IceBridge shipped in FrostWire 7.1.0 and was hardened in 7.1.1–7.1.3. Desktop,
 | remote manifest cap | 64 KiB, 256 entries |
 | tip cache / HTTP timeout | 60 s / 5 s |
 
-### A.3 Discrepancies between documents and code
+### A.3 Test vectors
+
+These values were computed or checked independently of the Java code (SHA-1 with `shasum`; the identity signature with OpenSSL 3 Ed25519 verification over the re-encoded record without `sig`). The fuzz seed files under `common/fuzz/src/test/resources/com/frostwire/search/relay/` hold more signed samples: identity records v1–v3, karma entries and manifests (`KarmaChainEntryFuzzTestInputs`, `KarmaChainFuzzTestInputs`) and catalog pages v1 and v2 (`CatalogBrowserFuzzTestInputs`).
+
+**BEP 5 topic info-hashes.** (SHA-1 of the US-ASCII topic string):
+
+    frostwire-peers-v1      5e7d9baf693a90e2b02d126b23fdbf23926cf88f
+    frostwire-relays-v1     28f76105801c0cb8dcccf5b2e83badc9d65fc277
+    frostwire-bootstrap-v1  bf9f9c1d6ba04db30860d0f6e63df55e65aaa6fd
+
+**rUDP HELLO header.** (fuzz seed `seed-hello`; payload omitted):
+
+    46 77 02 01 11 22 33 44 55 66 77 88 00 00 00 00 00 00 00 00 00 a8
+    magic=Fw  version=2  type=HELLO  cid=0x1122334455667788  seq=0  ack=0  len=168
+
+**Signed identity record, version 4.** (fuzz seed `IdentityRecordFuzzTestInputs/fromBencode/v4`). Concatenate the lines; the breaks are not part of the data. The public key is
+
+    b3c0b48c52553c67db5d54fec8eb0f696e60110bf61780c1d4b4113e672f4ec1
+
+The signature verifies over the same dictionary without the `sig` entry. The `node_id` is *not* SHA-1 of the key, and the key has no proof of work; Java accepts the record anyway, which shows that neither is checked.
+
+    d4:capsi7e11:ed25519_pub43:s8C0jFJVPGfbXVT+yOsPaW5gEQv2F4DB1LQRPmcvTsE10
+    :first_seeni1767225600e6:ib_ver5:1.1.09:last_seeni1767229200e7:node_id40
+    :7a2767bbb9c5619afba7bc34d30643feaba539cb4:role4:BOTH9:rudp_porti6882e3:
+    sig86:pY1l3CkmLExgURqlY0kIZ0KUpiuJowY8YRhWuFWZMzqPw6E6g/RRKbdcHDTtysyC8D
+    T/E19PQo8oL8Jc80DCAA8:utp_porti6881e1:vi4e10:x25519_pub43:jUhhu1kRQd/x6i
+    Ngpo9Xy7GoOF1kUF1PwOMC8qH7Eige
+
+**`/register` signing string.** (`RegisterRequestVersionTest`): for pub text `abcd`, host `example.com`, port 6889, role `FORWARDER`, timestamp 1000 and version `1.1.0`, the signed UTF-8 string is `4:abcd|11:example.com|6889|FORWARDER|1000|5:1.1.0`.
+
+**LAN beacon.** Accepted: `FWIB1 6888`, `FWIB1 65535`. Rejected: `FWIB1 70000`, `FWIB1 0`, `FWIB1 12a`, `FWIB1 -5`, `fwib1 6888`, `FWIB2 6888`, `FWIB1 6888 extra`, and anything over 64 bytes.
+
+### A.4 Discrepancies between documents and code
 
 The code is authoritative. Earlier documents and comments say otherwise in these places:
 
@@ -980,6 +1012,10 @@ The code is authoritative. Earlier documents and comments say otherwise in these
 - `--rudp-port 0` binds an automatic port; the help text says it disables rUDP.
 
 - The `SPEC_KARMA_CHAIN` document says entry timestamps are signed, lists a third block-hash source, and reverses hash bytes. The code does none of these.
+
+- `ICEBRIDGE.md` and `desktop/ICEBRIDGE_REVISION_PLAN.md` say multi-hop search forwarding is disabled (`ttl=0`). It is enabled (`IncomingSearchRequestHandler.MULTI_HOP_FORWARDING_ENABLED = true`); forwarders keep the requester’s signature and append themselves to the unsigned path.
+
+- `DESIGN_RELAY_REGISTRY.md` still describes a TCP identity port (6888). It is gone: peers are verified over rUDP, and the relay port opens no socket.
 
 - `ICEBRIDGE.md` says discovery probes 8 candidates at a time; the code uses 16 (`PeerDiscovery.DEFAULT_PROBE_CONCURRENCY`).
 

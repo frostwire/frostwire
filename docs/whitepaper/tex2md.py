@@ -21,6 +21,7 @@ src = re.sub(r'\\begin\{tabularx\}\{\\textwidth\}\{([^}]*)\}', lambda m: '\\begi
 src = src.replace('\\end{tabularx}', '\\end{tabular}')
 src = re.sub(r'\\midrule\n\\multicolumn\{4\}\{l\}\{Presets.*?\n\\multicolumn\{4\}\{l\}\{.*?\\\\\n', '', src, flags=re.S)
 src = src.replace('\\begin{center}\\small', '\\begin{center}')
+src = src.replace('\\allowbreak ', '').replace('\\allowbreak', '').replace('\\-', '').replace('-{}-', '--')
 with tempfile.TemporaryDirectory() as tmp:
     pin = os.path.join(tmp, 'in.tex'); pout = os.path.join(tmp, 'raw.md')
     open(pin, 'w').write(src)
