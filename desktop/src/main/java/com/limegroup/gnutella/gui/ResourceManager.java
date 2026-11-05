@@ -153,9 +153,18 @@ public final class ResourceManager {
           "firewall_no");
 
   /**
-   * Loads {@link #ANIMATED_THEME_IMAGES} and {@link #STATUS_BAR_THEME_IMAGES} into the theme-image
-   * cache. Call it off the EDT, at startup before the main window is built, so the EDT finds them
-   * cached.
+   * The buttons of the search results' button row (SearchButtons). The first search built them on
+   * the EDT, and each icon was read from the jar and decoded there (Icebase #f071da08eef4,
+   * frostwire/frostwire#1486).
+   */
+  static final List<String> SEARCH_BUTTON_ICONS =
+      List.of("SEARCH_DOWNLOAD", "TORRENT_DETAILS", "SEARCH_STOP");
+
+  /**
+   * Loads {@link #ANIMATED_THEME_IMAGES}, {@link #STATUS_BAR_THEME_IMAGES} and the theme images
+   * behind {@link #SEARCH_BUTTON_ICONS} into the theme-image cache. Call it off the EDT, at startup
+   * before the main window is built, so the EDT finds them cached. Only this synchronized cache is
+   * filled; the button icon cache stays EDT-only.
    */
   static void preloadStartupThemeImages() {
     for (List<String> names : List.of(ANIMATED_THEME_IMAGES, STATUS_BAR_THEME_IMAGES)) {
@@ -165,6 +174,28 @@ public final class ResourceManager {
         } catch (RuntimeException e) {
           LOG.warn("Could not preload theme image " + name, e);
         }
+      }
+    }
+    // Both icon sizes: a handful of small images, and no dependence on the UI settings here.
+    for (boolean small : new boolean[] {true, false}) {
+      for (List<String> candidates :
+          ButtonIconController.themeImageCandidates(SEARCH_BUTTON_ICONS, small)) {
+        preloadFirstThemeImage(candidates);
+      }
+    }
+  }
+
+  /** Loads the first of {@code names} that exists, as the button icon lookup would. */
+  private static void preloadFirstThemeImage(List<String> names) {
+    for (String name : names) {
+      try {
+        getThemeImage(name);
+        return;
+      } catch (MissingResourceException e) {
+        // ButtonIconController falls back to the next name too.
+      } catch (RuntimeException e) {
+        LOG.warn("Could not preload theme image " + name, e);
+        return;
       }
     }
   }
@@ -195,6 +226,20 @@ public final class ResourceManager {
     }
     // no resource? error.
     throw new MissingResourceException("image: " + name + " doesn't exist.", null, null);
+  }
+
+  /** Whether the theme image {@code name} is in the cache, without loading it. */
+  static boolean isThemeImageCached(String name) {
+    synchronized (THEME_IMAGES) {
+      return THEME_IMAGES.containsKey(name);
+    }
+  }
+
+  /** Drops the theme image {@code name} from the cache; tests use it to start from a cold cache. */
+  static void forgetThemeImage(String name) {
+    synchronized (THEME_IMAGES) {
+      THEME_IMAGES.remove(name);
+    }
   }
 
   /** Retrieves an icon from the specified path in the filesystem. */

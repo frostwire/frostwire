@@ -7,6 +7,7 @@
 
 package com.limegroup.gnutella.gui;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -15,6 +16,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -123,6 +126,53 @@ class ResourceManagerAnimatedImagePreloadTest {
       ImageIcon preloaded = ResourceManager.getThemeImage(name);
       assertSame(preloaded, ResourceManager.getThemeImage(name), name + " is not cached");
     }
+  }
+
+  /**
+   * The first search built its button row on the EDT, and each icon was read from the jar and
+   * decoded there (Icebase #f071da08eef4, frostwire/frostwire#1486). The startup preload loads the
+   * theme image each search button resolves to, in both icon sizes.
+   */
+  @Test
+  void theSearchButtonIconsArePreloadedOffTheEdt() throws Exception {
+    List<List<String>> candidates = new ArrayList<>();
+    for (boolean small : new boolean[] {true, false}) {
+      List<List<String>> sized =
+          ButtonIconController.themeImageCandidates(ResourceManager.SEARCH_BUTTON_ICONS, small);
+      assertEquals(
+          ResourceManager.SEARCH_BUTTON_ICONS.size(),
+          sized.size(),
+          "a search button has no icon mapping");
+      candidates.addAll(sized);
+    }
+    candidates.forEach(names -> names.forEach(ResourceManager::forgetThemeImage));
+
+    Thread worker = new Thread(ResourceManager::preloadStartupThemeImages, "startup");
+    worker.start();
+    worker.join(30_000);
+
+    for (List<String> names : candidates) {
+      assertTrue(
+          names.stream().anyMatch(ResourceManager::isThemeImageCached),
+          "none of " + names + " was preloaded");
+    }
+  }
+
+  /** The preload list names exactly the icons SearchButtons builds. */
+  @Test
+  void theSearchButtonPreloadListMatchesSearchButtons() throws IOException {
+    String source =
+        Files.readString(
+            Path.of("src/main/java/com/limegroup/gnutella/gui/search/SearchButtons.java"),
+            StandardCharsets.UTF_8);
+    Matcher array = Pattern.compile("iconNames\\s*=\\s*\\{([^}]*)\\}").matcher(source);
+    assertTrue(array.find(), "SearchButtons no longer declares iconNames");
+    Set<String> icons = new TreeSet<>();
+    Matcher literal = Pattern.compile("\"([A-Z0-9_]+)\"").matcher(array.group(1));
+    while (literal.find()) {
+      icons.add(literal.group(1));
+    }
+    assertEquals(new TreeSet<>(ResourceManager.SEARCH_BUTTON_ICONS), icons);
   }
 
   @Test

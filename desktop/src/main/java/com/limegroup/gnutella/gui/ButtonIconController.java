@@ -5,7 +5,9 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Properties;
@@ -39,6 +41,23 @@ class ButtonIconController {
       IOUtils.closeQuietly(is);
     }
     return p;
+  }
+
+  /**
+   * The theme images {@link #getIconForButton} reads for these buttons with the given icon size,
+   * best first: the sized image ({@code <file>_small} or {@code <file>_large}), then the plain one
+   * it falls back to. Unmapped buttons are left out.
+   */
+  static List<List<String>> themeImageCandidates(List<String> buttonNames, boolean small) {
+    Properties names = loadButtonNameMap();
+    List<List<String>> candidates = new ArrayList<>();
+    for (String buttonName : buttonNames) {
+      String fileName = names.getProperty(buttonName);
+      if (fileName != null) {
+        candidates.add(List.of(fileName + (small ? "_small" : "_large"), fileName));
+      }
+    }
+    return candidates;
   }
 
   /**
