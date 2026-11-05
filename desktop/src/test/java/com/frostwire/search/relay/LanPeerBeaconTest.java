@@ -23,10 +23,16 @@ class LanPeerBeaconTest {
 
   private static final long AWAIT_MS = 3_000;
 
-  private static int freeUdpPort() throws Exception {
-    try (DatagramSocket s = new DatagramSocket(0)) {
-      return s.getLocalPort();
-    }
+  /**
+   * Starts {@code beacon} and returns the port it listens on. Beacons bind port 0 and report the
+   * port they got: probing for a free port first and binding it later let another socket take it in
+   * between, and a beacon that could not bind silently heard nothing (frostwire/frostwire#1487).
+   */
+  private static int started(LanPeerBeacon beacon) {
+    beacon.start();
+    int port = beacon.localPort();
+    assertTrue(port > 0, "the beacon did not start listening");
+    return port;
   }
 
   private static LanPeerBeacon listener(int udpPort, long entryTtlMs) {
@@ -54,9 +60,8 @@ class LanPeerBeaconTest {
 
   @Test
   void onlyWellFormedBeaconsAreBelieved() throws Exception {
-    int udpPort = freeUdpPort();
-    try (LanPeerBeacon beacon = listener(udpPort, LanPeerBeacon.ENTRY_TTL_MS)) {
-      beacon.start();
+    try (LanPeerBeacon beacon = listener(0, LanPeerBeacon.ENTRY_TTL_MS)) {
+      int udpPort = started(beacon);
       for (String bad :
           new String[] {
             "",
@@ -108,17 +113,16 @@ class LanPeerBeaconTest {
 
   @Test
   void sendersThatAreNotOnTheLanAreIgnored() throws Exception {
-    int udpPort = freeUdpPort();
     try (LanPeerBeacon beacon =
         new LanPeerBeacon(
             7000,
-            udpPort,
+            0,
             Collections.emptyList(),
             LanPeerBeacon::isPrivateLanAddress,
             100,
             LanPeerBeacon.ENTRY_TTL_MS,
             false)) {
-      beacon.start();
+      int udpPort = started(beacon);
       send(udpPort, "FWIB1 6888"); // from loopback, which is not a private LAN address
       Thread.sleep(500);
       assertTrue(beacon.fetchEndpoints().isEmpty(), "a beacon from outside the LAN is spoofable");
@@ -127,34 +131,33 @@ class LanPeerBeaconTest {
 
   @Test
   void aNodeLearnsTheAddressAndRudpPortOfAnotherNodeOnTheNetwork() throws Exception {
-    int listenerUdp = freeUdpPort();
-    int announcerUdp = freeUdpPort();
     InetAddress loopback = InetAddress.getLoopbackAddress();
-    try (LanPeerBeacon listener = listener(listenerUdp, LanPeerBeacon.ENTRY_TTL_MS);
-        LanPeerBeacon announcer =
-            new LanPeerBeacon(
-                6889,
-                announcerUdp,
-                List.of(new InetSocketAddress(loopback, listenerUdp)),
-                address -> true,
-                100,
-                LanPeerBeacon.ENTRY_TTL_MS,
-                false)) {
-      listener.start();
-      announcer.start();
+    try (LanPeerBeacon listener = listener(0, LanPeerBeacon.ENTRY_TTL_MS)) {
+      int listenerUdp = started(listener);
+      try (LanPeerBeacon announcer =
+          new LanPeerBeacon(
+              6889,
+              0,
+              List.of(new InetSocketAddress(loopback, listenerUdp)),
+              address -> true,
+              100,
+              LanPeerBeacon.ENTRY_TTL_MS,
+              false)) {
+        started(announcer);
 
-      assertTrue(await(() -> !listener.fetchEndpoints().isEmpty()), "the announcement must arrive");
-      DiscoveredEndpoint found = listener.fetchEndpoints().get(0);
-      assertEquals(loopback.getHostAddress(), found.host);
-      assertEquals(6889, found.port);
+        assertTrue(
+            await(() -> !listener.fetchEndpoints().isEmpty()), "the announcement must arrive");
+        DiscoveredEndpoint found = listener.fetchEndpoints().get(0);
+        assertEquals(loopback.getHostAddress(), found.host);
+        assertEquals(6889, found.port);
+      }
     }
   }
 
   @Test
   void aNodeThatWentAwayIsForgotten() throws Exception {
-    int udpPort = freeUdpPort();
-    try (LanPeerBeacon beacon = listener(udpPort, 300)) {
-      beacon.start();
+    try (LanPeerBeacon beacon = listener(0, 300)) {
+      int udpPort = started(beacon);
       send(udpPort, "FWIB1 6888");
       assertTrue(await(() -> !beacon.fetchEndpoints().isEmpty()));
 
@@ -164,9 +167,8 @@ class LanPeerBeaconTest {
 
   @Test
   void theTableOfKnownNodesIsBounded() throws Exception {
-    int udpPort = freeUdpPort();
-    try (LanPeerBeacon beacon = listener(udpPort, LanPeerBeacon.ENTRY_TTL_MS)) {
-      beacon.start();
+    try (LanPeerBeacon beacon = listener(0, LanPeerBeacon.ENTRY_TTL_MS)) {
+      int udpPort = started(beacon);
       int sent = LanPeerBeacon.MAX_ENTRIES + 40;
       for (int i = 0; i < sent; i++) {
         send(udpPort, "FWIB1 " + (10_000 + i));
@@ -183,6 +185,7 @@ class LanPeerBeaconTest {
     LanPeerBeacon beacon = listener(0, LanPeerBeacon.ENTRY_TTL_MS);
     beacon.close();
     beacon.start();
+    assertEquals(-1, beacon.localPort(), "a closed beacon does not listen");
     assertTrue(beacon.fetchEndpoints().isEmpty());
     assertThrows(
         IllegalArgumentException.class,

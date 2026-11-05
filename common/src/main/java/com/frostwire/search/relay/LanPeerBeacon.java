@@ -140,6 +140,15 @@ public final class LanPeerBeacon implements PeerDiscoverySource, AutoCloseable {
     }
   }
 
+  /**
+   * The UDP port the beacon listens on, or -1 when it is not running (not started, closed, or the
+   * socket could not be opened). With a {@code udpPort} of 0 this is the port the system picked.
+   */
+  public synchronized int localPort() {
+    MulticastSocket s = socket;
+    return s == null || s.isClosed() ? -1 : s.getLocalPort();
+  }
+
   @Override
   public List<DiscoveredEndpoint> fetchEndpoints() {
     long cutoff = System.currentTimeMillis() - entryTtlMs;
