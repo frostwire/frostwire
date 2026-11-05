@@ -1,4 +1,5 @@
 FrostWire 7.1.3 NOV/04/2026
+   - fix:A torrent you add no longer sometimes loses track of its saved .torrent file, which left the transfer without the license and payment details the torrent carries
    - fix:MCP: searches and search notifications work right after FrostWire starts with the MCP server on, without restarting the MCP server
    - fix:MCP: after a failed start with TLS on (missing or unreadable keystore), the MCP server can start again on the same port instead of finding it in use until FrostWire quits
    - fix:MCP: restarting the MCP server no longer stops new transfers from showing in the transfer list or floods the app with repeated events

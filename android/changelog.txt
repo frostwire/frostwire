@@ -1,4 +1,5 @@
 FrostWire Android UNRELEASED
+  - fix:A torrent you add no longer sometimes loses track of its saved .torrent file
   - fix:Transfers again show when a torrent finishes, changes state or is removed after you pick more of its files or open its magnet or search result again; since 3.2.3 only the newest copy of the transfer heard about it (#1441)
   - fix:Removing an unfinished transfer deletes its partial files again instead of leaving them in the download folder
   - fix:A transfer you paused stays paused after a restart; before, it often started downloading again
