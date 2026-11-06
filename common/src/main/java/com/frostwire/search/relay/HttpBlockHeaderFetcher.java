@@ -20,13 +20,19 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Multi-source Bitcoin block header fetcher with a local flat-file cache.
+ * Bitcoin block hash fetcher that asks two independent block explorers and accepts only what both
+ * report, with a local flat-file cache.
  *
- * <p>HTTP sources are tried in order, falling through on failure. A 5-second timeout is applied per
- * request. Once a block is cached, it is never re-fetched (Bitcoin blocks are immutable).
+ * <p>Every source is asked, with a 5-second timeout per request. A block hash is returned only when
+ * all sources return the same hash for the height, and the tip only when all sources answer with
+ * tips at most {@link #MAX_TIP_SPREAD_BLOCKS} apart (the lower one is returned). A source that is
+ * down, answers garbage, or disagrees yields null or -1, so callers write nothing and try again
+ * later instead of trusting one explorer alone (IceBridge white paper §11.3). Once a block is
+ * cached, it is never re-fetched (Bitcoin blocks are immutable).
  *
  * <p>The local cache is a flat file {@code <cacheDir>/block-headers.cache} with one line per cached
  * block: {@code <height> <hex-hash>}.
@@ -42,19 +48,33 @@ public final class HttpBlockHeaderFetcher implements BlockHeaderSource {
   private static final String USER_AGENT = "FrostWire/1.0";
   private static final String CACHE_FILE_NAME = "block-headers.cache";
 
+  /**
+   * How far apart the sources' tips may be. Two up-to-date explorers differ by a block for a few
+   * seconds after one is found; a larger gap means one is stale or wrong.
+   */
+  static final int MAX_TIP_SPREAD_BLOCKS = 2;
+
   private final File cacheFile;
-  private final HttpClient httpClient;
+  private final UrlReader urlReader;
   private final ConcurrentHashMap<Long, byte[]> cache = new ConcurrentHashMap<>();
 
   public HttpBlockHeaderFetcher(File cacheDir) {
+    this(cacheDir, httpReader(HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC)));
+  }
+
+  /** Reads the sources through {@code urlReader}; tests pass fake explorers. */
+  HttpBlockHeaderFetcher(File cacheDir, UrlReader urlReader) {
     if (cacheDir == null) {
       throw new IllegalArgumentException("cacheDir is null");
+    }
+    if (urlReader == null) {
+      throw new IllegalArgumentException("urlReader is null");
     }
     if (!cacheDir.exists() && !cacheDir.mkdirs()) {
       throw new IllegalStateException("Could not create cache directory: " + cacheDir);
     }
     this.cacheFile = new File(cacheDir, CACHE_FILE_NAME);
-    this.httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
+    this.urlReader = urlReader;
     loadCache();
   }
 
@@ -67,43 +87,79 @@ public final class HttpBlockHeaderFetcher implements BlockHeaderSource {
     if (hash != null) {
       return new BitcoinBlockReference(height, hash);
     }
+    byte[] agreed = null;
     for (BitcoinHeaderApi api : BitcoinHeaderApi.values()) {
+      byte[] parsedHash;
       try {
-        String response = fetch(api.blockUrl(height));
-        byte[] parsedHash = api.parseBlockHash(response);
-        if (parsedHash != null) {
-          cache.put(height, parsedHash);
-          persistCache();
-          return new BitcoinBlockReference(height, parsedHash);
-        }
+        parsedHash = api.parseBlockHash(urlReader.get(api.blockUrl(height)));
       } catch (Throwable t) {
+        parsedHash = null;
         LOG.debug(
             "Block header source " + api + " failed for height " + height + ": " + t.getMessage());
       }
+      if (parsedHash == null) {
+        return null;
+      }
+      if (agreed == null) {
+        agreed = parsedHash;
+      } else if (!Arrays.equals(agreed, parsedHash)) {
+        LOG.info(
+            "Bitcoin block sources disagree on the hash at height " + height + ", not using it");
+        return null;
+      }
     }
-    return null;
+    cache.put(height, agreed);
+    persistCache();
+    return new BitcoinBlockReference(height, agreed);
   }
 
   @Override
   public long getChainTipHeight() {
+    long agreed = -1;
     for (BitcoinHeaderApi api : BitcoinHeaderApi.values()) {
+      long tip;
       try {
-        String response = fetch(api.tipUrl);
-        if (response != null) {
-          String trimmed = response.trim();
-          if (!trimmed.isEmpty()) {
-            return Long.parseLong(trimmed);
-          }
-        }
+        tip = parseTip(urlReader.get(api.tipUrl));
       } catch (Throwable t) {
+        tip = -1;
         LOG.debug("Chain tip source " + api + " failed: " + t.getMessage());
       }
+      if (tip < 0) {
+        return -1;
+      }
+      if (agreed < 0) {
+        agreed = tip;
+      } else if (Math.abs(tip - agreed) > MAX_TIP_SPREAD_BLOCKS) {
+        LOG.info("Bitcoin block sources disagree on the tip (" + agreed + ", " + tip + ")");
+        return -1;
+      } else {
+        agreed = Math.min(agreed, tip);
+      }
     }
-    return -1;
+    return agreed;
   }
 
-  private String fetch(String url) throws IOException {
-    return httpClient.get(url, HTTP_TIMEOUT_MS, USER_AGENT, null, null, null);
+  /** A tip response: a non-negative decimal height, or -1 if the response isn't one. */
+  private static long parseTip(String response) {
+    if (response == null) {
+      return -1;
+    }
+    try {
+      long tip = Long.parseLong(response.trim());
+      return tip >= 0 ? tip : -1;
+    } catch (NumberFormatException e) {
+      return -1;
+    }
+  }
+
+  private static UrlReader httpReader(HttpClient httpClient) {
+    return url -> httpClient.get(url, HTTP_TIMEOUT_MS, USER_AGENT, null, null, null);
+  }
+
+  /** Reads the body of a GET request. */
+  @FunctionalInterface
+  interface UrlReader {
+    String get(String url) throws IOException;
   }
 
   private void loadCache() {
@@ -165,7 +221,7 @@ public final class HttpBlockHeaderFetcher implements BlockHeaderSource {
     }
   }
 
-  /** Bitcoin block header HTTP sources, tried in priority order. */
+  /** Bitcoin block header HTTP sources; all must agree. */
   private enum BitcoinHeaderApi {
     BLOCKSTREAM(
         "https://blockstream.info/api/block-height/{h}",
