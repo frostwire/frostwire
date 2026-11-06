@@ -21,7 +21,6 @@ package com.frostwire.gui.tabs;
 import com.frostwire.gui.bittorrent.*;
 import com.frostwire.gui.components.transfers.TransferDetailComponent;
 import com.frostwire.gui.theme.PlatformFonts;
-import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.UISettings;
 import java.awt.*;
@@ -288,13 +287,11 @@ public final class TransfersTab extends AbstractTab {
         hideTransferDetailsComponent();
       } else if (selected instanceof BittorrentDownload bittorrentDownload) {
         showTransferDetailsComponent(bittorrentDownload);
-        GUIMediator.safeInvokeLater(
-            () -> {
-              transferDetailSplitter.revalidate();
-              transferDetailSplitter.repaint();
-              GUIMediator.safeInvokeLater(
-                  () -> downloadMediator.ensureDownloadVisible(bittorrentDownload));
-            });
+        // Opening the details panel shrinks the table above it and can cover the selected row, so
+        // lay the split out now and then scroll to the row. safeInvokeLater runs right away on the
+        // EDT, so deferring the scroll through it scrolled before the table shrank.
+        transferDetailSplitter.validate();
+        downloadMediator.ensureDownloadVisible(bittorrentDownload);
       }
     }
   }
