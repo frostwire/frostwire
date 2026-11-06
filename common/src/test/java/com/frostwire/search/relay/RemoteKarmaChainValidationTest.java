@@ -42,7 +42,7 @@ class RemoteKarmaChainValidationTest {
   @BeforeEach
   void setUp() throws Exception {
     owner = IdentityKeys.generate(0);
-    bitcoin = new FakeBlockSource().withTip(H).withBlock(H);
+    bitcoin = new FakeBlockSource().withAnchor(H).withBlock(H);
     writer = new KarmaChainWriter(owner, bitcoin, new InMemoryStore(owner.ed25519PubRaw()));
     publisher = new KarmaChainPublisher(writer, owner);
   }
@@ -69,7 +69,7 @@ class RemoteKarmaChainValidationTest {
   void trimmedTailPublishedByTheRealPublisherScoresItsEndorsements() {
     for (int i = 0; i < 12; i++) {
       long tip = H + 144L * i;
-      bitcoin.withTip(tip).withBlock(tip);
+      bitcoin.withAnchor(tip).withBlock(tip);
       writer.onDownloadCompletedFromPeer(PEER, filled(20, i + 1));
     }
     Entry manifest = publisher.buildManifest(writer.chain().entries());
@@ -151,7 +151,7 @@ class RemoteKarmaChainValidationTest {
   @Test
   void endorsementWhoseBlockCantBeResolvedYetIsNotValidYet() {
     writer.commitEpochIfNeeded();
-    bitcoin.withTip(H + 1).withBlock(H + 1);
+    bitcoin.withAnchor(H + 1).withBlock(H + 1);
     writer.onDownloadCompletedFromPeer(PEER, filled(20, 1));
     List<KarmaChainEntry> chain = writer.chain().entries();
     assertEquals(H + 1, chain.get(chain.size() - 1).blockHeight());
@@ -170,7 +170,7 @@ class RemoteKarmaChainValidationTest {
   @Test
   void chainStartingBeforeKarmaExistedScoresZero() throws Exception {
     long old = KarmaConstants.FIRST_KARMA_BLOCK_HEIGHT - 1;
-    FakeBlockSource then = new FakeBlockSource().withTip(old).withBlock(old);
+    FakeBlockSource then = new FakeBlockSource().withAnchor(old).withBlock(old);
     try (KarmaChainWriter backdated =
         new KarmaChainWriter(owner, then, new InMemoryStore(owner.ed25519PubRaw()))) {
       backdated.onDownloadCompletedFromPeer(PEER, filled(20, 1));
@@ -186,7 +186,7 @@ class RemoteKarmaChainValidationTest {
   @Test
   void chainStartingAtTheFirstKarmaHeightScoresItsEndorsements() throws Exception {
     long first = KarmaConstants.FIRST_KARMA_BLOCK_HEIGHT;
-    FakeBlockSource then = new FakeBlockSource().withTip(first).withBlock(first);
+    FakeBlockSource then = new FakeBlockSource().withAnchor(first).withBlock(first);
     try (KarmaChainWriter earliest =
         new KarmaChainWriter(owner, then, new InMemoryStore(owner.ed25519PubRaw()))) {
       earliest.onDownloadCompletedFromPeer(PEER, filled(20, 1));
@@ -245,6 +245,11 @@ class RemoteKarmaChainValidationTest {
     FakeBlockSource withTip(long height) {
       tip.set(height);
       return this;
+    }
+
+    /** A tip deep enough that the writer anchors at {@code height}. */
+    FakeBlockSource withAnchor(long height) {
+      return withTip(height + KarmaConstants.ANCHOR_DEPTH_BLOCKS);
     }
 
     FakeBlockSource withBlock(long height) {
