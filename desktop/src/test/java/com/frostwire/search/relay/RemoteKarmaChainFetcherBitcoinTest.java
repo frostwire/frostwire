@@ -108,7 +108,8 @@ class RemoteKarmaChainFetcherBitcoinTest {
   private static Published publish() throws Exception {
     Published p = new Published();
     p.height = 144L * 6000 + 17;
-    Blocks blocks = new Blocks(p.height, (byte) 0x11);
+    // The writer anchors this far below the tip, so its entries are at p.height.
+    Blocks blocks = new Blocks(p.height + KarmaConstants.ANCHOR_DEPTH_BLOCKS, (byte) 0x11);
     IdentityKeys identity = IdentityKeys.generate(0);
     p.owner = identity.ed25519PubRaw();
     KarmaChainWriter writer = new KarmaChainWriter(identity, blocks, new Store());

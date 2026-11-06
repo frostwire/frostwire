@@ -63,7 +63,7 @@ class KarmaChainWriterTest {
   void firstEndorsementCommitsEpochAndAppendsEndorsement() {
     FakeBlockSource source =
         new FakeBlockSource()
-            .withTip(144L) // epoch 1 boundary
+            .withAnchor(144L) // epoch 1 boundary
             .withBlock(144L, hashForHeight(144L));
     KarmaChainWriter writer = new KarmaChainWriter(identity, source, table);
 
@@ -80,7 +80,7 @@ class KarmaChainWriterTest {
   @Test
   void secondEndorsementInSameEpochDoesNotCommitAgain() {
     FakeBlockSource source =
-        new FakeBlockSource().withTip(200L).withBlock(200L, hashForHeight(200L));
+        new FakeBlockSource().withAnchor(200L).withBlock(200L, hashForHeight(200L));
     KarmaChainWriter writer = new KarmaChainWriter(identity, source, table);
 
     writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, FAKE_INFO_HASH);
@@ -92,7 +92,7 @@ class KarmaChainWriterTest {
   @Test
   void explicitSourceEndorsementIsIdempotentForPeerAndTorrent() {
     FakeBlockSource source =
-        new FakeBlockSource().withTip(200L).withBlock(200L, hashForHeight(200L));
+        new FakeBlockSource().withAnchor(200L).withBlock(200L, hashForHeight(200L));
     KarmaChainWriter writer = new KarmaChainWriter(identity, source, table);
     writer.commitEpochIfNeeded();
 
@@ -113,7 +113,7 @@ class KarmaChainWriterTest {
   void endorsementAtNewEpochBoundaryCommitsNewEpoch() {
     FakeBlockSource source =
         new FakeBlockSource()
-            .withTip(144L) // epoch 1
+            .withAnchor(144L) // epoch 1
             .withBlock(144L, hashForHeight(144L));
     KarmaChainWriter writer = new KarmaChainWriter(identity, source, table);
 
@@ -121,7 +121,7 @@ class KarmaChainWriterTest {
     assertEquals(1L, writer.chain().currentEpoch());
 
     source
-        .withTip(288L) // epoch 2
+        .withAnchor(288L) // epoch 2
         .withBlock(288L, hashForHeight(288L));
     writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, anotherInfoHash());
 
@@ -132,7 +132,7 @@ class KarmaChainWriterTest {
   @Test
   void commitEpochIfNeededCommitsAtStartup() {
     FakeBlockSource source =
-        new FakeBlockSource().withTip(144L).withBlock(144L, hashForHeight(144L));
+        new FakeBlockSource().withAnchor(144L).withBlock(144L, hashForHeight(144L));
     KarmaChainWriter writer = new KarmaChainWriter(identity, source, table);
 
     writer.commitEpochIfNeeded();
@@ -144,7 +144,7 @@ class KarmaChainWriterTest {
   @Test
   void commitEpochIfNeededIsNoOpWhenUpToDate() {
     FakeBlockSource source =
-        new FakeBlockSource().withTip(144L).withBlock(144L, hashForHeight(144L));
+        new FakeBlockSource().withAnchor(144L).withBlock(144L, hashForHeight(144L));
     KarmaChainWriter writer = new KarmaChainWriter(identity, source, table);
 
     writer.commitEpochIfNeeded();
@@ -168,7 +168,7 @@ class KarmaChainWriterTest {
   @Test
   void nullArgsAreNoOp() {
     FakeBlockSource source =
-        new FakeBlockSource().withTip(144L).withBlock(144L, hashForHeight(144L));
+        new FakeBlockSource().withAnchor(144L).withBlock(144L, hashForHeight(144L));
     KarmaChainWriter writer = new KarmaChainWriter(identity, source, table);
 
     writer.onDownloadCompletedFromPeer(null, FAKE_INFO_HASH);
@@ -179,7 +179,7 @@ class KarmaChainWriterTest {
   @Test
   void persistedEntriesMatchInMemory() {
     FakeBlockSource source =
-        new FakeBlockSource().withTip(144L).withBlock(144L, hashForHeight(144L));
+        new FakeBlockSource().withAnchor(144L).withBlock(144L, hashForHeight(144L));
     KarmaChainWriter writer = new KarmaChainWriter(identity, source, table);
 
     writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, FAKE_INFO_HASH);
@@ -191,7 +191,7 @@ class KarmaChainWriterTest {
   @Test
   void peerAggregateScoreIncrementsOnEndorsement() {
     FakeBlockSource source =
-        new FakeBlockSource().withTip(144L).withBlock(144L, hashForHeight(144L));
+        new FakeBlockSource().withAnchor(144L).withBlock(144L, hashForHeight(144L));
     KarmaChainWriter writer = new KarmaChainWriter(identity, source, table);
 
     writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, FAKE_INFO_HASH);
@@ -208,7 +208,7 @@ class KarmaChainWriterTest {
         new BlockHeaderSource() {
           @Override
           public long getChainTipHeight() {
-            return 144;
+            return 144 + KarmaConstants.ANCHOR_DEPTH_BLOCKS;
           }
 
           @Override
@@ -264,7 +264,7 @@ class KarmaChainWriterTest {
     KarmaChainWriter writer =
         new KarmaChainWriter(
             identity,
-            new FakeBlockSource().withTip(144).withBlock(144, hashForHeight(144)),
+            new FakeBlockSource().withAnchor(144).withBlock(144, hashForHeight(144)),
             store,
             permitted::get);
     Thread worker =
@@ -304,8 +304,9 @@ class KarmaChainWriterTest {
     private final AtomicLong tip = new AtomicLong(-1);
     private final java.util.Map<Long, byte[]> blocks = new java.util.HashMap<>();
 
-    FakeBlockSource withTip(long height) {
-      tip.set(height);
+    /** Puts the tip {@link KarmaConstants#ANCHOR_DEPTH_BLOCKS} above the block the writer uses. */
+    FakeBlockSource withAnchor(long height) {
+      tip.set(height + KarmaConstants.ANCHOR_DEPTH_BLOCKS);
       return this;
     }
 

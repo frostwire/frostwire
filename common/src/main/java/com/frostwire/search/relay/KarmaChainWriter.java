@@ -20,7 +20,8 @@ import java.util.function.BooleanSupplier;
  * <p>On each {@link KarmaEndorsementSink#onDownloadCompletedFromPeer}, the writer:
  *
  * <ol>
- *   <li>Resolves a current Bitcoin block via the injected {@link BlockHeaderSource}.
+ *   <li>Resolves the Bitcoin block {@link KarmaConstants#ANCHOR_DEPTH_BLOCKS} below the tip via the
+ *       injected {@link BlockHeaderSource}, so a reorganization can't orphan the anchor.
  *   <li>Lazily commits an {@code EPOCH_COMMITMENT} entry if the chain has not yet committed for
  *       this epoch.
  *   <li>Appends an {@code ENDORSEMENT} entry and persists both new entries to the {@link
@@ -119,11 +120,7 @@ public final class KarmaChainWriter implements KarmaEndorsementSink, AutoCloseab
       if (!isPermitted(permitted)) {
         return;
       }
-      long tip = blockSource.getChainTipHeight();
-      if (tip < 0 || !isPermitted(permitted)) {
-        return;
-      }
-      BitcoinBlockReference block = blockSource.getBlock(tip);
+      BitcoinBlockReference block = anchorBlock(permitted);
       if (block == null || !isPermitted(permitted)) {
         return;
       }
@@ -195,14 +192,9 @@ public final class KarmaChainWriter implements KarmaEndorsementSink, AutoCloseab
       if (!isPermitted(permitted)) {
         return false;
       }
-      long tip = blockSource.getChainTipHeight();
-      if (tip < 0 || !isPermitted(permitted)) {
-        LOG.debug("Skipping endorsement: no Bitcoin chain tip available");
-        return false;
-      }
-      BitcoinBlockReference block = blockSource.getBlock(tip);
+      BitcoinBlockReference block = anchorBlock(permitted);
       if (block == null || !isPermitted(permitted)) {
-        LOG.debug("Skipping endorsement: could not resolve tip block " + tip);
+        LOG.debug("Skipping endorsement: no confirmed Bitcoin block available");
         return false;
       }
       writeLock.lock();
@@ -234,6 +226,21 @@ public final class KarmaChainWriter implements KarmaEndorsementSink, AutoCloseab
       lifecycle.leave();
     }
     return appended;
+  }
+
+  /**
+   * The block to anchor a new entry to: {@link KarmaConstants#ANCHOR_DEPTH_BLOCKS} below the
+   * Bitcoin tip, never the tip itself, which a reorganization can replace (IceBridge white paper
+   * §11.3). Null when the tip or that block is unknown, or the writer was revoked while the tip was
+   * read; the caller then writes nothing this time.
+   */
+  private BitcoinBlockReference anchorBlock(BooleanSupplier permitted) {
+    long tip = blockSource.getChainTipHeight();
+    long height = tip - KarmaConstants.ANCHOR_DEPTH_BLOCKS;
+    if (tip < 0 || height < 0 || !isPermitted(permitted)) {
+      return null;
+    }
+    return blockSource.getBlock(height);
   }
 
   private boolean isPermitted(BooleanSupplier permitted) {

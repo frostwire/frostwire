@@ -29,6 +29,7 @@ import com.frostwire.search.relay.KarmaChainEntry;
 import com.frostwire.search.relay.KarmaChainPublisher;
 import com.frostwire.search.relay.KarmaChainStore;
 import com.frostwire.search.relay.KarmaChainWriter;
+import com.frostwire.search.relay.KarmaConstants;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.concurrent.CountDownLatch;
@@ -91,7 +92,7 @@ public class AndroidRelayStackLifecycleTest {
             call -> {
               entered.countDown();
               awaitUninterruptibly(release);
-              return 144L;
+              return 144L + KarmaConstants.ANCHOR_DEPTH_BLOCKS;
             });
     when(blocks.getBlock(144L)).thenReturn(new BitcoinBlockReference(144, new byte[32]));
     KarmaChainWriter writer = new KarmaChainWriter(testIdentity(), blocks, store, permitted::get);

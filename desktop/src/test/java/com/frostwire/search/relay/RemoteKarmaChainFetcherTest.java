@@ -91,7 +91,7 @@ class RemoteKarmaChainFetcherTest {
     // Feed ACTUAL publisher output: build a real KarmaChainWriter chain,
     // publish its manifest, feed it through the fetcher with a fake source.
     FakeBlockSource blockSource =
-        new FakeBlockSource().withTip(144L).withBlock(144L, hashForHeight(144L));
+        new FakeBlockSource().withAnchor(144L).withBlock(144L, hashForHeight(144L));
     IdentityKeys publisherIdentity = IdentityKeys.generate(0);
     byte[] ownerPub = publisherIdentity.ed25519PubRaw();
     InMemoryStore store = new InMemoryStore(ownerPub);
@@ -136,7 +136,7 @@ class RemoteKarmaChainFetcherTest {
     byte[] infoHash = new byte[20];
     for (int i = 0; i < 12; i++) {
       long tip = 144L * (i + 1);
-      blockSource.withTip(tip).withBlock(tip, hashForHeight(tip));
+      blockSource.withAnchor(tip).withBlock(tip, hashForHeight(tip));
       // One endorsement per (peer, torrent): grow the chain with distinct torrents.
       infoHash[0] = (byte) i;
       writer.onDownloadCompletedFromPeer(peerPub, infoHash);
@@ -169,7 +169,7 @@ class RemoteKarmaChainFetcherTest {
     byte[] infoHash = new byte[20];
     for (int i = 0; i < 12; i++) {
       long tip = 144L * (i + 1);
-      blockSource.withTip(tip).withBlock(tip, hashForHeight(tip));
+      blockSource.withAnchor(tip).withBlock(tip, hashForHeight(tip));
       // One endorsement per (peer, torrent): grow the chain with distinct torrents.
       infoHash[0] = (byte) i;
       writer.onDownloadCompletedFromPeer(peerPub, infoHash);
@@ -259,7 +259,7 @@ class RemoteKarmaChainFetcherTest {
   @Test
   void peerKarmaCacheCountsEndorsements() throws Exception {
     FakeBlockSource blockSource =
-        new FakeBlockSource().withTip(144L).withBlock(144L, hashForHeight(144L));
+        new FakeBlockSource().withAnchor(144L).withBlock(144L, hashForHeight(144L));
     IdentityKeys publisherIdentity = IdentityKeys.generate(0);
     byte[] ownerPub = publisherIdentity.ed25519PubRaw();
     InMemoryStore store = new InMemoryStore(ownerPub);
@@ -328,8 +328,9 @@ class RemoteKarmaChainFetcherTest {
     private final AtomicLong tip = new AtomicLong(-1);
     private final Map<Long, byte[]> blocks = new HashMap<>();
 
-    FakeBlockSource withTip(long height) {
-      tip.set(height);
+    /** Puts the tip {@link KarmaConstants#ANCHOR_DEPTH_BLOCKS} above the block the writer uses. */
+    FakeBlockSource withAnchor(long height) {
+      tip.set(height + KarmaConstants.ANCHOR_DEPTH_BLOCKS);
       return this;
     }
 

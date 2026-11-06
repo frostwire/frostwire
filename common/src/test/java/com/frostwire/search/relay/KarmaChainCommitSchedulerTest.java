@@ -111,7 +111,7 @@ class KarmaChainCommitSchedulerTest {
 
   @Test
   void tickCommitsEpochWhenNewBitcoinEpochAvailable() throws Exception {
-    blockSource.withTip(144L).withBlock(144L, hashForHeight(144L));
+    blockSource.withAnchor(144L).withBlock(144L, hashForHeight(144L));
     scheduler = new KarmaChainCommitScheduler(writer, publisher, 1);
     scheduler.start();
 
@@ -137,7 +137,7 @@ class KarmaChainCommitSchedulerTest {
           public long getChainTipHeight() {
             entered.countDown();
             awaitBarrier(release);
-            return 144;
+            return 144 + KarmaConstants.ANCHOR_DEPTH_BLOCKS;
           }
 
           @Override
@@ -176,7 +176,7 @@ class KarmaChainCommitSchedulerTest {
 
   @Test
   void identityReplacementDuringSessionReadPreventsPublication() throws Exception {
-    blockSource.withTip(144L).withBlock(144L, hashForHeight(144L));
+    blockSource.withAnchor(144L).withBlock(144L, hashForHeight(144L));
     CountDownLatch entered = new CountDownLatch(1);
     CountDownLatch release = new CountDownLatch(1);
     AtomicBoolean permitted = new AtomicBoolean(true);
@@ -239,8 +239,9 @@ class KarmaChainCommitSchedulerTest {
     private final AtomicLong tip = new AtomicLong(-1);
     private final Map<Long, byte[]> blocks = new HashMap<>();
 
-    FakeBlockSource withTip(long height) {
-      tip.set(height);
+    /** Puts the tip {@link KarmaConstants#ANCHOR_DEPTH_BLOCKS} above the block the writer uses. */
+    FakeBlockSource withAnchor(long height) {
+      tip.set(height + KarmaConstants.ANCHOR_DEPTH_BLOCKS);
       return this;
     }
 

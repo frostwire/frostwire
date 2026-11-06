@@ -59,6 +59,16 @@ public final class KarmaConstants {
    */
   public static final int EPOCH_TOLERANCE_BLOCKS = 2;
 
+  /**
+   * How many blocks must be mined on top of a block before this node anchors a karma entry to it. A
+   * block this deep is not replaced by a chain reorganization in practice (six is Bitcoin's
+   * customary threshold), so a published entry keeps naming a block that is in the chain, and
+   * {@link KarmaChain#verify(java.util.List, BlockHeaderSource)} keeps accepting it. The writer
+   * anchors at {@code tip - ANCHOR_DEPTH_BLOCKS}; verifiers accept any block up to the tip, so
+   * chains anchored at the tip by earlier versions still verify.
+   */
+  public static final int ANCHOR_DEPTH_BLOCKS = 6;
+
   private KarmaConstants() {}
 
   /** Compute the karma epoch number for a given Bitcoin block height. */
