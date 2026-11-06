@@ -115,6 +115,15 @@ class JdkWarmUpTest {
   }
 
   /**
+   * The first drag from a table creates a DragSourceContext; its static initializer ran on the EDT
+   * (Icebase #e1c372ba0f4b) after DragSource itself was already warmed up.
+   */
+  @Test
+  void dragSourceContextIsInitializedOffTheEdt() {
+    assertTrue(JdkWarmUp.CLASSES_TO_INITIALIZE.contains("java.awt.dnd.DragSourceContext"));
+  }
+
+  /**
    * The first tooltip ran PopupFactory's static initializer on the EDT
    * (ToolTipManager.showTipWindow, Icebase #5749af9dee1c).
    */

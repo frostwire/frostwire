@@ -148,6 +148,9 @@ public final class JdkWarmUp {
   static final List<String> CLASSES_TO_INITIALIZE =
       List.of(
           "java.awt.dnd.DragSource",
+          // DragSource.startDrag creates the first DragSourceContext, whose static initializer
+          // ran on the EDT as the first drag from a table began (Icebase #e1c372ba0f4b).
+          "java.awt.dnd.DragSourceContext",
           "sun.awt.SunGraphicsCallback",
           "net.miginfocom.layout.PlatformDefaults",
           // ToolTipManager.showTipWindow initialized it on the EDT for the first tooltip (Icebase
