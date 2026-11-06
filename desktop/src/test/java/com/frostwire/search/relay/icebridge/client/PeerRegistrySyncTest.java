@@ -9,22 +9,30 @@ package com.frostwire.search.relay.icebridge.client;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.frostwire.search.relay.DiscoveredEndpoint;
+import com.frostwire.search.relay.HostCachePeerDiscoverySource;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalSharedTorrent;
+import com.frostwire.search.relay.NodeCapabilities;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerKarmaCache;
 import com.frostwire.search.relay.RemoteKarmaChainFetcher;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
+import com.frostwire.search.relay.icebridge.IceBridgeHostCache;
 import com.frostwire.search.relay.icebridge.IceBridgeMetrics;
 import com.frostwire.search.relay.icebridge.IceBridgeTokens;
 import com.frostwire.search.relay.icebridge.control.ControlServer;
 import com.frostwire.search.relay.icebridge.control.InboundMessageQueue;
 import com.frostwire.search.relay.icebridge.peer.PeerRegistry;
 import com.frostwire.search.relay.icebridge.udp.RudpSessionManager;
+import java.io.File;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -287,9 +295,85 @@ class PeerRegistrySyncTest {
         new PeerRegistrySync(client, directory, "127.0.0.1", 6889, self, IceBridgeConfig.Role.BOTH);
     sync.sync();
     assertTrue(
-        directory.get(peer.ed25519PubRaw()).isPresent(),
-        "mesh lookup peer must be imported as verified");
-    assertTrue(directory.topByTrustVerified(10).size() >= 1);
+        directory.get(peer.ed25519PubRaw()).isPresent(), "mesh lookup peer must be imported");
+  }
+
+  /** IceBridge white paper §11.3: a /lookup row is an unauthenticated hint, not a verified peer. */
+  @Test
+  void lookupImportIsAnUnverifiedHintUntilThePeerProvesItsKey() throws Exception {
+    IdentityKeys peer = IdentityKeys.generate(0);
+    // Planted with the unsigned /route endpoint: nothing proves this host holds the key.
+    assertTrue(client.route(peer.ed25519PubRaw(), "10.0.0.9", 6889, IceBridgeConfig.Role.BOTH));
+    sync =
+        new PeerRegistrySync(
+            client,
+            directory,
+            "127.0.0.1",
+            6889,
+            IdentityKeys.generate(0),
+            IceBridgeConfig.Role.BOTH);
+
+    withTempHostCache(sync::sync);
+
+    PeerDirectory.PeerInfo imported = directory.get(peer.ed25519PubRaw()).orElseThrow();
+    assertFalse(imported.isVerified(), "a /lookup row must not be marked verified");
+    assertTrue(
+        directory.topByTrustVerified(10).isEmpty(), "an unverified hint must not be queryable");
+    assertTrue(
+        directory.sampleVerified(10, Set.of(), NodeCapabilities.NONE, new Random(1)).isEmpty(),
+        "an unverified hint must not be selected for search forwarding");
+    // The advertised role is kept for capability-scoped selection once the peer is verified.
+    assertTrue(NodeCapabilities.has(imported.capabilities(), NodeCapabilities.RELAY));
+
+    // An authenticated frame from the key (here NODE_META) is what makes it queryable.
+    directory.applyPeerMeta(peer.ed25519PubRaw(), imported.capabilities());
+    assertTrue(directory.get(peer.ed25519PubRaw()).orElseThrow().isVerified());
+    assertEquals(1, directory.topByTrustVerified(10).size());
+
+    // A later /lookup of the same key must not downgrade the now-verified entry.
+    withTempHostCache(sync::sync);
+    assertTrue(directory.get(peer.ed25519PubRaw()).orElseThrow().isVerified());
+  }
+
+  /** An imported forwarder must still reach the rUDP handshake path, or it could never verify. */
+  @Test
+  void lookupImportSeedsForwardersIntoTheProbedHostCache() throws Exception {
+    IdentityKeys peer = IdentityKeys.generate(0);
+    assertTrue(
+        client.route(peer.ed25519PubRaw(), "198.51.100.7", 6889, IceBridgeConfig.Role.FORWARDER));
+    sync =
+        new PeerRegistrySync(
+            client,
+            directory,
+            "127.0.0.1",
+            6889,
+            IdentityKeys.generate(0),
+            IceBridgeConfig.Role.BOTH);
+    List<DiscoveredEndpoint> candidates = new ArrayList<>();
+
+    withTempHostCache(
+        () -> {
+          sync.sync();
+          candidates.addAll(new HostCachePeerDiscoverySource().fetchEndpoints());
+        });
+
+    assertTrue(
+        candidates.stream().anyMatch(ep -> "198.51.100.7".equals(ep.host) && ep.port == 6889),
+        "an imported forwarder must be a PeerDiscovery handshake candidate");
+  }
+
+  /** Point the shared host cache at a scratch file so the test leaves ~/.frostwire alone. */
+  private static void withTempHostCache(Runnable body) throws Exception {
+    File original = IceBridgeHostCache.getInstance().cacheFile();
+    File scratch = File.createTempFile("peer-registry-sync-hosts-", ".txt");
+    scratch.deleteOnExit();
+    IceBridgeHostCache.configure(scratch);
+    try {
+      body.run();
+    } finally {
+      IceBridgeHostCache.configure(original);
+      scratch.delete();
+    }
   }
 
   @Test

@@ -174,6 +174,22 @@ public final class PeerDirectory {
     version.incrementAndGet();
   }
 
+  /**
+   * Upsert an unverified hint (registry {@code /lookup}, DHT, LAN beacon) with the role and version
+   * it advertises. Like {@link #upsert(byte[], String, int, int)}, the entry is not queryable and
+   * never replaces a verified one: it becomes verified only through an rUDP handshake or an
+   * authenticated frame from the key.
+   */
+  public void upsert(
+      byte[] peerPub,
+      String hostname,
+      int utpPort,
+      int rudpPort,
+      long capabilities,
+      String icebridgeVersion) {
+    upsert(peerPub, hostname, utpPort, rudpPort, false, capabilities, icebridgeVersion);
+  }
+
   /** Upsert a verified peer with explicit capability bitflags. */
   public void upsertVerified(
       byte[] peerPub, String hostname, int utpPort, int rudpPort, long capabilities) {

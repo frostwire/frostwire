@@ -364,6 +364,25 @@ class PeerDirectoryTest {
   }
 
   @Test
+  void hintWithCapabilitiesIsUnverifiedAndNeverReplacesAVerifiedEntry() {
+    PeerDirectory d = new PeerDirectory(new FakeKarmaCache());
+    byte[] pub = new byte[32];
+    pub[31] = 0x03;
+    d.upsert(pub, "hint", 6889, 6889, NodeCapabilities.fromRole("BOTH"), "1.0");
+    PeerDirectory.PeerInfo hint = d.get(pub).get();
+    assertFalse(hint.isVerified());
+    assertEquals(NodeCapabilities.fromRole("BOTH"), hint.capabilities());
+    assertEquals("1.0", hint.icebridgeVersion());
+
+    d.upsertVerified(pub, "proven", 6890, 6890);
+    d.upsert(pub, "spoofed", 6891, 6891, NodeCapabilities.NONE, "9.9");
+    PeerDirectory.PeerInfo after = d.get(pub).get();
+    assertTrue(after.isVerified());
+    assertEquals("proven", after.hostname());
+    assertEquals(6890, after.rudpPort());
+  }
+
+  @Test
   void topByTrustVerifiedExcludesUnverified() {
     PeerDirectory d = new PeerDirectory(new FakeKarmaCache());
     byte[] unverified = new byte[32];

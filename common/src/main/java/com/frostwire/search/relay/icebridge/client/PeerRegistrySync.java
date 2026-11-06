@@ -38,9 +38,12 @@ import java.util.function.BooleanSupplier;
  * route back to us.
  *
  * <p><b>Pull (forwarder-first discovery):</b> imports peers from IceBridge {@code GET /lookup} into
- * {@link PeerDirectory} as verified entries. Mesh registration is already Ed25519-signed at the
- * forwarder; this is the path when a direct rUDP path (home NAT) is unreachable —
- * DESIGN_RELAY_REGISTRY hybrid plane + §8 mesh search.
+ * {@link PeerDirectory} as <b>unverified</b> hints. The registry mixes signed {@code /register}
+ * rows with unsigned {@code /route} hints and {@code /lookup} does not say which is which, so an
+ * imported peer is not queryable until it proves its key: forwarders are seeded into the {@link
+ * com.frostwire.search.relay.icebridge.IceBridgeHostCache} that {@code PeerDiscovery} probes with
+ * the rUDP handshake, and any peer is verified by its first authenticated frame (IceBridge white
+ * paper §11.3).
  */
 public final class PeerRegistrySync implements AutoCloseable {
 
@@ -523,10 +526,13 @@ public final class PeerRegistrySync implements AutoCloseable {
       IceBridgeConfig.Role role = info.role != null ? info.role : IceBridgeConfig.Role.BOTH;
       long caps =
           com.frostwire.search.relay.NodeCapabilities.fromRole(role != null ? role.name() : "BOTH");
-      directory.upsertVerified(
-          pub, info.host, info.rudpPort, info.rudpPort, caps, info.icebridgeVersion);
+      // A registry row is a hint: /route is unsigned, so anyone with control access can plant
+      // one. The peer becomes queryable only once it proves its key (rUDP handshake through the
+      // host cache below, or an authenticated INDEX_DIGEST / NODE_META / CLUSTER_DIGEST frame).
+      directory.upsert(pub, info.host, info.rudpPort, info.rudpPort, caps, info.icebridgeVersion);
       client.route(pub, info.host, info.rudpPort, role);
-      // Seed host cache for Settings → Refresh/Ping (rUDP identity handshake).
+      // Seed host cache: PeerDiscovery probes it with the rUDP identity handshake, which is what
+      // verifies an imported forwarder (and Settings → Refresh/Ping uses it too).
       // Skip loopback USE_REMOTE self-registrations; only public/remote hosts.
       if (!isLoopbackHost(info.host)
           && (role == IceBridgeConfig.Role.FORWARDER || role == IceBridgeConfig.Role.BOTH)) {
