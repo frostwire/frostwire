@@ -707,6 +707,9 @@ public final class RudpSessionManager {
     if (Arrays.equals(peer, identity.ed25519PubRaw())) {
       return;
     }
+    if (!acceptsIdentity(peer, "HELLO")) {
+      return;
+    }
     RudpSession outbound = sessionsByAddress.get(sender);
     if (outbound != null
         && outbound.remotePub() != null
@@ -789,6 +792,9 @@ public final class RudpSessionManager {
     }
     byte[] peer = Arrays.copyOf(ack, 32);
     if (session.remotePub() != null && !Arrays.equals(session.remotePub(), peer)) {
+      return;
+    }
+    if (!acceptsIdentity(peer, "HELLO_ACK")) {
       return;
     }
     if (session.ackPayload != null && !Arrays.equals(session.ackPayload, ack)) {
@@ -949,6 +955,27 @@ public final class RudpSessionManager {
   private boolean deliverToLocalPollClient(byte[] target, byte[] source, byte[] payload) {
     return messageListener instanceof InboundMessageQueue
         && ((InboundMessageQueue) messageListener).offerForTarget(target, source, payload);
+  }
+
+  /**
+   * A signed handshake proves possession of a key, not that the key cost anything. Refuse a peer
+   * whose identity lacks the proof of work every released FrostWire mints (IceBridge white paper
+   * §10.5); without this check Sybil identities are free.
+   */
+  private boolean acceptsIdentity(byte[] peer, String step) {
+    if (IdentityKeys.meetsIdentityDifficulty(peer)) {
+      return true;
+    }
+    metrics.helloRejected();
+    LOG.debug(
+        "rUDP "
+            + step
+            + " refused: identity "
+            + com.frostwire.util.Hex.encode(peer).substring(0, 16)
+            + " is below the "
+            + com.frostwire.search.relay.KarmaConstants.IDENTITY_DIFFICULTY
+            + "-bit proof of work");
+    return false;
   }
 
   private boolean allowHello(InetSocketAddress sender) {

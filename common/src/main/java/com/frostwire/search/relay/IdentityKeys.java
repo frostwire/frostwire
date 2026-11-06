@@ -488,6 +488,18 @@ public final class IdentityKeys {
   }
 
   /**
+   * Whether a remote raw Ed25519 public key carries the identity proof of work: at least {@link
+   * KarmaConstants#IDENTITY_DIFFICULTY} leading zero bits in its node ID ({@code SHA-1(pub)}).
+   * Every released FrostWire mints its identity at that difficulty, so a key below it skipped the
+   * work and is a free Sybil identity (IceBridge white paper §10.5). Null or malformed keys fail.
+   */
+  public static boolean meetsIdentityDifficulty(byte[] ed25519PubRaw) {
+    return ed25519PubRaw != null
+        && ed25519PubRaw.length == 32
+        && countLeadingZeroBits(sha1(ed25519PubRaw)) >= KarmaConstants.IDENTITY_DIFFICULTY;
+  }
+
+  /**
    * Count the number of leading zero bits in {@code hash}, from the most significant bit of byte 0
    * downward. A hash of all zeros returns 160 (SHA-1 length in bits). A hash whose first bit is set
    * returns 0.
