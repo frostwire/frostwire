@@ -30,7 +30,7 @@ class DistributedSearchPerformerTest {
 
   @Test
   void constructorRejectsNullKeywords() throws Exception {
-    IdentityKeys id = IdentityKeys.generate();
+    IdentityKeys id = PowTestIdentities.next();
     assertThrows(
         IllegalArgumentException.class,
         () ->
@@ -40,7 +40,7 @@ class DistributedSearchPerformerTest {
 
   @Test
   void constructorRejectsNegativeToken() throws Exception {
-    IdentityKeys id = IdentityKeys.generate();
+    IdentityKeys id = PowTestIdentities.next();
     assertThrows(
         IllegalArgumentException.class,
         () ->
@@ -55,7 +55,7 @@ class DistributedSearchPerformerTest {
 
   @Test
   void constructorRejectsNullDependencies() throws Exception {
-    IdentityKeys id = IdentityKeys.generate();
+    IdentityKeys id = PowTestIdentities.next();
     LocalIndex index = new InMemoryLocalIndex();
     PeerDirectory dir = emptyDirectory();
     FakeTransport transport = new FakeTransport();
@@ -75,7 +75,7 @@ class DistributedSearchPerformerTest {
 
   @Test
   void constructorRejectsBadLimits() throws Exception {
-    IdentityKeys id = IdentityKeys.generate();
+    IdentityKeys id = PowTestIdentities.next();
     LocalIndex index = new InMemoryLocalIndex();
     PeerDirectory dir = emptyDirectory();
     FakeTransport transport = new FakeTransport();
@@ -119,7 +119,7 @@ class DistributedSearchPerformerTest {
             "ubuntu",
             new InMemoryLocalIndex(),
             emptyDirectory(),
-            IdentityKeys.generate(),
+            PowTestIdentities.next(),
             new FakeTransport());
     assertFalse(p.isCrawler());
     assertFalse(p.isDDOSProtectionActive());
@@ -133,7 +133,7 @@ class DistributedSearchPerformerTest {
             "ubuntu",
             new InMemoryLocalIndex(),
             emptyDirectory(),
-            IdentityKeys.generate(),
+            PowTestIdentities.next(),
             new FakeTransport());
     assertEquals("ubuntu", p.getKeywords());
   }
@@ -145,7 +145,7 @@ class DistributedSearchPerformerTest {
     RecordingListener listener = new RecordingListener();
     DistributedSearchPerformer p =
         new DistributedSearchPerformer(
-            1L, "ubuntu", index, emptyDirectory(), IdentityKeys.generate(), new FakeTransport());
+            1L, "ubuntu", index, emptyDirectory(), PowTestIdentities.next(), new FakeTransport());
     p.setListener(listener);
 
     p.perform();
@@ -164,8 +164,8 @@ class DistributedSearchPerformerTest {
     InMemoryLocalIndex index = new InMemoryLocalIndex();
     index.upsert(torrent("local ubuntu", 100L, 1));
 
-    IdentityKeys peerKeys = IdentityKeys.generate();
-    IdentityKeys requesterKeys = IdentityKeys.generate();
+    IdentityKeys peerKeys = PowTestIdentities.next();
+    IdentityKeys requesterKeys = PowTestIdentities.next();
     PeerDirectory directory = directoryWithVerifiedPeer(peerKeys, "127.0.0.1", 6888);
 
     FakeTransport transport = new FakeTransport();
@@ -196,7 +196,7 @@ class DistributedSearchPerformerTest {
   void searchesPureForwarderAlongsideSearchPeersEvenAtPeerCap() throws Exception {
     PeerDirectory directory = emptyDirectory();
     for (int i = 0; i < 3; i++) {
-      IdentityKeys searchable = IdentityKeys.generate(0);
+      IdentityKeys searchable = PowTestIdentities.next();
       directory.upsertVerified(
           searchable.ed25519PubRaw(),
           "127.0.0.1",
@@ -204,7 +204,7 @@ class DistributedSearchPerformerTest {
           6800 + i,
           NodeCapabilities.DEFAULT_PEER);
     }
-    IdentityKeys forwarder = IdentityKeys.generate(0);
+    IdentityKeys forwarder = PowTestIdentities.next();
     directory.upsertVerified(
         forwarder.ed25519PubRaw(), "127.0.0.1", 6889, 6889, NodeCapabilities.DEFAULT_FORWARDER);
     FakeTransport transport = new FakeTransport();
@@ -217,7 +217,7 @@ class DistributedSearchPerformerTest {
             "shielded bitcoin",
             new InMemoryLocalIndex(),
             directory,
-            IdentityKeys.generate(0),
+            PowTestIdentities.next(),
             transport,
             2,
             10,
@@ -238,7 +238,7 @@ class DistributedSearchPerformerTest {
     // Right after startup a relay is verified in the directory before the registry sync has
     // routed it into IceBridge; the search itself must supply the route or it is dropped.
     PeerDirectory directory = emptyDirectory();
-    IdentityKeys relay = IdentityKeys.generate(0);
+    IdentityKeys relay = PowTestIdentities.next();
     directory.upsertVerified(
         relay.ed25519PubRaw(), "203.0.113.7", 6888, 6889, NodeCapabilities.DEFAULT_FORWARDER);
     FakeTransport transport = new FakeTransport();
@@ -251,7 +251,7 @@ class DistributedSearchPerformerTest {
             "recordando",
             new InMemoryLocalIndex(),
             directory,
-            IdentityKeys.generate(0),
+            PowTestIdentities.next(),
             transport,
             4,
             10,
@@ -268,7 +268,7 @@ class DistributedSearchPerformerTest {
 
   @Test
   void performAcceptsResponseDeliveredDuringSend() throws Exception {
-    IdentityKeys peerKeys = IdentityKeys.generate();
+    IdentityKeys peerKeys = PowTestIdentities.next();
     PeerDirectory directory = directoryWithVerifiedPeer(peerKeys, "127.0.0.1", 6888);
     FakeTransport transport = new FakeTransport();
     transport.addResponse(peerKeys.ed25519PubRaw(), peerKeys, "peer ubuntu", 200L, 1);
@@ -281,7 +281,7 @@ class DistributedSearchPerformerTest {
             "ubuntu",
             new InMemoryLocalIndex(),
             directory,
-            IdentityKeys.generate(),
+            PowTestIdentities.next(),
             transport,
             5,
             50,
@@ -301,8 +301,8 @@ class DistributedSearchPerformerTest {
     LocalSharedTorrent local = torrent("local ubuntu", 100L, 1);
     index.upsert(local);
 
-    IdentityKeys peerKeys = IdentityKeys.generate();
-    IdentityKeys requesterKeys = IdentityKeys.generate();
+    IdentityKeys peerKeys = PowTestIdentities.next();
+    IdentityKeys requesterKeys = PowTestIdentities.next();
     PeerDirectory directory = directoryWithVerifiedPeer(peerKeys, "127.0.0.1", 6888);
 
     FakeTransport transport = new FakeTransport();
@@ -325,7 +325,7 @@ class DistributedSearchPerformerTest {
   @Test
   void performSkipsUnverifiedPeers() throws Exception {
     InMemoryLocalIndex index = new InMemoryLocalIndex();
-    IdentityKeys peerKeys = IdentityKeys.generate();
+    IdentityKeys peerKeys = PowTestIdentities.next();
     PeerDirectory directory = new PeerDirectory(new NoOpKarmaCache());
     directory.upsert(peerKeys.ed25519PubRaw(), "127.0.0.1", 6888); // unverified
 
@@ -335,7 +335,7 @@ class DistributedSearchPerformerTest {
     RecordingListener listener = new RecordingListener();
     DistributedSearchPerformer p =
         new DistributedSearchPerformer(
-            4L, "ubuntu", index, directory, IdentityKeys.generate(), transport, 5, 50, 25, 10);
+            4L, "ubuntu", index, directory, PowTestIdentities.next(), transport, 5, 50, 25, 10);
     p.setListener(listener);
 
     p.perform();
@@ -347,14 +347,14 @@ class DistributedSearchPerformerTest {
   @Test
   void performFailsClosedOnPeerError() throws Exception {
     InMemoryLocalIndex index = new InMemoryLocalIndex();
-    IdentityKeys peerKeys = IdentityKeys.generate();
+    IdentityKeys peerKeys = PowTestIdentities.next();
     PeerDirectory directory = directoryWithVerifiedPeer(peerKeys, "127.0.0.1", 6888);
     FakeTransport transport = new FakeTransport(); // no response registered -> empty
 
     RecordingListener listener = new RecordingListener();
     DistributedSearchPerformer p =
         new DistributedSearchPerformer(
-            5L, "ubuntu", index, directory, IdentityKeys.generate(), transport, 5, 50, 25, 3);
+            5L, "ubuntu", index, directory, PowTestIdentities.next(), transport, 5, 50, 25, 3);
     p.setListener(listener);
 
     p.perform();
@@ -370,7 +370,7 @@ class DistributedSearchPerformerTest {
     RecordingListener listener = new RecordingListener();
     DistributedSearchPerformer p =
         new DistributedSearchPerformer(
-            6L, "ubuntu", index, emptyDirectory(), IdentityKeys.generate(), new FakeTransport());
+            6L, "ubuntu", index, emptyDirectory(), PowTestIdentities.next(), new FakeTransport());
     p.setListener(listener);
     p.stop();
 
@@ -384,8 +384,8 @@ class DistributedSearchPerformerTest {
 
   @Test
   void endToEndWithFakeTransportAndRelayService() throws Exception {
-    IdentityKeys responderKeys = IdentityKeys.generate();
-    IdentityKeys requesterKeys = IdentityKeys.generate();
+    IdentityKeys responderKeys = PowTestIdentities.next();
+    IdentityKeys requesterKeys = PowTestIdentities.next();
 
     InMemoryLocalIndex responderIndex = new InMemoryLocalIndex();
     responderIndex.upsert(torrent("ubuntu server", 500L, 1));
@@ -426,7 +426,7 @@ class DistributedSearchPerformerTest {
             "ubuntu",
             new InMemoryLocalIndex(),
             emptyDirectory(),
-            IdentityKeys.generate(),
+            PowTestIdentities.next(),
             new FakeTransport());
     p.crawl((CrawlableSearchResult) null);
   }
@@ -434,8 +434,8 @@ class DistributedSearchPerformerTest {
   @Test
   void performSurfacesMatchedFileFromPeerResponse() throws Exception {
     InMemoryLocalIndex index = new InMemoryLocalIndex();
-    IdentityKeys peerKeys = IdentityKeys.generate();
-    IdentityKeys requesterKeys = IdentityKeys.generate();
+    IdentityKeys peerKeys = PowTestIdentities.next();
+    IdentityKeys requesterKeys = PowTestIdentities.next();
     PeerDirectory directory = directoryWithVerifiedPeer(peerKeys, "127.0.0.1", 6888);
 
     FakeTransport transport = new FakeTransport();
@@ -464,8 +464,8 @@ class DistributedSearchPerformerTest {
   @Test
   void performRejectsOversizedMatchedFileFromPeer() throws Exception {
     InMemoryLocalIndex index = new InMemoryLocalIndex();
-    IdentityKeys peerKeys = IdentityKeys.generate();
-    IdentityKeys requesterKeys = IdentityKeys.generate();
+    IdentityKeys peerKeys = PowTestIdentities.next();
+    IdentityKeys requesterKeys = PowTestIdentities.next();
     PeerDirectory directory = directoryWithVerifiedPeer(peerKeys, "127.0.0.1", 6888);
 
     String huge = "a".repeat(5000);
@@ -492,8 +492,8 @@ class DistributedSearchPerformerTest {
 
   @Test
   void performSetsDualEnvelopeTtlAndIncludesOwnPubkeyInPath() throws Exception {
-    IdentityKeys peerKeys = IdentityKeys.generate();
-    IdentityKeys requesterKeys = IdentityKeys.generate();
+    IdentityKeys peerKeys = PowTestIdentities.next();
+    IdentityKeys requesterKeys = PowTestIdentities.next();
     PeerDirectory directory = directoryWithVerifiedPeer(peerKeys, "127.0.0.1", 6888);
 
     FakeTransport transport = new FakeTransport();
@@ -532,7 +532,7 @@ class DistributedSearchPerformerTest {
 
   @Test
   void originBudgetIncludesItsOwnPathEntryAtMaximumTtl() throws Exception {
-    IdentityKeys identity = IdentityKeys.generate(0);
+    IdentityKeys identity = PowTestIdentities.next();
     DistributedSearchPerformer performer =
         new DistributedSearchPerformer(
             15, "row", new InMemoryLocalIndex(), emptyDirectory(), identity, new FakeTransport());
@@ -555,9 +555,9 @@ class DistributedSearchPerformerTest {
 
   @Test
   void emptyForwarderFinalDoesNotDiscardMultipleHolderStreams() throws Exception {
-    IdentityKeys hub = IdentityKeys.generate(0);
-    IdentityKeys first = IdentityKeys.generate(0);
-    IdentityKeys second = IdentityKeys.generate(0);
+    IdentityKeys hub = PowTestIdentities.next();
+    IdentityKeys first = PowTestIdentities.next();
+    IdentityKeys second = PowTestIdentities.next();
     FakeTransport transport = new FakeTransport();
     transport.stream =
         request ->
@@ -573,7 +573,7 @@ class DistributedSearchPerformerTest {
             "holder",
             new InMemoryLocalIndex(),
             directoryWithVerifiedPeer(hub, "127.0.0.1", 6888),
-            IdentityKeys.generate(0),
+            PowTestIdentities.next(),
             transport,
             1,
             10,
@@ -587,7 +587,7 @@ class DistributedSearchPerformerTest {
 
   @Test
   void directCompleteStreamReturnsWithoutWaitingForOverallDeadline() throws Exception {
-    IdentityKeys holder = IdentityKeys.generate(0);
+    IdentityKeys holder = PowTestIdentities.next();
     FakeTransport transport = new FakeTransport();
     transport.stream = request -> List.of(signedChunk(request, holder, 0, true, "direct"));
     DistributedSearchPerformer performer =
@@ -596,7 +596,7 @@ class DistributedSearchPerformerTest {
             "direct",
             new InMemoryLocalIndex(),
             directoryWithVerifiedPeer(holder, "127.0.0.1", 6888),
-            IdentityKeys.generate(0),
+            PowTestIdentities.next(),
             transport,
             1,
             10,
@@ -612,7 +612,7 @@ class DistributedSearchPerformerTest {
 
   @Test
   void gapAndConflictingDuplicateNeverPublishPartialRows() throws Exception {
-    IdentityKeys holder = IdentityKeys.generate(0);
+    IdentityKeys holder = PowTestIdentities.next();
     FakeTransport transport = new FakeTransport();
     transport.stream =
         request ->
@@ -626,7 +626,7 @@ class DistributedSearchPerformerTest {
             "row",
             new InMemoryLocalIndex(),
             directoryWithVerifiedPeer(holder, "127.0.0.1", 6888),
-            IdentityKeys.generate(0),
+            PowTestIdentities.next(),
             transport,
             1,
             10,
@@ -640,7 +640,7 @@ class DistributedSearchPerformerTest {
 
   @Test
   void stopCancelsOwnedSendAndWakesSearchWait() throws Exception {
-    IdentityKeys holder = IdentityKeys.generate(0);
+    IdentityKeys holder = PowTestIdentities.next();
     java.util.concurrent.CountDownLatch entered = new java.util.concurrent.CountDownLatch(1);
     java.util.concurrent.CountDownLatch cancelled = new java.util.concurrent.CountDownLatch(1);
     DistributedSearchTransport transport =
@@ -679,7 +679,7 @@ class DistributedSearchPerformerTest {
             "row",
             new InMemoryLocalIndex(),
             directoryWithVerifiedPeer(holder, "127.0.0.1", 6888),
-            IdentityKeys.generate(0),
+            PowTestIdentities.next(),
             transport,
             1,
             10,

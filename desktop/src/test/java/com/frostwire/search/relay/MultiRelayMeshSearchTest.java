@@ -187,7 +187,7 @@ class MultiRelayMeshSearchTest {
   private RelayNode startRelay(String label) throws Exception {
     Path tmp = Files.createTempDirectory("mesh-relay-" + label + "-");
     Path idFile = tmp.resolve("identity.dat");
-    IdentityKeys.save(IdentityKeys.generate(0), idFile.toFile());
+    IdentityKeys.save(PowTestIdentities.next(), idFile.toFile());
 
     IceBridgeConfig config =
         IceBridgeConfig.newBuilder()
@@ -215,7 +215,7 @@ class MultiRelayMeshSearchTest {
   }
 
   private PeerClient startPeerClient(String label, RelayNode homeRelay) throws Exception {
-    IdentityKeys identity = IdentityKeys.generate(0);
+    IdentityKeys identity = PowTestIdentities.next();
     InMemoryLocalIndex index = new InMemoryLocalIndex();
     PeerDirectory directory = new PeerDirectory(new NoOpKarmaCache());
 

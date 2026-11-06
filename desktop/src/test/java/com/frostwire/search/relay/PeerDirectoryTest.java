@@ -346,8 +346,7 @@ class PeerDirectoryTest {
   @Test
   void upsertVerifiedMarksEntryVerified() {
     PeerDirectory d = new PeerDirectory(new FakeKarmaCache());
-    byte[] pub = new byte[32];
-    pub[31] = 0x01;
+    byte[] pub = samplePub(1);
     d.upsertVerified(pub, "host", 6881);
     PeerDirectory.PeerInfo info = d.get(pub).get();
     assertTrue(info.isVerified());
@@ -366,8 +365,7 @@ class PeerDirectoryTest {
   @Test
   void hintWithCapabilitiesIsUnverifiedAndNeverReplacesAVerifiedEntry() {
     PeerDirectory d = new PeerDirectory(new FakeKarmaCache());
-    byte[] pub = new byte[32];
-    pub[31] = 0x03;
+    byte[] pub = samplePub(3);
     d.upsert(pub, "hint", 6889, 6889, NodeCapabilities.fromRole("BOTH"), "1.0");
     PeerDirectory.PeerInfo hint = d.get(pub).get();
     assertFalse(hint.isVerified());
@@ -385,10 +383,8 @@ class PeerDirectoryTest {
   @Test
   void topByTrustVerifiedExcludesUnverified() {
     PeerDirectory d = new PeerDirectory(new FakeKarmaCache());
-    byte[] unverified = new byte[32];
-    byte[] verified = new byte[32];
-    unverified[31] = 0x01;
-    verified[31] = 0x02;
+    byte[] unverified = samplePub(1);
+    byte[] verified = samplePub(2);
     d.upsert(unverified, "unverified", 1);
     d.upsertVerified(verified, "verified", 1);
     var top = d.topByTrustVerified(10);
@@ -588,10 +584,8 @@ class PeerDirectoryTest {
         1, d.sampleVerified(1, new HashSet<>(), NodeCapabilities.SEARCH, new Random(1)).size());
   }
 
+  /** A distinct peer key per {@code id} that may be verified (it carries the identity PoW). */
   private static byte[] samplePub(int id) {
-    byte[] pub = new byte[32];
-    pub[0] = (byte) id;
-    pub[1] = 0x5A;
-    return pub;
+    return PowTestIdentities.get(id).ed25519PubRaw();
   }
 }

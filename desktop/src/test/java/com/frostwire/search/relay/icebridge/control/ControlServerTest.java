@@ -10,6 +10,7 @@ package com.frostwire.search.relay.icebridge.control;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.PowTestIdentities;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.search.relay.icebridge.IceBridgeMetrics;
 import com.frostwire.search.relay.icebridge.IceBridgeTokens;
@@ -45,7 +46,7 @@ class ControlServerTest {
 
   @BeforeEach
   void startServer() throws Exception {
-    identity = IdentityKeys.generate(0);
+    identity = PowTestIdentities.next();
     IceBridgeConfig config =
         IceBridgeConfig.newBuilder()
             // 0: the server binds a free port itself (GitHub #1424).

@@ -17,6 +17,7 @@ import com.frostwire.search.relay.LocalSharedTorrent;
 import com.frostwire.search.relay.NodeCapabilities;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerKarmaCache;
+import com.frostwire.search.relay.PowTestIdentities;
 import com.frostwire.search.relay.RemoteKarmaChainFetcher;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.search.relay.icebridge.IceBridgeHostCache;
@@ -51,7 +52,7 @@ class PeerRegistrySyncTest {
 
   @BeforeEach
   void setUp() throws Exception {
-    identity = IdentityKeys.generate(0);
+    identity = PowTestIdentities.next();
     IceBridgeConfig config =
         IceBridgeConfig.newBuilder()
             .controlHttpPort(0)
@@ -91,7 +92,7 @@ class PeerRegistrySyncTest {
 
   @Test
   void syncRoutesVerifiedPeers() throws Exception {
-    IdentityKeys other = IdentityKeys.generate(0);
+    IdentityKeys other = PowTestIdentities.next();
     directory.upsertVerified(other.ed25519PubRaw(), "10.0.0.5", 6888, 6889);
     sync = new PeerRegistrySync(client, directory, "127.0.0.1");
     sync.sync();
@@ -100,7 +101,7 @@ class PeerRegistrySyncTest {
 
   @Test
   void syncNeverSubstitutesOurAutomaticPortForAnUnknownPeerEndpoint() throws Exception {
-    IdentityKeys other = IdentityKeys.generate(0);
+    IdentityKeys other = PowTestIdentities.next();
     directory.upsertVerified(other.ed25519PubRaw(), "10.0.0.5", 6888, 0);
     sync = new PeerRegistrySync(client, directory, "127.0.0.1", 52345);
     sync.sync();
@@ -120,7 +121,7 @@ class PeerRegistrySyncTest {
 
   @Test
   void transportEnsureRouteRegistersDirectoryPeerWithoutWaitingForSync() throws Exception {
-    IdentityKeys relay = IdentityKeys.generate(0);
+    IdentityKeys relay = PowTestIdentities.next();
     try (IceBridgeSearchTransport transport = new IceBridgeSearchTransport(client)) {
       assertNull(registry.lookup(relay.ed25519PubRaw()));
       transport.ensureRoute(
@@ -146,7 +147,7 @@ class PeerRegistrySyncTest {
 
   @Test
   void transportEnsureRouteKeepsEndpointTheDaemonAlreadyKnows() throws Exception {
-    IdentityKeys peer = IdentityKeys.generate(0);
+    IdentityKeys peer = PowTestIdentities.next();
     assertTrue(client.route(peer.ed25519PubRaw(), "127.0.0.1", 40123, IceBridgeConfig.Role.BOTH));
     try (IceBridgeSearchTransport transport = new IceBridgeSearchTransport(client)) {
       transport.ensureRoute(
@@ -163,7 +164,7 @@ class PeerRegistrySyncTest {
 
   @Test
   void syncSkipsUnverifiedPeers() throws Exception {
-    IdentityKeys other = IdentityKeys.generate(0);
+    IdentityKeys other = PowTestIdentities.next();
     directory.upsert(other.ed25519PubRaw(), "10.0.0.5", 6888);
     sync = new PeerRegistrySync(client, directory, "127.0.0.1");
     sync.sync();
@@ -172,7 +173,7 @@ class PeerRegistrySyncTest {
 
   @Test
   void syncRoutesLeafWithItsRealRoleNotBoth() throws Exception {
-    IdentityKeys leaf = IdentityKeys.generate(0);
+    IdentityKeys leaf = PowTestIdentities.next();
     directory.upsertVerified(
         leaf.ed25519PubRaw(),
         "10.0.0.7",
@@ -280,7 +281,7 @@ class PeerRegistrySyncTest {
 
   @Test
   void syncRegistersSelfAndPullsMeshPeers() throws Exception {
-    IdentityKeys peer = IdentityKeys.generate(0);
+    IdentityKeys peer = PowTestIdentities.next();
     // Pre-seed registry as if peer registered on the forwarder.
     registry.register(
         new com.frostwire.search.relay.icebridge.peer.PeerRecord(
@@ -289,7 +290,7 @@ class PeerRegistrySyncTest {
             6889,
             IceBridgeConfig.Role.BOTH,
             System.currentTimeMillis()));
-    IdentityKeys self = IdentityKeys.generate(0);
+    IdentityKeys self = PowTestIdentities.next();
     directory = new PeerDirectory(new PeerKarmaCache(new RemoteKarmaChainFetcher(pub -> null)));
     sync =
         new PeerRegistrySync(client, directory, "127.0.0.1", 6889, self, IceBridgeConfig.Role.BOTH);
@@ -301,7 +302,7 @@ class PeerRegistrySyncTest {
   /** IceBridge white paper §11.3: a /lookup row is an unauthenticated hint, not a verified peer. */
   @Test
   void lookupImportIsAnUnverifiedHintUntilThePeerProvesItsKey() throws Exception {
-    IdentityKeys peer = IdentityKeys.generate(0);
+    IdentityKeys peer = PowTestIdentities.next();
     // Planted with the unsigned /route endpoint: nothing proves this host holds the key.
     assertTrue(client.route(peer.ed25519PubRaw(), "10.0.0.9", 6889, IceBridgeConfig.Role.BOTH));
     sync =
@@ -310,7 +311,7 @@ class PeerRegistrySyncTest {
             directory,
             "127.0.0.1",
             6889,
-            IdentityKeys.generate(0),
+            PowTestIdentities.next(),
             IceBridgeConfig.Role.BOTH);
 
     withTempHostCache(sync::sync);
@@ -338,7 +339,7 @@ class PeerRegistrySyncTest {
   /** An imported forwarder must still reach the rUDP handshake path, or it could never verify. */
   @Test
   void lookupImportSeedsForwardersIntoTheProbedHostCache() throws Exception {
-    IdentityKeys peer = IdentityKeys.generate(0);
+    IdentityKeys peer = PowTestIdentities.next();
     assertTrue(
         client.route(peer.ed25519PubRaw(), "198.51.100.7", 6889, IceBridgeConfig.Role.FORWARDER));
     sync =
@@ -347,7 +348,7 @@ class PeerRegistrySyncTest {
             directory,
             "127.0.0.1",
             6889,
-            IdentityKeys.generate(0),
+            PowTestIdentities.next(),
             IceBridgeConfig.Role.BOTH);
     List<DiscoveredEndpoint> candidates = new ArrayList<>();
 
@@ -378,7 +379,7 @@ class PeerRegistrySyncTest {
 
   @Test
   void startRegistersSelfWithoutLegacyThreeSecondDelay() throws Exception {
-    IdentityKeys self = IdentityKeys.generate(0);
+    IdentityKeys self = PowTestIdentities.next();
     sync =
         new PeerRegistrySync(client, directory, "127.0.0.1", 6889, self, IceBridgeConfig.Role.BOTH);
 
@@ -395,7 +396,7 @@ class PeerRegistrySyncTest {
 
   @Test
   void syncWarmsRoutedPeersWithTelemetryPing() throws Exception {
-    IdentityKeys other = IdentityKeys.generate(0);
+    IdentityKeys other = PowTestIdentities.next();
     directory.upsertVerified(other.ed25519PubRaw(), "10.0.0.5", 6888, 6889);
     sync = new PeerRegistrySync(client, directory, "127.0.0.1");
     sync.sync();

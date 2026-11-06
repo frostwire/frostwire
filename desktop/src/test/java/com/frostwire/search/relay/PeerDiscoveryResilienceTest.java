@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.frostwire.jlibtorrent.Entry;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -64,7 +63,7 @@ class PeerDiscoveryResilienceTest {
 
   private static ProbedPeer peer() {
     try {
-      KeyPair keys = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+      KeyPair keys = PowTestIdentities.next().ed25519();
       return new ProbedPeer(
           IdentityRecord.createSigned(new byte[20], keys, new byte[32], 6889).ed25519Pub());
     } catch (Exception e) {

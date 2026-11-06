@@ -9,6 +9,7 @@ package com.frostwire.search.relay.icebridge.client;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.PowTestIdentities;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.search.relay.icebridge.IceBridgeServer;
 import com.frostwire.search.relay.icebridge.MeshProtocolId;
@@ -152,7 +153,7 @@ class AutomaticRudpBindingTest {
   private File identity(String name) throws Exception {
     Path home = Files.createDirectories(directory.resolve(name));
     File file = home.resolve("identity.dat").toFile();
-    IdentityKeys.save(IdentityKeys.generate(0), file);
+    IdentityKeys.save(PowTestIdentities.next(), file);
     return file;
   }
 }

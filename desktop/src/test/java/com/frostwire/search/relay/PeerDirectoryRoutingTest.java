@@ -34,7 +34,7 @@ class PeerDirectoryRoutingTest {
   }
 
   private static byte[] pub(int seed) throws GeneralSecurityException {
-    return IdentityKeys.generate(seed).ed25519PubRaw();
+    return PowTestIdentities.get(seed).ed25519PubRaw();
   }
 
   @Test

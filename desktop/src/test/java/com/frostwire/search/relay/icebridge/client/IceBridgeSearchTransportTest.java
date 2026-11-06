@@ -16,6 +16,7 @@ import com.frostwire.search.relay.IndexDigest;
 import com.frostwire.search.relay.KarmaChainSource;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerKarmaCache;
+import com.frostwire.search.relay.PowTestIdentities;
 import com.frostwire.search.relay.RelaySearchService;
 import com.frostwire.search.relay.RemoteKarmaChainFetcher;
 import com.frostwire.search.relay.RemoteSearchRequest;
@@ -48,8 +49,8 @@ class IceBridgeSearchTransportTest {
 
   @Test
   void blockedRequestWorkersDoNotBlockResponsesAndQueueRemainsBounded() throws Exception {
-    IdentityKeys holder = IdentityKeys.generate();
-    IdentityKeys requester = IdentityKeys.generate();
+    IdentityKeys holder = PowTestIdentities.next();
+    IdentityKeys requester = PowTestIdentities.next();
     CountDownLatch entered = new CountDownLatch(2);
     CountDownLatch release = new CountDownLatch(1);
     AtomicInteger reads = new AtomicInteger();
@@ -182,11 +183,11 @@ class IceBridgeSearchTransportTest {
 
   @Test
   void pollDeliversEveryImplementedAnnouncementToTheHandler() throws Exception {
-    IdentityKeys self = IdentityKeys.generate();
-    IdentityKeys ping = IdentityKeys.generate();
-    IdentityKeys meta = IdentityKeys.generate();
-    IdentityKeys holder = IdentityKeys.generate();
-    IdentityKeys cluster = IdentityKeys.generate();
+    IdentityKeys self = PowTestIdentities.next();
+    IdentityKeys ping = PowTestIdentities.next();
+    IdentityKeys meta = PowTestIdentities.next();
+    IdentityKeys holder = PowTestIdentities.next();
+    IdentityKeys cluster = PowTestIdentities.next();
     try (Fixture fixture = new Fixture()) {
       PeerDirectory directory = newDirectory();
       directory.upsertVerified(ping.ed25519PubRaw(), "10.0.0.1", 6889);
@@ -256,8 +257,8 @@ class IceBridgeSearchTransportTest {
 
   @Test
   void pollAnswersSearchCatalogAndMetadataOnTheirOwnProtocol() throws Exception {
-    IdentityKeys holder = IdentityKeys.generate();
-    IdentityKeys requester = IdentityKeys.generate();
+    IdentityKeys holder = PowTestIdentities.next();
+    IdentityKeys requester = PowTestIdentities.next();
     byte[] requesterPub = requester.ed25519PubRaw();
     try (Fixture fixture = new Fixture()) {
       SilentIndex index = new SilentIndex();
@@ -415,7 +416,7 @@ class IceBridgeSearchTransportTest {
 
   @Test
   void expiredAndPreviousGenerationWorkCannotEnterProvider() throws Exception {
-    IdentityKeys holder = IdentityKeys.generate();
+    IdentityKeys holder = PowTestIdentities.next();
     AtomicInteger reads = new AtomicInteger();
     try (Fixture fixture = new Fixture()) {
       IncomingSearchRequestHandler handler =
@@ -438,7 +439,7 @@ class IceBridgeSearchTransportTest {
               return null;
             }
           });
-      byte[] payload = request(IdentityKeys.generate(), 1);
+      byte[] payload = request(PowTestIdentities.next(), 1);
       long oldGeneration = handler.generation();
       handler.onPayloadBefore(
           new byte[32], payload, MeshProtocolId.METADATA, System.nanoTime() - 1, oldGeneration);
@@ -496,9 +497,9 @@ class IceBridgeSearchTransportTest {
 
   @Test
   void indexDigestFramesAreDeliveredAndStoredForHolderRouting() throws Exception {
-    IdentityKeys self = IdentityKeys.generate();
-    IdentityKeys sender = IdentityKeys.generate();
-    IdentityKeys other = IdentityKeys.generate();
+    IdentityKeys self = PowTestIdentities.next();
+    IdentityKeys sender = PowTestIdentities.next();
+    IdentityKeys other = PowTestIdentities.next();
     try (Fixture fixture = new Fixture()) {
       PeerDirectory directory = newDirectory();
       directory.upsertVerified(sender.ed25519PubRaw(), "10.0.0.9", 6889);

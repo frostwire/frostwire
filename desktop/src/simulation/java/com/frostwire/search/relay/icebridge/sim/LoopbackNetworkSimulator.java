@@ -17,6 +17,7 @@ import com.frostwire.search.relay.LocalIndexTable;
 import com.frostwire.search.relay.LocalSharedTorrent;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerKarmaCache;
+import com.frostwire.search.relay.PowTestIdentities;
 import com.frostwire.search.relay.RelaySearchService;
 import com.frostwire.search.relay.RemoteKarmaChainFetcher;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
@@ -75,7 +76,7 @@ public final class LoopbackNetworkSimulator {
       this.id = id;
       Path directoryPath = Files.createDirectories(workDirectory.resolve("node-" + id));
       Path identityPath = directoryPath.resolve("identity.dat");
-      IdentityKeys.save(IdentityKeys.generate(0), identityPath.toFile());
+      IdentityKeys.save(PowTestIdentities.next(), identityPath.toFile());
       IceBridgeConfig config =
           IceBridgeConfig.newBuilder()
               .host("127.0.0.1")

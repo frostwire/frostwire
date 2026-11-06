@@ -9,6 +9,7 @@ package com.frostwire.search.relay.icebridge.udp;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.PowTestIdentities;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.search.relay.icebridge.IceBridgeMetrics;
 import com.frostwire.search.relay.icebridge.peer.PeerRegistry;
@@ -20,8 +21,8 @@ import java.util.function.LongSupplier;
 
 /** In-memory wire fixture. Never bypasses manager authentication or packet signing. */
 final class RudpFixture implements AutoCloseable {
-  final IdentityKeys local = IdentityKeys.generate(0);
-  final IdentityKeys peer = IdentityKeys.generate(0);
+  final IdentityKeys local = PowTestIdentities.next();
+  final IdentityKeys peer;
   final InetSocketAddress address = new InetSocketAddress("127.0.0.1", 62001);
   final EmbeddedChannel channel = new EmbeddedChannel();
   final PeerRegistry registry =
@@ -32,12 +33,19 @@ final class RudpFixture implements AutoCloseable {
   byte[] transcript;
 
   RudpFixture(RudpMessageListener listener) throws Exception {
+    this(listener, PowTestIdentities.next());
+  }
+
+  /** With a chosen remote identity, e.g. one below the identity proof of work. */
+  RudpFixture(RudpMessageListener listener, IdentityKeys peer) throws Exception {
+    this.peer = peer;
     manager = new RudpSessionManager(local, registry, metrics, listener);
     manager.setChannel(channel);
   }
 
   /** On a test-owned clock, with no scheduler thread: time moves only through the clock. */
   RudpFixture(RudpMessageListener listener, LongSupplier nanoClock) throws Exception {
+    peer = PowTestIdentities.next();
     manager = new RudpSessionManager(local, registry, metrics, listener, nanoClock, false);
     manager.setChannel(channel);
   }

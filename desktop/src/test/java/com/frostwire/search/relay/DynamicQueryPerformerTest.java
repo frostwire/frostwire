@@ -46,7 +46,7 @@ class DynamicQueryPerformerTest {
             "ubuntu",
             new InMemoryLocalIndex(),
             directory,
-            IdentityKeys.generate(),
+            PowTestIdentities.next(),
             transport,
             10,
             50,
@@ -77,7 +77,7 @@ class DynamicQueryPerformerTest {
             "ubuntu",
             new InMemoryLocalIndex(),
             directory,
-            IdentityKeys.generate(),
+            PowTestIdentities.next(),
             transport,
             10,
             50,
@@ -112,7 +112,7 @@ class DynamicQueryPerformerTest {
             "rare-content-xyz",
             new InMemoryLocalIndex(),
             directory,
-            IdentityKeys.generate(),
+            PowTestIdentities.next(),
             transport,
             maxPeers,
             50,
@@ -148,7 +148,7 @@ class DynamicQueryPerformerTest {
             "ubuntu",
             new InMemoryLocalIndex(),
             directory,
-            IdentityKeys.generate(),
+            PowTestIdentities.next(),
             transport,
             12,
             50,
@@ -169,7 +169,7 @@ class DynamicQueryPerformerTest {
   private static List<IdentityKeys> verifiedPeers(int n) throws Exception {
     List<IdentityKeys> out = new ArrayList<>(n);
     for (int i = 0; i < n; i++) {
-      out.add(IdentityKeys.generate());
+      out.add(PowTestIdentities.next());
     }
     return out;
   }
@@ -367,7 +367,7 @@ class DynamicQueryPerformerTest {
             "ubuntu",
             new InMemoryLocalIndex(),
             directory,
-            IdentityKeys.generate(),
+            PowTestIdentities.next(),
             transport,
             10,
             50,

@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import com.frostwire.search.relay.DistributedSearchTransport;
 import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.PowTestIdentities;
 import com.frostwire.search.relay.icebridge.client.IceBridgeClient;
 import com.frostwire.search.relay.icebridge.client.IceBridgeSearchTransport;
 import com.frostwire.search.relay.icebridge.control.PeerInfo;
@@ -598,7 +599,7 @@ class IceBridgeStressTest {
   private Forwarder startForwarder(String label) throws Exception {
     Path tmp = Files.createTempDirectory(tempDir, "icebridge-stress-fw-" + label + "-");
     Path idFile = tmp.resolve("identity.dat");
-    IdentityKeys.save(IdentityKeys.generate(0), idFile.toFile());
+    IdentityKeys.save(PowTestIdentities.next(), idFile.toFile());
 
     IceBridgeConfig config =
         IceBridgeConfig.newBuilder()
@@ -632,7 +633,7 @@ class IceBridgeStressTest {
   private BothNode startBoth(String label) throws Exception {
     Path tmp = Files.createTempDirectory(tempDir, "icebridge-stress-both-" + label + "-");
     Path idFile = tmp.resolve("identity.dat");
-    IdentityKeys.save(IdentityKeys.generate(0), idFile.toFile());
+    IdentityKeys.save(PowTestIdentities.next(), idFile.toFile());
 
     IceBridgeConfig config =
         IceBridgeConfig.newBuilder()
@@ -665,7 +666,7 @@ class IceBridgeStressTest {
   }
 
   private ClientEndpoint startRemoteClient(String label, Forwarder fw) throws Exception {
-    IdentityKeys identity = IdentityKeys.generate(0);
+    IdentityKeys identity = PowTestIdentities.next();
     IceBridgeClient client = new IceBridgeClient(fw.server.controlPort());
     resources.add(client);
     client.setAuthToken(fw.server.authToken());

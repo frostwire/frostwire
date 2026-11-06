@@ -25,6 +25,7 @@ import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalSharedTorrent;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerKarmaCache;
+import com.frostwire.search.relay.PowTestIdentities;
 import com.frostwire.search.relay.RemoteKarmaChainFetcher;
 import com.frostwire.util.Hex;
 import com.google.gson.JsonArray;
@@ -77,7 +78,7 @@ class RelayToolsTest {
     directory.upsertVerified(ALICE, "alice.example", 6881, 6888);
     directory.upsertVerified(BOB, "bob.example", 6882, 6889);
     directory.setIndexDigest(ALICE, IndexDigest.build(List.of("ubuntu linux")).toBytes());
-    identity = IdentityKeys.generate();
+    identity = PowTestIdentities.next();
     distributed
         .setPeerDirectory(directory)
         .setLocalIndex(index)
@@ -356,10 +357,9 @@ class RelayToolsTest {
     return args;
   }
 
+  /** A distinct peer key per {@code seed} that may be verified (it carries the identity PoW). */
   private static byte[] pub(int seed) {
-    byte[] pub = new byte[32];
-    Arrays.fill(pub, (byte) seed);
-    return pub;
+    return PowTestIdentities.get(seed).ed25519PubRaw();
   }
 
   private static byte[] infoHash(int seed) {

@@ -47,8 +47,8 @@ class SharedTorrentDigestInvalidationTest {
   @Test
   @SuppressWarnings("try") // the handle only scopes the registration
   void createdTorrentBecomesHolderAndAnswersSignedQueryWithoutPeriodicSync() throws Exception {
-    IdentityKeys desktop = IdentityKeys.generate(0);
-    IdentityKeys relay = IdentityKeys.generate(0);
+    IdentityKeys desktop = PowTestIdentities.next();
+    IdentityKeys relay = PowTestIdentities.next();
     PeerDirectory relayDirectory = directory();
     relayDirectory.upsertVerified(
         desktop.ed25519PubRaw(), "127.0.0.1", 6888, 6889, NodeCapabilities.DEFAULT_PEER);
@@ -120,7 +120,7 @@ class SharedTorrentDigestInvalidationTest {
             relayTransport.routePub = holder;
             relayTransport.routeSource = relay.ed25519PubRaw();
             relayTransport.routeTransport = desktopTransport;
-            RemoteSearchRequest request = signedRequest(IdentityKeys.generate(0));
+            RemoteSearchRequest request = signedRequest(PowTestIdentities.next());
             relayTransport.deliver(
                 request.requesterPub(),
                 SearchPayloadCodec.encodeRequest(request),
@@ -159,8 +159,8 @@ class SharedTorrentDigestInvalidationTest {
 
   @Test
   void writeDuringDigestSendSchedulesAnotherProducerDrivenSnapshot() throws Exception {
-    IdentityKeys desktop = IdentityKeys.generate(0);
-    IdentityKeys relay = IdentityKeys.generate(0);
+    IdentityKeys desktop = PowTestIdentities.next();
+    IdentityKeys relay = PowTestIdentities.next();
     PeerDirectory relayDirectory = directory();
     CapturingTransport transport = new CapturingTransport();
     transport.addListener(

@@ -240,7 +240,7 @@ class TorrentFetchOverMeshTest {
     Path tmpDir = Files.createTempDirectory("frostwire-torrentfetch-" + label + "-");
     Path identityFile = tmpDir.resolve("identity.dat");
 
-    IdentityKeys preGenerated = IdentityKeys.generate(0);
+    IdentityKeys preGenerated = PowTestIdentities.next();
     IdentityKeys.save(preGenerated, identityFile.toFile());
 
     IceBridgeConfig config =

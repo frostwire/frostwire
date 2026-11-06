@@ -204,8 +204,7 @@ class PeerDiscoveryTest {
   @Test
   void aProbedPeersIdentityRecordSuppliesItsCapabilitiesWhileTheEndpointStaysTheRudpEndpoint()
       throws Exception {
-    java.security.KeyPair keys =
-        java.security.KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+    java.security.KeyPair keys = PowTestIdentities.next().ed25519();
     IdentityRecord record =
         IdentityRecord.createSigned(
             new byte[20],
@@ -308,8 +307,7 @@ class PeerDiscoveryTest {
 
     ProbedPeer add(String host, int port) {
       try {
-        java.security.KeyPair kp =
-            java.security.KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        java.security.KeyPair kp = PowTestIdentities.next().ed25519();
         IdentityRecord record = IdentityRecord.createSigned(new byte[20], kp, new byte[32], port);
         ProbedPeer peer = new ProbedPeer(record.ed25519Pub());
         peers.put(host + ":" + port, peer);

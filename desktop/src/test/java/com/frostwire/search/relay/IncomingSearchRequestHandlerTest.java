@@ -13,7 +13,6 @@ import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.search.relay.icebridge.MeshProtocolId;
 import com.frostwire.search.relay.icebridge.client.IncomingSearchRequestHandler;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.util.ArrayList;
@@ -38,7 +37,7 @@ class IncomingSearchRequestHandlerTest {
     KeyPair requesterKey = generateEd25519KeyPair();
     byte[] requesterPub = rawPub(requesterKey);
 
-    IdentityKeys handlerIdentity = IdentityKeys.generate();
+    IdentityKeys handlerIdentity = PowTestIdentities.next();
     InMemoryLocalIndex index = new InMemoryLocalIndex();
     index.torrents.add(torrent("ubuntu server", 500L, 1));
     RelaySearchService service =
@@ -83,7 +82,7 @@ class IncomingSearchRequestHandlerTest {
     KeyPair requesterKey = generateEd25519KeyPair();
     byte[] requesterPub = rawPub(requesterKey);
 
-    IdentityKeys handlerIdentity = IdentityKeys.generate();
+    IdentityKeys handlerIdentity = PowTestIdentities.next();
     InMemoryLocalIndex index = new InMemoryLocalIndex();
     index.torrents.add(torrent("ubuntu server", 500L, 1));
     RelaySearchService service =
@@ -113,7 +112,7 @@ class IncomingSearchRequestHandlerTest {
     KeyPair requesterKey = generateEd25519KeyPair();
     byte[] requesterPub = rawPub(requesterKey);
 
-    IdentityKeys handlerIdentity = IdentityKeys.generate();
+    IdentityKeys handlerIdentity = PowTestIdentities.next();
     InMemoryLocalIndex index = new InMemoryLocalIndex();
     index.torrents.add(torrent("ubuntu server", 500L, 1));
     RelaySearchService service =
@@ -140,7 +139,7 @@ class IncomingSearchRequestHandlerTest {
     KeyPair requesterKey = generateEd25519KeyPair();
     byte[] requesterPub = rawPub(requesterKey);
 
-    IdentityKeys handlerIdentity = IdentityKeys.generate();
+    IdentityKeys handlerIdentity = PowTestIdentities.next();
     InMemoryLocalIndex index = new InMemoryLocalIndex();
     index.torrents.add(torrent("ubuntu server", 500L, 1));
     RelaySearchService service =
@@ -174,8 +173,8 @@ class IncomingSearchRequestHandlerTest {
   void dualEnvelopeHopPreservesRequesterVerify() throws Exception {
     KeyPair requesterKey = generateEd25519KeyPair();
     byte[] requesterPub = rawPub(requesterKey);
-    IdentityKeys forwarder = IdentityKeys.generate();
-    IdentityKeys targetIdentity = IdentityKeys.generate();
+    IdentityKeys forwarder = PowTestIdentities.next();
+    IdentityKeys targetIdentity = PowTestIdentities.next();
     InMemoryLocalIndex index = new InMemoryLocalIndex();
     index.torrents.add(torrent("ubuntu server", 500L, 1));
     RelaySearchService targetService =
@@ -203,12 +202,12 @@ class IncomingSearchRequestHandlerTest {
 
   @Test
   void nodeMetaAnnouncementUpgradesObservedPeerCapabilities() throws Exception {
-    IdentityKeys handlerIdentity = IdentityKeys.generate();
+    IdentityKeys handlerIdentity = PowTestIdentities.next();
     RelaySearchService service =
         new RelaySearchService(
             new InMemoryLocalIndex(), handlerIdentity, ShareVisibilityPolicy.INCLUDE_ALL);
     PeerDirectory directory = new PeerDirectory(new NoOpKarmaCache());
-    byte[] peerPub = IdentityKeys.generate().ed25519PubRaw();
+    byte[] peerPub = PowTestIdentities.next().ed25519PubRaw();
     // Relay only observed the session: no capabilities recorded.
     directory.upsertVerified(
         peerPub, "10.0.0.61", 6889, 6889, com.frostwire.search.relay.NodeCapabilities.NONE);
@@ -239,7 +238,7 @@ class IncomingSearchRequestHandlerTest {
     KeyPair requesterKey = generateEd25519KeyPair();
     byte[] requesterPub = rawPub(requesterKey);
 
-    IdentityKeys handlerIdentity = IdentityKeys.generate();
+    IdentityKeys handlerIdentity = PowTestIdentities.next();
     InMemoryLocalIndex index = new InMemoryLocalIndex();
     index.torrents.add(torrent("ubuntu server", 500L, 1));
     RelaySearchService service =
@@ -275,7 +274,7 @@ class IncomingSearchRequestHandlerTest {
     KeyPair requesterKey = generateEd25519KeyPair();
     byte[] requesterPub = rawPub(requesterKey);
 
-    IdentityKeys handlerIdentity = IdentityKeys.generate();
+    IdentityKeys handlerIdentity = PowTestIdentities.next();
     InMemoryLocalIndex index = new InMemoryLocalIndex();
     index.torrents.add(torrent("ubuntu server", 500L, 1));
     RelaySearchService service =
@@ -304,7 +303,7 @@ class IncomingSearchRequestHandlerTest {
     KeyPair requesterKey = generateEd25519KeyPair();
     byte[] requesterPub = rawPub(requesterKey);
 
-    IdentityKeys handlerIdentity = IdentityKeys.generate();
+    IdentityKeys handlerIdentity = PowTestIdentities.next();
     InMemoryLocalIndex index = new InMemoryLocalIndex();
     int rows = RemoteSearchResponse.DEFAULT_STREAM_CHUNK_SIZE * 2 + 1;
     for (int i = 0; i < rows; i++) {
@@ -342,7 +341,7 @@ class IncomingSearchRequestHandlerTest {
     KeyPair requesterKey = generateEd25519KeyPair();
     byte[] requesterPub = rawPub(requesterKey);
 
-    IdentityKeys holderIdentity = IdentityKeys.generate();
+    IdentityKeys holderIdentity = PowTestIdentities.next();
     RelaySearchService service =
         new RelaySearchService(
             new InMemoryLocalIndex(), holderIdentity, ShareVisibilityPolicy.INCLUDE_ALL);
@@ -393,7 +392,7 @@ class IncomingSearchRequestHandlerTest {
     KeyPair requesterKey = generateEd25519KeyPair();
     byte[] requesterPub = rawPub(requesterKey);
 
-    IdentityKeys holderIdentity = IdentityKeys.generate();
+    IdentityKeys holderIdentity = PowTestIdentities.next();
     RelaySearchService service =
         new RelaySearchService(
             new InMemoryLocalIndex(), holderIdentity, ShareVisibilityPolicy.INCLUDE_ALL);
@@ -457,7 +456,7 @@ class IncomingSearchRequestHandlerTest {
     KeyPair requesterKey = generateEd25519KeyPair();
     byte[] requesterPub = rawPub(requesterKey);
 
-    IdentityKeys holderIdentity = IdentityKeys.generate();
+    IdentityKeys holderIdentity = PowTestIdentities.next();
     RelaySearchService service =
         new RelaySearchService(
             new InMemoryLocalIndex(), holderIdentity, ShareVisibilityPolicy.INCLUDE_ALL);
@@ -491,7 +490,7 @@ class IncomingSearchRequestHandlerTest {
     KeyPair requesterKey = generateEd25519KeyPair();
     byte[] requesterPub = rawPub(requesterKey);
 
-    IdentityKeys holderIdentity = IdentityKeys.generate();
+    IdentityKeys holderIdentity = PowTestIdentities.next();
     RelaySearchService service =
         new RelaySearchService(
             new InMemoryLocalIndex(), holderIdentity, ShareVisibilityPolicy.INCLUDE_ALL);
@@ -553,7 +552,7 @@ class IncomingSearchRequestHandlerTest {
 
   @Test
   void rejectedAndRepeatedSearchesNeverForward() throws Exception {
-    IdentityKeys holder = IdentityKeys.generate();
+    IdentityKeys holder = PowTestIdentities.next();
     KeyPair requester = generateEd25519KeyPair();
     PeerDirectory directory = new PeerDirectory(new NoOpKarmaCache());
     directory.upsertVerified(rawPub(generateEd25519KeyPair()), "peer", 6881);
@@ -582,7 +581,7 @@ class IncomingSearchRequestHandlerTest {
 
   @Test
   void defaultDeniedMetadataNeverReadsProviderAndWithdrawalInvalidatesCache() throws Exception {
-    IdentityKeys holder = IdentityKeys.generate();
+    IdentityKeys holder = PowTestIdentities.next();
     KeyPair requester = generateEd25519KeyPair();
     byte[] hash = randomBytes(20);
     CapturingTransport transport = new CapturingTransport();
@@ -659,7 +658,7 @@ class IncomingSearchRequestHandlerTest {
 
   @Test
   void streamingPreservesSeederEndpoints() throws Exception {
-    IdentityKeys holder = IdentityKeys.generate();
+    IdentityKeys holder = PowTestIdentities.next();
     KeyPair requester = generateEd25519KeyPair();
     InMemoryLocalIndex index = new InMemoryLocalIndex();
     for (int i = 0; i < 25; i++) index.torrents.add(torrent("ubuntu " + i, 100, 1));
@@ -685,7 +684,7 @@ class IncomingSearchRequestHandlerTest {
 
   @Test
   void browseUsesSamePublicPolicyAsSearchAndStopsAfterWithdrawal() throws Exception {
-    IdentityKeys holder = IdentityKeys.generate();
+    IdentityKeys holder = PowTestIdentities.next();
     KeyPair requester = generateEd25519KeyPair();
     InMemoryLocalIndex index = new InMemoryLocalIndex();
     LocalSharedTorrent visibleRow = torrent("public-name", 100, 1);
@@ -730,7 +729,7 @@ class IncomingSearchRequestHandlerTest {
 
   @Test
   void catalogPolicyIsIndependentOfSearchAndMetadataVisibility() throws Exception {
-    IdentityKeys holder = IdentityKeys.generate();
+    IdentityKeys holder = PowTestIdentities.next();
     KeyPair requester = generateEd25519KeyPair();
     InMemoryLocalIndex index = new InMemoryLocalIndex();
     LocalSharedTorrent seed = torrent("ubuntu seeding", 100, 1);
@@ -805,7 +804,7 @@ class IncomingSearchRequestHandlerTest {
 
   @Test
   void catalogServesOnlyActivelySharedTorrentsNotDownloadHistory() throws Exception {
-    IdentityKeys holder = IdentityKeys.generate();
+    IdentityKeys holder = PowTestIdentities.next();
     KeyPair requester = generateEd25519KeyPair();
     InMemoryLocalIndex index = new InMemoryLocalIndex();
     LocalSharedTorrent active = torrent("actively-seeding", 100, 1);
@@ -864,7 +863,7 @@ class IncomingSearchRequestHandlerTest {
 
   @Test
   void providerPermissionAloneDoesNotOverrideDefaultDeniedHandler() throws Exception {
-    IdentityKeys holder = IdentityKeys.generate();
+    IdentityKeys holder = PowTestIdentities.next();
     KeyPair requester = generateEd25519KeyPair();
     CapturingTransport transport = new CapturingTransport();
     IncomingSearchRequestHandler handler =
@@ -893,7 +892,7 @@ class IncomingSearchRequestHandlerTest {
 
   @Test
   void negativeResponsesAreFreshlySignedAndNeverCached() throws Exception {
-    IdentityKeys holder = IdentityKeys.generate();
+    IdentityKeys holder = PowTestIdentities.next();
     KeyPair requester = generateEd25519KeyPair();
     CapturingTransport transport = new CapturingTransport();
     IncomingSearchRequestHandler handler =
@@ -935,7 +934,7 @@ class IncomingSearchRequestHandlerTest {
 
   @Test
   void providerReplacementDuringReadCannotPopulateOrServeOldCache() throws Exception {
-    IdentityKeys holder = IdentityKeys.generate();
+    IdentityKeys holder = PowTestIdentities.next();
     KeyPair requester = generateEd25519KeyPair();
     CapturingTransport transport = new CapturingTransport();
     IncomingSearchRequestHandler handler =
@@ -984,7 +983,7 @@ class IncomingSearchRequestHandlerTest {
   @Test
   void metadataSendRejectionAndWithdrawalStopRemainingChunks() throws Exception {
     for (boolean withdraw : new boolean[] {false, true}) {
-      IdentityKeys holder = IdentityKeys.generate();
+      IdentityKeys holder = PowTestIdentities.next();
       KeyPair requester = generateEd25519KeyPair();
       CapturingTransport transport = new CapturingTransport();
       java.util.concurrent.atomic.AtomicBoolean visible =
@@ -1067,7 +1066,7 @@ class IncomingSearchRequestHandlerTest {
   }
 
   private static KeyPair generateEd25519KeyPair() throws Exception {
-    return KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+    return PowTestIdentities.next().ed25519();
   }
 
   private static byte[] rawPub(KeyPair kp) {

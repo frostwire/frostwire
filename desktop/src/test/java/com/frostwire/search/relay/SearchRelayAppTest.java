@@ -56,14 +56,14 @@ class SearchRelayAppTest {
   @Test
   void forwarderAppForwardsSignedRequestAndRoutesSignedResponse() throws Exception {
     // --- 1. Standalone forwarder + search app ---
-    IdentityKeys.save(IdentityKeys.generate(0), new File(tempDir, "fwd-identity.dat"));
+    IdentityKeys.save(PowTestIdentities.next(), new File(tempDir, "fwd-identity.dat"));
     IceBridgeServer server = startForwarder();
     resources.add(server);
     SearchRelayApp app = SearchRelayApp.start(server);
     resources.add(app);
 
     // --- 2. "Desktop": index holder registered on the forwarder ---
-    IdentityKeys desktopKeys = IdentityKeys.generate(0);
+    IdentityKeys desktopKeys = PowTestIdentities.next();
     InMemoryIndex desktopIndex = new InMemoryIndex();
     desktopIndex.torrents.add(torrent("mesh-only-torrent"));
     PeerClient desktop = startPeerClient(desktopKeys, desktopIndex, server);
@@ -79,7 +79,7 @@ class SearchRelayAppTest {
             "1.1.0");
 
     // --- 3. "Searcher": knows only the forwarder ---
-    IdentityKeys searcherKeys = IdentityKeys.generate(0);
+    IdentityKeys searcherKeys = PowTestIdentities.next();
     PeerClient searcher = startPeerClient(searcherKeys, new InMemoryIndex(), server);
     List<byte[]> inbox = new CopyOnWriteArrayList<>();
     searcher.transport.addListener((sourcePub, payload, receivedMs) -> inbox.add(payload));

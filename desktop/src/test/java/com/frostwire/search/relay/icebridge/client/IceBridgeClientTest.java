@@ -10,6 +10,7 @@ package com.frostwire.search.relay.icebridge.client;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.PowTestIdentities;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.search.relay.icebridge.IceBridgeMetrics;
 import com.frostwire.search.relay.icebridge.IceBridgeTokens;
@@ -40,7 +41,7 @@ class IceBridgeClientTest {
 
   @BeforeEach
   void startServer() throws Exception {
-    identity = IdentityKeys.generate(0);
+    identity = PowTestIdentities.next();
     IceBridgeConfig config =
         IceBridgeConfig.newBuilder()
             .controlHttpPort(0)

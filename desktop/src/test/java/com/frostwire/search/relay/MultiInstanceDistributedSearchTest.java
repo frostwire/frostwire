@@ -349,7 +349,7 @@ class MultiInstanceDistributedSearchTest {
     Path identityFile = tmpDir.resolve("identity.dat");
 
     // Generate with difficulty 0 (no PoW) for fast tests.
-    IdentityKeys preGenerated = IdentityKeys.generate(0);
+    IdentityKeys preGenerated = PowTestIdentities.next();
     IdentityKeys.save(preGenerated, identityFile.toFile());
 
     IceBridgeConfig config =

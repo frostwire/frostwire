@@ -1,0 +1,187 @@
+/*
+ *     Created by Angel Leon (@gubatron)
+ *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
+ *
+ *     Licensed under GPL v3. See LICENSE file.
+ */
+
+package com.frostwire.search.relay;
+
+import com.frostwire.util.Hex;
+import java.security.GeneralSecurityException;
+import java.util.concurrent.atomic.AtomicInteger;
+
+/**
+ * Identities that carry the proof of work every released FrostWire mints ({@link
+ * KarmaConstants#IDENTITY_DIFFICULTY} leading zero bits in the node ID), for tests whose peers must
+ * pass the remote identity checks: rUDP handshakes, verified directory entries, registration.
+ *
+ * <p>Mining one at difficulty 20 takes about a million Ed25519 key generations, so the seeds were
+ * mined once, offline, and are restored here through {@link IdentityKeys#fromSeed}; the Ed25519
+ * key, and so the node ID, depends only on the seed. Tests that need a key below the difficulty
+ * keep using {@link IdentityKeys#generate()}.
+ *
+ * <p>It lives in the simulation source set so the loopback network simulator, whose real nodes
+ * handshake with each other, and the tests (which see that source set) share one pool.
+ */
+public final class PowTestIdentities {
+
+  private static final String[] SEEDS = {
+    "7634fe8b84ad205239d16e68bf7df0ea8e066a2c720e9ef16278a59adc12dfac",
+    "d30e6a58155f1de7efbdf7262902ca362005e9a58cc65dedaa5aa341f4a66443",
+    "7141976cd26ecd25c44c3f20c4a052fea8f04f1c9c3f7288b79e33a6eb19ba20",
+    "4c5d0e580dc353d285f2a168d7df41650d11e8e5f613a7525b474566293b0e5f",
+    "25d94588063ff34547ec61c4c6af24c28bbb7904233d2b1e18e3730af4ff922f",
+    "c611a2bf2883363f8a596a54c85aea1e9f151bae1dc87d8c73e10ee5be6bbf0f",
+    "b082518575a22b4520b4fb0a0df5b87a9030114799a2fe6a3f3e1a3586b17d06",
+    "4a946d504d3244884b90c8f416eecd253044076f063d30141abbee9e995c24ec",
+    "27576beeb6d990ac312017aad104dd82d0dd1bd209e0853059e1175c62e1ecc4",
+    "9c2b26fc0d617973334525b56d48cb0c4b99134fd424a65b598f5c3de6831681",
+    "df3f00a3699eb0b5a7a42de390a5939db14b514cb8ad28ba18b13ad2cb9a7619",
+    "a3fb3e3ca0453531474d8e1d5083c4e747009f6a85db23846bd0cd4aeef9f6fc",
+    "706cfafc1c789aa7b869472d6acea0abaae45412f34686dd55085ff6902f3d8f",
+    "41a863a36b289f5bd19cd0daee049822858b51770c5742a0355df205d185a75c",
+    "3d5dd7d9df30dab0b68fe14770ad10897d8d97a11572497423bb926020bba92e",
+    "e894e0a29d4baafb7c1b2d0bc9680435b05598ea87089b5ce9373b81b7a18b58",
+    "da4599402554c6d05ea74bc70effe8ac42da6b67388d0322d212ad55842bae5e",
+    "d040b9e89493a77f96b94c39cccbb97775aa2753a4eabf9fdbbaa649b7ea75d6",
+    "078fb91233f8f8dee5c7bc995c126b5dc5da67de3d154a785fd6b748b227a0a5",
+    "5ef973db94d2acdba42509d3185d78927100f2aaf1bcc0ccfb8696398d531ecd",
+    "89b2d5dd570ce95bab56280042b95398caf7a23fcdbb92a02ed62f006771d5dc",
+    "3b3f03bb6e946f4eb67b59a666346d67e9b9dc3a16776877c344bf9e6436d583",
+    "4e816aac2392f4990ef227f82ba86d15024b1d0a8d46382dd70e607c0067cff6",
+    "42e6d1c777ae730c527a956324f0f505ffe04497351a1a3ef5a331694f5654d0",
+    "472cbcae9d89311c4e791c4e6ca7b47c73405a294f327c60541011cda451e15f",
+    "13c0e90caf98e10a73317a106cef7f042945f46d4a0e00e32703220b55196c20",
+    "b7456e315f503d166b507ebc6a94d47f7fd5892ee59bb2c9e7c49674f4b1cabe",
+    "bcd2a51d525099c439ff0e9d91d4ccdb32cb7a74b029bf4047fb26e3f5087610",
+    "9a564d0089301031ed8d1f171485e33800cf053d9b5bf3b82c76d0fa33530c72",
+    "0e57bb2b9123bfd400a36312acf151567b29a5d034d6e7ef3e3b2c515d5e0181",
+    "609416ef1a8ce115ee51532440aa04a8c899367a4905124b5f1d35928759cc9d",
+    "1c9ef3f8dcfa90bcce86bf12a7a2a7d94c871ddbd2ed9db6d7a728532a1253fc",
+    "329f8cd0d7368de688c45ca7eca083749b38221267825880e50e09134ab2a0b4",
+    "6177ed63d751931b2fb95ac3e4fb73245454b5b66b704af1e294caa348b89b3c",
+    "3d8f36a0a51d9edbac626e9dccc4dee1863a45e34136f983bc581dbbff53d2aa",
+    "875747cbcec06792c10c54f5d902fea57f63aa7d03478223aaf29b360c209545",
+    "478c4ec1dc8d1f9100aa539cd238b8169178806009b2be11280c4374a00fbf1c",
+    "57ec0cdcddb886bd6033e8ffba000c0694ad9dfc2a0e2c5fb4501abe044df36e",
+    "f40675955e720052bd1df51616ed4c6f56ebe74e75db39448ff2a3fdfc9e6383",
+    "080630617563e7f0facff0c6248b9404e98297b4352f85828b19f544c163ce9a",
+    "7bdbeef5afd26139d9cffc61fe3fb137d5b19dd139842e77d50aede5913d9add",
+    "5d9662042d6383b6e62a8aa8549f8a0410a87237af8c4677c506ef5cde7052b8",
+    "ab7fa3635fda5b37259148d2220bd8a6e189e0de3f1d965d2d5e3a32a0baeb5a",
+    "8d9af7a4ebf23b497573c1b0f0fc9ae5ea3fac9f8ae11395931511660ea6da49",
+    "4a341e430ebfba03078c194efb4486821133e2f63f0430f708caed0393182a0d",
+    "b62237c45e76206f134411c09887ad847872bcc5afa4da2bfbe7dc91ca415a22",
+    "f72df0590c77b9622844bf68e8ad73f5625369c9137b17b0d8f7c5282a09fb84",
+    "794b113b33fe04a39cd859189668f210679779f6e75b4e2a8a09617a4eba6640",
+    "fd31995a26ba3b909af3ac820c909d2aeb2c66c7530def2de273c8394da251d0",
+    "a7a9748a00005746cd16a34e4095592d4bb84f392697ea4ec07a30a8a24cd152",
+    "c1eaf4e9e2c5b78fb3908301b38ca8948eb4c1b41d93a1523063008e8428542c",
+    "196caa9904d677bbb93894ce4fdce7923dbc0d40880a3e6724ef98de1d0484ec",
+    "a8751e61ca1e7a09d2be6430887777a2e8dce55f18862ba10a8fe8d5d4d55214",
+    "d2ac14772486e410d82833f82a78554572ae730ec0425c7d539a56a6fd5c3bca",
+    "5f04d6f474f25298d60e723fb9912f1b6b9c3287ef7481b89d4c73a4bb106357",
+    "1c059148400bf49694cfacc8ff0c5605397907e68f2821e21d81f84510c18ebd",
+    "34a31a604ece90d22cbd69432a77b0da01858de372d52337fbee002633400a75",
+    "f7ae50c947e2777949429d668e14d42b12349af48a855e7156633e6903ca9694",
+    "778ca48e6bf99bd16f0090100d80e326e2f4d713a221c244e0c898210b115df0",
+    "212bc950c4e5c764038a6f6312b811de6d9bcaa4f236b58d4dff8998d1797335",
+    "11c3d541fd7dd24141de00617ddb2ede45ce1ad359f5882ae07ad9823c775b13",
+    "214182b206499aadb2175f51499b9a31bbadf5bf6bb33fb4e958d29baed3cc47",
+    "91f950117865e5fe5591be60d1d53d5bf2f5d23c45527b3ab7cf526be568f3c1",
+    "76aec10964ec0819fe75bc69947784f3fb751d535f4fd73ff5a413e84c554842",
+    "c79a74db78502ade97ea788d4413468e57302da92fa7c491501ab286e2717343",
+    "4b0c354373e9598b12a158877d4800f70124ff07dea2845c9e274738c008685a",
+    "312d2ba87d97ab9dc88f0ae1cd54a4863ff1a405f018546ea1b66dc1e3267afd",
+    "ec911c7a33607abc673286ed38beffc81b81ed414e6e4033dc8fbe7b3f8b0cc6",
+    "afd152cd1b5325eb76692e6252c89b32e96d35b89753c0e790175e05f618613d",
+    "9e7ec156b988a815b0d0ede381cd4e0ae56dba713484c2e7defe6d2558f2e01f",
+    "23d1dede66fd2c4f90e8e5a5c1546c8e6bd0f49b4efcb2c29a0609daf60de09e",
+    "0b744c70714ea422cac1078a335035eba9897f9e78584eed7962d1a7c309c2ff",
+    "e93249291b57620d3e0995edd3d441d68026e934e4a4bdff742a52daa0115205",
+    "0114f34e1613a9455e18d8fcc440dfa02c6b05affead5f619cfdfddaf231fd66",
+    "cde7b4f94bc351bd347f01743bac7e7687dfd786f7e9971bbee0b9bb4d09c25e",
+    "2979efefab70dc7f4929ae54a9e288da4a51f5df68274a9c6db3c4d669ebc453",
+    "59a9eb7bba060d13bb23b9d0117f1180296987110c7e2d3630618a379041db24",
+    "aec349a045efe3582f5d0386a92a4578340cddba9cb558b7318b1832a8e1c968",
+    "df233b13665772048aa256af45453cca7e69c874eaa8d3499e28358e765b4173",
+    "43b6abdf6cb0718f5ff5289551069699d2f8e7e73c89dd59ce0513c621a0671f",
+    "353424f6f4c0d296ea6f4edb78765b06d4c647499ed7b55de5561a62f432235a",
+    "df7185d71032352a6e6aa151b142f70667f1ce1e548029bb4cafc12699451e54",
+    "e6b7ac3fa51153df27f2f5c7a0ffa87f1a713147276bb9750b08598204d8aedd",
+    "00960b0f37905a217e5d9b068fa67a9d6351fbac17100d3b50ecafae7a966aac",
+    "06c1e832a253cd3e1cbdfc0b4b80f219488a21befdbb5a9b9b1304c75f4e955d",
+    "8736a2cc65176ed910f2934bdc8be97ad6f8d8d3e0217fa1cac6663651c02887",
+    "0ad6f7d45f121370f91ebab47459f72b9879c8b9f87166930f5b5942bb67e374",
+    "8362381f409859d2817ef8c7a146459ee86a6ce6c275d38397340bb6d1008a20",
+    "705f35628c616390c5cbf99e2b3d1f9a2eebe7c090b9c468e2c41ea6fa2b9021",
+    "6ab04d48df9926356b48cb3ddeefd2258c4f229c6b127b1414931a35e5cdc9ca",
+    "bd91c386f9036d249be7e76e5fbc9e69bd0508a38a06b2565bf3661fde881693",
+    "6fd4f9719b82b5e5e0b91695aec0018bebf1efa0959b8aeed7a47077cf41e59e",
+    "0e0b11ef6bc5806faa0d041203af5eb5b75f122c983472980a95e6cb052e3968",
+    "c511708b4cc3e7947f545fb5bec1f23731eb4f9293fd8175bfc190521556ce08",
+    "d22cc22b510e4dcf9c9bce01a90a5b620eaf41ad9c97e5a5699b2c5ade13ff5d",
+    "c380c430a314ce1892531f8602349914cc882f5ee582d934a76136063f9e6101",
+    "602399273a621085808a13b913afc02e5447b41d7e7f9aba733de44e3a46ceb1",
+    "8dfcb8f38245da630f49d94c417f8e26ef146f17b2021741f260fe134e430932",
+    "58f12c3bf32c7b2c180f63dd70e6e8ce9608cb9ed2d7b9274b5f5e15d6fc78d1",
+    "5f6d606413b5bb47ab15fb043917248bc878e50612a12ae6e9acef9b7a47cd30",
+    "11c184dced6c5e46bfb05e40b041746f757429eddd23bf7d97c7ac450d5a961d",
+    "ad9315947e77c75bae1cc731732321f9d5342f89c6c94852f93d0acd1bd13832",
+    "63902dec8226b5f317e4b3915e71b59e361b1a5faec2fc500a1b9476bdb1c781",
+    "2331536277a07d4ae4b6a6554c01417a6d062579c79b983fccef0746fd4b1889",
+    "ecfff28537e373afdc1ffa7472dcdc4f5e703178c3c2d67a63dfcff5908e88b9",
+    "1ec13b149024c6be470ef62d6b4108691f10fa6a36c2e7355a939caeb366e913",
+    "9dce01f6fa31ef83ba67ef291b6dcefbc89bf474816d0856a8cc1a14026f52eb",
+    "f0e1a33eb50faec45671706b72708bc48db975e8e1a7927797060856d73adb1b",
+    "69f1e6301bcaf2ba01a3ffe8179768e9fc7cda3568921245d40b16d99499eb6e",
+    "29463e2b38cf516caf911cbe2c39c25f743819dac182e62716dcdaf5350e39f9",
+    "bba1152f70f57a8b30a49b82db70aad82e27a98c6ca58bb7802cadd64fe6fd58",
+    "2742da11eee6cb34e8f117c260a3c83fabf7272f46df664862d99756efaf5f2a",
+    "628e85d95acb375caf8ef4893ad6507dd45ac344b7a254cd03d6326400a54267",
+    "6ee9fb2f4cd1f3df5713fa1588a44772fe9ab3470d7fd94abae377a1df9944eb",
+    "4193214111d4d66be02a23aeea98c2b0dc6832c5d47df7b4352aef842e32faf7",
+    "1fd924dee9a396ab15f58861d1aba502af188699db8f1ebd464271da4cd77a4a",
+    "94064e91c3327d0d13e416b952156a829d9d733de784af3dc5f95895e16a89b9",
+    "2ab4a6297b829bf267ec27b33920ed7967e91808b9b66f1ffb932164f188c4ff",
+    "3e1bc19cbe9e518e9ecf28fadf70e3db191f84eefc088378cabb3bf5187729f5",
+    "0ddcaf60c79a75a871504c7f55485eda8a04f8cc243fdbbf468bcde1da2d1d3d",
+    "6c87560f2dd323b13cc3376be7480750f5676cd1c408256e38b6437815997222",
+    "f19691a1a3d157b400bdc1aa7dd6d52a45f11ad59e93aed4d8761d899169212a",
+    "91df1fa7b542a0fe9d0ab918332115e60524eb3a73c67f49d48f9d7b1038b3f5",
+    "1a6b23253c8cdb8bb7b2722917a93d6acd9ae01bcb8084c8e41eb4e47e193408",
+    "a2be668026da4ccf715d38a8a6186b7f480a65d8f64aa51b69cf6b6218eb52fa",
+    "b10d6b67104eff87cc2209cb3219717bf655e9bb14e1b2eaff77119b0e1b531c",
+    "df417a88fe88845572845857dee395a757b4bdab5b92c029f970eb4762cce0d6",
+    "2345bcb16b176848ac93414961d71764fe293be5c2c2f99e12bb277a5aeb2a24",
+  };
+
+  private static final AtomicInteger NEXT = new AtomicInteger();
+
+  private PowTestIdentities() {}
+
+  /** Number of distinct identities; {@link #next()} wraps around after this many. */
+  public static int size() {
+    return SEEDS.length;
+  }
+
+  /** A fresh identity distinct from the previous {@link #size()} - 1 handed out. */
+  public static IdentityKeys next() {
+    return get(Math.floorMod(NEXT.getAndIncrement(), SEEDS.length));
+  }
+
+  /** Raw Ed25519 public key of a fresh identity, for tests that only need a peer key. */
+  public static byte[] nextPub() {
+    return next().ed25519PubRaw();
+  }
+
+  /** The identity mined from seed {@code index}. Its X25519 key pair is freshly generated. */
+  public static IdentityKeys get(int index) {
+    try {
+      return IdentityKeys.fromSeed(Hex.decode(SEEDS[index]));
+    } catch (GeneralSecurityException e) {
+      throw new IllegalStateException("could not restore test identity " + index, e);
+    }
+  }
+}

@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.frostwire.jlibtorrent.SessionManager;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -143,7 +142,7 @@ class DiscoveryHardeningTest {
             });
     try (PeerKarmaCache cache = new PeerKarmaCache(fetcher)) {
       PeerDirectory directory = new PeerDirectory(cache);
-      byte[] pub = new byte[32];
+      byte[] pub = PowTestIdentities.nextPub();
       directory.upsertVerified(pub, "peer.example", 6888);
       assertTimeoutPreemptively(
           Duration.ofSeconds(1),
@@ -296,7 +295,7 @@ class DiscoveryHardeningTest {
   void refreshPreservesSpamEndorsementsAndVerifiedRoutes() {
     try (PeerKarmaCache cache = new PeerKarmaCache(new RemoteKarmaChainFetcher(pub -> null))) {
       PeerDirectory directory = new PeerDirectory(cache);
-      byte[] pub = new byte[32];
+      byte[] pub = PowTestIdentities.nextPub();
       byte[] endorser = new byte[32];
       endorser[0] = 1;
       directory.upsertVerified(pub, "verified.example", 6888, 6889);
@@ -321,7 +320,7 @@ class DiscoveryHardeningTest {
   }
 
   private static KeyPair keys() throws Exception {
-    return KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+    return PowTestIdentities.next().ed25519();
   }
 
   private static IdentityRecord record(KeyPair key) {

@@ -9,6 +9,7 @@ package com.frostwire.search.relay.icebridge.udp;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.PowTestIdentities;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.search.relay.icebridge.IceBridgeMetrics;
 import com.frostwire.search.relay.icebridge.control.InboundMessageQueue;
@@ -326,7 +327,7 @@ class RudpSessionManagerComprehensiveTest {
   void relayForwardsToKnownTargetAndNeverForwardsUnknownTargetAtZeroTtl() throws Exception {
     try (RudpFixture f = new RudpFixture((pub, payload) -> {})) {
       f.handshake();
-      byte[] target = IdentityKeys.generate(0).ed25519PubRaw();
+      byte[] target = PowTestIdentities.next().ed25519PubRaw();
       InetSocketAddress next = new InetSocketAddress("127.0.0.1", 64001);
       assertTrue(
           f.registry.register(
@@ -373,7 +374,7 @@ class RudpSessionManagerComprehensiveTest {
       assertTrue(
           f.registry.register(
               new PeerRecord(
-                  IdentityKeys.generate(0).ed25519PubRaw(),
+                  PowTestIdentities.next().ed25519PubRaw(),
                   "127.0.0.1",
                   forwarder.getPort(),
                   IceBridgeConfig.Role.FORWARDER,
@@ -392,7 +393,7 @@ class RudpSessionManagerComprehensiveTest {
   void deliverFallsBackToMeshForwardWhenDialTargetIsRejected() throws Exception {
     try (RudpFixture f = new RudpFixture((pub, payload) -> {})) {
       f.handshake();
-      byte[] target = IdentityKeys.generate(0).ed25519PubRaw();
+      byte[] target = PowTestIdentities.next().ed25519PubRaw();
       assertTrue(
           f.registry.register(
               new PeerRecord(
@@ -405,7 +406,7 @@ class RudpSessionManagerComprehensiveTest {
       assertTrue(
           f.registry.register(
               new PeerRecord(
-                  IdentityKeys.generate(0).ed25519PubRaw(),
+                  PowTestIdentities.next().ed25519PubRaw(),
                   "127.0.0.1",
                   forwarder.getPort(),
                   IceBridgeConfig.Role.FORWARDER,
@@ -421,7 +422,7 @@ class RudpSessionManagerComprehensiveTest {
   void deliverDoesNotForwardWhenPayloadExceedsRelayCap() throws Exception {
     try (RudpFixture f = new RudpFixture((pub, payload) -> {})) {
       f.handshake();
-      byte[] target = IdentityKeys.generate(0).ed25519PubRaw();
+      byte[] target = PowTestIdentities.next().ed25519PubRaw();
       assertTrue(
           f.registry.register(
               new PeerRecord(
@@ -434,7 +435,7 @@ class RudpSessionManagerComprehensiveTest {
       assertTrue(
           f.registry.register(
               new PeerRecord(
-                  IdentityKeys.generate(0).ed25519PubRaw(),
+                  PowTestIdentities.next().ed25519PubRaw(),
                   "127.0.0.1",
                   forwarder.getPort(),
                   IceBridgeConfig.Role.FORWARDER,
@@ -476,7 +477,7 @@ class RudpSessionManagerComprehensiveTest {
       long oldCid = f.cid;
       assertTrue(f.manager.sendData(f.address, new byte[] {9}));
       f.drain();
-      IdentityKeys other = IdentityKeys.generate(0);
+      IdentityKeys other = PowTestIdentities.next();
       f.receive(
           new RudpPacket(
               RudpPacket.Type.HELLO,
@@ -532,7 +533,7 @@ class RudpSessionManagerComprehensiveTest {
   @Test
   void wrongExpectedPeerIsRejectedBeforeCreatingSession() throws Exception {
     try (RudpFixture f = new RudpFixture((pub, payload) -> fail("unexpected delivery"))) {
-      byte[] expected = IdentityKeys.generate(0).ed25519PubRaw();
+      byte[] expected = PowTestIdentities.next().ed25519PubRaw();
       f.receive(
           new RudpPacket(
               RudpPacket.Type.HELLO,
@@ -551,7 +552,7 @@ class RudpSessionManagerComprehensiveTest {
     AtomicInteger delivered = new AtomicInteger();
     try (RudpFixture f = new RudpFixture((pub, payload) -> delivered.incrementAndGet())) {
       for (int i = 0; i < 3; i++) {
-        IdentityKeys peer = IdentityKeys.generate(0);
+        IdentityKeys peer = PowTestIdentities.next();
         InetSocketAddress address = new InetSocketAddress("127.0.0.1", 63000 + i);
         long cid = 100 + i;
         byte[] hello = RudpAuth.createHelloPayload(peer, cid, f.local.ed25519PubRaw());
@@ -596,8 +597,8 @@ class RudpSessionManagerComprehensiveTest {
 
   @Test
   void twoRealServersExchangeSingleAndFragmentedPayloads() throws Exception {
-    IdentityKeys a = IdentityKeys.generate(0);
-    IdentityKeys b = IdentityKeys.generate(0);
+    IdentityKeys a = PowTestIdentities.next();
+    IdentityKeys b = PowTestIdentities.next();
     IceBridgeConfig config = IceBridgeConfig.newBuilder().controlHttpPort(8797).rudpPort(0).build();
     List<byte[]> received = new java.util.concurrent.CopyOnWriteArrayList<>();
     CountDownLatch latch = new CountDownLatch(2);
