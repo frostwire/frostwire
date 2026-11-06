@@ -171,23 +171,8 @@ public final class FrostWireUtils {
         f = f.getParentFile(); // jre
         f = f.getParentFile(); // PlugIns
         f = f.getParentFile(); // Contents
-        File macOSFolder = new File(f, "MacOS");
-        // macOS is packaged as a PyInstaller --onedir folder
-        // (telluride_macos.<arch>/telluride): a --onefile binary
-        // re-extracts into a fresh temp folder and macOS re-validates
-        // every Mach-O on every launch (~8s), while --onedir starts
-        // in ~0.2s. The installer unzips telluride_macos.<arch>.zip
-        // into Contents/MacOS/.
-        File onedirExecutable =
-            new File(
-                macOSFolder,
-                "telluride_macos." + OSUtils.getMacOSArchitecture() + File.separator + "telluride");
-        if (onedirExecutable.exists()) {
-          return onedirExecutable;
-        }
-        // Legacy --onefile layout (single file), for installers built
-        // before the macOS --onedir switch.
-        return new File(macOSFolder, "telluride_macos." + OSUtils.getMacOSArchitecture());
+        return new File(
+            f, "MacOS" + File.separator + "telluride_macos." + OSUtils.getMacOSArchitecture());
       } else if (OSUtils.isLinux()) {
         String executable_name = "telluride_linux." + OSUtils.getMacOSArchitecture();
         File candidate1 = new File("/usr/lib/frostwire", executable_name);
@@ -211,22 +196,7 @@ public final class FrostWireUtils {
       if (OSUtils.isWindows()) {
         return new File(pathPrefix, "telluride.exe");
       } else if (OSUtils.isAnyMac()) {
-        String arch = OSUtils.getMacOSArchitecture();
-        // macOS --onedir layout produced by telluride/build.sh
-        File onedirExecutable =
-            new File(pathPrefix, "telluride_macos." + arch + File.separator + "telluride");
-        if (onedirExecutable.exists()) {
-          return onedirExecutable;
-        }
-        // Raw PyInstaller --onedir output (dist/telluride/telluride)
-        File distExecutable =
-            new File(
-                pathPrefix, "dist" + File.separator + "telluride" + File.separator + "telluride");
-        if (distExecutable.exists()) {
-          return distExecutable;
-        }
-        // Legacy --onefile layout (single file)
-        return new File(pathPrefix, "telluride_macos." + arch);
+        return new File(pathPrefix, "telluride_macos." + OSUtils.getMacOSArchitecture());
       } else if (OSUtils.isLinux()) {
         return new File(pathPrefix, "telluride_linux." + OSUtils.getMacOSArchitecture());
       }
