@@ -76,17 +76,27 @@ public final class TellurideBuild {
     if (executable == null || executable.getParentFile() == null) {
       return null;
     }
-    File python = new File(executable.getParentFile(), "telluride.py");
-    if (!python.isFile()) {
-      return null;
+    // Legacy/dev layout: telluride.py sits next to the executable.
+    // --onedir layout: telluride.py is a couple of levels up
+    // (telluride_macos.<arch>/telluride or dist/telluride/telluride,
+    // with telluride.py in the telluride/ submodule root). Checking
+    // the ancestors keeps build detection instant in dev, without
+    // spawning the executable just to read its banner.
+    File dir = executable.getParentFile();
+    for (int depth = 0; depth < 3 && dir != null; depth++) {
+      File python = new File(dir, "telluride.py");
+      if (python.isFile()) {
+        try {
+          return parsePythonSource(
+              new String(Files.readAllBytes(python.toPath()), StandardCharsets.UTF_8));
+        } catch (Throwable t) {
+          LOG.warn("TellurideBuild.readFromPythonSource failed", t);
+          return null;
+        }
+      }
+      dir = dir.getParentFile();
     }
-    try {
-      return parsePythonSource(
-          new String(Files.readAllBytes(python.toPath()), StandardCharsets.UTF_8));
-    } catch (Throwable t) {
-      LOG.warn("TellurideBuild.readFromPythonSource failed", t);
-      return null;
-    }
+    return null;
   }
 
   private static Integer readFromProcess(File executable) {
