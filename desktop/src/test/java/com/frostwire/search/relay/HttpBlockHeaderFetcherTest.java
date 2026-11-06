@@ -48,7 +48,7 @@ class HttpBlockHeaderFetcherTest {
 
   @Test
   void getBlockReturnsCachedResult() {
-    File cacheFile = new File(tempDir, "block-headers.cache");
+    File cacheFile = new File(tempDir, "block-headers-v2.cache");
     long knownHeight = 850000L;
     byte[] knownHash = hexHash("00000000000000000000000000000000000000000000000000000000000000aa");
     writeCacheEntry(cacheFile, knownHeight, knownHash);
@@ -77,7 +77,7 @@ class HttpBlockHeaderFetcherTest {
 
   @Test
   void cacheFileRoundTrips() {
-    File cacheFile = new File(tempDir, "block-headers.cache");
+    File cacheFile = new File(tempDir, "block-headers-v2.cache");
     long h1 = 100L, h2 = 200L;
     byte[] hash1 = hexHash("00000000000000000000000000000000000000000000000000000000000000ab");
     byte[] hash2 = hexHash("00000000000000000000000000000000000000000000000000000000000000cd");
@@ -107,7 +107,7 @@ class HttpBlockHeaderFetcherTest {
 
   @Test
   void malformedCacheLinesAreSkipped() throws IOException {
-    File cacheFile = new File(tempDir, "block-headers.cache");
+    File cacheFile = new File(tempDir, "block-headers-v2.cache");
     try (PrintWriter pw = new PrintWriter(cacheFile, StandardCharsets.UTF_8)) {
       pw.println("");
       pw.println("garbage_no_space");

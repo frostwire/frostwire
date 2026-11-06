@@ -22,6 +22,7 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Bitcoin block hash fetcher that asks two independent block explorers and accepts only what both
@@ -31,11 +32,16 @@ import java.util.concurrent.ConcurrentHashMap;
  * all sources return the same hash for the height, and the tip only when all sources answer with
  * tips at most {@link #MAX_TIP_SPREAD_BLOCKS} apart (the lower one is returned). A source that is
  * down, answers garbage, or disagrees yields null or -1, so callers write nothing and try again
- * later instead of trusting one explorer alone (IceBridge white paper §11.3). Once a block is
- * cached, it is never re-fetched (Bitcoin blocks are immutable).
+ * later instead of trusting one explorer alone (IceBridge white paper §11.3).
  *
- * <p>The local cache is a flat file {@code <cacheDir>/block-headers.cache} with one line per cached
- * block: {@code <height> <hex-hash>}.
+ * <p>A block is cached only once it is {@link KarmaConstants#ANCHOR_DEPTH_BLOCKS} below the highest
+ * tip both sources reported, where a reorganization no longer replaces it in practice; a cached
+ * block is never re-fetched. A shallower block is returned but asked for again next time, so a
+ * block that a reorganization replaces is not remembered.
+ *
+ * <p>The local cache is a flat file {@code <cacheDir>/block-headers-v2.cache} with one line per
+ * cached block: {@code <height> <hex-hash>}. The earlier {@code block-headers.cache} held hashes
+ * from one source, including tip blocks, and is deleted.
  *
  * <p>Thread-safe: uses a {@link ConcurrentHashMap} for the in-memory cache and synchronizes file
  * writes.
@@ -46,7 +52,8 @@ public final class HttpBlockHeaderFetcher implements BlockHeaderSource {
 
   private static final int HTTP_TIMEOUT_MS = 5000;
   private static final String USER_AGENT = "FrostWire/1.0";
-  private static final String CACHE_FILE_NAME = "block-headers.cache";
+  private static final String CACHE_FILE_NAME = "block-headers-v2.cache";
+  private static final String UNCHECKED_CACHE_FILE_NAME = "block-headers.cache";
 
   /**
    * How far apart the sources' tips may be. Two up-to-date explorers differ by a block for a few
@@ -57,6 +64,9 @@ public final class HttpBlockHeaderFetcher implements BlockHeaderSource {
   private final File cacheFile;
   private final UrlReader urlReader;
   private final ConcurrentHashMap<Long, byte[]> cache = new ConcurrentHashMap<>();
+
+  /** The highest tip both sources agreed on, or -1; blocks deep below it are cached. */
+  private final AtomicLong highestTip = new AtomicLong(-1);
 
   public HttpBlockHeaderFetcher(File cacheDir) {
     this(cacheDir, httpReader(HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC)));
@@ -74,6 +84,10 @@ public final class HttpBlockHeaderFetcher implements BlockHeaderSource {
       throw new IllegalStateException("Could not create cache directory: " + cacheDir);
     }
     this.cacheFile = new File(cacheDir, CACHE_FILE_NAME);
+    File unchecked = new File(cacheDir, UNCHECKED_CACHE_FILE_NAME);
+    if (unchecked.exists() && !unchecked.delete()) {
+      LOG.debug("Could not delete " + unchecked);
+    }
     this.urlReader = urlReader;
     loadCache();
   }
@@ -108,8 +122,10 @@ public final class HttpBlockHeaderFetcher implements BlockHeaderSource {
         return null;
       }
     }
-    cache.put(height, agreed);
-    persistCache();
+    if (height <= highestTip.get() - KarmaConstants.ANCHOR_DEPTH_BLOCKS) {
+      cache.put(height, agreed);
+      persistCache();
+    }
     return new BitcoinBlockReference(height, agreed);
   }
 
@@ -136,6 +152,7 @@ public final class HttpBlockHeaderFetcher implements BlockHeaderSource {
         agreed = Math.min(agreed, tip);
       }
     }
+    highestTip.accumulateAndGet(agreed, Math::max);
     return agreed;
   }
 

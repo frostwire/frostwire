@@ -163,9 +163,63 @@ class HttpBlockHeaderFetcherAgreementTest {
     mempool.tip = tip;
   }
 
+  // The cache: a hash is remembered for good, so only blocks a reorganization can't replace, and
+  // only hashes both sources agreed on, may be in it.
+
+  @Test
+  void aBlockNearTheTipIsNotCachedSoAReorganizationIsSeen() {
+    setTips(1000);
+    File dir = tempDir.resolve("reorg").toFile();
+    HttpBlockHeaderFetcher fetcher = fetcher(dir);
+    assertEquals(1000, fetcher.getChainTipHeight());
+    assertArrayEquals(Explorer.hash(999, (byte) 0), fetcher.getBlock(999).hash());
+
+    // Both sources now report the block that replaced it.
+    blockstream.salt = 2;
+    mempool.salt = 2;
+    assertArrayEquals(Explorer.hash(999, (byte) 2), fetcher.getBlock(999).hash());
+    assertArrayEquals(Explorer.hash(999, (byte) 2), fetcher(dir).getBlock(999).hash());
+  }
+
+  @Test
+  void aDeepAgreedBlockIsCached() {
+    setTips(1000);
+    File dir = tempDir.resolve("deep").toFile();
+    HttpBlockHeaderFetcher fetcher = fetcher(dir);
+    long deep = 1000 - KarmaConstants.ANCHOR_DEPTH_BLOCKS;
+    assertEquals(1000, fetcher.getChainTipHeight());
+    assertNotNull(fetcher.getBlock(deep));
+
+    blockstream.down = true;
+    mempool.down = true;
+    assertArrayEquals(Explorer.hash(deep, (byte) 0), fetcher.getBlock(deep).hash());
+    assertArrayEquals(Explorer.hash(deep, (byte) 0), fetcher(dir).getBlock(deep).hash());
+  }
+
+  @Test
+  void theSingleSourceCacheOfEarlierVersionsIsNotUsed() throws Exception {
+    setTips(1000);
+    File dir = tempDir.resolve("legacy").toFile();
+    assertTrue(dir.mkdirs());
+    File legacy = new File(dir, "block-headers.cache");
+    java.nio.file.Files.write(
+        legacy.toPath(),
+        ("990 " + Hex.encode(Explorer.hash(990, (byte) 7)) + "\n")
+            .getBytes(java.nio.charset.StandardCharsets.UTF_8));
+
+    HttpBlockHeaderFetcher fetcher = fetcher(dir);
+
+    assertArrayEquals(Explorer.hash(990, (byte) 0), fetcher.getBlock(990).hash());
+    assertFalse(legacy.exists());
+  }
+
   /** A fresh fetcher, with its own empty cache, reading the fake explorers. */
   private HttpBlockHeaderFetcher fetcher() {
-    File cacheDir = tempDir.resolve("blocks-" + System.nanoTime()).toFile();
+    return fetcher(tempDir.resolve("blocks-" + System.nanoTime()).toFile());
+  }
+
+  /** A fetcher with its cache in {@code cacheDir}, reading the fake explorers. */
+  private HttpBlockHeaderFetcher fetcher(File cacheDir) {
     return new HttpBlockHeaderFetcher(
         cacheDir,
         url -> {
