@@ -135,6 +135,38 @@ class RemoteKarmaChainValidationTest {
     assertEquals(0, score(publisher.buildManifest(chain), bitcoin));
   }
 
+  @Test
+  void endorsementWithABlockHashBitcoinDoesntHaveScoresZero() {
+    KarmaChain chain = new KarmaChain(owner.ed25519PubRaw());
+    PrivateKey key = owner.ed25519().getPrivate();
+    chain.commitEpoch(bitcoin.getBlock(H), key);
+    // Signed at a real height, under a made-up hash.
+    chain.endorse(PEER, filled(20, 1), new BitcoinBlockReference(H + 1, filled(32, 0x66)), key);
+    bitcoin.withTip(H + 1).withBlock(H + 1);
+
+    assertEquals(0, score(publisher.buildManifest(chain.entries()), bitcoin));
+    assertEquals(1, score(publisher.buildManifest(chain.entries()), null), "offline: unchecked");
+  }
+
+  @Test
+  void endorsementWhoseBlockCantBeResolvedYetIsNotValidYet() {
+    writer.commitEpochIfNeeded();
+    bitcoin.withTip(H + 1).withBlock(H + 1);
+    writer.onDownloadCompletedFromPeer(PEER, filled(20, 1));
+    List<KarmaChainEntry> chain = writer.chain().entries();
+    assertEquals(H + 1, chain.get(chain.size() - 1).blockHeight());
+    Entry manifest = publisher.buildManifest(chain);
+
+    // The reader knows Bitcoin is at H + 1 but can't look that block up yet.
+    FakeBlockSource lagging = new FakeBlockSource().withTip(H + 1).withBlock(H);
+    assertEquals(0, score(manifest, lagging));
+    lagging.withBlock(H + 1);
+    assertEquals(1, score(manifest, lagging), "valid once the block resolves");
+    FakeBlockSource behind = new FakeBlockSource().withTip(H).withBlock(H);
+    assertEquals(1, score(manifest, behind), "a block past the tip is within the tolerance");
+    assertEquals(1, score(manifest, new FakeBlockSource()), "offline: unchecked, as before");
+  }
+
   // --- helpers ---
 
   private long score(Entry manifest, BlockHeaderSource blocks) {

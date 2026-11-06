@@ -14,6 +14,7 @@ import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -605,14 +606,18 @@ public final class KarmaChain {
 
   /**
    * Checks the entries' Bitcoin blocks against {@code blocks}: no height beyond the tip plus {@link
-   * KarmaConstants#EPOCH_TOLERANCE_BLOCKS}, and each commitment's block hash equal to Bitcoin's at
-   * its height. This is what stops a chain from claiming epochs that haven't happened yet, which
-   * the structural checks alone can't.
+   * KarmaConstants#EPOCH_TOLERANCE_BLOCKS}, and each entry's block hash equal to Bitcoin's at its
+   * height. This is what stops a chain from claiming epochs that haven't happened yet, which the
+   * structural checks alone can't. Each height is looked up once; {@link HttpBlockHeaderFetcher}
+   * keeps the blocks it has resolved, so a chain seen again costs no network.
    *
-   * <p>Offline fallback: with no source, an unknown tip ({@code -1}), or a height the source can't
-   * resolve (or that throws), that check is skipped and the chain is judged by the structural
-   * checks only, so verifying never depends on the network. Endorsement block hashes aren't looked
-   * up: they don't change the budget, and one lookup per commitment bounds the work per chain.
+   * <p>Offline fallback: with no source, or an unknown tip ({@code -1}), a height the source can't
+   * resolve (or that throws) is skipped and the chain is judged by the structural checks only, so
+   * verifying never depends on the network. A commitment's height the source can't resolve is
+   * skipped the same way, as is any height above the tip, within the tolerance. An endorsement's
+   * height at or below a known tip isn't: Bitcoin has that block, so a hash the source can't
+   * confirm (the lookup failed) leaves the chain not valid yet, refused until a later lookup
+   * resolves it.
    */
   private static boolean checkBlocks(List<KarmaChainEntry> entries, BlockHeaderSource blocks) {
     if (blocks == null) {
@@ -631,17 +636,25 @@ public final class KarmaChain {
         }
       }
     }
+    Map<Long, BitcoinBlockReference> resolved = new HashMap<>();
     for (KarmaChainEntry e : entries) {
-      if (e.kind() != KarmaChainEntry.Kind.EPOCH_COMMITMENT) {
-        continue;
-      }
+      long height = e.blockHeight();
       BitcoinBlockReference real;
-      try {
-        real = blocks.getBlock(e.blockHeight());
-      } catch (Throwable t) {
-        real = null;
+      if (resolved.containsKey(height)) {
+        real = resolved.get(height);
+      } else {
+        try {
+          real = blocks.getBlock(height);
+        } catch (Throwable t) {
+          real = null;
+        }
+        resolved.put(height, real);
       }
-      if (real != null && !Arrays.equals(real.hash(), e.blockHash())) {
+      if (real != null) {
+        if (!Arrays.equals(real.hash(), e.blockHash())) {
+          return false;
+        }
+      } else if (tip >= 0 && height <= tip && e.kind() == KarmaChainEntry.Kind.ENDORSEMENT) {
         return false;
       }
     }
