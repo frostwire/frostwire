@@ -157,7 +157,11 @@ public final class KarmaChainPublisher {
         new Entry(
             Base64.getUrlEncoder().withoutPadding().encodeToString(identity.ed25519PubRaw())));
     map.put("len", new Entry((long) fullChain.size()));
-    map.put("head", new Entry(com.frostwire.util.Hex.encode(writer.chain().headHash())));
+    // From the same snapshot as len and the entries: the live chain may have grown since, and
+    // readers refuse a head that isn't the last entry's.
+    map.put(
+        "head",
+        new Entry(com.frostwire.util.Hex.encode(fullChain.get(fullChain.size() - 1).entryHash())));
     map.put("entries", Entry.fromList(entryEntries));
     // Anchor for verifyTail: only tails trimmed from a longer chain need
     // it. A complete chain (first entry seq 0 with genesis prevHash)

@@ -78,6 +78,10 @@ class RelayRecordFromBencodeTest {
       dicts.add(manifestDict(e));
     }
     m.put("entries", dicts);
+    // The publisher's head and len: the last entry's hash and seq + 1.
+    KarmaChainEntry last = entries.get(entries.size() - 1);
+    m.put("head", Hex.encode(last.entryHash()));
+    m.put("len", last.seq() + 1);
     m.put("v", 1L);
     return Bencode.encode(m);
   }

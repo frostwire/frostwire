@@ -412,8 +412,16 @@ class RelayRecordFromBencodeCompatibilityTest {
     base.put("seq", TAIL_SEQ);
     m.put("base", base);
     m.put("entries", dicts);
+    putHeadAndLength(m, entries);
     m.put("v", 1L);
     return Bencode.encode(m);
+  }
+
+  /** The {@code head} and {@code len} the publisher derives from the last entry. */
+  private static void putHeadAndLength(Map<String, Object> m, List<KarmaChainEntry> entries) {
+    KarmaChainEntry last = entries.get(entries.size() - 1);
+    m.put("head", Hex.encode(last.entryHash()));
+    m.put("len", last.seq() + 1);
   }
 
   /** A manifest entry dictionary as {@link KarmaChainPublisher} writes it (no per-entry pub). */
@@ -442,6 +450,7 @@ class RelayRecordFromBencodeCompatibilityTest {
       dicts.add(manifestDict(e));
     }
     m.put("entries", dicts);
+    putHeadAndLength(m, entries);
     m.put("v", 1L);
     return Bencode.encode(m);
   }

@@ -339,6 +339,9 @@ public final class KarmaChain {
       }
       chain.add(entry);
     }
+    if (!headAndLengthMatch(dict, chain)) {
+      return null;
+    }
     Object baseValue = dict.get("base");
     if (baseValue != null) {
       Map<String, Object> baseDict = Bencode.asDictionary(baseValue);
@@ -357,6 +360,24 @@ public final class KarmaChain {
       return null;
     }
     return Collections.unmodifiableList(chain);
+  }
+
+  /**
+   * True when the manifest's {@code head} and {@code len} describe the chain whose tail it carries:
+   * {@link KarmaChainPublisher} always includes the head entry, so {@code head} must be the last
+   * entry's hash and {@code len} its seq plus one. Otherwise the manifest names one chain and
+   * carries another, as a forked or reset chain would.
+   *
+   * @throws IllegalArgumentException if {@code head} is not hex
+   */
+  private static boolean headAndLengthMatch(Map<String, Object> dict, List<KarmaChainEntry> chain) {
+    String head = Bencode.asString(dict.get("head"));
+    Long len = Bencode.asLong(dict.get("len"));
+    if (head == null || len == null || chain.isEmpty()) {
+      return false;
+    }
+    KarmaChainEntry last = chain.get(chain.size() - 1);
+    return len == last.seq() + 1 && Arrays.equals(Hex.decode(head), last.entryHash());
   }
 
   /**
