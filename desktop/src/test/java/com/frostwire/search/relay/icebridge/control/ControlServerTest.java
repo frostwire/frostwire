@@ -141,6 +141,27 @@ class ControlServerTest {
   }
 
   @Test
+  void registerRefusesIdentityBelowDifficulty() throws Exception {
+    do {
+      identity = IdentityKeys.generate();
+    } while (IdentityKeys.meetsIdentityDifficulty(identity.ed25519PubRaw()));
+    RegisterRequest req = new RegisterRequest();
+    req.pub = Base64.getUrlEncoder().withoutPadding().encodeToString(identity.ed25519PubRaw());
+    req.host = "198.51.100.1";
+    req.rudpPort = 6888;
+    req.role = IceBridgeConfig.Role.FORWARDER;
+    req.timestamp = System.currentTimeMillis() / 1000;
+    req.signature = signRegister(req);
+
+    HttpResponse<String> response = post("/register", req);
+    assertEquals(400, response.statusCode());
+    ApiResponse<?> body = GSON.fromJson(response.body(), ApiResponse.class);
+    assertFalse(body.ok);
+    assertTrue(body.error.contains("proof of work"), body.error);
+    assertEquals(0, registry.size());
+  }
+
+  @Test
   void routeAddsPeerWithoutSignature() throws Exception {
     RouteRequest req = new RouteRequest();
     req.pub = Base64.getUrlEncoder().withoutPadding().encodeToString(identity.ed25519PubRaw());

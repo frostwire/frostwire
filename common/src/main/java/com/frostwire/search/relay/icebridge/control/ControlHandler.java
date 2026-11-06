@@ -7,6 +7,8 @@
 
 package com.frostwire.search.relay.icebridge.control;
 
+import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.KarmaConstants;
 import com.frostwire.search.relay.event.IceBridgeEvent;
 import com.frostwire.search.relay.event.IceBridgeEventLog;
 import com.frostwire.search.relay.icebridge.IceBridgeAuth;
@@ -222,6 +224,12 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
     boolean verified = IceBridgeAuth.verify(rawPub, canonicalBytes(req), signature);
     if (!verified) {
       return ApiResponse.error("invalid signature");
+    }
+    // A signature proves possession, not cost: without the proof of work every released
+    // FrostWire mints, registration is free Sybil identities (IceBridge white paper §10.5).
+    if (!IdentityKeys.meetsIdentityDifficulty(rawPub)) {
+      return ApiResponse.error(
+          "identity below the " + KarmaConstants.IDENTITY_DIFFICULTY + "-bit proof of work");
     }
 
     long nowSec = System.currentTimeMillis() / 1000L;
