@@ -138,6 +138,7 @@ public final class PeerDirectory {
     if (utpPort < 0 || utpPort > 65535) {
       throw new IllegalArgumentException("utpPort out of range");
     }
+    if (verified && !mayVerify(peerPub)) return;
     String key = com.frostwire.util.Hex.encode(peerPub);
     Entry existing = entries.get(key);
     // An unauthenticated hint must not replace a possession-verified route or metadata.
@@ -205,6 +206,15 @@ public final class PeerDirectory {
       long capabilities,
       String icebridgeVersion) {
     upsert(peerPub, hostname, utpPort, rudpPort, true, capabilities, icebridgeVersion);
+  }
+
+  /**
+   * Only an identity with the proof of work every released FrostWire mints may become (or create) a
+   * verified, queryable entry; below it the key is a free Sybil identity (IceBridge white paper
+   * §10.5). Unverified hints are unaffected.
+   */
+  private static boolean mayVerify(byte[] peerPub) {
+    return IdentityKeys.meetsIdentityDifficulty(peerPub);
   }
 
   private static String coalesceIcebridgeVersion(String incoming, String existing) {
@@ -519,7 +529,7 @@ public final class PeerDirectory {
    * content would only be found by blind fan-out luck.
    */
   public synchronized void setIndexDigest(byte[] peerPub, byte[] digest) {
-    if (peerPub == null || peerPub.length != 32) {
+    if (!mayVerify(peerPub)) {
       return;
     }
     byte[] parsedBytes = null;
@@ -562,7 +572,7 @@ public final class PeerDirectory {
    * behind it might.
    */
   public synchronized void setClusterDigest(byte[] peerPub, byte[] digest) {
-    if (peerPub == null || peerPub.length != 32 || digest == null) {
+    if (!mayVerify(peerPub) || digest == null) {
       return;
     }
     IndexDigest parsed = IndexDigest.fromBytes(digest);
@@ -633,7 +643,7 @@ public final class PeerDirectory {
    * {@code RELAY}-capped digest targets) even though it advertises a role over the mesh.
    */
   public synchronized void applyPeerMeta(byte[] peerPub, long capabilities) {
-    if (peerPub == null || peerPub.length != 32) {
+    if (!mayVerify(peerPub)) {
       return;
     }
     String key = com.frostwire.util.Hex.encode(peerPub);
