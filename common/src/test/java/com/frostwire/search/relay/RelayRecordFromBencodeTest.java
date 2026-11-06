@@ -43,11 +43,13 @@ class RelayRecordFromBencodeTest {
     keyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
     owner = IdentityRecord.extractRawEd25519(keyPair.getPublic());
     KarmaChain karma = new KarmaChain(owner);
-    karma.commitEpoch(new BitcoinBlockReference(144, new byte[32]), keyPair.getPrivate());
+    // Remote chains can't name blocks from before karma existed.
+    long first = KarmaConstants.FIRST_KARMA_BLOCK_HEIGHT;
+    karma.commitEpoch(new BitcoinBlockReference(first, new byte[32]), keyPair.getPrivate());
     karma.endorse(
         new byte[32],
         new byte[20],
-        new BitcoinBlockReference(145, new byte[32]),
+        new BitcoinBlockReference(first + 1, new byte[32]),
         keyPair.getPrivate());
     chain = karma.entries();
   }

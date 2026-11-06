@@ -167,6 +167,36 @@ class RemoteKarmaChainValidationTest {
     assertEquals(1, score(manifest, new FakeBlockSource()), "offline: unchecked, as before");
   }
 
+  @Test
+  void chainStartingBeforeKarmaExistedScoresZero() throws Exception {
+    long old = KarmaConstants.FIRST_KARMA_BLOCK_HEIGHT - 1;
+    FakeBlockSource then = new FakeBlockSource().withTip(old).withBlock(old);
+    try (KarmaChainWriter backdated =
+        new KarmaChainWriter(owner, then, new InMemoryStore(owner.ed25519PubRaw()))) {
+      backdated.onDownloadCompletedFromPeer(PEER, filled(20, 1));
+      Entry manifest =
+          new KarmaChainPublisher(backdated, owner).buildManifest(backdated.chain().entries());
+      assertNotNull(manifest);
+
+      assertEquals(0, score(manifest, then));
+      assertEquals(0, score(manifest, null), "offline too");
+    }
+  }
+
+  @Test
+  void chainStartingAtTheFirstKarmaHeightScoresItsEndorsements() throws Exception {
+    long first = KarmaConstants.FIRST_KARMA_BLOCK_HEIGHT;
+    FakeBlockSource then = new FakeBlockSource().withTip(first).withBlock(first);
+    try (KarmaChainWriter earliest =
+        new KarmaChainWriter(owner, then, new InMemoryStore(owner.ed25519PubRaw()))) {
+      earliest.onDownloadCompletedFromPeer(PEER, filled(20, 1));
+      Entry manifest =
+          new KarmaChainPublisher(earliest, owner).buildManifest(earliest.chain().entries());
+
+      assertEquals(1, score(manifest, then));
+    }
+  }
+
   // --- helpers ---
 
   private long score(Entry manifest, BlockHeaderSource blocks) {

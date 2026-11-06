@@ -286,7 +286,15 @@ class KarmaChainVerifyHardeningTest {
   private static WriterRun writerChainAcrossEpochs() throws Exception {
     FakeBlocks blocks = new FakeBlocks(0, (byte) 0x11);
     KarmaChainWriter writer = new KarmaChainWriter(id, blocks, new MemoryStore());
-    long[] heights = {144 * 3 + 5, 144 * 4 + 1, 144 * 5 + 100, 144 * 8 + 7, 144 * 9 + 143};
+    // Counted from the first karma epoch: remote chains can't name older blocks.
+    long first = KarmaConstants.FIRST_KARMA_BLOCK_HEIGHT;
+    long[] heights = {
+      first + 144 * 3 + 5,
+      first + 144 * 4 + 1,
+      first + 144 * 5 + 100,
+      first + 144 * 8 + 7,
+      first + 144 * 9 + 143
+    };
     int[] endorsements = {2, 5, 0, 3, 1};
     int torrent = 0;
     for (int e = 0; e < heights.length; e++) {

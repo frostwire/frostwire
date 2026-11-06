@@ -27,6 +27,10 @@ import org.junit.jupiter.api.io.TempDir;
 class KarmaChainPublisherTest {
 
   private static final int LOW_DIFFICULTY = 4;
+
+  /** Remote chains can't name blocks from before karma existed. */
+  private static final long FIRST = KarmaConstants.FIRST_KARMA_BLOCK_HEIGHT;
+
   private static final byte[] FAKE_PEER_PUB =
       new byte[] {
         1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
@@ -48,7 +52,7 @@ class KarmaChainPublisherTest {
     dbFile = tempDir.resolve("karma-test.db").toFile();
     table = KarmaChainTable.open(dbFile);
     identity = IdentityKeys.generate(LOW_DIFFICULTY);
-    blockSource = new FakeBlockSource().withAnchor(144L).withBlock(144L, hashForHeight(144L));
+    blockSource = new FakeBlockSource().withAnchor(FIRST).withBlock(FIRST, hashForHeight(FIRST));
     writer = new KarmaChainWriter(identity, blockSource, table);
     publisher = new KarmaChainPublisher(writer, identity);
   }
@@ -98,7 +102,7 @@ class KarmaChainPublisherTest {
     Map<String, Entry> ec = entries.get(0).dictionary();
     assertEquals("EC", ec.get("k").string());
     assertEquals(0L, ec.get("seq").integer());
-    assertEquals(144L, ec.get("bh").integer());
+    assertEquals(FIRST, ec.get("bh").integer());
     assertNotNull(ec.get("ep"), "epoch must be present for EC");
     assertNotNull(ec.get("en"), "energy must be present for EC");
     assertNotNull(ec.get("s"), "signature must be present");
@@ -118,12 +122,12 @@ class KarmaChainPublisherTest {
   void buildManifestTruncatesOldestEntriesWhenOversize() {
     // Build a chain long enough to require truncation. With ~250B
     // per entry, ~10 entries should push us past the 950B cap.
-    blockSource.withAnchor(144L).withBlock(144L, hashForHeight(144L));
+    blockSource.withAnchor(FIRST).withBlock(FIRST, hashForHeight(FIRST));
     writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, FAKE_INFO_HASH);
 
     // Advance epochs and add endorsements to grow the chain.
     for (int i = 1; i < 12; i++) {
-      long tip = 144L * (i + 1);
+      long tip = FIRST + 144L * i;
       blockSource.withAnchor(tip).withBlock(tip, hashForHeight(tip));
       writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, distinctInfoHash(i));
     }
@@ -178,7 +182,7 @@ class KarmaChainPublisherTest {
 
   @Test
   void publishedManifestLenMatchesChainSize() {
-    blockSource.withAnchor(288L).withBlock(288L, hashForHeight(288L));
+    blockSource.withAnchor(FIRST + 144L).withBlock(FIRST + 144L, hashForHeight(FIRST + 144L));
     writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, FAKE_INFO_HASH);
 
     List<KarmaChainEntry> chain = writer.chain().entries();
@@ -188,7 +192,7 @@ class KarmaChainPublisherTest {
 
   @Test
   void buildManifestRoundTripReconstructsEveryEntry() {
-    blockSource.withAnchor(288L).withBlock(288L, hashForHeight(288L));
+    blockSource.withAnchor(FIRST + 144L).withBlock(FIRST + 144L, hashForHeight(FIRST + 144L));
     writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, FAKE_INFO_HASH);
 
     List<KarmaChainEntry> chain = writer.chain().entries();
@@ -229,10 +233,10 @@ class KarmaChainPublisherTest {
 
   @Test
   void truncatedManifestCarriesCorrectBase() {
-    blockSource.withAnchor(144L).withBlock(144L, hashForHeight(144L));
+    blockSource.withAnchor(FIRST).withBlock(FIRST, hashForHeight(FIRST));
     writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, FAKE_INFO_HASH);
     for (int i = 1; i < 12; i++) {
-      long tip = 144L * (i + 1);
+      long tip = FIRST + 144L * i;
       blockSource.withAnchor(tip).withBlock(tip, hashForHeight(tip));
       writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, distinctInfoHash(i));
     }

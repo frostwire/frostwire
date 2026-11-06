@@ -24,6 +24,9 @@ import org.junit.jupiter.api.Test;
 
 class RemoteKarmaChainFetcherTest {
 
+  /** Remote chains can't name blocks from before karma existed. */
+  private static final long FIRST = KarmaConstants.FIRST_KARMA_BLOCK_HEIGHT;
+
   private static byte[] peerPub;
   private static BitcoinBlockReference block;
 
@@ -33,7 +36,7 @@ class RemoteKarmaChainFetcherTest {
     for (int i = 0; i < 32; i++) peerPub[i] = (byte) (i + 1);
     byte[] hash = new byte[32];
     for (int i = 0; i < 32; i++) hash[i] = (byte) (i + 1);
-    block = new BitcoinBlockReference(850000L, hash);
+    block = new BitcoinBlockReference(FIRST, hash);
   }
 
   @Test
@@ -91,7 +94,7 @@ class RemoteKarmaChainFetcherTest {
     // Feed ACTUAL publisher output: build a real KarmaChainWriter chain,
     // publish its manifest, feed it through the fetcher with a fake source.
     FakeBlockSource blockSource =
-        new FakeBlockSource().withAnchor(144L).withBlock(144L, hashForHeight(144L));
+        new FakeBlockSource().withAnchor(FIRST).withBlock(FIRST, hashForHeight(FIRST));
     IdentityKeys publisherIdentity = IdentityKeys.generate(0);
     byte[] ownerPub = publisherIdentity.ed25519PubRaw();
     InMemoryStore store = new InMemoryStore(ownerPub);
@@ -135,7 +138,7 @@ class RemoteKarmaChainFetcherTest {
     KarmaChainWriter writer = new KarmaChainWriter(publisherIdentity, blockSource, store);
     byte[] infoHash = new byte[20];
     for (int i = 0; i < 12; i++) {
-      long tip = 144L * (i + 1);
+      long tip = FIRST + 144L * i;
       blockSource.withAnchor(tip).withBlock(tip, hashForHeight(tip));
       // One endorsement per (peer, torrent): grow the chain with distinct torrents.
       infoHash[0] = (byte) i;
@@ -168,7 +171,7 @@ class RemoteKarmaChainFetcherTest {
     KarmaChainWriter writer = new KarmaChainWriter(publisherIdentity, blockSource, store);
     byte[] infoHash = new byte[20];
     for (int i = 0; i < 12; i++) {
-      long tip = 144L * (i + 1);
+      long tip = FIRST + 144L * i;
       blockSource.withAnchor(tip).withBlock(tip, hashForHeight(tip));
       // One endorsement per (peer, torrent): grow the chain with distinct torrents.
       infoHash[0] = (byte) i;
@@ -259,7 +262,7 @@ class RemoteKarmaChainFetcherTest {
   @Test
   void peerKarmaCacheCountsEndorsements() throws Exception {
     FakeBlockSource blockSource =
-        new FakeBlockSource().withAnchor(144L).withBlock(144L, hashForHeight(144L));
+        new FakeBlockSource().withAnchor(FIRST).withBlock(FIRST, hashForHeight(FIRST));
     IdentityKeys publisherIdentity = IdentityKeys.generate(0);
     byte[] ownerPub = publisherIdentity.ed25519PubRaw();
     InMemoryStore store = new InMemoryStore(ownerPub);
@@ -370,7 +373,7 @@ class RemoteKarmaChainFetcherTest {
     Map<String, Object> entry = new HashMap<>();
     entry.put("k", new Entry("EC"));
     entry.put("seq", new Entry(0L));
-    entry.put("bh", new Entry(850000L));
+    entry.put("bh", new Entry(FIRST));
     entry.put("bkh", new Entry(Hex.encode(block.hash())));
     entry.put("ph", new Entry(Hex.encode(KarmaChainEntry.GENESIS_PREV_HASH)));
     entry.put("pub", new Entry(Base64.getUrlEncoder().withoutPadding().encodeToString(ownerPub)));

@@ -533,7 +533,8 @@ class LocalSharedTorrentSearchPerformerTest {
     FakeKarmaChainSource() {
       byte[] hash = new byte[32];
       for (int i = 0; i < 32; i++) hash[i] = (byte) (i + 1);
-      this.block = new BitcoinBlockReference(850000L, hash);
+      // Remote chains can't name blocks from before karma existed.
+      this.block = new BitcoinBlockReference(KarmaConstants.FIRST_KARMA_BLOCK_HEIGHT, hash);
     }
 
     void endorseCount(java.security.KeyPair keys, int count) {

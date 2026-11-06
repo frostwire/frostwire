@@ -38,6 +38,12 @@ class RelayRecordFromBencodeCompatibilityTest {
 
   private static final long TWO_TO_31 = 1L << 31;
 
+  /** An epoch after karma existed: remote chains can't name older blocks. */
+  private static final long EPOCH =
+      KarmaConstants.FIRST_KARMA_BLOCK_HEIGHT / KarmaConstants.BLOCKS_PER_EPOCH + 1;
+
+  private static final long FIRST = EPOCH * KarmaConstants.BLOCKS_PER_EPOCH;
+
   private static KeyPair keyPair;
   private static byte[] owner;
   private static Map<String, Object> commitmentDict;
@@ -78,7 +84,7 @@ class RelayRecordFromBencodeCompatibilityTest {
       KarmaChainEntry e = commitmentWithEnergy((String) c[0]);
       assertNotNull(e, (String) c[0]);
       assertEquals((double) c[1], e.energy().doubleValue(), (String) c[0]);
-      assertEquals(1L, e.epoch().longValue());
+      assertEquals(EPOCH, e.epoch().longValue());
     }
   }
 
@@ -334,12 +340,14 @@ class RelayRecordFromBencodeCompatibilityTest {
         KarmaChainEntry.GENESIS_PREV_HASH,
         0,
         owner,
-        new BitcoinBlockReference(144, new byte[32]),
+        new BitcoinBlockReference(FIRST, new byte[32]),
         energy,
         keyPair.getPrivate());
   }
 
-  /** An epoch-1 commitment with {@code energy} followed by {@code endorsements} endorsements. */
+  /**
+   * An {@link #EPOCH} commitment with {@code energy} followed by {@code endorsements} endorsements.
+   */
   private static List<KarmaChainEntry> chain(double energy, int endorsements) {
     List<KarmaChainEntry> entries = new ArrayList<>();
     entries.add(commitment(energy));
@@ -352,7 +360,7 @@ class RelayRecordFromBencodeCompatibilityTest {
               prev.entryHash(),
               entries.size(),
               owner,
-              new BitcoinBlockReference(145 + i, new byte[32]),
+              new BitcoinBlockReference(FIRST + 1 + i, new byte[32]),
               peer,
               new byte[20],
               1,
@@ -379,7 +387,7 @@ class RelayRecordFromBencodeCompatibilityTest {
             TAIL_BASE,
             TAIL_SEQ,
             owner,
-            new BitcoinBlockReference(144, new byte[32]),
+            new BitcoinBlockReference(FIRST, new byte[32]),
             energy,
             keyPair.getPrivate()));
     for (int i = 0; i < endorsements; i++) {
@@ -391,7 +399,7 @@ class RelayRecordFromBencodeCompatibilityTest {
               prev.entryHash(),
               TAIL_SEQ + entries.size(),
               owner,
-              new BitcoinBlockReference(145 + i, new byte[32]),
+              new BitcoinBlockReference(FIRST + 1 + i, new byte[32]),
               peer,
               new byte[20],
               1,

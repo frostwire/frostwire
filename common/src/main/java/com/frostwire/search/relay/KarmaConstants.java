@@ -69,6 +69,14 @@ public final class KarmaConstants {
    */
   public static final int ANCHOR_DEPTH_BLOCKS = 6;
 
+  /**
+   * Lowest Bitcoin height a remote karma chain's entries may name: the first block of epoch 6610,
+   * which holds block 951,939 (mined 2026-06-01), ten days before the karma chain code was written
+   * (2026-06-11). No FrostWire client can have signed an entry at a lower height, so a chain that
+   * starts below it was made to look older than the feature.
+   */
+  public static final long FIRST_KARMA_BLOCK_HEIGHT = 6610L * BLOCKS_PER_EPOCH;
+
   private KarmaConstants() {}
 
   /** Compute the karma epoch number for a given Bitcoin block height. */

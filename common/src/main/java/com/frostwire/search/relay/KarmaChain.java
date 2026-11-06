@@ -289,7 +289,8 @@ public final class KarmaChain {
    * @param manifest the manifest's bencoded bytes (untrusted)
    * @param owner the 32-byte Ed25519 key the manifest was fetched under
    * @return the verified entries (unmodifiable), or null if the manifest is too large, is missing
-   *     fields, has the wrong shape, or does not verify
+   *     fields, has the wrong shape, names a block below {@link
+   *     KarmaConstants#FIRST_KARMA_BLOCK_HEIGHT}, or does not verify
    * @throws IllegalArgumentException if {@code manifest} is not canonical bencode, or a hex or
    *     base64 field in it is malformed
    */
@@ -336,6 +337,10 @@ public final class KarmaChain {
       }
       KarmaChainEntry entry = KarmaChainEntry.fromDictionary(entryDict, owner);
       if (entry == null || !Arrays.equals(owner, entry.endorserPub())) {
+        return null;
+      }
+      // Older than the karma chain itself: backdated to look like an old identity.
+      if (entry.blockHeight() < KarmaConstants.FIRST_KARMA_BLOCK_HEIGHT) {
         return null;
       }
       chain.add(entry);
