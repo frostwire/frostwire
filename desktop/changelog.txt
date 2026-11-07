@@ -1,4 +1,8 @@
 FrostWire 7.1.3 NOV/05/2026
+   - new:Karma counts the endorsements a peer receives, weighted by how much your node trusts whoever endorsed it, instead of the endorsements it gives, so peers can no longer raise their own karma; an endorsement only counts for a torrent the endorsed peer shared itself (#1416, #1417)
+   - new:Options > Identity shows your received karma and, next to it, your participation (endorsements you have given) (#1417)
+   - fix:Karma chains publish more of their history in compact pages, keep publishing when there are no new endorsements, and publish right after you endorse a peer (#1416)
+   - fix:After an identity change, the old identity's karma chain can no longer overwrite the new one or be loaded under it (#1416)
    - new:Pieces tab: click or right-click a piece that hasn't downloaded yet to set its priority (Don't Download, Low, Normal, High); pieces that aren't at Normal priority are tinted on the hive, and the hover card no longer calls every piece High (#1485)
    - fix:MCP: an AI agent that sends a request right after opening its event stream gets the answer on that stream, as it expects, instead of sometimes on the request itself
    - fix:Distributed search: peers learned from another peer's lookup reply are no longer trusted until FrostWire verifies them directly
