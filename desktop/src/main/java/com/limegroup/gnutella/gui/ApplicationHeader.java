@@ -33,6 +33,7 @@ import com.limegroup.gnutella.gui.GUIMediator.Tabs;
 import com.limegroup.gnutella.settings.SearchSettings;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.List;
 import java.util.Map;
 import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
@@ -469,15 +470,27 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
   }
 
   /**
-   * Preloads header button background images on the main thread before UI construction. Call this
-   * before creating MainFrame to avoid MediaTracker.waitForID() blocking the EDT.
+   * Every theme image the header reads while it is built, preloaded by {@link #preloadImages} so
+   * the EDT finds them cached (frostwire/frostwire#1494).
+   */
+  static final List<String> THEME_IMAGES =
+      List.of(
+          "selected_header_button_background",
+          "unselected_header_button_background",
+          "update_button_on",
+          "update_button_off");
+
+  /**
+   * Decodes the header's theme images into the theme-image cache. Call it off the EDT, at startup
+   * before the main window is built: reading them from the jar on the EDT froze the window.
    */
   public static void preloadImages() {
-    try {
-      GUIMediator.getThemeImage("selected_header_button_background");
-      GUIMediator.getThemeImage("unselected_header_button_background");
-    } catch (Exception e) {
-      e.printStackTrace();
+    for (String name : THEME_IMAGES) {
+      try {
+        ResourceManager.getThemeImage(name);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
   }
 

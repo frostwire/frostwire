@@ -187,6 +187,36 @@ class ResourceManagerAnimatedImagePreloadTest {
     }
   }
 
+  /**
+   * The main window's header reads these while it is built on the EDT; the startup thread's preload
+   * must have decoded them first (frostwire/frostwire#1494).
+   */
+  @Test
+  void theHeaderImagesArePreloadedOffTheEdt() throws Exception {
+    Set<String> read = new TreeSet<>();
+    Matcher m =
+        THEME_IMAGE_LITERAL.matcher(
+            Files.readString(
+                Path.of("src/main/java/com/limegroup/gnutella/gui/ApplicationHeader.java"),
+                StandardCharsets.UTF_8));
+    while (m.find()) {
+      read.add(m.group(1));
+    }
+    assertFalse(read.isEmpty());
+    assertTrue(
+        ApplicationHeader.THEME_IMAGES.containsAll(read),
+        "not preloaded: " + read + " vs " + ApplicationHeader.THEME_IMAGES);
+    ApplicationHeader.THEME_IMAGES.forEach(ResourceManager::forgetThemeImage);
+
+    Thread worker = new Thread(ApplicationHeader::preloadImages, "startup");
+    worker.start();
+    worker.join(30_000);
+
+    for (String name : ApplicationHeader.THEME_IMAGES) {
+      assertTrue(ResourceManager.isThemeImageCached(name), name + " was not preloaded");
+    }
+  }
+
   /** The preload list names exactly the icons SearchButtons builds. */
   @Test
   void theSearchButtonPreloadListMatchesSearchButtons() throws IOException {
