@@ -9,10 +9,14 @@ package com.frostwire.search.relay;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.frostwire.jlibtorrent.Entry;
+import com.frostwire.jlibtorrent.SessionManager;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -214,6 +218,43 @@ class KarmaChainCommitSchedulerTest {
     } finally {
       release.countDown();
     }
+  }
+
+  @Test
+  void anEndorsementIsPublishedAtOnceNotOnTheNextInterval() throws Exception {
+    blockSource.withAnchor(144L).withBlock(144L, hashForHeight(144L));
+    List<Entry> heads = new CopyOnWriteArrayList<>();
+    SessionManager session =
+        new SessionManager() {
+          @Override
+          public void dhtPutItem(byte[] pub, byte[] key, Entry entry, byte[] salt) {
+            if (salt.length == KarmaConstants.BEP46_SALT_KARMA.length()) {
+              heads.add(entry);
+            }
+          }
+        };
+    scheduler = new KarmaChainCommitScheduler(writer, publisher, 3600, () -> session, () -> true);
+    scheduler.start();
+    awaitHeadOfLength(heads, 1);
+
+    byte[] peer = new byte[32];
+    peer[0] = 9;
+    assertTrue(writer.endorseSourcePeer(peer, new byte[20]));
+
+    awaitHeadOfLength(heads, 2);
+  }
+
+  private static void awaitHeadOfLength(List<Entry> heads, long length) throws Exception {
+    long deadline = System.currentTimeMillis() + 3_000;
+    while (System.currentTimeMillis() < deadline) {
+      for (Entry head : heads) {
+        if (head.dictionary().get("len").integer() == length) {
+          return;
+        }
+      }
+      Thread.sleep(20);
+    }
+    fail("no head of length " + length + " was published within 3s");
   }
 
   private static void awaitBarrier(CountDownLatch latch) {
