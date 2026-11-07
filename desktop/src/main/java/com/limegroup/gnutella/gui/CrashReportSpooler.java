@@ -136,6 +136,12 @@ public final class CrashReportSpooler {
 
   public static void record(Throwable problem) {
     try {
+      // Counted even when the report is throttled: the session still crashed.
+      LivePresenceHeartbeat.crashRecorded();
+    } catch (Throwable ignored) {
+      // Presence is best effort.
+    }
+    try {
       String throttleKey = throttleKeyFor(problem);
       if (!tryAcquire(throttleKey)) {
         LOG.debug("Throttled anonymous crash report for " + throttleKey);
@@ -166,6 +172,11 @@ public final class CrashReportSpooler {
       spooler.spool(problem);
     } catch (Throwable ignored) {
       LOG.info("Unable to synchronously spool anonymous crash report", ignored);
+    }
+    try {
+      LivePresenceHeartbeat.crashRecorded();
+    } catch (Throwable ignored) {
+      // Presence is best effort.
     }
   }
 

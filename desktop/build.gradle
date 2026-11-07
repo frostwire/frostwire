@@ -1032,6 +1032,7 @@ test {
         includeTestsMatching "com.frostwire.gui.searchfield.*"
         includeTestsMatching "com.frostwire.gui.HideExitDialogMessageTest"
         includeTestsMatching "com.limegroup.gnutella.gui.CrashReportSpoolerTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.LivePresenceHeartbeatTest"
         includeTestsMatching "com.limegroup.gnutella.gui.SizeStableLabelTest"
         includeTestsMatching "com.limegroup.gnutella.gui.VisibleCardLayoutTest"
         includeTestsMatching "com.limegroup.gnutella.gui.GridToolTipTest"
