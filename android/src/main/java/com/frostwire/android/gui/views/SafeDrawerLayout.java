@@ -21,15 +21,36 @@ package com.frostwire.android.gui.views;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
+import androidx.annotation.VisibleForTesting;
 import androidx.drawerlayout.widget.DrawerLayout;
 import com.frostwire.util.Logger;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 /**
- * A DrawerLayout that safely falls back to the provided measure specs even when not measured with
- * MeasureSpec.EXACTLY, preventing the IllegalStateException thrown by DrawerLayout.onMeasure().
+ * A DrawerLayout that survives an exception from its own measure pass instead of crashing the app
+ * (frostwire/frostwire#1384, "did not set the measured dimension").
+ *
+ * <p>It used to only log what it caught, which also hid any other bug that throws while the drawer
+ * measures. It now records the first one per process as a Crashlytics non-fatal ({@code
+ * DrawerMeasureFailed}), so whether this guard still catches anything shows up in Crashlytics, and
+ * it can be removed once releases report none (frostwire/frostwire#1405).
  */
 public class SafeDrawerLayout extends DrawerLayout {
-  private final Logger LOG = Logger.getLogger(SafeDrawerLayout.class);
+  private static final Logger LOG = Logger.getLogger(SafeDrawerLayout.class);
+
+  /** Only the first failure in a process is reported: a failing measure repeats every frame. */
+  private static final AtomicBoolean REPORTED = new AtomicBoolean();
+
+  private static volatile Consumer<RuntimeException> reporter =
+      failure -> {
+        try {
+          FirebaseCrashlytics.getInstance().recordException(new DrawerMeasureFailed(failure));
+        } catch (RuntimeException e) {
+          LOG.warn("SafeDrawerLayout: could not record the measure failure", e);
+        }
+      };
 
   public SafeDrawerLayout(Context context) {
     super(context);
@@ -50,16 +71,40 @@ public class SafeDrawerLayout extends DrawerLayout {
 
     try {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-    } catch (IllegalStateException e) {
-      LOG.error("DrawerLayout.onMeasure() failed; using fallback measure specs", e);
-    } catch (Exception e) {
-      LOG.error(
-          "DrawerLayout.onMeasure() threw exception; falling back to imposed measure specs", e);
+    } catch (RuntimeException e) {
+      LOG.error("DrawerLayout.onMeasure() failed; falling back to the imposed measure specs", e);
+      if (REPORTED.compareAndSet(false, true)) {
+        reporter.accept(e);
+      }
     } finally {
       // Android verifies after onMeasure() returns that this method called
       // setMeasuredDimension(). Do it explicitly even when DrawerLayout
       // returns without throwing on newer framework versions.
       setMeasuredDimension(width, height);
+    }
+  }
+
+  @VisibleForTesting
+  public static Consumer<RuntimeException> reporterForTesting() {
+    return reporter;
+  }
+
+  @VisibleForTesting
+  public static void setReporterForTesting(Consumer<RuntimeException> testReporter) {
+    reporter = testReporter;
+  }
+
+  @VisibleForTesting
+  public static void resetReported() {
+    REPORTED.set(false);
+  }
+
+  /**
+   * The non-fatal Crashlytics groups these failures under; its cause is what DrawerLayout threw.
+   */
+  static final class DrawerMeasureFailed extends Exception {
+    DrawerMeasureFailed(Throwable cause) {
+      super("DrawerLayout.onMeasure() threw; SafeDrawerLayout kept the app alive", cause);
     }
   }
 }
