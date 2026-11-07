@@ -1,4 +1,5 @@
 FrostWire 7.1.3 NOV/05/2026
+   - fix:MCP: an AI agent that sends a request right after opening its event stream gets the answer on that stream, as it expects, instead of sometimes on the request itself
    - fix:Distributed search: peers learned from another peer's lookup reply are no longer trusted until FrostWire verifies them directly
    - fix:Distributed search: karma chains are anchored to Bitcoin blocks six deep, and two block explorers must agree, so a short-lived fork or one lying explorer can't backdate karma
    - fix:Distributed search: a peer's karma chain must match what its manifest announces and real Bitcoin block hashes, and can't claim epochs from before karma existed
