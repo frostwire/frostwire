@@ -78,6 +78,12 @@ public class HexHivePanel extends JPanel implements Scrollable {
   private ColoredStroke hexagonBorderPaint;
   private CubePaint emptyHexPaint;
   private CubePaint fullHexPaint;
+
+  /** Not yet downloaded pieces whose priority isn't libtorrent's default, see {@link #paintFor}. */
+  private CubePaint skippedHexPaint;
+
+  private CubePaint lowPriorityHexPaint;
+  private CubePaint highPriorityHexPaint;
   private DrawingProperties drawingProperties;
   private HexDataAdapter<?> latestAdapter;
   private BufferedImage bitmap;
@@ -158,6 +164,19 @@ public class HexHivePanel extends JPanel implements Scrollable {
   private Point lastViewPosition;
   private final ChangeListener viewportListener = e -> onViewportChanged();
 
+  /** Told when a piece is clicked or asked for its popup menu, EDT confined. */
+  interface PieceClickListener {
+    void pieceClicked(int piece, MouseEvent event);
+  }
+
+  private PieceClickListener pieceClickListener;
+
+  /** Piece under the last mouse press, a release over another one (a drag) is no click. */
+  private int pressedHex = -1;
+
+  /** Whether the press already opened the popup menu (macOS), so its release doesn't again. */
+  private boolean pressShowedPopup;
+
   /**
    * @param hexSideLength - if -1 hexLength is calculated out of the available container area.
    */
@@ -199,6 +218,24 @@ public class HexHivePanel extends JPanel implements Scrollable {
           public void mouseExited(MouseEvent e) {
             clearHover();
           }
+
+          @Override
+          public void mousePressed(MouseEvent e) {
+            pressedHex = pieceAt(e.getX(), e.getY());
+            pressShowedPopup = e.isPopupTrigger() && firePieceClicked(pressedHex, e);
+          }
+
+          @Override
+          public void mouseReleased(MouseEvent e) {
+            int piece = pieceAt(e.getX(), e.getY());
+            boolean click =
+                e.isPopupTrigger() || (SwingUtilities.isLeftMouseButton(e) && !e.isControlDown());
+            if (click && !pressShowedPopup && piece == pressedHex) {
+              firePieceClicked(piece, e);
+            }
+            pressedHex = -1;
+            pressShowedPopup = false;
+          }
         };
     addMouseListener(hoverListener);
     addMouseMotionListener(hoverListener);
@@ -212,6 +249,33 @@ public class HexHivePanel extends JPanel implements Scrollable {
             relayoutTimer.restart();
           }
         });
+  }
+
+  /** Who to tell when a piece is clicked (left button) or right-clicked, null for nobody. */
+  void setPieceClickListener(PieceClickListener listener) {
+    pieceClickListener = listener;
+  }
+
+  private boolean firePieceClicked(int piece, MouseEvent e) {
+    if (piece < 0 || pieceClickListener == null) {
+      return false;
+    }
+    // the menu takes the hovered piece's place, its details card would cover it
+    clearHover();
+    pieceClickListener.pieceClicked(piece, e);
+    return true;
+  }
+
+  /**
+   * @return the piece whose cube is under ({@code x}, {@code y}) in the current layout, or -1 for
+   *     none (padding, the gaps past a row's last cube, below the last row or no layout yet)
+   */
+  int pieceAt(int x, int y) {
+    DrawingProperties snapshot;
+    synchronized (drawingPropertiesLock) {
+      snapshot = drawingProperties;
+    }
+    return snapshot != null ? hexIndexAt(snapshot, x, y) : -1;
   }
 
   /** Re-wraps the rows to the new width, e.g. when the window or the viewport is resized. */
@@ -1038,9 +1102,26 @@ public class HexHivePanel extends JPanel implements Scrollable {
             drawingProperties,
             graphics,
             hexagonBorderPaint,
-            adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint,
+            paintFor(adapter, pieceIndex),
             drawCubes);
       }
+    }
+  }
+
+  /** Cube colors of a piece: downloaded, or not yet and tinted by its priority. */
+  private CubePaint paintFor(HexDataAdapter<?> adapter, int pieceIndex) {
+    if (adapter.isFull(pieceIndex)) {
+      return fullHexPaint;
+    }
+    switch (adapter.priorityMark(pieceIndex)) {
+      case PiecePriorities.MARK_SKIP:
+        return skippedHexPaint;
+      case PiecePriorities.MARK_LOW:
+        return lowPriorityHexPaint;
+      case PiecePriorities.MARK_HIGH:
+        return highPriorityHexPaint;
+      default:
+        return emptyHexPaint;
     }
   }
 
@@ -1364,6 +1445,10 @@ public class HexHivePanel extends JPanel implements Scrollable {
     hexagonBorderPaint = new ColoredStroke(0.5f, new Color(numBorderColor, false));
     emptyHexPaint = new CubePaint(numEmptyColor, 10);
     fullHexPaint = new CubePaint(numFullColor, 30);
+    // a darker empty cube for pieces that won't download, warm tints for low and high priority
+    skippedHexPaint = new CubePaint(0x9e9e9e, 15);
+    lowPriorityHexPaint = new CubePaint(0xfff3c4, 10);
+    highPriorityHexPaint = new CubePaint(0xffb74d, 20);
     backgroundColor = new Color(bgColor);
   }
 
@@ -1385,6 +1470,14 @@ public class HexHivePanel extends JPanel implements Scrollable {
      */
     default Map<String, String> describeHex(int hexOffset) {
       return null;
+    }
+
+    /**
+     * How a piece that isn't full is marked, one of the {@code PiecePriorities.MARK_*} values.
+     * Called off the EDT while rendering, so it must answer from data already at hand.
+     */
+    default int priorityMark(int hexOffset) {
+      return PiecePriorities.MARK_NONE;
     }
   }
 

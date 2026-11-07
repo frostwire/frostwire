@@ -35,6 +35,7 @@ import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -519,6 +520,171 @@ class HexHivePanelTest {
     int requests =
         CountingRepaintManager.layoutRequestsDuring(() -> panel.updateData(adapter(400)));
     assertTrue(requests > 0, "a taller hive must tell its scroll pane");
+  }
+
+  /** Center of a piece's cube, from the layout's row counts and origins alone. */
+  private static Point expectedCenter(Object props, int piece) throws Exception {
+    int evenCount = (int) get(props, "evenRowHexCount");
+    int oddCount = (int) get(props, "oddRowHexCount");
+    Point evenOrigin = (Point) get(props, "evenRowOrigin");
+    Point oddOrigin = (Point) get(props, "oddRowOrigin");
+    float hexWidth = (float) get(props, "hexWidth");
+    float hexHeight = (float) get(props, "hexHeight");
+    int row = 2 * (piece / (evenCount + oddCount));
+    int col = piece % (evenCount + oddCount);
+    if (col >= evenCount) {
+      row++;
+      col -= evenCount;
+    }
+    int originX = row % 2 == 0 ? evenOrigin.x : oddOrigin.x;
+    return new Point(
+        Math.round(originX + col * hexWidth), Math.round(evenOrigin.y + row * hexHeight * 0.75f));
+  }
+
+  @Test
+  void pieceAtFindsEveryCubeFromItsCenterToNearItsEdges() throws Exception {
+    for (int width : new int[] {300, 317, 480}) {
+      HexHivePanel panel = newPanel();
+      panel.setSize(width, 400);
+      panel.updateData(adapter(97));
+      Object props = get(panel, "drawingProperties");
+      // the circle inside the hexagon has a radius of sqrt(3)/2 * side, stay a bit within it
+      float reach = SIDE * 0.8f;
+      for (int piece = 0; piece < 97; piece++) {
+        Point center = expectedCenter(props, piece);
+        assertEquals(piece, panel.pieceAt(center.x, center.y), "center of piece " + piece);
+        for (int angle = 0; angle < 360; angle += 30) {
+          int x = (int) Math.round(center.x + reach * Math.cos(Math.toRadians(angle)));
+          int y = (int) Math.round(center.y + reach * Math.sin(Math.toRadians(angle)));
+          assertEquals(
+              piece,
+              panel.pieceAt(x, y),
+              "piece " + piece + " at " + angle + " degrees, width " + width);
+        }
+      }
+    }
+  }
+
+  @Test
+  void pieceAtIsMinusOneAwayFromTheCubes() throws Exception {
+    HexHivePanel panel = newPanel();
+    assertEquals(-1, panel.pieceAt(20, 20), "no layout yet");
+    panel.updateData(adapter(40));
+    Object props = get(panel, "drawingProperties");
+    int evenCount = (int) get(props, "evenRowHexCount");
+    float hexWidth = (float) get(props, "hexWidth");
+    float hexHeight = (float) get(props, "hexHeight");
+
+    assertEquals(-1, panel.pieceAt(0, 0), "top-left padding");
+    Point lastOfFirstRow = expectedCenter(props, evenCount - 1);
+    assertEquals(
+        -1,
+        panel.pieceAt(Math.round(lastOfFirstRow.x + hexWidth), lastOfFirstRow.y),
+        "past the end of a row");
+    Point last = expectedCenter(props, 39);
+    assertEquals(-1, panel.pieceAt(Math.round(last.x + hexWidth), last.y), "after the last piece");
+    assertEquals(-1, panel.pieceAt(last.x, Math.round(last.y + hexHeight)), "below the last row");
+    assertEquals(-1, panel.pieceAt(-5, -5));
+  }
+
+  @Test
+  void clickingOrRightClickingACubeTellsTheListenerWhichPiece() throws Exception {
+    HexHivePanel panel = newPanel();
+    panel.updateData(adapter(40));
+    Object props = get(panel, "drawingProperties");
+    BlockingQueue<Integer> clicked = new ArrayBlockingQueue<>(8);
+    panel.setPieceClickListener((piece, event) -> clicked.add(piece));
+    Point seven = expectedCenter(props, 7);
+    Point eight = expectedCenter(props, 8);
+    SwingUtilities.invokeAndWait(
+        () -> {
+          // left click
+          panel.dispatchEvent(button(panel, MouseEvent.MOUSE_PRESSED, seven, 1, false));
+          panel.dispatchEvent(button(panel, MouseEvent.MOUSE_RELEASED, seven, 1, false));
+          // right click where the release is the popup trigger (Windows)
+          panel.dispatchEvent(button(panel, MouseEvent.MOUSE_PRESSED, eight, 3, false));
+          panel.dispatchEvent(button(panel, MouseEvent.MOUSE_RELEASED, eight, 3, true));
+          // right click where the press is the popup trigger (macOS, Linux): one menu, not two
+          panel.dispatchEvent(button(panel, MouseEvent.MOUSE_PRESSED, seven, 3, true));
+          panel.dispatchEvent(button(panel, MouseEvent.MOUSE_RELEASED, seven, 3, false));
+          // dragged from one cube to another, no click
+          panel.dispatchEvent(button(panel, MouseEvent.MOUSE_PRESSED, seven, 1, false));
+          panel.dispatchEvent(button(panel, MouseEvent.MOUSE_RELEASED, eight, 1, false));
+          // between cubes, no piece
+          panel.dispatchEvent(button(panel, MouseEvent.MOUSE_PRESSED, new Point(0, 0), 1, false));
+          panel.dispatchEvent(button(panel, MouseEvent.MOUSE_RELEASED, new Point(0, 0), 1, false));
+        });
+    assertEquals(List.of(7, 8, 7), List.copyOf(clicked));
+  }
+
+  private static MouseEvent button(
+      HexHivePanel panel, int id, Point at, int button, boolean popupTrigger) {
+    int mask = button == 1 ? MouseEvent.BUTTON1_DOWN_MASK : MouseEvent.BUTTON3_DOWN_MASK;
+    return new MouseEvent(
+        panel,
+        id,
+        System.currentTimeMillis(),
+        id == MouseEvent.MOUSE_PRESSED ? mask : 0,
+        at.x,
+        at.y,
+        at.x,
+        at.y,
+        1,
+        popupTrigger,
+        button == 1 ? MouseEvent.BUTTON1 : MouseEvent.BUTTON3);
+  }
+
+  @Test
+  void piecesThatWontDownloadOrArePrioritizedAreTinted() throws Exception {
+    int[] marks = {
+      PiecePriorities.MARK_NONE,
+      PiecePriorities.MARK_SKIP,
+      PiecePriorities.MARK_LOW,
+      PiecePriorities.MARK_HIGH
+    };
+    HexHivePanel panel = newPanel();
+    panel.updateData(
+        new HexHivePanel.HexDataAdapter<Object>() {
+          @Override
+          public void updateData(Object data) {}
+
+          @Override
+          public int getTotalHexagonsCount() {
+            return 8;
+          }
+
+          @Override
+          public int getFullHexagonsCount() {
+            return 0;
+          }
+
+          @Override
+          public boolean isFull(int hexOffset) {
+            // a downloaded piece shows as downloaded whatever its priority
+            return hexOffset >= 4;
+          }
+
+          @Override
+          public int priorityMark(int hexOffset) {
+            return marks[hexOffset % 4];
+          }
+        });
+    BufferedImage bitmap = awaitRender(panel);
+    Object props = get(panel, "drawingProperties");
+    int[] topFaces = new int[8];
+    for (int piece = 0; piece < 8; piece++) {
+      Point center = expectedCenter(props, piece);
+      // inside the cube's light top face
+      topFaces[piece] = bitmap.getRGB(center.x, center.y - SIDE / 2) & 0xffffff;
+    }
+    for (int a = 0; a < 4; a++) {
+      for (int b = a + 1; b < 4; b++) {
+        assertNotEquals(topFaces[a], topFaces[b], "marks " + a + " and " + b + " look alike");
+      }
+    }
+    for (int piece = 5; piece < 8; piece++) {
+      assertEquals(topFaces[4], topFaces[piece], "downloaded piece " + piece + " was tinted");
+    }
   }
 
   private static HexHivePanel newPanel() {
