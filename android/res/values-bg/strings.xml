@@ -638,6 +638,7 @@
     <string name="search_icebridge_peers_contacted">Разпределено търсене · свързани %1$d пиъра</string>
     <string name="distributed_identity_public_key">Public Key</string>
     <string name="distributed_identity_karma">Karma Score</string>
+    <string name="distributed_identity_participation">Участие: дадени препоръки: %1$d</string>
     <string name="distributed_identity_shared_count">Споделени торенти</string>
     <string name="distributed_identity_loading">Зареждане на запазената идентичност…</string>
     <string name="distributed_identity_loading_details">Loading…</string>

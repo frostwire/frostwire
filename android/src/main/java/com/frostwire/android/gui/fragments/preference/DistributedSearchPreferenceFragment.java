@@ -353,13 +353,15 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
               identity != null
                   ? SearchEngine.DISTRIBUTED_WIRING.localKarma(identity.ed25519PubRaw())
                   : null;
+          final Long participation =
+              identity != null ? SearchEngine.DISTRIBUTED_WIRING.localParticipation() : null;
           final int shared = identity != null ? readSharedCount() : -1;
           final IdentityKeys result = identity;
           SystemUtils.postToUIThread(
               () -> {
                 if (result != null) {
                   identityPathRetries = 0;
-                  applyIdentityToUi(result, karmaSummary(karma), shared);
+                  applyIdentityToUi(result, karmaSummary(karma, participation), shared);
                 } else if (filePresent) {
                   // File exists but load failed — still not "missing identity".
                   showIdentityLoadingState();
@@ -424,14 +426,20 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
   }
 
   /**
-   * The karma row: the local identity's {@link DisplayKarma} (what every karma indicator shows for
-   * a peer, frostwire/frostwire#1418), or "not available" while the relay stack is not running.
-   * Call on the main thread.
+   * The karma row: the local identity's {@link DisplayKarma} (the karma it received, what every
+   * karma indicator shows for a peer, frostwire/frostwire#1417), then its participation (the
+   * endorsements it gave, frostwire/frostwire#1416) when known, or "not available" while the relay
+   * stack is not running. Call on the main thread.
    */
-  private String karmaSummary(DisplayKarma karma) {
-    return karma != null
-        ? karma.text() + "\n" + getString(R.string.distributed_identity_tap_to_copy)
-        : getString(R.string.distributed_identity_not_available);
+  private String karmaSummary(DisplayKarma karma, Long participation) {
+    if (karma == null) {
+      return getString(R.string.distributed_identity_not_available);
+    }
+    String summary = karma.text();
+    if (participation != null) {
+      summary += "\n" + getString(R.string.distributed_identity_participation, participation);
+    }
+    return summary + "\n" + getString(R.string.distributed_identity_tap_to_copy);
   }
 
   private void updateIdentityRows(IdentityKeys identity, String karma, int shared) {

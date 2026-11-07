@@ -639,6 +639,7 @@
     <string name="search_icebridge_peers_contacted">分散検索 · %1$d ピアに接続</string>
     <string name="distributed_identity_public_key">Public Key</string>
     <string name="distributed_identity_karma">Karma Score</string>
+    <string name="distributed_identity_participation">参加度: 付与した推薦 %1$d 件</string>
     <string name="distributed_identity_shared_count">共有トレント</string>
     <string name="distributed_identity_loading">保存済みのIDを読み込み中…</string>
     <string name="distributed_identity_loading_details">Loading…</string>
