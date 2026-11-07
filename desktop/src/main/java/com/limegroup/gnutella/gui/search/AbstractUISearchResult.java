@@ -93,11 +93,16 @@ public abstract class AbstractUISearchResult implements UISearchResult {
 
   @Override
   public void showSearchResultWebPage(boolean now) {
+    String detailsUrl = getSearchResult().getDetailsUrl();
+    if (detailsUrl == null || detailsUrl.isBlank()) {
+      // The source's parser found no details page: there is nothing to open (frostwire#1497).
+      return;
+    }
     if (now) {
-      GUIMediator.openURL(getSearchResult().getDetailsUrl());
+      GUIMediator.openURL(detailsUrl);
     } else {
       if (SearchSettings.SHOW_DETAIL_PAGE_AFTER_DOWNLOAD_START.getValue()) {
-        GUIMediator.openURL(getSearchResult().getDetailsUrl(), SearchSettings.SHOW_DETAILS_DELAY);
+        GUIMediator.openURL(detailsUrl, SearchSettings.SHOW_DETAILS_DELAY);
       }
     }
   }
