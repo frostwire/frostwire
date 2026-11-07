@@ -6661,3 +6661,11 @@ msgstr "Fichiersattributer ewechloossen"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Doesn't store whether each file is hidden or executable."
 msgstr "Späichert net, ob all Fichier verstoppt oder ausféierbar ass."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java
+msgid "Not downloading"
+msgstr "Gëtt net erofgelueden"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/PiecePriorities.java
+msgid "downloaded"
+msgstr "erofgelueden"

@@ -7134,3 +7134,11 @@ msgstr "Udelad filattributter"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Doesn't store whether each file is hidden or executable."
 msgstr "Gemmer ikke, om hver fil er skjult eller eksekverbar."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java
+msgid "Not downloading"
+msgstr "Hentes ikke"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/PiecePriorities.java
+msgid "downloaded"
+msgstr "hentet"

@@ -6543,3 +6543,11 @@ msgstr "کنار گذاشتن ویژگی‌های فایل"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Doesn't store whether each file is hidden or executable."
 msgstr "مخفی یا اجرایی بودن هر فایل را ذخیره نمی‌کند."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java
+msgid "Not downloading"
+msgstr "دانلود نمی‌شود"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/PiecePriorities.java
+msgid "downloaded"
+msgstr "دانلود شده"

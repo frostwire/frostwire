@@ -7316,3 +7316,11 @@ msgstr "Ometti gli attributi dei file"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Doesn't store whether each file is hidden or executable."
 msgstr "Non memorizza se ogni file è nascosto o eseguibile."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java
+msgid "Not downloading"
+msgstr "Non in download"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/PiecePriorities.java
+msgid "downloaded"
+msgstr "scaricato"

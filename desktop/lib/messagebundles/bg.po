@@ -7170,3 +7170,11 @@ msgstr "Пропускане на файловите атрибути"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Doesn't store whether each file is hidden or executable."
 msgstr "Не съхранява дали всеки файл е скрит или изпълним."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java
+msgid "Not downloading"
+msgstr "Не се изтегля"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/PiecePriorities.java
+msgid "downloaded"
+msgstr "изтеглено"

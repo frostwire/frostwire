@@ -7076,3 +7076,11 @@ msgstr "ফাইলের বৈশিষ্ট্য বাদ দিন"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Doesn't store whether each file is hidden or executable."
 msgstr "প্রতিটি ফাইল লুকানো বা এক্সিকিউটেবল কিনা তা সংরক্ষণ করে না।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java
+msgid "Not downloading"
+msgstr "ডাউনলোড হচ্ছে না"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/PiecePriorities.java
+msgid "downloaded"
+msgstr "ডাউনলোড হয়েছে"
