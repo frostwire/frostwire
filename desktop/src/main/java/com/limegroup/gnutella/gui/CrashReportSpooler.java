@@ -326,20 +326,30 @@ public final class CrashReportSpooler {
     spoolPayload(watchdogReportFor(missedHeartbeats));
   }
 
-  private void spoolPayload(Object payload) {
+  /**
+   * Writes {@code payload} as a new report. The report is written to a temporary file first and
+   * renamed, so the uploader never reads half a report; the temporary file never outlives this
+   * call, even when serializing or writing fails (frostwire/frostwire#1493).
+   */
+  void spoolPayload(Object payload) {
     if (payload == null) {
       return;
     }
     try {
+      String json = GSON.toJson(payload);
       Files.createDirectories(directory.toPath());
       Path temporary = Files.createTempFile(directory.toPath(), "crash-", ".tmp");
-      Files.writeString(temporary, GSON.toJson(payload), StandardCharsets.UTF_8);
-      Path report =
-          directory.toPath().resolve(temporary.getFileName().toString().replace(".tmp", ".json"));
       try {
-        Files.move(temporary, report, StandardCopyOption.ATOMIC_MOVE);
-      } catch (AtomicMoveNotSupportedException ignored) {
-        Files.move(temporary, report);
+        Files.writeString(temporary, json, StandardCharsets.UTF_8);
+        Path report =
+            directory.toPath().resolve(temporary.getFileName().toString().replace(".tmp", ".json"));
+        try {
+          Files.move(temporary, report, StandardCopyOption.ATOMIC_MOVE);
+        } catch (AtomicMoveNotSupportedException ignored) {
+          Files.move(temporary, report);
+        }
+      } finally {
+        Files.deleteIfExists(temporary);
       }
       prune();
     } catch (Throwable ignored) {
@@ -488,7 +498,17 @@ public final class CrashReportSpooler {
         });
   }
 
+  /** A temporary report this old was left by an earlier run that failed while writing it. */
+  private static final long STALE_TEMPORARY_MILLIS = 60L * 60L * 1000L;
+
   private void prune() throws Exception {
+    long staleBefore = System.currentTimeMillis() - STALE_TEMPORARY_MILLIS;
+    try (var files = Files.list(directory.toPath())) {
+      files
+          .filter(path -> path.getFileName().toString().endsWith(".tmp"))
+          .filter(path -> lastModified(path) < staleBefore)
+          .forEach(path -> path.toFile().delete());
+    }
     try (var files = Files.list(directory.toPath())) {
       var reports =
           files

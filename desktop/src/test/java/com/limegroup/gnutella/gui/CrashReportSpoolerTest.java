@@ -277,6 +277,40 @@ class CrashReportSpoolerTest {
     assertTrue(sessionId.matches("[0-9a-f]{32}"));
   }
 
+  /** Gson can't serialize a field of a JDK-internal type: the report fails after spooling began. */
+  private static final class UnserializablePayload {
+    @SuppressWarnings("unused")
+    private final Thread thread = Thread.currentThread();
+  }
+
+  @Test
+  void aReportThatFailsToSerializeLeavesNoTemporaryFile() throws Exception {
+    Path directory = Files.createTempDirectory("frostwire-crash-spool");
+    CrashReportSpooler spooler = new CrashReportSpooler(directory.toFile(), null, "7.0.4", 331, "");
+
+    spooler.spoolPayload(new UnserializablePayload());
+
+    try (var files = Files.list(directory)) {
+      assertEquals(
+          Set.of(), files.map(f -> f.getFileName().toString()).collect(Collectors.toSet()));
+    }
+  }
+
+  @Test
+  void spoolingRemovesTemporaryFilesAnEarlierRunLeftBehind() throws Exception {
+    Path directory = Files.createTempDirectory("frostwire-crash-spool");
+    Path leftOver = Files.createFile(directory.resolve("crash-1.tmp"));
+    assertTrue(leftOver.toFile().setLastModified(System.currentTimeMillis() - 2 * 3600_000L));
+    Path inProgress = Files.createFile(directory.resolve("crash-2.tmp"));
+    CrashReportSpooler spooler = new CrashReportSpooler(directory.toFile(), null, "7.0.4", 331, "");
+
+    spooler.spool(new IllegalStateException("probe"));
+
+    assertFalse(Files.exists(leftOver));
+    // another thread may be writing a fresh one right now
+    assertTrue(Files.exists(inProgress));
+  }
+
   @Test
   void recordSyncNeverThrowsWithoutStartedInstance() {
     assertDoesNotThrow(() -> CrashReportSpooler.recordSync(null));
