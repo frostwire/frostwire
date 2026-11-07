@@ -60,7 +60,8 @@ class PeerDirectorySettingsPaneItemTest {
 
     // Karma is column 4 after IceBridge version column was added.
     assertEquals(DisplayKarma.of(directory.displayKarma(peerPub)), model.getValueAt(0, 4));
-    assertEquals(DisplayKarma.of(1).text(), model.getValueAt(0, 4).toString());
+    // The karma the peer received (#1417): nobody endorsed it, so 0, not the trust score's 1.
+    assertEquals(DisplayKarma.of(0).text(), model.getValueAt(0, 4).toString());
     assertEquals("Karma", model.getColumnName(4));
     assertEquals(DisplayKarma.class, model.getColumnClass(4));
     assertEquals("-", model.getValueAt(0, 2));
