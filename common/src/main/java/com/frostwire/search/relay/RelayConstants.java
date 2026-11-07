@@ -61,6 +61,9 @@ public final class RelayConstants {
 
   public static final String BITCOIN_HEADER_CACHE_DIR = "bitcoin-headers";
 
+  /** When this node first saw each endorser's karma chain ({@link ReceivedKarma#persistTo}). */
+  public static final String KARMA_FIRST_SEEN_FILE = "karma_first_seen.txt";
+
   /**
    * Legacy default of the removed TCP identity/search port. Peers are verified over rUDP now;
    * {@code IceBridgeConfig} keeps it only as the "standalone forwarder" marker.

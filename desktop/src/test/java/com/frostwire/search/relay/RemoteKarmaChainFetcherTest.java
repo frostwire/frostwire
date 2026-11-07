@@ -247,14 +247,14 @@ class RemoteKarmaChainFetcherTest {
   @Test
   void peerKarmaCacheReturnsZeroForBadInputs() {
     PeerKarmaCache cache = new PeerKarmaCache(new RemoteKarmaChainFetcher(new FakeSource()));
-    assertEquals(0, cache.getKarma(null));
-    assertEquals(0, cache.getKarma(new byte[31]));
+    assertEquals(0, cache.participation(null));
+    assertEquals(0, cache.participation(new byte[31]));
   }
 
   @Test
   void peerKarmaCacheReturnsZeroForEmptyChain() {
     PeerKarmaCache cache = new PeerKarmaCache(new RemoteKarmaChainFetcher(new FixedSource(null)));
-    assertEquals(0, cache.getKarma(peerPub));
+    assertEquals(0, cache.participation(peerPub));
   }
 
   @Test
@@ -276,7 +276,7 @@ class RemoteKarmaChainFetcherTest {
     source.nextManifest = manifest;
     PeerKarmaCache cache = new PeerKarmaCache(new RemoteKarmaChainFetcher(source));
 
-    assertEquals(1, cache.getKarma(ownerPub), "score counts ENDORSEMENT entries only");
+    assertEquals(1, cache.participation(ownerPub), "score counts ENDORSEMENT entries only");
   }
 
   @Test
@@ -284,9 +284,9 @@ class RemoteKarmaChainFetcherTest {
     FakeSource source = new FakeSource();
     source.nextManifest = null;
     PeerKarmaCache cache = new PeerKarmaCache(new RemoteKarmaChainFetcher(source));
-    cache.getKarma(peerPub);
-    cache.getKarma(peerPub);
-    cache.getKarma(peerPub);
+    cache.participation(peerPub);
+    cache.participation(peerPub);
+    cache.participation(peerPub);
     assertEquals(1, source.callCount.get(), "score should be memoized after first lookup");
     assertTrue(cache.cacheHitCount() >= 2);
   }
@@ -296,9 +296,9 @@ class RemoteKarmaChainFetcherTest {
     FakeSource source = new FakeSource();
     source.nextManifest = null;
     PeerKarmaCache cache = new PeerKarmaCache(new RemoteKarmaChainFetcher(source));
-    cache.getKarma(peerPub);
+    cache.participation(peerPub);
     cache.evict(peerPub);
-    cache.getKarma(peerPub);
+    cache.participation(peerPub);
     assertEquals(2, source.callCount.get());
   }
 

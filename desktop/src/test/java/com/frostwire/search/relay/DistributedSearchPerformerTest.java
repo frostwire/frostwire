@@ -193,6 +193,49 @@ class DistributedSearchPerformerTest {
   }
 
   @Test
+  void aVerifiedResponseRecordsTheTorrentsThePeerAnnounced() throws Exception {
+    IdentityKeys peerKeys = PowTestIdentities.next();
+    IdentityKeys requesterKeys = PowTestIdentities.next();
+    NoOpKarmaCache karma = new NoOpKarmaCache();
+    PeerDirectory directory = new PeerDirectory(karma);
+    directory.upsertVerified(peerKeys.ed25519PubRaw(), "127.0.0.1", 6888);
+    FakeTransport transport = new FakeTransport();
+    transport.addResponse(peerKeys.ed25519PubRaw(), peerKeys, "peer ubuntu", 200L, 1);
+    RecordingListener listener = new RecordingListener();
+    DistributedSearchPerformer p =
+        new DistributedSearchPerformer(
+            2L,
+            "ubuntu",
+            new InMemoryLocalIndex(),
+            directory,
+            requesterKeys,
+            transport,
+            5,
+            50,
+            25,
+            10);
+    p.setListener(listener);
+    p.perform();
+    String infoHash =
+        ((CompositeFileSearchResult) listener.results.get(0).get(0)).getTorrentHash().orElseThrow();
+
+    // This node endorses the peer for that torrent: it counts, since the peer announced it.
+    karma.received().setSelf(requesterKeys.ed25519PubRaw(), ih -> false);
+    KarmaChain own = new KarmaChain(requesterKeys.ed25519PubRaw());
+    long height = 6700L * KarmaConstants.BLOCKS_PER_EPOCH;
+    own.commitEpoch(
+        new BitcoinBlockReference(height, new byte[32]), requesterKeys.ed25519().getPrivate());
+    own.endorse(
+        peerKeys.ed25519PubRaw(),
+        com.frostwire.util.Hex.decode(infoHash),
+        new BitcoinBlockReference(height + 1, new byte[32]),
+        requesterKeys.ed25519().getPrivate());
+    karma.received().indexChain(requesterKeys.ed25519PubRaw(), own.entries());
+
+    assertEquals(1.0, karma.receivedKarma(peerKeys.ed25519PubRaw()), 1e-9);
+  }
+
+  @Test
   void searchesPureForwarderAlongsideSearchPeersEvenAtPeerCap() throws Exception {
     PeerDirectory directory = emptyDirectory();
     for (int i = 0; i < 3; i++) {
@@ -852,7 +895,7 @@ class DistributedSearchPerformerTest {
     }
 
     @Override
-    public long getKarma(byte[] peerPub) {
+    public long participation(byte[] peerPub) {
       return 0;
     }
   }

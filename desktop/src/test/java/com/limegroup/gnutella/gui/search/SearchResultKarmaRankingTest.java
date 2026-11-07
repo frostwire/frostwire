@@ -195,7 +195,7 @@ class SearchResultKarmaRankingTest {
     }
 
     @Override
-    public long getCachedKarma(byte[] peerPub) {
+    public double receivedKarma(byte[] peerPub) {
       return scores.getOrDefault(peerPub[31], 0L);
     }
   }

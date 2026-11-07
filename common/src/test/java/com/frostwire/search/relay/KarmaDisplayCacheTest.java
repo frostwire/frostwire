@@ -42,7 +42,7 @@ class KarmaDisplayCacheTest {
   private final AtomicLong now = new AtomicLong(10_000);
 
   @Test
-  void displayKarmaIsTheTrustScoreForNow() {
+  void displayKarmaIsTheReceivedKarma() {
     byte[] known = pub(1);
     byte[] spammer = pub(2);
     directory.upsert(known, "known.example", 6881);
@@ -50,10 +50,12 @@ class KarmaDisplayCacheTest {
     directory.markSpam(spammer);
     karmaCache.score = 3;
 
-    assertEquals(directory.trustScore(known), directory.displayKarma(known));
-    assertEquals(4.0, directory.displayKarma(known)); // 1 direct trust + 3 karma
+    // Received karma alone (#1417), not the trust score's 1 direct trust + 3.
+    assertEquals(3.0, directory.displayKarma(known));
+    assertEquals(4.0, directory.trustScore(known));
     assertEquals(-1.0, directory.displayKarma(spammer));
-    assertEquals(0.0, directory.displayKarma(pub(3))); // unknown peer
+    // A peer outside the directory, such as this node itself, has received karma too.
+    assertEquals(3.0, directory.displayKarma(pub(3)));
     assertEquals(0.0, directory.displayKarma(null));
   }
 
@@ -85,7 +87,7 @@ class KarmaDisplayCacheTest {
 
     assertEquals(List.of(worker), karmaCache.threads);
     assertEquals(DisplayKarma.of(directory.displayKarma(peer)), cache.get(Hex.encode(peer)));
-    assertEquals(3.0, cache.get(Hex.encode(peer)).value()); // 1 direct trust + 2 karma
+    assertEquals(2.0, cache.get(Hex.encode(peer)).value());
     assertEquals(0, loader.size(), "a fresh value is not loaded again");
   }
 
@@ -142,7 +144,7 @@ class KarmaDisplayCacheTest {
     cache.get(Hex.encode(peer));
     loader.runAll();
     ui.runAll();
-    assertEquals(DisplayKarma.of(6), cache.get(Hex.encode(peer)));
+    assertEquals(DisplayKarma.of(5), cache.get(Hex.encode(peer)));
     assertEquals(2, notified.get());
   }
 
@@ -158,6 +160,7 @@ class KarmaDisplayCacheTest {
     assertNull(cache.get(peer));
     assertEquals(0, loader.size(), "not retried on every paint");
 
+    karmaCache.score = 1;
     wired.set(directory);
     now.addAndGet(REFRESH_MS);
     cache.get(peer);
@@ -263,7 +266,7 @@ class KarmaDisplayCacheTest {
     }
 
     @Override
-    public long getCachedKarma(byte[] peerPub) {
+    public double receivedKarma(byte[] peerPub) {
       synchronized (threads) {
         threads.add(Thread.currentThread());
       }

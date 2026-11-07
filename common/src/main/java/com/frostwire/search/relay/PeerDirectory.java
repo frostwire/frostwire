@@ -34,9 +34,10 @@ import java.util.concurrent.atomic.AtomicLong;
  * <p>{@code DECAY} (typically 0.5) means trust decays by half per hop, so a peer trusted only by 4
  * strangers 3 hops away is less trusted than a peer trusted by 1 friend directly.
  *
- * <p>{@code karmaDelta} is the peer's karma score from {@link PeerKarmaCache} (positive for
- * participation, negative for {@link #markSpam(byte[])}). Karma is an additive offset to the
- * structural trust, with the same exponential-decay shape.
+ * <p>{@code karmaDelta} is the peer's received, trust-weighted karma from {@link
+ * PeerKarmaCache#receivedKarma(byte[])} (frostwire/frostwire#1417), lowered locally by {@link
+ * #markSpam(byte[])}. Karma is an additive offset to the structural trust. The endorsements a peer
+ * gives ({@link PeerKarmaCache#participation(byte[])}) are not trust: anyone can give them.
  *
  * <p>The directory is bounded: when the entry count exceeds {@code maxEntries}, the oldest-stale
  * entries are evicted.
@@ -325,10 +326,8 @@ public final class PeerDirectory {
     if (e.spam) {
       return -1.0;
     }
-    // Karma offset: count of endorsements in the chain tail
-    // (already a participation proxy) plus any local delta
-    // (e.g. from markSpam).
-    long karma = karmaCache.getCachedKarma(peerPub) + e.localKarmaDelta;
+    // Karma offset: the karma the peer received, plus any local delta (e.g. from markSpam).
+    double karma = karmaCache.receivedKarma(peerPub) + e.localKarmaDelta;
     // Structural WOT trust up to MAX_DEPTH
     double transitive =
         transitiveTrust(peerPub, RelayConstants.WOT_MAX_DEPTH, new java.util.HashSet<>());
@@ -339,12 +338,27 @@ public final class PeerDirectory {
    * The karma FrostWire shows for a peer: in search results, the Peer Directory and the identity
    * screens. Every karma indicator reads this one method, so a scoring change lands in one place.
    *
-   * <p>Currently the trust score ({@link #trustScore(byte[])}); frostwire/frostwire#1417 will
-   * switch it to the karma the peer received. It never waits on the network, but it walks the trust
-   * graph, so UI code reads it through {@link KarmaDisplayCache} or from a background thread.
+   * <p>The karma the peer received, trust-weighted ({@link PeerKarmaCache#receivedKarma(byte[])},
+   * frostwire/frostwire#1417), for any peer, in the directory or not, this node included. It never
+   * waits on the network, but a change in the endorsement index makes the next read rescore it, so
+   * UI code reads it through {@link KarmaDisplayCache} or from a background thread. A peer the user
+   * marked as spam shows -1, as its trust score does.
    */
   public double displayKarma(byte[] peerPub) {
-    return trustScore(peerPub);
+    if (peerPub == null || peerPub.length != 32) {
+      return 0;
+    }
+    Entry e = entries.get(com.frostwire.util.Hex.encode(peerPub));
+    return e != null && e.spam ? -1.0 : karmaCache.receivedKarma(peerPub);
+  }
+
+  /**
+   * Records that {@code peerPub} announced {@code infoHash} as its own, in a search response this
+   * node verified it signed. Endorsements of a peer count only for torrents it announced
+   * (frostwire/frostwire#1416, question 3).
+   */
+  public void recordAnnouncement(byte[] peerPub, byte[] infoHash) {
+    karmaCache.received().noteAnnounced(peerPub, infoHash);
   }
 
   private double transitiveTrust(byte[] peerPub, int depth, java.util.Set<String> visited) {

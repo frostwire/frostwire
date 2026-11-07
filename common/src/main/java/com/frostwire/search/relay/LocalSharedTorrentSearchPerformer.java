@@ -18,7 +18,9 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.UrlUtils;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Search performer that reads from the local {@link LocalIndex} and surfaces matching rows as
@@ -36,10 +38,10 @@ import java.util.List;
  * single-page executor.
  *
  * <p><b>Karma weighting (optional):</b> if a {@link PeerKarmaCache} is supplied at construction,
- * results are sorted by the publisher's karma score (descending). Ties keep the index's natural
- * order (FTS5 rank). The first lookup for an unknown peer blocks on a DHT fetch; subsequent lookups
- * are O(1) from the cache. Pass {@code null} for the karma cache to preserve the original FTS5-only
- * ordering.
+ * results are sorted by the publisher's received karma ({@link
+ * PeerKarmaCache#receivedKarma(byte[])}, descending). Ties keep the index's natural order (FTS5
+ * rank). Lookups never wait; an unknown publisher's chain is fetched in the background. Pass {@code
+ * null} for the karma cache to preserve the original FTS5-only ordering.
  *
  * <p>Source label: {@link #SOURCE_NAME}.
  */
@@ -199,14 +201,14 @@ public final class LocalSharedTorrentSearchPerformer implements ISearchPerformer
       }
       return out;
     }
-    // Karma-weighted sort. Stable: ties keep FTS5 rank order.
+    // Sorted by the publisher's received karma (frostwire/frostwire#1417), read once per row.
+    // Stable: ties keep FTS5 rank order.
+    Map<LocalSharedTorrent, Double> karma = new IdentityHashMap<>();
+    for (LocalSharedTorrent row : rows) {
+      karma.put(row, karmaFor(row));
+    }
     List<LocalSharedTorrent> sorted = new ArrayList<>(rows);
-    sorted.sort(
-        (a, b) -> {
-          long kb = karmaFor(b);
-          long ka = karmaFor(a);
-          return Long.compare(kb, ka);
-        });
+    sorted.sort((a, b) -> Double.compare(karma.get(b), karma.get(a)));
     List<FileSearchResult> out = new ArrayList<>(sorted.size());
     for (LocalSharedTorrent row : sorted) {
       out.add(toResult(row));
@@ -214,13 +216,13 @@ public final class LocalSharedTorrentSearchPerformer implements ISearchPerformer
     return out;
   }
 
-  private long karmaFor(LocalSharedTorrent t) {
+  private double karmaFor(LocalSharedTorrent t) {
     try {
       byte[] pub = t.publisherEd25519Pub();
       if (pub == null || pub.length != 32) {
         return 0;
       }
-      return karmaCache.getKarma(pub);
+      return karmaCache.receivedKarma(pub);
     } catch (Throwable ignored) {
       return 0;
     }
