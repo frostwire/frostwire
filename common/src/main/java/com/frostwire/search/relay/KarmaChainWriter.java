@@ -9,6 +9,8 @@ package com.frostwire.search.relay;
 
 import com.frostwire.util.Logger;
 import java.security.PrivateKey;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BooleanSupplier;
@@ -56,6 +58,7 @@ public final class KarmaChainWriter implements KarmaEndorsementSink, AutoCloseab
 
   private final ReentrantLock writeLock = new ReentrantLock();
   private final DhtAdvertiser.Lifecycle lifecycle;
+  private final List<Runnable> endorsementListeners = new CopyOnWriteArrayList<>();
 
   public KarmaChainWriter(
       IdentityKeys identity, BlockHeaderSource blockSource, KarmaChainStore table) {
@@ -225,7 +228,31 @@ public final class KarmaChainWriter implements KarmaEndorsementSink, AutoCloseab
     } finally {
       lifecycle.leave();
     }
+    if (appended) {
+      for (Runnable listener : endorsementListeners) {
+        try {
+          listener.run();
+        } catch (RuntimeException e) {
+          LOG.warn("Karma endorsement listener failed", e);
+        }
+      }
+    }
     return appended;
+  }
+
+  /**
+   * Runs {@code listener} on the endorsing thread after each endorsement this writer appends,
+   * outside its lock. Listeners must not block; {@link KarmaChainCommitScheduler} queues a
+   * publication.
+   */
+  public void addEndorsementListener(Runnable listener) {
+    if (listener != null) {
+      endorsementListeners.add(listener);
+    }
+  }
+
+  public void removeEndorsementListener(Runnable listener) {
+    endorsementListeners.remove(listener);
   }
 
   /**

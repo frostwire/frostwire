@@ -10,9 +10,11 @@ package com.frostwire.search.relay;
 import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import com.frostwire.jlibtorrent.SessionManager;
 import com.frostwire.util.Logger;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
@@ -28,6 +30,9 @@ import java.util.function.Supplier;
  *   <li>Calls {@link KarmaChainPublisher#publishIfNeeded(com.frostwire.jlibtorrent.SessionManager)}
  *       so peers can fetch the latest chain tail from the DHT.
  * </ol>
+ *
+ * <p>While running, it also runs a tick right after each endorsement the writer appends, so a new
+ * endorsement is published at once instead of on the next interval (frostwire/frostwire#1416).
  *
  * <p>Both steps fail-closed: any error is logged and swallowed. The chain never blocks on transient
  * network or DHT failures.
@@ -50,6 +55,8 @@ public final class KarmaChainCommitScheduler implements AutoCloseable {
   private final long intervalSec;
   private final DhtAdvertiser.Lifecycle lifecycle;
   private final Supplier<SessionManager> sessionSupplier;
+  private final Runnable publishSoon = this::publishSoon;
+  private final AtomicBoolean publishQueued = new AtomicBoolean();
   private volatile boolean running;
   private ScheduledExecutorService executor;
   private ScheduledFuture<?> task;
@@ -119,6 +126,7 @@ public final class KarmaChainCommitScheduler implements AutoCloseable {
       running = true;
       executor = ExecutorsHelper.newScheduledThreadPool(1, THREAD_NAME);
       task = executor.scheduleAtFixedRate(this::tick, 0, intervalSec, TimeUnit.SECONDS);
+      writer.addEndorsementListener(publishSoon);
     }
     LOG.info("Karma commit scheduler started, interval=" + intervalSec + "s");
   }
@@ -132,6 +140,7 @@ public final class KarmaChainCommitScheduler implements AutoCloseable {
     synchronized (lifecycle) {
       lifecycle.close();
       running = false;
+      writer.removeEndorsementListener(publishSoon);
       if (task != null) {
         task.cancel(false);
         task = null;
@@ -155,6 +164,24 @@ public final class KarmaChainCommitScheduler implements AutoCloseable {
   /** True between a successful start and stop. */
   public boolean isRunning() {
     return running && !lifecycle.isClosed();
+  }
+
+  /** Queues one tick on the scheduler's thread; endorsements in a burst share it. */
+  private void publishSoon() {
+    synchronized (lifecycle) {
+      if (!running || lifecycle.isClosed() || !publishQueued.compareAndSet(false, true)) {
+        return;
+      }
+      try {
+        executor.execute(
+            () -> {
+              publishQueued.set(false);
+              tick();
+            });
+      } catch (RejectedExecutionException e) {
+        publishQueued.set(false);
+      }
+    }
   }
 
   private void tick() {
