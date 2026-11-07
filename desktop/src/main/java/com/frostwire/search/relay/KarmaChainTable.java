@@ -29,7 +29,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * connections). Adds two new tables:
  *
  * <ul>
- *   <li>{@code karma_chain} — append-only chain entries
+ *   <li>{@code karma_chain} — append-only chain entries, keyed by owner ({@code endorser_pub}) and
+ *       seq, so an earlier identity's chain stays apart from the current one's
  *   <li>{@code peer_karma} — aggregate scores per peer for fast lookup
  * </ul>
  */
@@ -44,7 +45,7 @@ public final class KarmaChainTable implements KarmaChainStore {
       "CREATE TABLE IF NOT EXISTS "
           + CHAIN_TABLE
           + " ("
-          + "seq INTEGER PRIMARY KEY, "
+          + "seq INTEGER NOT NULL, "
           + "kind TEXT NOT NULL, "
           + "prev_hash TEXT NOT NULL, "
           + "endorser_pub TEXT NOT NULL, "
@@ -57,8 +58,16 @@ public final class KarmaChainTable implements KarmaChainStore {
           + "info_hash TEXT, "
           + "score_delta INTEGER, "
           + "signature TEXT NOT NULL, "
-          + "canonical_bytes BLOB NOT NULL"
+          + "canonical_bytes BLOB NOT NULL, "
+          + "PRIMARY KEY (endorser_pub, seq)"
           + ")";
+
+  private static final String OWNER_IS = " WHERE endorser_pub = ?";
+
+  /** The columns every version of {@link #CHAIN_TABLE} has, for copying rows between them. */
+  private static final String CHAIN_COLUMNS =
+      "seq, kind, prev_hash, endorser_pub, timestamp, block_height, block_hash, epoch, energy, "
+          + "peer_pub, info_hash, score_delta, signature, canonical_bytes";
 
   private static final String CREATE_PEER_TABLE_SQL =
       "CREATE TABLE IF NOT EXISTS "
@@ -225,59 +234,63 @@ public final class KarmaChainTable implements KarmaChainStore {
     ensureOpen();
     List<KarmaChainEntry> loaded = new ArrayList<>();
     int rows = 0;
+    String owner = Base64.getEncoder().withoutPadding().encodeToString(ownerPub);
     synchronized (connection) {
-      try (Statement s = connection.createStatement();
-          ResultSet rs =
-              s.executeQuery(
-                  "SELECT kind, prev_hash, endorser_pub, timestamp, "
-                      + "block_height, block_hash, epoch, energy, "
-                      + "peer_pub, info_hash, score_delta, signature "
-                      + "FROM "
-                      + CHAIN_TABLE
-                      + " ORDER BY seq ASC")) {
-        while (rs.next()) {
-          rows++;
-          int idx = 1;
-          try {
-            KarmaChainEntry.Kind kind =
-                "EC".equals(rs.getString(idx++))
-                    ? KarmaChainEntry.Kind.EPOCH_COMMITMENT
-                    : KarmaChainEntry.Kind.ENDORSEMENT;
-            byte[] prevHash = Hex.decode(rs.getString(idx++));
-            byte[] endorserPub = Base64.getDecoder().decode(rs.getString(idx++));
-            long timestamp = rs.getLong(idx++);
-            long blockHeight = rs.getLong(idx++);
-            byte[] blockHash = Hex.decode(rs.getString(idx++));
-            long epoch = rs.getLong(idx++);
-            boolean epochWasNull = rs.wasNull();
-            double energy = rs.getDouble(idx++);
-            boolean energyWasNull = rs.wasNull();
-            String peerPubStr = rs.getString(idx++);
-            byte[] peerPub = peerPubStr != null ? Base64.getDecoder().decode(peerPubStr) : null;
-            String infoHashStr = rs.getString(idx++);
-            byte[] infoHash = infoHashStr != null ? Hex.decode(infoHashStr) : null;
-            int scoreDelta = rs.getInt(idx++);
-            boolean scoreDeltaWasNull = rs.wasNull();
-            byte[] signature = Base64.getDecoder().decode(rs.getString(idx++));
+      try (PreparedStatement ps =
+          connection.prepareStatement(
+              "SELECT kind, prev_hash, endorser_pub, timestamp, "
+                  + "block_height, block_hash, epoch, energy, "
+                  + "peer_pub, info_hash, score_delta, signature "
+                  + "FROM "
+                  + CHAIN_TABLE
+                  + OWNER_IS
+                  + " ORDER BY seq ASC")) {
+        ps.setString(1, owner);
+        try (ResultSet rs = ps.executeQuery()) {
+          while (rs.next()) {
+            rows++;
+            int idx = 1;
+            try {
+              KarmaChainEntry.Kind kind =
+                  "EC".equals(rs.getString(idx++))
+                      ? KarmaChainEntry.Kind.EPOCH_COMMITMENT
+                      : KarmaChainEntry.Kind.ENDORSEMENT;
+              byte[] prevHash = Hex.decode(rs.getString(idx++));
+              byte[] endorserPub = Base64.getDecoder().decode(rs.getString(idx++));
+              long timestamp = rs.getLong(idx++);
+              long blockHeight = rs.getLong(idx++);
+              byte[] blockHash = Hex.decode(rs.getString(idx++));
+              long epoch = rs.getLong(idx++);
+              boolean epochWasNull = rs.wasNull();
+              double energy = rs.getDouble(idx++);
+              boolean energyWasNull = rs.wasNull();
+              String peerPubStr = rs.getString(idx++);
+              byte[] peerPub = peerPubStr != null ? Base64.getDecoder().decode(peerPubStr) : null;
+              String infoHashStr = rs.getString(idx++);
+              byte[] infoHash = infoHashStr != null ? Hex.decode(infoHashStr) : null;
+              int scoreDelta = rs.getInt(idx++);
+              boolean scoreDeltaWasNull = rs.wasNull();
+              byte[] signature = Base64.getDecoder().decode(rs.getString(idx++));
 
-            KarmaChainEntry entry =
-                KarmaChainEntry.fromStoredFields(
-                    kind,
-                    prevHash,
-                    loaded.size(),
-                    endorserPub,
-                    timestamp,
-                    blockHeight,
-                    blockHash,
-                    epochWasNull ? null : epoch,
-                    energyWasNull ? null : energy,
-                    peerPub,
-                    infoHash,
-                    scoreDeltaWasNull ? null : scoreDelta,
-                    signature);
-            loaded.add(entry);
-          } catch (Throwable t) {
-            LOG.warn("Skipping corrupt karma chain entry during load", t);
+              KarmaChainEntry entry =
+                  KarmaChainEntry.fromStoredFields(
+                      kind,
+                      prevHash,
+                      loaded.size(),
+                      endorserPub,
+                      timestamp,
+                      blockHeight,
+                      blockHash,
+                      epochWasNull ? null : epoch,
+                      energyWasNull ? null : energy,
+                      peerPub,
+                      infoHash,
+                      scoreDeltaWasNull ? null : scoreDelta,
+                      signature);
+              loaded.add(entry);
+            } catch (Throwable t) {
+              LOG.warn("Skipping corrupt karma chain entry during load", t);
+            }
           }
         }
       } catch (SQLException e) {
@@ -289,7 +302,7 @@ public final class KarmaChainTable implements KarmaChainStore {
       return chain;
     }
     if (rows > 0 && setAsideIfRejected) {
-      String keptIn = setAsideRejectedChain();
+      String keptIn = setAsideRejectedChain(owner);
       LOG.warn(
           "Persisted karma chain failed verification; kept it in " + keptIn + ", starting fresh");
     }
@@ -297,22 +310,34 @@ public final class KarmaChainTable implements KarmaChainStore {
   }
 
   /**
-   * Moves the chain's rows to a new {@code karma_chain_rejected_<millis>} table and empties the
-   * chain table. A fresh chain reuses the same sequence numbers, and its appends replace rows by
-   * seq, so without this a chain the verifier rejects (a writer bug, or a rule added later) would
-   * be overwritten and the user's karma lost for good.
+   * Moves {@code owner}'s rows to a new {@code karma_chain_rejected_<millis>} table and removes
+   * them from the chain table. A fresh chain reuses the same sequence numbers, and its appends
+   * replace rows by owner and seq, so without this a chain the verifier rejects (a writer bug, or a
+   * rule added later) would be overwritten and the user's karma lost for good. Other owners' chains
+   * stay where they are.
    *
    * @throws IllegalStateException if the rows can't be moved; the chain table is then unchanged
    */
-  private String setAsideRejectedChain() {
+  private String setAsideRejectedChain(String owner) {
     String keptIn = CHAIN_TABLE + "_rejected_" + System.currentTimeMillis();
     synchronized (connection) {
       try {
         boolean autoCommit = connection.getAutoCommit();
         connection.setAutoCommit(false);
-        try (Statement s = connection.createStatement()) {
-          s.execute("CREATE TABLE " + keptIn + " AS SELECT * FROM " + CHAIN_TABLE);
-          s.execute("DELETE FROM " + CHAIN_TABLE);
+        try {
+          try (Statement s = connection.createStatement()) {
+            s.execute("CREATE TABLE " + keptIn + " AS SELECT * FROM " + CHAIN_TABLE + " WHERE 0");
+          }
+          try (PreparedStatement copy =
+                  connection.prepareStatement(
+                      "INSERT INTO " + keptIn + " SELECT * FROM " + CHAIN_TABLE + OWNER_IS);
+              PreparedStatement delete =
+                  connection.prepareStatement("DELETE FROM " + CHAIN_TABLE + OWNER_IS)) {
+            copy.setString(1, owner);
+            copy.executeUpdate();
+            delete.setString(1, owner);
+            delete.executeUpdate();
+          }
           connection.commit();
         } catch (SQLException e) {
           connection.rollback();
@@ -445,11 +470,59 @@ public final class KarmaChainTable implements KarmaChainStore {
   private void initializeSchema() throws SQLException {
     try (Statement s = connection.createStatement()) {
       s.execute(CREATE_CHAIN_TABLE_SQL);
+      keyChainTableByOwner(s);
       s.execute(CREATE_PEER_TABLE_SQL);
       s.execute(CREATE_INDEX_EPOCH_SQL);
       s.execute(CREATE_INDEX_BLOCK_SQL);
       s.execute(CREATE_INDEX_SCORE_SQL);
     }
+  }
+
+  /**
+   * Rebuilds a {@link #CHAIN_TABLE} made before frostwire/frostwire#1416, keyed by seq alone, into
+   * one keyed by owner and seq. Every row keeps its values; {@code endorser_pub} is the owner of
+   * every entry in a chain. In the old table a new identity's chain replaced the old identity's
+   * rows seq by seq.
+   */
+  private void keyChainTableByOwner(Statement s) throws SQLException {
+    if (!isKeyedBySeqOnly(s)) {
+      return;
+    }
+    String legacy = CHAIN_TABLE + "_by_seq";
+    boolean autoCommit = connection.getAutoCommit();
+    connection.setAutoCommit(false);
+    try {
+      s.execute("ALTER TABLE " + CHAIN_TABLE + " RENAME TO " + legacy);
+      s.execute(CREATE_CHAIN_TABLE_SQL);
+      s.execute(
+          "INSERT INTO "
+              + CHAIN_TABLE
+              + " ("
+              + CHAIN_COLUMNS
+              + ") SELECT "
+              + CHAIN_COLUMNS
+              + " FROM "
+              + legacy);
+      s.execute("DROP TABLE " + legacy);
+      connection.commit();
+    } catch (SQLException e) {
+      connection.rollback();
+      throw e;
+    } finally {
+      connection.setAutoCommit(autoCommit);
+    }
+  }
+
+  private static boolean isKeyedBySeqOnly(Statement s) throws SQLException {
+    List<String> keys = new ArrayList<>();
+    try (ResultSet rs = s.executeQuery("PRAGMA table_info(" + CHAIN_TABLE + ")")) {
+      while (rs.next()) {
+        if (rs.getInt("pk") > 0) {
+          keys.add(rs.getString("name"));
+        }
+      }
+    }
+    return keys.equals(List.of("seq"));
   }
 
   private void ensureOpen() {

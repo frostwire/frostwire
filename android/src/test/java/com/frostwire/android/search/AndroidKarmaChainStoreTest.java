@@ -198,6 +198,69 @@ public class AndroidKarmaChainStoreTest {
     assertEquals(2, loaded.entries().size());
   }
 
+  @Test
+  public void twoIdentitiesChainsLiveSideBySide() throws Exception {
+    KeyPair other = java.security.KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+    byte[] otherPub = IdentityRecord.extractRawEd25519(other.getPublic());
+    store.append(new KarmaChain(pubRaw).commitEpoch(block(850000L), keyPair.getPrivate()));
+    store.append(new KarmaChain(otherPub).commitEpoch(block(850000L), other.getPrivate()));
+
+    assertOwnChain(pubRaw);
+    assertOwnChain(otherPub);
+  }
+
+  @Test
+  public void aTableKeyedBySeqIsRekeyedByOwnerAndKeepsItsRows() throws Exception {
+    store.close();
+    context.deleteDatabase("test-karma-chain.db");
+    KarmaChainEntry legacy =
+        new KarmaChain(pubRaw).commitEpoch(block(850000L), keyPair.getPrivate());
+    java.io.File file = context.getDatabasePath("test-karma-chain.db");
+    file.getParentFile().mkdirs();
+    try (android.database.sqlite.SQLiteDatabase db =
+        android.database.sqlite.SQLiteDatabase.openOrCreateDatabase(file, null)) {
+      db.execSQL(
+          "CREATE TABLE karma_chain (seq INTEGER PRIMARY KEY, kind TEXT NOT NULL, "
+              + "prev_hash TEXT NOT NULL, endorser_pub TEXT NOT NULL, timestamp INTEGER NOT NULL, "
+              + "block_height INTEGER NOT NULL, block_hash TEXT NOT NULL, epoch INTEGER, "
+              + "energy REAL, peer_pub TEXT, info_hash TEXT, score_delta INTEGER, "
+              + "signature TEXT NOT NULL, canonical_bytes BLOB NOT NULL)");
+      java.util.Base64.Encoder b64 = java.util.Base64.getEncoder().withoutPadding();
+      db.execSQL(
+          "INSERT INTO karma_chain (seq, kind, prev_hash, endorser_pub, timestamp, block_height,"
+              + " block_hash, epoch, energy, signature, canonical_bytes) VALUES"
+              + " (?,?,?,?,?,?,?,?,?,?,?)",
+          new Object[] {
+            legacy.seq(),
+            legacy.kind().code(),
+            com.frostwire.util.Hex.encode(legacy.prevHash()),
+            b64.encodeToString(legacy.endorserPub()),
+            legacy.timestamp(),
+            legacy.blockHeight(),
+            com.frostwire.util.Hex.encode(legacy.blockHash()),
+            legacy.epoch(),
+            legacy.energy(),
+            b64.encodeToString(legacy.signature()),
+            legacy.canonicalBytes()
+          });
+    }
+    store = new AndroidKarmaChainStore(context, "test-karma-chain.db");
+    assertOwnChain(pubRaw);
+
+    // Under the old key, another identity's seq 0 replaced this one's.
+    KeyPair other = java.security.KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+    byte[] otherPub = IdentityRecord.extractRawEd25519(other.getPublic());
+    store.append(new KarmaChain(otherPub).commitEpoch(block(850000L), other.getPrivate()));
+    assertOwnChain(pubRaw);
+    assertOwnChain(otherPub);
+  }
+
+  private void assertOwnChain(byte[] owner) {
+    KarmaChain chain = store.loadChain(owner);
+    assertEquals(1, chain.entries().size());
+    assertTrue(java.util.Arrays.equals(owner, chain.entries().get(0).endorserPub()));
+  }
+
   private static BitcoinBlockReference block(long height) {
     byte[] hash = new byte[32];
     for (int i = 0; i < 32; i++) hash[i] = (byte) ((height + i) & 0xff);
