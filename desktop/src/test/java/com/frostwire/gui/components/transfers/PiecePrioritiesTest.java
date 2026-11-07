@@ -187,8 +187,9 @@ class PiecePrioritiesTest {
     assertEquals("Low (2)", PiecePriorities.describe(Priority.TWO));
 
     assertEquals(PiecePriorities.MARK_SKIP, PiecePriorities.mark(0));
-    assertEquals(PiecePriorities.MARK_LOW, PiecePriorities.mark(1));
-    assertEquals(PiecePriorities.MARK_LOW, PiecePriorities.mark(3));
+    // 1 is what FrostWire gives the files it downloads: not tinted, like libtorrent's default 4
+    assertEquals(PiecePriorities.MARK_NONE, PiecePriorities.mark(1));
+    assertEquals(PiecePriorities.MARK_NONE, PiecePriorities.mark(3));
     assertEquals(PiecePriorities.MARK_NONE, PiecePriorities.mark(4));
     assertEquals(PiecePriorities.MARK_HIGH, PiecePriorities.mark(5));
     assertEquals(PiecePriorities.MARK_HIGH, PiecePriorities.mark(7));

@@ -635,12 +635,9 @@ class HexHivePanelTest {
   }
 
   @Test
-  void piecesThatWontDownloadOrArePrioritizedAreTinted() throws Exception {
+  void piecesThatWontDownloadAreRedAndHighPriorityOnesAreTinted() throws Exception {
     int[] marks = {
-      PiecePriorities.MARK_NONE,
-      PiecePriorities.MARK_SKIP,
-      PiecePriorities.MARK_LOW,
-      PiecePriorities.MARK_HIGH
+      PiecePriorities.MARK_NONE, PiecePriorities.MARK_SKIP, PiecePriorities.MARK_HIGH,
     };
     HexHivePanel panel = newPanel();
     panel.updateData(
@@ -650,7 +647,7 @@ class HexHivePanelTest {
 
           @Override
           public int getTotalHexagonsCount() {
-            return 8;
+            return 6;
           }
 
           @Override
@@ -661,29 +658,33 @@ class HexHivePanelTest {
           @Override
           public boolean isFull(int hexOffset) {
             // a downloaded piece shows as downloaded whatever its priority
-            return hexOffset >= 4;
+            return hexOffset >= 3;
           }
 
           @Override
           public int priorityMark(int hexOffset) {
-            return marks[hexOffset % 4];
+            return marks[hexOffset % 3];
           }
         });
     BufferedImage bitmap = awaitRender(panel);
     Object props = get(panel, "drawingProperties");
-    int[] topFaces = new int[8];
-    for (int piece = 0; piece < 8; piece++) {
+    int[] topFaces = new int[6];
+    for (int piece = 0; piece < 6; piece++) {
       Point center = expectedCenter(props, piece);
       // inside the cube's light top face
       topFaces[piece] = bitmap.getRGB(center.x, center.y - SIDE / 2) & 0xffffff;
     }
-    for (int a = 0; a < 4; a++) {
-      for (int b = a + 1; b < 4; b++) {
+    for (int a = 0; a < 3; a++) {
+      for (int b = a + 1; b < 3; b++) {
         assertNotEquals(topFaces[a], topFaces[b], "marks " + a + " and " + b + " look alike");
       }
     }
-    for (int piece = 5; piece < 8; piece++) {
-      assertEquals(topFaces[4], topFaces[piece], "downloaded piece " + piece + " was tinted");
+    int red = (topFaces[1] >> 16) & 0xff;
+    int green = (topFaces[1] >> 8) & 0xff;
+    int blue = topFaces[1] & 0xff;
+    assertTrue(red > 0xc0 && green < 0x80 && blue < 0x80, "skipped piece is not red");
+    for (int piece = 4; piece < 6; piece++) {
+      assertEquals(topFaces[3], topFaces[piece], "downloaded piece " + piece + " was tinted");
     }
   }
 

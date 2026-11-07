@@ -79,10 +79,9 @@ public class HexHivePanel extends JPanel implements Scrollable {
   private CubePaint emptyHexPaint;
   private CubePaint fullHexPaint;
 
-  /** Not yet downloaded pieces whose priority isn't libtorrent's default, see {@link #paintFor}. */
+  /** Not yet downloaded pieces set to Don't Download or High, see {@link #paintFor}. */
   private CubePaint skippedHexPaint;
 
-  private CubePaint lowPriorityHexPaint;
   private CubePaint highPriorityHexPaint;
   private DrawingProperties drawingProperties;
   private HexDataAdapter<?> latestAdapter;
@@ -1116,8 +1115,6 @@ public class HexHivePanel extends JPanel implements Scrollable {
     switch (adapter.priorityMark(pieceIndex)) {
       case PiecePriorities.MARK_SKIP:
         return skippedHexPaint;
-      case PiecePriorities.MARK_LOW:
-        return lowPriorityHexPaint;
       case PiecePriorities.MARK_HIGH:
         return highPriorityHexPaint;
       default:
@@ -1445,9 +1442,9 @@ public class HexHivePanel extends JPanel implements Scrollable {
     hexagonBorderPaint = new ColoredStroke(0.5f, new Color(numBorderColor, false));
     emptyHexPaint = new CubePaint(numEmptyColor, 10);
     fullHexPaint = new CubePaint(numFullColor, 30);
-    // a darker empty cube for pieces that won't download, warm tints for low and high priority
-    skippedHexPaint = new CubePaint(0x9e9e9e, 15);
-    lowPriorityHexPaint = new CubePaint(0xfff3c4, 10);
+    // red for pieces that won't download, orange for high priority; Normal and Low keep the empty
+    // cube's color
+    skippedHexPaint = new CubePaint(0xe53935, 20);
     highPriorityHexPaint = new CubePaint(0xffb74d, 20);
     backgroundColor = new Color(bgColor);
   }

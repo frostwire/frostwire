@@ -51,8 +51,7 @@ final class PiecePriorities {
   static final int MARK_NONE = 0;
 
   static final int MARK_SKIP = 1;
-  static final int MARK_LOW = 2;
-  static final int MARK_HIGH = 3;
+  static final int MARK_HIGH = 2;
 
   /** The piece operations the Pieces tab needs, so tests can stand in for the JNI handle. */
   interface PieceHandle {
@@ -195,13 +194,15 @@ final class PiecePriorities {
     return priority == null ? label(null) : label(priority) + " (" + priority.swig() + ")";
   }
 
-  /** How a piece of this libtorrent priority level is marked on the hive. */
+  /**
+   * How a piece of this libtorrent priority level is marked on the hive. Only Don't Download and
+   * High are marked. FrostWire gives the files it downloads level 1 (jlibtorrent's NORMAL) and
+   * libtorrent's default is 4, so every level from 1 to 4 is a normal download and keeps the empty
+   * cube's color.
+   */
   static int mark(int level) {
     if (level <= 0) {
       return MARK_SKIP;
-    }
-    if (level < 4) {
-      return MARK_LOW;
     }
     return level > 4 ? MARK_HIGH : MARK_NONE;
   }
