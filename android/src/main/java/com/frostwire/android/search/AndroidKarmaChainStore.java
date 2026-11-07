@@ -58,7 +58,7 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
       "CREATE TABLE IF NOT EXISTS "
           + CHAIN_TABLE
           + " ("
-          + "seq INTEGER PRIMARY KEY, "
+          + "seq INTEGER NOT NULL, "
           + "kind TEXT NOT NULL, "
           + "prev_hash TEXT NOT NULL, "
           + "endorser_pub TEXT NOT NULL, "
@@ -71,7 +71,15 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
           + "info_hash TEXT, "
           + "score_delta INTEGER, "
           + "signature TEXT NOT NULL, "
-          + "canonical_bytes BLOB NOT NULL)";
+          + "canonical_bytes BLOB NOT NULL, "
+          + "PRIMARY KEY (endorser_pub, seq))";
+
+  private static final String OWNER_IS = "endorser_pub = ?";
+
+  /** The columns every version of {@link #CHAIN_TABLE} has, for copying rows between them. */
+  private static final String CHAIN_COLUMNS =
+      "seq, kind, prev_hash, endorser_pub, timestamp, block_height, block_hash, epoch, energy, "
+          + "peer_pub, info_hash, score_delta, signature, canonical_bytes";
 
   private static final String CREATE_PEER_TABLE_SQL =
       "CREATE TABLE IF NOT EXISTS "
@@ -131,10 +139,56 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
 
   private void initializeSchema() {
     db.execSQL(CREATE_CHAIN_TABLE_SQL);
+    keyChainTableByOwner();
     db.execSQL(CREATE_PEER_TABLE_SQL);
     db.execSQL(CREATE_INDEX_EPOCH_SQL);
     db.execSQL(CREATE_INDEX_BLOCK_SQL);
     db.execSQL(CREATE_INDEX_SCORE_SQL);
+  }
+
+  /**
+   * Rebuilds a {@link #CHAIN_TABLE} made before frostwire/frostwire#1416, keyed by seq alone, into
+   * one keyed by owner and seq. Every row keeps its values; {@code endorser_pub} is the owner of
+   * every entry in a chain. In the old table a new identity's chain replaced the old identity's
+   * rows seq by seq.
+   */
+  private void keyChainTableByOwner() {
+    if (!isKeyedBySeqOnly()) {
+      return;
+    }
+    String legacy = CHAIN_TABLE + "_by_seq";
+    db.beginTransaction();
+    try {
+      db.execSQL("ALTER TABLE " + CHAIN_TABLE + " RENAME TO " + legacy);
+      db.execSQL(CREATE_CHAIN_TABLE_SQL);
+      db.execSQL(
+          "INSERT INTO "
+              + CHAIN_TABLE
+              + " ("
+              + CHAIN_COLUMNS
+              + ") SELECT "
+              + CHAIN_COLUMNS
+              + " FROM "
+              + legacy);
+      db.execSQL("DROP TABLE " + legacy);
+      db.setTransactionSuccessful();
+    } finally {
+      db.endTransaction();
+    }
+  }
+
+  private boolean isKeyedBySeqOnly() {
+    List<String> keys = new ArrayList<>();
+    try (Cursor c = db.rawQuery("PRAGMA table_info(" + CHAIN_TABLE + ")", null)) {
+      int name = c.getColumnIndexOrThrow("name");
+      int pk = c.getColumnIndexOrThrow("pk");
+      while (c.moveToNext()) {
+        if (c.getInt(pk) > 0) {
+          keys.add(c.getString(name));
+        }
+      }
+    }
+    return keys.size() == 1 && "seq".equals(keys.get(0));
   }
 
   @Override
@@ -218,6 +272,7 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
     ensureOpen();
     List<KarmaChainEntry> loaded = new ArrayList<>();
     int rows = 0;
+    String owner = Base64.getEncoder().withoutPadding().encodeToString(ownerPub);
     synchronized (db) {
       try (Cursor c =
           db.rawQuery(
@@ -226,8 +281,10 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
                   + "peer_pub, info_hash, score_delta, signature "
                   + "FROM "
                   + CHAIN_TABLE
+                  + " WHERE "
+                  + OWNER_IS
                   + " ORDER BY seq ASC",
-              null)) {
+              new String[] {owner})) {
         while (c.moveToNext()) {
           rows++;
           try {
@@ -282,7 +339,7 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
       return chain;
     }
     if (rows > 0 && setAsideIfRejected) {
-      String keptIn = setAsideRejectedChain();
+      String keptIn = setAsideRejectedChain(owner);
       LOG.warn(
           "Persisted karma chain failed verification; kept it in " + keptIn + ", starting fresh");
     }
@@ -290,20 +347,24 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
   }
 
   /**
-   * Moves the chain's rows to a new {@code karma_chain_rejected_<millis>} table and empties the
-   * chain table. A fresh chain reuses the same sequence numbers, and its appends replace rows by
-   * seq, so without this a chain the verifier rejects (a writer bug, or a rule added later) would
-   * be overwritten and the user's karma lost for good.
+   * Moves {@code owner}'s rows to a new {@code karma_chain_rejected_<millis>} table and removes
+   * them from the chain table. A fresh chain reuses the same sequence numbers, and its appends
+   * replace rows by owner and seq, so without this a chain the verifier rejects (a writer bug, or a
+   * rule added later) would be overwritten and the user's karma lost for good. Other owners' chains
+   * stay where they are.
    *
    * @throws IllegalStateException if the rows can't be moved; the chain table is then unchanged
    */
-  private String setAsideRejectedChain() {
+  private String setAsideRejectedChain(String owner) {
     String keptIn = CHAIN_TABLE + "_rejected_" + System.currentTimeMillis();
     synchronized (db) {
       db.beginTransaction();
       try {
-        db.execSQL("CREATE TABLE " + keptIn + " AS SELECT * FROM " + CHAIN_TABLE);
-        db.execSQL("DELETE FROM " + CHAIN_TABLE);
+        db.execSQL("CREATE TABLE " + keptIn + " AS SELECT * FROM " + CHAIN_TABLE + " WHERE 0");
+        db.execSQL(
+            "INSERT INTO " + keptIn + " SELECT * FROM " + CHAIN_TABLE + " WHERE " + OWNER_IS,
+            new Object[] {owner});
+        db.delete(CHAIN_TABLE, OWNER_IS, new String[] {owner});
         db.setTransactionSuccessful();
       } catch (RuntimeException e) {
         throw new IllegalStateException("Could not set the rejected karma chain aside", e);
