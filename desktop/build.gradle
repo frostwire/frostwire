@@ -964,6 +964,16 @@ tasks.register('runWithJSig', JavaExec) {
     }
 }
 
+// Every test JVM gets its own home folder under build/: FrostWire keeps its settings, crash reports
+// and torrent data under user.home, and a test that writes there must never touch the developer's
+// own FrostWire profile. Crash reports a test spooled there were uploaded to Icebase by the next
+// FrostWire started on the machine (GitHub #1493).
+tasks.withType(Test).configureEach { t ->
+    def testHome = layout.buildDirectory.dir("test-home/${t.name}").get().asFile
+    t.systemProperty 'user.home', testHome.absolutePath
+    t.doFirst { testHome.mkdirs() }
+}
+
 test {
     dependsOn icebridgeJar
     dependsOn tasks.named('jar')
