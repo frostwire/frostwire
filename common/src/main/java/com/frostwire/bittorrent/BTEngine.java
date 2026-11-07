@@ -75,6 +75,33 @@ public final class BTEngine extends SessionManager {
   /** Each torrent's extra data by canonical hash, shared by all of its BTDownloads. */
   private final Map<String, Map<String, String>> downloadExtras = new ConcurrentHashMap<>();
 
+  /**
+   * Held while a download saves its resume data (check that its torrent isn't being removed, then
+   * write) and while a removal marks its torrent, so a save that already passed the check finishes
+   * before the removal deletes the resume files, and later ones see the mark. Saves all run on the
+   * alert thread, so this lock is never contended between saves (frostwire#1496).
+   */
+  final Object resumeDataLock = new Object();
+
+  /**
+   * Canonical hashes of the torrents being removed. All BTDownloads of a torrent check it: an
+   * update makes a second one that hears the same save alerts. Cleared when the torrent is added
+   * again.
+   */
+  private final Set<String> removedTorrents = ConcurrentHashMap.newKeySet();
+
+  /** Marks a torrent as being removed; callers hold {@link #resumeDataLock}. */
+  void markRemoved(String infoHash) {
+    if (infoHash != null) {
+      removedTorrents.add(infoHash);
+    }
+  }
+
+  /** Whether the torrent is being removed, so its resume data must not be written again. */
+  boolean isRemoved(String infoHash) {
+    return infoHash != null && removedTorrents.contains(infoHash);
+  }
+
   /** Guards the session .torrent files, see {@link #ensureResumeTorrentFile}. */
   private final Object resumeTorrentLock = new Object();
 
@@ -1063,6 +1090,11 @@ public final class BTEngine extends SessionManager {
     try {
       TorrentHandle th = find(alert.handle().infoHash());
       if (th != null) {
+        // Added again after a removal: its resume data may be saved again.
+        String canonicalHash = canonicalInfoHash(th);
+        if (canonicalHash != null) {
+          removedTorrents.remove(canonicalHash);
+        }
         // Check if this is a V2-only torrent with stored priorities
         String infoHashStr = alert.handle().infoHash().toString();
         LOG.info("BTEngine.fireDownloadAdded() - alert hash: " + infoHashStr);

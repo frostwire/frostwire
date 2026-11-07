@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterEach;
@@ -106,6 +107,82 @@ class BTDownloadRemoveTest {
     assertEquals(TransferState.ERROR, dl.getState());
     assertEquals(0, dl.getProgress());
     assertFalse(dl.isFinished());
+  }
+
+  @Test
+  void aResumeDataSaveUnderwayWhenTheTransferIsRemovedDoesNotBringItBack() throws Exception {
+    BTDownload dl = seedingDownload("racing");
+    Recorder recorder = new Recorder(dl);
+
+    removeWhileASaveIsWriting(dl, dl, recorder, "racing");
+  }
+
+  @Test
+  void anotherDownloadOfTheTorrentCannotSaveItsResumeDataBackAfterTheRemoval() throws Exception {
+    BTDownload dl = seedingDownload("sibling");
+    Recorder recorder = new Recorder(dl);
+    // Opening the torrent again makes a second BTDownload, which hears the same save alerts.
+    local.engine.download(
+        dl.getTorrentHandle().torrentFile(), dir.resolve("content").toFile(), null, null, true);
+    BTDownload newer = Events.next(local.events.updated, "sibling");
+
+    removeWhileASaveIsWriting(newer, dl, recorder, "sibling");
+  }
+
+  /** A complete transfer of one file named {@code name}, seeding, with its resume data saved. */
+  private BTDownload seedingDownload(String name) throws Exception {
+    Path folder = dir.resolve("content/" + name);
+    content(folder.resolve("one.mp3"), 64 * 1024, 1);
+    TorrentInfo ti = torrent(folder.toFile(), null);
+    local.engine.download(ti, dir.resolve("content").toFile(), null, null, true);
+    BTDownload dl = Events.next(local.events.added, name);
+    String hash = ti.infoHashV1().toHex();
+    await(() -> dl.isFinished(true), "the data was checked");
+    await(() -> local.engine.resumeDataFile(hash).isFile(), "the resume data was saved");
+    return dl;
+  }
+
+  /**
+   * Holds a resume-data save of {@code saving} just before it writes, removes {@code removed} (with
+   * its data) meanwhile, then lets the save go on: the resume file must stay deleted. Saves and the
+   * removal callback run on the same alert thread, so once the listener hears the removal the held
+   * save has finished.
+   */
+  private void removeWhileASaveIsWriting(
+      BTDownload saving, BTDownload removed, Recorder recorder, String name) throws Exception {
+    String hash = removed.getTorrentHandle().torrentFile().infoHashV1().toHex();
+    CountDownLatch writing = new CountDownLatch(1);
+    CountDownLatch release = new CountDownLatch(1);
+    saving.beforeResumeDataWrite =
+        () -> {
+          writing.countDown();
+          try {
+            release.await(LocalEngine.TIMEOUT_SECONDS, TimeUnit.SECONDS);
+          } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+          }
+        };
+    saving.getTorrentHandle().saveResumeData();
+    assertTrue(
+        writing.await(LocalEngine.TIMEOUT_SECONDS, TimeUnit.SECONDS),
+        "a save of " + name + " reached its write");
+
+    Thread remover = new Thread(() -> removed.remove(true, true), "remove " + name);
+    remover.start();
+    // The removal either finishes (nothing stops it overtaking the save) or waits for the save.
+    long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(LocalEngine.TIMEOUT_SECONDS);
+    while (remover.isAlive()
+        && remover.getState() != Thread.State.BLOCKED
+        && System.nanoTime() < deadline) {
+      Thread.sleep(5);
+    }
+    release.countDown();
+    remover.join(TimeUnit.SECONDS.toMillis(LocalEngine.TIMEOUT_SECONDS));
+    assertFalse(remover.isAlive(), "the removal finished");
+
+    assertSame(removed, recorder.next(), "the download's listener heard it was removed");
+    assertFalse(local.engine.resumeDataFile(hash).exists(), "the resume data stays deleted");
+    assertFalse(local.engine.resumeTorrentFile(hash).exists(), "the session copy stays deleted");
   }
 
   @Test

@@ -84,6 +84,10 @@ public final class BTDownload implements BittorrentDownload {
   private long lastSaveResumeTime;
   private String predominantFileExtension;
   private volatile boolean removing;
+
+  /** Runs just before a resume-data save writes; tests interleave a removal here. */
+  volatile Runnable beforeResumeDataWrite = () -> {};
+
   private volatile TorrentStatus cachedStatus;
   private volatile long lastStatusUpdateTime;
   private final AtomicBoolean statusRefreshScheduled = new AtomicBoolean(false);
@@ -579,8 +583,12 @@ public final class BTDownload implements BittorrentDownload {
   public void remove(boolean deleteTorrent, boolean deleteData) {
     String infoHash = engine.canonicalInfoHash(th);
     incompleteFilesToRemove = getIncompleteFiles();
-    // prevent any further resume serialization during removal
-    removing = true;
+    // Stops any further resume serialization by this or any other BTDownload of the torrent, after
+    // waiting for one already writing, so the files deleted below stay deleted (frostwire#1496).
+    synchronized (engine.resumeDataLock) {
+      removing = true;
+      engine.markRemoved(infoHash);
+    }
     if (th.isValid() && engine.isRunning()) {
       // Keeps listening: torrentRemoved() stops on TORRENT_REMOVED, after telling the listener.
       if (deleteData) {
@@ -921,13 +929,16 @@ public final class BTDownload implements BittorrentDownload {
 
   private void serializeResumeData(SaveResumeDataAlert alert) {
     try {
-      if (removing) {
-        return;
-      }
-      if (th.isValid()) {
+      synchronized (engine.resumeDataLock) {
+        if (removing || !th.isValid()) {
+          return;
+        }
         // Same canonical hash BTEngine uses to name the session .torrent,
         // so restore's <torrent-name>.resume lookup always matches.
         String infoHash = engine.canonicalInfoHash(th);
+        if (engine.isRemoved(infoHash)) {
+          return;
+        }
         File file = engine.resumeDataFile(infoHash);
         entry e = add_torrent_params.write_resume_data(alert.swig().getParams());
         Map<String, String> extraSnapshot;
@@ -935,6 +946,7 @@ public final class BTDownload implements BittorrentDownload {
           extraSnapshot = new HashMap<>(extra);
         }
         e.dict().put(EXTRA_DATA_KEY, Entry.fromMap(extraSnapshot).swig());
+        beforeResumeDataWrite.run();
         FileUtils.writeByteArrayToFile(file, Vectors.byte_vector2bytes(e.bencode()));
         LOG.info("BTDownload::serializeResumeData saved resume for " + infoHash);
         engine.ensureResumeTorrentFile(th);
