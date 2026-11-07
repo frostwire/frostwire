@@ -386,6 +386,8 @@ public final class AndroidRelayStack implements AutoCloseable {
               new RemoteKarmaChainFetcher(
                   new DhtKarmaChainSource(btEngine),
                   new com.frostwire.search.relay.TipCachingBlockHeaderSource(blockSource)));
+      // Received karma (#1417): this node's own chain, clock, index and first sightings.
+      karmaCache.trackLocalNode(ident.ed25519PubRaw(), karmaWriter, li, homeDir);
       pd = new PeerDirectory(karmaCache);
 
       observer.phase(RelayStartupTracker.Phase.SERVER);
