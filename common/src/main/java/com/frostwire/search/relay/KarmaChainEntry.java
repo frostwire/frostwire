@@ -58,14 +58,29 @@ public final class KarmaChainEntry {
   /** Sentinel prevHash for the first entry in a chain (32 zero bytes). */
   public static final byte[] GENESIS_PREV_HASH = new byte[32];
 
+  /**
+   * Format of the epoch commitments FrostWire wrote up to 7.1.3 and 3.2.3: the carried energy
+   * decays once per commitment, however many epochs were skipped ({@link
+   * KarmaConstants#energyAtEpoch(double)}). Its canonical form has no {@code fv} field.
+   */
+  public static final int FORMAT_DECAY_PER_COMMITMENT = 1;
+
+  /**
+   * Format of the epoch commitments FrostWire writes since frostwire/frostwire#1416: the carried
+   * energy decays once per epoch that passed ({@link KarmaConstants#energyAtEpoch(double, long)}).
+   * Its canonical form carries {@code fv = 2}, so the signature binds the commitment to its rule.
+   */
+  public static final int FORMAT_DECAY_PER_EPOCH = 2;
+
   private static final Logger LOG = Logger.getLogger(KarmaChainEntry.class);
 
   /** The manifest entry fields {@link #fromDictionary(Map, byte[])} reads. */
   private static final String[] MANIFEST_FIELDS = {
-    "k", "seq", "bh", "bkh", "ph", "pub", "s", "ep", "en", "pp", "ih", "sd"
+    "k", "seq", "bh", "bkh", "ph", "pub", "s", "ep", "en", "fv", "pp", "ih", "sd"
   };
 
   private final Kind kind;
+  private final int formatVersion;
   private final byte[] prevHash;
   private final long seq;
   private final byte[] endorserPub;
@@ -85,6 +100,7 @@ public final class KarmaChainEntry {
 
   private KarmaChainEntry(Builder b) {
     this.kind = b.kind;
+    this.formatVersion = b.formatVersion;
     this.prevHash = b.prevHash.clone();
     this.seq = b.seq;
     this.endorserPub = b.endorserPub.clone();
@@ -100,7 +116,8 @@ public final class KarmaChainEntry {
   }
 
   /**
-   * Create and sign an epoch commitment entry.
+   * Create and sign an epoch commitment entry in {@link #FORMAT_DECAY_PER_COMMITMENT}, the format
+   * of FrostWire up to 7.1.3; {@link KarmaChain} writes {@link #FORMAT_DECAY_PER_EPOCH}.
    *
    * @param prevHash SHA-256 of the previous entry's canonical bytes (or GENESIS_PREV_HASH)
    * @param seq 0-based monotonic sequence number
@@ -116,6 +133,25 @@ public final class KarmaChainEntry {
       BitcoinBlockReference block,
       double energy,
       PrivateKey signingKey) {
+    return createEpochCommitment(
+        prevHash, seq, endorserPub, block, energy, FORMAT_DECAY_PER_COMMITMENT, signingKey);
+  }
+
+  /**
+   * As {@link #createEpochCommitment(byte[], long, byte[], BitcoinBlockReference, double,
+   * PrivateKey)}, in {@code formatVersion}.
+   *
+   * @throws IllegalArgumentException if {@code formatVersion} is not a known format
+   */
+  public static KarmaChainEntry createEpochCommitment(
+      byte[] prevHash,
+      long seq,
+      byte[] endorserPub,
+      BitcoinBlockReference block,
+      double energy,
+      int formatVersion,
+      PrivateKey signingKey) {
+    requireKnownFormat(formatVersion);
     if (prevHash == null || prevHash.length != 32) {
       throw new IllegalArgumentException("prevHash must be 32 bytes");
     }
@@ -135,6 +171,7 @@ public final class KarmaChainEntry {
 
     Builder b = new Builder();
     b.kind = Kind.EPOCH_COMMITMENT;
+    b.formatVersion = formatVersion;
     b.prevHash = prevHash;
     b.seq = seq;
     b.endorserPub = endorserPub;
@@ -214,6 +251,50 @@ public final class KarmaChainEntry {
       byte[] infoHash,
       Integer scoreDelta,
       byte[] signature) {
+    return fromStoredFields(
+        kind,
+        FORMAT_DECAY_PER_COMMITMENT,
+        prevHash,
+        seq,
+        endorserPub,
+        timestamp,
+        blockHeight,
+        blockHash,
+        epoch,
+        energy,
+        peerPub,
+        infoHash,
+        scoreDelta,
+        signature);
+  }
+
+  /**
+   * As {@link #fromStoredFields(Kind, byte[], long, byte[], long, long, byte[], Long, Double,
+   * byte[], byte[], Integer, byte[])}, for an entry in {@code formatVersion}; an endorsement's is
+   * always {@link #FORMAT_DECAY_PER_COMMITMENT}, since the formats differ only in commitments.
+   *
+   * @throws IllegalArgumentException if a field is missing or malformed for {@code kind}, or the
+   *     format is unknown or doesn't apply to {@code kind}
+   */
+  public static KarmaChainEntry fromStoredFields(
+      Kind kind,
+      int formatVersion,
+      byte[] prevHash,
+      long seq,
+      byte[] endorserPub,
+      long timestamp,
+      long blockHeight,
+      byte[] blockHash,
+      Long epoch,
+      Double energy,
+      byte[] peerPub,
+      byte[] infoHash,
+      Integer scoreDelta,
+      byte[] signature) {
+    requireKnownFormat(formatVersion);
+    if (kind == Kind.ENDORSEMENT && formatVersion != FORMAT_DECAY_PER_COMMITMENT) {
+      throw new IllegalArgumentException("endorsements have no format version");
+    }
     if (kind == null) {
       throw new IllegalArgumentException("kind is null");
     }
@@ -231,6 +312,7 @@ public final class KarmaChainEntry {
     }
     Builder b = new Builder();
     b.kind = kind;
+    b.formatVersion = formatVersion;
     b.prevHash = prevHash;
     b.seq = seq;
     b.endorserPub = endorserPub;
@@ -267,6 +349,15 @@ public final class KarmaChainEntry {
 
   public Kind kind() {
     return kind;
+  }
+
+  /**
+   * The format this entry was signed in: {@link #FORMAT_DECAY_PER_EPOCH} for a commitment written
+   * since frostwire/frostwire#1416, otherwise {@link #FORMAT_DECAY_PER_COMMITMENT} (every
+   * endorsement, since the formats differ only in how a commitment's energy is computed).
+   */
+  public int formatVersion() {
+    return formatVersion;
   }
 
   public byte[] prevHash() {
@@ -324,6 +415,7 @@ public final class KarmaChainEntry {
   public byte[] canonicalBytes() {
     Builder b = new Builder();
     b.kind = this.kind;
+    b.formatVersion = this.formatVersion;
     b.prevHash = this.prevHash;
     b.seq = this.seq;
     b.endorserPub = this.endorserPub;
@@ -363,7 +455,8 @@ public final class KarmaChainEntry {
    *   <li>{@code ph}: previous entry hash (hex)
    *   <li>{@code pub}: endorser public key (base64url, no padding)
    *   <li>{@code s}: signature (base64url, no padding)
-   *   <li>EC only: {@code ep} (epoch), {@code en} (energy, decimal string)
+   *   <li>EC only: {@code ep} (epoch), {@code en} (energy, decimal string), {@code fv} (format, 2;
+   *       absent in format 1)
    *   <li>EN only: {@code pp} (peer pub, base64url), {@code ih} (info hash hex), {@code sd} (score
    *       delta)
    * </ul>
@@ -492,6 +585,12 @@ public final class KarmaChainEntry {
       if (ep == null || en == null) {
         return null;
       }
+      Object fvValue = dict.get("fv");
+      Long fv = Bencode.asLong(fvValue);
+      if (fvValue != null && (fv == null || fv != FORMAT_DECAY_PER_EPOCH)) {
+        return null;
+      }
+      b.formatVersion = fv == null ? FORMAT_DECAY_PER_COMMITMENT : FORMAT_DECAY_PER_EPOCH;
       b.epoch = ep;
       try {
         b.energy = Double.parseDouble(en);
@@ -510,7 +609,7 @@ public final class KarmaChainEntry {
       String ih = Bencode.asString(dict.get("ih"));
       Object sdValue = dict.get("sd");
       Long sd = Bencode.asLong(sdValue);
-      if (pp == null || ih == null || (sdValue != null && sd == null)) {
+      if (pp == null || ih == null || (sdValue != null && sd == null) || dict.get("fv") != null) {
         return null;
       }
       // Reject rather than truncate: (int) of an out-of-range value still verified (#1401).
@@ -544,6 +643,12 @@ public final class KarmaChainEntry {
     } catch (Exception e) {
       LOG.debug("Signature verification failed", e);
       return false;
+    }
+  }
+
+  private static void requireKnownFormat(int formatVersion) {
+    if (formatVersion != FORMAT_DECAY_PER_COMMITMENT && formatVersion != FORMAT_DECAY_PER_EPOCH) {
+      throw new IllegalArgumentException("unknown karma chain format " + formatVersion);
     }
   }
 
@@ -601,6 +706,7 @@ public final class KarmaChainEntry {
 
   private static final class Builder {
     Kind kind;
+    int formatVersion = FORMAT_DECAY_PER_COMMITMENT;
     byte[] prevHash;
     long seq;
     byte[] endorserPub;
@@ -632,6 +738,10 @@ public final class KarmaChainEntry {
       if (kind == Kind.EPOCH_COMMITMENT) {
         map.put("e", String.format(java.util.Locale.ROOT, "%.2f", energy));
         map.put("ep", epoch);
+        // Format 1 has no fv field, so its canonical bytes (and signatures) are unchanged.
+        if (formatVersion != FORMAT_DECAY_PER_COMMITMENT) {
+          map.put("fv", (long) formatVersion);
+        }
       } else { // ENDORSEMENT
         map.put("ih", Hex.encode(infoHash));
         map.put("pp", Base64.getUrlEncoder().withoutPadding().encodeToString(peerPub));

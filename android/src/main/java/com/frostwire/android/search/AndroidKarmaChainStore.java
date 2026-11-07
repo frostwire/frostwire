@@ -54,6 +54,13 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
   static final String CHAIN_TABLE = "karma_chain";
   static final String PEER_TABLE = "peer_karma";
 
+  /**
+   * The entry's {@link KarmaChainEntry#formatVersion()}, which its canonical form (and so its
+   * signature) depends on. Rows written before frostwire/frostwire#1416 are format 1.
+   */
+  private static final String FORMAT_VERSION_COLUMN =
+      "format_version INTEGER NOT NULL DEFAULT " + KarmaChainEntry.FORMAT_DECAY_PER_COMMITMENT;
+
   private static final String CREATE_CHAIN_TABLE_SQL =
       "CREATE TABLE IF NOT EXISTS "
           + CHAIN_TABLE
@@ -72,6 +79,8 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
           + "score_delta INTEGER, "
           + "signature TEXT NOT NULL, "
           + "canonical_bytes BLOB NOT NULL, "
+          + FORMAT_VERSION_COLUMN
+          + ", "
           + "PRIMARY KEY (endorser_pub, seq))";
 
   private static final String OWNER_IS = "endorser_pub = ?";
@@ -140,6 +149,9 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
   private void initializeSchema() {
     db.execSQL(CREATE_CHAIN_TABLE_SQL);
     keyChainTableByOwner();
+    if (!chainColumns().contains("format_version")) {
+      db.execSQL("ALTER TABLE " + CHAIN_TABLE + " ADD COLUMN " + FORMAT_VERSION_COLUMN);
+    }
     db.execSQL(CREATE_PEER_TABLE_SQL);
     db.execSQL(CREATE_INDEX_EPOCH_SQL);
     db.execSQL(CREATE_INDEX_BLOCK_SQL);
@@ -191,6 +203,17 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
     return keys.size() == 1 && "seq".equals(keys.get(0));
   }
 
+  private List<String> chainColumns() {
+    List<String> columns = new ArrayList<>();
+    try (Cursor c = db.rawQuery("PRAGMA table_info(" + CHAIN_TABLE + ")", null)) {
+      int name = c.getColumnIndexOrThrow("name");
+      while (c.moveToNext()) {
+        columns.add(c.getString(name));
+      }
+    }
+    return columns;
+  }
+
   @Override
   public void append(KarmaChainEntry entry) {
     if (entry == null) {
@@ -238,6 +261,7 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
         }
         cv.put("signature", Base64.getEncoder().withoutPadding().encodeToString(entry.signature()));
         cv.put("canonical_bytes", entry.canonicalBytes());
+        cv.put("format_version", entry.formatVersion());
         db.replace(CHAIN_TABLE, null, cv);
 
         if (entry.kind() == KarmaChainEntry.Kind.ENDORSEMENT
@@ -278,7 +302,7 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
           db.rawQuery(
               "SELECT kind, prev_hash, endorser_pub, timestamp, "
                   + "block_height, block_hash, epoch, energy, "
-                  + "peer_pub, info_hash, score_delta, signature "
+                  + "peer_pub, info_hash, score_delta, signature, format_version "
                   + "FROM "
                   + CHAIN_TABLE
                   + " WHERE "
@@ -309,10 +333,12 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
             int scoreDelta = c.getInt(idx++);
             boolean scoreDeltaWasNull = c.isNull(idx - 1);
             byte[] signature = Base64.getDecoder().decode(c.getString(idx++));
+            int formatVersion = c.getInt(idx++);
 
             KarmaChainEntry entry =
                 KarmaChainEntry.fromStoredFields(
                     kind,
+                    formatVersion,
                     prevHash,
                     loaded.size(),
                     endorserPub,

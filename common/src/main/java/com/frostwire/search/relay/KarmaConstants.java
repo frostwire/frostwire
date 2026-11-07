@@ -86,8 +86,28 @@ public final class KarmaConstants {
 
   /**
    * Compute the available energy at an epoch given the energy remaining from the previous epoch.
+   * This is the rule of format 1 chains ({@link KarmaChainEntry#FORMAT_DECAY_PER_COMMITMENT}): the
+   * carried energy decays once per commitment, however many epochs were skipped.
    */
   public static double energyAtEpoch(double previousRemaining) {
     return KARMA_ENERGY_PER_EPOCH + previousRemaining * ENERGY_DECAY_FACTOR;
+  }
+
+  /**
+   * The energy of a commitment {@code epochsElapsed} epochs after the previous one, which left
+   * {@code previousRemaining} unused: the carried energy decays by {@link #ENERGY_DECAY_FACTOR} for
+   * every epoch that passed, committed or not. This is the rule of format 2 chains ({@link
+   * KarmaChainEntry#FORMAT_DECAY_PER_EPOCH}), so skipping epochs never keeps more energy than
+   * committing each of them would have.
+   *
+   * @throws IllegalArgumentException if {@code epochsElapsed} is below 1
+   */
+  public static double energyAtEpoch(double previousRemaining, long epochsElapsed) {
+    if (epochsElapsed < 1) {
+      throw new IllegalArgumentException("epochsElapsed must be >= 1");
+    }
+    // Past ~1100 epochs the factor underflows to 0, which is the right limit.
+    return KARMA_ENERGY_PER_EPOCH
+        + previousRemaining * Math.pow(ENERGY_DECAY_FACTOR, (double) epochsElapsed);
   }
 }

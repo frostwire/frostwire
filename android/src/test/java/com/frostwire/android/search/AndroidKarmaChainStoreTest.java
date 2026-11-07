@@ -199,6 +199,21 @@ public class AndroidKarmaChainStoreTest {
   }
 
   @Test
+  public void loadChain_restoresFormat2Commitments() {
+    KarmaChain chain = new KarmaChain(pubRaw);
+    store.append(chain.commitEpoch(block(850000L), keyPair.getPrivate()));
+    // Three epochs later: 5 + 5 * 0.5^3, which only verifies as format 2.
+    KarmaChainEntry later = chain.commitEpoch(block(850000L + 3 * 144), keyPair.getPrivate());
+    store.append(later);
+    assertEquals(KarmaChainEntry.FORMAT_DECAY_PER_EPOCH, later.formatVersion());
+
+    KarmaChain loaded = store.loadChain(pubRaw);
+
+    assertEquals(2, loaded.entries().size());
+    assertEquals(KarmaChainEntry.FORMAT_DECAY_PER_EPOCH, loaded.entries().get(1).formatVersion());
+  }
+
+  @Test
   public void twoIdentitiesChainsLiveSideBySide() throws Exception {
     KeyPair other = java.security.KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
     byte[] otherPub = IdentityRecord.extractRawEd25519(other.getPublic());
@@ -213,8 +228,15 @@ public class AndroidKarmaChainStoreTest {
   public void aTableKeyedBySeqIsRekeyedByOwnerAndKeepsItsRows() throws Exception {
     store.close();
     context.deleteDatabase("test-karma-chain.db");
+    // 3.2.3 wrote format 1 commitments.
     KarmaChainEntry legacy =
-        new KarmaChain(pubRaw).commitEpoch(block(850000L), keyPair.getPrivate());
+        KarmaChainEntry.createEpochCommitment(
+            KarmaChainEntry.GENESIS_PREV_HASH,
+            0,
+            pubRaw,
+            block(850000L),
+            KarmaConstants.KARMA_ENERGY_PER_EPOCH,
+            keyPair.getPrivate());
     java.io.File file = context.getDatabasePath("test-karma-chain.db");
     file.getParentFile().mkdirs();
     try (android.database.sqlite.SQLiteDatabase db =

@@ -56,7 +56,15 @@ class KarmaChainTableOwnerKeyTest {
   @Test
   void aTableKeyedBySeqIsRekeyedByOwnerAndKeepsItsRows() throws Exception {
     File db = db();
-    KarmaChainEntry legacy = commitment(alice);
+    // 7.1.3 wrote format 1 commitments.
+    KarmaChainEntry legacy =
+        KarmaChainEntry.createEpochCommitment(
+            KarmaChainEntry.GENESIS_PREV_HASH,
+            0,
+            alice.ed25519PubRaw(),
+            block(H),
+            KarmaConstants.KARMA_ENERGY_PER_EPOCH,
+            alice.ed25519().getPrivate());
     try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + db.getAbsolutePath())) {
       try (Statement s = c.createStatement()) {
         s.execute(

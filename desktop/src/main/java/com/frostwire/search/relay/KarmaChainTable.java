@@ -41,6 +41,13 @@ public final class KarmaChainTable implements KarmaChainStore {
   static final String CHAIN_TABLE = "karma_chain";
   static final String PEER_TABLE = "peer_karma";
 
+  /**
+   * The entry's {@link KarmaChainEntry#formatVersion()}, which its canonical form (and so its
+   * signature) depends on. Rows written before frostwire/frostwire#1416 are format 1.
+   */
+  private static final String FORMAT_VERSION_COLUMN =
+      "format_version INTEGER NOT NULL DEFAULT " + KarmaChainEntry.FORMAT_DECAY_PER_COMMITMENT;
+
   private static final String CREATE_CHAIN_TABLE_SQL =
       "CREATE TABLE IF NOT EXISTS "
           + CHAIN_TABLE
@@ -59,6 +66,8 @@ public final class KarmaChainTable implements KarmaChainStore {
           + "score_delta INTEGER, "
           + "signature TEXT NOT NULL, "
           + "canonical_bytes BLOB NOT NULL, "
+          + FORMAT_VERSION_COLUMN
+          + ", "
           + "PRIMARY KEY (endorser_pub, seq)"
           + ")";
 
@@ -169,7 +178,7 @@ public final class KarmaChainTable implements KarmaChainStore {
                   + "seq, kind, prev_hash, endorser_pub, timestamp, "
                   + "block_height, block_hash, epoch, energy, "
                   + "peer_pub, info_hash, score_delta, signature, "
-                  + "canonical_bytes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)")) {
+                  + "canonical_bytes, format_version) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")) {
         ps.setLong(1, entry.seq());
         ps.setString(2, entry.kind().code());
         ps.setString(3, Hex.encode(entry.prevHash()));
@@ -200,6 +209,7 @@ public final class KarmaChainTable implements KarmaChainStore {
         }
         ps.setString(13, Base64.getEncoder().withoutPadding().encodeToString(entry.signature()));
         ps.setBytes(14, entry.canonicalBytes());
+        ps.setInt(15, entry.formatVersion());
         ps.executeUpdate();
       } catch (SQLException e) {
         throw new IllegalStateException("Failed to append karma entry seq=" + entry.seq(), e);
@@ -240,7 +250,7 @@ public final class KarmaChainTable implements KarmaChainStore {
           connection.prepareStatement(
               "SELECT kind, prev_hash, endorser_pub, timestamp, "
                   + "block_height, block_hash, epoch, energy, "
-                  + "peer_pub, info_hash, score_delta, signature "
+                  + "peer_pub, info_hash, score_delta, signature, format_version "
                   + "FROM "
                   + CHAIN_TABLE
                   + OWNER_IS
@@ -271,10 +281,12 @@ public final class KarmaChainTable implements KarmaChainStore {
               int scoreDelta = rs.getInt(idx++);
               boolean scoreDeltaWasNull = rs.wasNull();
               byte[] signature = Base64.getDecoder().decode(rs.getString(idx++));
+              int formatVersion = rs.getInt(idx++);
 
               KarmaChainEntry entry =
                   KarmaChainEntry.fromStoredFields(
                       kind,
+                      formatVersion,
                       prevHash,
                       loaded.size(),
                       endorserPub,
@@ -471,6 +483,9 @@ public final class KarmaChainTable implements KarmaChainStore {
     try (Statement s = connection.createStatement()) {
       s.execute(CREATE_CHAIN_TABLE_SQL);
       keyChainTableByOwner(s);
+      if (!chainColumns(s).contains("format_version")) {
+        s.execute("ALTER TABLE " + CHAIN_TABLE + " ADD COLUMN " + FORMAT_VERSION_COLUMN);
+      }
       s.execute(CREATE_PEER_TABLE_SQL);
       s.execute(CREATE_INDEX_EPOCH_SQL);
       s.execute(CREATE_INDEX_BLOCK_SQL);
@@ -523,6 +538,16 @@ public final class KarmaChainTable implements KarmaChainStore {
       }
     }
     return keys.equals(List.of("seq"));
+  }
+
+  private static List<String> chainColumns(Statement s) throws SQLException {
+    List<String> columns = new ArrayList<>();
+    try (ResultSet rs = s.executeQuery("PRAGMA table_info(" + CHAIN_TABLE + ")")) {
+      while (rs.next()) {
+        columns.add(rs.getString("name"));
+      }
+    }
+    return columns;
   }
 
   private void ensureOpen() {
