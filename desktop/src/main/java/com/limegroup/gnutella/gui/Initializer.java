@@ -598,6 +598,8 @@ final class Initializer {
               new com.frostwire.search.relay.TipCachingBlockHeaderSource(blockSource));
       PeerKarmaCache karmaCache = new PeerKarmaCache(karmaFetcher);
       relayResources.add(karmaCache);
+      // Received karma (#1417): this node's own chain, clock, index and first sightings.
+      karmaCache.trackLocalNode(identity.ed25519PubRaw(), karmaWriter, localIndex, homeDir);
       LocalSearchEngineWire.setKarmaCache(karmaCache);
       relayResources.add(() -> LocalSearchEngineWire.setKarmaCache(null));
       if (!relayLifecycle.getAsBoolean()) return;
