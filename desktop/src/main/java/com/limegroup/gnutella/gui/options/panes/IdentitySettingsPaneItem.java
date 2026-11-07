@@ -10,8 +10,10 @@ package com.limegroup.gnutella.gui.options.panes;
 import com.frostwire.search.relay.DisplayKarma;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.IdentityLifecycle;
+import com.frostwire.search.relay.KarmaChainWriter;
 import com.frostwire.search.relay.KarmaConstants;
 import com.frostwire.search.relay.PeerDirectory;
+import com.frostwire.search.relay.PeerKarmaCache;
 import com.frostwire.search.relay.RelayConstants;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
@@ -83,6 +85,7 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
   private final JLabel NODE_ID_LABEL = new JLabel("—");
   private final JLabel PUBKEY_LABEL = new JLabel("—");
   private final JLabel KARMA_LABEL = new JLabel("—");
+  private final JLabel PARTICIPATION_LABEL = new JLabel("—");
   private final JLabel DIFFICULTY_LABEL = new JLabel("—");
   private final JLabel SHARED_COUNT_LABEL = new JLabel("—");
 
@@ -138,8 +141,9 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
 
     addInfoRow(panel, c, 2, I18n.tr("Public Key:"), PUBKEY_LABEL);
     addInfoRow(panel, c, 3, I18n.tr("Karma Score:"), KARMA_LABEL);
-    addInfoRow(panel, c, 4, I18n.tr("Identity Difficulty:"), DIFFICULTY_LABEL);
-    addInfoRow(panel, c, 5, I18n.tr("Shared Torrents:"), SHARED_COUNT_LABEL);
+    addInfoRow(panel, c, 4, I18n.tr("Participation:"), PARTICIPATION_LABEL);
+    addInfoRow(panel, c, 5, I18n.tr("Identity Difficulty:"), DIFFICULTY_LABEL);
+    addInfoRow(panel, c, 6, I18n.tr("Shared Torrents:"), SHARED_COUNT_LABEL);
 
     return panel;
   }
@@ -194,6 +198,7 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
       NODE_ID_LABEL.setText(I18n.tr("(not initialized)"));
       PUBKEY_LABEL.setText(I18n.tr("(not initialized)"));
       KARMA_LABEL.setText(I18n.tr("(not available)"));
+      PARTICIPATION_LABEL.setText(I18n.tr("(not available)"));
       DIFFICULTY_LABEL.setText(I18n.tr("(not available)"));
       SHARED_COUNT_LABEL.setText(I18n.tr("(not available)"));
       return;
@@ -223,6 +228,15 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
         text -> {
           if (generation == karmaGeneration) {
             KARMA_LABEL.setText(text);
+          }
+        });
+    PARTICIPATION_LABEL.setText("—");
+    loadParticipation(
+        SearchEngine::getDistributedKarmaChainWriter,
+        DesktopParallelExecutor::execute,
+        text -> {
+          if (generation == karmaGeneration) {
+            PARTICIPATION_LABEL.setText(text);
           }
         });
     SHARED_COUNT_LABEL.setText(getSharedCount() + " torrents");
@@ -320,6 +334,33 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
             text = karma != null ? karma.text() : I18n.tr("(not available)");
           } catch (Throwable t) {
             LOG.warn("Failed to read the local karma", t);
+            text = I18n.tr("(not available)");
+          }
+          String shown = text;
+          SwingUtilities.invokeLater(() -> show.accept(shown));
+        });
+  }
+
+  /**
+   * Reads the local identity's participation, the endorsements its chain has given (shown apart
+   * from its karma, frostwire/frostwire#1416), from {@code writer}'s chain on {@code background}
+   * and passes its text to {@code show} on the EDT: "(not available)" without a writer.
+   */
+  static void loadParticipation(
+      Supplier<KarmaChainWriter> writer, Executor background, Consumer<String> show) {
+    background.execute(
+        () -> {
+          String text;
+          try {
+            KarmaChainWriter w = writer.get();
+            if (w == null) {
+              text = I18n.tr("(not available)");
+            } else {
+              long given = PeerKarmaCache.endorsementsGiven(w.chain().entries());
+              text = I18n.trn("{0} endorsement given", "{0} endorsements given", given, given);
+            }
+          } catch (Throwable t) {
+            LOG.warn("Failed to read the local participation", t);
             text = I18n.tr("(not available)");
           }
           String shown = text;
