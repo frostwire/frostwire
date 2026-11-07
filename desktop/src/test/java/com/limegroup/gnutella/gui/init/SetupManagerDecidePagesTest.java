@@ -96,4 +96,32 @@ class SetupManagerDecidePagesTest {
     // and it can run off the EDT without a UI
     SetupManager.prepareSaveDirectoryPage();
   }
+
+  /**
+   * The social page's icons are decoded while the pages are decided, on the startup thread, and
+   * only when the page will show: it follows any settings page, never the intent page alone
+   * (Icebase #2c96471ade1e, frostwire/frostwire#1491).
+   */
+  @Test
+  void theSocialPageIconsArePreloadedWhileDecidingThePages() throws Exception {
+    assertTrue(new SetupManager.Pages(true, false, false, false, false).socialPage());
+    assertTrue(new SetupManager.Pages(false, true, false, false, false).socialPage());
+    assertTrue(new SetupManager.Pages(false, false, true, false, false).socialPage());
+    assertFalse(new SetupManager.Pages(false, false, false, true, false).socialPage());
+    assertFalse(SetupManager.Pages.NONE.socialPage());
+
+    String source =
+        Files.readString(
+                Path.of(System.getProperty("user.dir"))
+                    .resolve("src/main/java/com/limegroup/gnutella/gui/init/SetupManager.java"),
+                StandardCharsets.UTF_8)
+            .replaceAll("\\s+", "");
+    int start = source.indexOf("publicvoiddecidePages(){");
+    int end = source.indexOf("}", source.indexOf("preloadIcons", start));
+    assertTrue(start >= 0, "decidePages not found");
+    String body = source.substring(start, end);
+    assertTrue(
+        body.contains("if(pages.socialPage()){SocialRecommendationsWindow.preloadIcons();"),
+        "decidePages must preload the social page's icons when it will show: " + body);
+  }
 }

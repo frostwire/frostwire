@@ -176,10 +176,18 @@ public final class ResourceManager {
         }
       }
     }
-    // Both icon sizes: a handful of small images, and no dependence on the UI settings here.
+    preloadButtonThemeImages(SEARCH_BUTTON_ICONS);
+  }
+
+  /**
+   * Loads the theme images these buttons ({@code icon_mapping.properties} names) resolve to into
+   * the theme-image cache, in both icon sizes: a handful of small images, and no dependence on the
+   * UI settings here. Call it off the EDT.
+   */
+  public static void preloadButtonThemeImages(List<String> buttonNames) {
     for (boolean small : new boolean[] {true, false}) {
       for (List<String> candidates :
-          ButtonIconController.themeImageCandidates(SEARCH_BUTTON_ICONS, small)) {
+          ButtonIconController.themeImageCandidates(buttonNames, small)) {
         preloadFirstThemeImage(candidates);
       }
     }

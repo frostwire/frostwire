@@ -111,6 +111,10 @@ public final class SetupManager {
    */
   public void decidePages() {
     pages = decider.get();
+    // The social page's icons are read from the jar and decoded: here, not on the EDT (#1491).
+    if (pages.socialPage()) {
+      SocialRecommendationsWindow.preloadIcons();
+    }
   }
 
   private static Pages decide() {
@@ -185,7 +189,7 @@ public final class SetupManager {
     if (pages.associations()) {
       windows.add(new AssociationsWindow(this));
     }
-    if (windows.size() > 0) {
+    if (pages.socialPage()) {
       windows.add(new SocialRecommendationsWindow(this));
     }
     // THIS HAS TO GO LAST
@@ -536,6 +540,11 @@ public final class SetupManager {
       boolean intent,
       boolean partial) {
     static final Pages NONE = new Pages(false, false, false, false, false);
+
+    /** The social page follows any settings page; the intent page alone doesn't bring it. */
+    boolean socialPage() {
+      return saveDirectory || startOnStartup || associations;
+    }
   }
 
   private enum SaveStatus {

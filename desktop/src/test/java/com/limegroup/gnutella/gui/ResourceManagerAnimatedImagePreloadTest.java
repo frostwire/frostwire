@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.limegroup.gnutella.gui.init.SocialRecommendationsWindow;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -148,6 +149,34 @@ class ResourceManagerAnimatedImagePreloadTest {
     candidates.forEach(names -> names.forEach(ResourceManager::forgetThemeImage));
 
     Thread worker = new Thread(ResourceManager::preloadStartupThemeImages, "startup");
+    worker.start();
+    worker.join(30_000);
+
+    for (List<String> names : candidates) {
+      assertTrue(
+          names.stream().anyMatch(ResourceManager::isThemeImageCached),
+          "none of " + names + " was preloaded");
+    }
+  }
+
+  /**
+   * Building the setup wizard's social page on the EDT read and decoded its icons from the jar
+   * there (Icebase #2c96471ade1e, frostwire/frostwire#1491). The page's preload, run on the startup
+   * thread while the pages are decided, loads the theme image each icon resolves to.
+   */
+  @Test
+  void theSetupWizardSocialIconsArePreloadedOffTheEdt() throws Exception {
+    List<List<String>> candidates = new ArrayList<>();
+    for (boolean small : new boolean[] {true, false}) {
+      List<List<String>> sized =
+          ButtonIconController.themeImageCandidates(SocialRecommendationsWindow.ICONS, small);
+      assertEquals(
+          SocialRecommendationsWindow.ICONS.size(), sized.size(), "a social icon has no mapping");
+      candidates.addAll(sized);
+    }
+    candidates.forEach(names -> names.forEach(ResourceManager::forgetThemeImage));
+
+    Thread worker = new Thread(SocialRecommendationsWindow::preloadIcons, "startup");
     worker.start();
     worker.join(30_000);
 

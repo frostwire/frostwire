@@ -22,6 +22,8 @@ import com.limegroup.gnutella.gui.GUIConstants;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.IconButton;
+import com.limegroup.gnutella.gui.ResourceManager;
+import java.util.List;
 import javax.swing.*;
 import net.miginfocom.swing.MigLayout;
 
@@ -32,7 +34,7 @@ import net.miginfocom.swing.MigLayout;
  * @author gubatron
  * @author aldenml
  */
-class SocialRecommendationsWindow extends SetupWindow {
+public class SocialRecommendationsWindow extends SetupWindow {
   SocialRecommendationsWindow(SetupManager manager) {
     super(
         manager,
@@ -41,25 +43,40 @@ class SocialRecommendationsWindow extends SetupWindow {
             "Join the FrostWire community and help us spread FrostWire to continue to have a free and uncensored Internet. Stay in touch through social media channels for quick feedback, support, ideas or just to say hello."));
   }
 
+  private static final String CHECK_ICON = "SOCIAL_MEDIA_CHECK";
+  private static final String TWITTER_ICON = "SOCIAL_WIZARD_TWITTER";
+  private static final String FACEBOOK_ICON = "SOCIAL_WIZARD_FACEBOOK";
+  private static final String REDDIT_ICON = "SOCIAL_WIZARD_REDDIT";
+
+  /** The button icons this page shows. */
+  public static final List<String> ICONS =
+      List.of(CHECK_ICON, TWITTER_ICON, FACEBOOK_ICON, REDDIT_ICON);
+
+  /**
+   * Reads and decodes this page's icons from the jar into the theme-image cache. Building the page
+   * on the EDT did that there (Icebase #2c96471ade1e, frostwire/frostwire#1491), so {@link
+   * SetupManager#decidePages()} calls this on the startup thread when the page will show.
+   */
+  public static void preloadIcons() {
+    ResourceManager.preloadButtonThemeImages(ICONS);
+  }
+
   protected void createWindow() {
     super.createWindow();
     JPanel mainPanel = new JPanel(new MigLayout("fillx, insets 0, gap 4px", "[]"));
-    mainPanel.add(new IconButton("SOCIAL_MEDIA_CHECK", 150, 150), "growx, center, span, wrap");
+    mainPanel.add(new IconButton(CHECK_ICON, 150, 150), "growx, center, span, wrap");
     mainPanel.add(
         new JLabel(I18n.tr("<html><b>Keep in Touch!</b></html>")),
         "center, span, wrap, height 40px");
     int socialButtonW = 100;
     mainPanel.add(
-        createSocialButton(
-            "SOCIAL_WIZARD_TWITTER", GUIConstants.TWITTER_FROSTWIRE_URL, socialButtonW),
+        createSocialButton(TWITTER_ICON, GUIConstants.TWITTER_FROSTWIRE_URL, socialButtonW),
         "alignx center");
     mainPanel.add(
-        createSocialButton(
-            "SOCIAL_WIZARD_FACEBOOK", GUIConstants.FACEBOOK_FROSTWIRE_URL, socialButtonW),
+        createSocialButton(FACEBOOK_ICON, GUIConstants.FACEBOOK_FROSTWIRE_URL, socialButtonW),
         "alignx center");
     mainPanel.add(
-        createSocialButton(
-            "SOCIAL_WIZARD_REDDIT", GUIConstants.REDDIT_FROSTWIRE_URL, socialButtonW),
+        createSocialButton(REDDIT_ICON, GUIConstants.REDDIT_FROSTWIRE_URL, socialButtonW),
         "alignx center");
     setSetupComponent(mainPanel);
   }
