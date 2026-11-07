@@ -430,7 +430,7 @@ FrostWire publishes three items per identity. The code and older documents call 
 |:---|:---|:---|:---|
 | Identity | Ed25519 pub | `frostwire-identity-v1` | signed identity record, `sig` included (Table 2) |
 | Index manifest | Ed25519 pub | `frostwire-index-v1` | catalog manifest (Section 6.7) |
-| Karma chain | Ed25519 pub | `frostwire-karma-v1` | karma manifest (Section 10) |
+| Karma chain | Ed25519 pub | `frostwire-karma-v1`, `frostwire-karma-v1/<n>` | karma head page, older pages (Section 10) |
 
 *Table 6: BEP 44 mutable items.*
 
@@ -438,7 +438,7 @@ As BEP 44 specifies, the item target is $`\mathrm{SHA1}(\mathrm{pub} \,\Vert\, 
 
 Gets use `dht_get_item` with a timeout in whole seconds (5 s for identity, index and karma). The Java binding returns the *first* matching item alert. libtorrent can post a non-authoritative alert before the lookup finishes, so the result may not have the highest sequence number. A new implementation should wait for the authoritative result.
 
-Republish intervals: identity at most every 300 s; index manifest when it changes or every 300 s; karma manifest every 1800 s.
+Republish intervals: identity at most every 300 s; index manifest when it changes or every 300 s; karma pages every 1800 s and right after each endorsement.
 
 ### 6.3 BEP 5 topics
 
@@ -688,7 +688,7 @@ Signed bytes are the canonical bencoding of:
 
 The entry hash is $`\mathrm{SHA256}(\mathit{canonical\ bytes})`$. The next entry’s `ph` must equal it, and the first entry’s `ph` is 32 zero bytes. The local creation time is not signed.
 
-**Energy.** The first `EC` has energy 5. Each following `EC` has $`5 + 0.5 \cdot \max(0, E_{\mathrm{prev}} - \mathit{endorsements\ in\ previous\ epoch})`$, applied once regardless of how many epochs were skipped, capped at 10. An epoch allows $`\lfloor E \rfloor`$ endorsements.
+**Energy.** The first `EC` has energy 5. Each following `EC` carries $`R = \max(0, E_{\mathrm{prev}} - \mathit{endorsements\ in\ previous\ epoch})`$. In chain format 1 (FrostWire up to 7.1.3 and 3.2.3) its energy is $`5 + 0.5 R`$, applied once however many epochs were skipped. In format 2, written since then, it is $`5 + 0.5^{\Delta} R`$, where $`\Delta`$ is the number of epochs since the previous `EC`; a format 2 `EC` signs `fv = 2` in its canonical bytes (format 1 has no `fv`). Each `EC` is checked against its own format’s rule, and a chain never goes back from format 2 to format 1. Energy is capped at 10. An epoch allows $`\lfloor E \rfloor`$ endorsements.
 
 **Verification.** A verifier checks: a single owner; valid signatures; hash links; `seq` equals the index; block heights never decrease; `ep = bh/144` and epochs strictly increase; energy within $`[0, 10.01]`$ and within 0.01 of the expected value; no self-endorsement; endorsements per epoch at most $`\lfloor E \rfloor`$. With a known Bitcoin tip (cached for 60 s), it also rejects heights above tip + 2 and checks each `EC` block hash against the real hash at that height.
 
@@ -698,19 +698,32 @@ The writer anchors each entry to the current Bitcoin tip. It reads the height an
 
 ### 10.3 Publication
 
-Every 1800 s the node commits an epoch if needed and publishes its chain as a BEP 44 item with salt `frostwire-karma-v1`. The value is `{base?, entries, head, len, pub, ts, v:1}`, where the wire entry dictionary uses `bkh`, `en` (energy as `"%.3f"`), and `s` (signature in Base64url) in place of the signed names. The manifest must fit in 950 bytes. The publisher drops the oldest entries until it fits and the tail starts with an `EC`, and publishes nothing if fewer than 2 entries remain. Readers accept at most 64 KiB and 256 entries.
+Every 1800 s, and right after each endorsement, the node commits an epoch if needed and publishes its chain in pages (manifest version 2), each a BEP 44 item of at most 950 bytes. The head page uses salt `frostwire-karma-v1`; up to 7 older pages use `frostwire-karma-v1/<n>`, $`n = 1, 2, \ldots`$ counting back from the head. A page is `{v:2, seq, ph, e}`, and the head adds `len`, `head` and `pg` (the number of older pages). Its entries are compact: raw binary `bk` (block hash), `s` (signature), `pp` and `ih`; `en` is the signed `"%.2f"` text; `fv` when 2; `sd` only when not 1. Each entry’s seq and prevHash follow from the page’s `seq` and `ph` and the previous entry, its epoch from its height, and its owner from the item’s key, so the signed canonical bytes are rebuilt unchanged. An endorsement takes about 196 bytes (362 in version 1). The head holds the newest entries that fit, starting at an `EC` when one is among them, so it verifies alone. Every non-empty chain is published.
+
+A reader fetches the head, then older pages while each links to the page after it (seq and hash), within the lookup’s 5 s deadline. It verifies the result from its first `EC` as a tail, or as the whole chain from the genesis, and falls back to the head alone if older pages don’t verify. A head without `v:2` is a version 1 manifest (`{base?, entries, head, len, pub, ts, v:1}`, with hex and Base64url fields), which released clients still publish and readers still accept. Released clients read only the head item and treat a version 2 head as no chain. Readers accept at most 64 KiB and 256 entries.
 
 ### 10.4 Use in ranking
 
-A peer’s karma score is the number of `EN` entries in its published chain. Distributed search results show this number in a hidden-by-default Karma column, and sort by it after seeds. Peer selection prefers peers with higher trust, where trust is 1 plus karma plus local adjustments (a peer marked as spam gets $`-1`$).
+A peer’s karma is the endorsements it has *received*, as this node sees them (`ReceivedKarma`). Every chain the node verifies is indexed by endorsee. An endorsement of $`X`$ by $`E`$ for torrent $`T`$ counts only if $`E`$’s identity has proof of work, $`E \neq X`$, and $`X`$ announced $`T`$ itself: this node verified a search response that $`X`$ signed listing $`T`$ as its own (or $`T`$ is in this node’s index, when $`X`$ is this node). Each endorser casts one vote per endorsee, worth $`0.5^{a/30}`$ for the newest counting endorsement $`a`$ epochs old. Votes are weighted by trust that starts at this node:
+``` math
+T(\mathit{self}) = 1,\quad
+T(X) = \min\Big(1, \sum_E T(E) \cdot 0.5 \cdot \mathit{vote}(E, X)\Big)\ \text{(3 hops)},
+```
+``` math
+w(E) = \max\big(T(E),\ 0.1 \text{ if this node first saw } E \text{ at least 7 epochs ago}\big),
+```
+``` math
+\mathit{karma}(X) = \sum_E w(E) \cdot \mathit{vote}(E, X),
+```
+with $`w(\mathit{self}) = 1`$. The age is witnessed (first sightings are kept on disk), because an owner can sign entries at any past height. The endorsements a peer has *given* are shown separately as participation and never count as trust. Distributed search results show karma in a hidden-by-default Karma column, and sort by it after seeds. Peer selection prefers peers with higher trust, where trust is 1 plus karma plus local adjustments (a peer marked as spam gets $`-1`$).
 
 ### 10.5 Limitations in the current code
 
 These follow from the code as written. They are listed so that a new implementation does not copy them by accident.
 
-- The score counts endorsements a peer has *issued*, not endorsements it has *received*. A node can raise its score by endorsing arbitrary keys. A proposal to count received endorsements exists in `docs/karma-received-endorsements-proposal.md`.
+- Received karma is a partial, local view: an endorsement counts only once this node has verified the endorser’s chain and seen the endorsee announce the torrent. Nothing yet answers “who endorsed $`X`$” for an arbitrary $`X`$ (see `docs/karma-received-endorsements-proposal.md`).
 
-- With realistic values an `EC` entry is about 286 bytes and an `EN` about 362 bytes. Under the 950-byte cap, only a tail of one `EC` and one `EN` fits. A chain whose latest epoch has two or more endorsements, or none, publishes nothing, so remote scores are 0 or 1 in practice.
+- A reader sees at most the head and 7 older pages, about 30 endorsements of a chain.
 
 - The transitive web-of-trust code (`PeerDirectory.addEndorser`) has no production caller, so the transitive term is always 1.
 
@@ -788,7 +801,7 @@ The following points are easy to get wrong when writing an implementation in ano
 
 - **Java `trim()`** removes characters $`\le`$ U+0020 only. `toLowerCase(Locale.ROOT)` is required wherever the code uses it; the Turkish dotless i caused bug \#1407.
 
-- **Karma energy formatting.** Java’s `"%.2f"` rounds half-up on the shortest decimal representation: 9.125 becomes `"9.13"`, where C and Rust give `"9.12"`. Energies such as 9.125 occur. Also, the verifier signs `"%.2f"` of `parseDouble("%.3f"(x))`, which can differ from what the author signed (for example 9.0048828125). Match the Java behaviour exactly, or change both sides in a new version.
+- **Karma energy formatting.** Java’s `"%.2f"` rounds half-up on the shortest decimal representation: 9.125 becomes `"9.13"`, where C and Rust give `"9.12"`. Energies such as 9.125 occur. Also, the verifier signs `"%.2f"` of `parseDouble("%.3f"(x))`, which can differ from what the author signed (for example 9.0048828125). Match the Java behaviour exactly. Manifest version 2 carries the signed `"%.2f"` text itself, so it has no double rounding.
 
 ### 12.2 Protocol behaviour
 
@@ -844,7 +857,7 @@ IceBridge shipped in FrostWire 7.1.0 for desktop, hardened in 7.1.1–7.1.3, and
 
 - **NAT traversal.** An authenticated introduction protocol in which the target consents, so that `HOLE_PUNCH` can be re-enabled.
 
-- **Karma.** Count received endorsements, fit useful chains under the DHT size limit or page them, enforce identity proof of work on remote keys, populate the web of trust, and verify Bitcoin headers instead of trusting HTTP APIs.
+- **Karma.** Let any peer find the endorsements of any other (an endorsee-published “received” manifest, or gossip of endorsement references), populate the Peer Directory’s web of trust, and verify Bitcoin headers instead of trusting HTTP APIs.
 
 - **Connectivity detection.** `ConnectivityDetector.markConnectable` has no caller, so a `CLIENT` never promotes itself to the relay topic, and Android leaf promotion never triggers.
 
@@ -887,7 +900,8 @@ IceBridge shipped in FrostWire 7.1.0 for desktop, hardened in 7.1.1–7.1.3, and
 | `FW-METADATA-3` | metadata chunk signature domain |
 | `frostwire-identity-v1` | BEP 44 salt, identity record |
 | `frostwire-index-v1` | BEP 44 salt, index manifest |
-| `frostwire-karma-v1` | BEP 44 salt, karma chain |
+| `frostwire-karma-v1` | BEP 44 salt, karma chain head page |
+| `frostwire-karma-v1/<n>` | BEP 44 salt, karma chain older page $`n`$ (1–7) |
 | `frostwire-bootstrap-v1` | BEP 5 topic |
 | `frostwire-relays-v1` | BEP 5 topic |
 | `frostwire-peers-v1` | BEP 5 topic |
@@ -931,7 +945,8 @@ IceBridge shipped in FrostWire 7.1.0 for desktop, hardened in 7.1.1–7.1.3, and
 | announce interval (desktop / Android / daemon) | 30 / 300 / 60 s |
 | identity republish | 300 s |
 | DHT get timeout | 5 s |
-| index manifest / karma manifest size cap | 950 / 950 bytes |
+| index manifest / karma page size cap | 950 / 950 bytes |
+| received karma: stranger weight / min.\ age / half-life | 0.1 / 7 epochs / 30 epochs |
 | LAN beacon interval / expiry / max entries | 10 s / 120 s / 128 |
 | host-cache eviction / write throttle | 5 failures / 5 min |
 | identity proof of work | 20 leading zero bits of SHA-1(pub) |
