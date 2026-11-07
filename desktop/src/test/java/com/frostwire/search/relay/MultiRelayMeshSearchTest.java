@@ -445,7 +445,7 @@ class MultiRelayMeshSearchTest {
     }
 
     @Override
-    public long getKarma(byte[] peerPub) {
+    public long participation(byte[] peerPub) {
       return 0;
     }
   }

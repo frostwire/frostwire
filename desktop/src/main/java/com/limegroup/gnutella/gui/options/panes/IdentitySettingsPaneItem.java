@@ -293,7 +293,7 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
       }
       try (KarmaChainTable table = KarmaChainTable.open(karmaDb)) {
         var chain = table.loadChain(identity.ed25519PubRaw());
-        return PeerKarmaCache.computeScore(chain.entries());
+        return PeerKarmaCache.endorsementsGiven(chain.entries());
       }
     } catch (Throwable t) {
       LOG.warn("Failed to read karma score", t);

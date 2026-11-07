@@ -7,29 +7,36 @@
 
 package com.frostwire.search.relay;
 
+import com.frostwire.util.Hex;
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.BiConsumer;
 
 /**
- * Caches aggregate karma scores per peer, computed from the most recently fetched remote chain (via
- * {@link RemoteKarmaChainFetcher}) or the local karma table.
+ * Karma of remote peers, from the chains {@link RemoteKarmaChainFetcher} fetches and verifies.
  *
- * <p>Scoring model: a peer's karma score is the number of {@code ENDORSEMENT} entries in their
- * verified chain tail that target other peers. This is a rough participation signal — a peer that
- * has actively endorsed other peers' downloads has a higher score than one that only mines epoch
- * commitments.
+ * <p>Two numbers per peer (frostwire/frostwire#1417):
  *
- * <p>This is intentionally a proxy. A more robust score would aggregate endorsements
- * <em>received</em> by this peer from other peers' chains, but that requires crawling remote
- * chains, which is out of scope for this build.
+ * <ul>
+ *   <li><b>received karma</b> ({@link #receivedKarma(byte[])}): the trust-weighted endorsements
+ *       other peers gave it, from every chain this cache's fetcher verified ({@link
+ *       ReceivedKarma}). This is the peer's karma.
+ *   <li><b>participation</b> ({@link #participation(byte[])}): the endorsements the peer's own
+ *       verified chain gives others. Anyone can raise it by endorsing made-up peers, so it is shown
+ *       as participation and never counted as trust (frostwire/frostwire#1416, question 4).
+ * </ul>
  *
- * <p>The fetcher owns one bounded, expiring positive/negative cache. Aggregation is bounded by its
- * maximum verified chain size, avoiding a second memoization cache with a different lifetime.
+ * <p>The fetcher owns one bounded, expiring positive/negative cache; every chain it verifies is
+ * indexed into {@link #received()}.
  */
 public class PeerKarmaCache implements AutoCloseable {
 
   private final RemoteKarmaChainFetcher fetcher;
+  private final ReceivedKarma received = new ReceivedKarma();
+  private final BiConsumer<byte[], List<KarmaChainEntry>> indexer = received::indexChain;
   private final AtomicLong fetches = new AtomicLong();
+  private Runnable untrackLocalNode;
   private final AtomicLong cacheHits = new AtomicLong();
 
   public PeerKarmaCache(RemoteKarmaChainFetcher fetcher) {
@@ -37,14 +44,60 @@ public class PeerKarmaCache implements AutoCloseable {
       throw new IllegalArgumentException("fetcher is null");
     }
     this.fetcher = fetcher;
+    fetcher.addVerifiedChainListener(indexer);
   }
 
   /**
-   * Returns a karma score for the given peer. 0 means "no chain or no endorsements in the tail".
-   * Never negative. May wait up to five seconds; routing/UI callers must use {@link
-   * #getCachedKarma(byte[])}.
+   * The index of received endorsements this cache scores from, for wiring this node's identity, its
+   * own chain and the announcements it verifies.
    */
-  public long getKarma(byte[] peerPub) {
+  public ReceivedKarma received() {
+    return received;
+  }
+
+  /**
+   * Wires this node into {@link #received()}: its key, its own chain (indexed now and again after
+   * each endorsement {@code writer} appends), the clock (its chain's current epoch), its own index
+   * (endorsements of this node count for torrents in it) and the first-sightings file in {@code
+   * relayHomeDir}. Reads the file: call on a worker, once per relay generation.
+   */
+  public void trackLocalNode(
+      byte[] ownPub, KarmaChainWriter writer, LocalIndex index, File relayHomeDir) {
+    if (ownPub == null || writer == null || index == null) {
+      throw new IllegalArgumentException("null argument");
+    }
+    byte[] own = ownPub.clone();
+    received.setSelf(own, infoHash -> index.get(Hex.encode(infoHash)).isPresent());
+    received.setClock(() -> writer.chain().currentEpoch());
+    if (relayHomeDir != null) {
+      received.persistTo(new File(relayHomeDir, RelayConstants.KARMA_FIRST_SEEN_FILE));
+    }
+    Runnable indexOwnChain = () -> received.indexChain(own, writer.chain().entries());
+    indexOwnChain.run();
+    writer.addEndorsementListener(indexOwnChain);
+    synchronized (this) {
+      untrackLocalNode = () -> writer.removeEndorsementListener(indexOwnChain);
+    }
+  }
+
+  /**
+   * The peer's received, trust-weighted karma. Never waits: it reads the index, and queues a fetch
+   * of the peer's own chain (whose endorsements of others it indexes) when that isn't cached.
+   */
+  public double receivedKarma(byte[] peerPub) {
+    if (peerPub == null || peerPub.length != 32) {
+      return 0;
+    }
+    fetcher.getCachedChain(peerPub);
+    return received.score(peerPub);
+  }
+
+  /**
+   * The number of endorsements the peer's verified chain gives. 0 means no chain or no endorsements
+   * in what was published. Never negative. May wait up to the fetcher's lookup timeout; routing/UI
+   * callers must use {@link #cachedParticipation(byte[])}.
+   */
+  public long participation(byte[] peerPub) {
     if (peerPub == null || peerPub.length != 32) {
       return 0;
     }
@@ -53,15 +106,15 @@ public class PeerKarmaCache implements AutoCloseable {
     } else {
       fetches.incrementAndGet();
     }
-    return computeScore(fetcher.fetchChain(peerPub));
+    return endorsementsGiven(fetcher.fetchChain(peerPub));
   }
 
-  /** Nonblocking routing/UI lookup; coalesces bounded refresh work on cache misses. */
-  public long getCachedKarma(byte[] peerPub) {
-    return computeScore(fetcher.getCachedChain(peerPub));
+  /** Nonblocking {@link #participation(byte[])}; coalesces bounded refresh work on cache misses. */
+  public long cachedParticipation(byte[] peerPub) {
+    return endorsementsGiven(fetcher.getCachedChain(peerPub));
   }
 
-  /** Drop the cached score for a peer; the next lookup re-fetches. */
+  /** Drop the cached chain for a peer; the next lookup re-fetches. */
   public void evict(byte[] peerPub) {
     if (peerPub == null) {
       return;
@@ -69,15 +122,28 @@ public class PeerKarmaCache implements AutoCloseable {
     fetcher.evict(peerPub);
   }
 
-  /** Drop all cached scores. */
+  /** Drop all cached chains. The received-endorsement index is kept. */
   public void clear() {
     fetcher.clear();
   }
 
-  /** This cache owns its fetcher; close cancels its refreshes, not the shared DHT session. */
+  /**
+   * This cache owns its fetcher; close cancels its refreshes, not the shared DHT session, and saves
+   * the index's first sightings.
+   */
   @Override
   public void close() {
+    fetcher.removeVerifiedChainListener(indexer);
+    Runnable untrack;
+    synchronized (this) {
+      untrack = untrackLocalNode;
+      untrackLocalNode = null;
+    }
+    if (untrack != null) {
+      untrack.run();
+    }
     fetcher.close();
+    received.save();
   }
 
   /** Diagnostic counters. */
@@ -89,8 +155,8 @@ public class PeerKarmaCache implements AutoCloseable {
     return cacheHits.get();
   }
 
-  /** Compute the score from a chain without caching. */
-  public static long computeScore(List<KarmaChainEntry> chain) {
+  /** The number of endorsements in {@code chain}: what its owner gave, not what it received. */
+  public static long endorsementsGiven(List<KarmaChainEntry> chain) {
     if (chain == null || chain.isEmpty()) {
       return 0;
     }

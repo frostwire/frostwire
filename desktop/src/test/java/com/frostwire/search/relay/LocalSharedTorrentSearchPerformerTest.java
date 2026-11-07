@@ -287,7 +287,7 @@ class LocalSharedTorrentSearchPerformerTest {
   }
 
   @Test
-  void performSortsByKarmaDescendingWhenCacheProvided() throws Exception {
+  void performSortsByReceivedKarmaNotEndorsementsGiven() throws Exception {
     java.security.KeyPair lowKeys = testKarmaKeyPair();
     java.security.KeyPair midKeys = testKarmaKeyPair();
     java.security.KeyPair highKeys = testKarmaKeyPair();
@@ -300,15 +300,25 @@ class LocalSharedTorrentSearchPerformerTest {
     index.upsert(torrent("ubuntu 24.04", 1L, 1, midKarmaPub));
     index.upsert(torrent("ubuntu 23.04", 1L, 1, highKarmaPub));
 
+    // The low publisher endorsed the most peers itself: that is participation, not karma
+    // (frostwire/frostwire#1417), and must not lift its results.
     FakeKarmaChainSource source = new FakeKarmaChainSource();
-    source.endorseCount(lowKeys, 1);
+    source.endorseCount(lowKeys, 10);
     source.endorseCount(midKeys, 5);
-    source.endorseCount(highKeys, 10);
+    source.endorseCount(highKeys, 1);
 
-    PeerKarmaCache karma = new PeerKarmaCache(new RemoteKarmaChainFetcher(source));
-    assertEquals(1, karma.getKarma(lowKarmaPub), "verified low publisher history");
-    assertEquals(5, karma.getKarma(midKarmaPub), "verified mid publisher history");
-    assertEquals(10, karma.getKarma(highKarmaPub), "verified high publisher history");
+    PeerKarmaCache karma =
+        new PeerKarmaCache(new RemoteKarmaChainFetcher(source)) {
+          @Override
+          public double receivedKarma(byte[] peerPub) {
+            return java.util.Arrays.equals(peerPub, highKarmaPub)
+                ? 2.0
+                : java.util.Arrays.equals(peerPub, midKarmaPub) ? 1.0 : 0;
+          }
+        };
+    assertEquals(10, karma.participation(lowKarmaPub), "verified low publisher history");
+    assertEquals(5, karma.participation(midKarmaPub), "verified mid publisher history");
+    assertEquals(1, karma.participation(highKarmaPub), "verified high publisher history");
 
     RecordingListener listener = new RecordingListener();
     LocalSharedTorrentSearchPerformer p =
@@ -344,9 +354,9 @@ class LocalSharedTorrentSearchPerformerTest {
     source.endorseCount(keysC, 3);
 
     PeerKarmaCache karma = new PeerKarmaCache(new RemoteKarmaChainFetcher(source));
-    assertEquals(3, karma.getKarma(pubA));
-    assertEquals(3, karma.getKarma(pubB));
-    assertEquals(3, karma.getKarma(pubC));
+    assertEquals(3, karma.participation(pubA));
+    assertEquals(3, karma.participation(pubB));
+    assertEquals(3, karma.participation(pubC));
 
     RecordingListener listener = new RecordingListener();
     LocalSharedTorrentSearchPerformer p =

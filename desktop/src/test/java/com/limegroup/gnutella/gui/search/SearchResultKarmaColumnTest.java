@@ -70,7 +70,7 @@ class SearchResultKarmaColumnTest {
     assertNull(firstPaint.get(), "the EDT must not wait for the karma");
     DisplayKarma karma = awaitKarma(line);
     assertEquals(DisplayKarma.of(directory.displayKarma(peer)), karma);
-    assertEquals(DisplayKarma.of(3), karma); // 1 direct trust + 2 karma
+    assertEquals(DisplayKarma.of(2), karma); // the karma the peer received
     synchronized (karmaCache.onEdt) {
       assertFalse(karmaCache.onEdt.isEmpty());
       assertFalse(karmaCache.onEdt.contains(Boolean.TRUE), "karma read on the EDT");
@@ -184,7 +184,7 @@ class SearchResultKarmaColumnTest {
     }
 
     @Override
-    public long getCachedKarma(byte[] peerPub) {
+    public double receivedKarma(byte[] peerPub) {
       synchronized (onEdt) {
         onEdt.add(SwingUtilities.isEventDispatchThread());
       }

@@ -72,7 +72,7 @@ public class SearchResultListAdapterHidesKarmaTest {
         new PeerDirectory(
             new PeerKarmaCache(new RemoteKarmaChainFetcher(peerPub -> null)) {
               @Override
-              public long getCachedKarma(byte[] peerPub) {
+              public double receivedKarma(byte[] peerPub) {
                 return 2;
               }
             });

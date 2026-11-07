@@ -489,7 +489,8 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
       }
       try (AndroidKarmaChainStore store =
           new AndroidKarmaChainStore(ctx, AndroidLocalIndex.DEFAULT_DB_NAME)) {
-        return PeerKarmaCache.computeScore(store.loadChain(identity.ed25519PubRaw()).entries());
+        return PeerKarmaCache.endorsementsGiven(
+            store.loadChain(identity.ed25519PubRaw()).entries());
       }
     } catch (Throwable t) {
       LOG.warn("Failed to read karma score", t);

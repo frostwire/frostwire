@@ -14,12 +14,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 import java.util.function.IntFunction;
 import java.util.function.LongSupplier;
 
@@ -81,6 +83,8 @@ public final class RemoteKarmaChainFetcher implements AutoCloseable {
   }
 
   private final Map<String, CachedChain> cache = new LinkedHashMap<>();
+  private final List<BiConsumer<byte[], List<KarmaChainEntry>>> verifiedChainListeners =
+      new CopyOnWriteArrayList<>();
   private final int maxEntries;
   private final long ttlNanos;
   private final LongSupplier clock;
@@ -231,6 +235,15 @@ public final class RemoteKarmaChainFetcher implements AutoCloseable {
           && !state.task.isCancelled()
           && System.nanoTime() - state.lookupDeadline < 0)
         entries = parseAndVerify(manifest, pub, blocks, page -> olderPage(pub, page, state));
+      if (entries != null) {
+        for (BiConsumer<byte[], List<KarmaChainEntry>> listener : verifiedChainListeners) {
+          try {
+            listener.accept(pub.clone(), entries);
+          } catch (RuntimeException e) {
+            LOG.warn("Verified karma chain listener failed", e);
+          }
+        }
+      }
     } catch (Throwable t) {
       LOG.debug("Remote karma fetch failed for peer " + key, t);
     } finally {
@@ -243,6 +256,20 @@ public final class RemoteKarmaChainFetcher implements AutoCloseable {
         }
       }
     }
+  }
+
+  /**
+   * Runs {@code listener} with the owner and entries of every chain this fetcher verifies, on the
+   * worker that fetched it.
+   */
+  public void addVerifiedChainListener(BiConsumer<byte[], List<KarmaChainEntry>> listener) {
+    if (listener != null) {
+      verifiedChainListeners.add(listener);
+    }
+  }
+
+  public void removeVerifiedChainListener(BiConsumer<byte[], List<KarmaChainEntry>> listener) {
+    verifiedChainListeners.remove(listener);
   }
 
   /** Drop a peer from the cache. Forces the next fetchChain call to re-query the source. */

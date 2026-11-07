@@ -566,8 +566,14 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
               // pure forwarders; keep latch open for the real answer).
               return;
             }
-            // A verified response is proof the holder is reachable.
+            // A verified response is proof the holder is reachable, and that it announced the
+            // torrents it lists as its own: endorsements of it count for those (#1416).
             peerDirectory.markContact(holderPub);
+            for (RemoteSearchResponse.Row row : response.rows()) {
+              if (Arrays.equals(row.publisherEd25519Pub, holderPub)) {
+                peerDirectory.recordAnnouncement(holderPub, row.infoHash);
+              }
+            }
             IceBridgeEvents.search(
                 Hex.encode(holderPub),
                 "verified result rows="

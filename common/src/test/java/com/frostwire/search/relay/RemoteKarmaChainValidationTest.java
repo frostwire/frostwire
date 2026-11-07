@@ -80,7 +80,7 @@ class RemoteKarmaChainValidationTest {
     reader = new PeerKarmaCache(new RemoteKarmaChainFetcher(paged, bitcoin));
 
     // All 12 endorsements, where the version 1 manifest held one.
-    assertEquals(12, reader.getKarma(owner.ed25519PubRaw()));
+    assertEquals(12, reader.participation(owner.ed25519PubRaw()));
   }
 
   @Test
@@ -234,7 +234,7 @@ class RemoteKarmaChainValidationTest {
             blocks == null
                 ? new RemoteKarmaChainFetcher(pub -> manifest)
                 : new RemoteKarmaChainFetcher(pub -> manifest, blocks));
-    return reader.getKarma(owner.ed25519PubRaw());
+    return reader.participation(owner.ed25519PubRaw());
   }
 
   /** The version 1 manifest of {@code chain}, as released clients publish it. */

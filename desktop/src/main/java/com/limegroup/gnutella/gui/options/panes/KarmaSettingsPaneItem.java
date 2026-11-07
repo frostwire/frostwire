@@ -198,7 +198,7 @@ public final class KarmaSettingsPaneItem extends AbstractPaneItem {
       }
       ENDORSEMENTS_LABEL.setText(String.valueOf(endorsementsGiven));
 
-      long score = PeerKarmaCache.computeScore(chain.entries());
+      long score = PeerKarmaCache.endorsementsGiven(chain.entries());
       SCORE_LABEL.setText(score + " " + I18n.tr("endorsements"));
 
       fillTopPeers(table);

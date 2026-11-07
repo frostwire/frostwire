@@ -40,7 +40,7 @@ class PeerDirectoryTest {
     }
 
     @Override
-    public long getCachedKarma(byte[] peerPub) {
+    public double receivedKarma(byte[] peerPub) {
       if (peerPub == null) return 0;
       Long v = scores.get(com.frostwire.util.Hex.encode(peerPub));
       return v != null ? v : 0;
