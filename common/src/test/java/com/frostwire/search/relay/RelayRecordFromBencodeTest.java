@@ -54,7 +54,7 @@ class RelayRecordFromBencodeTest {
     chain = karma.entries();
   }
 
-  /** A manifest entry dictionary as {@link KarmaChainPublisher} writes it (no per-entry pub). */
+  /** A version 1 manifest entry dictionary, as released clients write it (no per-entry pub). */
   private static Map<String, Object> manifestDict(KarmaChainEntry e) {
     Map<String, Object> m = new TreeMap<>();
     m.put("k", e.kind().code());
@@ -65,6 +65,9 @@ class RelayRecordFromBencodeTest {
     if (e.kind() == KarmaChainEntry.Kind.EPOCH_COMMITMENT) {
       m.put("ep", e.epoch());
       m.put("en", String.format(java.util.Locale.ROOT, "%.3f", e.energy()));
+      if (e.formatVersion() != KarmaChainEntry.FORMAT_DECAY_PER_COMMITMENT) {
+        m.put("fv", (long) e.formatVersion());
+      }
     } else {
       m.put("pp", Base64.getUrlEncoder().withoutPadding().encodeToString(e.peerPub()));
       m.put("ih", Hex.encode(e.infoHash()));
