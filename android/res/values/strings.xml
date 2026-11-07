@@ -444,6 +444,7 @@
     <string name="distributed_identity_fingerprint">Fingerprint</string>
     <string name="distributed_identity_public_key">Public Key</string>
     <string name="distributed_identity_karma">Karma Score</string>
+    <string name="distributed_identity_participation">Participation: %1$d endorsements given</string>
     <string name="distributed_identity_difficulty">Identity Difficulty</string>
     <string name="distributed_identity_shared_count">Shared Torrents</string>
     <string name="distributed_identity_not_initialized">Not initialized — start engine or tap Initialize Identity</string>

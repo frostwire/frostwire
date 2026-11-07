@@ -638,6 +638,7 @@
     <string name="search_icebridge_peers_contacted">分布式搜索 · 已联系 %1$d 个节点</string>
     <string name="distributed_identity_public_key">Public Key</string>
     <string name="distributed_identity_karma">Karma Score</string>
+    <string name="distributed_identity_participation">参与度：已给出 %1$d 个背书</string>
     <string name="distributed_identity_shared_count">共享的种子</string>
     <string name="distributed_identity_loading">正在加载已保存的身份…</string>
     <string name="distributed_identity_loading_details">Loading…</string>

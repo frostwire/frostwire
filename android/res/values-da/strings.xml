@@ -638,6 +638,7 @@
     <string name="search_icebridge_peers_contacted">Distribueret søgning · %1$d peers kontaktet</string>
     <string name="distributed_identity_public_key">Public Key</string>
     <string name="distributed_identity_karma">Karma Score</string>
+    <string name="distributed_identity_participation">Deltagelse: %1$d anbefalinger givet</string>
     <string name="distributed_identity_shared_count">Delte torrents</string>
     <string name="distributed_identity_loading">Indlæser gemt identitet…</string>
     <string name="distributed_identity_loading_details">Loading…</string>

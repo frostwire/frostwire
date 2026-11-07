@@ -88,6 +88,16 @@ public final class RelaySearchWiring {
     return DisplayKarma.forPeer(peerDirectory, ownPub);
   }
 
+  /**
+   * The local identity's participation: the endorsements its karma chain has given, shown apart
+   * from its karma (frostwire/frostwire#1416). Null while the relay stack is not running. Reads the
+   * in-memory chain: call it off the main thread.
+   */
+  public Long localParticipation() {
+    KarmaChainWriter writer = karmaChainWriter;
+    return writer == null ? null : PeerKarmaCache.endorsementsGiven(writer.chain().entries());
+  }
+
   public DistributedSearchTransport searchTransport() {
     return searchTransport;
   }
