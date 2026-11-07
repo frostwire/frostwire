@@ -1,4 +1,5 @@
 FrostWire Android UNRELEASED
+  - fix:A transfer removed while FrostWire was saving its progress no longer comes back the next time FrostWire starts (#1496)
   - new:Karma counts the endorsements a peer receives, weighted by trust, instead of the ones it gives, so peers can no longer raise their own karma (#1416, #1417)
   - new:Distributed Search settings show your received karma and your participation (endorsements you have given) (#1417)
   - fix:Karma chains publish more history in compact pages and right after an endorsement, and an identity change can no longer mix up the old and new identity's karma chain (#1416)
