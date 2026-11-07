@@ -7259,3 +7259,6 @@ msgstr "Не загружается"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/PiecePriorities.java
 msgid "downloaded"
 msgstr "загружено"
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
+msgid "Participation:"
+msgstr "Участие:"

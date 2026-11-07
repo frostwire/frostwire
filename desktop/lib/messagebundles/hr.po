@@ -7241,3 +7241,6 @@ msgstr "Ne preuzima se"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/PiecePriorities.java
 msgid "downloaded"
 msgstr "preuzeto"
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
+msgid "Participation:"
+msgstr "Sudjelovanje:"

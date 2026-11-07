@@ -6820,3 +6820,6 @@ msgstr "Heb ei lwytho i lawr"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/PiecePriorities.java
 msgid "downloaded"
 msgstr "wedi’i lwytho i lawr"
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
+msgid "Participation:"
+msgstr "Cyfranogiad:"

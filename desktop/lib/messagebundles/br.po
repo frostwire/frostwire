@@ -6589,3 +6589,6 @@ msgstr "N'eo ket o pellgargañ"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/PiecePriorities.java
 msgid "downloaded"
 msgstr "pellgarget"
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
+msgid "Participation:"
+msgstr "Kemer perzh:"

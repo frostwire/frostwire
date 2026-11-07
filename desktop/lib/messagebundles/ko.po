@@ -7123,3 +7123,6 @@ msgstr "다운로드하지 않음"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/PiecePriorities.java
 msgid "downloaded"
 msgstr "다운로드됨"
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
+msgid "Participation:"
+msgstr "참여도:"
