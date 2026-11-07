@@ -296,7 +296,7 @@ class JdkWarmUpTest {
    * reflects over its methods, so a class it names in a signature from an unlisted subpackage was
    * read from the jar on the EDT: the Library's cover art panel and TagsReader (Icebase
    * #56dff5196bea, frostwire/frostwire#1489). The subpackages the preloaded screens use are listed
-   * too.
+   * too, and the search field's dictionary classes from org.limewire.collection (#1492).
    */
   @Test
   void theAppPreloadCoversTheSubpackagesThePreloadedScreensUse() throws Exception {
@@ -309,7 +309,11 @@ class JdkWarmUpTest {
             "com.limegroup.gnutella.gui.trees.FilteredTreeModel",
             "com.limegroup.gnutella.gui.options.panes.ipfilter.IPRange",
             "com.limegroup.gnutella.gui.icebridge.PeerCatalogWindow",
-            "com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService")) {
+            "com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService",
+            // The search field's dictionary (frostwire/frostwire#1492).
+            "org.limewire.collection.StringTrieSet",
+            "org.limewire.collection.StringTrie",
+            "org.limewire.collection.TrieNode")) {
       assertTrue(classNames.contains(className), className + " is not preloaded");
     }
   }

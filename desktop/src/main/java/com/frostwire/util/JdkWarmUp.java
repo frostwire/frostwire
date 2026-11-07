@@ -229,6 +229,9 @@ public final class JdkWarmUp {
           "com.frostwire.gui.tabs",
           // ApplicationHeader's search box and its update button.
           "com.frostwire.gui.searchfield",
+          // The search fields' suggestion dictionary (StringTrieSet, StringTrie), built when the
+          // first search field is (Icebase #1e727a1088e0, GitHub #1492).
+          "org.limewire.collection",
           "com.frostwire.gui.updates",
           // MainFrame's menu bar and the actions behind its items.
           "com.limegroup.gnutella.gui.menu",
