@@ -1,0 +1,4 @@
+# The repo is LF everywhere and Spotless checks LF on every platform (desktop/build.gradle), so
+# working trees must be LF whatever core.autocrlf says (GitHub's Windows runners set it to true).
+* text=auto eol=lf
+*.bat -text
