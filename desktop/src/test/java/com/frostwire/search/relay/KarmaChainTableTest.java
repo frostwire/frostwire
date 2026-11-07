@@ -124,6 +124,21 @@ class KarmaChainTableTest {
   }
 
   @Test
+  void loadChainRestoresFormat2Commitments() {
+    KarmaChain chain = new KarmaChain(pubRaw);
+    table.append(chain.commitEpoch(block(850000L), keyPair.getPrivate()));
+    // Three epochs later: 5 + 5 * 0.5^3, which only verifies as format 2.
+    KarmaChainEntry later = chain.commitEpoch(block(850000L + 3 * 144), keyPair.getPrivate());
+    table.append(later);
+    assertEquals(KarmaChainEntry.FORMAT_DECAY_PER_EPOCH, later.formatVersion());
+
+    KarmaChain loaded = table.loadChain(pubRaw);
+
+    assertEquals(2, loaded.entries().size(), "the format is persisted with the entry");
+    assertEquals(KarmaChainEntry.FORMAT_DECAY_PER_EPOCH, loaded.entries().get(1).formatVersion());
+  }
+
+  @Test
   void loadChainReturnsEmptyChainForMissingOwner() {
     KarmaChain loaded = table.loadChain(pubRaw);
     assertNotNull(loaded);

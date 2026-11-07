@@ -197,6 +197,9 @@ public final class KarmaChainPublisher {
     if (energy != null) {
       m.put("en", new Entry(formatEnergy(energy)));
     }
+    if (e.formatVersion() != KarmaChainEntry.FORMAT_DECAY_PER_COMMITMENT) {
+      m.put("fv", new Entry((long) e.formatVersion()));
+    }
     byte[] peerPub = e.peerPub();
     if (peerPub != null) {
       m.put("pp", new Entry(Base64.getUrlEncoder().withoutPadding().encodeToString(peerPub)));

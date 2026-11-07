@@ -136,12 +136,20 @@ public final class KarmaChain {
     }
     requireNotBelowHead(block);
 
-    // Compute new energy: KARMA_ENERGY_PER_EPOCH + (previousRemaining * decay)
-    double previousRemaining = currentEnergy - endorsementsThisEpoch;
-    if (previousRemaining < 0) previousRemaining = 0;
-    double energy = KarmaConstants.energyAtEpoch(previousRemaining);
+    // Format 2: the unused energy decays once per epoch since the last commitment.
+    double energy = KarmaConstants.KARMA_ENERGY_PER_EPOCH;
+    if (currentEpoch >= 0) {
+      double previousRemaining = Math.max(0, currentEnergy - endorsementsThisEpoch);
+      energy = KarmaConstants.energyAtEpoch(previousRemaining, newEpoch - currentEpoch);
+    }
     return KarmaChainEntry.createEpochCommitment(
-        headHash(), nextSeq(), ownerPub, block, energy, signingKey);
+        headHash(),
+        nextSeq(),
+        ownerPub,
+        block,
+        energy,
+        KarmaChainEntry.FORMAT_DECAY_PER_EPOCH,
+        signingKey);
   }
 
   /**
@@ -551,11 +559,15 @@ public final class KarmaChain {
    * <ul>
    *   <li>a commitment's epoch is its Bitcoin height's ({@code ep == bh / 144}), and epochs
    *       strictly increase, so two commitments can't share an epoch or a height's epoch;
-   *   <li>its energy is {@link KarmaConstants#energyAtEpoch} of the previous commitment's unused
-   *       energy (one decay step, however many epochs were skipped, as {@link #commitEpoch}
-   *       computes it), within {@link #ENERGY_TOLERANCE}; a full chain's first commitment has
-   *       nothing carried (5). A tail's first commitment follows an omitted prefix, so its energy
-   *       is only bounded by {@link KarmaConstants#MAX_ENERGY};
+   *   <li>its energy follows from the previous commitment's unused energy by the rule of its own
+   *       format, within {@link #ENERGY_TOLERANCE}: one decay step however many epochs were skipped
+   *       ({@link KarmaChainEntry#FORMAT_DECAY_PER_COMMITMENT}, {@link
+   *       KarmaConstants#energyAtEpoch(double)}), or one per epoch that passed ({@link
+   *       KarmaChainEntry#FORMAT_DECAY_PER_EPOCH}, {@link KarmaConstants#energyAtEpoch(double,
+   *       long)}, which {@link #commitEpoch} writes). A chain written by an older FrostWire moves
+   *       to format 2 at its first newer commitment and never back. A full chain's first commitment
+   *       has nothing carried (5). A tail's first commitment follows an omitted prefix, so its
+   *       energy is only bounded by {@link KarmaConstants#MAX_ENERGY};
    *   <li>an endorsement follows a commitment, sits in its epoch or later, names someone other than
    *       the chain's owner, and stays within the floor of the commitment's energy.
    * </ul>
@@ -565,6 +577,7 @@ public final class KarmaChain {
   private static boolean checkEpochsAndBudget(
       List<KarmaChainEntry> entries, boolean startsAtGenesis) {
     long lastCommitmentEpoch = -1;
+    int lastFormat = KarmaChainEntry.FORMAT_DECAY_PER_COMMITMENT;
     double energy = 0;
     int endorsements = 0;
     boolean energyKnown = startsAtGenesis;
@@ -572,10 +585,12 @@ public final class KarmaChain {
       if (e.kind() == KarmaChainEntry.Kind.EPOCH_COMMITMENT) {
         Long epoch = e.epoch();
         Double declared = e.energy();
+        int format = e.formatVersion();
         if (epoch == null
             || declared == null
             || epoch != KarmaConstants.epochForHeight(e.blockHeight())
-            || epoch <= lastCommitmentEpoch) {
+            || epoch <= lastCommitmentEpoch
+            || format < lastFormat) {
           return false;
         }
         // NaN fails every comparison, which would lift the budget below (#1401).
@@ -585,12 +600,19 @@ public final class KarmaChain {
           return false;
         }
         if (energyKnown) {
-          double expected = KarmaConstants.energyAtEpoch(Math.max(0, energy - endorsements));
+          double carried = Math.max(0, energy - endorsements);
+          double expected =
+              lastCommitmentEpoch < 0
+                  ? KarmaConstants.KARMA_ENERGY_PER_EPOCH
+                  : format == KarmaChainEntry.FORMAT_DECAY_PER_EPOCH
+                      ? KarmaConstants.energyAtEpoch(carried, epoch - lastCommitmentEpoch)
+                      : KarmaConstants.energyAtEpoch(carried);
           if (Math.abs(declared - expected) > ENERGY_TOLERANCE) {
             return false;
           }
         }
         energyKnown = true;
+        lastFormat = format;
         lastCommitmentEpoch = epoch;
         energy = declared;
         endorsements = 0;
