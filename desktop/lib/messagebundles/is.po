@@ -6818,3 +6818,7 @@ msgstr "Sleppa skráareigindum"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Doesn't store whether each file is hidden or executable."
 msgstr "Geymir ekki hvort hver skrá sé falin eða keyranleg."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
+msgid "Participation:"
+msgstr "Þátttaka:"

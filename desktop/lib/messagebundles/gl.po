@@ -6575,3 +6575,7 @@ msgstr "Omitir os atributos dos ficheiros"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Doesn't store whether each file is hidden or executable."
 msgstr "Non garda se cada ficheiro está oculto ou é executable."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
+msgid "Participation:"
+msgstr "Participación:"

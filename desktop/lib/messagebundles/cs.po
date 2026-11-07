@@ -7092,3 +7092,7 @@ msgstr "Vynechat atributy souborů"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Doesn't store whether each file is hidden or executable."
 msgstr "Neukládá, zda je každý soubor skrytý nebo spustitelný."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
+msgid "Participation:"
+msgstr "Účast:"

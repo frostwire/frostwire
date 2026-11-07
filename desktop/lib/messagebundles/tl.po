@@ -7283,3 +7283,7 @@ msgstr "Huwag isama ang mga attribute ng file"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Doesn't store whether each file is hidden or executable."
 msgstr "Hindi nito ini-imbak kung nakatago o executable ang bawat file."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
+msgid "Participation:"
+msgstr "Pakikilahok:"

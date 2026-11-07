@@ -6976,3 +6976,7 @@ msgstr "फाइल विशेषताहरू छोड्नुहोस�
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Doesn't store whether each file is hidden or executable."
 msgstr "प्रत्येक फाइल लुकेको वा कार्यान्वयनयोग्य छ कि छैन भनेर भण्डारण गर्दैन।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
+msgid "Participation:"
+msgstr "सहभागिता:"

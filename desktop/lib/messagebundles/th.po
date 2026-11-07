@@ -7143,3 +7143,7 @@ msgstr "ไม่รวมแอตทริบิวต์ของไฟล์
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Doesn't store whether each file is hidden or executable."
 msgstr "ไม่เก็บข้อมูลว่าแต่ละไฟล์ถูกซ่อนหรือเรียกใช้งานได้หรือไม่"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
+msgid "Participation:"
+msgstr "การมีส่วนร่วม:"

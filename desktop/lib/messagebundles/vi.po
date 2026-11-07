@@ -7186,3 +7186,7 @@ msgstr "Bỏ qua thuộc tính tệp"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Doesn't store whether each file is hidden or executable."
 msgstr "Không lưu việc mỗi tệp có bị ẩn hay có thể thực thi hay không."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
+msgid "Participation:"
+msgstr "Tham gia:"

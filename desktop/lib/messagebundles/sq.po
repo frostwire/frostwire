@@ -7199,3 +7199,7 @@ msgstr "Lëri jashtë atributet e skedarëve"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Doesn't store whether each file is hidden or executable."
 msgstr "Nuk ruan nëse çdo skedar është i fshehur ose i ekzekutueshëm."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
+msgid "Participation:"
+msgstr "Pjesëmarrja:"

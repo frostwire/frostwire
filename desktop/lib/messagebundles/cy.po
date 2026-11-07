@@ -6812,3 +6812,7 @@ msgstr "Hepgor priodoleddau ffeiliau"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Doesn't store whether each file is hidden or executable."
 msgstr "Nid yw'n cadw a yw pob ffeil yn gudd neu'n weithredadwy."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
+msgid "Participation:"
+msgstr "Cyfranogiad:"

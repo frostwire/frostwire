@@ -7058,3 +7058,7 @@ msgstr "عدم تضمين سمات الملفات"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java
 msgid "Doesn't store whether each file is hidden or executable."
 msgstr "لا يخزن ما إذا كان كل ملف مخفيًا أو قابلاً للتنفيذ."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
+msgid "Participation:"
+msgstr "المشاركة:"
