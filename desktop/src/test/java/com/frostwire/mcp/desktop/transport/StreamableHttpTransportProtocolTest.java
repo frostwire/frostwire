@@ -23,6 +23,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URI;
@@ -34,6 +35,7 @@ import java.nio.file.Path;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManager;
@@ -281,6 +283,27 @@ class StreamableHttpTransportProtocolTest {
             }
           });
     }
+  }
+
+  @Test
+  void aStreamIsOpenBeforeItsHeadersAreSent() throws Exception {
+    transport = new StreamableHttpTransport("127.0.0.1", 0);
+    // A client may POST the moment it has the stream's headers, which the flush sends. The stream
+    // must be registered by then, or the answer comes back on the POST (200) instead of on the
+    // stream (CI saw that race).
+    AtomicBoolean openWhenHeadersSent = new AtomicBoolean();
+    OutputStream headers =
+        new OutputStream() {
+          @Override
+          public void write(int b) {}
+
+          @Override
+          public void flush() {
+            openWhenHeadersSent.set(transport.hasOpenStream("mcp-session-race"));
+          }
+        };
+    transport.openStream("mcp-session-race", headers);
+    assertTrue(openWhenHeadersSent.get(), "the stream was registered after its headers went out");
   }
 
   @Test

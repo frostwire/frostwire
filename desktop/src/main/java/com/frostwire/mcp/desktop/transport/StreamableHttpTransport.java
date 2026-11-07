@@ -170,6 +170,24 @@ public class StreamableHttpTransport implements MCPTransport {
     return SelfSignedCertGenerator.createSSLContext(hostname);
   }
 
+  /**
+   * Registers an event stream, then sends its headers. A client that POSTs as soon as it has the
+   * headers (and so the session id) must find the stream open, or its answer comes back on the POST
+   * instead of on this stream.
+   */
+  SSEConnection openStream(String sessionId, OutputStream os) throws IOException {
+    SSEConnection conn = new SSEConnection(sessionId, os);
+    activeSSEConnections.put(sessionId, conn);
+    // The server holds the headers back until the body is flushed. Flushing an empty chunked body
+    // sends them, with the session id, without sending any data.
+    os.flush();
+    return conn;
+  }
+
+  boolean hasOpenStream(String sessionId) {
+    return activeSSEConnections.containsKey(sessionId);
+  }
+
   private class McpHttpHandler implements HttpHandler {
 
     @Override
@@ -225,11 +243,7 @@ public class StreamableHttpTransport implements MCPTransport {
       exchange.sendResponseHeaders(200, 0);
 
       OutputStream os = exchange.getResponseBody();
-      // The server holds the headers back until the body is flushed. Flushing an empty chunked
-      // body sends them, with the session id, without sending any data.
-      os.flush();
-      SSEConnection conn = new SSEConnection(sessionId, os);
-      activeSSEConnections.put(sessionId, conn);
+      SSEConnection conn = openStream(sessionId, os);
 
       // Do NOT send any initial data (comments or events) here.
       // Sending anything (even a neutral comment) can cause clients like Grok's
@@ -473,7 +487,7 @@ public class StreamableHttpTransport implements MCPTransport {
     }
   }
 
-  private static class SSEConnection {
+  static class SSEConnection {
     private final String sessionId;
     private final OutputStream outputStream;
     private volatile boolean closed;
