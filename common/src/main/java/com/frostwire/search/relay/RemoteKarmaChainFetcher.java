@@ -20,6 +20,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.IntFunction;
 import java.util.function.LongSupplier;
 
 /**
@@ -229,7 +230,7 @@ public final class RemoteKarmaChainFetcher implements AutoCloseable {
       if (manifest != null
           && !state.task.isCancelled()
           && System.nanoTime() - state.lookupDeadline < 0)
-        entries = parseAndVerify(manifest, pub, blocks);
+        entries = parseAndVerify(manifest, pub, blocks, page -> olderPage(pub, page, state));
     } catch (Throwable t) {
       LOG.debug("Remote karma fetch failed for peer " + key, t);
     } finally {
@@ -326,17 +327,29 @@ public final class RemoteKarmaChainFetcher implements AutoCloseable {
     boolean complete;
   }
 
+  /** Older page {@code page} of {@code pub}'s chain, within the lookup's deadline, or null. */
+  private byte[] olderPage(byte[] pub, int page, CachedChain state) {
+    if (state.task.isCancelled() || System.nanoTime() - state.lookupDeadline >= 0) {
+      return null;
+    }
+    Entry item =
+        source instanceof DhtKarmaChainSource
+            ? ((DhtKarmaChainSource) source).fetchManifestPage(pub, page, state.lookupDeadline)
+            : source.fetchManifestPage(pub, page);
+    return item == null ? null : item.bencode();
+  }
+
   /**
-   * Verifies a manifest libtorrent has decoded: its canonical bytes go through {@link
-   * KarmaChain#parseManifest(byte[], byte[], BlockHeaderSource)}, with this fetcher's block source
-   * (if any).
+   * Verifies a head item libtorrent has decoded, of either manifest version, with its older pages
+   * from {@code olderPage}: see {@link KarmaChainPages#read}, with this fetcher's block source (if
+   * any).
    */
   private static List<KarmaChainEntry> parseAndVerify(
-      Entry manifest, byte[] owner, BlockHeaderSource blocks) {
+      Entry manifest, byte[] owner, BlockHeaderSource blocks, IntFunction<byte[]> olderPage) {
     try {
-      // On a worker thread: block lookups may use the network (offline falls back, see
+      // On a worker thread: page and block lookups may use the network (offline falls back, see
       // KarmaChain.checkBlocks).
-      return KarmaChain.parseManifest(manifest.bencode(), owner, blocks);
+      return KarmaChainPages.read(manifest.bencode(), owner, olderPage, blocks);
     } catch (IllegalArgumentException e) {
       return null;
     }

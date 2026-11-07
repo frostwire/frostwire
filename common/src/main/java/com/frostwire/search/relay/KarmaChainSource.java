@@ -24,4 +24,13 @@ public interface KarmaChainSource {
    * lookup failed.
    */
   Entry fetchManifest(byte[] peerPub);
+
+  /**
+   * Fetch older page {@code page} (1 or more) of {@code peerPub}'s chain, published under {@link
+   * KarmaChainPages#salt(int)}, or null if it isn't available. A source without pages returns null,
+   * and readers then verify the head alone.
+   */
+  default Entry fetchManifestPage(byte[] peerPub, int page) {
+    return null;
+  }
 }

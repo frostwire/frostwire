@@ -10,20 +10,27 @@ package com.frostwire.search.relay;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.frostwire.jlibtorrent.Entry;
-import com.frostwire.util.Hex;
+import com.frostwire.jlibtorrent.SessionManager;
+import com.frostwire.util.Bencode;
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
+import java.util.function.IntFunction;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+/**
+ * The publisher puts the chain's pages (frostwire/frostwire#1416): every non-empty chain, a lone
+ * epoch commitment included, under the head salt and {@code frostwire-karma-v1/<n>}, each within
+ * the DHT value cap.
+ */
 class KarmaChainPublisherTest {
 
   private static final int LOW_DIFFICULTY = 4;
@@ -40,7 +47,6 @@ class KarmaChainPublisherTest {
 
   @TempDir Path tempDir;
 
-  private File dbFile;
   private KarmaChainTable table;
   private IdentityKeys identity;
   private FakeBlockSource blockSource;
@@ -49,7 +55,7 @@ class KarmaChainPublisherTest {
 
   @BeforeEach
   void setUp() throws Exception {
-    dbFile = tempDir.resolve("karma-test.db").toFile();
+    File dbFile = tempDir.resolve("karma-test.db").toFile();
     table = KarmaChainTable.open(dbFile);
     identity = IdentityKeys.generate(LOW_DIFFICULTY);
     blockSource = new FakeBlockSource().withAnchor(FIRST).withBlock(FIRST, hashForHeight(FIRST));
@@ -77,216 +83,77 @@ class KarmaChainPublisherTest {
   }
 
   @Test
-  void buildManifestForSingleEntryHasExpectedFields() {
-    writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, FAKE_INFO_HASH);
-
-    List<KarmaChainEntry> chain = writer.chain().entries();
-    Entry manifest = publisher.buildManifest(chain);
-    assertNotNull(manifest);
-
-    byte[] bencoded = manifest.bencode();
-    assertTrue(bencoded.length > 0);
-    assertTrue(
-        bencoded.length <= KarmaChainPublisher.MAX_MANIFEST_BYTES,
-        "Manifest must fit, was " + bencoded.length);
-
-    Map<String, Entry> dict = manifest.dictionary();
-    assertEquals(KarmaChainPublisher.MANIFEST_VERSION, (int) dict.get("v").integer());
-    assertNotNull(dict.get("pub"));
-    assertEquals(2L, dict.get("len").integer(), "1 commitment + 1 endorsement");
-
-    List<Entry> entries = dict.get("entries").list();
-    assertEquals(2, entries.size());
-
-    // First entry is EPOCH_COMMITMENT
-    Map<String, Entry> ec = entries.get(0).dictionary();
-    assertEquals("EC", ec.get("k").string());
-    assertEquals(0L, ec.get("seq").integer());
-    assertEquals(FIRST, ec.get("bh").integer());
-    assertNotNull(ec.get("ep"), "epoch must be present for EC");
-    assertNotNull(ec.get("en"), "energy must be present for EC");
-    assertNotNull(ec.get("s"), "signature must be present");
-
-    // Second entry is ENDORSEMENT
-    Map<String, Entry> en = entries.get(1).dictionary();
-    assertEquals("EN", en.get("k").string());
-    assertEquals(1L, en.get("seq").integer());
-    assertNotNull(en.get("pp"), "peerPub must be present for EN");
-    assertNotNull(en.get("ih"), "infoHash must be present for EN");
-    // scoreDelta is omitted when 1 (the only value this version emits);
-    // reconstruct() defaults the missing field to 1.
-    assertNull(en.get("sd"), "scoreDelta 1 must be omitted to fit the DHT cap");
-  }
-
-  @Test
-  void buildManifestTruncatesOldestEntriesWhenOversize() {
-    // Build a chain long enough to require truncation. With ~250B
-    // per entry, ~10 entries should push us past the 950B cap.
-    blockSource.withAnchor(FIRST).withBlock(FIRST, hashForHeight(FIRST));
-    writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, FAKE_INFO_HASH);
-
-    // Advance epochs and add endorsements to grow the chain.
-    for (int i = 1; i < 12; i++) {
-      long tip = FIRST + 144L * i;
-      blockSource.withAnchor(tip).withBlock(tip, hashForHeight(tip));
-      writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, distinctInfoHash(i));
-    }
-
-    List<KarmaChainEntry> chain = writer.chain().entries();
-    assertTrue(chain.size() > 5, "test requires a non-trivial chain, was " + chain.size());
-
-    Entry manifest = publisher.buildManifest(chain);
-    assertNotNull(manifest);
-    byte[] bencoded = manifest.bencode();
-    assertTrue(
-        bencoded.length <= KarmaChainPublisher.MAX_MANIFEST_BYTES,
-        "Truncated manifest must fit, was " + bencoded.length);
-
-    List<Entry> included = manifest.dictionary().get("entries").list();
-    assertTrue(
-        included.size() < chain.size(),
-        "Some entries must be truncated, got " + included.size() + " of " + chain.size());
-    assertTrue(included.size() > 0, "At least one entry must be included");
-
-    // The head (last entry) must be preserved when truncating.
-    long headSeq = included.get(included.size() - 1).dictionary().get("seq").integer();
-    long actualHeadSeq = chain.get(chain.size() - 1).seq();
-    assertEquals(actualHeadSeq, headSeq, "Head entry must be the last entry of the full chain");
-
-    // len field reports the full chain length, not the truncated count
-    assertEquals((long) chain.size(), manifest.dictionary().get("len").integer());
-  }
-
-  @Test
-  void publishIfNeededReturnsZeroForEmptyChain() {
+  void publishIfNeededReturnsZeroForEmptyChainOrNoSession() {
+    assertEquals(0, publisher.publishIfNeeded(new RecordingSession()));
+    writer.commitEpochIfNeeded();
     assertEquals(0, publisher.publishIfNeeded(null));
   }
 
   @Test
-  void publishIfNeededReturnsZeroWithNullSession() {
-    writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, FAKE_INFO_HASH);
-    assertEquals(0, publisher.publishIfNeeded(null));
+  void aLoneEpochCommitmentIsPublished() {
+    writer.commitEpochIfNeeded();
+    RecordingSession session = new RecordingSession();
+
+    assertEquals(1, publisher.publishIfNeeded(session), "an EC-only chain must not expire");
+
+    assertEquals(1, session.puts.size());
+    assertEquals(KarmaConstants.BEP46_SALT_KARMA, session.salt(0));
+    assertEquals(writer.chain().entries(), read(session.value(0), null));
   }
 
   @Test
-  void publishedManifestHeadHashMatchesChain() {
-    writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, FAKE_INFO_HASH);
-
-    // Build the manifest and decode its head field directly
+  void everyPageIsPutUnderItsSaltWithinTheCap() {
+    growAcrossEpochs(16);
     List<KarmaChainEntry> chain = writer.chain().entries();
-    Entry manifest = publisher.buildManifest(chain);
-    String manifestHeadHex = manifest.dictionary().get("head").string();
-    String chainHeadHex = Hex.encode(writer.chain().headHash());
-    assertEquals(chainHeadHex, manifestHeadHex);
-  }
+    RecordingSession session = new RecordingSession();
 
-  @Test
-  void publishedManifestLenMatchesChainSize() {
-    blockSource.withAnchor(FIRST + 144L).withBlock(FIRST + 144L, hashForHeight(FIRST + 144L));
-    writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, FAKE_INFO_HASH);
+    int published = publisher.publishIfNeeded(session);
 
-    List<KarmaChainEntry> chain = writer.chain().entries();
-    Entry manifest = publisher.buildManifest(chain);
-    assertEquals((long) chain.size(), manifest.dictionary().get("len").integer());
-  }
-
-  @Test
-  void buildManifestRoundTripReconstructsEveryEntry() {
-    blockSource.withAnchor(FIRST + 144L).withBlock(FIRST + 144L, hashForHeight(FIRST + 144L));
-    writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, FAKE_INFO_HASH);
-
-    List<KarmaChainEntry> chain = writer.chain().entries();
-    assertTrue(chain.size() >= 2);
-    Entry manifest = publisher.buildManifest(chain);
-    assertNotNull(manifest);
-
-    List<Entry> dicts = manifest.dictionary().get("entries").list();
-    assertEquals(chain.size(), dicts.size(), "untruncated chain must round-trip fully");
-    byte[] ownerPub = identity.ed25519PubRaw();
-    for (int i = 0; i < chain.size(); i++) {
-      KarmaChainEntry original = chain.get(i);
-      KarmaChainEntry reconstructed =
-          KarmaChainEntry.reconstruct(dicts.get(i).dictionary(), ownerPub);
-      assertNotNull(reconstructed, "entry " + i + " must carry all reader-required fields");
-      assertEquals(original.kind(), reconstructed.kind());
-      assertEquals(original.seq(), reconstructed.seq());
-      assertEquals(original.blockHeight(), reconstructed.blockHeight());
-      assertArrayEquals(original.blockHash(), reconstructed.blockHash());
-      assertArrayEquals(original.prevHash(), reconstructed.prevHash());
-      assertArrayEquals(original.endorserPub(), reconstructed.endorserPub());
-      assertArrayEquals(original.signature(), reconstructed.signature());
-      assertTrue(
-          reconstructed.verifySignature(), "reconstructed entry " + i + " signature must verify");
+    assertTrue(session.puts.size() > 1, "a long chain needs older pages");
+    assertEquals(KarmaConstants.BEP46_SALT_KARMA, session.salt(0));
+    for (int i = 1; i < session.puts.size(); i++) {
+      assertEquals(KarmaConstants.BEP46_SALT_KARMA + "/" + i, session.salt(i));
     }
-    byte[] verifyOwner = identity.ed25519PubRaw();
-    assertTrue(
-        KarmaChain.verify(
-            dicts.stream()
-                .map(d -> KarmaChainEntry.reconstruct(d.dictionary(), verifyOwner))
-                .collect(Collectors.toList())),
-        "full publisher output must pass full-chain verify");
-    assertEquals(
-        chain,
-        KarmaChain.parseManifest(manifest.bencode(), verifyOwner),
-        "the pure-Java manifest parser must accept the publisher's bytes");
+    for (Object[] put : session.puts) {
+      assertArrayEquals(identity.ed25519PubRaw(), (byte[]) put[0]);
+      assertTrue(((Entry) put[2]).bencode().length <= KarmaChainPublisher.MAX_MANIFEST_BYTES);
+    }
+    List<KarmaChainEntry> read = read(session.value(0), session::olderPage);
+    assertNotNull(read);
+    assertTrue(read.size() > 4, "the pages hold more than a version 1 manifest's two entries");
+    assertTrue(read.size() <= published);
+    assertEquals(chain.subList(chain.size() - read.size(), chain.size()), read);
   }
 
   @Test
-  void truncatedManifestCarriesCorrectBase() {
-    blockSource.withAnchor(FIRST).withBlock(FIRST, hashForHeight(FIRST));
+  void theHeadNamesTheSnapshotItWasBuiltFrom() {
     writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, FAKE_INFO_HASH);
-    for (int i = 1; i < 12; i++) {
-      long tip = FIRST + 144L * i;
-      blockSource.withAnchor(tip).withBlock(tip, hashForHeight(tip));
-      writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, distinctInfoHash(i));
-    }
+    List<KarmaChainEntry> snapshot = writer.chain().entries();
+    // The chain grows between the publisher's snapshot and its pages.
+    writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, distinctInfoHash(1));
 
-    List<KarmaChainEntry> chain = writer.chain().entries();
-    Entry manifest = publisher.buildManifest(chain);
-    assertNotNull(manifest);
-    Map<String, Entry> dict = manifest.dictionary();
-    List<Entry> included = dict.get("entries").list();
-    assertTrue(included.size() < chain.size(), "test requires truncation");
-    assertNotNull(dict.get("base"), "truncated manifest must carry base");
+    Map<String, Object> head =
+        Bencode.decodeDictionary(publisher.buildManifest(snapshot).bencode());
 
-    Map<String, Entry> base = dict.get("base").dictionary();
-    KarmaChainEntry firstIncluded =
-        KarmaChainEntry.reconstruct(included.get(0).dictionary(), identity.ed25519PubRaw());
-    assertNotNull(firstIncluded);
-    assertEquals(firstIncluded.seq(), base.get("seq").integer());
-    assertEquals(Hex.encode(firstIncluded.prevHash()), base.get("ph").string());
-
-    // The base prevHash must equal the entryHash of the chain entry
-    // immediately before the first included entry (never genesis here).
-    KarmaChainEntry predecessor = chain.get((int) firstIncluded.seq() - 1);
-    assertEquals(Hex.encode(predecessor.entryHash()), base.get("ph").string());
-
-    java.util.List<KarmaChainEntry> tail = new ArrayList<>();
-    byte[] tailOwner = identity.ed25519PubRaw();
-    for (Entry d : included) {
-      tail.add(KarmaChainEntry.reconstruct(d.dictionary(), tailOwner));
-    }
-    assertTrue(
-        KarmaChain.verifyTail(tail, Hex.decode(base.get("ph").string()), base.get("seq").integer()),
-        "truncated tail must pass verifyTail with its base");
-    assertEquals(
-        tail,
-        KarmaChain.parseManifest(manifest.bencode(), tailOwner),
-        "the pure-Java manifest parser must verify the tail against its base");
-    assertNull(
-        KarmaChain.parseManifest(manifest.bencode(), FAKE_PEER_PUB),
-        "a manifest fetched under another key must not verify");
-
-    KarmaChainEntry endorsement = tail.get(1);
-    assertFalse(
-        KarmaChain.verifyTail(
-            java.util.Collections.singletonList(endorsement),
-            endorsement.prevHash(),
-            endorsement.seq()),
-        "endorsement-only tails must not bypass energy-budget verification");
+    assertEquals((long) KarmaChainPublisher.MANIFEST_VERSION, head.get("v"));
+    assertEquals((long) snapshot.size(), head.get("len"));
+    assertArrayEquals(snapshot.get(snapshot.size() - 1).entryHash(), (byte[]) head.get("head"));
+    assertEquals(0L, head.get("pg"));
   }
 
   // --- helpers ---
+
+  private void growAcrossEpochs(int epochs) {
+    for (int i = 0; i < epochs; i++) {
+      long tip = FIRST + 144L * i;
+      blockSource.withAnchor(tip).withBlock(tip, hashForHeight(tip));
+      writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, distinctInfoHash(i));
+    }
+  }
+
+  private List<KarmaChainEntry> read(byte[] head, IntFunction<byte[]> older) {
+    return KarmaChainPages.read(head, identity.ed25519PubRaw(), older, null);
+  }
 
   private static byte[] hashForHeight(long height) {
     byte[] hash = new byte[32];
@@ -294,6 +161,35 @@ class KarmaChainPublisherTest {
       hash[i] = (byte) (height >>> (8 * (7 - i)));
     }
     return hash;
+  }
+
+  /** Endorsements are one per (peer, torrent), so growing a chain needs distinct torrents. */
+  private static byte[] distinctInfoHash(int i) {
+    byte[] infoHash = FAKE_INFO_HASH.clone();
+    infoHash[0] ^= (byte) i;
+    infoHash[1] ^= (byte) (i >>> 8);
+    return infoHash;
+  }
+
+  private static final class RecordingSession extends SessionManager {
+    final List<Object[]> puts = new CopyOnWriteArrayList<>();
+
+    @Override
+    public void dhtPutItem(byte[] publicKey, byte[] privateKey, Entry entry, byte[] salt) {
+      puts.add(new Object[] {publicKey, privateKey, entry, salt});
+    }
+
+    String salt(int i) {
+      return new String((byte[]) puts.get(i)[3], StandardCharsets.US_ASCII);
+    }
+
+    byte[] value(int i) {
+      return ((Entry) puts.get(i)[2]).bencode();
+    }
+
+    byte[] olderPage(int page) {
+      return page < puts.size() ? value(page) : null;
+    }
   }
 
   private static final class FakeBlockSource implements BlockHeaderSource {
@@ -324,13 +220,5 @@ class KarmaChainPublisherTest {
     public long getChainTipHeight() {
       return tip.get();
     }
-  }
-
-  /** Endorsements are one per (peer, torrent), so growing a chain needs distinct torrents. */
-  private static byte[] distinctInfoHash(int i) {
-    byte[] infoHash = FAKE_INFO_HASH.clone();
-    infoHash[0] ^= (byte) i;
-    infoHash[1] ^= (byte) (i >>> 8);
-    return infoHash;
   }
 }

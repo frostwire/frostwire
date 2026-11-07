@@ -23,8 +23,9 @@ import org.junit.jupiter.api.Test;
 
 /**
  * A remote peer's karma chain must be one the manifest format vouches for (IceBridge white paper
- * §10.5): chains published by {@link KarmaChainPublisher} score as before, and manifests whose
- * head, length, links or blocks don't hold up score 0.
+ * §10.5): version 1 manifests, which released clients publish ({@link KarmaManifestV1}), and the
+ * pages {@link KarmaChainPublisher} publishes now score as before, and manifests whose head,
+ * length, links or blocks don't hold up score 0.
  */
 class RemoteKarmaChainValidationTest {
 
@@ -56,9 +57,36 @@ class RemoteKarmaChainValidationTest {
   }
 
   @Test
+  void chainPublishedInPagesScoresEveryEndorsementItsPagesHold() {
+    for (int i = 0; i < 12; i++) {
+      long tip = H + 144L * i;
+      bitcoin.withAnchor(tip).withBlock(tip);
+      writer.onDownloadCompletedFromPeer(PEER, filled(20, i + 1));
+    }
+    List<Entry> pages = publisher.buildPages(writer.chain().entries());
+    assertTrue(pages.size() > 1, "test needs older pages");
+    KarmaChainSource paged =
+        new KarmaChainSource() {
+          @Override
+          public Entry fetchManifest(byte[] peerPub) {
+            return pages.get(0);
+          }
+
+          @Override
+          public Entry fetchManifestPage(byte[] peerPub, int page) {
+            return page < pages.size() ? pages.get(page) : null;
+          }
+        };
+    reader = new PeerKarmaCache(new RemoteKarmaChainFetcher(paged, bitcoin));
+
+    // All 12 endorsements, where the version 1 manifest held one.
+    assertEquals(12, reader.getKarma(owner.ed25519PubRaw()));
+  }
+
+  @Test
   void chainPublishedByTheRealPublisherScoresItsEndorsements() {
     writer.onDownloadCompletedFromPeer(PEER, filled(20, 1));
-    Entry manifest = publisher.buildManifest(writer.chain().entries());
+    Entry manifest = v1(writer.chain().entries());
     assertNotNull(manifest);
 
     assertEquals(1, score(manifest, bitcoin));
@@ -72,7 +100,7 @@ class RemoteKarmaChainValidationTest {
       bitcoin.withAnchor(tip).withBlock(tip);
       writer.onDownloadCompletedFromPeer(PEER, filled(20, i + 1));
     }
-    Entry manifest = publisher.buildManifest(writer.chain().entries());
+    Entry manifest = v1(writer.chain().entries());
     assertNotNull(manifest);
     assertNotNull(manifest.dictionary().get("base"), "test needs a trimmed tail");
     long endorsements =
@@ -92,14 +120,14 @@ class RemoteKarmaChainValidationTest {
     writer.onDownloadCompletedFromPeer(PEER, filled(20, 2));
     assertEquals(snapshot.size() + 1, writer.chain().entries().size());
 
-    assertEquals(1, score(publisher.buildManifest(snapshot), bitcoin));
+    assertEquals(1, score(v1(snapshot), bitcoin));
   }
 
   @Test
   void headThatIsNotTheLastEntryScoresZero() {
     writer.onDownloadCompletedFromPeer(PEER, filled(20, 1));
     List<KarmaChainEntry> chain = writer.chain().entries();
-    Entry manifest = publisher.buildManifest(chain);
+    Entry manifest = v1(chain);
 
     // A fork: the manifest names a head its entries don't end with.
     String forkHead = Hex.encode(chain.get(0).entryHash());
@@ -110,7 +138,7 @@ class RemoteKarmaChainValidationTest {
   @Test
   void lengthThatDoesNotMatchTheEntriesScoresZero() {
     writer.onDownloadCompletedFromPeer(PEER, filled(20, 1));
-    Entry manifest = publisher.buildManifest(writer.chain().entries());
+    Entry manifest = v1(writer.chain().entries());
 
     assertEquals(0, score(with(manifest, "len", new Entry(1L)), bitcoin), "a reset length");
     assertEquals(0, score(with(manifest, "len", new Entry(3L)), bitcoin), "a longer chain");
@@ -132,7 +160,7 @@ class RemoteKarmaChainValidationTest {
     chain.add(ec);
     chain.add(unlinked);
 
-    assertEquals(0, score(publisher.buildManifest(chain), bitcoin));
+    assertEquals(0, score(v1(chain), bitcoin));
   }
 
   @Test
@@ -144,8 +172,8 @@ class RemoteKarmaChainValidationTest {
     chain.endorse(PEER, filled(20, 1), new BitcoinBlockReference(H + 1, filled(32, 0x66)), key);
     bitcoin.withTip(H + 1).withBlock(H + 1);
 
-    assertEquals(0, score(publisher.buildManifest(chain.entries()), bitcoin));
-    assertEquals(1, score(publisher.buildManifest(chain.entries()), null), "offline: unchecked");
+    assertEquals(0, score(v1(chain.entries()), bitcoin));
+    assertEquals(1, score(v1(chain.entries()), null), "offline: unchecked");
   }
 
   @Test
@@ -155,7 +183,7 @@ class RemoteKarmaChainValidationTest {
     writer.onDownloadCompletedFromPeer(PEER, filled(20, 1));
     List<KarmaChainEntry> chain = writer.chain().entries();
     assertEquals(H + 1, chain.get(chain.size() - 1).blockHeight());
-    Entry manifest = publisher.buildManifest(chain);
+    Entry manifest = v1(chain);
 
     // The reader knows Bitcoin is at H + 1 but can't look that block up yet.
     FakeBlockSource lagging = new FakeBlockSource().withTip(H + 1).withBlock(H);
@@ -174,8 +202,7 @@ class RemoteKarmaChainValidationTest {
     try (KarmaChainWriter backdated =
         new KarmaChainWriter(owner, then, new InMemoryStore(owner.ed25519PubRaw()))) {
       backdated.onDownloadCompletedFromPeer(PEER, filled(20, 1));
-      Entry manifest =
-          new KarmaChainPublisher(backdated, owner).buildManifest(backdated.chain().entries());
+      Entry manifest = v1(backdated.chain().entries());
       assertNotNull(manifest);
 
       assertEquals(0, score(manifest, then));
@@ -190,8 +217,7 @@ class RemoteKarmaChainValidationTest {
     try (KarmaChainWriter earliest =
         new KarmaChainWriter(owner, then, new InMemoryStore(owner.ed25519PubRaw()))) {
       earliest.onDownloadCompletedFromPeer(PEER, filled(20, 1));
-      Entry manifest =
-          new KarmaChainPublisher(earliest, owner).buildManifest(earliest.chain().entries());
+      Entry manifest = v1(earliest.chain().entries());
 
       assertEquals(1, score(manifest, then));
     }
@@ -209,6 +235,11 @@ class RemoteKarmaChainValidationTest {
                 ? new RemoteKarmaChainFetcher(pub -> manifest)
                 : new RemoteKarmaChainFetcher(pub -> manifest, blocks));
     return reader.getKarma(owner.ed25519PubRaw());
+  }
+
+  /** The version 1 manifest of {@code chain}, as released clients publish it. */
+  private Entry v1(List<KarmaChainEntry> chain) {
+    return KarmaManifestV1.build(chain, owner.ed25519PubRaw());
   }
 
   /** The manifest with {@code key} replaced, or removed when {@code value} is null. */

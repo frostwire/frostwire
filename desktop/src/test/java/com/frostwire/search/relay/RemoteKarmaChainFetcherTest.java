@@ -145,8 +145,7 @@ class RemoteKarmaChainFetcherTest {
       writer.onDownloadCompletedFromPeer(peerPub, infoHash);
     }
     List<KarmaChainEntry> full = writer.chain().entries();
-    KarmaChainPublisher publisher = new KarmaChainPublisher(writer, publisherIdentity);
-    Entry manifest = publisher.buildManifest(full);
+    Entry manifest = KarmaManifestV1.build(full, ownerPub);
     assertNotNull(manifest);
     int included = manifest.dictionary().get("entries").list().size();
     assertTrue(included < full.size(), "test requires a trimmed tail");
@@ -178,8 +177,7 @@ class RemoteKarmaChainFetcherTest {
       writer.onDownloadCompletedFromPeer(peerPub, infoHash);
     }
     List<KarmaChainEntry> full = writer.chain().entries();
-    KarmaChainPublisher publisher = new KarmaChainPublisher(writer, publisherIdentity);
-    Entry manifest = publisher.buildManifest(full);
+    Entry manifest = KarmaManifestV1.build(full, ownerPub);
     assertNotNull(manifest);
     assertNotNull(manifest.dictionary().get("base"), "test requires a trimmed tail");
     writer.close();

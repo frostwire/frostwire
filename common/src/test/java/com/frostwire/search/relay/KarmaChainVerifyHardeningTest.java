@@ -60,13 +60,19 @@ class KarmaChainVerifyHardeningTest {
   @Test
   void writerChainVerifiesAsAPublishedManifest() throws Exception {
     WriterRun run = writerChainAcrossEpochs();
-    KarmaChainPublisher publisher = new KarmaChainPublisher(run.writer, id);
+    List<KarmaChainEntry> entries = run.writer.chain().entries();
 
-    byte[] manifest = publisher.buildManifest(run.writer.chain().entries()).bencode();
-
+    byte[] manifest = KarmaManifestV1.build(entries, owner).bencode();
     List<KarmaChainEntry> parsed = KarmaChain.parseManifest(manifest, owner);
-    assertNotNull(parsed, "the published (trimmed, two-decimal) form verifies");
+    assertNotNull(parsed, "the version 1 (trimmed, three-decimal) form verifies");
     assertNotNull(KarmaChain.parseManifest(manifest, owner, run.blocks));
+
+    List<byte[]> pages = KarmaChainPages.paginate(entries);
+    assertEquals(
+        entries,
+        KarmaChainPages.read(
+            pages.get(0), owner, n -> n < pages.size() ? pages.get(n) : null, run.blocks),
+        "the paged form verifies the whole chain");
   }
 
   @Test

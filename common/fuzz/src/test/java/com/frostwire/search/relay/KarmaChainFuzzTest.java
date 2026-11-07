@@ -58,6 +58,33 @@ class KarmaChainFuzzTest {
   }
 
   /**
+   * Fuzzes {@link KarmaChainPages#read}: the head item of a peer's chain in either manifest version
+   * (frostwire/frostwire#1416), with no older pages. Same contract and findings as {@link
+   * #parseManifest}.
+   */
+  @FuzzTest
+  void readPages(FuzzedDataProvider data) {
+    List<KarmaChainEntry> chain;
+    try {
+      chain = KarmaChainPages.read(data.consumeRemainingAsBytes(), OWNER, page -> null, null);
+    } catch (IllegalArgumentException documented) {
+      return;
+    }
+    if (chain == null) {
+      return;
+    }
+    if (chain.isEmpty() || chain.size() > KarmaChain.MAX_REMOTE_MANIFEST_ENTRIES) {
+      throw new AssertionError("accepted chain has " + chain.size() + " entries");
+    }
+    for (KarmaChainEntry entry : chain) {
+      if (!Arrays.equals(OWNER, entry.endorserPub()) || !entry.verifySignature()) {
+        throw new AssertionError("accepted chain has an entry not signed by the owner: " + entry);
+      }
+    }
+    assertEndorsementBudget(chain);
+  }
+
+  /**
    * The point of epoch energy: an accepted chain never has more endorsements after a commitment
    * than floor(energy), and the energy is a finite value in range. A "NaN" energy once lifted the
    * budget because every comparison with NaN is false (frostwire/frostwire#1401).
