@@ -29,11 +29,14 @@ import com.frostwire.jlibtorrent.Sha1Hash;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.TorrentStatus;
+import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.SizeStableLabel;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.MouseEvent;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +56,8 @@ public final class TransferDetailPieces extends JPanel
   private final HexHiveAdapter hexHivePanelAdapter;
   private boolean pieceSizeAlreadySet = false;
   private BittorrentDownload bittorrentDownload;
+  private final PiecePriorities piecePriorities =
+      new PiecePriorities(BackgroundQueuedExecutorService::schedule, GUIMediator::safeInvokeLater);
 
   TransferDetailPieces() {
     super(new MigLayout("fillx, insets 0 0 0 0, gap 0 5px"));
@@ -74,6 +79,7 @@ public final class TransferDetailPieces extends JPanel
     add(pieceSizeLabel, "grow, gapright 10px, wmin 130px, hmax 25px, wrap");
     hexHivePanel.setBackground(new Color(backgroundColor));
     hexHivePanel.setOpaque(true);
+    hexHivePanel.setPieceClickListener(this::showPiecePriorityMenu);
     // Defer the JScrollPane creation to keep it out of the constructor's EDT event.
     SwingUtilities.invokeLater(
         () -> {
@@ -124,6 +130,40 @@ public final class TransferDetailPieces extends JPanel
         });
   }
 
+  /** Pops up the priority menu of a clicked piece, once its state is read off the EDT. */
+  private void showPiecePriorityMenu(int piece, MouseEvent event) {
+    TorrentHandle handle = hexHivePanelAdapter.torrentHandle;
+    BittorrentDownload download = bittorrentDownload;
+    if (handle == null || download == null) {
+      return;
+    }
+    PiecePriorities.PieceHandle pieceHandle = PiecePriorities.of(handle);
+    int x = event.getX();
+    int y = event.getY();
+    piecePriorities.lookup(
+        pieceHandle,
+        piece,
+        state -> {
+          // the transfer changed or the tab closed while the piece was looked up
+          if (bittorrentDownload != download || !hexHivePanel.isShowing()) {
+            return;
+          }
+          PiecePriorities.createMenu(
+                  state,
+                  priority ->
+                      piecePriorities.apply(
+                          pieceHandle, piece, priority, () -> refreshIfStillShowing(download)))
+              .show(hexHivePanel, x, y);
+        });
+  }
+
+  /** Redraws the hive with a piece's new priority, runs on the background queue. */
+  private void refreshIfStillShowing(BittorrentDownload download) {
+    if (bittorrentDownload == download) {
+      updateData(download);
+    }
+  }
+
   private static JLabel boldCaption(String text) {
     JLabel caption = new JLabel(text);
     caption.setFont(caption.getFont().deriveFont(Font.BOLD));
@@ -154,6 +194,12 @@ public final class TransferDetailPieces extends JPanel
     private volatile TorrentHandle torrentHandle;
     private volatile TorrentInfo torrentInfo;
 
+    /**
+     * Hive marks of the pieces by priority, read by the render thread. Null when every piece is
+     * downloaded: then no piece is ever drawn by its priority.
+     */
+    private volatile byte[] priorityMarks;
+
     @Override
     public void updateData(BittorrentDownload btDownload) {
       bittorrentDownload = btDownload;
@@ -165,6 +211,7 @@ public final class TransferDetailPieces extends JPanel
       pieceSizeInHuman = GUIUtils.getBytesInHuman(torrentInfo.pieceSizeForReq(0));
       totalPieces = torrentInfo.numPieces();
       pieces = status.pieces();
+      priorityMarks = pieces.isAllSet() ? null : readPriorityMarks(torrentHandle, priorityMarks);
       if (pieces.isAllSet()) {
         numFullPieces = totalPieces;
       } else if (pieces.isNoneSet() || pieces.isEmpty()) {
@@ -198,6 +245,27 @@ public final class TransferDetailPieces extends JPanel
     @Override
     public boolean isFull(int hexOffset) {
       return pieces.getBit(hexOffset);
+    }
+
+    @Override
+    public int priorityMark(int hexOffset) {
+      byte[] marks = priorityMarks;
+      return marks != null && hexOffset >= 0 && hexOffset < marks.length
+          ? marks[hexOffset]
+          : PiecePriorities.MARK_NONE;
+    }
+
+    /** Reuses {@code previous} when the piece count is the same, this runs on every refresh. */
+    private static byte[] readPriorityMarks(TorrentHandle handle, byte[] previous) {
+      Priority[] priorities = handle.piecePriorities();
+      byte[] marks =
+          previous != null && previous.length == priorities.length
+              ? previous
+              : new byte[priorities.length];
+      for (int i = 0; i < priorities.length; i++) {
+        marks[i] = (byte) PiecePriorities.mark(priorities[i].swig());
+      }
+      return marks;
     }
 
     String getPieceSizeInHuman() {
@@ -237,7 +305,7 @@ public final class TransferDetailPieces extends JPanel
       if (availability != null && piece < availability.length) {
         rows.put(I18n.tr("Peers with it"), String.valueOf(availability[piece]));
       }
-      rows.put(I18n.tr("Priority"), describePriority(handle.piecePriority(piece)));
+      rows.put(I18n.tr("Priority"), PiecePriorities.describe(handle.piecePriority(piece)));
       Sha1Hash hash = info.hashForPiece(piece);
       if (hash != null && !hash.isAllZeros()) {
         // v2-only torrents carry no per-piece SHA-1
@@ -288,19 +356,9 @@ public final class TransferDetailPieces extends JPanel
         }
       }
       if (handle.piecePriority(piece) == Priority.IGNORE) {
-        return I18n.tr("Not downloading (skipped files)");
+        return I18n.tr("Not downloading");
       }
       return I18n.tr("Missing");
-    }
-
-    private static String describePriority(Priority priority) {
-      if (priority == Priority.IGNORE) {
-        return I18n.tr("Skip");
-      }
-      if (priority == Priority.NORMAL) {
-        return I18n.tr("Normal");
-      }
-      return I18n.tr("High") + " (" + priority.ordinal() + ")";
     }
 
     private static String abbreviate(String text, int maxLength) {
