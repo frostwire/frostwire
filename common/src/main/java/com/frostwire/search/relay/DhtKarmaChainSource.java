@@ -10,14 +10,15 @@ package com.frostwire.search.relay;
 import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.jlibtorrent.SessionManager;
 import com.frostwire.util.Logger;
-import java.nio.charset.StandardCharsets;
 
 /**
  * BEP 46 mutable DHT lookup for karma chain manifests.
  *
  * <p>Calls {@link SessionManager#dhtGetItem(byte[], byte[], int)} with the peer's raw Ed25519
- * public key and the karma salt ({@link KarmaConstants#BEP46_SALT_KARMA}). jlibtorrent verifies the
- * publisher signature on the returned item; we trust the manifest to be authentic.
+ * public key and the karma salt of the page ({@link KarmaChainPages#salt(int)}: the head under
+ * {@link KarmaConstants#BEP46_SALT_KARMA}, older pages under {@code frostwire-karma-v1/<n>}).
+ * jlibtorrent verifies the publisher signature on the returned item; we trust the manifest to be
+ * authentic.
  */
 public final class DhtKarmaChainSource implements KarmaChainSource {
 
@@ -46,23 +47,36 @@ public final class DhtKarmaChainSource implements KarmaChainSource {
 
   @Override
   public Entry fetchManifest(byte[] peerPub) {
-    return fetchManifest(peerPub, dhtTimeoutMs);
+    return fetch(peerPub, 0, dhtTimeoutMs);
+  }
+
+  @Override
+  public Entry fetchManifestPage(byte[] peerPub, int page) {
+    return page < 1 ? null : fetch(peerPub, page, dhtTimeoutMs);
   }
 
   Entry fetchManifest(byte[] peerPub, long deadlineNanos) {
+    return fetchBefore(peerPub, 0, deadlineNanos);
+  }
+
+  Entry fetchManifestPage(byte[] peerPub, int page, long deadlineNanos) {
+    return page < 1 ? null : fetchBefore(peerPub, page, deadlineNanos);
+  }
+
+  private Entry fetchBefore(byte[] peerPub, int page, long deadlineNanos) {
     long remainingMs =
         java.util.concurrent.TimeUnit.NANOSECONDS.toMillis(deadlineNanos - System.nanoTime());
     return remainingMs <= 0
         ? null
-        : fetchManifest(peerPub, (int) Math.min(dhtTimeoutMs, remainingMs));
+        : fetch(peerPub, page, (int) Math.min(dhtTimeoutMs, remainingMs));
   }
 
-  private Entry fetchManifest(byte[] peerPub, int timeoutMs) {
+  private Entry fetch(byte[] peerPub, int page, int timeoutMs) {
     if (peerPub == null || peerPub.length != 32) {
       return null;
     }
     try {
-      byte[] salt = KarmaConstants.BEP46_SALT_KARMA.getBytes(StandardCharsets.US_ASCII);
+      byte[] salt = KarmaChainPages.salt(page);
       SessionManager.MutableItem item =
           DhtPeerDiscoverySource.getMutableItem(session, peerPub, salt, timeoutMs);
       if (item == null) {
