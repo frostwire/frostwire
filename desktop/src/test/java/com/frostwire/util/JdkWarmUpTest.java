@@ -670,6 +670,31 @@ class JdkWarmUpTest {
   }
 
   /**
+   * The search fields paint with the text field font 2 pt larger, a strike of its own: its first
+   * glyphs were rasterized on the EDT on Windows when a search field was built (Icebase
+   * #442d120878b5, frostwire/frostwire#1490). The warm-up covers the very font a field paints with.
+   */
+  @Test
+  void textFontsIncludeTheSearchFieldFont() throws Exception {
+    UIDefaults defaults = new UIDefaults();
+    defaults.put("TextField.font", new FontUIResource(Font.SANS_SERIF, Font.PLAIN, 13));
+    assertTrue(
+        JdkWarmUp.textFonts(defaults).stream().anyMatch(f -> f.getSize2D() == 15f),
+        "the search field font is not warmed");
+
+    // GoogleSearchField can't be built headless (UISettings needs a screen), so check that it
+    // derives its font where the warm-up does.
+    String field =
+        Files.readString(
+                Path.of("src/main/java/com/frostwire/gui/searchfield/GoogleSearchField.java"),
+                StandardCharsets.UTF_8)
+            .replaceAll("\\s+", "");
+    assertTrue(
+        field.contains("setFont(PlatformFonts.searchField(cloudSearchField.getFont()))"),
+        "GoogleSearchField no longer derives its font with PlatformFonts.searchField");
+  }
+
+  /**
    * Clipping a table cell's complex text measured it with no font, so the JDK ran the bidi
    * algorithm and asked every installed font for the characters the default font lacks, reading
    * each font's character map from disk, on the EDT (Icebase #3e80aae69c6e, #624cbfa1c9da,

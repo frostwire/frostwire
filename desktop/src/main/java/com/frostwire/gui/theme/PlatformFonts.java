@@ -64,6 +64,15 @@ public final class PlatformFonts {
   }
 
   /**
+   * The search fields' font: the text field font 2 pt larger. GoogleSearchField paints with it and
+   * JdkWarmUp rasterizes its glyphs at startup, so both must derive it here
+   * (frostwire/frostwire#1490).
+   */
+  public static Font searchField(Font textFieldFont) {
+    return textFieldFont.deriveFont(textFieldFont.getSize2D() + 2f);
+  }
+
+  /**
    * Whether FrostWire uses a physical family in place of Dialog, because the Mac lacks its base.
    */
   public static boolean dialogIsSubstituted() {

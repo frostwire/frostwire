@@ -18,6 +18,7 @@
 
 package com.frostwire.gui.searchfield;
 
+import com.frostwire.gui.theme.PlatformFonts;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.OSUtils;
@@ -101,9 +102,7 @@ public class GoogleSearchField extends SearchField {
   public static void initCloudSearchField(GoogleSearchField cloudSearchField) {
     cloudSearchField.addActionListener(new GoogleSearchField.SearchListener(cloudSearchField));
     cloudSearchField.setPrompt(CLOUD_SEARCH_FIELD_HINT_TEXT);
-    Font origFont = cloudSearchField.getFont();
-    Font newFont = origFont.deriveFont(origFont.getSize2D() + 2f);
-    cloudSearchField.setFont(newFont);
+    cloudSearchField.setFont(PlatformFonts.searchField(cloudSearchField.getFont()));
     cloudSearchField.setMargin(new Insets(0, 2, 0, 0));
     cloudSearchField.setMaximumSize(
         new Dimension(Integer.MAX_VALUE, cloudSearchField.getPreferredSize().height));

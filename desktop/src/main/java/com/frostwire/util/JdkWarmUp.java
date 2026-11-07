@@ -510,7 +510,8 @@ public final class JdkWarmUp {
   /**
    * The fonts that show text in any script: labels, table cells (Table.font, a strike of its own
    * when the user picked a table font size) and the search suggestions on Windows (a plain 12 pt
-   * Dialog, ThemeMediator.DIALOG_FONT).
+   * Dialog, ThemeMediator.DIALOG_FONT), and the search fields' larger font
+   * (frostwire/frostwire#1490).
    */
   static Set<Font> textFonts(UIDefaults defaults) {
     Set<Font> fonts = new LinkedHashSet<>();
@@ -521,6 +522,10 @@ public final class JdkWarmUp {
       }
     }
     fonts.add(PlatformFonts.dialog(Font.PLAIN, 12));
+    Font textField = defaults.getFont("TextField.font");
+    if (textField != null) {
+      fonts.add(PlatformFonts.searchField(textField));
+    }
     return fonts;
   }
 
