@@ -346,7 +346,7 @@ public final class JdkWarmUp {
               0,
               text.length,
               Font.LAYOUT_LEFT_TO_RIGHT);
-      for (Font font : distinctFonts(UIManager.getDefaults())) {
+      for (Font font : fallbackSlotFonts(UIManager.getDefaults())) {
         font.canDisplay(UNMAPPED_CODE_POINT);
       }
     } catch (Throwable t) {
@@ -772,6 +772,30 @@ public final class JdkWarmUp {
       }
     }
     return created;
+  }
+
+  /**
+   * The fonts whose fallback slots are resolved before the splash shows: the look and feel's
+   * ({@link #distinctFonts}) and the {@link PlatformFonts} that components set directly, which are
+   * in no UI default. A logical font's slots belong to its family and style, not its size, so the
+   * setup wizard's 16 pt bold Dialog title (SetupWindow) shares Dialog bold's slots; the warm-up
+   * reached those only after the splash, and the first-run wizard measured its title first,
+   * resolving them on the EDT (Icebase #d5a31f6c0160, frostwire/frostwire#1329).
+   */
+  static List<Font> fallbackSlotFonts(UIDefaults defaults) {
+    Set<String> seen = new HashSet<>();
+    List<Font> fonts = new ArrayList<>();
+    List<Font> candidates = new ArrayList<>(distinctFonts(defaults));
+    candidates.add(PlatformFonts.dialog(Font.PLAIN, 12));
+    candidates.add(PlatformFonts.dialog(Font.BOLD, 12));
+    candidates.add(PlatformFonts.sansSerif(Font.PLAIN, 12));
+    candidates.add(PlatformFonts.sansSerif(Font.BOLD, 12));
+    for (Font font : candidates) {
+      if (seen.add(font.getFontName() + "/" + font.getStyle())) {
+        fonts.add(font);
+      }
+    }
+    return fonts;
   }
 
   /**

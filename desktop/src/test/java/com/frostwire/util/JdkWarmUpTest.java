@@ -74,6 +74,34 @@ class JdkWarmUpTest {
   }
 
   @Test
+  void fallbackSlotFontsIncludeTheSetupWizardTitleFont() {
+    // SetupWindow's title is a 16 pt bold Dialog; its fallback slots are Dialog bold's.
+    Font title = PlatformFonts.dialog(Font.BOLD, 16);
+
+    List<Font> fonts = JdkWarmUp.fallbackSlotFonts(new UIDefaults());
+
+    assertTrue(
+        fonts.stream()
+            .anyMatch(
+                f ->
+                    f.getFontName().equals(title.getFontName())
+                        && f.getStyle() == title.getStyle()),
+        "Dialog bold is warmed up before the splash: " + fonts);
+  }
+
+  @Test
+  void fallbackSlotFontsKeepOneFontPerFamilyAndStyle() {
+    UIDefaults defaults = new UIDefaults();
+    defaults.put("Label.font", new FontUIResource(PlatformFonts.dialog(Font.PLAIN, 13)));
+
+    List<Font> fonts = JdkWarmUp.fallbackSlotFonts(defaults);
+
+    assertEquals(
+        fonts.size(),
+        fonts.stream().map(f -> f.getFontName() + "/" + f.getStyle()).distinct().count());
+  }
+
+  @Test
   void distinctFontsOfEmptyDefaultsIsEmpty() {
     assertTrue(JdkWarmUp.distinctFonts(new UIDefaults()).isEmpty());
   }
