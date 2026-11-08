@@ -91,6 +91,12 @@ public final class MainFrame {
   private Tabs currentSelectedTab;
 
   /**
+   * Builds the Transfers and Search+Transfers tabs, scheduled for the event after the constructor.
+   * Anything that asks for a tab sooner runs it right away (frostwire/frostwire#1498).
+   */
+  private DeferredStep deferredTabs;
+
+  /**
    * Initializes the primary components of the main application window, including the `JFrame` and
    * the `JTabbedPane` contained in that window.
    */
@@ -318,39 +324,43 @@ public final class MainFrame {
   }
 
   private void scheduleDeferredTabInitialization(boolean useSearchTransfersSplitView) {
-    SwingUtilities.invokeLater(
-        () -> {
-          Tabs previousTab = getSelectedTab();
-          TransfersTab transfersTab;
-          if (!TABS.containsKey(Tabs.TRANSFERS)) {
-            transfersTab = new TransfersTab(getBTDownloadMediator());
-            TABS.put(Tabs.TRANSFERS, transfersTab);
-          } else {
-            Tab existingTransfers = TABS.get(Tabs.TRANSFERS);
-            transfersTab =
-                existingTransfers instanceof TransfersTab ? (TransfersTab) existingTransfers : null;
-          }
-          if (!TABS.containsKey(Tabs.SEARCH_TRANSFERS) && transfersTab != null) {
-            Tab searchTab = TABS.get(Tabs.SEARCH);
-            if (searchTab instanceof SearchTab) {
-              SearchTransfersTab searchTransfers =
-                  new SearchTransfersTab((SearchTab) searchTab, transfersTab);
-              TABS.put(Tabs.SEARCH_TRANSFERS, searchTransfers);
-            }
-          }
-          // Add all tabs now that deferred tabs are populated
-          addTabs(useSearchTransfersSplitView);
-          TABBED_PANE.setRequestFocusEnabled(false);
-          ApplicationHeader header = APPLICATION_HEADER;
-          if (header != null) {
-            header.refreshTabButtons(TABS);
-          }
-          Tabs tabToRestore = previousTab != null ? previousTab : resolveDefaultTab();
-          if (tabToRestore == null || !tabToRestore.isEnabled()) {
-            tabToRestore = resolveDefaultTab();
-          }
-          setSelectedTab(tabToRestore);
-        });
+    deferredTabs =
+        new DeferredStep(
+            () -> {
+              Tabs previousTab = getSelectedTab();
+              TransfersTab transfersTab;
+              if (!TABS.containsKey(Tabs.TRANSFERS)) {
+                transfersTab = new TransfersTab(getBTDownloadMediator());
+                TABS.put(Tabs.TRANSFERS, transfersTab);
+              } else {
+                Tab existingTransfers = TABS.get(Tabs.TRANSFERS);
+                transfersTab =
+                    existingTransfers instanceof TransfersTab
+                        ? (TransfersTab) existingTransfers
+                        : null;
+              }
+              if (!TABS.containsKey(Tabs.SEARCH_TRANSFERS) && transfersTab != null) {
+                Tab searchTab = TABS.get(Tabs.SEARCH);
+                if (searchTab instanceof SearchTab) {
+                  SearchTransfersTab searchTransfers =
+                      new SearchTransfersTab((SearchTab) searchTab, transfersTab);
+                  TABS.put(Tabs.SEARCH_TRANSFERS, searchTransfers);
+                }
+              }
+              // Add all tabs now that deferred tabs are populated
+              addTabs(useSearchTransfersSplitView);
+              TABBED_PANE.setRequestFocusEnabled(false);
+              ApplicationHeader header = APPLICATION_HEADER;
+              if (header != null) {
+                header.refreshTabButtons(TABS);
+              }
+              Tabs tabToRestore = previousTab != null ? previousTab : resolveDefaultTab();
+              if (tabToRestore == null || !tabToRestore.isEnabled()) {
+                tabToRestore = resolveDefaultTab();
+              }
+              setSelectedTab(tabToRestore);
+            });
+    SwingUtilities.invokeLater(deferredTabs);
   }
 
   private Tabs resolveDefaultTab() {
@@ -529,7 +539,7 @@ public final class MainFrame {
       return;
     }
     CardLayout cl = (CardLayout) (TABBED_PANE.getLayout());
-    Tab t = TABS.get(tab);
+    Tab t = getTab(tab);
     if (t == null) {
       Tabs fallback = resolveDefaultTab();
       if (fallback != tab) {
@@ -545,12 +555,27 @@ public final class MainFrame {
     }
   }
 
+  /**
+   * The tab, built now if it is one of the deferred tabs and their event hasn't run yet: a request
+   * posted before the main window was created (a torrent opened while FrostWire starts) runs before
+   * that event.
+   */
   final Tab getTab(Tabs tabs) {
-    return TABS.get(tabs);
+    return tabBuildingDeferred(TABS, tabs, deferredTabs);
+  }
+
+  /** {@code tabs}' tab for {@code which}, running {@code deferred} first if it is missing. */
+  static Tab tabBuildingDeferred(Map<Tabs, Tab> tabs, Tabs which, DeferredStep deferred) {
+    Tab tab = tabs.get(which);
+    if (tab == null && deferred != null && !deferred.isDone()) {
+      deferred.run();
+      tab = tabs.get(which);
+    }
+    return tab;
   }
 
   public void resizeSearchTransferDivider(int newLocation) {
-    SearchTransfersTab searchTab = (SearchTransfersTab) TABS.get(Tabs.SEARCH_TRANSFERS);
+    SearchTransfersTab searchTab = (SearchTransfersTab) getTab(Tabs.SEARCH_TRANSFERS);
     searchTab.setDividerLocation(newLocation);
   }
 
