@@ -1,4 +1,5 @@
 FrostWire 7.1.4 UNRELEASED
+   - fix:Windows: choosing a save folder no longer freezes the file chooser while Windows looks up each file's display name; names load in the background, like the icons (#1428)
    - fix:Starting FrostWire no longer stalls on slow machines while the Library and Transfers buttons load their icons; they are loaded in the background before the window is built (#1503)
    - fix:The "VPN Off: BitTorrent disabled" warning in the status bar no longer stalls the window when it appears; it is bold text, not a web page, as are the transfer details' Name and complete labels (#1502)
    - fix:Windows: keeping the tray icon's menu open is no longer reported as a FrostWire freeze in crash reports; it is reported apart as an open native menu (#1499)
