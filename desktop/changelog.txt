@@ -10,7 +10,7 @@ FrostWire 7.1.4 UNRELEASED
    - fix:The first search suggestions no longer stall the window while Java sets up its list classes; they are loaded at startup in the background (#1501)
    - fix:The first drag of a file out of a table no longer stalls while Java reads its clipboard format table; it is read at startup in the background (#1370)
    - fix:Moving the mouse over the VPN link in the status bar no longer stalls the window; the link is underlined without rendering it as a web page (#1500)
-   - fix:Opening FrostWire no longer stalls on a slow machine while Java prepares the splash screen's image classes, its first component and the drawing for its first window; all of it now happens before the splash, in the background (#1323)
+   - fix:Opening FrostWire no longer stalls on a slow machine while Java prepares the splash screen's image classes, its first component, its window's keyboard handling and the drawing for its first window; all of it now happens before the splash, in the background (#1323)
    - fix:On displays scaled to 125% or more, the first screens no longer stall while text is drawn for the first time; the startup warm-up now prepares text at the display's scale (#1346)
    - fix:Selecting a transfer no longer stalls while its comment is laid out as a web page; the comment is shown as plain text (#1362)
    - fix:Opening a torrent while FrostWire starts no longer causes an error when it switches to Transfers (#1498)
