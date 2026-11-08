@@ -1,4 +1,5 @@
 FrostWire 7.1.4 UNRELEASED
+   - fix:The first-run setup wizard no longer freezes while Windows looks up fallback fonts for its bold title — they are loaded in the background before the splash (#1329)
    - fix:Clicking the Source of a search result that has no details page no longer causes an error (#1497)
    - fix:A transfer removed while FrostWire was saving its progress no longer comes back the next time FrostWire starts (#1496)
    - fix:Starting FrostWire no longer freezes the window while the update button's images load; they are loaded in the background before the window is built (#1494)
