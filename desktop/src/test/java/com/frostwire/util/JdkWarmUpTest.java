@@ -214,6 +214,16 @@ class JdkWarmUpTest {
     assertNestedClassIsWarmedUp("javax.swing.plaf.basic.BasicRootPaneUI", "RootPaneInputMap");
   }
 
+  /**
+   * The search field's suggestions list was the first JList: BasicListUI's static initializer ran
+   * on the EDT as the first suggestions popped up (Icebase #c0e323953897,
+   * frostwire/frostwire#1501).
+   */
+  @Test
+  void theListUiIsInitializedByTheWarmUp() throws Exception {
+    assertNestedClassIsWarmedUp("javax.swing.plaf.basic.BasicListUI", "Handler");
+  }
+
   private static void assertNestedClassIsWarmedUp(String outer, String nested) throws Exception {
     assertTrue(JdkWarmUp.CLASSES_TO_INITIALIZE.contains(outer), outer + " is not warmed up");
     assertTrue(

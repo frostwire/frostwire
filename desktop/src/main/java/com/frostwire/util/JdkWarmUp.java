@@ -174,7 +174,11 @@ public final class JdkWarmUp {
           "javax.swing.text.DefaultHighlighter",
           // Every root pane's UI creates a BasicRootPaneUI.RootPaneInputMap; the splash window's
           // was the first, on the EDT (Icebase #2550522ba4dc).
-          "javax.swing.plaf.basic.BasicRootPaneUI");
+          "javax.swing.plaf.basic.BasicRootPaneUI",
+          // The search field's suggestions list is the main window's first JList: its UI's static
+          // initializer ran on the EDT as the first suggestions arrived (Icebase #c0e323953897,
+          // frostwire/frostwire#1501).
+          "javax.swing.plaf.basic.BasicListUI");
 
   /**
    * Windows-only JDK classes initialized like {@link #CLASSES_TO_INITIALIZE}. The first right-click
