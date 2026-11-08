@@ -860,8 +860,25 @@ class JdkWarmUpTest {
     assertTrue(warmUpSource().contains("warmUpDataTransfer();"), "not called by warmUp");
   }
 
+  /**
+   * The flavor map reads its native table and builds the standard text encodings lazily, on its
+   * first lookup; the first drag out of a table did that on the EDT (Icebase #fe1c073c0ca2,
+   * frostwire/frostwire#1370). The warm-up must fill it, not just create it.
+   */
+  @Test
+  void warmUpDataTransferFillsTheFlavorMap() throws Exception {
+    String before = runDataTransferProbe(false);
+    String after = runDataTransferProbe(true);
+    assertFalse(before.contains(FLAVOR_MAP_FILLED_CLASS), "filled before the warm-up");
+    assertTrue(after.contains(FLAVOR_MAP_FILLED_CLASS), "the warm-up left the flavor map empty");
+  }
+
   private static final String DATA_TRANSFER_SERVICE_CLASS =
       "sun.awt.datatransfer.DesktopDatatransferServiceImpl ";
+
+  /** Loaded by SystemFlavorMap.initSystemFlavorMap as it converts the table's text MIME types. */
+  private static final String FLAVOR_MAP_FILLED_CLASS =
+      "sun.datatransfer.DataFlavorUtil$StandardEncodingsHolder ";
 
   private static String runDataTransferProbe(boolean warmUp)
       throws IOException, InterruptedException {

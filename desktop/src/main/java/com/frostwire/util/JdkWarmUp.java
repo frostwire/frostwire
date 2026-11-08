@@ -14,6 +14,8 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.FlavorTable;
 import java.awt.datatransfer.SystemFlavorMap;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineBreakMeasurer;
@@ -598,9 +600,15 @@ public final class JdkWarmUp {
    * module graph that loaded the provider from the boot class path on the EDT
    * (frostwire/frostwire#1370, Icebase #c412f1f06e67). The provider builds the map under its own
    * lock.
+   *
+   * <p>Creating the map doesn't fill it: it reads its native table and builds the standard text
+   * encodings on the first lookup, which the first drag out of a table made on the EDT (Icebase
+   * #fe1c073c0ca2). Asking for the natives of the file-list flavor that drag exports fills it here.
    */
   static void warmUpDataTransfer() {
-    SystemFlavorMap.getDefaultFlavorMap();
+    if (SystemFlavorMap.getDefaultFlavorMap() instanceof FlavorTable table) {
+      table.getNativesForFlavor(DataFlavor.javaFileListFlavor);
+    }
   }
 
   /**
