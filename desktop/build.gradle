@@ -24,7 +24,7 @@ version = (file('src/main/java/com/limegroup/gnutella/util/FrostWireUtils.java')
 spotless {
     // The repo is LF everywhere. Without this Spotless asks JGit, which doesn't read the Windows
     // system gitconfig's core.autocrlf=input, and expects CRLF on Windows.
-    lineEndings 'UNIX'
+    lineEndings = com.diffplug.spotless.LineEnding.UNIX
     java {
         // common/ is outside this project's directory, which Spotless refuses; checkCommonFormat and
         // formatCommon below cover it with the same google-java-format.
