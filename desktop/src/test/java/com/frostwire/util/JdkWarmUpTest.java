@@ -44,6 +44,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.stream.Collectors;
+import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.KeyStroke;
 import javax.swing.LookAndFeel;
@@ -312,6 +313,27 @@ class JdkWarmUpTest {
     assertTrue(
         source.contains("resolveInputMaps(UIManager.getLookAndFeelDefaults());"),
         "the startup warm-up calls it");
+  }
+
+  /**
+   * The first right-click menu loaded the look and feel's lazy popup action map on the EDT when it
+   * showed, through a reflective call whose accessor the JDK built there (Icebase #cc3d418ff162).
+   * Loading it sets the look and feel's audio actions as its parent, so an unloaded map has none.
+   */
+  @Test
+  void thePopupMenuActionMapIsLoadedByTheWarmUp() throws Exception {
+    JdkWarmUp.warmUpPopupMenus();
+
+    ActionMap popupActions =
+        assertInstanceOf(
+            ActionMap.class,
+            UIManager.getLookAndFeelDefaults().get("PopupMenu.actionMap"),
+            "no popup menu action map was installed");
+    assertNotNull(popupActions.getParent(), "the popup menu action map was not loaded");
+    String source =
+        Files.readString(Path.of("src/main/java/com/frostwire/util/JdkWarmUp.java"))
+            .replaceAll("\\s+", "");
+    assertTrue(source.contains("warmUpPopupMenus();"), "the startup warm-up calls it");
   }
 
   /**

@@ -50,6 +50,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.IntStream;
+import javax.swing.ActionMap;
+import javax.swing.JPopupMenu;
 import javax.swing.LookAndFeel;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
@@ -538,6 +540,11 @@ public final class JdkWarmUp {
       LOG.warn("Menu accessor warm-up failed: " + t.getMessage(), t);
     }
     try {
+      warmUpPopupMenus();
+    } catch (Throwable t) {
+      LOG.warn("Popup menu warm-up failed: " + t.getMessage(), t);
+    }
+    try {
       warmUpDataTransfer();
     } catch (Throwable t) {
       LOG.warn("Data transfer warm-up failed: " + t.getMessage(), t);
@@ -999,6 +1006,32 @@ public final class JdkWarmUp {
       }
     }
     return classNames;
+  }
+
+  /**
+   * Builds a popup menu, which installs the look and feel's shared popup keyboard helper and its
+   * lazy {@code PopupMenu.actionMap}, then loads the lazy action maps (see {@link
+   * #resolveActionMaps}). The first right-click menu loaded that map on the EDT when it showed, and
+   * the JDK built the reflective call that fills it there (Icebase #cc3d418ff162). The popup is
+   * never shown; the helper and the map are shared by every popup menu, and the JDK installs the
+   * helper under a lock.
+   */
+  static void warmUpPopupMenus() {
+    new JPopupMenu();
+    resolveActionMaps(UIManager.getLookAndFeelDefaults());
+  }
+
+  /**
+   * Loads the look and feel's lazy action maps ({@code *.actionMap} entries). Each fills itself the
+   * first time it is read, by calling its UI class's {@code loadActionMap} through reflection, and
+   * the first such call builds the JDK's method accessor.
+   */
+  static void resolveActionMaps(UIDefaults defaults) {
+    for (Map.Entry<?, ?> entry : List.copyOf(defaults.entrySet())) {
+      if (entry.getValue() instanceof ActionMap map) {
+        map.size();
+      }
+    }
   }
 
   /**
