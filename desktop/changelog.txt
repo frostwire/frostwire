@@ -1,4 +1,5 @@
 FrostWire 7.1.4 UNRELEASED
+   - fix:Windows: keeping the tray icon's menu open is no longer reported as a FrostWire freeze in crash reports; it is reported apart as an open native menu (#1499)
    - fix:The first search suggestions no longer stall the window while Java sets up its list classes; they are loaded at startup in the background (#1501)
    - fix:The first drag of a file out of a table no longer stalls while Java reads its clipboard format table; it is read at startup in the background (#1370)
    - fix:Moving the mouse over the VPN link in the status bar no longer stalls the window; the link is underlined without rendering it as a web page (#1500)
