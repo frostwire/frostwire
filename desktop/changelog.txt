@@ -1,4 +1,5 @@
 FrostWire 7.1.4 UNRELEASED
+   - fix:The first right-click menu on a search, transfer or library list no longer stalls while Java loads the menu's keyboard actions; that happens at startup in the background (#1507)
    - fix:macOS 27: FrostWire starts again on Macs where it crashed at the splash screen because Java could not list the installed fonts (one damaged font can stop the list); it now loads Helvetica Neue by name and builds Java's fonts from it (#1484)
    - fix:Starting FrostWire on a slow computer no longer stalls while Java sets up the Library's folder tree; that happens at startup in the background (#1506)
    - fix:The first-run setup wizard no longer stalls when it opens while Java sets up its multi-line text; that happens at startup in the background (#1505)
