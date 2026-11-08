@@ -12,10 +12,12 @@ import com.frostwire.gui.theme.PlatformFonts;
 import com.frostwire.gui.theme.SkinMenu;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.awt.datatransfer.SystemFlavorMap;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineBreakMeasurer;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.StringReader;
@@ -615,11 +617,28 @@ public final class JdkWarmUp {
     rasterizeGlyphs(font, desktopHints, GLYPH_SAMPLE);
   }
 
-  /** Measures and draws {@code text} in the font, see {@link #rasterizeGlyphs(Font, Map)}. */
+  /**
+   * Measures and draws {@code text} in the font, see {@link #rasterizeGlyphs(Font, Map)}, once per
+   * transform painting uses ({@link #glyphTransforms}). A font strike is keyed by its transform,
+   * and on a scaled display (125%, 150%) Swing paints through the screen's scale: glyphs warmed
+   * only unscaled were rasterized again on the EDT by the first paint (Icebase #c8c8e424495c,
+   * frostwire/frostwire#1346).
+   */
   static void rasterizeGlyphs(Font font, Map<?, ?> desktopHints, String text) {
-    BufferedImage image = new BufferedImage(GLYPH_IMAGE_WIDTH, 32, BufferedImage.TYPE_INT_RGB);
+    for (AffineTransform transform : glyphTransforms(screenTransform())) {
+      rasterizeGlyphs(font, desktopHints, text, transform);
+    }
+  }
+
+  static void rasterizeGlyphs(
+      Font font, Map<?, ?> desktopHints, String text, AffineTransform transform) {
+    int scale =
+        (int) Math.ceil(Math.max(1, Math.max(transform.getScaleX(), transform.getScaleY())));
+    BufferedImage image =
+        new BufferedImage(GLYPH_IMAGE_WIDTH * scale, 32 * scale, BufferedImage.TYPE_INT_RGB);
     Graphics2D g = image.createGraphics();
     try {
+      g.transform(transform);
       if (desktopHints != null) {
         g.addRenderingHints(desktopHints);
       }
@@ -628,6 +647,29 @@ public final class JdkWarmUp {
       g.drawString(text, 0, 24);
     } finally {
       g.dispose();
+    }
+  }
+
+  /** Unscaled, and the screen's scale too when it has one. */
+  static List<AffineTransform> glyphTransforms(AffineTransform screen) {
+    if (screen == null || screen.isIdentity()) {
+      return List.of(new AffineTransform());
+    }
+    return List.of(new AffineTransform(), new AffineTransform(screen));
+  }
+
+  /** The default screen's transform (its display scale), or null when there is no screen. */
+  private static AffineTransform screenTransform() {
+    try {
+      if (GraphicsEnvironment.isHeadless()) {
+        return null;
+      }
+      return GraphicsEnvironment.getLocalGraphicsEnvironment()
+          .getDefaultScreenDevice()
+          .getDefaultConfiguration()
+          .getDefaultTransform();
+    } catch (Throwable t) {
+      return null;
     }
   }
 

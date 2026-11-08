@@ -21,6 +21,7 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -71,6 +72,26 @@ class JdkWarmUpTest {
         Set.of("Dialog/0", "Dialog/1", "Monospaced/0"),
         fonts.stream().map(f -> f.getName() + "/" + f.getStyle()).collect(Collectors.toSet()));
     assertEquals(3, fonts.size());
+  }
+
+  /**
+   * On a scaled display Swing paints through the screen's scale, and font strikes are keyed by
+   * their transform: the warm-up must also rasterize at that scale (Icebase #c8c8e424495c,
+   * frostwire/frostwire#1346).
+   */
+  @Test
+  void glyphsAreWarmedAtTheScreenScaleToo() {
+    AffineTransform scaled = AffineTransform.getScaleInstance(1.5, 1.5);
+
+    List<AffineTransform> transforms = JdkWarmUp.glyphTransforms(scaled);
+
+    assertEquals(List.of(new AffineTransform(), scaled), transforms);
+    assertEquals(List.of(new AffineTransform()), JdkWarmUp.glyphTransforms(new AffineTransform()));
+    assertEquals(List.of(new AffineTransform()), JdkWarmUp.glyphTransforms(null));
+    assertDoesNotThrow(
+        () ->
+            JdkWarmUp.rasterizeGlyphs(
+                PlatformFonts.dialog(Font.PLAIN, 12), null, "FrostWire", scaled));
   }
 
   @Test
