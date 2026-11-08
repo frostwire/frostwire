@@ -181,6 +181,26 @@ public final class JdkWarmUp {
   static final List<String> WINDOWS_CLASSES_TO_INITIALIZE =
       List.of("sun.awt.windows.WPopupMenuPeer");
 
+  /**
+   * JDK classes the Swing splash window initializes on the EDT, initialized beforehand by the
+   * startup thread that decodes the splash image ({@link #initializeSplashClasses}): the warm-up
+   * thread runs alongside the splash and can't be relied on to get there first. ImageIcon's static
+   * initializer builds its shared MediaTracker and component, which a cold JVM loaded on the EDT
+   * while building the splash (Icebase #e45e1beac54a, frostwire/frostwire#1323).
+   */
+  static final List<String> SPLASH_CLASSES_TO_INITIALIZE = List.of("javax.swing.ImageIcon");
+
+  /** Initializes {@link #SPLASH_CLASSES_TO_INITIALIZE}; call off the EDT before the splash. */
+  public static void initializeSplashClasses() {
+    for (String className : SPLASH_CLASSES_TO_INITIALIZE) {
+      try {
+        Class.forName(className);
+      } catch (Throwable t) {
+        LOG.warn("Warm-up of " + className + " failed: " + t.getMessage(), t);
+      }
+    }
+  }
+
   /** The classes the warm-up initializes: the Windows-only ones too when {@code windows}. */
   static List<String> classesToInitialize(boolean windows) {
     if (!windows) {

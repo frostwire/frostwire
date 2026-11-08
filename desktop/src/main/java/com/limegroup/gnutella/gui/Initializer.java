@@ -324,6 +324,8 @@ final class Initializer {
       // Decode the splash image on this thread, not on the EDT while it builds the splash; a lookup
       // when the AWT splash already decoded it.
       Main.getChosenSplashImage();
+      // The splash shows that image in an ImageIcon: initialize the class here too (#1323).
+      JdkWarmUp.initializeSplashClasses();
     }
     try {
       GUIMediator.safeInvokeAndWait(

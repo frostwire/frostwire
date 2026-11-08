@@ -231,6 +231,19 @@ class JdkWarmUpTest {
         "the startup warm-up calls it");
   }
 
+  /**
+   * The Swing splash shows its image in an ImageIcon, whose static initializer ran on the EDT while
+   * the splash was built (Icebase #e45e1beac54a, frostwire/frostwire#1323).
+   */
+  @Test
+  void theSplashImageIconIsInitializedBeforeTheSplash() {
+    assertTrue(JdkWarmUp.SPLASH_CLASSES_TO_INITIALIZE.contains("javax.swing.ImageIcon"));
+    for (String className : JdkWarmUp.SPLASH_CLASSES_TO_INITIALIZE) {
+      assertDoesNotThrow(() -> Class.forName(className), className);
+    }
+    assertDoesNotThrow(JdkWarmUp::initializeSplashClasses);
+  }
+
   @Test
   void everyClassToInitializeExistsAndLoads() {
     for (String className : JdkWarmUp.CLASSES_TO_INITIALIZE) {
