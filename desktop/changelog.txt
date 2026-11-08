@@ -1,4 +1,5 @@
 FrostWire 7.1.4 UNRELEASED
+   - fix:Starting FrostWire no longer stalls on slow machines while the Library and Transfers buttons load their icons; they are loaded in the background before the window is built (#1503)
    - fix:The "VPN Off: BitTorrent disabled" warning in the status bar no longer stalls the window when it appears; it is bold text, not a web page, as are the transfer details' Name and complete labels (#1502)
    - fix:Windows: keeping the tray icon's menu open is no longer reported as a FrostWire freeze in crash reports; it is reported apart as an open native menu (#1499)
    - fix:The first search suggestions no longer stall the window while Java sets up its list classes; they are loaded at startup in the background (#1501)
