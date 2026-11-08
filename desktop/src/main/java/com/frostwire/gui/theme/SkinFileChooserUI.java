@@ -77,20 +77,51 @@ public class SkinFileChooserUI extends BaseFileChooserUI {
   private static final ExecutorService ICON_LOOKUPS = WarmExecutors.serialQueue("FileChooserIcons");
 
   /**
-   * System file icons, looked up off the EDT (Icebase #e51928be4469): the list renderer asks for
-   * one per row, and on Windows each lookup waits for the shell over COM.
+   * System file icons and display names, looked up off the EDT (Icebase #e51928be4469,
+   * #0d182adae29c, frostwire/frostwire#1428): the list renderer asks for both per row, and on
+   * Windows each lookup waits for the shell over COM.
    */
   private class SubstanceFileView extends BasicFileView {
     /** The chooser's FileSystemView, read on the EDT for the lookups that run on the worker. */
     private volatile FileSystemView lookupView;
 
-    private final AsyncFileIconCache icons =
-        new AsyncFileIconCache(
+    private final AsyncFileLookupCache<Icon> icons =
+        new AsyncFileLookupCache<>(
             ICON_LOOKUPS,
             f -> {
               FileSystemView view = lookupView;
               return view != null ? view.getSystemIcon(f) : null;
-            });
+            },
+            f -> AsyncFileLookupCache.BLANK_ICON);
+
+    /**
+     * The shell's display name (e.g. without a hidden extension, or a drive's label); the plain
+     * file name shows while it loads.
+     */
+    private final AsyncFileLookupCache<String> names =
+        new AsyncFileLookupCache<>(
+            ICON_LOOKUPS,
+            f -> {
+              FileSystemView view = lookupView;
+              return view != null ? view.getSystemDisplayName(f) : null;
+            },
+            SubstanceFileView::plainName);
+
+    /** A file's own name, or its path for a root such as C:\, whose name is empty. */
+    private static String plainName(File f) {
+      String name = f.getName();
+      return name.isEmpty() ? f.getPath() : name;
+    }
+
+    @Override
+    public String getName(File f) {
+      JFileChooser fileChooser = getFileChooser();
+      if (f == null || fileChooser == null) {
+        return null;
+      }
+      lookupView = fileChooser.getFileSystemView();
+      return names.get(f, fileChooser::repaint);
+    }
 
     @Override
     public Icon getCachedIcon(File f) {
@@ -115,6 +146,7 @@ public class SkinFileChooserUI extends BaseFileChooserUI {
     @Override
     public void clearIconCache() {
       icons.clear();
+      names.clear();
     }
   }
 }

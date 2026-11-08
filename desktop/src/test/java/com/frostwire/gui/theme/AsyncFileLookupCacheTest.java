@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
  * COM, on every cache miss (Icebase #e51928be4469). A miss must return a placeholder at once and
  * load the icon on the cache's worker.
  */
-class AsyncFileIconCacheTest {
+class AsyncFileLookupCacheTest {
 
   private final List<Runnable> queued = new ArrayList<>();
   private final AtomicInteger lookups = new AtomicInteger();
@@ -36,7 +36,7 @@ class AsyncFileIconCacheTest {
 
   @Test
   void aMissReturnsAPlaceholderAndLooksUpOnTheWorker() throws Exception {
-    AsyncFileIconCache cache = cache();
+    AsyncFileLookupCache<Icon> cache = cache();
     File file = new File("some.torrent");
     AtomicReference<Icon> first = new AtomicReference<>();
 
@@ -60,7 +60,7 @@ class AsyncFileIconCacheTest {
 
   @Test
   void aPendingLookupIsNotQueuedTwice() throws Exception {
-    AsyncFileIconCache cache = cache();
+    AsyncFileLookupCache<Icon> cache = cache();
     File file = new File("movie.mkv");
     SwingUtilities.invokeAndWait(
         () -> {
@@ -73,7 +73,7 @@ class AsyncFileIconCacheTest {
 
   @Test
   void clearingForgetsIcons() throws Exception {
-    AsyncFileIconCache cache = cache();
+    AsyncFileLookupCache<Icon> cache = cache();
     File file = new File("song.mp3");
     SwingUtilities.invokeAndWait(() -> cache.get(file, loaded::incrementAndGet));
     queued.remove(0).run();
@@ -82,12 +82,44 @@ class AsyncFileIconCacheTest {
     assertEquals(1, queued.size(), "after clear the icon is looked up again");
   }
 
-  private AsyncFileIconCache cache() {
-    return new AsyncFileIconCache(
+  private AsyncFileLookupCache<Icon> cache() {
+    return new AsyncFileLookupCache<>(
         queued::add,
         f -> {
           lookups.incrementAndGet();
           return systemIcon;
-        });
+        },
+        f -> AsyncFileLookupCache.BLANK_ICON);
+  }
+
+  /**
+   * Display names go through the same cache: the shell's name (Icebase #0d182adae29c,
+   * frostwire/frostwire#1428) loads on the worker while the plain file name shows, and a lookup
+   * that finds nothing keeps the plain name.
+   */
+  @Test
+  void aNameMissShowsThePlainNameAndLooksUpOnTheWorker() throws Exception {
+    AsyncFileLookupCache<String> names =
+        new AsyncFileLookupCache<>(
+            queued::add,
+            f -> {
+              lookups.incrementAndGet();
+              return f.getName().equals("report.pdf") ? "report" : null;
+            },
+            File::getName);
+    File named = new File("report.pdf");
+    File unnamed = new File("notes.txt");
+    AtomicReference<String> first = new AtomicReference<>();
+
+    SwingUtilities.invokeAndWait(() -> first.set(names.get(named, loaded::incrementAndGet)));
+    SwingUtilities.invokeAndWait(() -> names.get(unnamed, loaded::incrementAndGet));
+
+    assertEquals("report.pdf", first.get(), "the EDT must not wait for the shell");
+    assertEquals(0, lookups.get());
+    queued.remove(0).run();
+    queued.remove(0).run();
+    SwingUtilities.invokeAndWait(() -> {});
+    assertEquals("report", names.cached(named));
+    assertEquals("notes.txt", names.cached(unnamed), "no display name keeps the plain name");
   }
 }
