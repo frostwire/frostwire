@@ -19,6 +19,8 @@
 package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.search.engines.SearchEngine;
+import com.frostwire.search.engines.SearchEngineID;
 import com.frostwire.search.relay.DhtPeerDiscoverySource;
 import com.frostwire.search.relay.DistributedSearchTransport;
 import com.frostwire.search.relay.IdentityKeys;
@@ -173,15 +175,14 @@ public final class IceBridgeUrlHandler {
       showError(I18n.tr("IceBridge search requires keywords in the URL path"));
       return;
     }
-    SearchEngine distributed =
-        SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.DISTRIBUTED_ID);
+    SearchEngine distributed = DesktopSearchEngines.byId(SearchEngineID.DISTRIBUTED_ID);
     if (distributed == null || !distributed.isEnabled() || !distributed.isReady()) {
       showError(
           I18n.tr("Distributed search engine is not ready. Please wait for IceBridge to start."));
       return;
     }
-    DistributedSearchTransport transport = distributed.getSearchTransport();
-    IdentityKeys identity = distributed.identityKeys();
+    DistributedSearchTransport transport = DesktopSearchEngines.distributed().searchTransport();
+    IdentityKeys identity = DesktopSearchEngines.distributed().identity();
     if (transport == null || identity == null) {
       showError(I18n.tr("Distributed search transport or identity is not available."));
       return;

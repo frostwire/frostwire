@@ -719,7 +719,8 @@ public final class BTDownloadMediator
   /** Reads libtorrent and the karma chain: not on the EDT. */
   private boolean canEndorseSourcePeer(BTDownload download) {
     return canEndorseSourcePeer(
-        download, com.limegroup.gnutella.gui.search.SearchEngine.getDistributedKarmaChainWriter());
+        download,
+        com.limegroup.gnutella.gui.search.DesktopSearchEngines.distributed().karmaChainWriter());
   }
 
   /** Reads libtorrent and the karma chain: not on the EDT. */
@@ -753,7 +754,8 @@ public final class BTDownloadMediator
           // Endorse with the writer that passed the checks; the relay stack may replace or drop
           // it while the dialog is open (a revoked writer refuses to write).
           KarmaChainWriter writer =
-              com.limegroup.gnutella.gui.search.SearchEngine.getDistributedKarmaChainWriter();
+              com.limegroup.gnutella.gui.search.DesktopSearchEngines.distributed()
+                  .karmaChainWriter();
           if (!canEndorseSourcePeer(download, writer)) {
             return;
           }

@@ -26,6 +26,8 @@ import com.frostwire.gui.filters.SearchFilterFactoryImpl;
 import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.search.*;
 import com.frostwire.search.CompositeFileSearchResult;
+import com.frostwire.search.engines.SearchEngine;
+import com.frostwire.search.engines.SearchEngineID;
 import com.frostwire.search.internetarchive.InternetArchiveCrawledSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.telluride.TellurideSearchResult;
@@ -533,18 +535,17 @@ public final class SearchMediator {
 
       if (query.startsWith("http") && !query.endsWith(".torrent")) {
         manager.perform(
-            SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.FROSTCLICK_ID)
-                .getPerformer(token, query));
+            DesktopSearchEngines.byId(SearchEngineID.FROSTCLICK_ID).getPerformer(token, query));
         boolean isPlaylist = isYouTubePlaylistUrl(query);
         manager.perform(
-            SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.TELLURIDE_ID)
+            DesktopSearchEngines.byId(SearchEngineID.TELLURIDE_ID)
                 .getPerformer(token, query, isPlaylist));
         return;
       }
 
-      for (SearchEngine se : SearchEngine.getEngines()) {
-        if (se.isEnabled() && se.isReady()) {
-          ISearchPerformer p = se.getPerformer(token, query);
+      for (SearchEngine se : DesktopSearchEngines.registry().enabled()) {
+        ISearchPerformer p = se.getPerformer(token, query);
+        if (p != null) {
           manager.perform(p);
         }
       }
@@ -703,7 +704,7 @@ public final class SearchMediator {
         filtered = f;
       }
       if (filtered != null && !filtered.isEmpty()) {
-        SearchEngine se = SearchEngine.getSearchEngineByName(filtered.get(0).getSource());
+        SearchEngine se = DesktopSearchEngines.byName(filtered.get(0).getSource());
         if (se == null) {
           return;
         }

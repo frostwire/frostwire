@@ -12,6 +12,7 @@ import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.KarmaDisplayCache;
 import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.PeerDirectory;
+import com.frostwire.search.relay.RelaySearchWiring;
 import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import javax.swing.SwingUtilities;
 
@@ -55,30 +56,20 @@ public final class DistributedSearchEngineWire {
     if (transport == null) {
       throw new IllegalArgumentException("transport is null");
     }
-    SearchEngine distributed =
-        SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.DISTRIBUTED_ID);
-    if (distributed == null) {
-      throw new IllegalStateException("DISTRIBUTED search engine is not registered");
-    }
-    distributed
-        .setLocalIndex(localIndex)
-        .setPeerDirectory(peerDirectory)
-        .setIdentityKeys(identity)
-        .setSearchTransport(transport);
+    DesktopSearchEngines.distributed()
+        .localIndex(localIndex)
+        .peerDirectory(peerDirectory)
+        .identity(identity)
+        .searchTransport(transport);
     peerDirectoryRef = peerDirectory;
     KARMA_DISPLAY.clear();
   }
 
   /** Clear only the wiring owned by the stopping stack, never a replacement's transport. */
   public static synchronized void unwire(DistributedSearchTransport transport) {
-    SearchEngine distributed =
-        SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.DISTRIBUTED_ID);
-    if (distributed != null && transport != null && distributed.getSearchTransport() == transport) {
-      distributed
-          .setSearchTransport(null)
-          .setIdentityKeys(null)
-          .setPeerDirectory(null)
-          .setLocalIndex(null);
+    RelaySearchWiring distributed = DesktopSearchEngines.distributed();
+    if (transport != null && distributed.searchTransport() == transport) {
+      distributed.searchTransport(null).identity(null).peerDirectory(null).localIndex(null);
       peerDirectoryRef = null;
       KARMA_DISPLAY.clear();
     }

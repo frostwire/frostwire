@@ -8,9 +8,10 @@
 package com.frostwire.mcp.desktop.tools.search;
 
 import com.frostwire.mcp.MCPTool;
+import com.frostwire.search.engines.SearchEngine;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.limegroup.gnutella.gui.search.SearchEngine;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 import java.util.List;
 
 public class SearchEnginesTool implements MCPTool {
@@ -34,7 +35,7 @@ public class SearchEnginesTool implements MCPTool {
 
   @Override
   public JsonObject execute(JsonObject arguments) {
-    List<SearchEngine> engines = SearchEngine.getEngines();
+    List<SearchEngine> engines = DesktopSearchEngines.all();
     JsonArray enginesArray = new JsonArray();
 
     for (SearchEngine engine : engines) {

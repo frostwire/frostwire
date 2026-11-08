@@ -8,8 +8,10 @@
 package com.frostwire.mcp.desktop.tools.search;
 
 import com.frostwire.mcp.MCPTool;
+import com.frostwire.search.engines.SearchEngine;
 import com.google.gson.JsonObject;
-import com.limegroup.gnutella.gui.search.SearchEngine;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngineAdapter;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 import java.util.List;
 
 public class SearchEngineToggleTool implements MCPTool {
@@ -55,7 +57,7 @@ public class SearchEngineToggleTool implements MCPTool {
     String engineId = arguments.get("engineId").getAsString();
     boolean enabled = arguments.get("enabled").getAsBoolean();
 
-    List<SearchEngine> engines = SearchEngine.getEngines();
+    List<SearchEngine> engines = DesktopSearchEngines.all();
     SearchEngine target = null;
     for (SearchEngine engine : engines) {
       if (engine.getId().name().equals(engineId)) {
@@ -73,7 +75,7 @@ public class SearchEngineToggleTool implements MCPTool {
       return result;
     }
 
-    target.getEnabledSetting().setValue(enabled);
+    DesktopSearchEngineAdapter.settingFor(target.getId()).setValue(enabled);
     result.addProperty("enabled", target.isEnabled());
     result.addProperty("name", target.getName());
     return result;

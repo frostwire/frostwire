@@ -12,11 +12,12 @@ import com.frostwire.search.relay.KarmaChain;
 import com.frostwire.search.relay.KarmaChainEntry;
 import com.frostwire.search.relay.KarmaChainTable;
 import com.frostwire.search.relay.PeerKarmaCache;
+import com.frostwire.search.relay.RelaySearchWiring;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.search.SearchEngine;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseAdapter;
@@ -36,8 +37,8 @@ public final class KarmaSettingsPaneItem extends AbstractPaneItem {
 
   private static final String NA = "—";
 
-  private static SearchEngine distributedEngine() {
-    return SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.DISTRIBUTED_ID);
+  private static RelaySearchWiring distributedEngine() {
+    return DesktopSearchEngines.distributed();
   }
 
   private static final String TITLE = I18n.tr("Karma");
@@ -163,7 +164,7 @@ public final class KarmaSettingsPaneItem extends AbstractPaneItem {
     SCORE_LABEL.setText(NA);
     TABLE_MODEL.setRowCount(0);
 
-    IdentityKeys identity = distributedEngine().identityKeys();
+    IdentityKeys identity = distributedEngine().identity();
     if (identity == null) {
       EPOCH_LABEL.setText(I18n.tr("(not initialized)"));
       ENERGY_LABEL.setText(I18n.tr("(not available)"));

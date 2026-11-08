@@ -21,6 +21,7 @@ package com.limegroup.gnutella.gui.search;
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.StreamableSearchResult;
+import com.frostwire.search.engines.SearchEngine;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.telluride.TellurideSearchResult;
 import com.limegroup.gnutella.gui.GUIMediator;

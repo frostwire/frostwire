@@ -51,11 +51,10 @@ public final class LocalSearchEngineWire {
     if (index == null) {
       throw new IllegalArgumentException("index is null");
     }
-    SearchEngine local = SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.LOCAL_ID);
-    if (local == null) {
-      throw new IllegalStateException("LOCAL search engine is not registered");
-    }
-    local.setLocalIndex(index);
+    // Local searches return only the transfers the user shares with this machine.
+    DesktopSearchEngines.local()
+        .visibility(com.frostwire.gui.bittorrent.BtTransferShareVisibility.LOCAL)
+        .localIndex(index);
   }
 
   /**
@@ -63,10 +62,6 @@ public final class LocalSearchEngineWire {
    * Pass {@code null} to disable karma weighting. Idempotent; the most recent call wins.
    */
   public static void setKarmaCache(PeerKarmaCache karmaCache) {
-    SearchEngine local = SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.LOCAL_ID);
-    if (local == null) {
-      throw new IllegalStateException("LOCAL search engine is not registered");
-    }
-    local.setKarmaCache(karmaCache);
+    DesktopSearchEngines.local().karmaCache(karmaCache);
   }
 }

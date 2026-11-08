@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.frostwire.search.relay.icebridge.IceBridgeMetrics;
 import com.google.gson.JsonObject;
-import com.limegroup.gnutella.gui.search.SearchEngine;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +22,7 @@ class RelayMetricsToolTest {
 
   @AfterEach
   void clearMetrics() {
-    SearchEngine.setDistributedTransportMetrics(null);
+    DesktopSearchEngines.distributed().transportMetrics(null);
   }
 
   @Test
@@ -35,7 +35,7 @@ class RelayMetricsToolTest {
     metrics.incrementRequestWorkRejected(1);
     metrics.incrementVerifyFailures(1);
     metrics.setRequestWorkQueueDepthGauge(7);
-    SearchEngine.setDistributedTransportMetrics(metrics);
+    DesktopSearchEngines.distributed().transportMetrics(metrics);
 
     JsonObject out = new RelayMetricsTool().execute(new JsonObject());
 
@@ -50,7 +50,7 @@ class RelayMetricsToolTest {
 
   @Test
   void omitsTransportCountersWhenNotWired() {
-    SearchEngine.setDistributedTransportMetrics(null);
+    DesktopSearchEngines.distributed().transportMetrics(null);
     JsonObject out = new RelayMetricsTool().execute(new JsonObject());
     assertFalse(out.has("transport_poll_runs"));
     assertTrue(out.has("distributed_ready"));

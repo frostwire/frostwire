@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui.search;
 
+import com.frostwire.search.engines.SearchEngine;
 import com.frostwire.search.telluride.TellurideSearchResult;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.util.PopupUtils;

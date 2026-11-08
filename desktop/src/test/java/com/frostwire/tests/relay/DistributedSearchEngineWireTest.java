@@ -9,6 +9,8 @@ package com.frostwire.tests.relay;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.frostwire.search.engines.SearchEngine;
+import com.frostwire.search.engines.SearchEngineID;
 import com.frostwire.search.relay.DistributedSearchTransport;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.KarmaChainSource;
@@ -17,8 +19,8 @@ import com.frostwire.search.relay.LocalSharedTorrent;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerKarmaCache;
 import com.frostwire.search.relay.RemoteKarmaChainFetcher;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 import com.limegroup.gnutella.gui.search.DistributedSearchEngineWire;
-import com.limegroup.gnutella.gui.search.SearchEngine;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -28,8 +30,7 @@ class DistributedSearchEngineWireTest {
 
   @Test
   void distributedEngineIsRegistered() {
-    SearchEngine engine =
-        SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.DISTRIBUTED_ID);
+    SearchEngine engine = DesktopSearchEngines.byId(SearchEngineID.DISTRIBUTED_ID);
     assertNotNull(engine);
     assertEquals("Distributed", engine.getName());
   }
@@ -37,8 +38,8 @@ class DistributedSearchEngineWireTest {
   @Test
   void getEnginesIncludesDistributed() {
     boolean found = false;
-    for (SearchEngine engine : SearchEngine.getEngines()) {
-      if (engine.getId() == SearchEngine.SearchEngineID.DISTRIBUTED_ID) {
+    for (SearchEngine engine : DesktopSearchEngines.all()) {
+      if (engine.getId() == SearchEngineID.DISTRIBUTED_ID) {
         found = true;
         break;
       }
@@ -48,15 +49,13 @@ class DistributedSearchEngineWireTest {
 
   @Test
   void distributedEngineIsNotReadyBeforeWiring() {
-    SearchEngine engine =
-        SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.DISTRIBUTED_ID);
+    SearchEngine engine = DesktopSearchEngines.byId(SearchEngineID.DISTRIBUTED_ID);
     assertFalse(engine.isReady(), "DISTRIBUTED engine is not ready before wiring");
   }
 
   @Test
   void wireFlipsReadyState() throws Exception {
-    SearchEngine engine =
-        SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.DISTRIBUTED_ID);
+    SearchEngine engine = DesktopSearchEngines.byId(SearchEngineID.DISTRIBUTED_ID);
 
     LocalIndex index = new InMemoryLocalIndex();
     IdentityKeys identity = IdentityKeys.generate(0);
@@ -102,8 +101,7 @@ class DistributedSearchEngineWireTest {
     IdentityKeys identity = IdentityKeys.generate(0);
     DistributedSearchTransport oldTransport = new NoopTransport();
     DistributedSearchTransport replacement = new NoopTransport();
-    SearchEngine engine =
-        SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.DISTRIBUTED_ID);
+    SearchEngine engine = DesktopSearchEngines.byId(SearchEngineID.DISTRIBUTED_ID);
     try (PeerKarmaCache cache =
         new PeerKarmaCache(new RemoteKarmaChainFetcher(new NoOpKarmaSource()))) {
       PeerDirectory oldDirectory = new PeerDirectory(cache);
@@ -113,12 +111,12 @@ class DistributedSearchEngineWireTest {
       DistributedSearchEngineWire.unwire(oldTransport);
       DistributedSearchEngineWire.unwire(null);
       assertTrue(engine.isReady());
-      assertSame(replacement, engine.getSearchTransport());
+      assertSame(replacement, DesktopSearchEngines.distributed().searchTransport());
       assertSame(newDirectory, DistributedSearchEngineWire.getPeerDirectory());
       DistributedSearchEngineWire.unwire(replacement);
       DistributedSearchEngineWire.unwire(replacement);
       assertFalse(engine.isReady());
-      assertNull(engine.identityKeys());
+      assertNull(DesktopSearchEngines.distributed().identity());
       assertNull(DistributedSearchEngineWire.getPeerDirectory());
     } finally {
       DistributedSearchEngineWire.unwire(replacement);

@@ -19,6 +19,7 @@
 package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.gui.tabs.TransfersTab;
+import com.frostwire.search.engines.SearchEngine;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;

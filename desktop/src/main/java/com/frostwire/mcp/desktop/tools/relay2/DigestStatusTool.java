@@ -11,7 +11,7 @@ import com.frostwire.mcp.MCPTool;
 import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.PeerDirectory;
 import com.google.gson.JsonObject;
-import com.limegroup.gnutella.gui.search.SearchEngine;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 
 /** MCP tool summarizing the IceBridge peer directory and local-index readiness. */
 public final class DigestStatusTool implements MCPTool {
@@ -38,8 +38,8 @@ public final class DigestStatusTool implements MCPTool {
   public JsonObject execute(JsonObject arguments) {
     JsonObject out = new JsonObject();
     try {
-      PeerDirectory dir = SearchEngine.getDistributedPeerDirectory();
-      LocalIndex index = SearchEngine.getDistributedLocalIndex();
+      PeerDirectory dir = DesktopSearchEngines.distributed().peerDirectory();
+      LocalIndex index = DesktopSearchEngines.distributed().localIndex();
 
       out.addProperty("peer_directory_size", dir != null ? dir.size() : 0);
       out.addProperty("live", dir != null ? dir.liveCount() : 0);

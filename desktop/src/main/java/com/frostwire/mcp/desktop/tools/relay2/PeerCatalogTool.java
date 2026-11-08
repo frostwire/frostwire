@@ -16,7 +16,7 @@ import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.limegroup.gnutella.gui.search.SearchEngine;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 import java.util.Collections;
 import java.util.List;
 
@@ -86,8 +86,8 @@ public final class PeerCatalogTool implements MCPTool {
       }
       String peer = Hex.encode(pubBytes);
 
-      DistributedSearchTransport transport = SearchEngine.getDistributedSearchTransport();
-      IdentityKeys identity = SearchEngine.getDistributedIdentity();
+      DistributedSearchTransport transport = DesktopSearchEngines.distributed().searchTransport();
+      IdentityKeys identity = DesktopSearchEngines.distributed().identity();
       if (transport == null || identity == null) {
         out.addProperty("error", "distributed relay not wired");
         return out;

@@ -10,10 +10,12 @@ package com.frostwire.tests.relay;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.frostwire.BuildConfig;
+import com.frostwire.search.engines.SearchEngine;
+import com.frostwire.search.engines.SearchEngineID;
 import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalSharedTorrent;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 import com.limegroup.gnutella.gui.search.LocalSearchEngineWire;
-import com.limegroup.gnutella.gui.search.SearchEngine;
 import com.limegroup.gnutella.settings.SearchEnginesSettings;
 import java.util.Collections;
 import java.util.List;
@@ -24,7 +26,7 @@ class LocalSearchEngineWireTest {
 
   @Test
   void localEngineIsRegisteredBeforeWiring() {
-    SearchEngine local = SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.LOCAL_ID);
+    SearchEngine local = DesktopSearchEngines.byId(SearchEngineID.LOCAL_ID);
     assertNotNull(local, "LOCAL_ID must be in the engine list");
     assertEquals("Local (test)", local.getName());
   }
@@ -36,7 +38,7 @@ class LocalSearchEngineWireTest {
 
   @Test
   void wireFlipsReadyState() {
-    SearchEngine local = SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.LOCAL_ID);
+    SearchEngine local = DesktopSearchEngines.byId(SearchEngineID.LOCAL_ID);
     boolean wasReady = local.isReady();
     LocalSearchEngineWire.setIndex(new NoopLocalIndex());
     assertTrue(local.isReady(), "Wiring a LocalIndex flips isReady to true");
@@ -56,10 +58,10 @@ class LocalSearchEngineWireTest {
 
   @Test
   void localEngineVisibilityMatchesBuildType() {
-    List<SearchEngine> all = SearchEngine.getEngines();
+    List<SearchEngine> all = DesktopSearchEngines.all();
     boolean found = false;
     for (SearchEngine se : all) {
-      if (se.getId() == SearchEngine.SearchEngineID.LOCAL_ID) {
+      if (se.getId() == SearchEngineID.LOCAL_ID) {
         found = true;
         break;
       }

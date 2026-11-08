@@ -20,14 +20,12 @@ package com.frostwire.gui.updates;
 
 import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
-import com.limegroup.gnutella.gui.search.SearchEngine;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.*;
@@ -337,14 +335,6 @@ final class UpdateMessageReader implements ContentHandler {
     // LOG.info("startElement " + localName);
     if (localName.equalsIgnoreCase("update")) {
       UpdateManager.getInstance().setServerTime(atts.getValue("time"));
-      if (atts.getValue("torrentDetailsUrl") != null
-          && atts.getValue("torrentDetailsUrl").length() > 0) {
-        String torrentDetailsUrl = atts.getValue("torrentDetailsUrl");
-        List<SearchEngine> searchEngines = SearchEngine.getEngines();
-        for (SearchEngine searchEngine : searchEngines) {
-          searchEngine.setRedirectUrl(torrentDetailsUrl);
-        }
-      }
     } else if (localName.equalsIgnoreCase("message")) {
       String type = atts.getValue("type");
       String message = atts.getValue("value");

@@ -24,10 +24,12 @@ import com.frostwire.search.ISearchPerformer;
 import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchResult;
+import com.frostwire.search.engines.SearchEngine;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.limegroup.gnutella.gui.search.SearchEngine;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngineAdapter;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -277,14 +279,14 @@ class SearchToolsTest {
   @Test
   void enginesAreListedWithTheirTypeAndState() {
     JsonArray engines = new SearchEnginesTool().execute(new JsonObject()).getAsJsonArray("engines");
-    assertEquals(SearchEngine.getEngines().size(), engines.size());
+    assertEquals(DesktopSearchEngines.all().size(), engines.size());
 
     Set<String> ids = new HashSet<>();
     for (int i = 0; i < engines.size(); i++) {
       JsonObject engine = engines.get(i).getAsJsonObject();
       String id = engine.get("id").getAsString();
       ids.add(id);
-      SearchEngine real = SearchEngine.getEngines().get(i);
+      SearchEngine real = DesktopSearchEngines.all().get(i);
       assertEquals(real.getId().name(), id);
       assertEquals(real.getName(), engine.get("name").getAsString());
       assertEquals(real.isEnabled(), engine.get("enabled").getAsBoolean());
@@ -301,8 +303,8 @@ class SearchToolsTest {
 
   @Test
   void toggleEnablesAndDisablesAnEngine() {
-    SearchEngine engine = SearchEngine.getEngines().get(0);
-    boolean original = engine.getEnabledSetting().getValue();
+    SearchEngine engine = DesktopSearchEngines.all().get(0);
+    boolean original = DesktopSearchEngineAdapter.settingFor(engine.getId()).getValue();
     try {
       JsonObject args = new JsonObject();
       args.addProperty("engineId", engine.getId().name());
@@ -312,10 +314,10 @@ class SearchToolsTest {
 
       assertEquals(engine.getId().name(), toggled.get("engineId").getAsString());
       assertEquals(engine.getName(), toggled.get("name").getAsString());
-      assertEquals(!original, engine.getEnabledSetting().getValue());
+      assertEquals(!original, DesktopSearchEngineAdapter.settingFor(engine.getId()).getValue());
       assertEquals(engine.isEnabled(), toggled.get("enabled").getAsBoolean());
     } finally {
-      engine.getEnabledSetting().setValue(original);
+      DesktopSearchEngineAdapter.settingFor(engine.getId()).setValue(original);
     }
   }
 

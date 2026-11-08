@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui.search;
 
+import com.frostwire.search.engines.SearchEngine;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.LabeledTextField;
 import java.awt.*;
@@ -71,7 +72,7 @@ final class SearchOptionsPanel extends JPanel {
     if (generalFilter == null) {
       generalFilter = new GeneralResultFilter(resultPanel, sliderSeeds, sliderSize);
     }
-    updateCheckboxes(SearchEngine.getEngines());
+    updateCheckboxes(DesktopSearchEngines.all());
     resultPanel.setFilterQuietly(new SearchEngineFilter(engineCheckboxes), 0);
     resultPanel.setFilterQuietly(generalFilter, 1);
   }
@@ -110,7 +111,7 @@ final class SearchOptionsPanel extends JPanel {
   private JComponent createSearchEnginesFilter() {
     JPanel panel = new JPanel();
     panel.setLayout(new MigLayout("insets 3, wrap 2"));
-    List<SearchEngine> searchEngines = SearchEngine.getEngines();
+    List<SearchEngine> searchEngines = DesktopSearchEngines.all();
     setupCheckboxes(searchEngines, panel);
     return panel;
   }
@@ -164,7 +165,7 @@ final class SearchOptionsPanel extends JPanel {
                     "has been disabled on your FrostWire Search Options. (Go to Tools > Options > Search to enable)"));
       }
       parent.add(cBox);
-      cBoxes.put(cBox, se.getEnabledSetting());
+      cBoxes.put(cBox, DesktopSearchEngineAdapter.settingFor(se.getId()));
       cBox.addItemListener(listener);
       engineCheckboxes.put(se, cBox);
     }

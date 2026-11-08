@@ -323,8 +323,8 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
                 //    or local child) so standalone forwarder logs show TELEMETRY lines.
                 try {
                   com.frostwire.search.relay.DistributedSearchTransport tr =
-                      com.limegroup.gnutella.gui.search.SearchEngine
-                          .getDistributedSearchTransport();
+                      com.limegroup.gnutella.gui.search.DesktopSearchEngines.distributed()
+                          .searchTransport();
                   if (tr
                       instanceof
                       com.frostwire.search.relay.icebridge.client.IceBridgeSearchTransport) {

@@ -33,7 +33,7 @@ import com.limegroup.gnutella.gui.DialogOption;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.VPNDropGuard;
-import com.limegroup.gnutella.gui.search.SearchEngine;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 import com.limegroup.gnutella.gui.search.TorrentUISearchResult;
 import com.limegroup.gnutella.gui.search.UISearchResult;
 import com.limegroup.gnutella.settings.SharingSettings;
@@ -381,12 +381,12 @@ public final class TorrentUtil {
 
   private static void indexCreatedTorrent(TorrentInfo torrent, String name) {
     try {
-      LocalIndex index = SearchEngine.getDistributedLocalIndex();
+      LocalIndex index = DesktopSearchEngines.distributed().localIndex();
       if (index == null) {
         LOG.warn("TorrentUtil: no LocalIndex yet, created torrent not in mesh until downloadAdded");
         return;
       }
-      IdentityKeys identity = SearchEngine.getDistributedIdentity();
+      IdentityKeys identity = DesktopSearchEngines.distributed().identity();
       SharedTorrentIndexer indexer =
           new SharedTorrentIndexer(
               index,

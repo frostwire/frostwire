@@ -12,7 +12,7 @@ import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalSharedTorrent;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.limegroup.gnutella.gui.search.SearchEngine;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 import java.util.List;
 
 /** MCP tool searching this node's local distributed-search index. */
@@ -64,7 +64,7 @@ public final class LocalIndexSearchTool implements MCPTool {
 
       int limit = RelayToolSupport.clampInt(arguments, "limit", 50, 1, 200);
 
-      LocalIndex index = SearchEngine.getDistributedLocalIndex();
+      LocalIndex index = DesktopSearchEngines.distributed().localIndex();
       if (index == null) {
         out.addProperty("error", "LocalIndex is not available (relay stack not wired)");
         return out;

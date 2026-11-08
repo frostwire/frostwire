@@ -19,6 +19,8 @@
 package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.gui.filters.TableLineFilter;
+import com.frostwire.search.engines.SearchEngine;
+import com.frostwire.search.engines.SearchEngineID;
 import java.util.Map;
 import javax.swing.*;
 
@@ -32,8 +34,8 @@ class SearchEngineFilter implements TableLineFilter<SearchResultDataLine> {
   public boolean allow(SearchResultDataLine node) {
     boolean result = false;
     final SearchEngine searchEngine = node.getSearchEngine();
-    if (searchEngine.getId().equals(SearchEngine.SearchEngineID.TELLURIDE_ID)
-        || searchEngine.getId().equals(SearchEngine.SearchEngineID.YT_ID)) {
+    if (searchEngine.getId().equals(SearchEngineID.TELLURIDE_ID)
+        || searchEngine.getId().equals(SearchEngineID.YT_ID)) {
       return true;
     }
     JCheckBox box = engineCheckboxes.get(searchEngine);

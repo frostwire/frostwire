@@ -23,7 +23,7 @@ import com.limegroup.gnutella.gui.DropTargets;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.search.SearchEngine;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -170,7 +170,7 @@ public final class PeerCatalogWindow {
   private static List<PeerChoice> knownPeers() {
     List<PeerChoice> out = new ArrayList<>();
     try {
-      PeerDirectory dir = SearchEngine.getDistributedPeerDirectory();
+      PeerDirectory dir = DesktopSearchEngines.distributed().peerDirectory();
       if (dir != null) {
         List<PeerDirectory.PeerInfo> infos = dir.topByTrustVerified(MAX_PEER_CHOICES);
         if (infos.isEmpty()) {
@@ -336,8 +336,8 @@ public final class PeerCatalogWindow {
 
   private static List<RemoteIndexFetcher.RemoteTorrentEntry> fetchOverMesh(byte[] pub) {
     try {
-      DistributedSearchTransport transport = SearchEngine.getDistributedSearchTransport();
-      IdentityKeys identity = SearchEngine.getDistributedIdentity();
+      DistributedSearchTransport transport = DesktopSearchEngines.distributed().searchTransport();
+      IdentityKeys identity = DesktopSearchEngines.distributed().identity();
       if (transport == null || identity == null) {
         return Collections.emptyList();
       }

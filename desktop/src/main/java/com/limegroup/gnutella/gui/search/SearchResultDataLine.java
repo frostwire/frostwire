@@ -20,6 +20,7 @@ package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.gui.bittorrent.BTDownloadMediator;
 import com.frostwire.search.PerformersHelper;
+import com.frostwire.search.engines.SearchEngine;
 import com.frostwire.search.relay.DisplayKarma;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;

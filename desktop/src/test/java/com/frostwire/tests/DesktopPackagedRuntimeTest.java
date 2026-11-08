@@ -25,7 +25,8 @@ class DesktopPackagedRuntimeTest {
       "com.frostwire.search.relay.icebridge.client.IceBridgeClient";
   private static final String TRANSPORT =
       "com.frostwire.search.relay.icebridge.client.IceBridgeSearchTransport";
-  private static final String SEARCH_ENGINE = "com.limegroup.gnutella.gui.search.SearchEngine";
+  // The search engines' relay wiring holds the transport metrics (frostwire/frostwire#1002).
+  private static final String SEARCH_ENGINE = "com.frostwire.search.relay.RelaySearchWiring";
   private static final String ANNOUNCEMENT =
       "com.frostwire.search.relay.icebridge.IceBridgeControlPortAnnouncement";
 
@@ -69,10 +70,8 @@ class DesktopPackagedRuntimeTest {
       assertFromApplicationJar(transport, loader);
       assertFromApplicationJar(metrics, loader);
       assertEquals(void.class, transport.getMethod("setMetrics", metrics).getReturnType());
-      assertEquals(
-          void.class,
-          searchEngine.getMethod("setDistributedTransportMetrics", metrics).getReturnType());
-      assertSame(metrics, searchEngine.getMethod("getDistributedTransportMetrics").getReturnType());
+      assertSame(searchEngine, searchEngine.getMethod("transportMetrics", metrics).getReturnType());
+      assertSame(metrics, searchEngine.getMethod("transportMetrics").getReturnType());
       assertSame(metrics, searchEngine.getDeclaredField("transportMetrics").getType());
     }
   }

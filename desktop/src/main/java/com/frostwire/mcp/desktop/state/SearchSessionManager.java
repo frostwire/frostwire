@@ -12,7 +12,8 @@ import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchManager;
 import com.frostwire.search.SearchResult;
-import com.limegroup.gnutella.gui.search.SearchEngine;
+import com.frostwire.search.engines.SearchEngine;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,17 +40,17 @@ public class SearchSessionManager implements SearchListener {
         keywords,
         token -> {
           List<ISearchPerformer> performers = new ArrayList<>();
-          for (SearchEngine engine : SearchEngine.getEngines()) {
+          for (SearchEngine engine : DesktopSearchEngines.all()) {
             if (filterEngines && !engineIds.contains(engine.getId().name())) {
               continue;
             }
             if (!engine.isEnabled()) {
               continue;
             }
-            try {
-              performers.add(engine.getPerformer(token, keywords));
-            } catch (Exception e) {
-              // skip engines that fail to create performers (e.g. not ready)
+            // Null when the engine isn't ready (no TPB mirror yet, relay not wired).
+            ISearchPerformer performer = engine.getPerformer(token, keywords);
+            if (performer != null) {
+              performers.add(performer);
             }
           }
           return performers;

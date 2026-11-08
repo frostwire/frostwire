@@ -477,8 +477,9 @@ class JdkWarmUpTest {
             "com.limegroup.gnutella.gui.tables.AbstractTableMediator",
             "com.frostwire.gui.bittorrent.BTDownloadMediator", // (#3b22ab60fc43)
             "com.frostwire.gui.bittorrent.TransferActionsRenderer",
-            "com.limegroup.gnutella.gui.search.SearchEngine", // (#48a6b825e96e)
-            "com.limegroup.gnutella.gui.search.SearchEngine$1", // one class per engine
+            "com.frostwire.search.engines.SearchEngines", // (#48a6b825e96e)
+            "com.frostwire.search.engines.SearchEngine",
+            "com.limegroup.gnutella.gui.search.DesktopSearchEngines",
             "com.limegroup.gnutella.gui.search.SearchOptionsPanel",
             "com.limegroup.gnutella.gui.search.SearchResultMediator", // (#bcd3f2f6fee1)
             "com.frostwire.gui.library.LibraryMediator", // (#9ea38cf3577b)

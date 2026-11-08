@@ -18,6 +18,8 @@
 
 package com.frostwire.platform;
 
+import com.frostwire.search.engines.SearchEngineAdapter;
+
 /**
  * @author gubatron
  * @author aldenml
@@ -32,4 +34,13 @@ public interface Platform {
   VPNMonitor vpn();
 
   boolean isUIThread();
+
+  /**
+   * This client's side of the search engines both clients share: its settings, the engines it
+   * offers and how it reaches Telluride (frostwire/frostwire#1002). Null on a platform without
+   * search, such as a test stub.
+   */
+  default SearchEngineAdapter searchEngineAdapter() {
+    return null;
+  }
 }

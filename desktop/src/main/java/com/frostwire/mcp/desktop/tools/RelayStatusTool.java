@@ -8,11 +8,12 @@
 package com.frostwire.mcp.desktop.tools;
 
 import com.frostwire.mcp.MCPTool;
+import com.frostwire.search.engines.SearchEngine;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.PeerDirectory;
 import com.google.gson.JsonObject;
-import com.limegroup.gnutella.gui.search.SearchEngine;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 
 /**
  * MCP tool to inspect the decentralized search / IceBridge relay stack state. Useful for live
@@ -44,7 +45,7 @@ public class RelayStatusTool implements MCPTool {
     JsonObject out = new JsonObject();
     try {
       SearchEngine dist = null;
-      for (SearchEngine e : SearchEngine.getEngines()) {
+      for (SearchEngine e : DesktopSearchEngines.all()) {
         if ("Distributed".equals(e.getName())) {
           dist = e;
           break;
@@ -53,11 +54,11 @@ public class RelayStatusTool implements MCPTool {
       boolean ready = dist != null && dist.isReady();
       out.addProperty("ready", ready);
       if (ready) {
-        PeerDirectory dir = SearchEngine.getDistributedPeerDirectory();
+        PeerDirectory dir = DesktopSearchEngines.distributed().peerDirectory();
         if (dir != null) {
           out.addProperty("peer_count", dir.size());
         }
-        IdentityKeys id = SearchEngine.getDistributedIdentity();
+        IdentityKeys id = DesktopSearchEngines.distributed().identity();
         if (id != null) {
           out.addProperty("has_identity", true);
           byte[] pub = id.ed25519PubRaw();
@@ -65,7 +66,7 @@ public class RelayStatusTool implements MCPTool {
             out.addProperty("pubkey_hex", com.frostwire.util.Hex.encode(pub));
           }
         }
-        LocalIndex lidx = SearchEngine.getDistributedLocalIndex();
+        LocalIndex lidx = DesktopSearchEngines.distributed().localIndex();
         out.addProperty("has_local_index", lidx != null);
       }
       out.addProperty(

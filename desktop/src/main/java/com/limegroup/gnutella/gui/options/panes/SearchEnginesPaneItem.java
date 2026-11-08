@@ -18,8 +18,11 @@
 
 package com.limegroup.gnutella.gui.options.panes;
 
+import com.frostwire.search.engines.SearchEngine;
+import com.frostwire.search.engines.SearchEngineID;
 import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.search.SearchEngine;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngineAdapter;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -90,25 +93,24 @@ public final class SearchEnginesPaneItem extends AbstractPaneItem {
     JPanel panel = new JPanel();
     panel.setLayout(new MigLayout("insets 2, wrap 4, gap 8"));
     addDistributedSearchCheckbox(panel);
-    List<SearchEngine> searchEngines = SearchEngine.getEngines();
+    List<SearchEngine> searchEngines = DesktopSearchEngines.all();
     setupCheckboxes(searchEngines, panel);
     return panel;
   }
 
   private void addDistributedSearchCheckbox(JPanel parent) {
-    SearchEngine distributed =
-        SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.DISTRIBUTED_ID);
+    SearchEngine distributed = DesktopSearchEngines.byId(SearchEngineID.DISTRIBUTED_ID);
     JCheckBox checkbox = new JCheckBox(I18n.tr("Distributed Search"));
     checkbox.setSelected(distributed.isEnabled());
     searchEngineCheckboxes.add(checkbox);
-    cBoxes.put(checkbox, distributed.getEnabledSetting());
+    cBoxes.put(checkbox, DesktopSearchEngineAdapter.settingFor(distributed.getId()));
     checkbox.addItemListener(searchEnginesCheckboxListener);
     parent.add(checkbox);
   }
 
   private void setupCheckboxes(List<SearchEngine> searchEngines, JPanel parent) {
     for (SearchEngine se : searchEngines) {
-      if (se.getId() == SearchEngine.SearchEngineID.DISTRIBUTED_ID) {
+      if (se.getId() == SearchEngineID.DISTRIBUTED_ID) {
         continue;
       }
       JCheckBox cBox = new JCheckBox(se.getName());
@@ -116,7 +118,7 @@ public final class SearchEnginesPaneItem extends AbstractPaneItem {
       cBox.setSelected(se.isEnabled());
       cBox.setEnabled(true);
       parent.add(cBox);
-      cBoxes.put(cBox, se.getEnabledSetting());
+      cBoxes.put(cBox, DesktopSearchEngineAdapter.settingFor(se.getId()));
       cBox.addItemListener(searchEnginesCheckboxListener);
     }
   }

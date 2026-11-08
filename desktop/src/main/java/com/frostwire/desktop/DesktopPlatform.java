@@ -21,6 +21,8 @@ package com.frostwire.desktop;
 import com.frostwire.platform.AbstractPlatform;
 import com.frostwire.platform.DefaultFileSystem;
 import com.frostwire.platform.VPNMonitor;
+import com.frostwire.search.engines.SearchEngineAdapter;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 import java.awt.*;
 
 /**
@@ -38,6 +40,11 @@ public final class DesktopPlatform extends AbstractPlatform {
   @Override
   public VPNMonitor vpn() {
     return vpn;
+  }
+
+  @Override
+  public SearchEngineAdapter searchEngineAdapter() {
+    return DesktopSearchEngines.adapter();
   }
 
   @Override

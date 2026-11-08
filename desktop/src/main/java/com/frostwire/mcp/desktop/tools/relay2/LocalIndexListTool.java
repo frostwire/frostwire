@@ -12,7 +12,7 @@ import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalSharedTorrent;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.limegroup.gnutella.gui.search.SearchEngine;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 import java.util.List;
 
 /** MCP tool listing every torrent in this node's local shared index. */
@@ -49,7 +49,7 @@ public final class LocalIndexListTool implements MCPTool {
     try {
       int limit = RelayToolSupport.clampInt(arguments, "limit", 100, 1, 1000);
 
-      LocalIndex index = SearchEngine.getDistributedLocalIndex();
+      LocalIndex index = DesktopSearchEngines.distributed().localIndex();
       if (index == null) {
         out.addProperty("error", "LocalIndex is not available (relay stack not wired)");
         return out;

@@ -297,6 +297,8 @@ public final class JdkWarmUp {
           // class of each engine. Before Transfers: MainFrame builds Search first and defers
           // Transfers (Icebase #fd2a47a7c8e4).
           "com.limegroup.gnutella.gui.search",
+          // The search engines both clients share (frostwire/frostwire#1002).
+          "com.frostwire.search.engines",
           // Transfers tab, built just after the main window (BTDownloadMediator,
           // TransferActionsRenderer), and its detail panes.
           "com.frostwire.gui.bittorrent",

@@ -11,7 +11,7 @@ import com.frostwire.mcp.MCPTool;
 import com.frostwire.search.relay.PeerDirectory;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.limegroup.gnutella.gui.search.SearchEngine;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 
 /** MCP tool to evict a peer from the IceBridge peer directory (Settings -&gt; Peer Directory). */
 public final class PeerRemoveTool implements MCPTool {
@@ -63,7 +63,7 @@ public final class PeerRemoveTool implements MCPTool {
         return out;
       }
 
-      PeerDirectory dir = SearchEngine.getDistributedPeerDirectory();
+      PeerDirectory dir = DesktopSearchEngines.distributed().peerDirectory();
       if (dir == null) {
         out.addProperty("error", "PeerDirectory is not available (relay stack not wired)");
         return out;

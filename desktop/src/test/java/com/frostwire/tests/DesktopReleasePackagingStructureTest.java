@@ -69,15 +69,20 @@ class DesktopReleasePackagingStructureTest {
         Files.readString(DESKTOP.resolve("src/main/java/com/frostwire/BuildConfig.java"));
     String searchEngine =
         Files.readString(
-            DESKTOP.resolve("src/main/java/com/limegroup/gnutella/gui/search/SearchEngine.java"));
+            DESKTOP.resolve(
+                "src/main/java/com/limegroup/gnutella/gui/search/DesktopSearchEngines.java"));
+    String searchEngineAdapter =
+        Files.readString(
+            DESKTOP.resolve(
+                "src/main/java/com/limegroup/gnutella/gui/search/DesktopSearchEngineAdapter.java"));
 
     assertTrue(
         buildConfig.contains(
             "CommonUtils.isRunningFromGradle() || CommonUtils.isRunningFromIntelliJ()"));
-    assertTrue(searchEngine.contains("BuildConfig.DEBUG ? ENGINES : PRODUCTION_ENGINES"));
+    assertTrue(
+        searchEngineAdapter.contains("return id != SearchEngineID.LOCAL_ID || BuildConfig.DEBUG;"));
     assertTrue(searchEngine.contains("if (!BuildConfig.DEBUG)"));
     assertTrue(searchEngine.contains("SearchEnginesSettings.LOCAL_SEARCH_ENABLED.setValue(false)"));
-    assertTrue(searchEngine.contains("return BuildConfig.DEBUG && super.isEnabled()"));
 
     String settingsAdapter =
         Files.readString(

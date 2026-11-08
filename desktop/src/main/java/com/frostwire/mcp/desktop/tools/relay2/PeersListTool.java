@@ -12,7 +12,7 @@ import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.util.Hex;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.limegroup.gnutella.gui.search.SearchEngine;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 import java.util.List;
 
 /** MCP tool exposing the IceBridge peer directory (Settings -&gt; IceBridge) as read-only JSON. */
@@ -56,7 +56,7 @@ public final class PeersListTool implements MCPTool {
       int limit = RelayToolSupport.clampInt(arguments, "limit", 50, 1, 500);
       boolean withDigestOnly = RelayToolSupport.boolArg(arguments, "with_digest_only", false);
 
-      PeerDirectory dir = SearchEngine.getDistributedPeerDirectory();
+      PeerDirectory dir = DesktopSearchEngines.distributed().peerDirectory();
       if (dir == null) {
         out.addProperty("error", "PeerDirectory is not available (relay stack not wired)");
         return out;

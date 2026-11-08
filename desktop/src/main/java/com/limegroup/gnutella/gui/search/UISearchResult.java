@@ -19,6 +19,7 @@
 package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.search.SearchResult;
+import com.frostwire.search.engines.SearchEngine;
 import javax.swing.*;
 
 /**

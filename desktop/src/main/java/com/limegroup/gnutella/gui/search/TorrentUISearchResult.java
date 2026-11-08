@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui.search;
 
+import com.frostwire.search.engines.SearchEngine;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.VPNDropGuard;

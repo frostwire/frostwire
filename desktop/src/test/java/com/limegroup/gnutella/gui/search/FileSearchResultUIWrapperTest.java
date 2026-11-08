@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.frostwire.gui.theme.SkinPopupMenu;
 import com.frostwire.search.CompositeFileSearchResult;
+import com.frostwire.search.engines.SearchEngineID;
 import java.util.Base64;
 import javax.swing.JMenuItem;
 import org.junit.jupiter.api.Test;
@@ -102,9 +103,7 @@ class FileSearchResultUIWrapperTest {
 
   private static FileSearchResultUIWrapper wrapper(CompositeFileSearchResult result) {
     return new FileSearchResultUIWrapper(
-        result,
-        SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.DISTRIBUTED_ID),
-        "back 2 life");
+        result, DesktopSearchEngines.byId(SearchEngineID.DISTRIBUTED_ID), "back 2 life");
   }
 
   private static String magnet(String name, String extra) {

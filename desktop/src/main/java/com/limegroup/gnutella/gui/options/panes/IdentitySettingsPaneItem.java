@@ -15,6 +15,7 @@ import com.frostwire.search.relay.KarmaConstants;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerKarmaCache;
 import com.frostwire.search.relay.RelayConstants;
+import com.frostwire.search.relay.RelaySearchWiring;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.DropTargets;
@@ -22,8 +23,8 @@ import com.limegroup.gnutella.gui.FileChooserHandler;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.ShellFolderWarmUp;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 import com.limegroup.gnutella.gui.search.DistributedSearchEngineWire;
-import com.limegroup.gnutella.gui.search.SearchEngine;
 import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -59,12 +60,12 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
 
   private static final Logger LOG = Logger.getLogger(IdentitySettingsPaneItem.class);
 
-  private static SearchEngine distributedEngine() {
-    return SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.DISTRIBUTED_ID);
+  private static RelaySearchWiring distributedEngine() {
+    return DesktopSearchEngines.distributed();
   }
 
-  private static SearchEngine localEngine() {
-    return SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.LOCAL_ID);
+  private static RelaySearchWiring localEngine() {
+    return DesktopSearchEngines.local();
   }
 
   /**
@@ -232,7 +233,7 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
         });
     PARTICIPATION_LABEL.setText("—");
     loadParticipation(
-        SearchEngine::getDistributedKarmaChainWriter,
+        () -> DesktopSearchEngines.distributed().karmaChainWriter(),
         DesktopParallelExecutor::execute,
         text -> {
           if (generation == karmaGeneration) {
@@ -243,7 +244,7 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
   }
 
   private IdentityKeys resolveIdentity() {
-    return IdentityLifecycle.resolve(distributedEngine().identityKeys(), identityFile());
+    return IdentityLifecycle.resolve(distributedEngine().identity(), identityFile());
   }
 
   private void initializeIdentity() {
@@ -370,7 +371,7 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
 
   private int getSharedCount() {
     try {
-      var index = localEngine().getLocalIndex();
+      var index = localEngine().localIndex();
       if (index != null) {
         return index.size();
       }

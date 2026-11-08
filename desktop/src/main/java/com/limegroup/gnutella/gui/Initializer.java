@@ -559,10 +559,12 @@ final class Initializer {
       KarmaChainWriter karmaWriter =
           new KarmaChainWriter(identity, blockSource, karmaTable, relayLifecycle);
       relayLifecycle.own(karmaWriter, karmaWriter::awaitStopped);
-      com.limegroup.gnutella.gui.search.SearchEngine.setDistributedKarmaChainWriter(karmaWriter);
+      com.limegroup.gnutella.gui.search.DesktopSearchEngines.distributed()
+          .karmaChainWriter(karmaWriter);
       relayResources.add(
           () ->
-              com.limegroup.gnutella.gui.search.SearchEngine.setDistributedKarmaChainWriter(null));
+              com.limegroup.gnutella.gui.search.DesktopSearchEngines.distributed()
+                  .karmaChainWriter(null));
       if (!relayLifecycle.getAsBoolean()) return;
       KarmaEndorsementTrigger endorsementTrigger =
           new KarmaEndorsementTrigger(
@@ -803,8 +805,8 @@ final class Initializer {
       com.frostwire.search.relay.icebridge.IceBridgeMetrics transportMetrics =
           new com.frostwire.search.relay.icebridge.IceBridgeMetrics();
       transport.setMetrics(transportMetrics);
-      com.limegroup.gnutella.gui.search.SearchEngine.setDistributedTransportMetrics(
-          transportMetrics);
+      com.limegroup.gnutella.gui.search.DesktopSearchEngines.distributed()
+          .transportMetrics(transportMetrics);
 
       // Register an incoming-request handler so remote peers can
       // search our local index through IceBridge.

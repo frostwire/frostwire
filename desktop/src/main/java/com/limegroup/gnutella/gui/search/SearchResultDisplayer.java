@@ -20,6 +20,7 @@ package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.gui.components.slides.MultimediaSlideshowPanel;
 import com.frostwire.gui.components.slides.Slide;
+import com.frostwire.search.engines.SearchEngineID;
 import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.BoxPanel;
 import com.limegroup.gnutella.gui.GUIMediator;
@@ -306,8 +307,7 @@ public final class SearchResultDisplayer implements RefreshListener {
    * the given group. Updates the count on the tab in this and restarts the spinning lime.
    */
   void addQueryResult(long token, UISearchResult line, SearchResultMediator rp) {
-    boolean isTellurideSearch =
-        line.getSearchEngine().getId() == SearchEngine.SearchEngineID.TELLURIDE_ID;
+    boolean isTellurideSearch = line.getSearchEngine().getId() == SearchEngineID.TELLURIDE_ID;
     if (!isTellurideSearch && rp.isStopped()) {
       return;
     }

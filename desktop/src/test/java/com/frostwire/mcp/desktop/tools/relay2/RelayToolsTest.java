@@ -26,11 +26,12 @@ import com.frostwire.search.relay.LocalSharedTorrent;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerKarmaCache;
 import com.frostwire.search.relay.PowTestIdentities;
+import com.frostwire.search.relay.RelaySearchWiring;
 import com.frostwire.search.relay.RemoteKarmaChainFetcher;
 import com.frostwire.util.Hex;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.limegroup.gnutella.gui.search.SearchEngine;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -51,7 +52,7 @@ class RelayToolsTest {
   private static final byte[] ALICE = pub(1);
   private static final byte[] BOB = pub(2);
 
-  private SearchEngine distributed;
+  private RelaySearchWiring distributed;
   private PeerDirectory previousDirectory;
   private LocalIndex previousIndex;
   private IdentityKeys previousIdentity;
@@ -63,15 +64,11 @@ class RelayToolsTest {
 
   @BeforeEach
   void wireTheDistributedEngine() throws Exception {
-    distributed =
-        SearchEngine.getEngines().stream()
-            .filter(e -> e.getId() == SearchEngine.SearchEngineID.DISTRIBUTED_ID)
-            .findFirst()
-            .orElseThrow();
-    previousDirectory = SearchEngine.getDistributedPeerDirectory();
-    previousIndex = SearchEngine.getDistributedLocalIndex();
-    previousIdentity = SearchEngine.getDistributedIdentity();
-    previousTransport = SearchEngine.getDistributedSearchTransport();
+    distributed = DesktopSearchEngines.distributed();
+    previousDirectory = DesktopSearchEngines.distributed().peerDirectory();
+    previousIndex = DesktopSearchEngines.distributed().localIndex();
+    previousIdentity = DesktopSearchEngines.distributed().identity();
+    previousTransport = DesktopSearchEngines.distributed().searchTransport();
 
     KarmaChainSource noChains = peerPub -> null;
     directory = new PeerDirectory(new PeerKarmaCache(new RemoteKarmaChainFetcher(noChains)));
@@ -80,19 +77,19 @@ class RelayToolsTest {
     directory.setIndexDigest(ALICE, IndexDigest.build(List.of("ubuntu linux")).toBytes());
     identity = PowTestIdentities.next();
     distributed
-        .setPeerDirectory(directory)
-        .setLocalIndex(index)
-        .setIdentityKeys(identity)
-        .setSearchTransport(new SilentTransport());
+        .peerDirectory(directory)
+        .localIndex(index)
+        .identity(identity)
+        .searchTransport(new SilentTransport());
   }
 
   @AfterEach
   void restoreTheDistributedEngine() {
     distributed
-        .setPeerDirectory(previousDirectory)
-        .setLocalIndex(previousIndex)
-        .setIdentityKeys(previousIdentity)
-        .setSearchTransport(previousTransport);
+        .peerDirectory(previousDirectory)
+        .localIndex(previousIndex)
+        .identity(previousIdentity)
+        .searchTransport(previousTransport);
   }
 
   @Test
@@ -257,11 +254,7 @@ class RelayToolsTest {
 
   @Test
   void toolsReportARelayThatIsNotWired() {
-    distributed
-        .setPeerDirectory(null)
-        .setLocalIndex(null)
-        .setIdentityKeys(null)
-        .setSearchTransport(null);
+    distributed.peerDirectory(null).localIndex(null).identity(null).searchTransport(null);
 
     String noDirectory = "PeerDirectory is not available (relay stack not wired)";
     assertEquals(noDirectory, new PeersListTool().execute(null).get("error").getAsString());

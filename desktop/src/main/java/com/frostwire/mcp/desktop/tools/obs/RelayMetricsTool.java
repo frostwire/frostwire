@@ -13,7 +13,7 @@ import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.event.IceBridgeEventLog;
 import com.frostwire.util.Hex;
 import com.google.gson.JsonObject;
-import com.limegroup.gnutella.gui.search.SearchEngine;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 
 /**
  * MCP tool that aggregates IceBridge / distributed-search relay metrics: peer directory health,
@@ -50,8 +50,8 @@ public class RelayMetricsTool implements MCPTool {
       PeerDirectory dir = null;
       boolean hasTransport = false;
       try {
-        dir = SearchEngine.getDistributedPeerDirectory();
-        hasTransport = SearchEngine.getDistributedSearchTransport() != null;
+        dir = DesktopSearchEngines.distributed().peerDirectory();
+        hasTransport = DesktopSearchEngines.distributed().searchTransport() != null;
       } catch (Throwable ignore) {
         // Leave dir null / hasTransport false.
       }
@@ -65,7 +65,7 @@ public class RelayMetricsTool implements MCPTool {
 
       IdentityKeys identity = null;
       try {
-        identity = SearchEngine.getDistributedIdentity();
+        identity = DesktopSearchEngines.distributed().identity();
       } catch (Throwable ignore) {
         // Leave identity null.
       }
@@ -79,7 +79,7 @@ public class RelayMetricsTool implements MCPTool {
 
       boolean hasLocalIndex = false;
       try {
-        hasLocalIndex = SearchEngine.getDistributedLocalIndex() != null;
+        hasLocalIndex = DesktopSearchEngines.distributed().localIndex() != null;
       } catch (Throwable ignore) {
         // Leave hasLocalIndex false.
       }
@@ -87,7 +87,7 @@ public class RelayMetricsTool implements MCPTool {
 
       try {
         com.frostwire.search.relay.icebridge.IceBridgeMetrics metrics =
-            SearchEngine.getDistributedTransportMetrics();
+            DesktopSearchEngines.distributed().transportMetrics();
         if (metrics != null) {
           out.addProperty("transport_poll_runs", metrics.transportPollRunsCount());
           out.addProperty("transport_poll_errors", metrics.transportPollErrorsCount());

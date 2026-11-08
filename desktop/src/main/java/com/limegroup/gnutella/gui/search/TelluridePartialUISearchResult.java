@@ -19,6 +19,7 @@
 package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.search.AbstractFileSearchResult;
+import com.frostwire.search.engines.SearchEngine;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.util.PopupUtils;
 import javax.swing.*;

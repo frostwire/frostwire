@@ -10,10 +10,11 @@ package com.limegroup.gnutella.gui.options.panes;
 import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalIndexTable;
 import com.frostwire.search.relay.LocalSharedTorrent;
+import com.frostwire.search.relay.RelaySearchWiring;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.search.SearchEngine;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 import com.limegroup.gnutella.settings.SearchEnginesSettings;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
@@ -125,13 +126,13 @@ public final class SharedTorrentsDatabasePaneItem extends AbstractPaneItem {
     return panel;
   }
 
-  private static SearchEngine localEngine() {
-    return SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.LOCAL_ID);
+  private static RelaySearchWiring localEngine() {
+    return DesktopSearchEngines.local();
   }
 
   private static LocalIndex localIndexOrNull() {
     try {
-      return localEngine().getLocalIndex();
+      return localEngine().localIndex();
     } catch (Throwable t) {
       LOG.warn("Failed to obtain LocalIndex", t);
       return null;

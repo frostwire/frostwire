@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.frostwire.search.CompositeFileSearchResult;
+import com.frostwire.search.engines.SearchEngineID;
 import com.frostwire.search.relay.DistributedSearchPerformer;
 import com.frostwire.search.relay.DistributedSearchTransport;
 import com.frostwire.search.relay.IdentityKeys;
@@ -163,9 +164,7 @@ class SearchResultKarmaRankingTest {
       builder.distributedSourcePeerPub(peer);
     }
     return new FileSearchResultUIWrapper(
-        builder.build(),
-        SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.DISTRIBUTED_ID),
-        name);
+        builder.build(), DesktopSearchEngines.byId(SearchEngineID.DISTRIBUTED_ID), name);
   }
 
   private static <T> T proxy(Class<T> type) {

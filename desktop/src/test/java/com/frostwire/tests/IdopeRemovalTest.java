@@ -36,8 +36,8 @@ import org.junit.jupiter.api.Test;
  * </ul>
  *
  * <p>If Idope comes back, the right path is: (1) re-add a working pattern implementation, (2)
- * restore the test, (3) wire it into SearchEngine.getEngines() / Android's ALL_ENGINES, and (4)
- * update AndroidStringResourceParityTest's locale count to match the new strings.
+ * restore the test, (3) define it in common's SearchEngines and map its setting in both clients'
+ * adapters, and (4) update AndroidStringResourceParityTest's locale count to match the new strings.
  */
 public class IdopeRemovalTest {
 
@@ -45,12 +45,14 @@ public class IdopeRemovalTest {
       List.of(
           "../common/src/main/java/com/frostwire/search/SearchPerformerFactory.java",
           "../common/src/main/java/com/frostwire/util/Ssl.java",
-          "../desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchEngine.java",
+          "../common/src/main/java/com/frostwire/search/engines/SearchEngines.java",
+          "../common/src/main/java/com/frostwire/search/engines/SearchEngineID.java",
+          "../desktop/src/main/java/com/limegroup/gnutella/gui/search/DesktopSearchEngineAdapter.java",
           "../desktop/src/main/java/com/limegroup/gnutella/settings/SearchEnginesSettings.java",
           "../desktop/src/main/java/com/frostwire/mcp/desktop/adapters/SettingsAdapter.java",
           "../desktop/src/main/java/com/frostwire/mcp/desktop/tools/settings/SettingsSetTool.java",
           "../android/src/main/java/com/frostwire/android/core/Constants.java",
-          "../android/src/main/java/com/frostwire/android/gui/SearchEngine.java",
+          "../android/src/main/java/com/frostwire/android/gui/AndroidSearchEngineAdapter.java",
           "../android/res/xml/settings_search_engines.xml");
 
   private static final List<String> BANNED_SYMBOLS =

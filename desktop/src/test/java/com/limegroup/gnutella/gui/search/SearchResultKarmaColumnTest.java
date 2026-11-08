@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.frostwire.search.CompositeFileSearchResult;
+import com.frostwire.search.engines.SearchEngineID;
 import com.frostwire.search.relay.DisplayKarma;
 import com.frostwire.search.relay.DistributedSearchPerformer;
 import com.frostwire.search.relay.DistributedSearchTransport;
@@ -153,7 +154,7 @@ class SearchResultKarmaColumnTest {
             .distributedSourcePeerPub(peer)
             .build();
     return new FileSearchResultUIWrapper(
-        result, SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.DISTRIBUTED_ID), name);
+        result, DesktopSearchEngines.byId(SearchEngineID.DISTRIBUTED_ID), name);
   }
 
   private static <T> T proxy(Class<T> type) {

@@ -346,7 +346,7 @@ final class DistributedSearchResultDetailsWindow {
 
   private static PeerDirectory currentPeerDirectory() {
     try {
-      return SearchEngine.getDistributedPeerDirectory();
+      return DesktopSearchEngines.distributed().peerDirectory();
     } catch (Throwable unavailable) {
       return null;
     }

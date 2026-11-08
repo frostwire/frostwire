@@ -11,7 +11,7 @@ import com.frostwire.mcp.MCPTool;
 import com.frostwire.search.relay.PeerDirectory;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.limegroup.gnutella.gui.search.SearchEngine;
+import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 import java.util.List;
 
 /**
@@ -45,8 +45,8 @@ public class DiscoveredPeersTool implements MCPTool {
       boolean ready = false;
       PeerDirectory dir = null;
       try {
-        dir = SearchEngine.getDistributedPeerDirectory();
-        ready = (dir != null) && SearchEngine.getDistributedSearchTransport() != null;
+        dir = DesktopSearchEngines.distributed().peerDirectory();
+        ready = (dir != null) && DesktopSearchEngines.distributed().searchTransport() != null;
       } catch (Exception ignore) {
       }
       out.addProperty("distributed_ready", ready);

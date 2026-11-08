@@ -21,6 +21,7 @@ package com.limegroup.gnutella.gui.search;
 import com.frostwire.search.CompositeFileSearchResult;
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.LibTorrentMagnetDownloader;
+import com.frostwire.search.engines.SearchEngine;
 import com.frostwire.search.relay.DistributedSearchPerformer;
 import com.frostwire.search.relay.KarmaDisplayCache;
 import com.frostwire.search.torrent.TorrentSearchResult;

@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.SearchResult;
+import com.frostwire.search.engines.SearchEngine;
 import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
 import javax.swing.*;
 import org.junit.jupiter.api.Test;
