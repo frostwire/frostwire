@@ -1,4 +1,5 @@
 FrostWire 7.1.4 UNRELEASED
+   - fix:The first drag of a file out of a table no longer stalls while Java reads its clipboard format table; it is read at startup in the background (#1370)
    - fix:Moving the mouse over the VPN link in the status bar no longer stalls the window; the link is underlined without rendering it as a web page (#1500)
    - fix:Opening FrostWire no longer stalls on a slow machine while Java sets up drawing for its first window; this now happens before the splash screen, in the background (#1323)
    - fix:On displays scaled to 125% or more, the first screens no longer stall while text is drawn for the first time; the startup warm-up now prepares text at the display's scale (#1346)
