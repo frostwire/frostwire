@@ -1,4 +1,5 @@
 FrostWire 7.1.4 UNRELEASED
+   - fix:Opening FrostWire no longer stalls on a slow machine while Java sets up drawing for its first window; this now happens before the splash screen, in the background (#1323)
    - fix:On displays scaled to 125% or more, the first screens no longer stall while text is drawn for the first time; the startup warm-up now prepares text at the display's scale (#1346)
    - fix:Selecting a transfer no longer stalls while its comment is laid out as a web page; the comment is shown as plain text (#1362)
    - fix:Showing the splash screen no longer stalls on a slow machine while Java prepares its image classes (#1323)
