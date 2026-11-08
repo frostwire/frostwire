@@ -28,7 +28,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.IceBridgePortPreferences;
-import com.frostwire.android.gui.SearchEngine;
+import com.frostwire.android.gui.AndroidSearchEngines;
 import com.frostwire.android.gui.services.EngineForegroundService;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
@@ -37,6 +37,7 @@ import com.frostwire.android.search.AndroidRelayStack;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.platform.Platforms;
+import com.frostwire.search.engines.SearchEngine;
 import com.frostwire.search.relay.DisplayKarma;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.IdentityLifecycle;
@@ -307,7 +308,7 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
   }
 
   private IdentityKeys resolveIdentity() {
-    return IdentityLifecycle.resolve(SearchEngine.DISTRIBUTED_WIRING.identity(), identityFile());
+    return IdentityLifecycle.resolve(AndroidSearchEngines.distributed().identity(), identityFile());
   }
 
   private static File identityFile() {
@@ -332,7 +333,7 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
 
   private void refreshIdentityInfo() {
     // Instant paint from wiring if already preloaded — no flash of empty state.
-    IdentityKeys live = SearchEngine.DISTRIBUTED_WIRING.identity();
+    IdentityKeys live = AndroidSearchEngines.distributed().identity();
     if (live != null) {
       applyIdentityToUi(live, null, -1);
     } else {
@@ -345,16 +346,16 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
         SystemUtils.HandlerThreadName.HIGH_PRIORITY,
         () -> {
           IdentityKeys identity = resolveIdentity();
-          if (identity != null && SearchEngine.DISTRIBUTED_WIRING.identity() == null) {
-            SearchEngine.DISTRIBUTED_WIRING.identity(identity);
+          if (identity != null && AndroidSearchEngines.distributed().identity() == null) {
+            AndroidSearchEngines.distributed().identity(identity);
           }
           final boolean filePresent = identityFilePresent();
           final DisplayKarma karma =
               identity != null
-                  ? SearchEngine.DISTRIBUTED_WIRING.localKarma(identity.ed25519PubRaw())
+                  ? AndroidSearchEngines.distributed().localKarma(identity.ed25519PubRaw())
                   : null;
           final Long participation =
-              identity != null ? SearchEngine.DISTRIBUTED_WIRING.localParticipation() : null;
+              identity != null ? AndroidSearchEngines.distributed().localParticipation() : null;
           final int shared = identity != null ? readSharedCount() : -1;
           final IdentityKeys result = identity;
           SystemUtils.postToUIThread(
@@ -503,7 +504,7 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
 
   private int readSharedCount() {
     try {
-      var index = SearchEngine.LOCAL_WIRING.localIndex();
+      var index = AndroidSearchEngines.local().localIndex();
       if (index != null) {
         return index.size();
       }
@@ -554,7 +555,7 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
             long t0 = System.currentTimeMillis();
             IdentityKeys keys =
                 IdentityLifecycle.generateAndInstall(file, KarmaConstants.IDENTITY_DIFFICULTY);
-            SearchEngine.DISTRIBUTED_WIRING.identity(keys);
+            AndroidSearchEngines.distributed().identity(keys);
             LOG.info(
                 "Identity generate: installed in "
                     + (System.currentTimeMillis() - t0)
@@ -644,7 +645,7 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
               throw new IllegalStateException("libtorrent homeDir not available");
             }
             IdentityKeys keys = IdentityLifecycle.restoreFromSeedPhrase(raw, file);
-            SearchEngine.DISTRIBUTED_WIRING.identity(keys);
+            AndroidSearchEngines.distributed().identity(keys);
             final IdentityKeys installed = keys;
             SystemUtils.postToUIThread(
                 () -> {
@@ -726,7 +727,7 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
             IdentityKeys imported = IdentityLifecycle.importFromFile(temp, dest);
             //noinspection ResultOfMethodCallIgnored
             temp.delete();
-            SearchEngine.DISTRIBUTED_WIRING.identity(imported);
+            AndroidSearchEngines.distributed().identity(imported);
             final IdentityKeys keys = imported;
             SystemUtils.postToUIThread(
                 () -> {
@@ -752,7 +753,8 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
     SystemUtils.postToHandler(
         SystemUtils.HandlerThreadName.MISC,
         () -> {
-          DisplayKarma karma = SearchEngine.DISTRIBUTED_WIRING.localKarma(identity.ed25519PubRaw());
+          DisplayKarma karma =
+              AndroidSearchEngines.distributed().localKarma(identity.ed25519PubRaw());
           int shared = readSharedCount();
           String summary =
               IdentityLifecycle.summaryText(
@@ -767,7 +769,7 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
     SystemUtils.postToHandler(
         SystemUtils.HandlerThreadName.HIGH_PRIORITY,
         () -> {
-          PeerDirectory directory = SearchEngine.DISTRIBUTED_WIRING.peerDirectory();
+          PeerDirectory directory = AndroidSearchEngines.distributed().peerDirectory();
           final int peerCount = directory != null ? directory.size() : -1;
           final List<PeerDirectory.PeerInfo> verified =
               directory != null ? directory.topByTrustVerified(50) : null;
@@ -895,7 +897,7 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
           EngineForegroundService svc = EngineForegroundService.getInstance();
           AndroidRelayStack stack = svc != null ? svc.getRelayStack() : null;
           boolean running = stack != null;
-          boolean transport = SearchEngine.DISTRIBUTED_WIRING.searchTransport() != null;
+          boolean transport = AndroidSearchEngines.distributed().searchTransport() != null;
           int configuredRudp =
               IceBridgePortPreferences.configuredPort(
                   safePrefString(Constants.PREF_KEY_ICEBRIDGE_RUDP_PORT, "0"), true, 0);

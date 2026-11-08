@@ -17,7 +17,7 @@ import android.view.View;
 import android.widget.TextView;
 import androidx.test.core.app.ApplicationProvider;
 import com.frostwire.android.R;
-import com.frostwire.android.gui.SearchEngine;
+import com.frostwire.android.gui.AndroidSearchEngines;
 import com.frostwire.platform.Platform;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.CompositeFileSearchResult;
@@ -77,13 +77,13 @@ public class SearchResultListAdapterHidesKarmaTest {
               }
             });
     directory.upsert(peer, "peer.example", 6881);
-    previousDirectory = SearchEngine.DISTRIBUTED_WIRING.peerDirectory();
-    SearchEngine.DISTRIBUTED_WIRING.peerDirectory(directory);
+    previousDirectory = AndroidSearchEngines.distributed().peerDirectory();
+    AndroidSearchEngines.distributed().peerDirectory(directory);
   }
 
   @After
   public void tearDown() {
-    SearchEngine.DISTRIBUTED_WIRING.peerDirectory(previousDirectory);
+    AndroidSearchEngines.distributed().peerDirectory(previousDirectory);
   }
 
   @Test

@@ -47,7 +47,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.TellurideCourier;
-import com.frostwire.android.gui.SearchEngine;
+import com.frostwire.android.gui.AndroidSearchEngines;
 import com.frostwire.android.gui.SearchMediator;
 import com.frostwire.android.gui.adapters.PromotionDownloader;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
@@ -86,6 +86,7 @@ import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchManager;
 import com.frostwire.search.SearchResult;
+import com.frostwire.search.engines.SearchEngineID;
 import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 import com.frostwire.util.HttpClientFactory;
@@ -366,7 +367,7 @@ public final class SearchFragment extends AbstractFragment
     showSupportBanner();
 
     postToHandler(
-        SEARCH_PERFORMER, () -> SearchMediator.instance().performTellurideSearch(pageUrl, adapter));
+        SEARCH_PERFORMER, () -> SearchMediator.instance().performTellurideSearch(pageUrl));
     searchInput.setText(" "); // an empty space so the 'x' button is shown.
     switchView(view, R.id.fragment_search_list);
   }
@@ -645,11 +646,11 @@ public final class SearchFragment extends AbstractFragment
     if (searchProgress == null) {
       return;
     }
-    if (!SearchEngine.DISTRIBUTED.isEnabled()) {
+    if (!AndroidSearchEngines.byId(SearchEngineID.DISTRIBUTED_ID).isEnabled()) {
       searchProgress.setIceBridgeHint(null);
       return;
     }
-    if (!SearchEngine.DISTRIBUTED.isReady()) {
+    if (!AndroidSearchEngines.byId(SearchEngineID.DISTRIBUTED_ID).isReady()) {
       if (AndroidRelayStack.isParticipationEnabled()) {
         searchProgress.setIceBridgeHint(getString(R.string.search_icebridge_starting));
       } else {
@@ -776,7 +777,9 @@ public final class SearchFragment extends AbstractFragment
                 }
                 // Perform additional actions after dialog setup
                 SearchManager.getInstance()
-                    .perform(SearchEngine.FROSTCLICK.getPerformer(1, "https://plus.youtube.com"));
+                    .perform(
+                        AndroidSearchEngines.byId(SearchEngineID.FROSTCLICK_ID)
+                            .getPerformer(1, "https://plus.youtube.com"));
               });
         });
   }

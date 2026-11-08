@@ -354,7 +354,7 @@ public class TorrentFetcherDownload implements BittorrentDownload {
     try {
       byte[] holderPub = LibTorrentMagnetDownloader.parseHolderPub(magnetUri);
       com.frostwire.search.relay.RelaySearchWiring wiring =
-          com.frostwire.android.gui.SearchEngine.DISTRIBUTED_WIRING;
+          com.frostwire.android.gui.AndroidSearchEngines.distributed();
       if (holderPub == null || wiring.searchTransport() == null || wiring.identity() == null) {
         return null;
       }

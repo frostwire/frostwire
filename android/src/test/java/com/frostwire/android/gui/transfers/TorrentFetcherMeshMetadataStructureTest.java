@@ -44,7 +44,9 @@ public class TorrentFetcherMeshMetadataStructureTest {
     assertTrue(
         "holder pub comes from the magnet x.hp param",
         compact.contains("LibTorrentMagnetDownloader.parseHolderPub(magnetUri)"));
-    assertTrue("fetch rides the distributed relay wiring", compact.contains("DISTRIBUTED_WIRING"));
+    assertTrue(
+        "fetch rides the distributed relay wiring",
+        compact.contains("AndroidSearchEngines.distributed()"));
     assertTrue(
         "fetch failure falls back to the direct magnet add",
         compact.contains("Startingx.pemagnetdirectlyinBTEngine"));

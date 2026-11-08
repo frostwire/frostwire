@@ -11,6 +11,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import com.frostwire.android.BuildConfig;
+import com.frostwire.search.engines.SearchEngineID;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -20,12 +21,15 @@ public class SearchEngineSelectionStructureTest {
 
   @Test
   public void getEngines_neverForceEnablesAnEngine() throws Exception {
-    String source = readProjectFile("src/main/java/com/frostwire/android/gui/SearchEngine.java");
+    // The engines are defined once, in common, for both clients (frostwire/frostwire#1002).
+    String source =
+        readProjectFile("../common/src/main/java/com/frostwire/search/engines/SearchEngines.java");
     String compactSource = source.replaceAll("\\s+", "");
 
     assertFalse(compactSource.contains("oneEnabled"));
     assertFalse(compactSource.contains("engineToEnable"));
     assertFalse(compactSource.contains("setBoolean"));
+    assertFalse(compactSource.contains("setEnabled("));
   }
 
   @Test
@@ -44,12 +48,13 @@ public class SearchEngineSelectionStructureTest {
   @Test
   public void releaseBuild_hidesAndDisablesDiagnosticLocalSearch() throws Exception {
     String engineSource =
-        readProjectFile("src/main/java/com/frostwire/android/gui/SearchEngine.java");
+        readProjectFile("src/main/java/com/frostwire/android/gui/AndroidSearchEngineAdapter.java");
     String repositorySource =
         readProjectFile("src/main/java/com/frostwire/android/core/ConfigurationRepository.kt");
 
-    assertTrue(engineSource.contains("return BuildConfig.DEBUG;"));
-    assertTrue(SearchEngine.LOCAL.isActive() == BuildConfig.DEBUG);
+    assertTrue(engineSource.contains("case LOCAL_ID -> BuildConfig.DEBUG;"));
+    assertTrue(
+        new AndroidSearchEngineAdapter().isOffered(SearchEngineID.LOCAL_ID) == BuildConfig.DEBUG);
     assertTrue(
         repositorySource.contains(
             "if (!BuildConfig.DEBUG) {\n            setDefault(Constants.PREF_KEY_SEARCH_USE_LOCAL, false)"));

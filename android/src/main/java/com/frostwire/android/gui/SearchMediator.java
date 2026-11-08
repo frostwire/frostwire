@@ -18,7 +18,6 @@
 
 package com.frostwire.android.gui;
 
-import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.util.SystemUtils;
@@ -30,6 +29,8 @@ import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchManager;
 import com.frostwire.search.SearchResult;
+import com.frostwire.search.engines.SearchEngine;
+import com.frostwire.search.engines.SearchEngineID;
 import com.frostwire.search.relay.DistributedSearchPerformer;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.util.StringUtils;
@@ -53,7 +54,7 @@ public final class SearchMediator {
   private long currentSearchToken;
   private List<String> currentSearchTokens;
   private boolean searchFinished;
-  private TellurideCourier.SearchPerformer<?> lastTellurideCourier;
+  private ISearchPerformer lastTellurideCourier;
   private volatile DistributedSearchPerformer distributedPerformer;
 
   private static final class InstanceHolder {
@@ -119,18 +120,20 @@ public final class SearchMediator {
     currentSearchTokens = PerformersHelper.tokenizeSearchKeywords(query);
     searchFinished = false;
     distributedPerformer = null;
-    ArrayList<SearchEngine> shuffledEngines = new ArrayList<>(SearchEngine.getEngines(true));
+    ArrayList<SearchEngine> shuffledEngines =
+        new ArrayList<>(AndroidSearchEngines.registry().enabled());
     Collections.shuffle(shuffledEngines);
     int started = 0;
     for (SearchEngine se : shuffledEngines) {
-      if (se.isEnabled() && se.isReady()) {
-        ISearchPerformer p = se.getPerformer(currentSearchToken, query);
-        if (p instanceof DistributedSearchPerformer) {
-          distributedPerformer = (DistributedSearchPerformer) p;
-        }
-        manager.perform(p);
-        started++;
+      ISearchPerformer p = se.getPerformer(currentSearchToken, query);
+      if (p == null) {
+        continue;
       }
+      if (p instanceof DistributedSearchPerformer) {
+        distributedPerformer = (DistributedSearchPerformer) p;
+      }
+      manager.perform(p);
+      started++;
     }
     if (started == 0) {
       // No engines ran — finish immediately so UI can leave the spinner.
@@ -141,7 +144,7 @@ public final class SearchMediator {
     }
   }
 
-  public void performTellurideSearch(String pageUrl, SearchResultListAdapter adapter) {
+  public void performTellurideSearch(String pageUrl) {
     SystemUtils.ensureBackgroundThreadOrCrash(
         "LocalSearchEngine::performTellurideSearch(pageUrl=" + pageUrl + ")");
     if (StringUtils.isNullOrEmpty(pageUrl, true)) {
@@ -153,9 +156,12 @@ public final class SearchMediator {
     currentSearchTokens.add(pageUrl);
     searchFinished = false;
     lastTellurideCourier =
-        SearchEngine.TELLURIDE_COURIER.getTelluridePerformer(currentSearchToken, pageUrl, adapter);
+        AndroidSearchEngines.registry()
+            .telluride()
+            .getPerformer(currentSearchToken, pageUrl, false);
     manager.perform(lastTellurideCourier);
-    manager.perform(SearchEngine.FROSTCLICK.getPerformer(1, pageUrl));
+    manager.perform(
+        AndroidSearchEngines.byId(SearchEngineID.FROSTCLICK_ID).getPerformer(1, pageUrl));
   }
 
   public void cancelSearch() {

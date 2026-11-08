@@ -14,7 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import android.app.Application;
-import com.frostwire.android.gui.SearchEngine;
+import com.frostwire.android.gui.AndroidSearchEngines;
 import com.frostwire.search.relay.DistributedSearchTransport;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.IdentityRecord;
@@ -69,7 +69,7 @@ public class TorrentFetcherMetadataIdentityTest {
           @Override
           public void removeListener(PayloadListener listener) {}
         };
-    RelaySearchWiring wiring = SearchEngine.DISTRIBUTED_WIRING;
+    RelaySearchWiring wiring = AndroidSearchEngines.distributed();
     IdentityKeys previousIdentity = wiring.identity();
     DistributedSearchTransport previousTransport = wiring.searchTransport();
     try {

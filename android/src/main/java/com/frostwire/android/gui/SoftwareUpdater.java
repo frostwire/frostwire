@@ -27,6 +27,8 @@ import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.dialogs.SoftwareUpdaterDialog;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.search.engines.SearchEngine;
+import com.frostwire.search.engines.SearchEngineID;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
@@ -138,12 +140,13 @@ public final class SoftwareUpdater {
 
     if (update.config.activeSearchEngines != null) {
       for (String name : update.config.activeSearchEngines.keySet()) {
-        SearchEngine engine = SearchEngine.forName(name);
+        SearchEngine engine = AndroidSearchEngines.registry().byName(name);
         if (engine != null) {
           // LOG.info(engine.getName() + " is remotely active: " +
           // update.config.activeSearchEngines.get(name));
           Boolean engineActive = update.config.activeSearchEngines.get(name);
-          engine.setActive(engineActive != null && engineActive);
+          AndroidSearchEngines.adapter()
+              .setActive(engine.getId(), engineActive != null && engineActive);
 
         } else {
           LOG.warn("Can't find any search engine by the name of: '" + name + "'");
@@ -219,8 +222,8 @@ public final class SoftwareUpdater {
     SystemUtils.ensureUIThreadOrCrash("SoftwareUpdater::checkUpdateAsyncPost");
     // Even if we're offline, we need to disable these for the Google Play Distro.
     if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !Constants.IS_BASIC_AND_DEBUG) {
-      SearchEngine.SOUNCLOUD.setActive(false);
-      SearchEngine.YT.setActive(false);
+      AndroidSearchEngines.adapter().setActive(SearchEngineID.SOUNDCLOUD_ID, false);
+      AndroidSearchEngines.adapter().setActive(SearchEngineID.YT_ID, false);
     }
 
     // nav menu or other components always needs to be updated after we read the config.

@@ -23,8 +23,8 @@ import android.os.SystemClock;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.IceBridgePortPreferences;
+import com.frostwire.android.gui.AndroidSearchEngines;
 import com.frostwire.android.gui.NetworkManager;
-import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.util.SystemUtils;
@@ -291,19 +291,19 @@ public final class AndroidRelayStack implements AutoCloseable {
       LOG.info(
           "AndroidRelayStack: identity loaded: "
               + com.frostwire.util.Hex.encode(ident.ed25519PubRaw()));
-      SearchEngine.DISTRIBUTED_WIRING.identity(ident);
+      AndroidSearchEngines.distributed().identity(ident);
       LOG.info("AndroidRelayStack: identity ready in " + elapsedMs(phaseNs) + "ms");
       phaseNs = System.nanoTime();
 
       observer.phase(RelayStartupTracker.Phase.INDEX);
-      LocalIndex existingIndex = SearchEngine.LOCAL_WIRING.localIndex();
+      LocalIndex existingIndex = AndroidSearchEngines.local().localIndex();
       if (existingIndex instanceof AndroidLocalIndex
           && ((AndroidLocalIndex) existingIndex).isOpen()) {
         li = (AndroidLocalIndex) existingIndex;
       } else {
         li = AndroidLocalIndex.open(context);
       }
-      SearchEngine.LOCAL_WIRING.localIndex(li);
+      AndroidSearchEngines.local().localIndex(li);
       LOG.info("AndroidRelayStack: local index ready in " + elapsedMs(phaseNs) + "ms");
       phaseNs = System.nanoTime();
 
@@ -320,7 +320,7 @@ public final class AndroidRelayStack implements AutoCloseable {
       com.frostwire.search.relay.BlockHeaderSource blockSource =
           new com.frostwire.search.relay.HttpBlockHeaderFetcher(bitcoinCacheDir);
       karmaWriter = new KarmaChainWriter(ident, blockSource, ks, permitted);
-      SearchEngine.DISTRIBUTED_WIRING.karmaChainWriter(karmaWriter);
+      AndroidSearchEngines.distributed().karmaChainWriter(karmaWriter);
       endorsementListener =
           new KarmaEndorsementTrigger(
               com.frostwire.search.relay.IdentityLifecycle.ownEd25519Keys(ident, identityFile),
@@ -585,8 +585,8 @@ public final class AndroidRelayStack implements AutoCloseable {
         throw new IllegalStateException("Wiring inputs must be non-null");
       }
       requirePermitted(permitted);
-      SearchEngine.LOCAL_WIRING.localIndex(li).karmaCache(karmaCache);
-      SearchEngine.DISTRIBUTED_WIRING
+      AndroidSearchEngines.local().localIndex(li).karmaCache(karmaCache);
+      AndroidSearchEngines.distributed()
           .localIndex(li)
           .peerDirectory(pd)
           .identity(ident)
@@ -667,11 +667,11 @@ public final class AndroidRelayStack implements AutoCloseable {
           new PublicationOwners(da, kcs, endorsementListener, karmaWriter, ks);
       failed.stop();
       LOG.warn("Failed to start AndroidRelayStack", t);
-      if (SearchEngine.DISTRIBUTED_WIRING.searchTransport() == tr) {
-        SearchEngine.DISTRIBUTED_WIRING.searchTransport(null).peerDirectory(null);
+      if (AndroidSearchEngines.distributed().searchTransport() == tr) {
+        AndroidSearchEngines.distributed().searchTransport(null).peerDirectory(null);
       }
-      if (SearchEngine.DISTRIBUTED_WIRING.karmaChainWriter() == karmaWriter) {
-        SearchEngine.DISTRIBUTED_WIRING.karmaChainWriter(null);
+      if (AndroidSearchEngines.distributed().karmaChainWriter() == karmaWriter) {
+        AndroidSearchEngines.distributed().karmaChainWriter(null);
       }
       if (ih != null)
         try {
@@ -901,8 +901,8 @@ public final class AndroidRelayStack implements AutoCloseable {
       }
       int indexSize = -1;
       try {
-        if (SearchEngine.LOCAL_WIRING.localIndex() != null) {
-          indexSize = SearchEngine.LOCAL_WIRING.localIndex().size();
+        if (AndroidSearchEngines.local().localIndex() != null) {
+          indexSize = AndroidSearchEngines.local().localIndex().size();
         }
       } catch (Throwable ignored) {
       }
@@ -930,11 +930,11 @@ public final class AndroidRelayStack implements AutoCloseable {
     publications.stop();
     incomingHandler.stop();
     transport.close();
-    if (SearchEngine.DISTRIBUTED_WIRING.searchTransport() == transport) {
-      SearchEngine.DISTRIBUTED_WIRING.searchTransport(null).peerDirectory(null);
+    if (AndroidSearchEngines.distributed().searchTransport() == transport) {
+      AndroidSearchEngines.distributed().searchTransport(null).peerDirectory(null);
     }
-    if (SearchEngine.DISTRIBUTED_WIRING.karmaChainWriter() == karmaWriter) {
-      SearchEngine.DISTRIBUTED_WIRING.karmaChainWriter(null);
+    if (AndroidSearchEngines.distributed().karmaChainWriter() == karmaWriter) {
+      AndroidSearchEngines.distributed().karmaChainWriter(null);
     }
   }
 

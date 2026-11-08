@@ -32,9 +32,10 @@ import com.chaquo.python.android.AndroidPlatform;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.core.player.CoreMediaPlayer;
+import com.frostwire.android.gui.AndroidSearchEngines;
 import com.frostwire.android.gui.MainApplication;
-import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.search.engines.SearchEngineID;
 import com.frostwire.util.Logger;
 import java.io.File;
 import java.util.concurrent.CountDownLatch;
@@ -181,7 +182,7 @@ public final class Engine implements IEngineService {
   public void ensureDistributedSearchReady(long timeoutMs) {
     if (wasShutdown
         || !com.frostwire.android.search.AndroidRelayStack.isParticipationEnabled()
-        || SearchEngine.DISTRIBUTED.isReady()) {
+        || AndroidSearchEngines.byId(SearchEngineID.DISTRIBUTED_ID).isReady()) {
       return;
     }
     LOG.info("Engine: IceBridge down at search time — restarting");
@@ -205,7 +206,7 @@ public final class Engine implements IEngineService {
     }
     while (!wasShutdown
         && com.frostwire.android.search.AndroidRelayStack.isParticipationEnabled()
-        && !SearchEngine.DISTRIBUTED.isReady()
+        && !AndroidSearchEngines.byId(SearchEngineID.DISTRIBUTED_ID).isReady()
         && TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt) < budgetMs) {
       if (getForegroundService() == null) {
         ensureServicesRunning();
@@ -220,7 +221,7 @@ public final class Engine implements IEngineService {
         return;
       }
     }
-    if (!SearchEngine.DISTRIBUTED.isReady()) {
+    if (!AndroidSearchEngines.byId(SearchEngineID.DISTRIBUTED_ID).isReady()) {
       LOG.warn("Engine: IceBridge still not ready after " + timeoutMs + "ms");
     }
   }

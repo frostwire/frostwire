@@ -214,9 +214,7 @@ public final class SearchEngines {
 
   /** The engines a search runs: offered, switched on by the user and ready. */
   public List<SearchEngine> enabled() {
-    return engines.stream()
-        .filter(e -> e.isEnabled() && e.isReady())
-        .collect(Collectors.toList());
+    return engines.stream().filter(e -> e.isEnabled() && e.isReady()).collect(Collectors.toList());
   }
 
   /** The engine with this id, Telluride included; null if none. */

@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 
+import com.frostwire.search.engines.SearchEngineID;
 import com.frostwire.search.relay.DisplayKarma;
 import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalSharedTorrent;
@@ -50,14 +51,15 @@ public class RelaySearchWiringTest {
   @Test
   public void distributedEngine_notReady_beforeWiring() {
     assertFalse(
-        "DISTRIBUTED should not be ready before wiring", SearchEngine.DISTRIBUTED.isReady());
+        "DISTRIBUTED should not be ready before wiring",
+        AndroidSearchEngines.byId(SearchEngineID.DISTRIBUTED_ID).isReady());
   }
 
   @Test
   public void distributedEngine_getPerformerReturnsNull_whenNotReady() {
     assertNull(
         "getPerformer should return null when not ready",
-        SearchEngine.DISTRIBUTED.getPerformer(1L, "test"));
+        AndroidSearchEngines.byId(SearchEngineID.DISTRIBUTED_ID).getPerformer(1L, "test"));
   }
 
   /**
@@ -89,14 +91,14 @@ public class RelaySearchWiringTest {
   public void distributedEngine_notReady_withOnlyLocalIndex() {
     LocalIndex stubIndex = new StubLocalIndex();
     java.util.Optional<LocalIndex> savedLi =
-        java.util.Optional.ofNullable(SearchEngine.DISTRIBUTED_WIRING.localIndex());
+        java.util.Optional.ofNullable(AndroidSearchEngines.distributed().localIndex());
     try {
-      SearchEngine.DISTRIBUTED_WIRING.localIndex(stubIndex);
+      AndroidSearchEngines.distributed().localIndex(stubIndex);
       assertFalse(
           "DISTRIBUTED should not be ready with only localIndex",
-          SearchEngine.DISTRIBUTED.isReady());
+          AndroidSearchEngines.byId(SearchEngineID.DISTRIBUTED_ID).isReady());
     } finally {
-      SearchEngine.DISTRIBUTED_WIRING.localIndex(savedLi.orElse(null));
+      AndroidSearchEngines.distributed().localIndex(savedLi.orElse(null));
     }
   }
 

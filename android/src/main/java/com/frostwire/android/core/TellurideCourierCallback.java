@@ -19,10 +19,9 @@
 package com.frostwire.android.core;
 
 import com.frostwire.android.gui.SearchMediator;
-import com.frostwire.android.gui.adapters.SearchResultListAdapter;
-import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.search.ISearchPerformer;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.telluride.TellurideSearchPerformer;
 import com.frostwire.search.telluride.TellurideSearchResult;
@@ -37,6 +36,13 @@ public class TellurideCourierCallback<
   private final T adapter;
   private final String url;
   private final TellurideCourier.SearchPerformer<T> searchPerformer;
+
+  /**
+   * When set, results go to this performer's search listener, like any search engine's, instead of
+   * into a list adapter (frostwire/frostwire#1002).
+   */
+  private final ISearchPerformer listenerPerformer;
+
   private boolean hasAborted = false;
 
   private static Logger LOG = Logger.getLogger(TellurideCourierCallback.class);
@@ -46,50 +52,26 @@ public class TellurideCourierCallback<
     this.searchPerformer = searchPerformer;
     this.url = pageUrl;
     this.adapter = adapter;
+    this.listenerPerformer = null;
   }
 
-  void onSearchResultListAdapterResults(List<TellurideSearchResult> results, boolean errored) {
+  /** Reports the results to {@code performer}'s search listener, then that the search stopped. */
+  TellurideCourierCallback(ISearchPerformer performer, String pageUrl) {
+    this.searchPerformer = null;
+    this.url = pageUrl;
+    this.adapter = null;
+    this.listenerPerformer = performer;
+  }
+
+  /** No results, or Telluride failed: empty the adapter and let the search screen stop waiting. */
+  private void onNoResults() {
     SystemUtils.postToUIThread(
         () -> {
-          LOG.info("onSearchResultListAdapterResults: " + adapter.getClass().getName());
-
-          if (results == null || results.isEmpty() || errored) {
+          if (adapter != null) {
             adapter.clear();
-            if (SearchMediator.instance().getListener() != null && searchPerformer != null) {
-              SearchMediator.instance().getListener().onStopped(searchPerformer.getToken());
-            }
-            return;
           }
-          if (adapter
-              instanceof
-              com.frostwire.android.gui.dialogs.TellurideSearchResultDownloadDialog
-                  .TellurideSearchResultDownloadDialogAdapter) {
-            LOG.info(
-                "onSearchResultListAdapterResults: TellurideSearchResultDownloadDialogAdapter, aborting.");
-            return;
-          }
-          SearchResultListAdapter srlAdapter = (SearchResultListAdapter) adapter;
-          // Screw our listener, make the adapter do what we want.
-          adapter.clear();
-          if (results != null && !results.isEmpty()) {
-            srlAdapter.addResults(results); // adds to full list of results
-            srlAdapter.setFileType(Constants.FILE_TYPE_AUDIO, false, null);
-            srlAdapter.setFileType(
-                Constants.FILE_TYPE_VIDEOS,
-                true,
-                filteredSearchResults -> {
-                  // The adapter has already shown the audio and video results. The search screen
-                  // may have been destroyed while yt-dlp was running.
-                  SearchFragment fragment = SearchFragment.instance();
-                  if (fragment != null && fragment.isAdded()) {
-                    fragment.refreshFileTypeCounters(false, filteredSearchResults);
-                  }
-                });
-            // Not from the callback above: a later setFileType (a tab swipe) supersedes it.
-            SearchListener listener = SearchMediator.instance().getListener();
-            if (listener != null && searchPerformer != null) {
-              listener.onStopped(searchPerformer.getToken());
-            }
+          if (SearchMediator.instance().getListener() != null && searchPerformer != null) {
+            SearchMediator.instance().getListener().onStopped(searchPerformer.getToken());
           }
         });
   }
@@ -110,15 +92,23 @@ public class TellurideCourierCallback<
   }
 
   void onResults(List<TellurideSearchResult> results, boolean errored) {
-    // This comes in too fast, gotta let the UI get there
-    if (adapter instanceof SearchResultListAdapter
-        || (results == null || results.isEmpty() || errored)) {
-      onSearchResultListAdapterResults(results, errored);
-    } else {
-      if (results != null && !results.isEmpty() && adapter != null) {
-        for (TellurideSearchResult result : results) {
-          adapter.addItem(result);
-        }
+    if (listenerPerformer != null) {
+      SearchListener listener = listenerPerformer.getListener();
+      if (listener == null || hasAborted) {
+        return;
+      }
+      long token = listenerPerformer.getToken();
+      if (!errored && results != null && !results.isEmpty()) {
+        listener.onResults(token, results);
+      }
+      listener.onStopped(token);
+      return;
+    }
+    if (results == null || results.isEmpty() || errored) {
+      onNoResults();
+    } else if (adapter != null) {
+      for (TellurideSearchResult result : results) {
+        adapter.addItem(result);
       }
     }
   }

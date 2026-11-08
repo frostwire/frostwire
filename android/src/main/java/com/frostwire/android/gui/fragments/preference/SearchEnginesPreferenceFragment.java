@@ -27,11 +27,13 @@ import androidx.preference.PreferenceViewHolder;
 import androidx.recyclerview.widget.RecyclerView;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.gui.SearchEngine;
+import com.frostwire.android.gui.AndroidSearchEngineAdapter;
+import com.frostwire.android.gui.AndroidSearchEngines;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
+import com.frostwire.search.engines.SearchEngine;
+import com.frostwire.search.engines.SearchEngineID;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -121,11 +123,14 @@ public final class SearchEnginesPreferenceFragment extends AbstractPreferenceFra
     inactive.clear();
     active.clear();
 
-    List<SearchEngine> engines = SearchEngine.getEngines(false);
-    for (SearchEngine engine : engines) {
-      CheckBoxPreference preference = findPreference(engine.getPreferenceKey());
+    for (SearchEngineID id : SearchEngineID.values()) {
+      if (id == SearchEngineID.TELLURIDE_ID) {
+        continue; // Telluride opens pasted URLs; it isn't a search engine choice.
+      }
+      SearchEngine engine = AndroidSearchEngines.byId(id);
+      CheckBoxPreference preference = findPreference(AndroidSearchEngineAdapter.preferenceKey(id));
       if (preference != null) { // it could already have been removed due to remote config value.
-        if (engine.isActive()) {
+        if (engine.isOffered()) {
           active.put(preference, engine);
         } else {
           inactive.put(preference, engine);

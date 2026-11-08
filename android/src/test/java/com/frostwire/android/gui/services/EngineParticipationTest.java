@@ -20,8 +20,9 @@ import static org.mockito.Mockito.when;
 
 import android.app.Application;
 import com.frostwire.android.core.TellurideCourier;
-import com.frostwire.android.gui.SearchEngine;
+import com.frostwire.android.gui.AndroidSearchEngines;
 import com.frostwire.android.search.AndroidRelayStack;
+import com.frostwire.search.engines.SearchEngineID;
 import java.lang.reflect.Constructor;
 import java.util.concurrent.TimeUnit;
 import org.junit.Test;
@@ -102,12 +103,12 @@ public class EngineParticipationTest {
     EngineForegroundService service = mock(EngineForegroundService.class);
     when(service.acceptsStarts()).thenReturn(true);
     when(service.isRelayStackRunning()).thenReturn(false);
-    SearchEngine.DISTRIBUTED_WIRING
+    AndroidSearchEngines.distributed()
         .localIndex(null)
         .peerDirectory(null)
         .identity(null)
         .searchTransport(null);
-    assertFalse(SearchEngine.DISTRIBUTED.isReady());
+    assertFalse(AndroidSearchEngines.byId(SearchEngineID.DISTRIBUTED_ID).isReady());
     try (MockedStatic<EngineForegroundService> services =
             mockStatic(EngineForegroundService.class);
         MockedStatic<AndroidRelayStack> relay = mockStatic(AndroidRelayStack.class)) {

@@ -11,7 +11,7 @@ import android.app.Activity;
 import android.content.Context;
 import androidx.appcompat.app.AlertDialog;
 import com.frostwire.android.R;
-import com.frostwire.android.gui.SearchEngine;
+import com.frostwire.android.gui.AndroidSearchEngines;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.OffMainQuery;
 import com.frostwire.android.gui.util.UIUtils;
@@ -45,7 +45,7 @@ public final class EndorseSourcePeerMenuAction extends MenuAction {
     com.frostwire.bittorrent.BTDownload bt = ((UIBittorrentDownload) download).getDl();
     return bt != null
         && bt.getDistributedSourcePeerPub() != null
-        && SearchEngine.DISTRIBUTED_WIRING.karmaChainWriter() != null;
+        && AndroidSearchEngines.distributed().karmaChainWriter() != null;
   }
 
   /**
@@ -122,7 +122,7 @@ public final class EndorseSourcePeerMenuAction extends MenuAction {
       com.frostwire.bittorrent.BTDownload bt = ((UIBittorrentDownload) download).getDl();
       byte[] peer = bt.getDistributedSourcePeerPub();
       String infoHashHex = bt.getV1InfoHash();
-      KarmaChainWriter writer = SearchEngine.DISTRIBUTED_WIRING.karmaChainWriter();
+      KarmaChainWriter writer = AndroidSearchEngines.distributed().karmaChainWriter();
       if (peer == null || infoHashHex == null || writer == null) {
         return null;
       }
