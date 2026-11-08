@@ -205,14 +205,41 @@ class JdkWarmUpTest {
   }
 
   /**
-   * The first text field's highlighter and the splash window's root pane loaded nested JDK classes
-   * on the EDT (Icebase #aeedf97b8f8a, #2550522ba4dc). The warm-up loads each listed class's nested
-   * classes, so listing the outer class covers them.
+   * The first text field's highlighter loaded a nested JDK class on the EDT (Icebase
+   * #aeedf97b8f8a). The warm-up loads each listed class's nested classes, so listing the outer
+   * class covers them.
    */
   @Test
-  void theHighlighterAndRootPaneInputMapClassesAreLoadedByTheWarmUp() throws Exception {
+  void theHighlighterClassesAreLoadedByTheWarmUp() throws Exception {
     assertNestedClassIsWarmedUp("javax.swing.text.DefaultHighlighter", "SafeDamager");
-    assertNestedClassIsWarmedUp("javax.swing.plaf.basic.BasicRootPaneUI", "RootPaneInputMap");
+  }
+
+  /**
+   * The splash window is the first root pane, and its UI's RootPaneInputMap was loaded on the EDT
+   * (Icebase #2550522ba4dc). The background warm-up hadn't reached it on a 2-CPU machine (Icebase
+   * #e6bb648dd725, frostwire/frostwire#1323), so the splash's own pre-step, which runs before the
+   * splash is built, initializes BasicRootPaneUI and loads its nested classes.
+   */
+  @Test
+  void theRootPaneInputMapIsLoadedBeforeTheSplash() throws Exception {
+    assertTrue(
+        JdkWarmUp.SPLASH_CLASSES_TO_INITIALIZE.containsAll(
+            List.of(
+                "javax.swing.plaf.basic.BasicRootPaneUI",
+                "javax.swing.plaf.synth.SynthRootPaneUI")));
+    assertTrue(
+        Arrays.stream(Class.forName("javax.swing.plaf.basic.BasicRootPaneUI").getDeclaredClasses())
+            .anyMatch(c -> c.getSimpleName().equals("RootPaneInputMap")));
+    String source =
+        Files.readString(
+                Path.of(System.getProperty("user.dir"))
+                    .resolve("src/main/java/com/frostwire/util/JdkWarmUp.java"))
+            .replaceAll("\\s+", "");
+    String splash = source.substring(source.indexOf("publicstaticvoidinitializeSplashClasses(){"));
+    splash = splash.substring(0, splash.indexOf("LOG.warn"));
+    assertTrue(
+        splash.contains("Class.forName(className).getDeclaredClasses();"),
+        "the splash pre-step doesn't load nested classes");
   }
 
   /**

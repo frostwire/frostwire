@@ -172,9 +172,6 @@ public final class JdkWarmUp {
           // The same text field's highlighter: its first instance loads DefaultHighlighter and
           // its nested SafeDamager on the EDT (Icebase #aeedf97b8f8a, frostwire/frostwire#1480).
           "javax.swing.text.DefaultHighlighter",
-          // Every root pane's UI creates a BasicRootPaneUI.RootPaneInputMap; the splash window's
-          // was the first, on the EDT (Icebase #2550522ba4dc).
-          "javax.swing.plaf.basic.BasicRootPaneUI",
           // The search field's suggestions list is the main window's first JList: its UI's static
           // initializer ran on the EDT as the first suggestions arrived (Icebase #c0e323953897,
           // frostwire/frostwire#1501).
@@ -210,7 +207,14 @@ public final class JdkWarmUp {
       List.of(
           "javax.swing.ImageIcon",
           "sun.java2d.loops.GraphicsPrimitiveMgr",
-          "sun.awt.LightweightPeerHolder");
+          "sun.awt.LightweightPeerHolder",
+          // Every root pane's UI creates a BasicRootPaneUI.RootPaneInputMap, and the splash's is
+          // the first (Icebase #2550522ba4dc). On the background warm-up thread a 2-CPU machine
+          // hadn't reached it before the splash was built (Icebase #e6bb648dd725).
+          "javax.swing.plaf.basic.BasicRootPaneUI",
+          // With Nimbus the root pane's UI is SynthRootPaneUI, created in SynthLookAndFeel.createUI
+          // on the EDT as the splash was built (Icebase #e55c52246999).
+          "javax.swing.plaf.synth.SynthRootPaneUI");
 
   /**
    * Windows-only splash classes, initialized after {@link #SPLASH_CLASSES_TO_INITIALIZE}: the first
@@ -234,7 +238,8 @@ public final class JdkWarmUp {
   public static void initializeSplashClasses() {
     for (String className : splashClassesToInitialize(OSUtils.isWindows())) {
       try {
-        Class.forName(className);
+        // Nested classes too, e.g. BasicRootPaneUI's RootPaneInputMap.
+        Class.forName(className).getDeclaredClasses();
       } catch (Throwable t) {
         LOG.warn("Warm-up of " + className + " failed: " + t.getMessage(), t);
       }
