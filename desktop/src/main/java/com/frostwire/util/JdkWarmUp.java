@@ -198,9 +198,14 @@ public final class JdkWarmUp {
    * the first native window: its screen surface registers Java2D's rendering loops, so
    * GraphicsPrimitiveMgr's static initializer ran on the EDT in the splash's pack() (Icebase
    * #e3e91ab8b37d). ImageIcon comes first: its Toolkit loads the native library the loops need.
+   * Packing the splash also gives its first lightweight component a peer, which ran
+   * LightweightPeerHolder's static initializer on the EDT (Icebase #16351ea60cdb).
    */
   static final List<String> SPLASH_CLASSES_TO_INITIALIZE =
-      List.of("javax.swing.ImageIcon", "sun.java2d.loops.GraphicsPrimitiveMgr");
+      List.of(
+          "javax.swing.ImageIcon",
+          "sun.java2d.loops.GraphicsPrimitiveMgr",
+          "sun.awt.LightweightPeerHolder");
 
   /**
    * Windows-only splash classes, initialized after {@link #SPLASH_CLASSES_TO_INITIALIZE}: the first

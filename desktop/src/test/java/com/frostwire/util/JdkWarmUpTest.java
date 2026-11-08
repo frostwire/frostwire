@@ -269,6 +269,10 @@ class JdkWarmUpTest {
   @Test
   void theSplashImageIconIsInitializedBeforeTheSplash() {
     assertTrue(JdkWarmUp.SPLASH_CLASSES_TO_INITIALIZE.contains("javax.swing.ImageIcon"));
+    // Packing the splash gives its first lightweight component a peer (Icebase #16351ea60cdb).
+    assertTrue(
+        JdkWarmUp.SPLASH_CLASSES_TO_INITIALIZE.contains("sun.awt.LightweightPeerHolder"),
+        "the lightweight peer holder is not initialized before the splash");
     for (String className : JdkWarmUp.SPLASH_CLASSES_TO_INITIALIZE) {
       assertDoesNotThrow(() -> Class.forName(className), className);
     }
