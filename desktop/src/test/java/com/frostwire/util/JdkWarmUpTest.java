@@ -225,6 +225,17 @@ class JdkWarmUpTest {
     assertNestedClassIsWarmedUp("javax.swing.plaf.basic.BasicListUI", "Handler");
   }
 
+  /**
+   * The setup wizard's MultiLineLabel was the first JTextArea, and wrapping its lines built a
+   * WrappedPlainView: both initialized on the EDT as the wizard opened (Icebase #394182e705b5,
+   * frostwire/frostwire#1505).
+   */
+  @Test
+  void theWrappingTextAreaClassesAreInitializedByTheWarmUp() throws Exception {
+    assertTrue(JdkWarmUp.CLASSES_TO_INITIALIZE.contains("javax.swing.plaf.basic.BasicTextAreaUI"));
+    assertNestedClassIsWarmedUp("javax.swing.text.WrappedPlainView", "WrappedLine");
+  }
+
   private static void assertNestedClassIsWarmedUp(String outer, String nested) throws Exception {
     assertTrue(JdkWarmUp.CLASSES_TO_INITIALIZE.contains(outer), outer + " is not warmed up");
     assertTrue(

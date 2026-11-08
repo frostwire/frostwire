@@ -178,7 +178,12 @@ public final class JdkWarmUp {
           // The search field's suggestions list is the main window's first JList: its UI's static
           // initializer ran on the EDT as the first suggestions arrived (Icebase #c0e323953897,
           // frostwire/frostwire#1501).
-          "javax.swing.plaf.basic.BasicListUI");
+          "javax.swing.plaf.basic.BasicListUI",
+          // The setup wizard's MultiLineLabel is the first JTextArea: setLineWrap(true) made its UI
+          // build a WrappedPlainView, both initialized on the EDT as the wizard opened (Icebase
+          // #394182e705b5, frostwire/frostwire#1505).
+          "javax.swing.plaf.basic.BasicTextAreaUI",
+          "javax.swing.text.WrappedPlainView");
 
   /**
    * Windows-only JDK classes initialized like {@link #CLASSES_TO_INITIALIZE}. The first right-click
