@@ -10,6 +10,7 @@ FrostWire 7.1.4 UNRELEASED
    - fix:Clicking the Source of a search result that has no details page no longer causes an error (#1497)
    - fix:A transfer removed while FrostWire was saving its progress no longer comes back the next time FrostWire starts (#1496)
    - fix:Starting FrostWire no longer freezes the window while the update button's images load; they are loaded in the background before the window is built (#1494)
+
 FrostWire 7.1.3 NOV/07/2026
    - fix:A crash report that fails to save no longer leaves an empty temporary file in FrostWire's settings folder, and files left by earlier versions are cleaned up (#1493)
    - fix:The setup wizard's social page no longer freezes while its icons load; they are loaded in the background before the wizard opens (#1491)
@@ -226,6 +227,7 @@ FrostWire 7.1.3 NOV/07/2026
    - update:Gradle 9.8.1 -> 9.8.2 for building FrostWire (developers only)
    - update:Spotless 7.0.4 -> 8.10.4, the code formatter check (developers only)
    - update:JUnit 5.13.4 -> 5.14.4 for the test suites (developers only)
+
 FrostWire 7.1.2 OCT/25/2026
    - update:The Java runtime bundled with the Windows, macOS and Linux installers is updated from OpenJDK 27 to 27.0.1.0.3, which fixes the vulnerabilities in this week's severe Oracle Java security advisory
    - fix:Windows: text is no longer blurry at display scaling above 100% — FrostWire.exe now declares per-monitor DPI awareness, so Windows no longer stretches the whole window as a bitmap (#1243, #1300)
@@ -506,6 +508,7 @@ FrostWire 7.1.0 OCT/10/2026
   - fix:IceBridge ops scripts — systemd install creates writable /opt dir; control URL is SSH tunnel only (127.0.0.1 bind); install uses absolute java path and preserves icebridge.env; no --background+--gradle; default control HTTP 8081 aligns run-local/fromEnv/.env.example
   - new:IceBridge fat JAR multi-arch jlibtorrent natives (Linux x86_64/arm64 + macOS) so Mac-built icebridge.jar runs DHT on EC2; scripts/icebridge-systemd-install.sh
   - new:ICEBRIDGE.md operator stub (ports, local vs remote, tokens, co-located pitfalls, security model)
+
 FrostWire 7.0.4 APR/22/2026
   - new:Built-in Model Context Protocol (MCP) server with 38 desktop tools across 8 categories, settings-pane controls, and client configuration support for Copilot, Codex, Claude Desktop, OpenCode, Qwen, and ChatGPT Desktop
   - new:Restart button dialog — when settings changes require a restart, users can now click "Restart Now" instead of manually closing and reopening FrostWire
