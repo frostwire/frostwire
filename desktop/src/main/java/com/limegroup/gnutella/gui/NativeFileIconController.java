@@ -4,6 +4,10 @@ import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.util.WarmExecutors;
 import com.limegroup.gnutella.settings.UISettings;
+import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
+import java.awt.image.BaseMultiResolutionImage;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Collections;
 import java.util.Map;
@@ -364,6 +368,69 @@ public class NativeFileIconController implements FileIconController {
     boolean isViewAvailable() {
       return true;
     }
+
+    /**
+     * The icon painted once into buffered images, at 1x and at the screen's scale. A native icon
+     * (macOS's AquaIcon around a CImage) makes its pixels lazily: the first paint of each
+     * resolution copies the NSImage through JNI, and tables paint on the EDT (Icebase
+     * #ef2365240d83, frostwire/frostwire#1320). Call it where icons are looked up, off the EDT, so
+     * the EDT only draws pixels. An icon that is already a buffered image, or that can't be painted
+     * without a component, is returned as is.
+     */
+    static Icon rendered(Icon icon) {
+      if (icon == null
+          || (icon instanceof ImageIcon imageIcon
+              && imageIcon.getImage() instanceof BufferedImage)) {
+        return icon;
+      }
+      int width = icon.getIconWidth();
+      int height = icon.getIconHeight();
+      if (width <= 0 || height <= 0) {
+        return icon;
+      }
+      try {
+        BufferedImage base = paint(icon, width, height, 1.0);
+        double scale = screenScale();
+        if (scale <= 1.0) {
+          return new ImageIcon(base);
+        }
+        return new ImageIcon(new BaseMultiResolutionImage(base, paint(icon, width, height, scale)));
+      } catch (RuntimeException e) {
+        return icon;
+      }
+    }
+
+    private static BufferedImage paint(Icon icon, int width, int height, double scale) {
+      BufferedImage image =
+          new BufferedImage(
+              (int) Math.ceil(width * scale),
+              (int) Math.ceil(height * scale),
+              BufferedImage.TYPE_INT_ARGB);
+      Graphics2D g = image.createGraphics();
+      try {
+        g.scale(scale, scale);
+        icon.paintIcon(null, g, 0, 0);
+      } finally {
+        g.dispose();
+      }
+      return image;
+    }
+
+    /** The default screen's scale (2 on a Retina display), or 1 without a screen. */
+    static double screenScale() {
+      if (GraphicsEnvironment.isHeadless()) {
+        return 1.0;
+      }
+      try {
+        return GraphicsEnvironment.getLocalGraphicsEnvironment()
+            .getDefaultScreenDevice()
+            .getDefaultConfiguration()
+            .getDefaultTransform()
+            .getScaleX();
+      } catch (RuntimeException e) {
+        return 1.0;
+      }
+    }
   }
 
   /**
@@ -487,7 +554,7 @@ public class NativeFileIconController implements FileIconController {
           return CACHE.get(f);
         }
       }
-      Icon icon = VIEW.getSystemIcon(f);
+      Icon icon = rendered(VIEW.getSystemIcon(f));
       CACHE.put(f, icon);
       return icon;
     }
@@ -567,6 +634,7 @@ public class NativeFileIconController implements FileIconController {
       synchronized (DELEGATE) {
         icon = DELEGATE.getIcon(f);
       }
+      icon = rendered(icon);
       CACHE.put(f, icon);
       return icon;
     }

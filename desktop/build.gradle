@@ -1036,6 +1036,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.ReadOnlyLabelsTakeNoDropsTest"
         includeTestsMatching "com.limegroup.gnutella.gui.WindowsTakeNoDropsTest"
         includeTestsMatching "com.limegroup.gnutella.gui.NativeFileIconControllerTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.NativeFileIconPixelsTest"
         includeTestsMatching "com.limegroup.gnutella.gui.IconManagerNativeInitTest"
         includeTestsMatching "com.limegroup.gnutella.gui.NativeUiChooserTest"
         includeTestsMatching "com.limegroup.gnutella.gui.shell.ShellAssociationManagerThreadingTest"
