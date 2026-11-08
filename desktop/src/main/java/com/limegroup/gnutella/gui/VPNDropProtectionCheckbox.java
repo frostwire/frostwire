@@ -23,6 +23,8 @@ import com.limegroup.gnutella.settings.ConnectionSettings;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.font.TextAttribute;
+import java.util.Map;
 import javax.swing.*;
 
 /**
@@ -76,17 +78,20 @@ public class VPNDropProtectionCheckbox extends JPanel {
     vpnLink.setForeground(new Color(0, 0, 200)); // Blue color for link
     vpnLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-    // Add underline and hover effects
+    // Underline the link while hovered by swapping fonts, not by setting HTML text: an HTML label
+    // builds and styles an HTML view on the EDT on every hover (frostwire/frostwire#1500).
+    Font linkFont = vpnLink.getFont();
+    Font hoveredLinkFont = underlined(linkFont);
     vpnLink.addMouseListener(
         new MouseAdapter() {
           @Override
           public void mouseEntered(MouseEvent e) {
-            vpnLink.setText("<html><u>VPN</u></html>");
+            vpnLink.setFont(hoveredLinkFont);
           }
 
           @Override
           public void mouseExited(MouseEvent e) {
-            vpnLink.setText(I18n.tr("VPN"));
+            vpnLink.setFont(linkFont);
           }
 
           @Override
@@ -103,6 +108,11 @@ public class VPNDropProtectionCheckbox extends JPanel {
     setToolTipText(
         I18n.tr("When enabled, BitTorrent transfers will pause if your VPN is disconnected"));
     setPreferredSize(new Dimension(130, 20));
+  }
+
+  /** {@code font} with a single underline. */
+  static Font underlined(Font font) {
+    return font.deriveFont(Map.of(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON));
   }
 
   /** Updates the checkbox state to reflect the current setting value. */
