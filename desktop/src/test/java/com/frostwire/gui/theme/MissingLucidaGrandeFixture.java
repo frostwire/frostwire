@@ -32,12 +32,17 @@ import javax.swing.JLabel;
  * </ul>
  *
  * <p>Argument {@code unrepaired} measures right away; {@code repaired} runs {@link
- * MacLogicalFonts#repairIfMissing()} first.
+ * MacLogicalFonts#repairIfMissing()} first. With {@code unlisted-unrepaired} and {@code
+ * unlisted-repaired} the Mac is in the state a native font listing that ended early leaves (macOS
+ * 27, frostwire/frostwire#1484): Lucida Grande's substitutes and the Serif and Monospaced fonts
+ * with the families they are built from are not registered either.
  */
 public final class MissingLucidaGrandeFixture {
 
   public static void main(String[] args) throws Exception {
-    boolean repair = args.length > 0 && args[0].equals("repaired");
+    String mode = args.length > 0 ? args[0] : "";
+    boolean unlisted = mode.startsWith("unlisted-");
+    boolean repair = mode.endsWith("repaired") && !mode.endsWith("unrepaired");
     // Load the native fonts and build the logical fonts, as the first lookup at startup does.
     Object fontManager =
         Class.forName("sun.font.FontManagerFactory").getMethod("getInstance").invoke(null);
@@ -46,7 +51,7 @@ public final class MissingLucidaGrandeFixture {
             .getMethod("findFont2D", String.class, int.class, int.class);
     findFont2D.invoke(fontManager, "Helvetica", Font.PLAIN, 0);
 
-    hideLucidaGrande(fontManager);
+    hideFamilies(fontManager, unlisted ? UNLISTED : LUCIDA_GRANDE);
     if (findFont2D.invoke(fontManager, Font.DIALOG, Font.PLAIN, 0) != null) {
       System.out.println("SETUP the logical Dialog font is still registered");
       return;
@@ -75,8 +80,21 @@ public final class MissingLucidaGrandeFixture {
       Graphics2D g = image.createGraphics();
       // The splash label's font on macOS (AquaFonts' control font), then the logical fonts.
       for (String family :
-          new String[] {"Lucida Grande", Font.DIALOG, Font.SANS_SERIF, Font.DIALOG_INPUT}) {
-        g.getFontMetrics(new Font(family, Font.PLAIN, 13)).stringWidth("FrostWire");
+          new String[] {
+            "Lucida Grande",
+            // FrostWire's sans serif font on macOS (PlatformFonts.sansSerif).
+            "Helvetica",
+            Font.DIALOG,
+            Font.SANS_SERIF,
+            Font.DIALOG_INPUT,
+            Font.SERIF,
+            Font.MONOSPACED
+          }) {
+        for (int style : new int[] {Font.PLAIN, Font.BOLD, Font.ITALIC, Font.BOLD | Font.ITALIC}) {
+          if (g.getFontMetrics(new Font(family, style, 13)).stringWidth("FrostWire") <= 0) {
+            throw new IllegalStateException("no width: " + family + " " + style);
+          }
+        }
       }
       g.getFontMetrics(PlatformFonts.dialog(Font.BOLD, 12)).stringWidth("FrostWire");
       // An HTML label: its default style sheet asks for the SansSerif family.
@@ -93,28 +111,52 @@ public final class MissingLucidaGrandeFixture {
     }
   }
 
-  /** Unregisters the Lucida Grande family and the logical fonts built from it, and their caches. */
-  private static void hideLucidaGrande(Object fontManager) throws Exception {
+  /** Lucida Grande and the logical fonts the JDK builds from it. */
+  private static final java.util.Set<String> LUCIDA_GRANDE =
+      java.util.Set.of("lucida grande", "dialog", "sansserif", "dialoginput");
+
+  /**
+   * What a native font listing that ended early leaves unregistered: also the families FrostWire
+   * builds the logical fonts from instead, and Serif and Monospaced with theirs.
+   */
+  private static final java.util.Set<String> UNLISTED =
+      java.util.Set.of(
+          "lucida grande",
+          "dialog",
+          "sansserif",
+          "dialoginput",
+          "helvetica neue",
+          "helvetica",
+          "arial",
+          "serif",
+          "times",
+          "times new roman",
+          "monospaced",
+          "menlo",
+          "courier");
+
+  /** Unregisters the families (lower case) and their fonts, and empties the lookup cache. */
+  private static void hideFamilies(Object fontManager, java.util.Set<String> hidden)
+      throws Exception {
     Class<?> fontFamily = Class.forName("sun.font.FontFamily");
     Map<?, ?> families = (Map<?, ?>) staticField(fontFamily, "familyNameMap");
-    for (String name : new String[] {"lucida grande", "dialog", "sansserif", "dialoginput"}) {
-      families.remove(name);
-    }
+    families.keySet().removeIf(hidden::contains);
     Class<?> font2D = Class.forName("sun.font.Font2D");
     Method familyName = font2D.getMethod("getFamilyName", Locale.class);
-    removeLucidaGrande((Map<?, ?>) field(fontManager, "genericFonts"), familyName);
-    removeLucidaGrande((Map<?, ?>) field(fontManager, "fullNameToFont"), familyName);
+    removeFamilies((Map<?, ?>) field(fontManager, "genericFonts"), familyName, hidden);
+    removeFamilies((Map<?, ?>) field(fontManager, "fullNameToFont"), familyName, hidden);
     ((Map<?, ?>) field(fontManager, "fontNameCache")).clear();
   }
 
-  private static void removeLucidaGrande(Map<?, ?> fonts, Method familyName) {
+  private static void removeFamilies(
+      Map<?, ?> fonts, Method familyName, java.util.Set<String> hidden) {
     fonts
         .values()
         .removeIf(
             font -> {
               try {
-                return "Lucida Grande"
-                    .equalsIgnoreCase((String) familyName.invoke(font, Locale.ENGLISH));
+                return hidden.contains(
+                    ((String) familyName.invoke(font, Locale.ENGLISH)).toLowerCase(Locale.ENGLISH));
               } catch (ReflectiveOperationException e) {
                 throw new IllegalStateException(e);
               }

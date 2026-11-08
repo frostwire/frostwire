@@ -44,6 +44,35 @@ class MacLogicalFontsTest {
   }
 
   /**
+   * macOS 27 (Icebase #8994426028bf): a native font listing that ended early leaves Lucida Grande's
+   * substitutes unregistered too, so the repair has to register a family itself.
+   */
+  @Test
+  void withAFontListingThatEndedEarlyMeasuringTextCrashesAsReported() throws Exception {
+    assumeTrue(OSUtils.isMacOSX(), "the JDK builds its logical fonts from Lucida Grande on macOS");
+    assertEquals(
+        "CRASH java.lang.NullPointerException java.awt.Font.getFont2D",
+        runFixture("unlisted-unrepaired"),
+        "the simulated unfinished font listing no longer reproduces the reported crash");
+  }
+
+  @Test
+  void theRepairRegistersAFamilyWhenTheFontListingEndedEarly() throws Exception {
+    assumeTrue(OSUtils.isMacOSX(), "the JDK builds its logical fonts from Lucida Grande on macOS");
+    assertEquals("OK", runFixture("unlisted-repaired"));
+  }
+
+  /** Every family the logical fonts are built from can be registered by its faces' names. */
+  @Test
+  void everySourceFamilyHasItsFourFaces() {
+    for (String family : PlatformFonts.MAC_DIALOG_SUBSTITUTES) {
+      assertEquals(4, MacLogicalFonts.FACES.get(family).size(), family);
+    }
+    assertEquals(4, MacLogicalFonts.FACES.get("Times").size());
+    assertEquals(4, MacLogicalFonts.FACES.get("Menlo").size());
+  }
+
+  /**
    * A launcher without access to sun.font cannot rebuild the logical fonts; FrostWire's own still
    * work.
    */
