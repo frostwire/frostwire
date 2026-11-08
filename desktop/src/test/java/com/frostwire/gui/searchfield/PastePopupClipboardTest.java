@@ -15,12 +15,12 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 /**
- * The search field's popup decides whether to offer Paste without asking the system clipboard.
+ * The text fields' popups decide whether to offer Paste without asking the system clipboard.
  * Opening the popup runs on the EDT, and on Windows the clipboard's lock can be held for seconds by
  * a background read: the search field reads the clipboard when it gains focus, which the same
  * right-click does (frostwire/frostwire#1508).
  *
- * <p>The field installs ThemeMediator key strokes in its constructor, which needs a display, so
+ * <p>Both fields install ThemeMediator key strokes in their constructors, which needs a display, so
  * this checks the source, as {@code ClipboardSearchFocusListenerTest} does for GoogleSearchField.
  * Whitespace-insensitive: the formatter may wrap these calls across lines.
  */
@@ -33,6 +33,13 @@ class PastePopupClipboardTest {
     assertTrue(
         source.contains(
             "privatebooleanisPasteAvailable(){returnSearchSettings.AUTO_SEARCH_CLIPBOARD_URL.getValue();}"));
+    assertNoClipboardQuery(source);
+  }
+
+  @Test
+  void theTextFieldPopupDoesNotAskTheClipboard() throws IOException {
+    String source = source("src/main/java/com/limegroup/gnutella/gui/LimeTextField.java");
+    assertTrue(source.contains("PASTE_ACTION.setEnabled(isEnabled()&&isEditable());"));
     assertNoClipboardQuery(source);
   }
 

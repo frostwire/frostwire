@@ -23,8 +23,6 @@ import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
 import com.frostwire.gui.theme.ThemeMediator;
 import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
 import javax.swing.text.Document;
@@ -191,7 +189,10 @@ public class LimeTextField extends JTextField {
     UNDO_ACTION.setEnabled(isEnabled() && isEditable() && isUndoAvailable());
     CUT_ACTION.setEnabled(isEnabled() && isEditable() && stuffSelected);
     COPY_ACTION.setEnabled(isEnabled() && stuffSelected);
-    PASTE_ACTION.setEnabled(isEnabled() && isEditable() && isPasteAvailable());
+    // Paste is offered without asking the system clipboard: this runs on the EDT while the popup
+    // opens, and on Windows the clipboard's lock can be held for seconds by a background read.
+    // Pasting text that isn't there does nothing.
+    PASTE_ACTION.setEnabled(isEnabled() && isEditable());
     DELETE_ACTION.setEnabled(isEnabled() && stuffSelected);
     SELECT_ALL_ACTION.setEnabled(isEnabled() && !allSelected);
   }
@@ -199,16 +200,6 @@ public class LimeTextField extends JTextField {
   /** Determines if an Undo is available. */
   private boolean isUndoAvailable() {
     return getUndoManager() != null && getUndoManager().canUndoOrRedo();
-  }
-
-  /** Determines if paste is currently available. */
-  private boolean isPasteAvailable() {
-    try {
-      Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-      return clipboard.isDataFlavorAvailable(DataFlavor.stringFlavor);
-    } catch (UnsupportedOperationException | IllegalStateException he) {
-      return false;
-    }
   }
 
   /** Base Action that all LimeTextField actions extend. */
