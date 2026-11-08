@@ -11,28 +11,31 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
 
     steps:
-      - uses: actions/checkout@v5
+      - name: Git defaults
+        # Silences git's "default branch name" hint on checkout.
+        run: git config --global init.defaultBranch master
+      - uses: actions/checkout@v7
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           java-version: '21'
           distribution: 'temurin'
 
       - name: Set up Python 3.13
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: '3.13'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
         with:
           # The action's default 'packages' still requests the removed 'tools'
           # package, which makes `sdkmanager tools` fail with exit code 1.
@@ -71,7 +74,7 @@ jobs:
 
       - name: Upload coverage report
         if: always() && hashFiles('android/build/reports/coverage/test/plus1/debug/report.xml') != ''
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: android-coverage-report
           path: android/build/reports/coverage/test/plus1/debug/
@@ -86,7 +89,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: android-unit-test-results
           path: android/build/reports/tests/testPlus1DebugUnitTest/
