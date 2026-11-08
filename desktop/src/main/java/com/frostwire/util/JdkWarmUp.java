@@ -188,13 +188,35 @@ public final class JdkWarmUp {
    * startup thread that decodes the splash image ({@link #initializeSplashClasses}): the warm-up
    * thread runs alongside the splash and can't be relied on to get there first. ImageIcon's static
    * initializer builds its shared MediaTracker and component, which a cold JVM loaded on the EDT
-   * while building the splash (Icebase #e45e1beac54a, frostwire/frostwire#1323).
+   * while building the splash (Icebase #e45e1beac54a, frostwire/frostwire#1323). The splash is also
+   * the first native window: its screen surface registers Java2D's rendering loops, so
+   * GraphicsPrimitiveMgr's static initializer ran on the EDT in the splash's pack() (Icebase
+   * #e3e91ab8b37d). ImageIcon comes first: its Toolkit loads the native library the loops need.
    */
-  static final List<String> SPLASH_CLASSES_TO_INITIALIZE = List.of("javax.swing.ImageIcon");
+  static final List<String> SPLASH_CLASSES_TO_INITIALIZE =
+      List.of("javax.swing.ImageIcon", "sun.java2d.loops.GraphicsPrimitiveMgr");
 
-  /** Initializes {@link #SPLASH_CLASSES_TO_INITIALIZE}; call off the EDT before the splash. */
+  /**
+   * Windows-only splash classes, initialized after {@link #SPLASH_CLASSES_TO_INITIALIZE}: the first
+   * window's GDI surface registers the GDI blit loops in its static initializer, which ran on the
+   * EDT in the splash's pack() (Icebase #709822685cbb, #bc64bcf27594, frostwire/frostwire#1323).
+   */
+  static final List<String> WINDOWS_SPLASH_CLASSES_TO_INITIALIZE =
+      List.of("sun.java2d.windows.GDIWindowSurfaceData");
+
+  /** The classes {@link #initializeSplashClasses} initializes: Windows-only ones too if asked. */
+  static List<String> splashClassesToInitialize(boolean windows) {
+    if (!windows) {
+      return SPLASH_CLASSES_TO_INITIALIZE;
+    }
+    List<String> classes = new ArrayList<>(SPLASH_CLASSES_TO_INITIALIZE);
+    classes.addAll(WINDOWS_SPLASH_CLASSES_TO_INITIALIZE);
+    return classes;
+  }
+
+  /** Initializes the splash's JDK classes in order; call off the EDT before the splash. */
   public static void initializeSplashClasses() {
-    for (String className : SPLASH_CLASSES_TO_INITIALIZE) {
+    for (String className : splashClassesToInitialize(OSUtils.isWindows())) {
       try {
         Class.forName(className);
       } catch (Throwable t) {

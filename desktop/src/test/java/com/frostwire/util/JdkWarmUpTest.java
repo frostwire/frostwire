@@ -265,6 +265,27 @@ class JdkWarmUpTest {
     assertDoesNotThrow(JdkWarmUp::initializeSplashClasses);
   }
 
+  /**
+   * The splash is FrostWire's first native window, and creating its screen surface registered
+   * Java2D's rendering loops (GraphicsPrimitiveMgr) and, on Windows, the GDI blit loops
+   * (GDIWindowSurfaceData) on the EDT (Icebase #709822685cbb, frostwire/frostwire#1323).
+   */
+  @Test
+  void theFirstWindowsRenderingLoopsAreInitializedBeforeTheSplash() {
+    List<String> classes = JdkWarmUp.splashClassesToInitialize(false);
+    assertTrue(classes.contains("sun.java2d.loops.GraphicsPrimitiveMgr"), classes.toString());
+    assertTrue(
+        classes.indexOf("javax.swing.ImageIcon")
+            < classes.indexOf("sun.java2d.loops.GraphicsPrimitiveMgr"),
+        "ImageIcon's Toolkit loads the native library the loops need: " + classes);
+    assertDoesNotThrow(() -> Class.forName("sun.java2d.loops.GraphicsPrimitiveMgr"));
+
+    List<String> windows = JdkWarmUp.splashClassesToInitialize(true);
+    assertTrue(windows.contains("sun.java2d.windows.GDIWindowSurfaceData"), windows.toString());
+    assertEquals(classes, windows.subList(0, classes.size()));
+    assertFalse(classes.contains("sun.java2d.windows.GDIWindowSurfaceData"));
+  }
+
   @Test
   void everyClassToInitializeExistsAndLoads() {
     for (String className : JdkWarmUp.CLASSES_TO_INITIALIZE) {
