@@ -86,13 +86,7 @@ public final class VPNStatusButton extends JPanel implements VPNStatusRefresher.
     bitTorrentDisabledWarning.setToolTipText(
         I18n.tr(
             "Due to current settings without VPN connection BitTorrent will not start. Click to see the settings screen"));
-    // Defer HTML content to avoid EDT violation
-    // HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
-    SwingUtilities.invokeLater(
-        () -> {
-          bitTorrentDisabledWarning.setText(
-              "<html><b>" + I18n.tr("VPN Off: BitTorrent disabled") + "</b></html>");
-        });
+    GUIUtils.setBoldText(bitTorrentDisabledWarning, I18n.tr("VPN Off: BitTorrent disabled"));
     bitTorrentDisabledWarning.addMouseListener(
         new MouseAdapter() {
           @Override

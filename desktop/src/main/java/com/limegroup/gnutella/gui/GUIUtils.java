@@ -167,6 +167,16 @@ public final class GUIUtils {
     return format;
   }
 
+  /**
+   * Shows {@code text} in bold through the label's font, not through HTML: an HTML label is parsed
+   * into a view and every glyph measured on the EDT whenever its text, font or graphics
+   * configuration changes, e.g. each time it is added to a container (frostwire/frostwire#1502).
+   */
+  public static void setBoldText(JLabel label, String text) {
+    label.setFont(label.getFont().deriveFont(Font.BOLD));
+    label.setText(text);
+  }
+
   /** Sets the child components of a component to all be either opaque or not opaque. */
   public static void setOpaque(boolean op, JComponent c) {
     c.setOpaque(op);

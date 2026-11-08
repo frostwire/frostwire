@@ -128,7 +128,6 @@ public final class TransferDetailGeneral extends JPanel
     upperPanel.setForeground(foregroundColor);
     upperPanel.setBackground(backgroundColor);
     upperPanel.setOpaque(true);
-    // Create labels without HTML content to avoid EDT violation
     JLabel nameLabel = new JLabel();
     JLabel completeLabel = new JLabel();
     upperPanel.add(nameLabel, "left, gapleft 2px, gapright 10px");
@@ -142,13 +141,8 @@ public final class TransferDetailGeneral extends JPanel
     upperPanel.add(completionPercentageLabel, "left, gapright 5px");
     upperPanel.add(completeLabel, "left, pushx, wrap");
     upperPanel.add(completionPercentageProgressbar = new JProgressBar(), "span 5, growx");
-    // Defer HTML content to avoid EDT violation
-    // HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
-    SwingUtilities.invokeLater(
-        () -> {
-          nameLabel.setText("<html><b>" + I18n.tr("Name") + ":</b></html>");
-          completeLabel.setText("<html><b>" + I18n.tr("complete") + "</b></html>");
-        });
+    GUIUtils.setBoldText(nameLabel, I18n.tr("Name") + ":");
+    GUIUtils.setBoldText(completeLabel, I18n.tr("complete"));
     // 2nd Section (TRANSFER)
     JPanel midPanel = new JPanel(new MigLayout("insets 18px, gap 5px 5px"));
     midPanel.setForeground(foregroundColor);
