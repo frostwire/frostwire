@@ -1,4 +1,5 @@
 FrostWire 7.1.4 UNRELEASED
+   - fix:macOS: scrolling the Library or Transfers to files of new types no longer stalls while macOS file icons are turned into images; that happens in the background when the icon is looked up (#1320)
    - fix:TPB search results show up on slower connections too: FrostWire now waits up to 3 seconds for a TPB mirror to answer, where 1 second often left TPB out of searches (#1002)
    - fix:Opening FrostWire on a slow computer no longer stalls while the main window loads the Search tab's code; it is loaded in the background as soon as the splash screen shows (#1489)
    - fix:Windows: choosing a save folder no longer freezes the file chooser while Windows looks up each file's display name; names load in the background, like the icons (#1428)
