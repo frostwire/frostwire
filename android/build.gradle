@@ -51,9 +51,9 @@ plugins {
 repositories {
     google()
     mavenCentral()
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+    maven { url = "https://oss.sonatype.org/content/repositories/snapshots" }
     maven {
-        url "https://dl.frostwire.com/maven"
+        url = "https://dl.frostwire.com/maven"
         content {
             includeGroup "com.frostwire"
         }
@@ -134,7 +134,7 @@ if (isRootAssembleRelease && !androidSigningEnvKeyPassword) {
 }
 
 android {
-    namespace "com.frostwire.android"
+    namespace = "com.frostwire.android"
 
     compileSdk = 37  // Android 17
 
@@ -143,7 +143,7 @@ android {
         versionName project.ext.versionName
         minSdkVersion 26 // Android 8.0 Oreo
         targetSdkVersion 34 // Android 14 (more involved upgrade, crashes on targetsdkversion 35)
-        multiDexEnabled true
+        multiDexEnabled = true
 
         ndk {
             abiFilters "arm64-v8a", "x86_64"
@@ -156,7 +156,7 @@ android {
             }
             chaquopy {
                 defaultConfig {
-                    version "3.13"
+                    version = "3.13"
                 }
             }
             pip {
@@ -245,16 +245,16 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
                     'proguard-rules.pro'
-            signingConfig signingConfigs.release
-            multiDexKeepFile file('multidex-config.txt')
+            signingConfig = signingConfigs.release
+            multiDexKeepFile = file('multidex-config.txt')
         }
         debug {
             // JaCoCo coverage of the unit tests: ./gradlew createPlus1DebugUnitTestCoverageReport
-            enableUnitTestCoverage true
+            enableUnitTestCoverage = true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
                     'proguard-rules.pro'
-            multiDexKeepFile file('multidex-config.txt')
+            multiDexKeepFile = file('multidex-config.txt')
         }
     }
 
@@ -269,7 +269,7 @@ android {
         }
     }
     lint {
-        abortOnError false
+        abortOnError = false
         // CI checks only NewApi (frostwire/frostwire#1400); local lint runs everything.
         if (project.hasProperty('lintNewApiOnly')) {
             checkOnly.add('NewApi')
@@ -311,9 +311,9 @@ android {
         }
     }
     buildFeatures {
-        aidl true
-        buildConfig true
-        resValues true
+        aidl = true
+        buildConfig = true
+        resValues = true
     }
     packaging {
         resources {
