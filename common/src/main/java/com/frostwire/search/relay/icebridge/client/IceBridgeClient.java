@@ -33,6 +33,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.function.UnaryOperator;
 import okhttp3.Call;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
@@ -79,14 +80,24 @@ public final class IceBridgeClient implements AutoCloseable {
   private volatile boolean closed;
 
   public IceBridgeClient(int controlPort) {
-    this(LOOPBACK_CONTROL_URL + controlPort, true);
+    this(LOOPBACK_CONTROL_URL + controlPort, true, UnaryOperator.identity());
   }
 
   public IceBridgeClient(String baseUrl) {
-    this(baseUrl, false);
+    this(baseUrl, false, UnaryOperator.identity());
   }
 
-  private IceBridgeClient(String baseUrl, boolean localControlPort) {
+  /**
+   * For tests: {@code configureHttp} adjusts the HTTP client before it is built, e.g. to add an
+   * interceptor that answers with a canned response. The client is final, and changing it by
+   * reflection is warned about (and will be blocked) by recent JDKs.
+   */
+  IceBridgeClient(String baseUrl, UnaryOperator<OkHttpClient.Builder> configureHttp) {
+    this(baseUrl, false, configureHttp);
+  }
+
+  private IceBridgeClient(
+      String baseUrl, boolean localControlPort, UnaryOperator<OkHttpClient.Builder> configureHttp) {
     this.localControlPort = localControlPort;
     HttpUrl url = HttpUrl.get(baseUrl);
     String host = url.host();
@@ -106,12 +117,14 @@ public final class IceBridgeClient implements AutoCloseable {
     this.baseUrl =
         normalized.endsWith("/") ? normalized.substring(0, normalized.length() - 1) : normalized;
     this.http =
-        new OkHttpClient.Builder()
-            .connectTimeout(CONNECT_TIMEOUT_SEC, TimeUnit.SECONDS)
-            .callTimeout(CALL_TIMEOUT_SEC, TimeUnit.SECONDS)
-            .retryOnConnectionFailure(false)
-            .followRedirects(false)
-            .followSslRedirects(false)
+        configureHttp
+            .apply(
+                new OkHttpClient.Builder()
+                    .connectTimeout(CONNECT_TIMEOUT_SEC, TimeUnit.SECONDS)
+                    .callTimeout(CALL_TIMEOUT_SEC, TimeUnit.SECONDS)
+                    .retryOnConnectionFailure(false)
+                    .followRedirects(false)
+                    .followSslRedirects(false))
             .build();
   }
 

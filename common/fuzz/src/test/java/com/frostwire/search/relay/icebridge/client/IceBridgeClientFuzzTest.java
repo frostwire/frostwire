@@ -11,10 +11,8 @@ import com.code_intelligence.jazzer.api.FuzzedDataProvider;
 import com.code_intelligence.jazzer.junit.FuzzTest;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.search.relay.icebridge.MeshProtocolId;
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
 import okhttp3.Protocol;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
@@ -79,28 +77,19 @@ class IceBridgeClientFuzzTest {
   }
 
   private static IceBridgeClient clientAnsweringFuzzedBody() {
-    IceBridgeClient client = new IceBridgeClient("http://127.0.0.1:1");
-    try {
-      Field http = IceBridgeClient.class.getDeclaredField("http");
-      http.setAccessible(true);
-      OkHttpClient original = (OkHttpClient) http.get(client);
-      OkHttpClient offline =
-          original
-              .newBuilder()
-              .addInterceptor(
-                  chain ->
-                      new Response.Builder()
-                          .request(chain.request())
-                          .protocol(Protocol.HTTP_1_1)
-                          .code(200)
-                          .message("OK")
-                          .body(ResponseBody.create(responseBody, JSON))
-                          .build())
-              .build();
-      http.set(client, offline);
-    } catch (ReflectiveOperationException e) {
-      throw new IllegalStateException("IceBridgeClient.http not found", e);
-    }
-    return client;
+    // The client's OkHttpClient is final: answer through an interceptor added before it is built,
+    // not by replacing the field reflectively (JDK 26+ warns, and will block it).
+    return new IceBridgeClient(
+        "http://127.0.0.1:1",
+        builder ->
+            builder.addInterceptor(
+                chain ->
+                    new Response.Builder()
+                        .request(chain.request())
+                        .protocol(Protocol.HTTP_1_1)
+                        .code(200)
+                        .message("OK")
+                        .body(ResponseBody.create(responseBody, JSON))
+                        .build()));
   }
 }
