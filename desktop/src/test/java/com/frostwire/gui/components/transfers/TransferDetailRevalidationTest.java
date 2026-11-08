@@ -56,9 +56,7 @@ class TransferDetailRevalidationTest {
   /**
    * A label whose text is HTML parses it and builds a View tree, measured with the stylesheet, on
    * every new text. The labels whose text changes from one refresh to the next (progress, piece
-   * counts) set plain text; bold comes from the font (frostwire/frostwire#1362). Texts that only
-   * change with the selected transfer, like the wrapped comment, may stay HTML: an unchanged text
-   * fires no update.
+   * counts) set plain text; bold comes from the font (frostwire/frostwire#1362).
    */
   @Test
   void labelsThatChangeEveryRefreshSetNoHtml() throws Exception {
@@ -75,6 +73,26 @@ class TransferDetailRevalidationTest {
       }
       assertTrue(found > 0, label + ".setText not found");
     }
+  }
+
+  /**
+   * The torrent's comment was an HTML label: every transfer shown in the details parsed an HTML
+   * document on the EDT (Icebase #7096f9cbb47f, #c6a0a2b70d9a), and the .torrent author's markup
+   * was rendered. It is plain text in a wrapping text area (frostwire/frostwire#1362).
+   */
+  @Test
+  void theCommentIsPlainText() throws Exception {
+    String general = readSource("TransferDetailGeneral.java");
+    assertFalse(general.contains("commentLabel"), "the comment is no longer a label");
+    assertTrue(general.contains("commentText = new JTextArea()"));
+    Matcher calls = Pattern.compile("setCommentText\\(([^;]*)\\);").matcher(general);
+    int found = 0;
+    while (calls.find()) {
+      found++;
+      assertFalse(
+          calls.group(1).contains("<html"), "the comment is set to HTML: " + calls.group(1));
+    }
+    assertTrue(found > 0, "setCommentText not found");
   }
 
   private static void assertRefreshSetsOnlySizeStableLabels(String source, String refresh) {

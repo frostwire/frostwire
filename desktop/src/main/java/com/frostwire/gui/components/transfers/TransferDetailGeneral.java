@@ -82,7 +82,14 @@ public final class TransferDetailGeneral extends JPanel
   private volatile long recheckDoneNanos;
   private volatile String recheckResultText = "";
   private final JLabel createdOnLabel;
-  private final JLabel commentLabel;
+
+  /**
+   * The torrent's comment as plain text, wrapped at 600 px. It used to be an HTML label, which
+   * parsed an HTML document on the EDT for every transfer shown (frostwire/frostwire#1362) and
+   * rendered whatever markup the .torrent's author put in the comment.
+   */
+  private final JTextArea commentText;
+
   private ActionListener copyInfoHashActionListener;
   private ActionListener copyMagnetURLActionListener;
   private BTDownload btDownload;
@@ -227,7 +234,14 @@ public final class TransferDetailGeneral extends JPanel
     lowerPanel.add(new JGrayLabel(I18n.tr("Created On") + ":"), "split 2, gapright 10");
     lowerPanel.add(createdOnLabel = new SizeStableLabel(), "gapright 60, wrap");
     lowerPanel.add(new JGrayLabel(I18n.tr("Comment") + ":"), "split 2, gapright 10");
-    lowerPanel.add(commentLabel = new SizeStableLabel(), "gapright 60, wrap");
+    commentText = new JTextArea();
+    commentText.setEditable(false);
+    commentText.setLineWrap(true);
+    commentText.setWrapStyleWord(true);
+    commentText.setOpaque(false);
+    commentText.setBorder(BorderFactory.createEmptyBorder());
+    commentText.setFont(UIManager.getFont("Label.font"));
+    lowerPanel.add(commentText, "w 600!, gapright 60, wrap");
     copyInfoHashButton.setPressedIcon(copy_paste);
     copyInfoHashButton.setContentAreaFilled(false);
     copyMagnetURLButton.setContentAreaFilled(false);
@@ -393,10 +407,7 @@ public final class TransferDetailGeneral extends JPanel
           copyMagnetURLActionListener = e -> GUIMediator.setClipboardContent(magnetURI);
           copyMagnetURLButton.addActionListener(copyMagnetURLActionListener);
           createdOnLabel.setText(created);
-          commentLabel.setText(
-              "<html><body><p style='width: 600px;'>"
-                  + SafeText.sanitize(comment)
-                  + "</p></body></html>");
+          setCommentText(SafeText.sanitize(comment));
         });
   }
 
@@ -441,7 +452,16 @@ public final class TransferDetailGeneral extends JPanel
       copyMagnetURLActionListener = null;
     }
     createdOnLabel.setText("");
-    commentLabel.setText("");
+    setCommentText("");
+  }
+
+  /** Replaces the comment only when it changed: a text area rebuilds its document on setText. */
+  private void setCommentText(String comment) {
+    String text = comment == null ? "" : comment;
+    if (!text.equals(commentText.getText())) {
+      commentText.setText(text);
+      commentText.setCaretPosition(0);
+    }
   }
 
   private void onAdjustDownloadSpeedLimit() {
