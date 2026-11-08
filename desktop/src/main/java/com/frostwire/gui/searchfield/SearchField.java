@@ -26,8 +26,6 @@ import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.SearchSettings;
 import com.limegroup.gnutella.settings.UISettings;
 import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
 import java.awt.event.*;
 import java.util.Iterator;
 import java.util.Vector;
@@ -207,17 +205,14 @@ public class SearchField extends JXSearchField {
   // Protected methods
   // ----------------------------------------------------------------------------
 
-  /** Determines if paste is currently available. */
+  /**
+   * Whether the popup offers Paste. It never asks the system clipboard: this runs on the EDT while
+   * the popup opens, and on Windows the clipboard's lock can be held for seconds by a background
+   * read (the search field reads the clipboard when it gains focus, which the same right-click
+   * does). Pasting text that isn't there does nothing.
+   */
   private boolean isPasteAvailable() {
-    if (!SearchSettings.AUTO_SEARCH_CLIPBOARD_URL.getValue()) {
-      return false;
-    }
-    try {
-      Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-      return clipboard.isDataFlavorAvailable(DataFlavor.stringFlavor);
-    } catch (UnsupportedOperationException | IllegalStateException he) {
-      return false;
-    }
+    return SearchSettings.AUTO_SEARCH_CLIPBOARD_URL.getValue();
   }
 
   /** Creates the default dictionary object */
