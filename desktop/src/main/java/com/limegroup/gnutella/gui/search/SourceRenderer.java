@@ -37,7 +37,11 @@ public class SourceRenderer extends DefaultTableBevelledCellRenderer implements 
   private static final Map<String, ImageIcon> sourceIcons = new HashMap<>();
   private static volatile boolean iconsLoaded = false;
 
-  /** Lazy load source icons on first access to avoid EDT blocking during class loading */
+  /**
+   * Loads the source icons on first use. The startup thread preloads them into the theme-image
+   * cache (ResourceManager.SEARCH_SOURCE_THEME_IMAGES), so the first paint finds them there instead
+   * of reading them from the jar on the EDT (frostwire/frostwire#1509).
+   */
   private static synchronized void ensureIconsLoaded() {
     if (iconsLoaded) {
       return;

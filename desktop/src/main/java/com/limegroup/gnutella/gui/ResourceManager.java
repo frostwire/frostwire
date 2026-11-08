@@ -153,6 +153,21 @@ public final class ResourceManager {
           "firewall_no");
 
   /**
+   * The icons of the search results' Source column (SourceRenderer). The first search painted the
+   * column on the EDT, and each icon was read from the jar and decoded there (Icebase
+   * #4a875fff00fd, frostwire/frostwire#1509).
+   */
+  static final List<String> SEARCH_SOURCE_THEME_IMAGES =
+      List.of(
+          "soundcloud_off",
+          "archive_source",
+          "tpb_source",
+          "zooqle_source",
+          "magnetdl_source",
+          "seeding_small_source",
+          "1337_source");
+
+  /**
    * The buttons of the search results' button row (SearchButtons). The first search built them on
    * the EDT, and each icon was read from the jar and decoded there (Icebase #f071da08eef4,
    * frostwire/frostwire#1486).
@@ -184,14 +199,15 @@ public final class ResourceManager {
           "DOWNLOAD_CLEAR_INACTIVE");
 
   /**
-   * Loads {@link #ANIMATED_THEME_IMAGES}, {@link #STATUS_BAR_THEME_IMAGES} and the theme images
-   * behind {@link #SEARCH_BUTTON_ICONS}, {@link #LIBRARY_BUTTON_ICONS} and {@link
-   * #TRANSFER_BUTTON_ICONS} into the theme-image cache. Call it off the EDT, at startup before the
-   * main window is built, so the EDT finds them cached. Only this synchronized cache is filled; the
-   * button icon cache stays EDT-only.
+   * Loads {@link #ANIMATED_THEME_IMAGES}, {@link #STATUS_BAR_THEME_IMAGES}, {@link
+   * #SEARCH_SOURCE_THEME_IMAGES} and the theme images behind {@link #SEARCH_BUTTON_ICONS}, {@link
+   * #LIBRARY_BUTTON_ICONS} and {@link #TRANSFER_BUTTON_ICONS} into the theme-image cache. Call it
+   * off the EDT, at startup before the main window is built, so the EDT finds them cached. Only
+   * this synchronized cache is filled; the button icon cache stays EDT-only.
    */
   static void preloadStartupThemeImages() {
-    for (List<String> names : List.of(ANIMATED_THEME_IMAGES, STATUS_BAR_THEME_IMAGES)) {
+    for (List<String> names :
+        List.of(ANIMATED_THEME_IMAGES, STATUS_BAR_THEME_IMAGES, SEARCH_SOURCE_THEME_IMAGES)) {
       for (String name : names) {
         try {
           getThemeImage(name);

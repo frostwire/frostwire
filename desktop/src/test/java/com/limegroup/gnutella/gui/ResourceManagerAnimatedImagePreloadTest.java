@@ -267,6 +267,39 @@ class ResourceManagerAnimatedImagePreloadTest {
     assertTrue(icons.containsAll(ResourceManager.TRANSFER_BUTTON_ICONS), "transfers: " + icons);
   }
 
+  /**
+   * The first search painted the Source column on the EDT, and each source icon was read from the
+   * jar and decoded there (Icebase #4a875fff00fd, frostwire/frostwire#1509). The startup preload
+   * loads them.
+   */
+  @Test
+  void theSearchSourceIconsArePreloadedOffTheEdt() throws Exception {
+    ResourceManager.SEARCH_SOURCE_THEME_IMAGES.forEach(ResourceManager::forgetThemeImage);
+
+    Thread worker = new Thread(ResourceManager::preloadStartupThemeImages, "startup");
+    worker.start();
+    worker.join(30_000);
+
+    for (String name : ResourceManager.SEARCH_SOURCE_THEME_IMAGES) {
+      assertTrue(ResourceManager.isThemeImageCached(name), name + " was not preloaded");
+    }
+  }
+
+  /** The preload list names exactly the icons SourceRenderer loads. */
+  @Test
+  void theSearchSourcePreloadListMatchesSourceRenderer() throws IOException {
+    Matcher m =
+        THEME_IMAGE_LITERAL.matcher(
+            Files.readString(
+                Path.of("src/main/java/com/limegroup/gnutella/gui/search/SourceRenderer.java"),
+                StandardCharsets.UTF_8));
+    Set<String> icons = new TreeSet<>();
+    while (m.find()) {
+      icons.add(m.group(1));
+    }
+    assertEquals(new TreeSet<>(ResourceManager.SEARCH_SOURCE_THEME_IMAGES), icons);
+  }
+
   /** The preload list names exactly the icons SearchButtons builds. */
   @Test
   void theSearchButtonPreloadListMatchesSearchButtons() throws IOException {
