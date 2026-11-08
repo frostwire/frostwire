@@ -1,4 +1,5 @@
 FrostWire Android UNRELEASED
+  - fix:Archive.org searches on slow connections return their results instead of timing out after 5 seconds; they get 15 seconds, as on desktop (#1002)
   - fix:A transfer removed while FrostWire was saving its progress no longer comes back the next time FrostWire starts (#1496)
   - new:Karma counts the endorsements a peer receives, weighted by trust, instead of the ones it gives, so peers can no longer raise their own karma (#1416, #1417)
   - new:Distributed Search settings show your received karma and your participation (endorsements you have given) (#1417)
