@@ -39,6 +39,7 @@ import com.frostwire.search.one337x.One337xSearchPattern;
 import com.frostwire.search.relay.DistributedSearchPerformer;
 import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalSharedTorrentSearchPerformer;
+import com.frostwire.search.relay.RelaySearchWiring;
 import com.frostwire.search.soundcloud.SoundcloudSearchPattern;
 import com.frostwire.search.torrentscsv.TorrentsCSVSearchPattern;
 import com.frostwire.search.torrentz2.Torrentz2SearchPattern;

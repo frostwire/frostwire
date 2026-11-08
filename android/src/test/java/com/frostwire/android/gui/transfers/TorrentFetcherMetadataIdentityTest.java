@@ -14,11 +14,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import android.app.Application;
-import com.frostwire.android.gui.RelaySearchWiring;
 import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.search.relay.DistributedSearchTransport;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.IdentityRecord;
+import com.frostwire.search.relay.RelaySearchWiring;
 import com.frostwire.search.relay.SearchPayloadCodec;
 import com.frostwire.search.relay.TorrentMetadataRequest;
 import com.frostwire.search.relay.icebridge.MeshProtocolId;

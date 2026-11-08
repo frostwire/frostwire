@@ -12,7 +12,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import android.app.Application;
-import com.frostwire.android.gui.RelaySearchWiring;
 import com.frostwire.search.relay.BitcoinBlockReference;
 import com.frostwire.search.relay.BlockHeaderSource;
 import com.frostwire.search.relay.IdentityKeys;
@@ -21,6 +20,7 @@ import com.frostwire.search.relay.KarmaChainEntry;
 import com.frostwire.search.relay.KarmaChainStore;
 import com.frostwire.search.relay.KarmaChainWriter;
 import com.frostwire.search.relay.KarmaConstants;
+import com.frostwire.search.relay.RelaySearchWiring;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.util.Arrays;

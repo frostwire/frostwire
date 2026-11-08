@@ -16,6 +16,7 @@ import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalSharedTorrent;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerKarmaCache;
+import com.frostwire.search.relay.RelaySearchWiring;
 import com.frostwire.search.relay.RemoteKarmaChainFetcher;
 import java.util.Collections;
 import java.util.List;

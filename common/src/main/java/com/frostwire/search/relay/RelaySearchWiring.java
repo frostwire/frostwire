@@ -16,15 +16,9 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.android.gui;
+package com.frostwire.search.relay;
 
-import com.frostwire.search.relay.DisplayKarma;
-import com.frostwire.search.relay.DistributedSearchTransport;
-import com.frostwire.search.relay.IdentityKeys;
-import com.frostwire.search.relay.KarmaChainWriter;
-import com.frostwire.search.relay.LocalIndex;
-import com.frostwire.search.relay.PeerDirectory;
-import com.frostwire.search.relay.PeerKarmaCache;
+import com.frostwire.search.relay.icebridge.IceBridgeMetrics;
 
 /**
  * Holds the relay-stack wiring dependencies (localIndex, karmaCache, peerDirectory, identity,
@@ -42,6 +36,8 @@ public final class RelaySearchWiring {
   private volatile IdentityKeys identity;
   private volatile DistributedSearchTransport searchTransport;
   private volatile KarmaChainWriter karmaChainWriter;
+  private volatile ShareVisibilityPolicy visibility;
+  private volatile IceBridgeMetrics transportMetrics;
 
   public LocalIndex localIndex() {
     return localIndex;
@@ -113,6 +109,26 @@ public final class RelaySearchWiring {
 
   public RelaySearchWiring karmaChainWriter(KarmaChainWriter writer) {
     this.karmaChainWriter = writer;
+    return this;
+  }
+
+  /** Which shared transfers a local search may return; null returns every shared transfer. */
+  public ShareVisibilityPolicy visibility() {
+    return visibility;
+  }
+
+  public RelaySearchWiring visibility(ShareVisibilityPolicy visibility) {
+    this.visibility = visibility;
+    return this;
+  }
+
+  /** The IceBridge transport's metrics, for the relay status tools; null while not running. */
+  public IceBridgeMetrics transportMetrics() {
+    return transportMetrics;
+  }
+
+  public RelaySearchWiring transportMetrics(IceBridgeMetrics metrics) {
+    this.transportMetrics = metrics;
     return this;
   }
 }
