@@ -35,6 +35,7 @@ import com.frostwire.util.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * Every search engine both clients offer, defined once (frostwire/frostwire#1002). A client builds
@@ -207,12 +208,15 @@ public final class SearchEngines {
 
   /** The engines this client offers, in listing order (Telluride is not listed: it opens URLs). */
   public List<SearchEngine> all() {
-    return engines.stream().filter(SearchEngine::isOffered).toList();
+    // Collectors, not Stream.toList(): that needs API 34 on Android (minSdk 26).
+    return engines.stream().filter(SearchEngine::isOffered).collect(Collectors.toList());
   }
 
   /** The engines a search runs: offered, switched on by the user and ready. */
   public List<SearchEngine> enabled() {
-    return engines.stream().filter(e -> e.isEnabled() && e.isReady()).toList();
+    return engines.stream()
+        .filter(e -> e.isEnabled() && e.isReady())
+        .collect(Collectors.toList());
   }
 
   /** The engine with this id, Telluride included; null if none. */
