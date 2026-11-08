@@ -40,6 +40,7 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.stream.Collectors;
@@ -1073,16 +1074,65 @@ class JdkWarmUpTest {
   }
 
   @Test
-  void warmUpLoadsAppClassesOnlyAfterTheSplashSteps() throws Exception {
+  void warmUpWaitsForTheSplashAfterItsSplashSteps() throws Exception {
     String source = warmUpSource();
     int painters = source.indexOf("createPainters(");
     int glyphs = source.indexOf("rasterizeGlyphs(");
     int await = source.indexOf("awaitSplashShown(SPLASH_SHOWN");
-    int appClasses = source.indexOf("APP_PACKAGES_TO_LOAD");
 
     assertTrue(painters >= 0 && glyphs >= 0, "splash steps not found");
     assertTrue(await > painters && await > glyphs, "splash steps wait for the splash");
-    assertTrue(appClasses > await, "app classes load before the splash shows");
+  }
+
+  /**
+   * The app class preload ran on the warm-up thread after every JDK step; on a slow Mac those steps
+   * were still running when the EDT built the main window, and the EDT read the Search tab's
+   * classes from the jar itself (Icebase #fd2a47a7c8e4, frostwire/frostwire#1489). It now runs on
+   * its own thread, as soon as the splash is showing.
+   */
+  @Test
+  void appClassesLoadOnTheirOwnThreadAsSoonAsTheSplashShows() throws Exception {
+    CountDownLatch splashShown = new CountDownLatch(1);
+    CountDownLatch loaded = new CountDownLatch(1);
+    AtomicReference<String> loadingThread = new AtomicReference<>();
+
+    Thread preload =
+        JdkWarmUp.startAppClassPreload(
+            splashShown,
+            TimeUnit.MINUTES.toMillis(1),
+            () -> {
+              loadingThread.set(Thread.currentThread().getName());
+              loaded.countDown();
+            });
+
+    assertTrue(preload.isDaemon());
+    assertFalse(loaded.await(300, TimeUnit.MILLISECONDS), "loaded before the splash showed");
+    splashShown.countDown();
+    assertTrue(loaded.await(5, TimeUnit.SECONDS), "not loaded after the splash showed");
+    assertEquals("JdkWarmUp-AppClasses", loadingThread.get());
+
+    String source = warmUpSource();
+    assertFalse(
+        source.contains("APP_PACKAGES_TO_LOAD"), "warmUp() still loads the app classes itself");
+    String all =
+        Files.readString(
+                Path.of(System.getProperty("user.dir"))
+                    .resolve("src/main/java/com/frostwire/util/JdkWarmUp.java"))
+            .replaceAll("\\s+", "");
+    String start = all.substring(all.indexOf("publicstaticvoidstartInBackground(){"));
+    start = start.substring(0, start.indexOf("}") + 1);
+    assertTrue(
+        start.contains("startAppClassPreload(SPLASH_SHOWN,SPLASH_WAIT_MS,"),
+        "startInBackground doesn't start the app class preload");
+  }
+
+  @Test
+  void theSearchTabsClassesPreloadBeforeTheDeferredTransfersTabs() {
+    List<String> packages = JdkWarmUp.APP_PACKAGES_TO_LOAD;
+    assertTrue(
+        packages.indexOf("com.limegroup.gnutella.gui.search")
+            < packages.indexOf("com.frostwire.gui.bittorrent"),
+        "MainFrame builds Search first and defers Transfers");
   }
 
   @Test

@@ -293,13 +293,14 @@ public final class JdkWarmUp {
           "com.limegroup.gnutella.gui.actions",
           // Table mediators, LimeJTable, renderers and editors shared by every table pane.
           "com.limegroup.gnutella.gui.tables",
+          // Search tab: SearchResultMediator, SearchOptionsPanel, SearchEngine and the anonymous
+          // class of each engine. Before Transfers: MainFrame builds Search first and defers
+          // Transfers (Icebase #fd2a47a7c8e4).
+          "com.limegroup.gnutella.gui.search",
           // Transfers tab, built just after the main window (BTDownloadMediator,
           // TransferActionsRenderer), and its detail panes.
           "com.frostwire.gui.bittorrent",
           "com.frostwire.gui.components.transfers",
-          // Search tab: SearchResultMediator, SearchOptionsPanel, SearchEngine and the anonymous
-          // class of each engine.
-          "com.limegroup.gnutella.gui.search",
           // Library tab: LibraryMediator, its tree and its table mediators.
           "com.frostwire.gui.library",
           // Only classes directly in a listed package load, not its subpackages. The Library's
@@ -384,6 +385,50 @@ public final class JdkWarmUp {
     Thread warmUp = new Thread(JdkWarmUp::warmUp, "JdkWarmUp");
     warmUp.setDaemon(true);
     warmUp.start();
+    startAppClassPreload(SPLASH_SHOWN, SPLASH_WAIT_MS, JdkWarmUp::loadAppClasses);
+  }
+
+  /**
+   * Starts loading {@link #APP_PACKAGES_TO_LOAD} on its own thread as soon as the splash is
+   * showing. It used to run on the warm-up thread after every JDK step; on a slow machine those
+   * steps were still running when the EDT built the main window, so the EDT read the Search tab's
+   * classes from the jar itself (Icebase #fd2a47a7c8e4, frostwire/frostwire#1489). It still waits
+   * for the splash, so on 2-CPU machines it doesn't compete with the EDT building it.
+   */
+  static Thread startAppClassPreload(
+      CountDownLatch splashShown, long waitMs, Runnable loadAppClasses) {
+    Thread preload =
+        new Thread(
+            () -> {
+              try {
+                awaitSplashShown(splashShown, waitMs);
+              } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+              }
+              try {
+                loadAppClasses.run();
+              } catch (Throwable t) {
+                LOG.warn("App class warm-up failed: " + t.getMessage(), t);
+              }
+            },
+            "JdkWarmUp-AppClasses");
+    preload.setDaemon(true);
+    preload.start();
+    return preload;
+  }
+
+  private static void loadAppClasses() {
+    Path location = codeSourceOf(JdkWarmUp.class);
+    if (location == null) {
+      return;
+    }
+    try {
+      loadWithoutInitializing(
+          classNamesIn(location, APP_PACKAGES_TO_LOAD), JdkWarmUp.class.getClassLoader());
+    } catch (IOException e) {
+      LOG.warn("App class warm-up failed: " + e.getMessage(), e);
+    }
   }
 
   private static void warmUp() {
@@ -487,16 +532,12 @@ public final class JdkWarmUp {
       LOG.warn("Splash class warm-up failed: " + t.getMessage(), t);
     }
     try {
+      // The steps below are for the main window: like the app classes (loaded on their own thread,
+      // see startAppClassPreload), they wait until the splash is showing.
       awaitSplashShown(SPLASH_SHOWN, SPLASH_WAIT_MS);
-      if (location != null) {
-        loadWithoutInitializing(
-            classNamesIn(location, APP_PACKAGES_TO_LOAD), JdkWarmUp.class.getClassLoader());
-      }
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       return;
-    } catch (Throwable t) {
-      LOG.warn("App class warm-up failed: " + t.getMessage(), t);
     }
     try {
       Map<?, ?> desktopHints = desktopFontHints();
@@ -642,7 +683,7 @@ public final class JdkWarmUp {
   static void awaitSplashShown(CountDownLatch splashShown, long timeoutMs)
       throws InterruptedException {
     if (!splashShown.await(timeoutMs, TimeUnit.MILLISECONDS)) {
-      LOG.info("Splash not shown after " + timeoutMs + " ms, loading app classes anyway");
+      LOG.info("Splash not shown after " + timeoutMs + " ms, warming up anyway");
     }
   }
 
