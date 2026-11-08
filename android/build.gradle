@@ -292,6 +292,9 @@ android {
                 }
                 jvmArgs '-Djava.awt.headless=true'
                 jvmArgs '--add-opens=java.base/java.lang=ALL-UNNAMED'
+                // JaCoCo's agent appends to the bootstrap classpath, which turns class data sharing
+                // off for all but boot classes and prints a VM warning in every test JVM.
+                jvmArgs '-Xshare:off'
                 filter {
                     excludeTestsMatching "com.frostwire.android.gui.dialogs.*"
                     excludeTestsMatching "com.frostwire.android.gui.views.*"

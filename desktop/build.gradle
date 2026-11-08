@@ -774,6 +774,9 @@ def configureFuzzTask = { Test t ->
     // warns about; 0.30.0 is the latest Jazzer. Allowed for the fuzz tasks only, so the app and the
     // normal tests still warn if our own code ever uses it.
     t.jvmArgs '--sun-misc-unsafe-memory-access=allow'
+    // Jazzer's agent appends to the bootstrap classpath, which turns class data sharing off for all
+    // but boot classes and prints a VM warning.
+    t.jvmArgs '-Xshare:off'
     // Keep the stack of exceptions the JIT throws often (NPE, ClassCast...), as the app does:
     // without it a hot finding is reported with no frames, and harnesses that classify an
     // exception by where it was thrown (SevereLogTrap) misclassify it.
