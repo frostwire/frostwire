@@ -611,6 +611,45 @@ class StrictEdtModeTest {
     assertFalse(StrictEdtMode.isRenderQueueLockWait(null));
   }
 
+  /**
+   * The tray icon's menu is a native Windows menu: the EDT waits in WPopupMenuPeer._show for as
+   * long as the user keeps it open (Icebase #ac8b13da6506, frostwire/frostwire#1499).
+   */
+  @Test
+  void anOpenNativeTrayMenuIsTaggedNativeMenu() {
+    StackTraceElement[] stack = {
+      frame("sun.awt.windows.WPopupMenuPeer", "_show"),
+      frame("sun.awt.windows.WPopupMenuPeer", "show"),
+      frame("sun.awt.windows.WTrayIconPeer", "lambda$showPopupMenu$0"),
+      frame("java.awt.event.InvocationEvent", "dispatch"),
+      frame("java.awt.EventQueue", "dispatchEventImpl"),
+      frame("java.awt.EventQueue", "dispatchEvent"),
+      frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
+    };
+
+    assertTrue(StrictEdtMode.isNativeMenuShow(stack));
+    assertEquals(StrictEdtMode.NATIVE_MENU_TAG, StrictEdtMode.reportTag("", stack, true));
+  }
+
+  @Test
+  void appWorkWhileANativeMenuIsShownIsNotTaggedNativeMenu() {
+    StackTraceElement[] appAboveMenu = {
+      frame("java.io.FileInputStream", "readBytes"),
+      frame("com.frostwire.gui.tray.SomeMenuListener", "itemStateChanged"),
+      frame("sun.awt.windows.WPopupMenuPeer", "_show"),
+      frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
+    };
+    StackTraceElement[] noMenu = {
+      frame("sun.awt.windows.WToolkit", "sync"),
+      frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
+    };
+
+    assertFalse(StrictEdtMode.isNativeMenuShow(appAboveMenu));
+    assertEquals("", StrictEdtMode.reportTag("", appAboveMenu, true));
+    assertFalse(StrictEdtMode.isNativeMenuShow(noMenu));
+    assertFalse(StrictEdtMode.isNativeMenuShow(null));
+  }
+
   @Test
   void cancelledStallTimersLeaveTheWatchdogQueueImmediately() {
     ScheduledThreadPoolExecutor scheduler = StrictEdtMode.newWatchdogScheduler();

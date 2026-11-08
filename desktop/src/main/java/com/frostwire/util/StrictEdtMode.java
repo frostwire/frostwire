@@ -375,6 +375,9 @@ public final class StrictEdtMode {
     if (isRenderQueueLockWait(stack)) {
       return RENDER_QUEUE_TAG;
     }
+    if (isNativeMenuShow(stack)) {
+      return NATIVE_MENU_TAG;
+    }
     if (isJdkShellFolderStall(stack)) {
       return SHELL_FOLDER_TAG;
     }
@@ -419,6 +422,41 @@ public final class StrictEdtMode {
   static final String STACK_MISSED_TAG = "stack-missed:";
   static final String EARLY_SAMPLE_TAG = "early-sample:";
   static final String RENDER_QUEUE_TAG = "render-queue:";
+  static final String NATIVE_MENU_TAG = "native-menu:";
+
+  /**
+   * True when the EDT is waiting for a native Windows popup menu to close: {@code
+   * WPopupMenuPeer._show} has the toolkit thread run the menu's modal loop ({@code TrackPopupMenu})
+   * and returns only when the user dismisses the menu, so the stall lasts as long as the menu stays
+   * open (the tray icon's menu, frostwire/frostwire#1499). Only the frames above the native call
+   * count: an app frame there is app work while the menu is shown and is not tagged.
+   *
+   * <p>Thread-safe: stateless stack inspection.
+   */
+  static boolean isNativeMenuShow(StackTraceElement[] stack) {
+    if (stack == null) {
+      return false;
+    }
+    for (StackTraceElement frame : stack) {
+      if (frame == null || frame.getClassName() == null) {
+        continue;
+      }
+      String className = frame.getClassName();
+      if (className.startsWith(WATCHDOG_PREFIX)) {
+        return false;
+      }
+      for (String appPrefix : APP_FRAME_PREFIXES) {
+        if (className.startsWith(appPrefix)) {
+          return false;
+        }
+      }
+      if ("sun.awt.windows.WPopupMenuPeer".equals(className)
+          && "_show".equals(frame.getMethodName())) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   /**
    * True when the EDT is blocked acquiring {@code SunToolkit.awtLock} inside Java2D's {@code
