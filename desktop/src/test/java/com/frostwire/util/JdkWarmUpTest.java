@@ -1127,6 +1127,19 @@ class JdkWarmUpTest {
         "startInBackground doesn't start the app class preload");
   }
 
+  /**
+   * MainFrame's constructor creates its DropTarget with the dnd package's classes almost first; as
+   * the last package in the list, the preload hadn't reached it when the EDT built the window on a
+   * slow Mac (Icebase #628f10bffe90, frostwire/frostwire#1489).
+   */
+  @Test
+  void theDragAndDropClassesPreloadRightAfterTheMainWindowsOwnPackage() {
+    List<String> packages = JdkWarmUp.APP_PACKAGES_TO_LOAD;
+    assertEquals(
+        packages.indexOf("com.limegroup.gnutella.gui") + 1,
+        packages.indexOf("com.limegroup.gnutella.gui.dnd"));
+  }
+
   @Test
   void theSearchTabsClassesPreloadBeforeTheDeferredTransfersTabs() {
     List<String> packages = JdkWarmUp.APP_PACKAGES_TO_LOAD;

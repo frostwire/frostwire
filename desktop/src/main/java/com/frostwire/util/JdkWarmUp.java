@@ -280,6 +280,10 @@ public final class JdkWarmUp {
           // MainFrame itself and what its constructor builds from this package: ApplicationHeader,
           // StatusLine and their listeners.
           "com.limegroup.gnutella.gui",
+          // Drag and drop: MainFrame's constructor creates its DropTarget with these almost first
+          // (Icebase #628f10bffe90), and the first drag out of a table builds LimeTransferHandler,
+          // the drag gesture listener and FileTransferable (Icebase #3315b9f6e6e7).
+          "com.limegroup.gnutella.gui.dnd",
           // The tab objects MainFrame.buildTabs creates first (SearchTab, LibraryTab).
           "com.frostwire.gui.tabs",
           // ApplicationHeader's search box and its update button.
@@ -319,10 +323,7 @@ public final class JdkWarmUp {
           "com.limegroup.gnutella.gui.options.panes",
           // Their subpackages: the options tree's model and the IP filter pane.
           "com.limegroup.gnutella.gui.trees",
-          "com.limegroup.gnutella.gui.options.panes.ipfilter",
-          // Drag and drop, built on the first drag out of a table: LimeTransferHandler, the drag
-          // gesture listener and FileTransferable (Icebase #3315b9f6e6e7).
-          "com.limegroup.gnutella.gui.dnd");
+          "com.limegroup.gnutella.gui.options.panes.ipfilter");
 
   /** Synth-based looks (Nimbus) map every delegate key to this class, which creates "Synth"+key. */
   private static final String SYNTH_LOOK_AND_FEEL = "javax.swing.plaf.synth.SynthLookAndFeel";
