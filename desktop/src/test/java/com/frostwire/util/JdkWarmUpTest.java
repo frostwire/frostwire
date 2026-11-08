@@ -263,6 +263,19 @@ class JdkWarmUpTest {
     assertNestedClassIsWarmedUp("javax.swing.text.WrappedPlainView", "WrappedLine");
   }
 
+  /**
+   * The Library's tree is the main window's first JTree, and its UI and default cell renderer were
+   * initialized on the EDT (Icebase #8e40e9608fb0, frostwire/frostwire#1506).
+   */
+  @Test
+  void theTreeClassesAreInitializedByTheWarmUp() throws Exception {
+    assertTrue(
+        JdkWarmUp.CLASSES_TO_INITIALIZE.containsAll(
+            List.of(
+                "javax.swing.plaf.basic.BasicTreeUI", "javax.swing.tree.DefaultTreeCellRenderer")));
+    assertNestedClassIsWarmedUp("javax.swing.plaf.synth.SynthTreeUI", "SynthTreeCellRenderer");
+  }
+
   private static void assertNestedClassIsWarmedUp(String outer, String nested) throws Exception {
     assertTrue(JdkWarmUp.CLASSES_TO_INITIALIZE.contains(outer), outer + " is not warmed up");
     assertTrue(

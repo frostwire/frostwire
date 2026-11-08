@@ -180,7 +180,14 @@ public final class JdkWarmUp {
           // build a WrappedPlainView, both initialized on the EDT as the wizard opened (Icebase
           // #394182e705b5, frostwire/frostwire#1505).
           "javax.swing.plaf.basic.BasicTextAreaUI",
-          "javax.swing.text.WrappedPlainView");
+          "javax.swing.text.WrappedPlainView",
+          // The Library's LibraryIconTree is the main window's first JTree: its UI and default cell
+          // renderer (SynthTreeUI's nested SynthTreeCellRenderer, a DefaultTreeCellRenderer) were
+          // initialized on the EDT (Icebase #8e40e9608fb0, #e20e6e4fca6d,
+          // frostwire/frostwire#1506).
+          "javax.swing.plaf.basic.BasicTreeUI",
+          "javax.swing.plaf.synth.SynthTreeUI",
+          "javax.swing.tree.DefaultTreeCellRenderer");
 
   /**
    * Windows-only JDK classes initialized like {@link #CLASSES_TO_INITIALIZE}. The first right-click
