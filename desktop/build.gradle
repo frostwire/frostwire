@@ -770,6 +770,10 @@ def configureFuzzTask = { Test t ->
     t.systemProperty 'java.util.logging.config.file', new File(fuzzBaseDir, 'logging.properties').absolutePath
     // Jazzer self-attaches its agent and loads libFuzzer through JNI.
     t.jvmArgs '-XX:+EnableDynamicAgentLoading', '--enable-native-access=ALL-UNNAMED'
+    // Jazzer's sanitizers use sun.misc.Unsafe (ReflectionUtils.objectFieldOffset), which the JDK
+    // warns about; 0.30.0 is the latest Jazzer. Allowed for the fuzz tasks only, so the app and the
+    // normal tests still warn if our own code ever uses it.
+    t.jvmArgs '--sun-misc-unsafe-memory-access=allow'
     // Keep the stack of exceptions the JIT throws often (NPE, ClassCast...), as the app does:
     // without it a hot finding is reported with no frames, and harnesses that classify an
     // exception by where it was thrown (SevereLogTrap) misclassify it.
