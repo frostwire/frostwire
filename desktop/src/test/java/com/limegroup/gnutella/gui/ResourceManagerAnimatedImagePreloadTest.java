@@ -217,6 +217,56 @@ class ResourceManagerAnimatedImagePreloadTest {
     }
   }
 
+  /**
+   * The Library's and Transfers' button rows are built at startup with their tabs, and each icon
+   * was read from the jar and decoded on the EDT (Icebase #cfa1bcdf5328, frostwire/frostwire#1503).
+   * The startup preload loads the theme image each of their buttons resolves to, in both sizes.
+   */
+  @Test
+  void theLibraryAndTransferButtonIconsArePreloadedOffTheEdt() throws Exception {
+    List<List<String>> candidates = new ArrayList<>();
+    for (List<String> buttons :
+        List.of(ResourceManager.LIBRARY_BUTTON_ICONS, ResourceManager.TRANSFER_BUTTON_ICONS)) {
+      for (boolean small : new boolean[] {true, false}) {
+        List<List<String>> sized = ButtonIconController.themeImageCandidates(buttons, small);
+        assertEquals(
+            buttons.size(), sized.size(), "a button in " + buttons + " has no icon mapping");
+        candidates.addAll(sized);
+      }
+    }
+    candidates.forEach(names -> names.forEach(ResourceManager::forgetThemeImage));
+
+    Thread worker = new Thread(ResourceManager::preloadStartupThemeImages, "startup");
+    worker.start();
+    worker.join(30_000);
+
+    for (List<String> names : candidates) {
+      assertTrue(
+          names.stream().anyMatch(ResourceManager::isThemeImageCached),
+          "none of " + names + " was preloaded");
+    }
+  }
+
+  /** Every icon the preload lists is one the Library or Transfers actions name. */
+  @Test
+  void theLibraryAndTransferPreloadListsNameTheirActionsIcons() throws IOException {
+    Set<String> icons = new TreeSet<>();
+    for (String file :
+        List.of(
+            "src/main/java/com/frostwire/gui/library/LibraryFilesTableMediator.java",
+            "src/main/java/com/frostwire/gui/library/AbstractLibraryTableMediator.java",
+            "src/main/java/com/frostwire/gui/bittorrent/BTDownloadActions.java")) {
+      Matcher literal =
+          Pattern.compile("ICON_NAME,\\s*\"([A-Z0-9_]+)\"")
+              .matcher(Files.readString(Path.of(file), StandardCharsets.UTF_8));
+      while (literal.find()) {
+        icons.add(literal.group(1));
+      }
+    }
+    assertTrue(icons.containsAll(ResourceManager.LIBRARY_BUTTON_ICONS), "library: " + icons);
+    assertTrue(icons.containsAll(ResourceManager.TRANSFER_BUTTON_ICONS), "transfers: " + icons);
+  }
+
   /** The preload list names exactly the icons SearchButtons builds. */
   @Test
   void theSearchButtonPreloadListMatchesSearchButtons() throws IOException {

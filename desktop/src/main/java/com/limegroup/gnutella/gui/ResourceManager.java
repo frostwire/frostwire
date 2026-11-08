@@ -161,10 +161,34 @@ public final class ResourceManager {
       List.of("SEARCH_DOWNLOAD", "TORRENT_DETAILS", "SEARCH_STOP");
 
   /**
+   * The buttons of the Library's file table (LibraryFilesTableMediator: Launch, Open in Folder,
+   * Send to Friend, Delete), built at startup with the Library tab; their icons were read from the
+   * jar and decoded on the EDT (Icebase #cfa1bcdf5328, frostwire/frostwire#1503).
+   */
+  static final List<String> LIBRARY_BUTTON_ICONS =
+      List.of("LIBRARY_LAUNCH", "LIBRARY_EXPLORE", "LIBRARY_SEND", "LIBRARY_DELETE");
+
+  /**
+   * The buttons of the Transfers table (BTDownloadMediator.getActions: Resume, Pause, Retry, Show
+   * in Library, Explore, Remove, Clear Inactive), built at startup with the Transfers tab
+   * (frostwire/frostwire#1503).
+   */
+  static final List<String> TRANSFER_BUTTON_ICONS =
+      List.of(
+          "DOWNLOAD_FILE_MORE_SOURCES",
+          "DOWNLOAD_PAUSE",
+          "MAGNET",
+          "DOWNLOAD_SHOW_IN_LIBRARY",
+          "LIBRARY_EXPLORE",
+          "DOWNLOAD_KILL",
+          "DOWNLOAD_CLEAR_INACTIVE");
+
+  /**
    * Loads {@link #ANIMATED_THEME_IMAGES}, {@link #STATUS_BAR_THEME_IMAGES} and the theme images
-   * behind {@link #SEARCH_BUTTON_ICONS} into the theme-image cache. Call it off the EDT, at startup
-   * before the main window is built, so the EDT finds them cached. Only this synchronized cache is
-   * filled; the button icon cache stays EDT-only.
+   * behind {@link #SEARCH_BUTTON_ICONS}, {@link #LIBRARY_BUTTON_ICONS} and {@link
+   * #TRANSFER_BUTTON_ICONS} into the theme-image cache. Call it off the EDT, at startup before the
+   * main window is built, so the EDT finds them cached. Only this synchronized cache is filled; the
+   * button icon cache stays EDT-only.
    */
   static void preloadStartupThemeImages() {
     for (List<String> names : List.of(ANIMATED_THEME_IMAGES, STATUS_BAR_THEME_IMAGES)) {
@@ -176,7 +200,10 @@ public final class ResourceManager {
         }
       }
     }
-    preloadButtonThemeImages(SEARCH_BUTTON_ICONS);
+    for (List<String> buttons :
+        List.of(SEARCH_BUTTON_ICONS, LIBRARY_BUTTON_ICONS, TRANSFER_BUTTON_ICONS)) {
+      preloadButtonThemeImages(buttons);
+    }
   }
 
   /**
