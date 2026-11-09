@@ -10,12 +10,15 @@ package com.limegroup.gnutella.gui;
 import com.frostwire.jlibtorrent.LibTorrent;
 import com.frostwire.search.telluride.TellurideBuild;
 import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.JdkWarmUp;
 import com.frostwire.util.Logger;
+import com.frostwire.util.WarmUpProgress;
 import com.frostwire.util.http.HttpClient;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import java.io.File;
+import java.lang.management.ManagementFactory;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
@@ -245,6 +248,16 @@ public final class CrashReportSpooler {
       int violationCount,
       StackTraceElement[] capturedStack,
       GcWindow gcWindow) {
+    recordStrictMode(violationClass, violationCount, capturedStack, gcWindow, null);
+  }
+
+  /** Also adds where the CPU went during that window, when it was measured. */
+  public static void recordStrictMode(
+      String violationClass,
+      int violationCount,
+      StackTraceElement[] capturedStack,
+      GcWindow gcWindow,
+      StallCpu.Window cpuWindow) {
     try {
       if (!tryAcquire("strictmode:" + sanitizeViolationClass(violationClass))) {
         LOG.debug("Throttled anonymous strictmode report");
@@ -254,7 +267,9 @@ public final class CrashReportSpooler {
       if (spooler != null) {
         queue(
             spooler,
-            s -> s.spoolStrictMode(violationClass, violationCount, capturedStack, gcWindow),
+            s ->
+                s.spoolStrictMode(
+                    violationClass, violationCount, capturedStack, gcWindow, cpuWindow),
             "strictmode");
       }
     } catch (Throwable ignored) {
@@ -313,7 +328,17 @@ public final class CrashReportSpooler {
       int violationCount,
       StackTraceElement[] capturedStack,
       GcWindow gcWindow) {
-    spoolPayload(strictModeReportFor(violationClass, violationCount, capturedStack, gcWindow));
+    spoolStrictMode(violationClass, violationCount, capturedStack, gcWindow, null);
+  }
+
+  void spoolStrictMode(
+      String violationClass,
+      int violationCount,
+      StackTraceElement[] capturedStack,
+      GcWindow gcWindow,
+      StallCpu.Window cpuWindow) {
+    spoolPayload(
+        strictModeReportFor(violationClass, violationCount, capturedStack, gcWindow, cpuWindow));
   }
 
   /**
@@ -396,7 +421,8 @@ public final class CrashReportSpooler {
       String violationClass,
       int violationCount,
       StackTraceElement[] capturedStack,
-      GcWindow gcWindow) {
+      GcWindow gcWindow,
+      StallCpu.Window cpuWindow) {
     return new StrictModeReport(
         appVersion,
         appBuild,
@@ -417,6 +443,7 @@ public final class CrashReportSpooler {
         clamp(violationCount, 1, 1000),
         capturedStack == null ? null : framesFor(capturedStack),
         gcWindow,
+        cpuWindow,
         UUID.randomUUID().toString().replace("-", ""));
   }
 
@@ -451,6 +478,15 @@ public final class CrashReportSpooler {
       ascii.append(c >= 0x20 && c <= 0x7E ? c : '?');
     }
     return ascii.length() == 0 ? "unknown" : ascii.toString();
+  }
+
+  /** Seconds since the JVM started, or null when the runtime can't say. */
+  private static Long uptimeSeconds() {
+    try {
+      return ManagementFactory.getRuntimeMXBean().getUptime() / 1000;
+    } catch (RuntimeException | LinkageError e) {
+      return null;
+    }
   }
 
   private static int clamp(int value, int min, int max) {
@@ -645,6 +681,14 @@ public final class CrashReportSpooler {
     private final Integer thread_peak;
     private final Integer thread_stack_mb;
     private final List<ThreadCensus.Group> thread_groups;
+
+    /** How long the app had been running; null when it can't be read. */
+    private final Long uptime_s;
+
+    /** The startup warm-up's state; both null when it never started. */
+    private final Boolean warmup_done;
+
+    private final Long warmup_ms;
     private final String exception_class;
 
     /** Null, and then left out of the JSON, for anything but an OutOfMemoryError. */
@@ -695,6 +739,10 @@ public final class CrashReportSpooler {
       this.thread_peak = threads == null ? null : threads.peak;
       this.thread_stack_mb = threads == null ? null : threads.stackMb;
       this.thread_groups = threads == null ? null : threads.groups;
+      this.uptime_s = uptimeSeconds();
+      WarmUpProgress.Snapshot warmUp = JdkWarmUp.progress();
+      this.warmup_done = warmUp == null ? null : warmUp.done();
+      this.warmup_ms = warmUp == null ? null : warmUp.elapsedMs();
       this.exception_class = exceptionClass;
       this.oom_kind = oomKind;
       this.missing_class = missingClass;
@@ -742,6 +790,14 @@ public final class CrashReportSpooler {
     private final Integer thread_peak;
     private final Integer thread_stack_mb;
     private final List<ThreadCensus.Group> thread_groups;
+
+    /** How long the app had been running; null when it can't be read. */
+    private final Long uptime_s;
+
+    /** The startup warm-up's state; both null when it never started. */
+    private final Boolean warmup_done;
+
+    private final Long warmup_ms;
     private final String violation_class;
     private final int violation_count;
     private final Frame[] stack_frames;
@@ -751,6 +807,14 @@ public final class CrashReportSpooler {
 
     private final Integer gc_time_ms;
     private final Integer gc_window_ms;
+
+    /** CPU use over the GC window; each is null, and left out, when it wasn't measured. */
+    private final Integer edt_cpu_ms;
+
+    private final Integer process_cpu_ms;
+    private final Integer system_cpu_pct;
+    private final Integer phys_free_mb;
+    private final List<StallCpu.ThreadCpu> cpu_threads;
 
     private final String report_nonce;
 
@@ -774,6 +838,7 @@ public final class CrashReportSpooler {
         int violationCount,
         Frame[] stackFrames,
         GcWindow gcWindow,
+        StallCpu.Window cpuWindow,
         String nonce) {
       this.app_version = appVersion;
       this.app_build = Integer.toString(appBuild);
@@ -793,12 +858,24 @@ public final class CrashReportSpooler {
       this.thread_peak = threads == null ? null : threads.peak;
       this.thread_stack_mb = threads == null ? null : threads.stackMb;
       this.thread_groups = threads == null ? null : threads.groups;
+      this.uptime_s = uptimeSeconds();
+      WarmUpProgress.Snapshot warmUp = JdkWarmUp.progress();
+      this.warmup_done = warmUp == null ? null : warmUp.done();
+      this.warmup_ms = warmUp == null ? null : warmUp.elapsedMs();
       this.violation_class = violationClass;
       this.violation_count = violationCount;
       this.stack_frames = stackFrames;
       this.gc_count = gcWindow == null ? null : gcWindow.count();
       this.gc_time_ms = gcWindow == null ? null : gcWindow.timeMs();
       this.gc_window_ms = gcWindow == null ? null : gcWindow.windowMs();
+      this.edt_cpu_ms = cpuWindow == null ? null : cpuWindow.edtCpuMs();
+      this.process_cpu_ms = cpuWindow == null ? null : cpuWindow.processCpuMs();
+      this.system_cpu_pct = cpuWindow == null ? null : cpuWindow.systemCpuPct();
+      this.phys_free_mb = cpuWindow == null ? null : cpuWindow.physFreeMb();
+      this.cpu_threads =
+          cpuWindow == null || cpuWindow.busiestThreads().isEmpty()
+              ? null
+              : cpuWindow.busiestThreads();
       this.report_nonce = nonce;
     }
   }
@@ -828,6 +905,14 @@ public final class CrashReportSpooler {
     private final Integer thread_peak;
     private final Integer thread_stack_mb;
     private final List<ThreadCensus.Group> thread_groups;
+
+    /** How long the app had been running; null when it can't be read. */
+    private final Long uptime_s;
+
+    /** The startup warm-up's state; both null when it never started. */
+    private final Boolean warmup_done;
+
+    private final Long warmup_ms;
     private final int missed_heartbeats;
     private final String report_nonce;
 
@@ -867,6 +952,10 @@ public final class CrashReportSpooler {
       this.thread_peak = threads == null ? null : threads.peak;
       this.thread_stack_mb = threads == null ? null : threads.stackMb;
       this.thread_groups = threads == null ? null : threads.groups;
+      this.uptime_s = uptimeSeconds();
+      WarmUpProgress.Snapshot warmUp = JdkWarmUp.progress();
+      this.warmup_done = warmUp == null ? null : warmUp.done();
+      this.warmup_ms = warmUp == null ? null : warmUp.elapsedMs();
       this.missed_heartbeats = missedHeartbeats;
       this.report_nonce = nonce;
     }

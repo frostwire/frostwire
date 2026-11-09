@@ -64,6 +64,7 @@ class CrashReportSpoolerTest {
                 "thread_count",
                 "thread_peak",
                 "thread_groups",
+                "uptime_s",
                 "exception_class",
                 "stack_frames",
                 "report_nonce"));

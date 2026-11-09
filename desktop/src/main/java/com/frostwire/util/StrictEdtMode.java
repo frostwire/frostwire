@@ -3,6 +3,7 @@ package com.frostwire.util;
 // StrictEdtMode.java
 
 import com.limegroup.gnutella.gui.CrashReportSpooler;
+import com.limegroup.gnutella.gui.StallCpu;
 import java.awt.*;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
@@ -183,6 +184,9 @@ public final class StrictEdtMode {
 
       private long earlySampleNanos;
 
+      /** CPU counters when the early sample was due; null until then or when unreadable. */
+      private StallCpu.Snapshot cpuAtEarlySample;
+
       StallWatch(AWTEvent event, long my) {
         this.event = event;
         this.my = my;
@@ -202,6 +206,7 @@ public final class StrictEdtMode {
         }
         // Only events already running this long pay for reading the GC counters.
         gcAtEarlySample = GcTotals.now();
+        cpuAtEarlySample = StallCpu.take(edt);
         earlySampleNanos = System.nanoTime();
         StackTraceElement[] stack = edt.getStackTrace();
         if (stillRunning() && isInsideWatchedDispatch(stack)) {
@@ -229,6 +234,7 @@ public final class StrictEdtMode {
                           SHUTDOWN_TAG,
                           this::stillRunning,
                           null,
+                          null,
                           null);
                     }
                   },
@@ -242,7 +248,8 @@ public final class StrictEdtMode {
               "",
               this::stillRunning,
               earlySample,
-              gcWindow(gcAtEarlySample, earlySampleNanos, GcTotals.now(), System.nanoTime()));
+              gcWindow(gcAtEarlySample, earlySampleNanos, GcTotals.now(), System.nanoTime()),
+              StallCpu.since(cpuAtEarlySample, edt));
         }
       }
     }
@@ -254,7 +261,8 @@ public final class StrictEdtMode {
         String tag,
         BooleanSupplier stalledEventStillRunning,
         StackTraceElement[] earlySample,
-        CrashReportSpooler.GcWindow gcWindow) {
+        CrashReportSpooler.GcWindow gcWindow,
+        StallCpu.Window cpuWindow) {
       System.err.printf(
           "=== STRICT-EDT VIOLATION: event took > %,d ms on %s ===%n", thresholdMs, edt);
       System.err.println("Event: " + event);
@@ -305,23 +313,31 @@ public final class StrictEdtMode {
             gcWindow.count(), gcWindow.timeMs(), gcWindow.windowMs());
         System.err.flush();
       }
+      if (cpuWindow != null) {
+        System.err.printf(
+            "--- CPU in that window: EDT %s ms, process %s ms, system %s%% ---%n",
+            cpuWindow.edtCpuMs(), cpuWindow.processCpuMs(), cpuWindow.systemCpuPct());
+        System.err.flush();
+      }
       maybeQueueProductionReport(
           report.tag() + event.getClass().getName() + "#" + event.getID(),
           report.stack(),
-          gcWindow);
+          gcWindow,
+          cpuWindow);
     }
 
     private static void maybeQueueProductionReport(
         String eventDescription,
         StackTraceElement[] edtStack,
-        CrashReportSpooler.GcWindow gcWindow) {
+        CrashReportSpooler.GcWindow gcWindow,
+        StallCpu.Window cpuWindow) {
       long now = System.currentTimeMillis();
       if (now - lastProductionReportMillis < REPORT_COOLDOWN_MS) {
         return;
       }
       lastProductionReportMillis = now;
       try {
-        CrashReportSpooler.recordStrictMode(eventDescription, 1, edtStack, gcWindow);
+        CrashReportSpooler.recordStrictMode(eventDescription, 1, edtStack, gcWindow, cpuWindow);
       } catch (Throwable ignored) {
         // Reporting must never break event dispatch.
       }

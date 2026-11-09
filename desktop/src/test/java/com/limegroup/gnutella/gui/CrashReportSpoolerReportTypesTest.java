@@ -20,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,53 @@ import org.junit.jupiter.api.io.TempDir;
 
 class CrashReportSpoolerReportTypesTest {
   @TempDir Path tempDir;
+
+  @Test
+  void strictmodeReportCarriesWhereTheCpuWentWhenMeasured() {
+    File spoolDir = new File(tempDir.toFile(), "strictmode-cpu");
+    CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.1.4", 337, "");
+
+    spooler.spoolStrictMode(
+        "java.awt.event.MouseEvent#502",
+        1,
+        new Throwable().getStackTrace(),
+        new CrashReportSpooler.GcWindow(0, 0, 2500),
+        new StallCpu.Window(
+            12,
+            4900,
+            100,
+            180,
+            StallCpu.busiest(
+                new String[] {"SearchManager-crawlExecutor-thread-1", "AWT-EventQueue-0"},
+                new long[] {2_210_000_000L, 12_000_000L})));
+
+    JsonObject json = spooledJson(spoolDir.toPath());
+    assertEquals(12, json.get("edt_cpu_ms").getAsInt());
+    assertEquals(4900, json.get("process_cpu_ms").getAsInt());
+    assertEquals(100, json.get("system_cpu_pct").getAsInt());
+    assertEquals(180, json.get("phys_free_mb").getAsInt());
+    JsonObject busiest = json.getAsJsonArray("cpu_threads").get(0).getAsJsonObject();
+    // The server accepts exactly these keys, in this order.
+    assertEquals(List.of("name", "cpu_ms"), List.copyOf(busiest.keySet()));
+    assertEquals("SearchManager-crawlExecutor-thread-N", busiest.get("name").getAsString());
+    assertEquals(2210, busiest.get("cpu_ms").getAsInt());
+  }
+
+  @Test
+  void everyReportCarriesTheAppUptime() {
+    File spoolDir = new File(tempDir.toFile(), "uptime");
+    CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.1.4", 337, "");
+
+    spooler.spoolStrictMode("com.example.BlockingCall", 1);
+
+    JsonObject json = spooledJson(spoolDir.toPath());
+    assertTrue(json.getAsJsonPrimitive("uptime_s").isNumber());
+    assertTrue(json.get("uptime_s").getAsLong() >= 0);
+    // No warm-up ran in this test JVM, so its state is left out rather than reported as running.
+    assertFalse(json.has("warmup_done"));
+    assertFalse(json.has("warmup_ms"));
+    assertFalse(json.has("edt_cpu_ms"));
+  }
 
   @Test
   void strictmodeReportCarriesItsGcWindowWhenMeasured() {
@@ -77,6 +125,7 @@ class CrashReportSpoolerReportTypesTest {
                 "thread_count",
                 "thread_peak",
                 "thread_groups",
+                "uptime_s",
                 "violation_class",
                 "violation_count",
                 "report_nonce"));
@@ -171,6 +220,7 @@ class CrashReportSpoolerReportTypesTest {
                 "thread_count",
                 "thread_peak",
                 "thread_groups",
+                "uptime_s",
                 "missed_heartbeats",
                 "report_nonce"));
 

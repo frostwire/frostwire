@@ -1072,6 +1072,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.VPNsEngineNotReadyTest"
         includeTestsMatching "com.limegroup.gnutella.gui.CrashReportSpoolerReportTypesTest"
         includeTestsMatching "com.limegroup.gnutella.gui.ThreadCensusTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.StallCpuTest"
         includeTestsMatching "com.limegroup.gnutella.gui.ShellFolderWarmUpTest"
         includeTestsMatching "com.limegroup.gnutella.gui.BugDialogRemovalTest"
         includeTestsMatching "com.limegroup.gnutella.gui.DefaultErrorCatcherTest"
