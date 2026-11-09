@@ -20,6 +20,7 @@ package com.limegroup.gnutella.gui.actions;
 
 import com.frostwire.gui.bittorrent.CreateTorrentDialog;
 import com.frostwire.gui.bittorrent.SendFileProgressDialog;
+import com.frostwire.util.UrlUtils;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.search.MagnetClipboardListener;
@@ -48,16 +49,17 @@ public final class FileMenuActions {
    * @return true if it was valid and we opened it
    */
   public static boolean openMagnetOrTorrent(final String userText) {
-    if (userText.startsWith("magnet:?xt=urn:btih")) {
-      GUIMediator.instance().openTorrentURI(userText, true);
+    // Any valid magnet form, not only "magnet:?xt=urn:btih..." (frostwire/frostwire#1513).
+    if (UrlUtils.isMagnetLink(userText)) {
+      GUIMediator.instance().openTorrentURI(UrlUtils.normalizeTorrentLink(userText), true);
       return true;
     } else if (userText.matches(".*soundcloud.com.*")) {
       // the new soundcloud redirects to what seems to be an ajax page
       String soundCloudURL = userText.replace("soundcloud.com/#", "soundcloud.com/");
       GUIMediator.instance().openSoundcloudTrackUrl(soundCloudURL, null, true);
       return true;
-    } else if (userText.startsWith("http") && (userText.endsWith(".torrent"))) {
-      GUIMediator.instance().openTorrentURI(userText, true);
+    } else if (UrlUtils.isTorrentLink(userText)) {
+      GUIMediator.instance().openTorrentURI(UrlUtils.normalizeTorrentLink(userText), true);
       return true;
     } else {
       // See if it's a path to a file on the disk

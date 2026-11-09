@@ -19,6 +19,7 @@
 package com.limegroup.gnutella.gui;
 
 import com.frostwire.util.Logger;
+import com.frostwire.util.UrlUtils;
 import java.io.File;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -56,8 +57,8 @@ public class MacEventHandler {
         args -> {
           String uri = MacOSHandler.getURI(args[0]).toString();
           LOG.debug("URI: " + uri);
-          if (uri.startsWith("magnet:?xt=urn:btih")) {
-            GUIMediator.instance().openTorrentURI(uri, false);
+          if (UrlUtils.isMagnetLink(uri)) {
+            GUIMediator.instance().openTorrentURI(UrlUtils.normalizeTorrentLink(uri), false);
           }
         });
   }

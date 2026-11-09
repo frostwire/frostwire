@@ -247,15 +247,16 @@ public class ExternalControl {
     }
   }
 
+  /** Any valid magnet form: {@code dn} or {@code tr} may come first (frostwire/frostwire#1513). */
   private boolean isTorrentMagnetRequest(String request) {
-    return request.startsWith("magnet:?xt=urn:btih");
+    return UrlUtils.isMagnetLink(request);
   }
 
   private void handleTorrentMagnetRequest(String request) {
     ActivityCallback callback = restoreApplication();
     LOG.info(
         "handleTorrentMagnetRequest restored application. About to callback.handleTorrentMagnet()");
-    callback.handleTorrentMagnet(request, true);
+    callback.handleTorrentMagnet(UrlUtils.normalizeTorrentLink(request), true);
   }
 
   /**

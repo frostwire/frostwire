@@ -20,6 +20,7 @@ package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.util.Logger;
+import com.frostwire.util.UrlUtils;
 import com.limegroup.gnutella.MagnetOptions;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
@@ -108,9 +109,10 @@ public class MagnetClipboardListener extends WindowAdapter {
       if (clipboardText.contains("\n")) {
         clipboardText = clipboardText.split("\n")[0].trim();
       }
-      if (clipboardText.startsWith("magnet:?xt=urn:btih:")
-          || clipboardText.matches("^http.*\\.torrent$")
-          || clipboardText.matches(".*soundcloud.com.*")) {
+      if (UrlUtils.isTorrentLink(clipboardText)) {
+        return UrlUtils.normalizeTorrentLink(clipboardText);
+      }
+      if (clipboardText.matches(".*soundcloud.com.*")) {
         return clipboardText;
       }
     } catch (Throwable e) {
