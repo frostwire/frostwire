@@ -99,6 +99,9 @@ public class SoundcloudDownload extends HttpBTDownload {
           String downloadUrl = null;
           try {
             downloadUrl = sr.getDownloadUrl();
+            if (downloadUrl == null) {
+              throw new IOException("SoundCloud returned no stream URL for " + sr.getDetailsUrl());
+            }
             if (sr.isHls()) {
               HlsAudioDownloader.save(httpClient, downloadUrl, temp);
             } else {
@@ -106,7 +109,7 @@ public class SoundcloudDownload extends HttpBTDownload {
             }
           } catch (Throwable e) {
             LOG.error("SoundCloud audio download failed", e);
-            httpClientListener.onError(httpClient, e);
+            onDownloadError(e);
           }
         });
   }

@@ -45,7 +45,7 @@ abstract class HttpBTDownload implements BTDownload {
   volatile long size;
   volatile TransferState state;
   volatile long bytesReceived;
-  HttpClient.HttpClientListener httpClientListener;
+  private final HttpClient.HttpClientListener httpClientListener;
   private long averageSpeed; // in bytes
   private boolean deleteDataWhenRemoved;
   private long speedMarkTimestamp;
@@ -59,7 +59,17 @@ abstract class HttpBTDownload implements BTDownload {
     dateCreated = new Date();
     bytesReceived = 0;
     httpClient = HttpClientFactory.newInstance(HttpClientFactory.HttpContext.DOWNLOAD);
-    httpClient.setListener(createHttpClientListener());
+    httpClientListener = createHttpClientListener();
+    httpClient.setListener(httpClientListener);
+  }
+
+  /**
+   * Reports a failure the download thread caught to this download's listener, which puts the
+   * transfer in ERROR. The listener is the one created here: a field subclasses had to assign
+   * themselves stayed null, so failures threw instead (frostwire/frostwire#1510).
+   */
+  final void onDownloadError(Throwable error) {
+    httpClientListener.onError(httpClient, error);
   }
 
   static boolean copyPlayingTemp(File temp, File dest) {

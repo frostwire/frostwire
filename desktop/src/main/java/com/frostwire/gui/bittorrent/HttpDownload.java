@@ -284,12 +284,7 @@ public class HttpDownload extends HttpBTDownload {
             }
           } catch (IOException | StackOverflowError e) {
             LOG.error(url, e);
-            if (httpClientListener != null) {
-              httpClientListener.onError(httpClient, e);
-            }
-            if (httpClient.getListener() != null) {
-              httpClient.getListener().onError(httpClient, e);
-            }
+            onDownloadError(e);
           }
         });
   }
