@@ -116,6 +116,8 @@
             </intent-filter>
 
             <!-- handle .torrent urls, files and magnets -->
+            <!-- A magnet link has no host (magnet:?xt=...): listing android:host here would make
+                 the filter reject every magnet link (frostwire/frostwire#1513). -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -123,7 +125,6 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data android:scheme="magnet" />
-                <data android:host="*" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
