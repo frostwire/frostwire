@@ -39,11 +39,20 @@ public class FileTransferable implements Transferable {
   static final DataFlavor URIFlavor = createURIFlavor();
 
   static final DataFlavor URIFlavor16 = createURIFlavor16();
+
+  /**
+   * Marks a drag whose files are listed only on drop ({@link #listedOnDrop}: FrostWire's own
+   * transfers), so a drop target can turn it down from its flavors without listing the files on the
+   * EDT (GitHub #1511). JVM-local: other applications never see it.
+   */
+  public static final DataFlavor LISTED_ON_DROP_FLAVOR = createListedOnDropFlavor();
+
   private static final List<? extends FileTransfer> EMPTY_FILE_TRANSFER_LiST =
       Collections.emptyList();
   private final List<File> files;
   private final List<? extends FileTransfer> lazyFiles;
   private Supplier<List<File>> pendingFiles;
+  private boolean listedOnDrop;
 
   /** What the drag image shows while {@link #pendingFiles} isn't listed yet. */
   private Supplier<List<File>> preview = Collections::emptyList;
@@ -62,6 +71,7 @@ public class FileTransferable implements Transferable {
       Supplier<List<File>> files, Supplier<List<File>> preview) {
     FileTransferable transferable = new FileTransferable(Collections.emptyList());
     transferable.pendingFiles = files;
+    transferable.listedOnDrop = true;
     transferable.preview = preview;
     return transferable;
   }
@@ -94,6 +104,11 @@ public class FileTransferable implements Transferable {
     }
   }
 
+  private static DataFlavor createListedOnDropFlavor() {
+    return new DataFlavor(
+        DataFlavor.javaJVMLocalObjectMimeType + ";class=java.lang.Boolean", "Files listed on drop");
+  }
+
   private static DataFlavor createURIFlavor16() {
     try {
       return new DataFlavor("text/uri-list;representationclass=java.lang.String");
@@ -118,7 +133,9 @@ public class FileTransferable implements Transferable {
   }
 
   public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
-    if (flavor.equals(DataFlavor.javaFileListFlavor)) {
+    if (listedOnDrop && flavor.equals(LISTED_ON_DROP_FLAVOR)) {
+      return Boolean.TRUE;
+    } else if (flavor.equals(DataFlavor.javaFileListFlavor)) {
       return getFiles();
     } else if ((URIFlavor != null && URIFlavor.equals(flavor))
         || (URIFlavor16 != null && URIFlavor16.equals(flavor))) {
@@ -138,15 +155,21 @@ public class FileTransferable implements Transferable {
   }
 
   public DataFlavor[] getTransferDataFlavors() {
-    if (OSUtils.isWindows()) {
-      return new DataFlavor[] {DataFlavor.javaFileListFlavor};
-    } else {
-      return new DataFlavor[] {DataFlavor.javaFileListFlavor, URIFlavor, URIFlavor16};
+    List<DataFlavor> flavors = new ArrayList<>();
+    flavors.add(DataFlavor.javaFileListFlavor);
+    if (!OSUtils.isWindows()) {
+      flavors.add(URIFlavor);
+      flavors.add(URIFlavor16);
     }
+    if (listedOnDrop) {
+      flavors.add(LISTED_ON_DROP_FLAVOR);
+    }
+    return flavors.toArray(new DataFlavor[0]);
   }
 
   public boolean isDataFlavorSupported(DataFlavor flavor) {
-    return flavor.equals(DataFlavor.javaFileListFlavor)
+    return (listedOnDrop && flavor.equals(LISTED_ON_DROP_FLAVOR))
+        || flavor.equals(DataFlavor.javaFileListFlavor)
         || flavor.equals(URIFlavor)
         || flavor.equals(URIFlavor16);
   }

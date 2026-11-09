@@ -8,6 +8,8 @@
 package com.frostwire.gui.bittorrent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.limegroup.gnutella.gui.dnd.FileTransferable;
 import java.awt.datatransfer.DataFlavor;
@@ -74,5 +76,37 @@ class BTDownloadTransferHandlerTest {
     transferable.getTransferData(DataFlavor.javaFileListFlavor);
     assertEquals(2, diskTouches.get(), "listed once");
     assertEquals(1, ignorableLookups.get());
+  }
+
+  /**
+   * Dropping a transfer back on the transfers list listed every file in its folder on the EDT,
+   * because the default handlers asked for the files to see whether they were torrents (Icebase
+   * #ea5453ae3ccf, GitHub #1511). The list turns down its own drags from the flavors alone.
+   */
+  @Test
+  void theTransfersListTurnsDownItsOwnDragsWithoutListingFiles() throws Exception {
+    Path album = Files.createDirectories(dir.resolve("album/disc 1"));
+    Files.createFile(album.resolve("01.mp3"));
+    AtomicInteger diskTouches = new AtomicInteger();
+    FileTransferable transferable =
+        BTDownloadTransferHandler.transferableFor(
+            new BTDownload[] {savedAt(dir.resolve("album").toFile(), diskTouches)}, HashSet::new);
+    BTDownloadTransferHandler handler = new BTDownloadTransferHandler();
+
+    assertFalse(handler.canImport(null, transferable.getTransferDataFlavors()));
+    assertFalse(handler.importData(null, transferable));
+    assertEquals(0, diskTouches.get(), "the drop must not list the transfer's files");
+  }
+
+  /** Files dragged from other applications still drop on the transfers list. */
+  @Test
+  void theTransfersListStillAcceptsFilesFromOtherApplications() throws Exception {
+    File torrent = Files.createFile(dir.resolve("ubuntu.torrent")).toFile();
+    FileTransferable transferable = new FileTransferable(List.of(torrent));
+    assertFalse(
+        List.of(transferable.getTransferDataFlavors())
+            .contains(FileTransferable.LISTED_ON_DROP_FLAVOR));
+    assertTrue(
+        new BTDownloadTransferHandler().canImport(null, transferable.getTransferDataFlavors()));
   }
 }

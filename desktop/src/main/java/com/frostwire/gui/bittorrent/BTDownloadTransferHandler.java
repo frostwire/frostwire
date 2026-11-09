@@ -47,7 +47,19 @@ final class BTDownloadTransferHandler extends LimeTransferHandler {
     super(COPY);
   }
 
+  /**
+   * Turns down drags that started on this table: dropping a transfer back on the transfers list
+   * does nothing useful, and the default handlers would list the transfer's files on the EDT to
+   * find out (Icebase #ea5453ae3ccf, GitHub #1511).
+   */
+  private static boolean isTransfersDrag(DataFlavor[] flavors) {
+    return DNDUtils.contains(flavors, FileTransferable.LISTED_ON_DROP_FLAVOR);
+  }
+
   public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
+    if (isTransfersDrag(transferFlavors)) {
+      return false;
+    }
     return DNDUtils.contains(transferFlavors, SearchResultTransferable.dataFlavor)
         || DNDUtils.DEFAULT_TRANSFER_HANDLER.canImport(comp, transferFlavors);
   }
@@ -58,6 +70,9 @@ final class BTDownloadTransferHandler extends LimeTransferHandler {
   }
 
   public boolean importData(JComponent comp, Transferable t) {
+    if (isTransfersDrag(t.getTransferDataFlavors())) {
+      return false;
+    }
     if (DNDUtils.contains(t.getTransferDataFlavors(), SearchResultTransferable.dataFlavor)) {
       try {
         SearchResultTransferable srt =
