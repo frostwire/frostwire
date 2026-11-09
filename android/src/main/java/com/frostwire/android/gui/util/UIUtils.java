@@ -65,6 +65,7 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.MimeDetector;
 import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
+import com.frostwire.util.UrlUtils;
 import com.google.android.material.snackbar.Snackbar;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -849,9 +850,10 @@ public final class UIUtils {
           } else {
             text = charSequence.toString();
           }
-          if (!StringUtils.isNullOrEmpty(text)
-              && (text.startsWith("http") || text.startsWith("magnet"))) {
-            targetTextView.setText(text.trim());
+          String link = text == null ? null : text.trim();
+          if (!StringUtils.isNullOrEmpty(link)
+              && (link.startsWith("http") || UrlUtils.isMagnetLink(link))) {
+            targetTextView.setText(link);
           }
         }
       } catch (Throwable ignored) {

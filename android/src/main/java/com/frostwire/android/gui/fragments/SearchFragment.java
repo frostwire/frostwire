@@ -93,6 +93,7 @@ import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
+import com.frostwire.util.UrlUtils;
 import com.frostwire.util.http.HttpClient;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -956,12 +957,12 @@ public final class SearchFragment extends AbstractFragment
         fragment.cancelSearch();
         new AsyncDownloadSoundcloudFromUrl(fragment.getActivity(), query);
         fragment.searchInput.setText("");
-      } else if (query.startsWith("magnet:?xt=urn:btih:")
-          || (query.startsWith("http") && query.endsWith(".torrent"))) {
-        fragment.startMagnetDownload(query);
+      } else if (UrlUtils.isTorrentLink(query)) {
+        // Any valid magnet form, not only "magnet:?xt=urn:btih:..." (frostwire/frostwire#1513).
+        fragment.startMagnetDownload(UrlUtils.normalizeTorrentLink(query));
         fragment.currentQuery = null;
         fragment.searchInput.setText("");
-      } else if (query.startsWith("http") && !query.endsWith(".torrent")) {
+      } else if (query.startsWith("http")) {
         // URls that are no torrents, Telluride Search
         fragment.performTellurideSearch(query);
       } else {

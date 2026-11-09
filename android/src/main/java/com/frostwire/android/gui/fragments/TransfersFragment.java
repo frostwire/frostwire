@@ -79,6 +79,7 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.TaskThrottle;
+import com.frostwire.util.UrlUtils;
 import com.google.android.material.tabs.TabLayout;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -1171,19 +1172,21 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     // magnets and urls
     // are automatically started if found on the clipboard by autoPasteMagnetOrURL
     String url = addTransferUrlTextView.getText();
-    if (!StringUtils.isNullOrEmpty(url) && (url.startsWith("magnet") || url.startsWith("http"))) {
+    url = url == null ? null : url.trim();
+    if (!StringUtils.isNullOrEmpty(url)
+        && (UrlUtils.isTorrentLink(url) || url.startsWith("http"))) {
       toggleAddTransferControls();
       if (url.startsWith("http") && (url.contains("soundcloud.com/"))) {
         startCloudTransfer(url);
-      } else if (url.startsWith("magnet:?xt=urn:btih:")
-          || (url.startsWith("http") && url.endsWith(".torrent"))) {
+      } else if (UrlUtils.isTorrentLink(url)) {
+        // Any valid magnet form, not only "magnet:?xt=urn:btih:..." (frostwire/frostwire#1513).
         TransferManager.instance()
             .downloadTorrent(
-                url.trim(),
+                UrlUtils.normalizeTorrentLink(url),
                 new HandpickedTorrentDownloadDialogOnFetch(
                     (AppCompatActivity) getActivity(), true));
         UIUtils.showLongMessage(getActivity(), R.string.torrent_url_added);
-      } else if (url.startsWith("http") && !url.endsWith(".torrent")) {
+      } else if (url.startsWith("http")) {
         if (MainActivity.instance() != null && SearchFragment.instance() != null) {
           MainActivity.instance().switchContent(SearchFragment.instance());
           SearchFragment.instance().performTellurideSearch(url);
