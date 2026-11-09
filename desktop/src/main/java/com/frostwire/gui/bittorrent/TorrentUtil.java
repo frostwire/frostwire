@@ -361,6 +361,11 @@ public final class TorrentUtil {
       bos.close();
       final TorrentInfo torrent = TorrentInfo.bdecode(bencoded_torrent_bytes);
       indexCreatedTorrent(torrent, file.getName());
+      if (showShareTorrentDialog) {
+        // Still on the torrent maker's thread: load the dialog's button icons here, not on the
+        // EDT (frostwire/frostwire#1514).
+        ShareTorrentDialog.preloadButtonIcons();
+      }
       GUIMediator.safeInvokeLater(
           () -> {
             if (uiTorrentMakerListener != null) {

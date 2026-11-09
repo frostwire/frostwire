@@ -14,10 +14,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.SwingUtilities;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -86,5 +91,83 @@ class ShareTorrentOpenerTest {
       assertFalse(source.contains("newShareTorrentDialog("), file + " opens the dialog itself");
       assertTrue(source.contains("ShareTorrentOpener.open("), file);
     }
+  }
+
+  /**
+   * The dialog's four button icons were read from the jar on the EDT when it was built (Icebase
+   * #724233234e3e, frostwire/frostwire#1514). They are loaded on the background worker, after the
+   * torrent and before the dialog is posted to the EDT.
+   */
+  @Test
+  void theDialogsIconsAreLoadedOffTheEdtBeforeItOpens() throws Exception {
+    List<String> steps = new CopyOnWriteArrayList<>();
+    AtomicBoolean preparedOnEdt = new AtomicBoolean(true);
+    CountDownLatch shown = new CountDownLatch(1);
+
+    SwingUtilities.invokeAndWait(
+        () ->
+            ShareTorrentOpener.open(
+                () -> {
+                  steps.add("read");
+                  return "fixture torrent";
+                },
+                () -> {
+                  preparedOnEdt.set(SwingUtilities.isEventDispatchThread());
+                  steps.add("prepare");
+                },
+                task -> new Thread(task, "fixture-background").start(),
+                torrent -> {
+                  steps.add("show");
+                  shown.countDown();
+                }));
+
+    assertTrue(shown.await(10, TimeUnit.SECONDS), "the dialog opens");
+    assertFalse(preparedOnEdt.get(), "the icons must not be loaded on the EDT");
+    assertEquals(List.of("read", "prepare", "show"), steps);
+  }
+
+  @Test
+  void aFailedPreloadStillOpensTheDialog() throws Exception {
+    CountDownLatch shown = new CountDownLatch(1);
+    ShareTorrentOpener.open(
+        () -> "fixture torrent",
+        () -> {
+          throw new IllegalStateException("fixture: no theme");
+        },
+        Runnable::run,
+        torrent -> shown.countDown());
+    assertTrue(shown.await(10, TimeUnit.SECONDS), "the dialog still opens");
+  }
+
+  @Test
+  void theListedIconsAreTheOnesTheDialogsButtonsUse() throws Exception {
+    Path main = Path.of(System.getProperty("user.dir")).resolve("src/main/java");
+    String dialog =
+        Files.readString(
+            main.resolve("com/frostwire/gui/bittorrent/ShareTorrentDialog.java"),
+            StandardCharsets.UTF_8);
+    List<String> named = new ArrayList<>();
+    Matcher m = Pattern.compile("ICON_NAME,\\s*\"([A-Z_]+)\"").matcher(dialog);
+    while (m.find()) {
+      named.add(m.group(1));
+    }
+    assertEquals(ShareTorrentDialog.BUTTON_ICONS, named);
+  }
+
+  @Test
+  void bothWaysTheDialogOpensPreloadItsIcons() throws Exception {
+    Path main = Path.of(System.getProperty("user.dir")).resolve("src/main/java");
+    String opener =
+        Files.readString(
+                main.resolve("com/frostwire/gui/bittorrent/ShareTorrentOpener.java"),
+                StandardCharsets.UTF_8)
+            .replaceAll("\\s+", "");
+    String torrentUtil =
+        Files.readString(
+                main.resolve("com/frostwire/gui/bittorrent/TorrentUtil.java"),
+                StandardCharsets.UTF_8)
+            .replaceAll("\\s+", "");
+    assertTrue(opener.contains("ShareTorrentDialog::preloadButtonIcons"));
+    assertTrue(torrentUtil.contains("ShareTorrentDialog.preloadButtonIcons();"));
   }
 }

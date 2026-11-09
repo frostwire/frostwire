@@ -29,6 +29,8 @@ final class ShareTorrentOpener {
   static void open(BittorrentDownload download) {
     open(
         download::getTorrentInfo,
+        // Its button icons are read from the jar too (frostwire/frostwire#1514).
+        ShareTorrentDialog::preloadButtonIcons,
         DesktopParallelExecutor::execute,
         info -> new ShareTorrentDialog(GUIMediator.getAppFrame(), info).setVisible(true));
   }
@@ -37,6 +39,15 @@ final class ShareTorrentOpener {
    * Reads the torrent with {@code read} on {@code background}, then runs {@code show} on the EDT.
    */
   static <T> void open(Supplier<T> read, Executor background, Consumer<T> show) {
+    open(read, () -> {}, background, show);
+  }
+
+  /**
+   * Reads the torrent with {@code read} and, once it was read, runs {@code prepare} (work the
+   * dialog would otherwise do on the EDT), both on {@code background}; then runs {@code show} on
+   * the EDT.
+   */
+  static <T> void open(Supplier<T> read, Runnable prepare, Executor background, Consumer<T> show) {
     background.execute(
         () -> {
           T info;
@@ -48,6 +59,12 @@ final class ShareTorrentOpener {
             return;
           }
           if (info != null) {
+            try {
+              prepare.run();
+            } catch (RuntimeException e) {
+              // Only a head start: the dialog loads what is missing itself.
+              LOG.warn("Can't prepare the share dialog: " + e.getMessage());
+            }
             GUIMediator.safeInvokeLater(() -> show.accept(info));
           }
         });

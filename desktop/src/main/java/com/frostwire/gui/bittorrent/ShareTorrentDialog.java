@@ -32,6 +32,7 @@ import com.limegroup.gnutella.gui.DropTargets;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.ResourceManager;
 import com.limegroup.gnutella.gui.actions.LimeAction;
 import java.awt.*;
 import java.awt.event.*;
@@ -48,6 +49,13 @@ import javax.swing.border.Border;
  * @author aldenml
  */
 public class ShareTorrentDialog extends JDialog {
+  /**
+   * The icons of the dialog's buttons (Post to X, Copy to Clipboard, Copy Link, Copy Magnet), as
+   * their actions name them. Building the dialog read each one from the jar on the EDT
+   * (frostwire/frostwire#1514); {@link #preloadButtonIcons()} loads them beforehand.
+   */
+  static final List<String> BUTTON_ICONS = List.of("X", "COPY_PASTE", "LINK", "MAGNET");
+
   private final TorrentInfo torrent;
   private Container container;
   private JEditorPane textArea;
@@ -57,6 +65,14 @@ public class ShareTorrentDialog extends JDialog {
   private String link;
   private String info_hash;
   private String torrent_name;
+
+  /**
+   * Loads {@link #BUTTON_ICONS} into the theme-image cache, so building the dialog finds them
+   * there. Call it off the EDT, before posting the dialog to it.
+   */
+  static void preloadButtonIcons() {
+    ResourceManager.preloadButtonThemeImages(BUTTON_ICONS);
+  }
 
   public ShareTorrentDialog(JFrame frame, TorrentInfo torrent) {
     super(frame);
