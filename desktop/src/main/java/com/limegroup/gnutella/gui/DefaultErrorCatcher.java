@@ -154,13 +154,27 @@ class DefaultErrorCatcher implements Thread.UncaughtExceptionHandler {
   /** Bounds the walk down a cause chain, which may loop. */
   private static final int MAX_CAUSES = 16;
 
+  /** Where the EDT hands an event to its target: the frames above it are that event's. */
+  private static final String EVENT_QUEUE_CLASS = "java.awt.EventQueue";
+
+  private static final String EVENT_QUEUE_DISPATCH_METHOD = "dispatchEvent";
+
   /**
    * True if the bug or one of its causes has a frame of FrostWire code that isn't a pass-through.
+   *
+   * <p>On the EDT only the frames of the event being dispatched count. Under them may be FrostWire
+   * code that opened a modal dialog: the dialog's event loop dispatches every event that arrives
+   * while it is open, including the JDK's own, and those frames say nothing about the event that
+   * failed (Icebase #c2692f672244, frostwire/frostwire#1518: a JDK tray task failing while the
+   * close dialog was open).
    */
   static boolean hasAppFrame(Throwable bug) {
     Throwable current = bug;
     for (int depth = 0; current != null && depth < MAX_CAUSES; depth++) {
       for (StackTraceElement frame : current.getStackTrace()) {
+        if (isEventDispatch(frame)) {
+          break;
+        }
         if (isAppFrame(frame)) {
           return true;
         }
@@ -168,6 +182,11 @@ class DefaultErrorCatcher implements Thread.UncaughtExceptionHandler {
       current = current.getCause() == current ? null : current.getCause();
     }
     return false;
+  }
+
+  private static boolean isEventDispatch(StackTraceElement frame) {
+    return frame.getClassName().equals(EVENT_QUEUE_CLASS)
+        && frame.getMethodName().equals(EVENT_QUEUE_DISPATCH_METHOD);
   }
 
   private static boolean isAppFrame(StackTraceElement frame) {

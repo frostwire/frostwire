@@ -135,6 +135,56 @@ class DefaultErrorCatcherTest {
     }
   }
 
+  @Test
+  void jdkEventsFailingInsideAnAppModalLoopAreDropped() throws Exception {
+    RecordingCallback callback = new RecordingCallback();
+    ErrorCallback previous = swapErrorCallback(callback);
+    try {
+      // Icebase #c2692f672244: the JDK's tray task threw while the close dialog was open.
+      UnsupportedOperationException jdkTask = new UnsupportedOperationException();
+      jdkTask.setStackTrace(
+          modalLoopStack(
+              frame("java.awt.SystemTray", "getSystemTray"),
+              frame("sun.awt.X11.XTrayIconPeer$3$1", "run"),
+              frame("java.awt.event.InvocationEvent", "dispatch")));
+      new DefaultErrorCatcher().handle(jdkTask);
+      assertEquals(0, callback.seen.size());
+
+      // FrostWire code failing in an event of that same loop is still ours.
+      IllegalStateException appTask = new IllegalStateException("modal loop probe");
+      appTask.setStackTrace(
+          modalLoopStack(
+              frame("com.limegroup.gnutella.gui.VisualConnectionCallback", "showDownloads"),
+              frame("java.awt.event.InvocationEvent", "dispatch")));
+      new DefaultErrorCatcher().handle(appTask);
+      assertEquals(List.of(appTask), callback.seen);
+    } finally {
+      ErrorService.setErrorCallback(previous);
+    }
+  }
+
+  /**
+   * The given event's frames, dispatched by the event loop of a modal dialog that FrostWire's
+   * window-closing listener opened.
+   */
+  private static StackTraceElement[] modalLoopStack(StackTraceElement... eventFrames) {
+    List<StackTraceElement> stack = new ArrayList<>(List.of(eventFrames));
+    stack.add(frame("java.awt.EventQueue", "dispatchEvent"));
+    stack.add(
+        frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent"));
+    stack.add(frame("java.awt.EventDispatchThread", "pumpOneEventForFilters"));
+    stack.add(frame("java.awt.WaitDispatchSupport", "enter"));
+    stack.add(frame("java.awt.Dialog", "show"));
+    stack.add(frame("com.limegroup.gnutella.gui.GUIMediator", "close"));
+    stack.add(frame("com.limegroup.gnutella.gui.MainFrame$2", "windowClosing"));
+    stack.add(frame("java.awt.Window", "processWindowEvent"));
+    stack.add(frame("java.awt.EventQueue", "dispatchEvent"));
+    stack.add(
+        frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent"));
+    stack.add(frame("java.awt.EventDispatchThread", "run"));
+    return stack.toArray(StackTraceElement[]::new);
+  }
+
   /** A Swing call failing inside the given app frames, dispatched through StrictEdtMode's queue. */
   private static StackTraceElement[] edtStack(StackTraceElement... appFrames) {
     List<StackTraceElement> stack = new ArrayList<>();
