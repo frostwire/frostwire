@@ -1113,6 +1113,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.dnd.FileOrFolderTransferHandlerTest"
         includeTestsMatching "com.limegroup.gnutella.gui.util.RestartDialogGateTest"
         includeTestsMatching "com.frostwire.gui.theme.PlatformFontsTest"
+        includeTestsMatching "com.frostwire.gui.theme.DisabledIconsTest"
         includeTestsMatching "com.frostwire.gui.theme.MacLogicalFontsTest"
         includeTestsMatching "com.frostwire.gui.theme.BaseFileChooserUIDirectoryComboTest"
         includeTestsMatching "com.frostwire.gui.theme.IconRepainterCacheTest"

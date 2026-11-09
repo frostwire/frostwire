@@ -20,6 +20,7 @@ package com.frostwire.gui.theme;
 
 import com.apple.laf.AquaFonts;
 import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.frostwire.gui.tabs.SearchTab;
 import com.frostwire.util.Logger;
@@ -226,22 +227,16 @@ public final class ThemeMediator {
   public static void loadThemeAtStartup(ThemeEnum theme) {
     try {
       if (theme == ThemeEnum.DEFAULT) {
-        UIManager.setLookAndFeel(
-            new NimbusLookAndFeel() {
-              @Override
-              public UIDefaults getDefaults() {
-                return modifyNimbusDefaults(super.getDefaults());
-              }
-            });
+        UIManager.setLookAndFeel(new SkinNimbusLookAndFeel());
         applySkinSettings();
         setupGlobalKeyManager();
       } else if (theme == ThemeEnum.DARK_FLAT_LAF) {
         purgeSynthOverrides();
-        FlatDarkLaf.setup();
+        FlatLaf.setup(new SkinFlatDarkLaf());
         installFlatDarkLafDefaults();
       } else if (theme == ThemeEnum.LIGHT_FLAT_LAF) {
         purgeSynthOverrides();
-        FlatLightLaf.setup();
+        FlatLaf.setup(new SkinFlatLightLaf());
         installFlatLightLafDefaults();
       }
       currentTheme = theme;
@@ -257,13 +252,7 @@ public final class ThemeMediator {
         new Runnable() {
           public void run() {
             try {
-              UIManager.setLookAndFeel(
-                  new NimbusLookAndFeel() {
-                    @Override
-                    public UIDefaults getDefaults() {
-                      return modifyNimbusDefaults(super.getDefaults());
-                    }
-                  });
+              UIManager.setLookAndFeel(new SkinNimbusLookAndFeel());
               applySkinSettings();
               setupGlobalKeyManager();
             } catch (Throwable e) {
@@ -295,7 +284,7 @@ public final class ThemeMediator {
     Runnable task =
         () -> {
           purgeSynthOverrides();
-          FlatLightLaf.setup();
+          FlatLaf.setup(new SkinFlatLightLaf());
           installFlatLightLafDefaults();
 
           for (Window w : Window.getWindows()) {
@@ -320,7 +309,7 @@ public final class ThemeMediator {
     Runnable task =
         () -> {
           purgeSynthOverrides();
-          FlatDarkLaf.setup();
+          FlatLaf.setup(new SkinFlatDarkLaf());
           installFlatDarkLafDefaults();
           for (Window w : Window.getWindows()) {
             SwingUtilities.updateComponentTreeUI(w);
@@ -726,6 +715,45 @@ public final class ThemeMediator {
       LOG.error("Error fixing font", e);
     }
     return font;
+  }
+
+  /**
+   * The default theme: Nimbus with FrostWire's skin defaults, and disabled icons made on the
+   * calling thread (frostwire/frostwire#1516, see {@link DisabledIcons}).
+   */
+  static final class SkinNimbusLookAndFeel extends NimbusLookAndFeel {
+    private static final javax.swing.GrayFilter DISABLED_FILTER =
+        new javax.swing.GrayFilter(true, 50);
+
+    @Override
+    public UIDefaults getDefaults() {
+      return modifyNimbusDefaults(super.getDefaults());
+    }
+
+    @Override
+    public Icon getDisabledIcon(JComponent component, Icon icon) {
+      // GrayFilter(true, 50) is what LookAndFeel.getDisabledIcon applies.
+      Icon disabled = DisabledIcons.grayed(icon, DISABLED_FILTER);
+      return disabled != null ? disabled : super.getDisabledIcon(component, icon);
+    }
+  }
+
+  /** FlatLaf Dark, with disabled icons made on the calling thread (frostwire/frostwire#1516). */
+  static final class SkinFlatDarkLaf extends FlatDarkLaf {
+    @Override
+    public Icon getDisabledIcon(JComponent component, Icon icon) {
+      Icon disabled = DisabledIcons.flatLaf(icon, isDark());
+      return disabled != null ? disabled : super.getDisabledIcon(component, icon);
+    }
+  }
+
+  /** FlatLaf Light, with disabled icons made on the calling thread (frostwire/frostwire#1516). */
+  static final class SkinFlatLightLaf extends FlatLightLaf {
+    @Override
+    public Icon getDisabledIcon(JComponent component, Icon icon) {
+      Icon disabled = DisabledIcons.flatLaf(icon, isDark());
+      return disabled != null ? disabled : super.getDisabledIcon(component, icon);
+    }
   }
 
   private static UIDefaults modifyNimbusDefaults(UIDefaults defaults) {
