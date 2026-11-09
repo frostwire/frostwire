@@ -106,7 +106,10 @@ class SoundcloudDynamicCredentialsTest {
     ISearchPerformer performer =
         SearchPerformerFactory.createSearchPerformer(
             2L,
-            "creative commons",
+            // SoundCloud's API answers HTTP 500 to "creative commons" with limit >= 20 since
+            // 2026-11-09 (its own server error, for that query only). "test" is the query
+            // SoundCloudConfigFetcher checks the credentials with.
+            "test",
             pattern,
             null, // No crawling for Soundcloud
             5000);
