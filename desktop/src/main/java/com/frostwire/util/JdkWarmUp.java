@@ -392,6 +392,8 @@ public final class JdkWarmUp {
   /** Released once the Swing splash window is showing, or when no splash will be shown. */
   private static final CountDownLatch SPLASH_SHOWN = new CountDownLatch(1);
 
+  private static final WarmUpProgress PROGRESS = new WarmUpProgress();
+
   private JdkWarmUp() {}
 
   /**
@@ -404,10 +406,31 @@ public final class JdkWarmUp {
   }
 
   public static void startInBackground() {
-    Thread warmUp = new Thread(JdkWarmUp::warmUp, "JdkWarmUp");
+    // Two threads: the JDK steps and the app class preload.
+    PROGRESS.start(2, System.nanoTime());
+    Thread warmUp = new Thread(tracked(JdkWarmUp::warmUp), "JdkWarmUp");
     warmUp.setDaemon(true);
     warmUp.start();
-    startAppClassPreload(SPLASH_SHOWN, SPLASH_WAIT_MS, JdkWarmUp::loadAppClasses);
+    startAppClassPreload(SPLASH_SHOWN, SPLASH_WAIT_MS, tracked(JdkWarmUp::loadAppClasses));
+  }
+
+  /**
+   * Whether the warm-up has finished and how long it took (or has been running), for Icebase
+   * reports; null when it was never started (frostwire/frostwire#1490).
+   */
+  public static WarmUpProgress.Snapshot progress() {
+    return PROGRESS.snapshot(System.nanoTime());
+  }
+
+  /** {@code step}, counted as finished in {@link #PROGRESS} however it ends. */
+  static Runnable tracked(Runnable step) {
+    return () -> {
+      try {
+        step.run();
+      } finally {
+        PROGRESS.stepFinished(System.nanoTime());
+      }
+    };
   }
 
   /**
