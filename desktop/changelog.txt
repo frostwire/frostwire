@@ -1,4 +1,4 @@
-FrostWire 7.1.4 UNRELEASED
+FrostWire 7.1.4 NOV/09/2026
    - Anonymous crash and freeze reports now say how long FrostWire had been running, whether its startup warm-up had finished, and, for a freeze, how much CPU the window thread, FrostWire and the whole computer used and which threads used most, so freezes on slow machines can be traced (#1490, #1512)
    - fix:Opening the share dialog for a transfer no longer stalls while its four buttons read their icons from disk; they are loaded in the background before it opens (#1514)
    - fix:A magnet link whose name or trackers come before its hash is now opened from the search box, the clipboard, a link clicked on macOS, or when it starts FrostWire on Windows and Linux; it used to run a search or be ignored (#1513)
