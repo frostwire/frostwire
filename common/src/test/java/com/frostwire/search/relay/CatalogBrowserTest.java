@@ -242,6 +242,41 @@ class CatalogBrowserTest {
         "page 0 rows were dropped and the forged page 0 must not verify");
   }
 
+  /** frostwire/frostwire#1504: a lost page is asked for again instead of waiting out the budget. */
+  @Test
+  void lostPageIsRecoveredByReRequestWellBeforeTheTimeout() throws Exception {
+    IdentityKeys holder = IdentityKeys.generate(0);
+    byte[] peerPub = holder.ed25519PubRaw();
+    List<RemoteIndexFetcher.RemoteTorrentEntry> big = bigCatalog(30);
+    java.util.concurrent.atomic.AtomicInteger requests =
+        new java.util.concurrent.atomic.AtomicInteger();
+    FakeTransport transport =
+        new FakeTransport(
+            peerPub,
+            request -> {
+              List<byte[]> pages =
+                  new java.util.ArrayList<>(signedPages(holder, big, nonceOf(request)));
+              if (requests.incrementAndGet() == 1) {
+                pages.remove(1); // lost above rUDP
+              }
+              return pages;
+            });
+
+    long start = System.nanoTime();
+    List<RemoteIndexFetcher.RemoteTorrentEntry> entries =
+        new CatalogBrowser(IdentityKeys.generate(0), transport).fetchCatalog(peerPub, 10_000);
+    long elapsedMs = (System.nanoTime() - start) / 1_000_000L;
+
+    assertEquals(big.size(), entries.size(), "the lost page must be recovered");
+    for (int i = 0; i < big.size(); i++) {
+      assertEquals(big.get(i).infoHashHex(), entries.get(i).infoHashHex());
+    }
+    assertTrue(elapsedMs < 5_000, "recovery took " + elapsedMs + "ms");
+    assertEquals(2, transport.sent.size(), "one re-request recovers one lost page");
+    assertTrue(transport.sent.stream().allMatch(op -> op.cancelled));
+    assertTrue(transport.listeners().isEmpty());
+  }
+
   // --- helpers ---
 
   /**

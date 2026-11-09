@@ -451,6 +451,63 @@ class IncomingSearchRequestHandlerTest {
         "round 2 must be served from the cached templates (no extra provider read)");
   }
 
+  /** frostwire/frostwire#1504: a re-request names the chunks it holds; only the rest go out. */
+  @Test
+  void reRequestWithHaveBitmapGetsOnlyTheMissingChunks() throws Exception {
+    KeyPair requesterKey = generateEd25519KeyPair();
+    byte[] requesterPub = rawPub(requesterKey);
+    IdentityKeys holderIdentity = PowTestIdentities.next();
+    RelaySearchService service =
+        new RelaySearchService(
+            new InMemoryLocalIndex(), holderIdentity, ShareVisibilityPolicy.INCLUDE_ALL);
+    CapturingTransport transport = new CapturingTransport();
+    IncomingSearchRequestHandler handler =
+        new IncomingSearchRequestHandler(
+            transport, service, new PeerDirectory(new NoOpKarmaCache()), holderIdentity);
+    byte[] infoHash = TestTorrentMetadata.infoHash();
+    byte[] torrentBytes = TestTorrentMetadata.bytes(2000);
+    int chunkCount =
+        (torrentBytes.length + TorrentMetadataResponse.CHUNK_DATA_BYTES - 1)
+            / TorrentMetadataResponse.CHUNK_DATA_BYTES;
+    assertTrue(chunkCount >= 4, "fixture must span several chunks");
+    handler.setTorrentMetadataProvider(publicProvider(ih -> torrentBytes));
+    handler.start();
+
+    // Holds every chunk except 1 and the last one.
+    byte[] have = new byte[(chunkCount + 7) / 8];
+    for (int i = 0; i < chunkCount - 1; i++) {
+      if (i != 1) {
+        have[i >>> 3] |= (byte) (1 << (i & 7));
+      }
+    }
+    TorrentMetadataRequest signed = signedMetadataRequest(requesterKey, infoHash, randomBytes(32));
+    TorrentMetadataRequest retry =
+        TorrentMetadataRequest.builder()
+            .infoHash(signed.infoHash())
+            .nonce(signed.nonce())
+            .requesterPub(signed.requesterPub())
+            .timestamp(signed.timestamp())
+            .signature(signed.signature())
+            .have(have)
+            .build();
+    handler.onPayload(
+        requesterPub,
+        SearchPayloadCodec.encodeTorrentMetadataRequest(retry),
+        System.currentTimeMillis(),
+        MeshProtocolId.METADATA);
+
+    List<Integer> sentIndexes = new ArrayList<>();
+    for (CapturingTransport.SentPayload sp : transport.sent) {
+      TorrentMetadataResponse chunk = SearchPayloadCodec.decodeTorrentMetadataResponse(sp.payload);
+      assertNotNull(chunk);
+      assertFalse(chunk.isError());
+      assertTrue(chunk.verifySignature(holderIdentity.ed25519PubRaw()));
+      assertArrayEquals(retry.nonce(), chunk.nonce());
+      sentIndexes.add(chunk.chunkIndex());
+    }
+    assertEquals(List.of(1, chunkCount - 1), sentIndexes);
+  }
+
   @Test
   void torrentOver256KBIsRejectedTooLarge() throws Exception {
     KeyPair requesterKey = generateEd25519KeyPair();

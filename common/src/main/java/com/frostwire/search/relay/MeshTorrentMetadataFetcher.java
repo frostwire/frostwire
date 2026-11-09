@@ -49,6 +49,15 @@ import java.util.concurrent.atomic.AtomicInteger;
  * cannot exhaust threads. Callers should treat {@code null} as retryable backpressure. Every
  * reserved slot is released in a {@code finally}, including on interrupt, timeout, and rejection.
  *
+ * <p>Loss recovery (frostwire/frostwire#1504): rUDP retransmits datagrams, but a request or chunk
+ * can still be lost above it — the at-most-once {@code /poll} hand-off, a saturated request lane on
+ * the holder, a session dropped after its retransmit budget, or a holder send that fails midway and
+ * stops the rest of the stream. When no new chunk arrives for {@link #RE_REQUEST_AFTER_MS}
+ * (doubling per attempt, at most {@link #MAX_RE_REQUESTS} times), the fetcher signs a fresh request
+ * whose {@code have} bitmap lists the chunks it already holds, so the holder resends only the
+ * missing ones. Chunks of every request this fetch issued are accepted: positive chunks are signed
+ * over content only, never the nonce.
+ *
  * <p>Chunks arriving via EC2 RELAY_RESPONSE are attributed to the hop pub, not the holder. Auth is
  * the holder Ed25519 signature on each chunk — never require {@code sourcePub == holderPub} or
  * cellular TORRENT_FETCH times out.
@@ -83,6 +92,16 @@ public final class MeshTorrentMetadataFetcher
    * belt-and-suspenders cap so a bug can never grow the map without bound.
    */
   static final int MAX_TRACKED_HOLDERS = 64;
+
+  /**
+   * How long the fetch may go without a new chunk before it asks the holder again for the missing
+   * ones. Each further re-request waits twice as long as the previous one. Long enough that rUDP's
+   * own first retransmit (500 ms) and both sides' 300 ms polls normally land first.
+   */
+  static final long RE_REQUEST_AFTER_MS = 1_500;
+
+  /** Most re-requests one fetch sends after the first request. */
+  static final int MAX_RE_REQUESTS = 3;
 
   /**
    * Process-wide in-flight fetch gate. Fair so arrival order is preserved under contention;
@@ -121,6 +140,15 @@ public final class MeshTorrentMetadataFetcher
 
   private final byte[] nonce;
   private final CountDownLatch done = new CountDownLatch(1);
+
+  /** Nonces of every request this fetch sent; the first is {@link #nonce}. Guarded by this. */
+  private final List<byte[]> nonces = new ArrayList<>();
+
+  /** Last time a request went out or a new chunk arrived. Guarded by this. */
+  private long lastActivityNanos;
+
+  private final List<DistributedSearchTransport.SendOperation> operations = new ArrayList<>();
+  private final List<Future<Boolean>> sends = new ArrayList<>();
   private final Map<Integer, TorrentMetadataResponse> chunks = new HashMap<>();
   private int finalIndex = -1;
   private int retainedBytes;
@@ -143,6 +171,7 @@ public final class MeshTorrentMetadataFetcher
     byte[] n = new byte[32];
     new java.security.SecureRandom().nextBytes(n);
     this.nonce = n;
+    this.nonces.add(n);
   }
 
   /**
@@ -258,23 +287,10 @@ public final class MeshTorrentMetadataFetcher
 
   private byte[] fetchNow() {
     deadlineNanos = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(Math.min(timeoutMs, 60_000));
-    DistributedSearchTransport.SendOperation operation = null;
-    Future<Boolean> sent = null;
     Future<Boolean> verified = null;
     transport.addListener(this);
     try {
-      TorrentMetadataRequest request = buildSignedRequest();
-      if (request == null) {
-        return null;
-      }
-      byte[] payload = SearchPayloadCodec.encodeTorrentMetadataRequest(request);
-      operation = transport.createSend(holderPub, MeshProtocolId.METADATA, payload, deadlineNanos);
-      DistributedSearchTransport.SendOperation send = operation;
-      sent = submitOrNull(send::execute);
-      if (sent == null) {
-        return null;
-      }
-      if (!sent.get(Math.max(1, deadlineNanos - System.nanoTime()), TimeUnit.NANOSECONDS)) {
+      if (!sendRequest(nonce, null)) {
         LOG.info(
             "MeshTorrentMetadataFetcher: send failed to holder "
                 + Hex.encode(holderPub).substring(0, 8)
@@ -282,7 +298,7 @@ public final class MeshTorrentMetadataFetcher
                 + Hex.encode(infoHash));
         return null;
       }
-      if (!done.await(Math.max(0, deadlineNanos - System.nanoTime()), TimeUnit.NANOSECONDS)) {
+      if (!awaitChunks()) {
         LOG.info("MeshTorrentMetadataFetcher: timed out ih=" + Hex.encode(infoHash));
         return null;
       }
@@ -323,10 +339,10 @@ public final class MeshTorrentMetadataFetcher
       return null;
     } finally {
       closed = true;
-      if (operation != null) {
+      for (DistributedSearchTransport.SendOperation operation : operations) {
         operation.cancel();
       }
-      if (sent != null) {
+      for (Future<Boolean> sent : sends) {
         sent.cancel(true);
       }
       if (verified != null) {
@@ -338,6 +354,114 @@ public final class MeshTorrentMetadataFetcher
         chunks.clear();
       }
     }
+  }
+
+  /**
+   * Wait for the complete chunk set (or a holder error) until the deadline. Whenever the stream
+   * goes quiet for the current re-request interval, ask the holder again for the chunks still
+   * missing instead of waiting out the whole timeout for a frame that is never coming.
+   *
+   * @return true once {@link #done} fired, false at the deadline
+   */
+  private boolean awaitChunks() throws Exception {
+    int reRequests = 0;
+    while (true) {
+      long now = System.nanoTime();
+      long remaining = deadlineNanos - now;
+      if (remaining <= 0) {
+        return false;
+      }
+      long wait = remaining;
+      if (reRequests < MAX_RE_REQUESTS) {
+        long quietLimit = TimeUnit.MILLISECONDS.toNanos(RE_REQUEST_AFTER_MS << reRequests);
+        long dueIn;
+        synchronized (this) {
+          dueIn = lastActivityNanos + quietLimit - now;
+        }
+        if (dueIn <= 0) {
+          reRequests++;
+          reRequestMissing(reRequests);
+          continue;
+        }
+        wait = Math.min(wait, dueIn);
+      }
+      if (done.await(wait, TimeUnit.NANOSECONDS)) {
+        return true;
+      }
+    }
+  }
+
+  /** Sign and send a fresh request that names the chunks already held. */
+  private void reRequestMissing(int attempt) throws Exception {
+    byte[] retryNonce = new byte[32];
+    new java.security.SecureRandom().nextBytes(retryNonce);
+    byte[] have;
+    int held;
+    synchronized (this) {
+      if (done.getCount() == 0) {
+        return;
+      }
+      nonces.add(retryNonce);
+      have = haveBitmap();
+      held = chunks.size();
+    }
+    LOG.info(
+        "MeshTorrentMetadataFetcher: no progress, re-request "
+            + attempt
+            + "/"
+            + MAX_RE_REQUESTS
+            + " holding "
+            + held
+            + " chunks ih="
+            + Hex.encode(infoHash));
+    if (!sendRequest(retryNonce, have)) {
+      LOG.info("MeshTorrentMetadataFetcher: re-request send failed ih=" + Hex.encode(infoHash));
+    }
+  }
+
+  /**
+   * Bitmap of the chunk indexes already held, or null when none are (the holder then sends all).
+   */
+  private byte[] haveBitmap() {
+    if (chunks.isEmpty()) {
+      return null;
+    }
+    int highest = finalIndex;
+    for (int index : chunks.keySet()) {
+      highest = Math.max(highest, index);
+    }
+    byte[] bitmap = new byte[highest / 8 + 1];
+    for (int index : chunks.keySet()) {
+      bitmap[index >>> 3] |= (byte) (1 << (index & 7));
+    }
+    return bitmap;
+  }
+
+  /**
+   * Sign a request under {@code requestNonce} and send it on the bounded sender pool, waiting at
+   * most until the deadline. Marks activity so the next re-request waits a full interval.
+   *
+   * @return false when the request could not be built, the pool is saturated, or the send failed
+   */
+  private boolean sendRequest(byte[] requestNonce, byte[] have) throws Exception {
+    TorrentMetadataRequest request = buildSignedRequest(requestNonce, have);
+    if (request == null) {
+      return false;
+    }
+    byte[] payload = SearchPayloadCodec.encodeTorrentMetadataRequest(request);
+    DistributedSearchTransport.SendOperation operation =
+        transport.createSend(holderPub, MeshProtocolId.METADATA, payload, deadlineNanos);
+    operations.add(operation);
+    Future<Boolean> sent = submitOrNull(operation::execute);
+    if (sent == null) {
+      return false;
+    }
+    sends.add(sent);
+    boolean ok = sent.get(Math.max(1, deadlineNanos - System.nanoTime()), TimeUnit.NANOSECONDS);
+    synchronized (this) {
+      lastActivityNanos = System.nanoTime();
+    }
+    return ok;
   }
 
   /**
@@ -380,12 +504,13 @@ public final class MeshTorrentMetadataFetcher
     }
   }
 
-  private TorrentMetadataRequest buildSignedRequest() {
+  private TorrentMetadataRequest buildSignedRequest(byte[] requestNonce, byte[] have) {
     try {
       TorrentMetadataRequest.Builder b =
           TorrentMetadataRequest.builder()
               .infoHash(infoHash)
-              .nonce(nonce)
+              .nonce(requestNonce)
+              .have(have)
               .requesterPub(identity.ed25519PubRaw())
               .timestamp(System.currentTimeMillis() / 1000L);
       TorrentMetadataRequest unsigned = b.signature(new byte[64]).build();
@@ -422,7 +547,7 @@ public final class MeshTorrentMetadataFetcher
       LOG.warn("MeshTorrentMetadataFetcher: undecodable metadata frame");
       return;
     }
-    if (!Arrays.equals(response.nonce(), nonce) || !Arrays.equals(response.infoHash(), infoHash)) {
+    if (!isOwnNonce(response.nonce()) || !Arrays.equals(response.infoHash(), infoHash)) {
       LOG.warn(
           "MeshTorrentMetadataFetcher: metadata frame nonce/ih mismatch — stale or crossed fetch");
       return;
@@ -445,6 +570,10 @@ public final class MeshTorrentMetadataFetcher
       failed = true;
       done.countDown();
       return;
+    }
+    if (!Arrays.equals(response.nonce(), nonce)) {
+      // A re-request's answer: same signed content, restamped so assembly sees one nonce.
+      response = response.withNonceTimestamp(nonce, response.timestamp());
     }
     int index = response.chunkIndex();
     TorrentMetadataResponse previous = chunks.get(index);
@@ -470,11 +599,21 @@ public final class MeshTorrentMetadataFetcher
     payloadDigest = response.payloadDigest();
     retainedBytes += data.length;
     chunks.put(index, response);
+    lastActivityNanos = System.nanoTime();
     if (response.isFinalChunk()) {
       finalIndex = index;
     }
     if (finalIndex >= 0 && chunks.size() == finalIndex + 1) {
       done.countDown();
     }
+  }
+
+  private boolean isOwnNonce(byte[] candidate) {
+    for (byte[] issued : nonces) {
+      if (Arrays.equals(issued, candidate)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

@@ -112,4 +112,48 @@ class TorrentMetadataRequestTest {
                 .signature(new byte[63])
                 .build());
   }
+
+  @Test
+  void haveBitmapRoundTripsOutsideTheSignature() throws Exception {
+    KeyPair kp = ed25519();
+    TorrentMetadataRequest signed = signedRequest(kp, new byte[20], 1000L);
+    TorrentMetadataRequest withHave =
+        TorrentMetadataRequest.builder()
+            .infoHash(signed.infoHash())
+            .nonce(signed.nonce())
+            .requesterPub(signed.requesterPub())
+            .timestamp(signed.timestamp())
+            .signature(signed.signature())
+            .have(new byte[] {0b0000_0101, 0, (byte) 0x80})
+            .build();
+
+    TorrentMetadataRequest decoded =
+        SearchPayloadCodec.decodeTorrentMetadataRequest(
+            SearchPayloadCodec.encodeTorrentMetadataRequest(withHave));
+
+    assertNotNull(decoded);
+    assertTrue(decoded.verifySignature(), "have is a hint outside the signed bytes");
+    assertTrue(decoded.hasChunk(0));
+    assertFalse(decoded.hasChunk(1));
+    assertTrue(decoded.hasChunk(2));
+    assertTrue(decoded.hasChunk(23));
+    assertFalse(decoded.hasChunk(24), "indexes past the bitmap are wanted");
+    assertFalse(decoded.hasChunk(-1));
+    assertNull(signed.have());
+    assertFalse(signed.hasChunk(0), "no bitmap means every chunk is wanted");
+  }
+
+  @Test
+  void oversizedHaveBitmapIsRejected() {
+    assertThrows(
+        IllegalStateException.class,
+        () ->
+            TorrentMetadataRequest.builder()
+                .infoHash(new byte[20])
+                .nonce(new byte[32])
+                .requesterPub(new byte[32])
+                .signature(new byte[64])
+                .have(new byte[TorrentMetadataRequest.MAX_HAVE_BYTES + 1])
+                .build());
+  }
 }

@@ -18,15 +18,19 @@ import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -49,6 +53,10 @@ import java.util.concurrent.atomic.AtomicReference;
  *   <li>{@code createSend(peerPub, SEARCH, bytes, deadline)} and execute the send off-thread;
  *   <li>block on a latch up to a single monotonic {@link System#nanoTime()} deadline while the
  *       listener decodes, bounds, and verifies the manifest;
+ *   <li>if no new page arrives for {@link MeshTorrentMetadataFetcher#RE_REQUEST_AFTER_MS}
+ *       (doubling, at most {@link MeshTorrentMetadataFetcher#MAX_RE_REQUESTS} times), send a
+ *       freshly signed request and accept pages bound to any nonce this fetch issued, so a request
+ *       or page lost above rUDP does not cost the whole budget (frostwire/frostwire#1504);
  *   <li>always remove the listener and cancel the send in {@code finally}.
  * </ol>
  *
@@ -144,12 +152,16 @@ public final class CatalogBrowser {
       LOG.debug("CatalogBrowser: could not encode catalog browse request", t);
       return Collections.emptyList();
     }
-    final byte[] expectedNonce = request.nonce();
+    // Nonces of every request this fetch sent: a re-request's pages are as good as the first's.
+    final List<byte[]> nonces = new CopyOnWriteArrayList<>();
+    nonces.add(request.nonce());
     final CountDownLatch done = new CountDownLatch(1);
     final AtomicReference<List<RemoteIndexFetcher.RemoteTorrentEntry>> result =
         new AtomicReference<>();
     final Map<Integer, List<RemoteIndexFetcher.RemoteTorrentEntry>> pages = new HashMap<>();
     final int[] expectedPages = {-1};
+    // Last time a request went out or a new page arrived. Guarded by pages.
+    final long[] lastActivityNanos = {System.nanoTime()};
 
     DistributedSearchTransport.PayloadListener listener =
         new DistributedSearchTransport.PayloadListener() {
@@ -169,7 +181,7 @@ public final class CatalogBrowser {
             if (done.getCount() == 0 || System.nanoTime() >= deadlineNanos) {
               return;
             }
-            Page page = decodeAndVerifyManifest(payload, expectedNonce, target);
+            Page page = decodeAndVerifyManifest(payload, nonces, target);
             if (page == null) {
               return;
             }
@@ -185,9 +197,11 @@ public final class CatalogBrowser {
               } else if (expectedPages[0] != page.pages) {
                 return; // pages of a different catalog snapshot
               }
-              pages.putIfAbsent(page.page, page.entries);
+              if (pages.putIfAbsent(page.page, page.entries) == null) {
+                lastActivityNanos[0] = System.nanoTime();
+              }
               if (pages.size() == expectedPages[0]) {
-                result.compareAndSet(null, CatalogManifestPages.merge(pages));
+                result.compareAndSet(null, mergeDistinct(pages));
                 done.countDown();
               }
             }
@@ -195,18 +209,51 @@ public final class CatalogBrowser {
         };
 
     transport.addListener(listener);
-    DistributedSearchTransport.SendOperation operation = null;
-    Future<?> sendFuture = null;
+    List<DistributedSearchTransport.SendOperation> operations = new ArrayList<>();
+    List<Future<?>> sendFutures = new ArrayList<>();
     try {
-      operation = transport.createSend(target, MeshProtocolId.CATALOG, encoded, deadlineNanos);
+      DistributedSearchTransport.SendOperation operation =
+          transport.createSend(target, MeshProtocolId.CATALOG, encoded, deadlineNanos);
       if (operation == null) {
         return Collections.emptyList();
       }
-      final DistributedSearchTransport.SendOperation op = operation;
-      sendFuture = SENDERS.submit(op::execute);
-      long remaining = deadlineNanos - System.nanoTime();
-      if (remaining > 0) {
-        done.await(remaining, TimeUnit.NANOSECONDS);
+      operations.add(operation);
+      sendFutures.add(SENDERS.submit(operation::execute));
+      synchronized (pages) {
+        lastActivityNanos[0] = System.nanoTime();
+      }
+      int reRequests = 0;
+      while (true) {
+        long now = System.nanoTime();
+        long remaining = deadlineNanos - now;
+        if (remaining <= 0) {
+          break;
+        }
+        long wait = remaining;
+        if (reRequests < MeshTorrentMetadataFetcher.MAX_RE_REQUESTS) {
+          long dueIn;
+          synchronized (pages) {
+            dueIn =
+                lastActivityNanos[0]
+                    + TimeUnit.MILLISECONDS.toNanos(
+                        MeshTorrentMetadataFetcher.RE_REQUEST_AFTER_MS << reRequests)
+                    - now;
+          }
+          if (dueIn <= 0) {
+            // Pages or the request were lost above rUDP: ask again rather than wait out the
+            // whole budget (frostwire/frostwire#1504).
+            reRequests++;
+            reRequest(target, deadlineNanos, nonces, operations, sendFutures);
+            synchronized (pages) {
+              lastActivityNanos[0] = System.nanoTime();
+            }
+            continue;
+          }
+          wait = Math.min(wait, dueIn);
+        }
+        if (done.await(wait, TimeUnit.NANOSECONDS)) {
+          break;
+        }
       }
       List<RemoteIndexFetcher.RemoteTorrentEntry> entries = result.get();
       if (entries == null) {
@@ -220,7 +267,7 @@ public final class CatalogBrowser {
                     + expectedPages[0]
                     + " pages from "
                     + Hex.encode(target));
-            return CatalogManifestPages.merge(pages);
+            return mergeDistinct(pages);
           }
         }
       }
@@ -232,15 +279,68 @@ public final class CatalogBrowser {
       LOG.debug("CatalogBrowser.fetchCatalog failed for peer " + Hex.encode(target), t);
       return Collections.emptyList();
     } finally {
-      if (sendFuture != null) {
+      for (Future<?> sendFuture : sendFutures) {
         sendFuture.cancel(true);
       }
-      if (operation != null) {
+      for (DistributedSearchTransport.SendOperation operation : operations) {
         operation.cancel();
       }
       SENDERS.purge();
       transport.removeListener(listener);
     }
+  }
+
+  /**
+   * Send a freshly signed browse request; its nonce joins {@code nonces} first so its pages are
+   * accepted. Best effort: a saturated sender pool or a failed send just leaves the fetch waiting.
+   */
+  private void reRequest(
+      byte[] target,
+      long deadlineNanos,
+      List<byte[]> nonces,
+      List<DistributedSearchTransport.SendOperation> operations,
+      List<Future<?>> sendFutures) {
+    byte[] retryNonce = new byte[NONCE_LENGTH];
+    new SecureRandom().nextBytes(retryNonce);
+    RemoteCatalogBrowseRequest retry = buildSignedRequest(target, retryNonce);
+    if (retry == null) {
+      return;
+    }
+    nonces.add(retry.nonce());
+    LOG.info(
+        "CatalogBrowser: no progress, re-request "
+            + (nonces.size() - 1)
+            + "/"
+            + MeshTorrentMetadataFetcher.MAX_RE_REQUESTS
+            + " to "
+            + Hex.encode(target));
+    try {
+      DistributedSearchTransport.SendOperation operation =
+          transport.createSend(
+              target,
+              MeshProtocolId.CATALOG,
+              SearchPayloadCodec.encodeCatalogBrowseRequest(retry),
+              deadlineNanos);
+      if (operation != null) {
+        operations.add(operation);
+        sendFutures.add(SENDERS.submit(operation::execute));
+      }
+    } catch (RejectedExecutionException e) {
+      LOG.debug("CatalogBrowser: sender pool saturated, skipping re-request");
+    }
+  }
+
+  /**
+   * Concatenate pages in order, keeping the first row per info hash: after a re-request, pages may
+   * come from two snapshots of the catalog taken seconds apart, so a row can appear on both.
+   */
+  private static List<RemoteIndexFetcher.RemoteTorrentEntry> mergeDistinct(
+      Map<Integer, List<RemoteIndexFetcher.RemoteTorrentEntry>> pages) {
+    Map<String, RemoteIndexFetcher.RemoteTorrentEntry> distinct = new LinkedHashMap<>();
+    for (RemoteIndexFetcher.RemoteTorrentEntry entry : CatalogManifestPages.merge(pages)) {
+      distinct.putIfAbsent(entry.infoHashHex(), entry);
+    }
+    return new ArrayList<>(distinct.values());
   }
 
   private RemoteCatalogBrowseRequest buildSignedRequest(byte[] targetPub, byte[] nonce) {
@@ -282,6 +382,11 @@ public final class CatalogBrowser {
    * valid, peer-signed manifest for this fetch.
    */
   static Page decodeAndVerifyManifest(byte[] payload, byte[] expectedNonce, byte[] peerPub) {
+    return decodeAndVerifyManifest(payload, List.of(expectedNonce), peerPub);
+  }
+
+  /** As above, accepting a manifest bound to any of the {@code expectedNonces} this fetch sent. */
+  static Page decodeAndVerifyManifest(byte[] payload, List<byte[]> expectedNonces, byte[] peerPub) {
     if (payload == null || payload.length == 0 || payload.length > MAX_MANIFEST_BYTES) {
       return null;
     }
@@ -295,7 +400,11 @@ public final class CatalogBrowser {
       JsonElement nonceElement = root.get("nonce");
       if (nonceElement != null && nonceElement.isJsonPrimitive()) {
         manifestNonce = Base64.getDecoder().decode(nonceElement.getAsString());
-        if (!Arrays.equals(manifestNonce, expectedNonce)) {
+        boolean ours = false;
+        for (byte[] expectedNonce : expectedNonces) {
+          ours |= Arrays.equals(manifestNonce, expectedNonce);
+        }
+        if (!ours) {
           return null;
         }
       }

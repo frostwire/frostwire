@@ -82,6 +82,35 @@ class TorrentFetchOverMeshTest {
     assertArrayEquals(torrentBytes, fetched);
   }
 
+  /**
+   * frostwire/frostwire#1504: a chunk lost above rUDP (here: the requester's delivery of chunk 1)
+   * is asked for again, and the holder resends it, long before the 10 s timeout.
+   */
+  @Test
+  void requesterRecoversAChunkLostAboveRudp() throws Exception {
+    Instance requester = startInstance("lossy-requester");
+    Instance holder = startInstance("lossy-holder");
+    crossRegister(requester, holder);
+    byte[] torrentBytes = TestTorrentMetadata.bytes(1000);
+    holder.provider.delegate = infoHash1 -> infoHash1 == null ? null : torrentBytes;
+    ChunkDroppingTransport lossy = new ChunkDroppingTransport(requester.transport, 1);
+
+    long start = System.currentTimeMillis();
+    byte[] fetched =
+        MeshTorrentMetadataFetcher.fetch(
+            lossy,
+            requester.identity,
+            holder.identity.ed25519PubRaw(),
+            TestTorrentMetadata.infoHash(),
+            10_000);
+    long elapsed = System.currentTimeMillis() - start;
+
+    assertTrue(lossy.dropped.get(), "the test must actually lose chunk 1");
+    assertNotNull(fetched, "a lost chunk must be re-requested, not wait out the timeout");
+    assertArrayEquals(torrentBytes, fetched);
+    assertTrue(elapsed < 7_000, "recovery took " + elapsed + "ms");
+  }
+
   @Test
   void notFoundFallsBackFastWithoutWaitingOutTheTimeout() throws Exception {
     Instance requester = startInstance("requester");
@@ -292,6 +321,69 @@ class TorrentFetchOverMeshTest {
     resources.add(() -> incomingHandler.stop());
 
     return new Instance(identity, directory, client, transport, provider, server.rudpPort());
+  }
+
+  /** Delegates to a real transport but loses the first METADATA chunk with one index. */
+  private static final class ChunkDroppingTransport implements DistributedSearchTransport {
+    private final DistributedSearchTransport delegate;
+    private final int dropIndex;
+    final java.util.concurrent.atomic.AtomicBoolean dropped =
+        new java.util.concurrent.atomic.AtomicBoolean();
+    private final java.util.Map<PayloadListener, PayloadListener> wrapped =
+        new java.util.concurrent.ConcurrentHashMap<>();
+
+    ChunkDroppingTransport(DistributedSearchTransport delegate, int dropIndex) {
+      this.delegate = delegate;
+      this.dropIndex = dropIndex;
+    }
+
+    @Override
+    public boolean send(byte[] targetPub, int protocolId, byte[] payload) {
+      return delegate.send(targetPub, protocolId, payload);
+    }
+
+    @Override
+    public SendOperation createSend(
+        byte[] targetPub, int protocolId, byte[] payload, long deadlineNanos) {
+      return delegate.createSend(targetPub, protocolId, payload, deadlineNanos);
+    }
+
+    @Override
+    public void addListener(PayloadListener listener) {
+      PayloadListener filter =
+          new PayloadListener() {
+            @Override
+            public void onPayload(byte[] sourcePub, byte[] payload, long receivedMs) {
+              listener.onPayload(sourcePub, payload, receivedMs);
+            }
+
+            @Override
+            public void onPayload(
+                byte[] sourcePub, byte[] payload, long receivedMs, int protocolId) {
+              if (protocolId == com.frostwire.search.relay.icebridge.MeshProtocolId.METADATA) {
+                TorrentMetadataResponse chunk =
+                    SearchPayloadCodec.decodeTorrentMetadataResponse(payload);
+                if (chunk != null
+                    && !chunk.isError()
+                    && chunk.chunkIndex() == dropIndex
+                    && dropped.compareAndSet(false, true)) {
+                  return;
+                }
+              }
+              listener.onPayload(sourcePub, payload, receivedMs, protocolId);
+            }
+          };
+      wrapped.put(listener, filter);
+      delegate.addListener(filter);
+    }
+
+    @Override
+    public void removeListener(PayloadListener listener) {
+      PayloadListener filter = wrapped.remove(listener);
+      if (filter != null) {
+        delegate.removeListener(filter);
+      }
+    }
   }
 
   private static final class MutableProvider implements TorrentMetadataProvider {

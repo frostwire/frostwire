@@ -513,9 +513,14 @@ public final class IncomingSearchRequestHandler
   /**
    * Serve cached signed templates to a new request: restamp each with the live nonce/timestamp
    * (outside the positive v3 signature domain), encode, and send. Zero Ed25519 SIGNs on a hit.
+   * Chunks the request's {@code have} bitmap marks as already held are skipped, so a requester
+   * re-asking after a lost chunk gets only what is missing (frostwire/frostwire#1504).
    */
   private void sendCachedTemplates(CachedMetadata cached, TorrentMetadataRequest request, long ts) {
     for (TorrentMetadataResponse template : cached.signedChunks) {
+      if (request.hasChunk(template.chunkIndex())) {
+        continue;
+      }
       if (!isMetadataPublic(cached.provider, request.infoHash())) {
         torrentCache.remove(request.infoHashHex());
         return;
