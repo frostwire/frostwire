@@ -1,4 +1,5 @@
 FrostWire 7.1.4 UNRELEASED
+   - fix:A SoundCloud download that can't start now shows an error in Transfers instead of staying "Waiting" forever (#1510)
    - fix:The first search results no longer freeze the window while the Source column loads its site icons; they are loaded at startup in the background (#1509)
    - fix:Windows: right-clicking the search box or another text field no longer freezes while FrostWire waits for the clipboard; Paste is offered without checking what the clipboard holds (#1508)
    - fix:The first right-click menu on a search, transfer or library list no longer stalls while Java loads the menu's keyboard actions; that happens at startup in the background (#1507)
