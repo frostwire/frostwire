@@ -1,4 +1,5 @@
 FrostWire 7.1.4 UNRELEASED
+   - fix:Opening the share dialog for a transfer no longer stalls while its four buttons read their icons from disk; they are loaded in the background before it opens (#1514)
    - fix:A magnet link whose name or trackers come before its hash is now opened from the search box, the clipboard, a link clicked on macOS, or when it starts FrostWire on Windows and Linux; it used to run a search or be ignored (#1513)
    - fix:Dragging a transfer and letting go of it over the Transfers list no longer freezes FrostWire while it lists the transfer's files; the list ignores its own drags (#1511)
    - fix:A SoundCloud download that can't start now shows an error in Transfers instead of staying "Waiting" forever (#1510)
