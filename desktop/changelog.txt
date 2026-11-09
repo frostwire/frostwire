@@ -1,4 +1,6 @@
 FrostWire 7.1.4 NOV/09/2026
+   - fix:Pasting into the search box or another text field with Ctrl+V no longer freezes FrostWire while Windows waits for the app that copied the text; the clipboard is read in the background (#1517)
+   - fix:A disabled button no longer freezes the window the first time it is drawn while Java prepares its greyed-out icon on another thread; the grey icon is made directly (#1516)
    - fix:Opening FrostWire on a slow computer no longer freezes while the main window lays out tabs you haven't opened yet; each tab is laid out the first time you open it (#1515)
    - fix:Torrent details and peer catalogs fetched from other FrostWire users over IceBridge no longer fail after a long wait when one piece of the answer is lost on the way; the missing piece is requested again (#1504)
    - Anonymous crash and freeze reports now say how long FrostWire had been running, whether its startup warm-up had finished, and, for a freeze, how much CPU the window thread, FrostWire and the whole computer used and which threads used most, so freezes on slow machines can be traced (#1490, #1512)
