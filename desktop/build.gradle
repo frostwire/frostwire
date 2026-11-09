@@ -1132,6 +1132,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.ShutdownWindowImageTest"
         includeTestsMatching "com.limegroup.gnutella.gui.MainFrameWindowSizeTest"
         includeTestsMatching "com.limegroup.gnutella.gui.MainFrameDeferredTabsTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.MainFrameLazyTabsTest"
     }
 
     testLogging {

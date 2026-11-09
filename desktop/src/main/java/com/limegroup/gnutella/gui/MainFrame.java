@@ -42,6 +42,7 @@ import java.awt.event.WindowEvent;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import javax.swing.*;
 import net.miginfocom.swing.MigLayout;
 
@@ -217,7 +218,8 @@ public final class MainFrame {
     int width = horizontal.getMinimumSize().width;
     int height = 0;
     for (JComponent c : verticals) {
-      // A tab holder measures only the tab on show; the window must fit every tab.
+      // A tab holder measures only the tab on show; the window must fit every tab shown so far
+      // (tabs join the window when first shown, see showCard; MINIMUM_WINDOW_SIZE covers the rest).
       height +=
           c.getLayout() instanceof VisibleCardLayout cards
               ? cards.largestCardMinimumSize(c).height
@@ -319,8 +321,7 @@ public final class MainFrame {
     TABS.put(Tabs.LIBRARY, libraryTab);
 
     TABBED_PANE.setPreferredSize(new Dimension(10000, 10000));
-    // Add Search and Library tabs immediately so they're visible
-    addTabsPartial(useSearchTransfersSplitView);
+    updateEnabledTabs(useSearchTransfersSplitView);
   }
 
   private void scheduleDeferredTabInitialization(boolean useSearchTransfersSplitView) {
@@ -347,8 +348,8 @@ public final class MainFrame {
                   TABS.put(Tabs.SEARCH_TRANSFERS, searchTransfers);
                 }
               }
-              // Add all tabs now that deferred tabs are populated
-              addTabs(useSearchTransfersSplitView);
+              // The tabs join the window when first shown (showCard).
+              updateEnabledTabs(useSearchTransfersSplitView);
               TABBED_PANE.setRequestFocusEnabled(false);
               ApplicationHeader header = APPLICATION_HEADER;
               if (header != null) {
@@ -376,46 +377,28 @@ public final class MainFrame {
     return Tabs.LIBRARY;
   }
 
-  /** Add only Search and Library tabs initially (lightweight tabs that don't block EDT) */
-  private void addTabsPartial(boolean useSearchTransfersSplitView) {
-    updateEnabledTabs(useSearchTransfersSplitView);
-    // Only add Search and Library tabs initially
-    Tab searchTab = TABS.get(Tabs.SEARCH);
-    if (searchTab != null && Tabs.SEARCH.isEnabled()) {
-      addTabIfAbsent(Tabs.SEARCH, searchTab);
-    }
-    Tab libraryTab = TABS.get(Tabs.LIBRARY);
-    if (libraryTab != null && Tabs.LIBRARY.isEnabled()) {
-      addTabIfAbsent(Tabs.LIBRARY, libraryTab);
-    }
-  }
-
-  private void addTabs(boolean useSearchTransfersSplitView) {
-    updateEnabledTabs(useSearchTransfersSplitView);
-    for (Tabs tabEnum : Tabs.values()) {
-      final Tab tab = TABS.get(tabEnum);
-      if (tabEnum.isEnabled() && tab != null) {
-        addTabIfAbsent(tabEnum, tab);
-      }
-    }
-  }
-
   /**
-   * Adds a tab to the `JTabbedPane` based on the data supplied in the `Tab` instance.
+   * Shows {@code tab}'s card, adding it to {@code cards} the first time it is shown.
    *
-   * @param tab the `Tab` instance containing data for the tab to add
+   * <p>Tabs join the window only when first shown: Swing's validateTree lays out every child of a
+   * container, hidden cards included, so a window holding every tab laid out all of them when it
+   * first appeared, and again whenever one of them changed. On a 2-CPU machine the first showing of
+   * the main window froze for over 5 s, sampled while a hidden tab's table header measured itself
+   * (Icebase #b64b06849851, frostwire/frostwire#1515).
+   *
+   * @return false when the tab has no component to show
    */
-  private void addTabIfAbsent(Tabs tabEnum, Tab tab) {
-    if (tab == null || addedCards.contains(tabEnum)) {
-      return;
+  static boolean showCard(JPanel cards, Set<Tabs> added, Tabs which, Tab tab) {
+    if (!added.contains(which)) {
+      JComponent component = tab.getComponent();
+      if (component == null) {
+        return false;
+      }
+      cards.add(component, tab.getTitle());
+      added.add(which);
     }
-    String title = tab.getTitle();
-    JComponent component = tab.getComponent();
-    if (component == null) {
-      return;
-    }
-    TABBED_PANE.add(component, title);
-    addedCards.add(tabEnum);
+    ((CardLayout) cards.getLayout()).show(cards, tab.getTitle());
+    return true;
   }
 
   /**
@@ -538,7 +521,6 @@ public final class MainFrame {
       setSelectedTab(fallback);
       return;
     }
-    CardLayout cl = (CardLayout) (TABBED_PANE.getLayout());
     Tab t = getTab(tab);
     if (t == null) {
       Tabs fallback = resolveDefaultTab();
@@ -547,8 +529,9 @@ public final class MainFrame {
       }
       return;
     }
-    addTabIfAbsent(tab, t);
-    cl.show(TABBED_PANE, t.getTitle());
+    if (!showCard(TABBED_PANE, addedCards, tab, t)) {
+      return;
+    }
     currentSelectedTab = tab;
     if (APPLICATION_HEADER != null) {
       APPLICATION_HEADER.selectTab(t);
