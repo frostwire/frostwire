@@ -1,4 +1,5 @@
 FrostWire 3.2.4 build 780 NOV/09/2026
+  - fix:Torrent details and peer catalogs fetched from other FrostWire users over IceBridge no longer fail after a long wait when one piece of the answer is lost on the way; the missing piece is requested again (#1504)
   - fix:Tapping a magnet link in your browser or another app now offers to open it in FrostWire, and FrostWire can be your default app for magnet links; Android never matched magnet links to FrostWire before (#1513)
   - fix:A magnet link pasted into the search box or the Transfers "add URL" box always starts the download; magnets whose name or trackers come before the hash ran a search or were dropped (#1513)
   - fix:Archive.org searches on slow connections return their results instead of timing out after 5 seconds; they get 15 seconds, as on desktop (#1002)
