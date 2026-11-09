@@ -104,7 +104,9 @@ class DesktopReleasePackagingStructureTest {
     assertTrue(initializer.contains("MacEventHandler.instance()"));
     assertTrue(macEventHandler.contains("setOpenURIHandler"));
     assertTrue(macEventHandler.contains("java.awt.desktop.OpenURIHandler"));
-    assertTrue(macEventHandler.contains("GUIMediator.instance().openTorrentURI(uri, false)"));
+    assertTrue(
+        macEventHandler.contains(
+            "GUIMediator.instance().openTorrentURI(UrlUtils.normalizeTorrentLink(uri), false)"));
     assertFalse(
         Files.exists(DESKTOP.resolve("src/main/java/com/limegroup/gnutella/gui/GURLHandler.java")));
     assertFalse(Files.exists(DESKTOP.resolve("lib/native-src/osx/GURLjnilib.c")));
