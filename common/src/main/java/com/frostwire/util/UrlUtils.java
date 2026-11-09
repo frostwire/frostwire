@@ -282,6 +282,62 @@ public final class UrlUtils {
   }
 
   /**
+   * Whether text a user typed, pasted or opened is a magnet link FrostWire can download: {@code
+   * magnet:?} in any case with a v1 info hash in any form {@link #magnetHexInfoHash(String)} reads,
+   * wherever its {@code xt} parameter is. Surrounding whitespace is ignored. Use this instead of
+   * {@code startsWith("magnet:?xt=urn:btih:")}, which misses magnets whose {@code dn} or {@code tr}
+   * comes first (frostwire/frostwire#1513).
+   */
+  public static boolean isMagnetLink(String text) {
+    return text != null && magnetHexInfoHash(text.trim()) != null;
+  }
+
+  /**
+   * Whether text is a link to a torrent: a magnet link ({@link #isMagnetLink(String)}), or an
+   * http(s) URL whose path ends in {@code .torrent} in any case, with or without a query or
+   * fragment. Surrounding whitespace is ignored.
+   */
+  public static boolean isTorrentLink(String text) {
+    if (text == null) {
+      return false;
+    }
+    String link = text.trim();
+    if (isMagnetLink(link)) {
+      return true;
+    }
+    if (!link.regionMatches(true, 0, "http://", 0, 7)
+        && !link.regionMatches(true, 0, "https://", 0, 8)) {
+      return false;
+    }
+    int end = link.length();
+    int query = link.indexOf('?');
+    if (query >= 0) {
+      end = query;
+    }
+    int fragment = link.indexOf('#');
+    if (fragment >= 0 && fragment < end) {
+      end = fragment;
+    }
+    return end >= 8 && link.regionMatches(true, end - 8, ".torrent", 0, 8);
+  }
+
+  /**
+   * The link to hand to the download code: trimmed, with a magnet link's scheme in lower case
+   * ({@code Magnet:?} becomes {@code magnet:?}), since that code checks {@code
+   * startsWith("magnet:")}. Anything else is returned trimmed; null stays null.
+   */
+  public static String normalizeTorrentLink(String text) {
+    if (text == null) {
+      return null;
+    }
+    String link = text.trim();
+    if (link.regionMatches(true, 0, "magnet:", 0, 7) && !link.startsWith("magnet:")) {
+      return "magnet:" + link.substring(7);
+    }
+    return link;
+  }
+
+  /**
    * The v1 info hash of a magnet link, as 40 lowercase hex digits, from its first {@code
    * xt=urn:btih:} parameter: 40 hex digits, or 32 base32 digits converted to hex (BEP 9). The
    * scheme, the parameter name and the urn are matched in any case and {@code xt} may come after
