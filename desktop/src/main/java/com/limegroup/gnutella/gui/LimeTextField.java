@@ -32,6 +32,12 @@ import javax.swing.undo.UndoManager;
 
 /** A better JTextField. */
 public class LimeTextField extends JTextField {
+  /** Reads the clipboard off the EDT (frostwire/frostwire#1517, see AsyncPaste). */
+  @Override
+  public void paste() {
+    com.limegroup.gnutella.gui.util.AsyncPaste.paste(this);
+  }
+
   /** The undo action. */
   private static final Action UNDO_ACTION =
       new FieldAction(I18n.tr("Undo")) {

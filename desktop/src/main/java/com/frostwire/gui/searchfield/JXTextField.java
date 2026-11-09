@@ -24,6 +24,12 @@ class JXTextField extends JTextField {
     PromptSupport.init(promptText, promptForeground, promptBackground, this);
   }
 
+  /** Reads the clipboard off the EDT (frostwire/frostwire#1517, see AsyncPaste). */
+  @Override
+  public void paste() {
+    com.limegroup.gnutella.gui.util.AsyncPaste.paste(this);
+  }
+
   /**
    * @see PromptSupport#setPrompt(String, javax.swing.text.JTextComponent)
    */
