@@ -1,4 +1,8 @@
-FrostWire 7.1.4 NOV/09/2026
+FrostWire 7.1.4 NOV/10/2026
+   - fix:Freeze reports sent when the whole computer stalled, not FrostWire, are labeled as such so they stop hiding real problems (#1512)
+   - fix:The first search no longer freezes on a slow computer while FrostWire prepares to compare accented keywords; that is prepared once, at startup (#1521)
+   - fix:Previewing a search result whose stream can't be found (some SoundCloud tracks) no longer fails silently; FrostWire opens the result's page instead (#1520)
+   - fix:An error in Java's own system tray code on Linux, when the desktop's tray goes away while FrostWire's close dialog is open, is no longer reported as a FrostWire crash (#1518)
    - fix:Pasting into the search box or another text field with Ctrl+V no longer freezes FrostWire while Windows waits for the app that copied the text; the clipboard is read in the background (#1517)
    - fix:A disabled button no longer freezes the window the first time it is drawn while Java prepares its greyed-out icon on another thread; the grey icon is made directly (#1516)
    - fix:Opening FrostWire on a slow computer no longer freezes while the main window lays out tabs you haven't opened yet; each tab is laid out the first time you open it (#1515)
