@@ -33,6 +33,7 @@ import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.util.Logger;
+import com.frostwire.util.SearchText;
 import com.limegroup.gnutella.gui.ApplicationHeader;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
@@ -41,7 +42,6 @@ import com.limegroup.gnutella.gui.util.WarmExecutors;
 import com.limegroup.gnutella.settings.SearchSettings;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.text.Normalizer;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import javax.swing.*;
@@ -656,10 +656,7 @@ public final class SearchMediator {
   }
 
   private String normalize(String token) {
-    String norm = Normalizer.normalize(token, Normalizer.Form.NFKD);
-    norm = norm.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-    norm = norm.toLowerCase(Locale.US);
-    return norm;
+    return SearchText.normalize(token);
   }
 
   public static boolean isYouTubePlaylistUrl(String url) {

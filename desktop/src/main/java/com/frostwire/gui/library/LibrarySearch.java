@@ -22,6 +22,7 @@ import com.frostwire.gui.bittorrent.TorrentUtil;
 import com.frostwire.gui.searchfield.JXSearchField.SearchMode;
 import com.frostwire.gui.searchfield.SearchField;
 import com.frostwire.util.BoundedFileWalker;
+import com.frostwire.util.SearchText;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
@@ -38,7 +39,6 @@ import java.io.File;
 import java.io.FileFilter;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.text.Normalizer;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
@@ -194,10 +194,7 @@ public class LibrarySearch extends JPanel {
     }
 
     private String normalize(String token) {
-      String norm = Normalizer.normalize(token, Normalizer.Form.NFKD);
-      norm = norm.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-      norm = norm.toLowerCase(Locale.US);
-      return norm;
+      return SearchText.normalize(token);
     }
   }
 

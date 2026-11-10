@@ -610,6 +610,7 @@ public final class JdkWarmUp {
       warmUpDateFormatAndCollation(formatLocale(), Locale.getDefault());
       warmUpDateToString();
       warmUpNormalizer();
+      warmUpSearchText();
     } catch (Throwable t) {
       LOG.warn("Date format and collation warm-up failed: " + t.getMessage(), t);
     }
@@ -925,6 +926,15 @@ public final class JdkWarmUp {
    */
   static String warmUpNormalizer() {
     return Normalizer.normalize("cafe\u0301", Normalizer.Form.NFC);
+  }
+
+  /**
+   * The normalization of search keywords: compiles {@link SearchText}'s pattern, which initializes
+   * {@code Character.UnicodeBlock}, and loads the NFKD data. The first search did both on the EDT
+   * (Icebase #914536b5767d, frostwire/frostwire#1521).
+   */
+  static String warmUpSearchText() {
+    return SearchText.normalize("Cafe\u0301");
   }
 
   /**
