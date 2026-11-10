@@ -139,6 +139,13 @@ public abstract class AbstractUISearchResult implements UISearchResult {
   }
 
   private void playStream(String streamUrl) {
+    if (streamUrl == null || streamUrl.isBlank()) {
+      // The stream's address couldn't be resolved (a SoundCloud track with no supported
+      // transcoding, a failed lookup): show the result's page instead, if it has one
+      // (frostwire#1520).
+      showSearchResultWebPage(true);
+      return;
+    }
     // Stream playback - open in browser
     GUIMediator.openURL(streamUrl);
   }
