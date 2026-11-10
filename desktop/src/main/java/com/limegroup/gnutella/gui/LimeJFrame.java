@@ -19,11 +19,15 @@
 package com.limegroup.gnutella.gui;
 
 import com.frostwire.util.OSUtils;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.function.BiConsumer;
 import javax.swing.*;
 import org.limewire.util.SystemUtils;
 
@@ -82,8 +86,21 @@ public class LimeJFrame extends JFrame {
   @Override
   public void addNotify() {
     super.addNotify();
-    // Replace the Swing icon with a prettier platform-specific one
-    SystemUtils.setWindowIcon(this, GUIConstants.FROSTWIRE_EXE_FILE);
+    setPlatformIcon(this, BackgroundQueuedExecutorService::schedule, SystemUtils::setWindowIcon);
+  }
+
+  /**
+   * Replaces the Swing icon of a frame that has its native window with the platform's own, in the
+   * background. On Windows that is a native call that finds the window handle, reads the icons out
+   * of FrostWire.exe the first time and sends the window two messages: none of it needs the EDT,
+   * and it froze the window as it appeared (frostwire/frostwire#1522). A frame disposed before the
+   * call runs just gets no icon.
+   *
+   * <p>Thread-safe: only hands the call to {@code background}.
+   */
+  static void setPlatformIcon(
+      Component frame, Executor background, BiConsumer<Component, File> setIcon) {
+    background.execute(() -> setIcon.accept(frame, GUIConstants.FROSTWIRE_EXE_FILE));
   }
 
   private void setupPopupHide() {
