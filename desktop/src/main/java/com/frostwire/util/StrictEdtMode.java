@@ -320,7 +320,11 @@ public final class StrictEdtMode {
         System.err.flush();
       }
       maybeQueueProductionReport(
-          report.tag() + event.getClass().getName() + "#" + event.getID(),
+          processStallTag(gcWindow, thresholdMs)
+              + report.tag()
+              + event.getClass().getName()
+              + "#"
+              + event.getID(),
           report.stack(),
           gcWindow,
           cpuWindow);
@@ -371,6 +375,30 @@ public final class StrictEdtMode {
     int count = (int) Math.max(0, end.count() - start.count());
     int timeMs = (int) Math.min(windowMs, Math.max(0, end.timeMs() - start.timeMs()));
     return new CrashReportSpooler.GcWindow(count, timeMs, windowMs);
+  }
+
+  static final String PROCESS_STALL_TAG = "process-stall:";
+
+  /** How late the watchdog has to run, beyond what GC explains, to call it a process stall. */
+  static final int PROCESS_STALL_LATE_MS = 1000;
+
+  /**
+   * {@link #PROCESS_STALL_TAG} when the watchdog itself ran late, otherwise an empty string. The
+   * watchdog samples the EDT halfway to the threshold and again at the threshold, on its own
+   * thread, so {@code gcWindow} should span the second half of the threshold. A window that is much
+   * longer, with no GC pause to account for it, means the watchdog thread could not run either: the
+   * whole process (or the machine) was stalled, and the EDT stack is whatever line it happened to
+   * be on (frostwire/frostwire#1512). Icebase groups these reports per build instead of per stack.
+   *
+   * <p>Thread-safe: stateless.
+   */
+  static String processStallTag(CrashReportSpooler.GcWindow gcWindow, long thresholdMs) {
+    if (gcWindow == null) {
+      return "";
+    }
+    long expectedWindowMs = thresholdMs - earlySampleDelayMs(thresholdMs);
+    long lateMs = gcWindow.windowMs() - expectedWindowMs;
+    return lateMs - gcWindow.timeMs() >= PROCESS_STALL_LATE_MS ? PROCESS_STALL_TAG : "";
   }
 
   /**

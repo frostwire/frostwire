@@ -46,6 +46,30 @@ class StrictEdtModeTest {
   }
 
   @Test
+  void aLateWatchdogWithoutGcIsAProcessStall() {
+    // Icebase #2a14320f1f24: 5 s threshold, the second sample came 5,794 ms after the first.
+    assertEquals(
+        StrictEdtMode.PROCESS_STALL_TAG,
+        StrictEdtMode.processStallTag(new CrashReportSpooler.GcWindow(0, 0, 5794), 5000));
+    assertEquals(
+        StrictEdtMode.PROCESS_STALL_TAG,
+        StrictEdtMode.processStallTag(new CrashReportSpooler.GcWindow(0, 0, 3500), 5000));
+  }
+
+  @Test
+  void aWatchdogOnTimeOrDelayedByGcIsNotAProcessStall() {
+    assertEquals(
+        "", StrictEdtMode.processStallTag(new CrashReportSpooler.GcWindow(0, 0, 2500), 5000));
+    // A few hundred milliseconds late is scheduling noise (Icebase #4bafe7bb799f: 2,874 ms).
+    assertEquals(
+        "", StrictEdtMode.processStallTag(new CrashReportSpooler.GcWindow(0, 0, 2874), 5000));
+    // GC pauses stop the watchdog thread too: that is a GC stall, reported with its stack.
+    assertEquals(
+        "", StrictEdtMode.processStallTag(new CrashReportSpooler.GcWindow(12, 3400, 6000), 5000));
+    assertEquals("", StrictEdtMode.processStallTag(null, 5000));
+  }
+
+  @Test
   void gcTotalsNeverGoNegative() {
     StrictEdtMode.GcTotals totals = StrictEdtMode.GcTotals.now();
     assertTrue(totals.count() >= 0);
