@@ -1136,6 +1136,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.MainFrameDeferredTabsTest"
         includeTestsMatching "com.limegroup.gnutella.gui.MainFrameLazyTabsTest"
         includeTestsMatching "com.limegroup.gnutella.gui.LimeJFramePlatformIconTest"
+        includeTestsMatching "org.limewire.util.FileUtilsListFilesTest"
     }
 
     testLogging {

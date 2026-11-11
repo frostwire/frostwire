@@ -23,6 +23,7 @@ import com.frostwire.util.OSUtils;
 import java.awt.Desktop;
 import java.io.*;
 import java.net.URL;
+import java.nio.file.DirectoryIteratorException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -258,21 +259,37 @@ public class FileUtils {
 
   // aldenml: Why are we using NIO2 for this?
   public static File[] listFiles(File directoryFile) {
-    List<File> files = new LinkedList<>();
     DirectoryStream<Path> dir = null;
     try {
       dir = Files.newDirectoryStream(directoryFile.toPath());
+      return listFiles(dir);
+    } catch (IOException e) {
+      e.printStackTrace();
+      return new File[0];
+    } finally {
+      if (dir != null) {
+        IOUtils.closeQuietly(dir);
+      }
+    }
+  }
+
+  /**
+   * The entries of an open directory, as absolute files. A directory that can't be read to the end
+   * (its drive went away, its permissions changed, it was deleted meanwhile) gives the entries read
+   * so far: {@link DirectoryStream}'s iterator reports that I/O error as an unchecked {@link
+   * DirectoryIteratorException}, which used to escape and stop the Library from listing the whole
+   * tree (frostwire/frostwire#1525).
+   */
+  static File[] listFiles(DirectoryStream<Path> dir) {
+    List<File> files = new LinkedList<>();
+    try {
       for (Path child : dir) {
         // Ensure absolute paths so downstream code (library table model,
         // cache deduplication, canonical path resolution) works correctly.
         files.add(child.toAbsolutePath().toFile());
       }
-    } catch (IOException e) {
+    } catch (DirectoryIteratorException e) {
       e.printStackTrace();
-    } finally {
-      if (dir != null) {
-        IOUtils.closeQuietly(dir);
-      }
     }
     return files.toArray(new File[0]);
   }
