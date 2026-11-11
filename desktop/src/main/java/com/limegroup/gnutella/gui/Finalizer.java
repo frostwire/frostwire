@@ -23,13 +23,12 @@ public final class Finalizer {
   static void shutdown() {
     GUIMediator.applyWindowSettings();
     GUIMediator.setAppVisible(false);
-    ShutdownWindow window = new ShutdownWindow();
-    GUIUtils.centerOnScreen(window);
-    window.setVisible(true);
-    // Do shutdown stuff in another thread.
-    // We don't want to lockup the event thread
-    // (which this was called on).
-    startShutdownThread(
+    shutdown(
+        () -> {
+          ShutdownWindow window = new ShutdownWindow();
+          GUIUtils.centerOnScreen(window);
+          window.setVisible(true);
+        },
         // Removing the tray icon is a native call that stalled the EDT, so it runs first on the
         // shutdown thread.
         () -> NotifyUserProxy.instance().hideTrayIcon(),
@@ -39,6 +38,23 @@ public final class Finalizer {
           LimeWireCore.instance().getLifecycleManager().shutdown(null);
         },
         () -> System.exit(0));
+  }
+
+  /**
+   * Shows the shutdown window, then shuts down on the "Shutdown Thread" so the event thread this
+   * runs on is not locked up. The window is a courtesy: Windows refuses to create new windows for a
+   * process while the session is ending (the JDK then throws InternalError from {@code
+   * WComponentPeer.checkCreation}), and that used to stop the shutdown before it started, leaving
+   * FrostWire running with its main window hidden (frostwire/frostwire#1524).
+   */
+  static Thread shutdown(
+      Runnable showShutdownWindow, Runnable removeTrayIcon, Runnable shutdownCore, Runnable exit) {
+    try {
+      showShutdownWindow.run();
+    } catch (Throwable t) {
+      LOG.warn("Unable to show the shutdown window, shutting down without it", t);
+    }
+    return startShutdownThread(removeTrayIcon, shutdownCore, exit);
   }
 
   /**

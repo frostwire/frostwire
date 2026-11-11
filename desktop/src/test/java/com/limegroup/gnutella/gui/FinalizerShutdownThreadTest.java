@@ -60,6 +60,39 @@ class FinalizerShutdownThreadTest {
   }
 
   @Test
+  void shutdownGoesOnWhenTheShutdownWindowCannotBeShown() throws Exception {
+    // Icebase #087422f6a048: Windows refused a new native window while FrostWire was closing.
+    List<String> steps = new CopyOnWriteArrayList<>();
+    Thread thread =
+        Finalizer.shutdown(
+            () -> {
+              throw new InternalError("fixture: no window handle");
+            },
+            () -> steps.add("tray"),
+            () -> steps.add("core"),
+            () -> steps.add("exit"));
+    thread.join(10_000);
+
+    assertFalse(thread.isAlive());
+    assertEquals(List.of("tray", "core", "exit"), steps);
+  }
+
+  @Test
+  void theShutdownWindowIsShownBeforeTheShutdownThreadStarts() throws Exception {
+    List<String> steps = new CopyOnWriteArrayList<>();
+    Thread thread =
+        Finalizer.shutdown(
+            () -> steps.add("window on " + Thread.currentThread().getName()),
+            () -> steps.add("tray"),
+            () -> steps.add("core"),
+            () -> steps.add("exit"));
+    thread.join(10_000);
+
+    assertEquals(
+        List.of("window on " + Thread.currentThread().getName(), "tray", "core", "exit"), steps);
+  }
+
+  @Test
   void failingStepsStillExit() throws Exception {
     List<String> steps = new CopyOnWriteArrayList<>();
     Thread thread =
