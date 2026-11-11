@@ -772,10 +772,28 @@ public class CreateTorrentDialog extends JDialog {
     disableSaveCloseButtons();
     File f = new File((create_from_dir) ? directoryPath : singlePath);
     try {
-      file_storage fs = new file_storage();
       reportCurrentTask(I18n.tr("Adding files..."));
-      libtorrent.add_files(fs, f.getPath(), creationFlags);
-      create_torrent torrent = new create_torrent(fs, pieceSize, creationFlags);
+      // libtorrent 2.1 lists the files first and creates the torrent from that list. The listener
+      // is a director: only delete() frees it, and so the vector once the torrent has its copy.
+      add_files_listener acceptAll =
+          new add_files_listener() {
+            @Override
+            public boolean pred(String p) {
+              return true;
+            }
+          };
+      create_file_entry_vector files;
+      try {
+        files = libtorrent.list_files_ex(f.getPath(), acceptAll, creationFlags);
+      } finally {
+        acceptAll.delete();
+      }
+      create_torrent torrent;
+      try {
+        torrent = new create_torrent(files, pieceSize, creationFlags);
+      } finally {
+        files.delete();
+      }
       torrent.set_priv(makePrivate);
       if (comment != null && !comment.isEmpty()) {
         torrent.set_comment(comment);
@@ -905,13 +923,10 @@ public class CreateTorrentDialog extends JDialog {
       mirror = mirror + "/";
     }
     if (isMultiFile) {
-      final file_storage files = torrent.files();
-      // path should be <http://mirror-url/> + torrentName + "/" + relativeFilePath
-      urlPath =
-          mirror
-              + files.name()
-              + "/"
-              + files.file_path(0); // torrent.getFiles()[0].getRelativePath();
+      // path should be <http://mirror-url/> + torrentName + "/" + relativeFilePath. libtorrent
+      // 2.1's
+      // file entries carry that path, starting with the torrent's name.
+      urlPath = mirror + torrent.file_at(0).getFilename();
     } else {
       // url-list should point straight to the file.
       urlPath = mirror;

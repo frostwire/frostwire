@@ -55,7 +55,7 @@ class CreateTorrentDialogFlagsTest {
         Files.readString(
                 Path.of("src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java"))
             .replaceAll("\\s+", "");
-    assertTrue(source.contains("libtorrent.add_files(fs,f.getPath(),creationFlags);"));
-    assertTrue(source.contains("newcreate_torrent(fs,pieceSize,creationFlags);"));
+    assertTrue(source.contains("libtorrent.list_files_ex(f.getPath(),acceptAll,creationFlags);"));
+    assertTrue(source.contains("newcreate_torrent(files,pieceSize,creationFlags);"));
   }
 }

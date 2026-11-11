@@ -14,15 +14,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.Sha1Hash;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.Vectors;
+import com.frostwire.jlibtorrent.swig.create_file_entry;
+import com.frostwire.jlibtorrent.swig.create_file_entry_vector;
 import com.frostwire.jlibtorrent.swig.create_flags_t;
 import com.frostwire.jlibtorrent.swig.create_torrent;
 import com.frostwire.jlibtorrent.swig.error_code;
-import com.frostwire.jlibtorrent.swig.file_storage;
+import com.frostwire.jlibtorrent.swig.file_flags_t;
 import com.frostwire.jlibtorrent.swig.libtorrent;
 import com.frostwire.jlibtorrent.swig.set_piece_hashes_listener;
 import com.frostwire.jlibtorrent.swig.sha1_hash;
@@ -89,9 +90,9 @@ class TransferAdapterIdentityTest {
 
   private Fixture fixture() throws Exception {
     Files.write(tempDir.resolve(NAME), new byte[] {42});
-    FileStorage files = new FileStorage(new file_storage());
-    files.addFile(NAME, 1);
-    create_torrent creator = new create_torrent(files.swig(), 16384, new create_flags_t());
+    create_file_entry_vector files = new create_file_entry_vector();
+    files.add(new create_file_entry(NAME, 1, new file_flags_t()));
+    create_torrent creator = new create_torrent(files, 16384, new create_flags_t());
     error_code error = new error_code();
     libtorrent.set_piece_hashes_ex(
         creator,

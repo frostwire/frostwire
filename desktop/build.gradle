@@ -328,14 +328,16 @@ dependencies {
     implementation 'io.netty:netty-all:4.2.19.Final'
 
     // Also used by icebridgeCloudNatives / icebridgeJar multi-arch packaging below.
-    ext.jlibtorrent_version = '2.0.15.3'
+    ext.jlibtorrent_version = '2.1.2.0'
     def jlibtorrent_version = ext.jlibtorrent_version
 
     def os = OperatingSystem.current()
     def arch = System.getProperty('os.arch').toLowerCase()
     def is_arm64 = arch == "aarch64" || arch == "arm64"
 
-    def use_maven_jlibtorrent = true
+    // jlibtorrent 2.1.2.0 is not on Maven until its release is published: until then build with
+    // -PlocalJlibtorrent, which uses the jars frostwire-jlibtorrent built next to this checkout.
+    def use_maven_jlibtorrent = !project.hasProperty('localJlibtorrent')
 
     if (use_maven_jlibtorrent) {
         // jlibtorrent java wrappers
@@ -516,10 +518,20 @@ configurations {
     icebridgeCloudNatives
 }
 dependencies {
-    icebridgeCloudNatives "com.frostwire:jlibtorrent-linux-x86_64:${ext.jlibtorrent_version}"
-    icebridgeCloudNatives "com.frostwire:jlibtorrent-linux-arm64:${ext.jlibtorrent_version}"
-    icebridgeCloudNatives "com.frostwire:jlibtorrent-macosx-arm64:${ext.jlibtorrent_version}"
-    icebridgeCloudNatives "com.frostwire:jlibtorrent-macosx-x86_64:${ext.jlibtorrent_version}"
+    if (project.hasProperty('localJlibtorrent')) {
+        // Only the natives frostwire-jlibtorrent has built here (see the jlibtorrent dependency above)
+        ['linux-x86_64', 'linux-arm64', 'macosx-arm64', 'macosx-x86_64'].each { platform ->
+            def jar = file("../../frostwire-jlibtorrent/build/libs/jlibtorrent-${platform}-${ext.jlibtorrent_version}.jar")
+            if (jar.exists()) {
+                icebridgeCloudNatives files(jar)
+            }
+        }
+    } else {
+        icebridgeCloudNatives "com.frostwire:jlibtorrent-linux-x86_64:${ext.jlibtorrent_version}"
+        icebridgeCloudNatives "com.frostwire:jlibtorrent-linux-arm64:${ext.jlibtorrent_version}"
+        icebridgeCloudNatives "com.frostwire:jlibtorrent-macosx-arm64:${ext.jlibtorrent_version}"
+        icebridgeCloudNatives "com.frostwire:jlibtorrent-macosx-x86_64:${ext.jlibtorrent_version}"
+    }
 }
 
 // Fat JAR for the headless IceBridge relay servent.

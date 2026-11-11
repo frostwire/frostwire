@@ -11,15 +11,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.Priority;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.Vectors;
+import com.frostwire.jlibtorrent.swig.create_file_entry;
+import com.frostwire.jlibtorrent.swig.create_file_entry_vector;
 import com.frostwire.jlibtorrent.swig.create_torrent;
 import com.frostwire.jlibtorrent.swig.error_code;
+import com.frostwire.jlibtorrent.swig.file_flags_t;
 import com.frostwire.jlibtorrent.swig.file_progress_flags_t;
-import com.frostwire.jlibtorrent.swig.file_storage;
 import com.frostwire.jlibtorrent.swig.int64_vector;
 import com.frostwire.jlibtorrent.swig.int_vector;
 import com.frostwire.jlibtorrent.swig.libtorrent;
@@ -72,13 +73,13 @@ public final class TestTransfers {
   /** A torrent of {@code sizes.length} files, file{i}.bin, created in {@code dir}. */
   public static TorrentInfo torrent(Path dir, String name, int... sizes) throws IOException {
     Path root = Files.createDirectories(dir.resolve(name));
-    FileStorage files = new FileStorage(new file_storage());
+    create_file_entry_vector files = new create_file_entry_vector();
     for (int i = 0; i < sizes.length; i++) {
       Files.write(root.resolve("file" + i + ".bin"), new byte[sizes[i]]);
-      files.addFile(name + "/file" + i + ".bin", sizes[i]);
+      files.add(new create_file_entry(name + "/file" + i + ".bin", sizes[i], new file_flags_t()));
     }
     // v1 only, so no pad files: sizes and file counts are the ones given.
-    create_torrent creator = new create_torrent(files.swig(), 16384, create_torrent.v1_only);
+    create_torrent creator = new create_torrent(files, 16384, create_torrent.v1_only);
     error_code error = new error_code();
     libtorrent.set_piece_hashes_ex(
         creator,

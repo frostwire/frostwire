@@ -91,9 +91,15 @@ final class FakeTorrentHandle extends torrent_handle {
     return metadata != null ? metadata.swig() : null;
   }
 
+  /**
+   * What TorrentHandle.torrentFileWithHashes() reads with libtorrent 2.1: the metadata as params.
+   */
   @Override
-  public torrent_info torrent_file_with_hashes_copy() {
-    return torrent_file_ptr();
+  public com.frostwire.jlibtorrent.swig.add_torrent_params torrent_file_with_hashes_atp(
+      com.frostwire.jlibtorrent.swig.error_code ec) {
+    return metadata != null
+        ? metadata.swigParams()
+        : com.frostwire.jlibtorrent.AddTorrentParams.createInstance().swig();
   }
 
   @Override

@@ -83,7 +83,10 @@ public class BTInfoAdditionalMetadataHolder {
    * touches native code.
    */
   private static Map<String, Object> additionalInfo(TorrentInfo tinfo) {
-    final Map<String, Entry> info = getInfo(tinfo.toEntry().dictionary().get("info").swig());
+    // Decode the written torrent again: with libtorrent 2.1 the "info" of toEntry()'s result is not
+    // a dictionary the swig layer can read (its type is undefined_t), while the bytes decode fine.
+    final Map<String, Entry> info =
+        getInfo(Entry.bdecode(tinfo.bencode()).dictionary().get("info").swig());
     final Map<String, Object> additional = new HashMap<>();
     for (String key : new String[] {"license", "paymentOptions"}) {
       final Entry value = info.get(key);

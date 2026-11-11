@@ -299,7 +299,6 @@ public final class TorrentUtil {
     }
 
     try {
-      file_storage fs = new file_storage();
       add_files_listener addf_listener =
           new add_files_listener() {
             @Override
@@ -307,8 +306,21 @@ public final class TorrentUtil {
               return true;
             }
           };
-      libtorrent.add_files_ex(fs, file.getAbsolutePath(), addf_listener, new create_flags_t());
-      create_torrent torrentCreator = getCreateTorrent(dhtTrackedOnly, fs, torrentType);
+      // libtorrent 2.1 lists the files first and creates the torrent from that list. The listener
+      // is a director: only delete() frees it, and so the vector once the torrent has its copy.
+      create_file_entry_vector files;
+      try {
+        files =
+            libtorrent.list_files_ex(file.getAbsolutePath(), addf_listener, new create_flags_t());
+      } finally {
+        addf_listener.delete();
+      }
+      create_torrent torrentCreator;
+      try {
+        torrentCreator = getCreateTorrent(dhtTrackedOnly, files, torrentType);
+      } finally {
+        files.delete();
+      }
       final File torrentFile =
           new File(SharingSettings.TORRENTS_DIR_SETTING.getValue(), file.getName() + ".torrent");
       final error_code ec = new error_code();
@@ -404,8 +416,8 @@ public final class TorrentUtil {
   }
 
   private static @NotNull create_torrent getCreateTorrent(
-      boolean dhtTrackedOnly, file_storage fs, TorrentType torrentType) {
-    create_torrent torrentCreator = createTorrentWithType(fs, torrentType);
+      boolean dhtTrackedOnly, create_file_entry_vector files, TorrentType torrentType) {
+    create_torrent torrentCreator = createTorrentWithType(files, torrentType);
     if (!dhtTrackedOnly) {
       for (String tracker : DefaultTrackers.ANNOUNCE_URLS) {
         torrentCreator.add_tracker(tracker, 0);
@@ -420,25 +432,26 @@ public final class TorrentUtil {
     return torrentCreator;
   }
 
-  private static create_torrent createTorrentWithType(file_storage fs, TorrentType torrentType) {
+  private static create_torrent createTorrentWithType(
+      create_file_entry_vector files, TorrentType torrentType) {
     create_torrent torrent;
     int autoPieceSize = 0; // Let libtorrent auto-detect piece size
 
     switch (torrentType) {
       case V1_ONLY:
         // Create v1-only torrent - use legacy format
-        torrent = new create_torrent(fs, autoPieceSize, create_torrent.v1_only);
+        torrent = new create_torrent(files, autoPieceSize, create_torrent.v1_only);
         break;
 
       case V2_ONLY:
         // Create v2-only torrent - use modern format with v2 features only
-        torrent = new create_torrent(fs, autoPieceSize, create_torrent.v2_only);
+        torrent = new create_torrent(files, autoPieceSize, create_torrent.v2_only);
         break;
 
       case HYBRID:
       default:
         // Create hybrid torrent - supports both v1 and v2 protocols (default)
-        torrent = new create_torrent(fs, autoPieceSize);
+        torrent = new create_torrent(files, autoPieceSize);
         break;
     }
 

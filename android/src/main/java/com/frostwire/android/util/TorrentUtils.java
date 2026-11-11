@@ -31,9 +31,11 @@ import com.frostwire.bittorrent.DefaultTrackers;
 import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentInfo;
+import com.frostwire.jlibtorrent.swig.add_files_listener;
+import com.frostwire.jlibtorrent.swig.create_file_entry_vector;
+import com.frostwire.jlibtorrent.swig.create_flags_t;
 import com.frostwire.jlibtorrent.swig.create_torrent;
 import com.frostwire.jlibtorrent.swig.error_code;
-import com.frostwire.jlibtorrent.swig.file_storage;
 import com.frostwire.jlibtorrent.swig.libtorrent;
 import com.frostwire.jlibtorrent.swig.set_piece_hashes_listener;
 import com.frostwire.transfers.BittorrentDownload;
@@ -150,10 +152,29 @@ public final class TorrentUtils {
     try {
       File file = new File(fd.filePath);
       File saveDir = file.getParentFile();
-      file_storage fs = new file_storage();
-      libtorrent.add_files(fs, file.getAbsolutePath());
-      fs.set_name(file.getName());
-      create_torrent ct = new create_torrent(fs);
+      // libtorrent 2.1 lists the files first and creates the torrent from that list; a single
+      // file's torrent is named after the file. The listener is a director: only delete() frees
+      // it, and so the vector once the torrent has its copy.
+      add_files_listener acceptAll =
+          new add_files_listener() {
+            @Override
+            public boolean pred(String p) {
+              return true;
+            }
+          };
+      create_file_entry_vector files;
+      try {
+        files =
+            libtorrent.list_files_ex(file.getAbsolutePath(), acceptAll, new create_flags_t());
+      } finally {
+        acceptAll.delete();
+      }
+      create_torrent ct;
+      try {
+        ct = new create_torrent(files);
+      } finally {
+        files.delete();
+      }
       ct.set_creator(
           "FrostWire "
               + Constants.FROSTWIRE_VERSION_STRING
