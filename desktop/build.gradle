@@ -1106,6 +1106,7 @@ test {
         includeTestsMatching "com.frostwire.gui.library.LibraryFolderDropTest"
         includeTestsMatching "com.frostwire.gui.library.LibraryTreeDoubleClickRefreshTest"
         includeTestsMatching "com.frostwire.gui.library.SavedFilesDirectoryHolderTest"
+        includeTestsMatching "com.frostwire.gui.library.OnDemandViewTest"
         includeTestsMatching "com.frostwire.gui.library.LibraryFilesTableRowsOffEdtTest"
         includeTestsMatching "com.frostwire.gui.library.LibraryRowFlagsTest"
         includeTestsMatching "com.frostwire.gui.library.LibraryCoverArtPanelEdtTest"
