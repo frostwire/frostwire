@@ -1,3 +1,11 @@
+FrostWire 7.1.5 UNRELEASED
+   - fix:Windows: FrostWire's window no longer freezes as it appears while its icon is read from FrostWire.exe; the icon is set in the background (#1522)
+   - fix:Windows: closing FrostWire while Windows is logging off or shutting down no longer leaves it running with no window; it now shuts down even when its "shutting down" window can't be shown (#1524)
+   - fix:The Library lists your saved files even when one folder in them can't be read to the end (a disconnected drive, changed permissions); it used to show nothing and report a crash (#1525)
+   - fix:Links such as "Learn more about this option..." in the setup wizard, About and Options no longer stall the window while they are created; they are underlined text, not web pages (#1526)
+   - fix:Starting FrostWire on a slow computer no longer stalls while the main window's header is laid out for the first time; that setup happens at startup in the background (#1527)
+   - fix:Options > Library: the Remove button is no longer left enabled after you deselect a folder, where clicking it caused an error (#1528)
+
 FrostWire 7.1.4 NOV/10/2026
    - fix:Freeze reports sent when the whole computer stalled, not FrostWire, are labeled as such so they stop hiding real problems (#1512)
    - fix:The first search no longer freezes on a slow computer while FrostWire prepares to compare accented keywords; that is prepared once, at startup (#1521)
