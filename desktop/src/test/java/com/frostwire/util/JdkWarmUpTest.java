@@ -166,6 +166,20 @@ class JdkWarmUpTest {
   }
 
   /**
+   * The first component added to a MigLayout container initializes SwingComponentWrapper, whose
+   * static initializer looks methods up by reflection; it ran on the EDT while the main window's
+   * header was built (Icebase #f0a59fd34e60, frostwire/frostwire#1527). Loading the package is not
+   * enough: the class has to be initialized.
+   */
+  @Test
+  void migLayoutComponentWrapperIsInitializedByTheWarmUp() throws Exception {
+    String wrapper = "net.miginfocom.swing.SwingComponentWrapper";
+    assertTrue(JdkWarmUp.CLASSES_TO_INITIALIZE.contains(wrapper));
+    // The name must be a real class, or the warm-up would skip it silently.
+    Class.forName(wrapper, false, JdkWarmUpTest.class.getClassLoader());
+  }
+
+  /**
    * The first drag from a table creates a DragSourceContext; its static initializer ran on the EDT
    * (Icebase #e1c372ba0f4b) after DragSource itself was already warmed up.
    */

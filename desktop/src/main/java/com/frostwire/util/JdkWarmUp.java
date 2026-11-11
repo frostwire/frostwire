@@ -159,6 +159,11 @@ public final class JdkWarmUp {
           "java.awt.dnd.DragSourceContext",
           "sun.awt.SunGraphicsCallback",
           "net.miginfocom.layout.PlatformDefaults",
+          // The first component added to a MigLayout container initializes its wrapper, whose
+          // static initializer looks methods up by reflection (Class.getDeclaredMethod). It ran
+          // on the EDT in ApplicationHeader's constructor: the package is loaded in the
+          // background, but loading does not initialize (Icebase #f0a59fd34e60).
+          "net.miginfocom.swing.SwingComponentWrapper",
           // ToolTipManager.showTipWindow initialized it on the EDT for the first tooltip (Icebase
           // #5749af9dee1c).
           "javax.swing.PopupFactory",
