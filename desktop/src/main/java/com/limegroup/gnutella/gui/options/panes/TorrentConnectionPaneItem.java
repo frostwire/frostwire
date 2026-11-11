@@ -19,6 +19,7 @@
 package com.limegroup.gnutella.gui.options.panes;
 
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.bittorrent.SessionLimits;
 import com.frostwire.jlibtorrent.SettingsPack;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.settings.ConnectionSettings;
@@ -111,30 +112,32 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
 
   @Override
   public boolean isDirty() {
-    final BTEngine btEngine = BTEngine.getInstance();
-    return btEngine.isDhtRunning() != ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.isSelected()
+    // The window closing asks every pane: read the engine's limits from its cache, not from the
+    // session, which can take seconds (frostwire/frostwire#1529).
+    final SessionLimits limits = BTEngine.getInstance().sessionLimits();
+    return limits.dhtRunning() != ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.isSelected()
         || ConnectionSettings.VPN_DROP_PROTECTION.getValue()
             != VPN_DROP_PROTECTION_CHECKBOX.isSelected()
         || ConnectionSettings.ALLOW_MULTIPLE_CONNECTIONS_PER_PID.getValue()
             != ALLOW_MULTIPLE_CONNECTIONS_PER_PID_CHECKBOX.isSelected()
-        || btEngine.maxActiveDownloads() != MAX_ACTIVE_DOWNLOADS_FIELD.getValue()
-        || btEngine.maxConnections() != MAX_GLOBAL_NUM_CONNECTIONS_FIELD.getValue()
-        || btEngine.maxPeers() != MAX_PEERS_FIELD.getValue()
-        || btEngine.maxActiveSeeds() != MAX_ACTIVE_SEEDS_FIELD.getValue();
+        || limits.maxActiveDownloads() != MAX_ACTIVE_DOWNLOADS_FIELD.getValue()
+        || limits.maxConnections() != MAX_GLOBAL_NUM_CONNECTIONS_FIELD.getValue()
+        || limits.maxPeers() != MAX_PEERS_FIELD.getValue()
+        || limits.maxActiveSeeds() != MAX_ACTIVE_SEEDS_FIELD.getValue();
   }
 
   @Override
   public void initOptions() {
-    final BTEngine btEngine = BTEngine.getInstance();
+    final SessionLimits limits = BTEngine.getInstance().sessionLimits();
     ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.setSelected(
         SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.getValue());
     VPN_DROP_PROTECTION_CHECKBOX.setSelected(ConnectionSettings.VPN_DROP_PROTECTION.getValue());
     ALLOW_MULTIPLE_CONNECTIONS_PER_PID_CHECKBOX.setSelected(
         ConnectionSettings.ALLOW_MULTIPLE_CONNECTIONS_PER_PID.getValue());
-    MAX_GLOBAL_NUM_CONNECTIONS_FIELD.setValue(btEngine.maxConnections());
-    MAX_PEERS_FIELD.setValue(btEngine.maxPeers());
-    MAX_ACTIVE_DOWNLOADS_FIELD.setValue(btEngine.maxActiveDownloads());
-    MAX_ACTIVE_SEEDS_FIELD.setValue(btEngine.maxActiveSeeds());
+    MAX_GLOBAL_NUM_CONNECTIONS_FIELD.setValue(limits.maxConnections());
+    MAX_PEERS_FIELD.setValue(limits.maxPeers());
+    MAX_ACTIVE_DOWNLOADS_FIELD.setValue(limits.maxActiveDownloads());
+    MAX_ACTIVE_SEEDS_FIELD.setValue(limits.maxActiveSeeds());
   }
 
   @Override

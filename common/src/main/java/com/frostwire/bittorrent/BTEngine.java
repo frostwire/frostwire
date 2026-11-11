@@ -114,6 +114,9 @@ public final class BTEngine extends SessionManager {
   // Cached paused state to avoid blocking EDT calls
   private volatile boolean cachedPausedState = false;
 
+  // The limits and DHT state the Options window shows, for the same reason
+  private final SessionLimitsCache limitsCache = new SessionLimitsCache(this::readSessionLimits);
+
   // Last externally-visible IP reported by libtorrent (external_ip alert).
   // Used to skip our own hairpinned endpoint during peer discovery. Null
   // until the first alert; can change on network rebinding (read fresh).
@@ -352,6 +355,11 @@ public final class BTEngine extends SessionManager {
             // If there's an issue getting the initial state, assume it not paused
             cachedPausedState = false;
           }
+          try {
+            limitsCache.refresh();
+          } catch (Exception e) {
+            // Whoever needs them first reads them from the session
+          }
         },
         "BTEngine::onAfterStart() cache BTEngine's first paused state in the background");
     fireStarted();
@@ -484,6 +492,73 @@ public final class BTEngine extends SessionManager {
   public void resume() {
     super.resume();
     cachedPausedState = false;
+  }
+
+  private SessionLimits readSessionLimits() {
+    return new SessionLimits(
+        super.maxConnections(),
+        super.maxPeers(),
+        super.maxActiveDownloads(),
+        super.maxActiveSeeds(),
+        super.downloadRateLimit(),
+        super.uploadRateLimit(),
+        super.isDhtRunning());
+  }
+
+  /**
+   * The connection limits, rate limits and DHT state, without calling into libtorrent's session
+   * thread, which can block for seconds. Safe on the EDT once the engine has started.
+   */
+  public SessionLimits sessionLimits() {
+    return limitsCache.get();
+  }
+
+  @Override
+  public void maxConnections(int limit) {
+    super.maxConnections(limit);
+    limitsCache.update(l -> l.withMaxConnections(limit));
+  }
+
+  @Override
+  public void maxPeers(int limit) {
+    super.maxPeers(limit);
+    limitsCache.update(l -> l.withMaxPeers(limit));
+  }
+
+  @Override
+  public void maxActiveDownloads(int limit) {
+    super.maxActiveDownloads(limit);
+    limitsCache.update(l -> l.withMaxActiveDownloads(limit));
+  }
+
+  @Override
+  public void maxActiveSeeds(int limit) {
+    super.maxActiveSeeds(limit);
+    limitsCache.update(l -> l.withMaxActiveSeeds(limit));
+  }
+
+  @Override
+  public void downloadRateLimit(int bytesPerSecond) {
+    super.downloadRateLimit(bytesPerSecond);
+    limitsCache.update(l -> l.withDownloadRateLimit(bytesPerSecond));
+  }
+
+  @Override
+  public void uploadRateLimit(int bytesPerSecond) {
+    super.uploadRateLimit(bytesPerSecond);
+    limitsCache.update(l -> l.withUploadRateLimit(bytesPerSecond));
+  }
+
+  @Override
+  public void startDht() {
+    super.startDht();
+    limitsCache.update(l -> l.withDhtRunning(true));
+  }
+
+  @Override
+  public void stopDht() {
+    super.stopDht();
+    limitsCache.update(l -> l.withDhtRunning(false));
   }
 
   /**

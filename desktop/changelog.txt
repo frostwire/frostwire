@@ -5,6 +5,7 @@ FrostWire 7.1.5 UNRELEASED
    - fix:Links such as "Learn more about this option..." in the setup wizard, About and Options no longer stall the window while they are created; they are underlined text, not web pages (#1526)
    - fix:Starting FrostWire on a slow computer no longer stalls while the main window's header is laid out for the first time; that setup happens at startup in the background (#1527)
    - fix:Options > Library: the Remove button is no longer left enabled after you deselect a folder, where clicking it caused an error (#1528)
+   - fix:Opening Options, switching to its Torrent and IP Filter pages, and closing it no longer freeze the window while the BitTorrent engine is busy; the limits it shows are kept ready instead of being asked from the engine each time (#1529)
 
 FrostWire 7.1.4 NOV/10/2026
    - fix:Freeze reports sent when the whole computer stalled, not FrostWire, are labeled as such so they stop hiding real problems (#1512)

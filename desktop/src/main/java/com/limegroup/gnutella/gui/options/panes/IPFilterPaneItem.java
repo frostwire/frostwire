@@ -114,13 +114,11 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     if (ipFilterTable != null) {
       return;
     }
-    BTEngine engine;
-    ip_filter ipFilter = null;
-    if ((engine = BTEngine.getInstance()) != null) {
-      ipFilter = engine.swig().get_ip_filter();
-    }
-    if (ipFilter == null) {
-      throw new RuntimeException("Check your logic. No BTEngine ip_filter instance available");
+    // Only the engine's existence matters here. Asking the session for its filter was a
+    // synchronous call into libtorrent that nothing used, and froze the window while the
+    // session thread was busy (frostwire/frostwire#1529).
+    if (BTEngine.getInstance() == null) {
+      throw new RuntimeException("Check your logic. No BTEngine instance available");
     }
     JPanel panel = new JPanel(new MigLayout("fillx, ins 0, insets, nogrid", "[][][][][][][][]"));
     try {

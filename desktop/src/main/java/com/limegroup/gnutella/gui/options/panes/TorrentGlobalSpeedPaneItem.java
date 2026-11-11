@@ -19,6 +19,7 @@
 package com.limegroup.gnutella.gui.options.panes;
 
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.bittorrent.SessionLimits;
 import com.frostwire.gui.theme.PlatformFonts;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.LabeledComponent;
@@ -115,7 +116,9 @@ public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
 
   @Override
   public void initOptions() {
-    int storedDownloadSpeed = BTEngine.getInstance().downloadRateLimit() / 1024;
+    // From the engine's cache: the session can take seconds to answer (frostwire/frostwire#1529)
+    SessionLimits limits = BTEngine.getInstance().sessionLimits();
+    int storedDownloadSpeed = limits.downloadRateLimit() / 1024;
     if (storedDownloadSpeed == 0) {
       DOWNLOAD_SLIDER.setValue(101 * 1024);
       DOWNLOAD_SLIDER_LABEL.setText(I18n.tr("Unlimited"));
@@ -123,7 +126,7 @@ public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
       DOWNLOAD_SLIDER.setValue(storedDownloadSpeed);
     }
     updateSpeedLabel(DOWNLOAD_SLIDER, DOWNLOAD_SLIDER_LABEL);
-    int storedUploadSpeed = BTEngine.getInstance().uploadRateLimit() / 1024;
+    int storedUploadSpeed = limits.uploadRateLimit() / 1024;
     if (storedUploadSpeed == 0) {
       UPLOAD_SLIDER.setValue(101 * 1024);
       UPLOAD_SLIDER_LABEL.setText(I18n.tr("Unlimited"));
