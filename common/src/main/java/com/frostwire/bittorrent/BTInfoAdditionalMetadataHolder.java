@@ -22,6 +22,7 @@ import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.swig.byte_vector;
 import com.frostwire.jlibtorrent.swig.entry;
+import com.frostwire.jlibtorrent.swig.libtorrent;
 import com.frostwire.util.Bencode;
 import java.io.File;
 import java.util.HashMap;
@@ -83,10 +84,18 @@ public class BTInfoAdditionalMetadataHolder {
    * touches native code.
    */
   private static Map<String, Object> additionalInfo(TorrentInfo tinfo) {
-    // Decode the written torrent again: with libtorrent 2.1 the "info" of toEntry()'s result is not
-    // a dictionary the swig layer can read (its type is undefined_t), while the bytes decode fine.
+    // Only the info dictionary is read, so write it without requiring the v2 piece layers: a
+    // session's metadata (TorrentHandle.torrentFile()) has none, and TorrentInfo.bencode() refuses
+    // to write a v2 or hybrid torrent without them, which cost every one of them its payment
+    // options. Decode the written bytes again: with libtorrent 2.1 the "info" of the written entry
+    // is not a dictionary the swig layer can read (its type is undefined_t), the bytes decode fine.
+    final byte[] written =
+        new Entry(
+                libtorrent.write_torrent_file(
+                    tinfo.swigParams(), libtorrent.getAllow_missing_piece_layer()))
+            .bencode();
     final Map<String, Entry> info =
-        getInfo(Entry.bdecode(tinfo.bencode()).dictionary().get("info").swig());
+        getInfo(Entry.bdecode(written).dictionary().get("info").swig());
     final Map<String, Object> additional = new HashMap<>();
     for (String key : new String[] {"license", "paymentOptions"}) {
       final Entry value = info.get(key);
