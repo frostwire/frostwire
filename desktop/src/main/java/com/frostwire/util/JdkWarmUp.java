@@ -364,9 +364,11 @@ public final class JdkWarmUp {
 
   /**
    * Painters of the search options panel, built on the first search: its range sliders (the slider,
-   * its thumb and its track) and a checkbox per search engine.
+   * its thumb and its track), a checkbox per search engine, and the separator next to the file type
+   * buttons (Icebase #60a32635447a, frostwire/frostwire#1419).
    */
-  static final List<String> SEARCH_OPTIONS_PAINTER_KEY_PREFIXES = List.of("Slider", "CheckBox[");
+  static final List<String> SEARCH_OPTIONS_PAINTER_KEY_PREFIXES =
+      List.of("Slider", "CheckBox[", "Separator[");
 
   /**
    * Painters of the menu bar and its menus, built with the main window: each menu item's first

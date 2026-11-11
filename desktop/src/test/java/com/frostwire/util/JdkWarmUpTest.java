@@ -757,6 +757,8 @@ class JdkWarmUpTest {
     }
     assertTrue(JdkWarmUp.SEARCH_OPTIONS_PAINTER_KEY_PREFIXES.contains("Slider"));
     assertTrue(JdkWarmUp.SEARCH_OPTIONS_PAINTER_KEY_PREFIXES.contains("CheckBox["));
+    // The separator next to the file type buttons (Icebase #60a32635447a).
+    assertTrue(JdkWarmUp.SEARCH_OPTIONS_PAINTER_KEY_PREFIXES.contains("Separator["));
     assertTrue(
         warmUpSource()
             .replaceAll("\\s+", "")
