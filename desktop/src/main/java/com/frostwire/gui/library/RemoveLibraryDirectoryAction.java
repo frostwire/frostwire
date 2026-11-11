@@ -22,34 +22,60 @@ import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.actions.AbstractAction;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.TreePath;
 
-/** Removes selected root folders from a {@link RecursiveLibraryDirectoryPanel}. */
+/** Removes the selected root folder from a {@link RecursiveLibraryDirectoryPanel}. */
 public class RemoveLibraryDirectoryAction extends AbstractAction {
-  private final RecursiveLibraryDirectoryPanel recursiveSharingPanel;
+  private final JTree tree;
+  private final Predicate<File> isRoot;
+  private final Consumer<File> removeRoot;
 
   public RemoveLibraryDirectoryAction(RecursiveLibraryDirectoryPanel recursiveSharingPanel) {
+    this(
+        recursiveSharingPanel.getTree(),
+        recursiveSharingPanel::isRoot,
+        recursiveSharingPanel::removeRoot);
+  }
+
+  RemoveLibraryDirectoryAction(JTree tree, Predicate<File> isRoot, Consumer<File> removeRoot) {
     super(I18n.tr("Remove"));
-    this.recursiveSharingPanel = recursiveSharingPanel;
+    this.tree = tree;
+    this.isRoot = isRoot;
+    this.removeRoot = removeRoot;
     setEnabled(false);
-    recursiveSharingPanel.getTree().addTreeSelectionListener(new EnablementSelectionListener());
+    tree.addTreeSelectionListener(new EnablementSelectionListener());
   }
 
   public void actionPerformed(ActionEvent e) {
-    File dir = (File) recursiveSharingPanel.getTree().getSelectionPath().getLastPathComponent();
-    recursiveSharingPanel.removeRoot(dir);
+    File root = selectedRoot();
+    if (root != null) {
+      removeRoot.accept(root);
+    }
   }
 
-  /** Enables action when a root folder is selected. */
+  /**
+   * The root folder that is selected now, or null. Both the button's state and the removal go by
+   * this: the state used to follow {@link TreeSelectionEvent#getPath()}, which is the path that was
+   * added to or removed from the selection, so deselecting a root left Remove enabled with nothing
+   * selected, and clicking it threw NullPointerException (frostwire/frostwire#1528).
+   */
+  private File selectedRoot() {
+    TreePath selection = tree.getSelectionPath();
+    if (selection == null || !(selection.getLastPathComponent() instanceof File folder)) {
+      return null;
+    }
+    return isRoot.test(folder) ? folder : null;
+  }
+
+  /** Enables the action while a root folder is selected. */
   private class EnablementSelectionListener implements TreeSelectionListener {
     public void valueChanged(TreeSelectionEvent e) {
-      Object obj = e.getPath().getLastPathComponent();
-      if (obj instanceof File) {
-        setEnabled(recursiveSharingPanel.isRoot(((File) obj)));
-      } else {
-        setEnabled(false);
-      }
+      setEnabled(selectedRoot() != null);
     }
   }
 }
