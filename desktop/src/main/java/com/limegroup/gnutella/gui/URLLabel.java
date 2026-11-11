@@ -23,10 +23,14 @@ import java.awt.*;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeListener;
 import javax.swing.*;
+import javax.swing.plaf.FontUIResource;
+import javax.swing.plaf.UIResource;
 
 /**
- * A label that has a clickable text. The text is rendered as an HTML link and the mouse cursor is
- * changed when the mouse hovers over the label.
+ * A label that has a clickable text. The text is underlined through the label's font and colored
+ * through its foreground, and the mouse cursor is changed when the mouse hovers over the label. It
+ * is not an HTML link: an HTML label makes Swing parse it and build and style an HTML view on the
+ * EDT just to underline one line of text (frostwire/frostwire#1526).
  */
 public class URLLabel extends JLabel {
   private MouseListener urlListener;
@@ -61,18 +65,22 @@ public class URLLabel extends JLabel {
   @Override
   public void setText(String text) {
     this.text = text;
-    String htmlString = null;
-    if (text != null) {
-      htmlString =
-          ("<html><a href=\""
-              + url
-              + "\""
-              + (linkColor != null ? "color=\"#" + GUIUtils.colorToHex(linkColor) + "\"" : "")
-              + ">"
-              + text
-              + "</a></html>");
+    if (linkColor != null) {
+      setForeground(linkColor);
     }
-    super.setText(htmlString);
+    super.setText(text);
+  }
+
+  /** Every font this label is given is underlined: that is what marks it as a link. */
+  @Override
+  public void setFont(Font font) {
+    if (font == null) {
+      super.setFont(null);
+      return;
+    }
+    Font underlined = VPNDropProtectionCheckbox.underlined(font);
+    // A look and feel only replaces fonts it installed itself, so keep that mark.
+    super.setFont(font instanceof UIResource ? new FontUIResource(underlined) : underlined);
   }
 
   private void setColor(Color fg) {
