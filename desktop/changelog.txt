@@ -13,6 +13,7 @@ FrostWire 7.1.5 UNRELEASED
    - fix:The window no longer freezes when your VPN connects or drops while VPN-Drop protection pauses or resumes your transfers; that happens in the background (#1535)
    - fix:Error and input dialogs no longer ask Windows to register for drag and drop before they open, which could freeze the window for seconds on a slow computer (#1536)
    - fix:Opening the transfer details for the first time on a slow computer no longer freezes while the font of its "hide" link is prepared; that happens at startup in the background (#1537)
+   - new:The anonymous presence heartbeat now also says how many freeze reports this session recorded, so Icebase can show EDT stall-free sessions per release next to crash-free sessions; it still has no installation or user id
 
 FrostWire 7.1.4 NOV/10/2026
    - fix:Freeze reports sent when the whole computer stalled, not FrostWire, are labeled as such so they stop hiding real problems (#1512)
