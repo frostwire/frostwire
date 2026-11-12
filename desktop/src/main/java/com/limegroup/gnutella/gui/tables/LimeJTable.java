@@ -379,16 +379,30 @@ public class LimeJTable extends JTable implements JSortTable {
    * @param col the MODEL index of the column
    */
   private int getDataWidth(int row, int col) {
-    DataLineModel<?, ?> dlm = (DataLineModel<?, ?>) dataModel;
+    return dataWidth(this, (DataLineModel<?, ?>) dataModel, row, col, CLIPPED_TIP);
+  }
+
+  /**
+   * The width of the data of a cell, -1 when it has none or its column is hidden. Renderers take
+   * the VIEW index of the column: this passed them the model index, which with hidden columns can
+   * be past the last view column, and the renderer's getColumnClass threw
+   * ArrayIndexOutOfBoundsException on the tooltip timer (Icebase #ea44101740a1).
+   */
+  static int dataWidth(
+      JTable table, DataLineModel<?, ?> dlm, int row, int col, String[] clippedTip) {
+    int viewCol = table.convertColumnIndexToView(col);
+    if (viewCol < 0) {
+      return -1;
+    }
     DataLine<?> dl = dlm.get(row);
     Object data = dl.getValueAt(col);
     String info;
     if (data != null && (info = data.toString()) != null) {
       if (data instanceof Icon && info.startsWith("file:")) return -1;
-      CLIPPED_TIP[0] = info;
-      TableCellRenderer tcr = getDefaultRenderer(dlm.getColumnClass(col));
+      clippedTip[0] = info;
+      TableCellRenderer tcr = table.getDefaultRenderer(dlm.getColumnClass(col));
       JComponent renderer =
-          (JComponent) tcr.getTableCellRendererComponent(this, data, false, false, row, col);
+          (JComponent) tcr.getTableCellRendererComponent(table, data, false, false, row, viewCol);
       try {
         FontMetrics fm = renderer.getFontMetrics(renderer.getFont());
         return fm.stringWidth(info) + 3;

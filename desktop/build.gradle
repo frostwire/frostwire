@@ -1103,6 +1103,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.trees.FileTreeModelLeafTest"
         includeTestsMatching "com.limegroup.gnutella.gui.tables.AbstractActionsRendererTest"
         includeTestsMatching "com.limegroup.gnutella.gui.tables.SeedsHolderTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.tables.LimeJTableHiddenColumnTooltipTest"
         includeTestsMatching "com.frostwire.gui.library.LibraryActionsHolderTest"
         includeTestsMatching "com.frostwire.gui.library.RemoveLibraryDirectoryActionTest"
         includeTestsMatching "com.frostwire.gui.library.LibraryFolderDropTest"
