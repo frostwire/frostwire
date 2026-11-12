@@ -184,6 +184,7 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
     String java = resolveJavaBinary();
     List<String> command = new ArrayList<>();
     command.add(java);
+    command.addAll(jvmOptions(Runtime.getRuntime().availableProcessors()));
     command.add("-jar");
     command.add(jarPath.getAbsolutePath());
     command.add("--rudp-port");
@@ -299,6 +300,31 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
   private static String tail(String log) {
     String trimmed = log.trim();
     return trimmed.length() <= 2000 ? trimmed : "..." + trimmed.substring(trimmed.length() - 2000);
+  }
+
+  /**
+   * JVM options for the child on a computer with one or two CPUs, which is also the computer with
+   * little memory to spare. The child is a second JVM next to FrostWire's own, and idles at a small
+   * fraction of one CPU, so what it should be is small: one serial collector thread instead of
+   * G1's, only the quick compiler, one compiler thread, a heap capped well above what its bounded
+   * queues can hold (16 MiB of retained packets, 32 MiB of fragments), small thread stacks.
+   * Measured idle on macOS: 95 MB to 72 MB resident and 0.55 s to 0.30 s of CPU in the first 40 s.
+   * Other computers keep the JVM defaults. Part of #1512, whose reports come from 1-CPU Windows
+   * machines with 50 to 160 MB of free memory.
+   *
+   * @param cpus the computer's processor count
+   */
+  static List<String> jvmOptions(int cpus) {
+    if (cpus > 2) {
+      return List.of();
+    }
+    return List.of(
+        "-XX:+UseSerialGC",
+        "-XX:TieredStopAtLevel=1",
+        "-XX:CICompilerCount=1",
+        "-Xmx256m",
+        "-Xss512k",
+        "-XX:-UsePerfData");
   }
 
   /**
