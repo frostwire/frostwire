@@ -259,6 +259,12 @@ public final class CrashReportSpooler {
       GcWindow gcWindow,
       StallCpu.Window cpuWindow) {
     try {
+      // Counted even when the report is throttled: the session still stalled.
+      LivePresenceHeartbeat.stallRecorded();
+    } catch (Throwable ignored) {
+      // Presence is best effort.
+    }
+    try {
       if (!tryAcquire("strictmode:" + sanitizeViolationClass(violationClass))) {
         LOG.debug("Throttled anonymous strictmode report");
         return;
@@ -279,6 +285,11 @@ public final class CrashReportSpooler {
 
   /** Queues an anonymous EDT watchdog report for Icebase. No-op until {@link #start()}. */
   public static void recordWatchdog(int missedHeartbeats) {
+    try {
+      LivePresenceHeartbeat.stallRecorded();
+    } catch (Throwable ignored) {
+      // Presence is best effort.
+    }
     try {
       if (!tryAcquire("watchdog")) {
         LOG.debug("Throttled anonymous watchdog report");
