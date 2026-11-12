@@ -11,6 +11,7 @@ FrostWire 7.1.5 UNRELEASED
    - fix:The first search on a slow computer no longer stalls while the separator of the search options is prepared; that happens at startup in the background with the rest of that panel (#1419)
    - fix:The first time FrostWire runs on a computer with a single CPU, its window stays responsive while its IceBridge identity is created; that work now runs at low priority instead of taking the whole processor for minutes (#1534)
    - fix:On computers with one or two processors, FrostWire's search helper process now starts with a small footprint, using less memory and processor time while the window is busy starting (#1512)
+   - fix:Starting FrostWire on a slow computer no longer stalls while the status bar's layout classes are read from Java's module image; they are loaded at startup in the background (#1538)
    - fix:The window no longer freezes when your VPN connects or drops while VPN-Drop protection pauses or resumes your transfers; that happens in the background (#1535)
    - fix:Error and input dialogs no longer ask Windows to register for drag and drop before they open, which could freeze the window for seconds on a slow computer (#1536)
    - fix:Opening the transfer details for the first time on a slow computer no longer freezes while the font of its "hide" link is prepared; that happens at startup in the background (#1537)
