@@ -577,11 +577,6 @@ public final class JdkWarmUp {
       LOG.warn("Menu accessor warm-up failed: " + t.getMessage(), t);
     }
     try {
-      warmUpPopupMenus();
-    } catch (Throwable t) {
-      LOG.warn("Popup menu warm-up failed: " + t.getMessage(), t);
-    }
-    try {
       warmUpDataTransfer();
     } catch (Throwable t) {
       LOG.warn("Data transfer warm-up failed: " + t.getMessage(), t);
@@ -602,6 +597,17 @@ public final class JdkWarmUp {
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       return;
+    }
+    try {
+      // After the splash, not before: this builds a JPopupMenu, which adds PopupMenu.actionMap to
+      // the
+      // look and feel's table. The first Nimbus style the EDT validates (the splash's first panel)
+      // copies that table once, and a key added meanwhile made the copy throw
+      // ConcurrentModificationException, which left Nimbus's defaults half built and failed every
+      // later component, FatalBugManager's dialog included (Icebase #721dc3021809, #90e72cf67632).
+      warmUpPopupMenus();
+    } catch (Throwable t) {
+      LOG.warn("Popup menu warm-up failed: " + t.getMessage(), t);
     }
     try {
       Map<?, ?> desktopHints = desktopFontHints();

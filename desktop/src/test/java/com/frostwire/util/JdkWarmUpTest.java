@@ -351,6 +351,27 @@ class JdkWarmUpTest {
   }
 
   /**
+   * Building the warm-up's popup menu adds {@code PopupMenu.actionMap} (and two look and feel class
+   * keys) to the UI tables. The first Nimbus style the EDT validates, the splash's first panel,
+   * copies those tables once, and a key added meanwhile made the copy throw
+   * ConcurrentModificationException: Nimbus's defaults were left half built, so every later
+   * component failed too, FatalBugManager's dialog with a NullPointerException (Icebase
+   * #721dc3021809, #90e72cf67632, Mac OS X 15.8, uptime 3 s). The popup menu step therefore runs
+   * after the splash is showing.
+   */
+  @Test
+  void thePopupMenuWarmUpRunsAfterTheSplashIsShowing() throws Exception {
+    String source = warmUpSource();
+
+    int popupMenus = source.indexOf("warmUpPopupMenus();");
+    int splashWait = source.indexOf("awaitSplashShown(SPLASH_SHOWN");
+
+    assertTrue(splashWait >= 0 && popupMenus >= 0, "warmUp() lost a step");
+    assertTrue(
+        popupMenus > splashWait, "it builds a JPopupMenu while the EDT may be building the splash");
+  }
+
+  /**
    * The Swing splash shows its image in an ImageIcon, whose static initializer ran on the EDT while
    * the splash was built (Icebase #e45e1beac54a, frostwire/frostwire#1323).
    */
