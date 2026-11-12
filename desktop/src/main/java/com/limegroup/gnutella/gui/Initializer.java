@@ -487,7 +487,11 @@ final class Initializer {
       File identityFile =
           com.frostwire.search.relay.RelayConstants.identityFile(CommonUtils.getUserSettingsDir());
       relayLog.info("Loading identity from: " + identityFile.getAbsolutePath());
-      IdentityKeys identity = IdentityKeys.loadOrCreate(identityFile);
+      // With no identity yet (a first run), this mines one: about a million key generations in a
+      // tight loop. At this thread's normal priority that took the only CPU of a single-CPU
+      // computer for minutes, right after the window appeared (#1534).
+      IdentityKeys identity =
+          com.frostwire.util.BackgroundPriority.call(() -> IdentityKeys.loadOrCreate(identityFile));
       relayLog.info("Identity loaded, nodeId=" + com.frostwire.util.Hex.encode(identity.nodeId()));
 
       // 3. Install the auto-indexer on BTEngine (chains onto any
