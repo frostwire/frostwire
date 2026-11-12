@@ -1070,6 +1070,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.VPNWarningLabelBoldTest"
         includeTestsMatching "com.limegroup.gnutella.gui.VPNDropProtectionLinkTest"
         includeTestsMatching "com.limegroup.gnutella.gui.VPNsEngineNotReadyTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.VPNDropGuardOffEdtTest"
         includeTestsMatching "com.limegroup.gnutella.gui.CrashReportSpoolerReportTypesTest"
         includeTestsMatching "com.limegroup.gnutella.gui.ThreadCensusTest"
         includeTestsMatching "com.limegroup.gnutella.gui.StallCpuTest"
