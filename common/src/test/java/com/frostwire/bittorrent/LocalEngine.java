@@ -293,14 +293,16 @@ final class LocalEngine implements AutoCloseable {
     static BTDownload next(
         BlockingQueue<BTDownload> queue, Predicate<BTDownload> match, String what) {
       long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(TIMEOUT_SECONDS);
+      List<String> skipped = new java.util.ArrayList<>();
       try {
         while (true) {
           long left = deadline - System.nanoTime();
           BTDownload dl = left > 0 ? queue.poll(left, TimeUnit.NANOSECONDS) : null;
-          assertNotNull(dl, "timed out waiting for " + what);
+          assertNotNull(dl, "timed out waiting for " + what + "; skipped downloads: " + skipped);
           if (match.test(dl)) {
             return dl;
           }
+          skipped.add(String.valueOf(dl.getName()));
         }
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
