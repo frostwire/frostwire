@@ -33,6 +33,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -181,8 +182,7 @@ class BTDownloadTransferTest {
     File secondDir = dir.resolve("save-2").toFile();
     local.engine.download(first, firstDir, null, null);
     local.engine.download(second, secondDir, null, null);
-    Events.next(local.events.added, "first");
-    Events.next(local.events.added, "second");
+    Events.nextEach(local.events.added, "first", "second");
     awaitResume(first);
     awaitResume(second);
     Files.write(new File(local.ctx.homeDir, "corrupt.torrent").toPath(), new byte[] {'x'});
@@ -191,8 +191,10 @@ class BTDownloadTransferTest {
     local.restart();
     local.engine.restoreDownloads();
 
-    assertEquals(firstDir, Events.next(local.events.added, "first").getSavePath());
-    assertEquals(secondDir, Events.next(local.events.added, "second").getSavePath());
+    // In the order the file system lists the session files, which is not alphabetical everywhere.
+    Map<String, BTDownload> restored = Events.nextEach(local.events.added, "first", "second");
+    assertEquals(firstDir, restored.get("first").getSavePath());
+    assertEquals(secondDir, restored.get("second").getSavePath());
   }
 
   @Test
