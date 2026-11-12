@@ -750,6 +750,23 @@ class JdkWarmUpTest {
    * checkbox per search engine.
    */
   @Test
+  void warmUpInitializesTheStatusBarsLayoutClasses() throws Exception {
+    // StatusLine builds its panel with a GridBagLayout inside MainFrame's constructor, so the JDK
+    // read the class from its module image on the EDT (Icebase #5309675dbc2c, GitHub #1538).
+    assertTrue(JdkWarmUp.CLASSES_TO_INITIALIZE.contains("java.awt.GridBagLayout"));
+    assertTrue(JdkWarmUp.CLASSES_TO_INITIALIZE.contains("java.awt.GridBagConstraints"));
+    for (String name : List.of("java.awt.GridBagLayout", "java.awt.GridBagConstraints")) {
+      Class.forName(name, true, JdkWarmUp.class.getClassLoader());
+    }
+    String statusLine =
+        java.nio.file.Files.readString(
+            java.nio.file.Path.of("src/main/java/com/limegroup/gnutella/gui/StatusLine.java"));
+    assertTrue(
+        statusLine.contains("new GridBagLayout()"),
+        "the warm-up entry exists because the status bar builds one on the EDT");
+  }
+
+  @Test
   void warmUpCreatesTheSearchOptionsPanelsNimbusPainters() throws Exception {
     javax.swing.UIDefaults nimbus = new NimbusLookAndFeel().getDefaults();
     for (String prefix : JdkWarmUp.SEARCH_OPTIONS_PAINTER_KEY_PREFIXES) {

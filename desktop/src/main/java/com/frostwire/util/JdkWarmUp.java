@@ -194,7 +194,14 @@ public final class JdkWarmUp {
           // frostwire/frostwire#1506).
           "javax.swing.plaf.basic.BasicTreeUI",
           "javax.swing.plaf.synth.SynthTreeUI",
-          "javax.swing.tree.DefaultTreeCellRenderer");
+          "javax.swing.tree.DefaultTreeCellRenderer",
+          // The status bar is the first user of GridBagLayout: StatusLine's constructor builds its
+          // panel with one and its cells with GridBagConstraints, inside MainFrame's constructor
+          // on the EDT. The JDK read them from its module image there on a 1-CPU computer, 5
+          // minutes after the warm-up had finished (Icebase #5309675dbc2c,
+          // frostwire/frostwire#1538).
+          "java.awt.GridBagLayout",
+          "java.awt.GridBagConstraints");
 
   /**
    * Windows-only JDK classes initialized like {@link #CLASSES_TO_INITIALIZE}. The first right-click
