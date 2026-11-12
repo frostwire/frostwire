@@ -52,6 +52,13 @@ public final class PlatformFonts {
    */
   public static final Font DIALOG_BOLD = dialog(Font.BOLD, 12);
 
+  /**
+   * The transfer details' "hide" link, plain 13 pt sans serif: the only text at that size, so a
+   * strike of its own. The startup warm-up rasterizes it (JdkWarmUp), or building the transfer
+   * details the first time did that on the EDT (frostwire/frostwire#1537).
+   */
+  public static final Font TRANSFER_DETAIL_LINK = sansSerif(Font.PLAIN, 13);
+
   private PlatformFonts() {}
 
   /**

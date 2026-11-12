@@ -788,6 +788,23 @@ class JdkWarmUpTest {
    * #53d09edfad4a, #05ccc2dc9c89, GitHub #1467). The buttons and the warm-up share one constant.
    */
   @Test
+  void warmUpRasterizesTheTransferDetailLinkFont() throws Exception {
+    // Plain 13 pt, used only by that link: building the transfer details the first time
+    // rasterized it through GDI on the EDT (Icebase #b89319ed13f7, GitHub #1537).
+    assertTrue(
+        JdkWarmUp.mainWindowPlatformFonts().contains(PlatformFonts.TRANSFER_DETAIL_LINK),
+        JdkWarmUp.mainWindowPlatformFonts()::toString);
+    assertTrue(PlatformFonts.TRANSFER_DETAIL_LINK.getSize() == 13);
+    String component =
+        java.nio.file.Files.readString(
+            java.nio.file.Path.of(
+                "src/main/java/com/frostwire/gui/components/transfers/TransferDetailComponent.java"));
+    assertTrue(
+        component.contains("hideLink.setFont(PlatformFonts.TRANSFER_DETAIL_LINK)"),
+        "the link and the warm-up share one constant");
+  }
+
+  @Test
   void warmUpRasterizesTheDonationButtonFont() throws Exception {
     assertTrue(
         JdkWarmUp.mainWindowPlatformFonts().contains(PlatformFonts.DIALOG_BOLD),

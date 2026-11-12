@@ -661,7 +661,9 @@ public final class JdkWarmUp {
         PlatformFonts.sansSerif(Font.BOLD, 10),
         PlatformFonts.sansSerif(Font.PLAIN, 12),
         // The donation buttons (frostwire/frostwire#1467).
-        PlatformFonts.DIALOG_BOLD);
+        PlatformFonts.DIALOG_BOLD,
+        // The transfer details' "hide" link (frostwire/frostwire#1537).
+        PlatformFonts.TRANSFER_DETAIL_LINK);
   }
 
   /**

@@ -68,7 +68,7 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
     SwingUtilities.invokeLater(
         () -> {
           hideLink.setText("<html><a href='#'>" + I18n.tr("hide") + "</a></html>");
-          hideLink.setFont(PlatformFonts.sansSerif(Font.PLAIN, 13));
+          hideLink.setFont(PlatformFonts.TRANSFER_DETAIL_LINK);
         });
     add(labelAndLink, "left, gapleft 10px, growx");
     add(createDetailSwitcherButtons(), "push, right, wrap");
