@@ -10,6 +10,9 @@ FrostWire 7.1.5 UNRELEASED
    - fix:Right-clicking a selection of search results of different kinds (a torrent and a stream, for example) shows the menu for the first results of one kind again; it used to show nothing and report an error (#1532)
    - fix:The first search on a slow computer no longer stalls while the separator of the search options is prepared; that happens at startup in the background with the rest of that panel (#1419)
    - fix:The first time FrostWire runs on a computer with a single CPU, its window stays responsive while its IceBridge identity is created; that work now runs at low priority instead of taking the whole processor for minutes (#1534)
+   - fix:The window no longer freezes when your VPN connects or drops while VPN-Drop protection pauses or resumes your transfers; that happens in the background (#1535)
+   - fix:Error and input dialogs no longer ask Windows to register for drag and drop before they open, which could freeze the window for seconds on a slow computer (#1536)
+   - fix:Opening the transfer details for the first time on a slow computer no longer freezes while the font of its "hide" link is prepared; that happens at startup in the background (#1537)
 
 FrostWire 7.1.4 NOV/10/2026
    - fix:Freeze reports sent when the whole computer stalled, not FrostWire, are labeled as such so they stop hiding real problems (#1512)
