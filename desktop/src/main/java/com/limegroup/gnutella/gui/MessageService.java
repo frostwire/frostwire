@@ -73,8 +73,11 @@ public final class MessageService {
           editorPane.setText(message);
           optionPane.setMessage(editorPane);
           optionPane.setOpaque(ThemeMediator.isLightThemeOn());
-          JDialog dialog = optionPane.createDialog(getParentComponent(), I18n.tr("Error"));
           // The message is an editor pane, which the look and feel gives a drop target (#1471).
+          // Removed before createDialog: it packs the dialog, and realizing a component that
+          // still has a drop target registers it with the OS (#1536).
+          DropTargets.removeAll(optionPane);
+          JDialog dialog = optionPane.createDialog(getParentComponent(), I18n.tr("Error"));
           DropTargets.removeAll(dialog);
           dialog.setVisible(true);
         });
@@ -235,6 +238,8 @@ public final class MessageService {
               Object component = message;
               if (ignore != null) component = doNotDisplayAgainLabel(message, ignore);
               JOptionPane pane = new JOptionPane(component, msgType);
+              // Before createDialog, which realizes the dialog (#1536).
+              DropTargets.removeAll(pane);
               JDialog dialog = pane.createDialog(getParentComponent(), finalTitle);
               DropTargets.removeAll(dialog);
               dialog.setModal(true);
