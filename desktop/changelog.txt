@@ -98,6 +98,7 @@ FrostWire 7.1.3 NOV/07/2026
    - fix:Create Torrent: picking a Creative Commons license works again instead of failing with an error, and torrents made with one by older FrostWire versions show their license again
    - fix:MCP: text settings changed with frostwire_settings_set, such as the IceBridge remote URL, are saved as sent instead of wrapped in quotes, and numbers or true/false sent as text are accepted
    - fix:Smart search's crawl cache database releases its SQLite file when it is closed (it stayed open), and saving to it returns the saved row's id instead of always 1
+   - fix:When FrostWire's own files are damaged (a class it can't read), it now says so in plain words and offers a button to download FrostWire again, instead of an error dialog full of technical details; Icebase reports name the damaged class when the JVM does (#1541)
    - fix:Security: on macOS, "Show in Finder" passes the file path to its script as an argument, so a crafted file name can no longer inject AppleScript
    - fix:macOS: FrostWire starts and works on a Mac where the Lucida Grande font is missing or disabled (it crashed at the splash screen); its fonts and Java's built-in fonts fall back to Helvetica Neue (#1484)
    - windows-launcher: DLLs in the folder FrostWire is started from are no longer loaded: the current folder is out of the DLL search order and Java's jvm.dll is loaded by its full path
