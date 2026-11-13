@@ -132,8 +132,9 @@ public class Main {
       System.out.println("FrostWire is running in a PRODUCTION environment.");
       com.frostwire.util.StrictEdtMode.installProduction(java.time.Duration.ofMillis(5000));
     }
-    ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
-    JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+    // Popups and tooltips are lightweight (Swing's default): they used to be forced heavyweight to
+    // stay above the SWT Browser and the MPlayer canvas, both gone; as native windows, every
+    // tooltip and menu waited on Windows' toolkit thread (frostwire/frostwire#1552).
 
     // System.out.println("1: Main.main("+args+")");
     // make sure jlibtorrent is statically loaded on time to avoid jni symbols not found issues.
