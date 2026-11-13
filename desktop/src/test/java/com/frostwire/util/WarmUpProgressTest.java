@@ -53,17 +53,20 @@ class WarmUpProgressTest {
   }
 
   @Test
-  void bothWarmUpThreadsAreTracked() throws Exception {
+  void everyWarmUpThreadIsTracked() throws Exception {
     Path source = Path.of("src/main/java/com/frostwire/util/JdkWarmUp.java");
     if (!Files.isRegularFile(source)) {
       source = Path.of("desktop").resolve(source);
     }
     String code =
         new String(Files.readAllBytes(source), StandardCharsets.UTF_8).replaceAll("\\s+", "");
-    assertTrue(code.contains("PROGRESS.start(2,System.nanoTime());"));
+    assertTrue(code.contains("PROGRESS.start(3,System.nanoTime());"));
     assertTrue(code.contains("newThread(tracked(()->warmUp(earlyWindowText)),\"JdkWarmUp\")"));
     assertTrue(
         code.contains(
             "startAppClassPreload(SPLASH_SHOWN,SPLASH_WAIT_MS,tracked(JdkWarmUp::loadAppClasses))"));
+    assertTrue(
+        code.contains(
+            "startFallbackFontSweep(MAIN_WINDOW_SHOWN,MAIN_WINDOW_WAIT_MS,tracked(JdkWarmUp::sweepFallbackFonts))"));
   }
 }

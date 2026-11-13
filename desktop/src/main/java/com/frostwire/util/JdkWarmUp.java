@@ -70,7 +70,10 @@ import javax.swing.text.html.HTMLEditorKit;
  *       which builds a Foreign Function linker).
  *   <li>Fallback fonts: a composite UI font maps characters missing from its primary font through
  *       fallback "slot" fonts, and each slot reads its character map from disk the first time it is
- *       consulted (several MB for CJK fonts).
+ *       consulted (several MB for CJK fonts), under the JDK's global font lock. Before the splash
+ *       only the slots of the first windows' text load ({@link #initializeSlotsFor}); every other
+ *       slot loads once the main window is showing, at low priority ({@link
+ *       #startFallbackFontSweep}).
  *   <li>Font resolution and bidi: clipping complex text in a cell measures it with no font, so the
  *       JDK looks for a font per character among all installed fonts, see {@link
  *       #warmUpTextLayout}.
@@ -403,9 +406,27 @@ public final class JdkWarmUp {
   /** Released once the Swing splash window is showing, or when no splash will be shown. */
   private static final CountDownLatch SPLASH_SHOWN = new CountDownLatch(1);
 
+  /**
+   * Upper bound on how long the fallback font sweep waits for the main window. A first run shows
+   * the setup wizard before it, for as long as the user takes; the bound only keeps a main window
+   * that never shows from leaving the fonts unloaded.
+   */
+  static final long MAIN_WINDOW_WAIT_MS = TimeUnit.MINUTES.toMillis(5);
+
+  /** Released once the main window is showing, or when startup goes to the tray without it. */
+  private static final CountDownLatch MAIN_WINDOW_SHOWN = new CountDownLatch(1);
+
   private static final WarmUpProgress PROGRESS = new WarmUpProgress();
 
   private JdkWarmUp() {}
+
+  /**
+   * Lets the fallback font sweep start (see {@link #startFallbackFontSweep}): call once the main
+   * window is showing, or when startup leaves it hidden.
+   */
+  public static void mainWindowShown() {
+    MAIN_WINDOW_SHOWN.countDown();
+  }
 
   /**
    * Lets the warm-up thread move on to loading app classes. Until then it does only the steps the
@@ -423,12 +444,15 @@ public final class JdkWarmUp {
    *     fonts it needs load before the splash (see {@link #initializeSlotsFor})
    */
   public static void startInBackground(Supplier<String> earlyWindowText) {
-    // Two threads: the JDK steps and the app class preload.
-    PROGRESS.start(2, System.nanoTime());
+    // Three threads: the JDK steps, the app class preload and the fallback font sweep.
+    PROGRESS.start(3, System.nanoTime());
     Thread warmUp = new Thread(tracked(() -> warmUp(earlyWindowText)), "JdkWarmUp");
     warmUp.setDaemon(true);
     warmUp.start();
     startAppClassPreload(SPLASH_SHOWN, SPLASH_WAIT_MS, tracked(JdkWarmUp::loadAppClasses));
+    // TODO(frostwire/frostwire#1555): skip the sweep in Lite mode.
+    startFallbackFontSweep(
+        MAIN_WINDOW_SHOWN, MAIN_WINDOW_WAIT_MS, tracked(JdkWarmUp::sweepFallbackFonts));
   }
 
   /**
@@ -630,10 +654,9 @@ public final class JdkWarmUp {
       Map<?, ?> desktopHints = desktopFontHints();
       for (Font font : textFonts(UIManager.getDefaults())) {
         rasterizeGlyphs(font, desktopHints, GLYPH_SAMPLE);
-        rasterizeGlyphs(font, desktopHints, SCRIPT_GLYPH_SAMPLE);
       }
     } catch (Throwable t) {
-      LOG.warn("Script glyph warm-up failed: " + t.getMessage(), t);
+      LOG.warn("Text font glyph warm-up failed: " + t.getMessage(), t);
     }
     try {
       warmUpDateFormatAndCollation(formatLocale(), Locale.getDefault());
@@ -660,18 +683,108 @@ public final class JdkWarmUp {
     } catch (Throwable t) {
       LOG.warn("Line break warm-up failed: " + t.getMessage(), t);
     }
+    // The fallback fonts of every other script load later, once the main window is showing, see
+    // startFallbackFontSweep.
+  }
+
+  /**
+   * Starts the sweep of every fallback font on its own thread, below normal priority, once the main
+   * window is showing (or after {@code waitMs}). Each fallback slot is a font file loaded under the
+   * JDK's global font lock; loading them all before the splash made the EDT wait for that lock
+   * while it built the setup wizard and the main window (Icebase #7d83b84c37c5, #0068ec7873a2,
+   * frostwire/frostwire#1544).
+   */
+  static Thread startFallbackFontSweep(
+      CountDownLatch mainWindowShown, long waitMs, Runnable sweep) {
+    Thread fonts =
+        new Thread(
+            () -> {
+              try {
+                if (!mainWindowShown.await(waitMs, TimeUnit.MILLISECONDS)) {
+                  LOG.info("Main window not shown after " + waitMs + " ms, loading fonts anyway");
+                }
+              } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+              }
+              try {
+                sweep.run();
+              } catch (Throwable t) {
+                LOG.warn("Fallback font warm-up failed: " + t.getMessage(), t);
+              }
+            },
+            "JdkWarmUp-Fonts");
+    fonts.setDaemon(true);
+    fonts.setPriority(BackgroundPriority.PRIORITY);
+    fonts.start();
+    return fonts;
+  }
+
+  /**
+   * Loads every fallback slot of every UI font, for text in any script (file names, search results
+   * and suggestions), then rasterizes {@link #SCRIPT_GLYPH_SAMPLE} and resolves fonts for complex
+   * text ({@link #warmUpTextLayout}), which consult those slots too.
+   */
+  private static void sweepFallbackFonts() {
+    try {
+      for (Font font : fallbackSlotFonts(UIManager.getDefaults())) {
+        initializeAllSlots(font, JdkWarmUp::releaseFontLock);
+      }
+    } catch (Throwable t) {
+      LOG.warn("Fallback font warm-up failed: " + t.getMessage(), t);
+    }
+    try {
+      Map<?, ?> desktopHints = desktopFontHints();
+      for (Font font : textFonts(UIManager.getDefaults())) {
+        rasterizeGlyphs(font, desktopHints, SCRIPT_GLYPH_SAMPLE);
+      }
+    } catch (Throwable t) {
+      LOG.warn("Script glyph warm-up failed: " + t.getMessage(), t);
+    }
     try {
       warmUpTextLayout();
     } catch (Throwable t) {
       LOG.warn("Text layout warm-up failed: " + t.getMessage(), t);
     }
+  }
+
+  /**
+   * One letter of each script of {@link #SCRIPT_GLYPH_SAMPLE}, in its order, then {@link
+   * #UNMAPPED_CODE_POINT}: looking each up loads the slots up to its script's font, a few at a
+   * time, and the last one the rest.
+   */
+  static final int[] SLOT_SWEEP_CODE_POINTS = slotSweepCodePoints();
+
+  private static int[] slotSweepCodePoints() {
+    Set<Character.UnicodeScript> scripts = new HashSet<>();
+    IntStream letters =
+        SCRIPT_GLYPH_SAMPLE
+            .codePoints()
+            .filter(cp -> Character.isLetter(cp) && scripts.add(Character.UnicodeScript.of(cp)));
+    return IntStream.concat(letters, IntStream.of(UNMAPPED_CODE_POINT)).toArray();
+  }
+
+  /** Pause between lookups of the fallback font sweep. */
+  private static final long FONT_LOCK_PAUSE_MS = 20;
+
+  /**
+   * Loads every fallback slot of a font a few at a time ({@link #SLOT_SWEEP_CODE_POINTS}), calling
+   * {@code pause} after each lookup. The JDK's font lock is held only while one slot loads, but a
+   * thread that releases a monitor and asks for it again right away often gets it back before a
+   * waiting thread; the pause lets the EDT take the lock between slots.
+   */
+  static void initializeAllSlots(Font font, Runnable pause) {
+    for (int codePoint : SLOT_SWEEP_CODE_POINTS) {
+      font.canDisplay(codePoint);
+      pause.run();
+    }
+  }
+
+  private static void releaseFontLock() {
     try {
-      // Every other fallback slot, for text in any script (file names, search results).
-      for (Font font : fallbackSlotFonts(UIManager.getDefaults())) {
-        font.canDisplay(UNMAPPED_CODE_POINT);
-      }
-    } catch (Throwable t) {
-      LOG.warn("Fallback font warm-up failed: " + t.getMessage(), t);
+      Thread.sleep(FONT_LOCK_PAUSE_MS);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
     }
   }
 
@@ -1050,12 +1163,13 @@ public final class JdkWarmUp {
   }
 
   /**
-   * The fonts whose fallback slots are resolved before the splash shows: the look and feel's
-   * ({@link #distinctFonts}) and the {@link PlatformFonts} that components set directly, which are
-   * in no UI default. A logical font's slots belong to its family and style, not its size, so the
-   * setup wizard's 16 pt bold Dialog title (SetupWindow) shares Dialog bold's slots; the warm-up
-   * reached those only after the splash, and the first-run wizard measured its title first,
-   * resolving them on the EDT (Icebase #d5a31f6c0160, frostwire/frostwire#1329).
+   * The fonts whose fallback slots for the first windows' text are resolved before the splash
+   * shows, and all of whose slots load once the main window shows: the look and feel's ({@link
+   * #distinctFonts}) and the {@link PlatformFonts} that components set directly, which are in no UI
+   * default. A logical font's slots belong to its family and style, not its size, so the setup
+   * wizard's 16 pt bold Dialog title (SetupWindow) shares Dialog bold's slots; the warm-up reached
+   * those only after the splash, and the first-run wizard measured its title first, resolving them
+   * on the EDT (Icebase #d5a31f6c0160, frostwire/frostwire#1329).
    */
   static List<Font> fallbackSlotFonts(UIDefaults defaults) {
     Set<String> seen = new HashSet<>();

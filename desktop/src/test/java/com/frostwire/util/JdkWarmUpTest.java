@@ -172,6 +172,99 @@ class JdkWarmUpTest {
     }
   }
 
+  /**
+   * Every other fallback slot loads only once the main window is showing, on its own thread below
+   * normal priority, so the EDT building the wizard and the main window doesn't wait for the font
+   * lock behind dozens of font files (Icebase #7d83b84c37c5, #0068ec7873a2,
+   * frostwire/frostwire#1544).
+   */
+  @Test
+  void theFallbackFontSweepWaitsForTheMainWindowAndRunsBelowNormalPriority() throws Exception {
+    CountDownLatch mainWindowShown = new CountDownLatch(1);
+    CountDownLatch swept = new CountDownLatch(1);
+    AtomicReference<Thread> sweeper = new AtomicReference<>();
+
+    Thread thread =
+        JdkWarmUp.startFallbackFontSweep(
+            mainWindowShown,
+            TimeUnit.MINUTES.toMillis(1),
+            () -> {
+              sweeper.set(Thread.currentThread());
+              swept.countDown();
+            });
+
+    assertTrue(thread.isDaemon());
+    assertTrue(thread.getPriority() < Thread.NORM_PRIORITY, "competes with the EDT");
+    assertFalse(swept.await(300, TimeUnit.MILLISECONDS), "swept before the main window showed");
+    mainWindowShown.countDown();
+    assertTrue(swept.await(5, TimeUnit.SECONDS), "not swept after the main window showed");
+    assertSame(thread, sweeper.get());
+    thread.join();
+  }
+
+  @Test
+  void theFallbackFontSweepGivesUpWaitingForAMainWindowThatNeverShows() throws Exception {
+    CountDownLatch swept = new CountDownLatch(1);
+    JdkWarmUp.startFallbackFontSweep(new CountDownLatch(1), 50, swept::countDown);
+    assertTrue(swept.await(5, TimeUnit.SECONDS));
+  }
+
+  @Test
+  void everyFallbackSlotLoadsOnlyInTheSweepStartedForTheMainWindow() throws Exception {
+    String warmUp = warmUpSource();
+    for (String sweep :
+        List.of(
+            "UNMAPPED_CODE_POINT", "SCRIPT_GLYPH_SAMPLE", "warmUpTextLayout(", "sweepFallback")) {
+      assertFalse(warmUp.contains(sweep), sweep + " runs before the main window shows");
+    }
+    String start = methodSource("public static void startInBackground(").replaceAll("\\s+", "");
+    assertTrue(
+        start.contains(
+            "startFallbackFontSweep(MAIN_WINDOW_SHOWN,MAIN_WINDOW_WAIT_MS,tracked(JdkWarmUp::sweepFallbackFonts));"),
+        "startInBackground doesn't start the sweep for the main window");
+    assertTrue(start.contains("TODO(frostwire/frostwire#1555)"), "Lite mode TODO missing");
+    assertTrue(
+        methodSource("private static void sweepFallbackFonts() {")
+            .replaceAll("\\s+", "")
+            .contains(
+                "for(Fontfont:fallbackSlotFonts(UIManager.getDefaults())){initializeAllSlots(font,"),
+        "the sweep doesn't load every UI font's slots");
+  }
+
+  /**
+   * The sweep loads a font's slots a few at a time, one script after another and every remaining
+   * slot last, pausing after each lookup so the EDT can take the font lock in between.
+   */
+  @Test
+  void initializeAllSlotsLooksUpOneScriptAtATimeAndPausesBetween() {
+    List<String> calls = new ArrayList<>();
+    Font font =
+        new Font(Font.DIALOG, Font.PLAIN, 12) {
+          @Override
+          public boolean canDisplay(int codePoint) {
+            calls.add(Integer.toHexString(codePoint));
+            return super.canDisplay(codePoint);
+          }
+        };
+
+    JdkWarmUp.initializeAllSlots(font, () -> calls.add("pause"));
+
+    int[] codePoints = JdkWarmUp.SLOT_SWEEP_CODE_POINTS;
+    List<String> expected = new ArrayList<>();
+    for (int cp : codePoints) {
+      expected.add(Integer.toHexString(cp));
+      expected.add("pause");
+    }
+    assertEquals(expected, calls);
+    assertEquals(0x0378, codePoints[codePoints.length - 1], "every remaining slot last");
+    Set<Character.UnicodeScript> scripts = new HashSet<>();
+    for (int i = 0; i < codePoints.length - 1; i++) {
+      assertTrue(scripts.add(Character.UnicodeScript.of(codePoints[i])), "a script twice");
+    }
+    assertTrue(scripts.contains(Character.UnicodeScript.HAN), scripts.toString());
+    assertTrue(scripts.contains(Character.UnicodeScript.ARABIC), scripts.toString());
+  }
+
   @Test
   void theEarlyWindowTextAddsLatinDigitsAndPunctuation() {
     String ascii = JdkWarmUp.GLYPH_SAMPLE;
@@ -1030,8 +1123,15 @@ class JdkWarmUpTest {
     String warmUp = warmUpSource().replaceAll("\\s+", "");
     assertTrue(
         warmUp.contains("(Fontfont:textFonts(UIManager.getDefaults()))")
-            && warmUp.contains("rasterizeGlyphs(font,desktopHints,SCRIPT_GLYPH_SAMPLE)"),
-        "script glyphs not rasterized by warmUp");
+            && warmUp.contains("rasterizeGlyphs(font,desktopHints,GLYPH_SAMPLE)"),
+        "text font glyphs not rasterized by warmUp");
+    // The other scripts' glyphs, once their fallback fonts load after the main window shows.
+    String sweep =
+        methodSource("private static void sweepFallbackFonts() {").replaceAll("\\s+", "");
+    assertTrue(
+        sweep.contains("(Fontfont:textFonts(UIManager.getDefaults()))")
+            && sweep.contains("rasterizeGlyphs(font,desktopHints,SCRIPT_GLYPH_SAMPLE)"),
+        "script glyphs not rasterized by the fallback font sweep");
   }
 
   /**
@@ -1075,7 +1175,10 @@ class JdkWarmUpTest {
     assertFalse(before.contains(BIDI_DATA_CLASS), "probe itself runs bidi");
     assertTrue(after.lines().anyMatch("unread=0"::equals), after);
     assertTrue(after.contains(BIDI_DATA_CLASS), "bidi data not loaded");
-    assertTrue(warmUpSource().contains("warmUpTextLayout();"), "not called by warmUp");
+    // It asks every slot of the default font, so it runs with the fallback font sweep (#1544).
+    assertTrue(
+        methodSource("private static void sweepFallbackFonts() {").contains("warmUpTextLayout();"),
+        "not called by the fallback font sweep");
   }
 
   private static final String BIDI_DATA_CLASS = "jdk.internal.icu.impl.UBiDiProps ";
@@ -1429,6 +1532,18 @@ class JdkWarmUpTest {
     assertTrue(
         body.indexOf("JdkWarmUp.splashShown();") > body.indexOf("}finally{"),
         "not released in a finally block");
+  }
+
+  /** The source of JdkWarmUp's method with this signature line, up to its closing brace. */
+  private static String methodSource(String signature) throws IOException {
+    String source =
+        Files.readString(
+            Path.of(System.getProperty("user.dir"))
+                .resolve("src/main/java/com/frostwire/util/JdkWarmUp.java"));
+    int start = source.indexOf(signature);
+    int end = source.indexOf("\n  }\n", start);
+    assertTrue(start >= 0 && end > start, signature + " not found");
+    return source.substring(start, end);
   }
 
   private static String warmUpSource() throws IOException {

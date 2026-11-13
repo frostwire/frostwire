@@ -44,6 +44,41 @@ class JdkWarmUpStartupOrderTest {
   }
 
   /**
+   * The warm-up loads every fallback font file, under the JDK's global font lock, only once the
+   * main window is showing: loading them while the EDT built the setup wizard and the main window
+   * made it wait for that lock (Icebase #7d83b84c37c5, #0068ec7873a2, frostwire/frostwire#1544).
+   * The signal comes after the window is shown, also when startup leaves it in the tray.
+   */
+  @Test
+  void theFallbackFontSweepStartsOnlyAfterTheMainWindowIsShown() throws Exception {
+    String source = Files.readString(INITIALIZER).replaceAll("\\s+", "");
+    String signal =
+        "GUIMediator.safeInvokeLater(()->SwingUtilities.invokeLater(JdkWarmUp::mainWindowShown));";
+    int show = source.indexOf("privatevoidhideSplashAndShowUI(){");
+    int visible = source.indexOf("GUIMediator.setAppVisible(true);", show);
+    int hidden = source.indexOf("GUIMediator.startupHidden();", show);
+    int shown = source.indexOf(signal, show);
+    int nextMethod = source.indexOf("privatevoid", show + 1);
+
+    assertTrue(show >= 0 && visible > show && hidden > show, "hideSplashAndShowUI changed");
+    assertTrue(shown > visible && shown > hidden, "the sweep may start before the main window");
+    assertTrue(shown < nextMethod, "not signaled when the main window shows");
+    assertEquals(
+        shown + signal.indexOf("mainWindowShown"),
+        source.indexOf("mainWindowShown"),
+        "signaled before the main window is shown");
+    assertEquals(shown, source.lastIndexOf(signal), "signaled twice");
+    assertEquals(
+        source.indexOf("mainWindowShown"),
+        source.lastIndexOf("mainWindowShown"),
+        "signaled more than once");
+    assertTrue(
+        source.indexOf("hideSplashAndShowUI();")
+            > source.indexOf("startSetupManager(setupManager);"),
+        "the main window shows before the setup wizard");
+  }
+
+  /**
    * The "Loading HTML Engine" startup step built an HTML label on the EDT, which parsed the HTML
    * DTD there (Icebase #fb904a5d872d). The startup thread loads it into a model instead.
    */

@@ -431,6 +431,11 @@ final class Initializer {
     } else {
       GUIMediator.startupHidden();
     }
+    // The warm-up loads every other fallback font file only now, under the JDK's global font lock
+    // the EDT waited for while building the main window (#1544). setAppVisible shows the window
+    // from an EDT event, which queues its revalidation and first paint: the second hop runs after
+    // them.
+    GUIMediator.safeInvokeLater(() -> SwingUtilities.invokeLater(JdkWarmUp::mainWindowShown));
   }
 
   /** Runs any late UI tasks, such as initializing Icons, I18n support. */
