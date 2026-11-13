@@ -94,8 +94,7 @@ public class BTInfoAdditionalMetadataHolder {
                 libtorrent.write_torrent_file(
                     tinfo.swigParams(), libtorrent.getAllow_missing_piece_layer()))
             .bencode();
-    final Map<String, Entry> info =
-        getInfo(Entry.bdecode(written).dictionary().get("info").swig());
+    final Map<String, Entry> info = getInfo(Entry.bdecode(written).dictionary().get("info").swig());
     final Map<String, Object> additional = new HashMap<>();
     for (String key : new String[] {"license", "paymentOptions"}) {
       final Entry value = info.get(key);
