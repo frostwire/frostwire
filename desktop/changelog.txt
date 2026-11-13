@@ -148,6 +148,7 @@ FrostWire 7.1.3 NOV/07/2026
    - fix:Corrupt MP4/M4A files no longer break reading the tags and cover art of the files after them, or make Extract audio fail with an internal error — every box size is checked against its parent and the file before it is read, and an empty box no longer hides the rest of the file
    - fix:A SoundCloud MP3 with an invalid text encoding in its ID3 tag is re-tagged without errors — the bad frame is skipped when the tag is read
    - fix:A SoundCloud MP3 with a cut-short ID3 frame (empty title, truncated cover art) is re-tagged without errors — frames shorter than their fields are skipped
+   - fix:The search box's suggestion list no longer re-shapes every suggestion's text on each repaint, which froze the window on slow machines; the shaped text is kept between repaints (#1551)
    - fix:MP3 tags read correctly in more files: UTF-16 comments and picture descriptions are no longer empty, tags with an extended header are read, and a short last tag field is no longer dropped (#1409)
    - fix:An Internet Archive search answer with one empty entry no longer hides all Internet Archive results (#1432)
    - fix:Pasting a SoundCloud link whose answer holds an empty track now downloads the other tracks instead of doing nothing (#1433)
