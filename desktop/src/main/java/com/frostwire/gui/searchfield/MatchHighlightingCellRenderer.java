@@ -16,8 +16,12 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
+import java.awt.font.FontRenderContext;
 import java.awt.font.TextAttribute;
+import java.awt.font.TextLayout;
 import java.text.AttributedString;
+import java.util.BitSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 import javax.swing.JComponent;
@@ -32,6 +36,10 @@ import org.limewire.util.LCS;
  * built an HTML document view for every entry on every size pass and repaint; on slow machines that
  * stalled the EDT for seconds. This renderer wraps the look-and-feel's renderer, copies its colors,
  * font and border, and paints the plain text with matched runs in bold.
+ *
+ * <p>Drawing an attributed string builds a new {@link TextLayout}, which shapes the whole entry, so
+ * the layouts of the visible entries are kept and reused until the text, the bold runs, the font or
+ * the font render context change.
  */
 final class MatchHighlightingCellRenderer extends JComponent implements ListCellRenderer<String> {
   private static final Object DESKTOP_TEXT_HINTS =
@@ -42,6 +50,20 @@ final class MatchHighlightingCellRenderer extends JComponent implements ListCell
   private String text = "";
   private boolean[] bold;
   private Dimension preferredSize = new Dimension();
+  private Font boldFontBase;
+  private Font boldFont;
+  private final Map<LayoutKey, TextLayout> layouts =
+      new LinkedHashMap<>(16, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<LayoutKey, TextLayout> eldest) {
+          return size() > MAX_CACHED_LAYOUTS;
+        }
+      };
+  private int layoutsBuilt;
+
+  private static final int MAX_CACHED_LAYOUTS = 64;
+
+  private record LayoutKey(String text, BitSet bold, Font font, FontRenderContext frc) {}
 
   MatchHighlightingCellRenderer(ListCellRenderer<? super String> delegate, Supplier<String> query) {
     this.delegate = delegate;
@@ -98,7 +120,7 @@ final class MatchHighlightingCellRenderer extends JComponent implements ListCell
     }
     String matched = boldChars.toString();
     int extra =
-        getFontMetrics(font.deriveFont(Font.BOLD)).stringWidth(matched)
+        getFontMetrics(boldFontOf(font)).stringWidth(matched)
             - getFontMetrics(font).stringWidth(matched);
     return new Dimension(plain.width + Math.max(0, extra), plain.height);
   }
@@ -123,28 +145,64 @@ final class MatchHighlightingCellRenderer extends JComponent implements ListCell
             RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
       }
       Font font = getFont();
-      AttributedString styled = new AttributedString(text);
-      styled.addAttribute(TextAttribute.FONT, font);
-      Font boldFont = font.deriveFont(Font.BOLD);
-      for (int i = 0; i < bold.length; i++) {
-        if (bold[i]) {
-          int end = i;
-          while (end < bold.length && bold[end]) {
-            end++;
-          }
-          styled.addAttribute(TextAttribute.FONT, boldFont, i, end);
-          i = end - 1;
-        }
-      }
+      TextLayout layout = layoutFor(font, g2.getFontRenderContext());
       Insets insets = getInsets();
       FontMetrics metrics = g2.getFontMetrics(font);
       int innerHeight = getHeight() - insets.top - insets.bottom;
       int baseline = insets.top + (innerHeight - metrics.getHeight()) / 2 + metrics.getAscent();
       g2.setColor(getForeground());
-      g2.drawString(styled.getIterator(), insets.left, baseline);
+      // What Graphics2D.drawString(AttributedCharacterIterator, x, y) does, minus the shaping.
+      layout.draw(g2, insets.left, baseline);
     } finally {
       g2.dispose();
     }
+  }
+
+  private Font boldFontOf(Font font) {
+    if (!font.equals(boldFontBase)) {
+      boldFontBase = font;
+      boldFont = font.deriveFont(Font.BOLD);
+    }
+    return boldFont;
+  }
+
+  private TextLayout layoutFor(Font font, FontRenderContext frc) {
+    BitSet boldRuns = new BitSet(bold.length);
+    for (int i = 0; i < bold.length; i++) {
+      if (bold[i]) {
+        boldRuns.set(i);
+      }
+    }
+    LayoutKey key = new LayoutKey(text, boldRuns, font, frc);
+    TextLayout layout = layouts.get(key);
+    if (layout == null) {
+      layout = new TextLayout(styledText(font).getIterator(), frc);
+      layouts.put(key, layout);
+      layoutsBuilt++;
+    }
+    return layout;
+  }
+
+  private AttributedString styledText(Font font) {
+    AttributedString styled = new AttributedString(text);
+    styled.addAttribute(TextAttribute.FONT, font);
+    Font boldFont = boldFontOf(font);
+    for (int i = 0; i < bold.length; i++) {
+      if (bold[i]) {
+        int end = i;
+        while (end < bold.length && bold[end]) {
+          end++;
+        }
+        styled.addAttribute(TextAttribute.FONT, boldFont, i, end);
+        i = end - 1;
+      }
+    }
+    return styled;
+  }
+
+  /** How many text layouts this renderer has shaped, for tests. */
+  int layoutsBuilt() {
+    return layoutsBuilt;
   }
 
   // Renderer stamps never need layout, repaint or change notifications (as
