@@ -111,6 +111,7 @@ FrostWire 7.1.3 NOV/07/2026
    - fix:A corrupt or malicious MP4/M4A file in your downloads can no longer make FrostWire run out of memory when the Library reads its tags or you extract its audio — entry counts in the file are checked against its size before anything is allocated
    - fix:A SoundCloud MP3 with a corrupt ID3 tag can no longer make FrostWire allocate gigabytes of memory while re-tagging it — frame lengths are checked against the tag before anything is copied
    - fix:Re-tagging a low-bitrate MP3 (MPEG-2 or 2.5, 24 kHz and below) no longer cuts its audio down to a single frame, and its duration and ID3v2 tag are read correctly
+   - fix:FrostWire no longer reports a NullPointerException at startup because the Library's search box was added to the header before it had been created (introduced by the on-demand Library view in 7.1.5, #1530) (#1542)
    - fix:MP3s with an ID3v2.4 tag that ends in a footer are read instead of rejected, and footers FrostWire writes are valid
    - fix:An MP3 with a blank ID3v2 genre or an unreadable comment description no longer makes reading its tags fail
    - fix:MP3s whose ID3v1 track number is 128 or higher show that number instead of a negative one
@@ -120,6 +121,7 @@ FrostWire 7.1.3 NOV/07/2026
    - new:Create Torrent: drop a file or a folder on the dialog to pick it as the torrent's content, then fine-tune it: private torrents, a comment, tracker tiers (a blank line between trackers), an Advanced tab for file modification times, symbolic links and file attributes, DHT nodes in trackerless torrents, and a progress bar while pieces are hashed; picking a large folder no longer freezes the dialog (#1474)
    - new:Distributed search results are ranked by the karma of the peer that shared them (after seeds), and a new Karma column, hidden by default, shows that karma; the Peer Directory's Trust Score column is now Karma (same number, now sorted by value) (#1418)
    - new:The IceBridge Console shows IceBridge network traffic in its status bar: download (blue) and upload (red) speeds, a graph of the last 5 minutes in the same colors, and the total received, sent and combined since IceBridge started
+   - fix:Removing many files from the Library no longer freezes the window for seconds; the table's row lookup is rebuilt once for the whole removal instead of once per file (#1545)
    - new:Double-clicking a folder or media type in the Library's left-hand tree refreshes it, like F5 does
    - update:FrostWire uses up to a quarter of your computer's memory instead of a fixed 512 MB (never less than 512 MB, at most 4 GB), so computers with more memory get fewer slowdowns and pauses
    - jlibtorrent: updated 2.0.12.9 → 2.0.15.3: libtorrent RC_2_0 with the fixes of libtorrent 2.0.13, 2.0.14, 2.0.15 and the unreleased 2.0.16 (123 commits), and OpenSSL 3.6.0 → 4.1.0
@@ -129,6 +131,7 @@ FrostWire 7.1.3 NOV/07/2026
    - fix:Karma: your karma chain can no longer be lost: each entry is saved before it is used, never signed at an older Bitcoin block, and a chain that fails verification is kept aside instead of overwritten (#1413)
    - jlibtorrent: BitTorrent memory leaks: every torrent, magnet, resume-data and DHT message it decoded leaked a native copy of its input (100,000 parses of a 13.5 KB torrent leaked 1.7 GB; now flat), and identity secret keys no longer stay behind in leaked native memory
    - fix:Errors on the UI thread no longer freeze the app for seconds, and they are now reported — FrostWire installs a real uncaught-exception handler (the old one was ignored by current Java) and files reports in the background
+   - fix:Clicking OK in Options no longer freezes the window when the BitTorrent engine is slow to answer; the BitTorrent connection and speed settings are now applied to the engine in the background (#1546)
    - fix:Fragmented MP4/M4A files (such as downloaded YouTube audio) open again: a stricter check from an earlier fix rejected their sample runs (#1354)
    - windows-launcher: Java can use IPv6 again, so peers and servers on IPv6-only networks are reachable (IPv4 is still preferred where both exist)
    - fix:The Library no longer runs out of memory or hangs on folders with symlink loops (also Library search, Create Torrent's size count and the MCP library tools), and Options → Apply no longer checks the save folder on disk when it didn't change or crashes when ProgramFiles isn't set — one bounded, non-recursive folder walker that follows symlinked subfolders but enters each real folder once

@@ -135,10 +135,17 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
     // Defer LibraryMediator access to avoid EDT violation from static initializers
     SwingUtilities.invokeLater(
         () -> {
-          librarySearchField = LibraryMediator.instance().getLibrarySearch().getSearchField();
-          searchPanels.add(librarySearchField, LIBRARY_SEARCH_FIELD);
-          searchPanels.revalidate();
-          searchPanels.repaint();
+          // The Library's search field is created after the Library search is, and the Library is
+          // now built when first shown, so it may not exist yet (Icebase #c90f930e756a).
+          LibraryMediator.instance()
+              .getLibrarySearch()
+              .whenSearchFieldReady(
+                  field -> {
+                    librarySearchField = field;
+                    searchPanels.add(librarySearchField, LIBRARY_SEARCH_FIELD);
+                    searchPanels.revalidate();
+                    searchPanels.repaint();
+                  });
         });
 
     schemaListener.actionPerformed(null);

@@ -18,9 +18,12 @@
 
 package com.limegroup.gnutella.gui.tables;
 
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.TreeSet;
 
 /**
  * This class extends the BasicDataLineModel by storing the 'initializing' object in a HashMap.
@@ -116,6 +119,42 @@ public class HashBasedDataLineModel<T extends DataLine<E>, E> extends BasicDataL
     synchronized (getListLock()) {
       remapIndexes(row);
     }
+  }
+
+  /**
+   * Removes the rows that were initialized by the given objects, and remaps the indexes once. A
+   * loop of {@link #remove(int)} remaps every row after the removed one each time, so removing
+   * thousands of rows of a big table took seconds on the EDT, and allocated gigabytes of boxed row
+   * numbers while doing it (Icebase #cc692a1a7966, frostwire/frostwire#1545).
+   *
+   * @return how many rows were removed
+   */
+  public int removeAll(Collection<? extends E> initializers) {
+    TreeSet<Integer> rows = new TreeSet<>(Comparator.reverseOrder());
+    synchronized (getListLock()) {
+      for (E initializer : initializers) {
+        Integer row = _indexes.get(initializer);
+        if (row != null) {
+          rows.add(row);
+        }
+      }
+    }
+    if (rows.isEmpty()) {
+      return 0;
+    }
+    int lowest = rows.last();
+    // From the last row up: the rows below the one being removed keep their numbers.
+    for (int row : rows) {
+      Object init = get(row).getInitializeObject();
+      synchronized (getListLock()) {
+        _indexes.remove(init);
+      }
+      super.remove(row);
+    }
+    synchronized (getListLock()) {
+      remapIndexes(lowest);
+    }
+    return rows.size();
   }
 
   /**

@@ -51,6 +51,7 @@ import org.limewire.util.StringUtils;
 public class LibrarySearch extends JPanel {
   private JLabel statusLabel;
   private SearchField searchField;
+  private final OnceReady<SearchField> searchFieldReady = new OnceReady<>();
   private SearchRunnable currentSearchRunnable;
   private int resultsCount;
   private String status;
@@ -71,6 +72,12 @@ public class LibrarySearch extends JPanel {
   private void createSearchField() {
     searchField = new SearchField();
     setupUIListeners();
+    searchFieldReady.set(searchField);
+  }
+
+  /** Runs the action with the search field once it exists (it is created after construction). */
+  public void whenSearchFieldReady(java.util.function.Consumer<SearchField> action) {
+    searchFieldReady.whenReady(action);
   }
 
   public void searchFor(final String query, final boolean displayTextOnSearchBox) {
