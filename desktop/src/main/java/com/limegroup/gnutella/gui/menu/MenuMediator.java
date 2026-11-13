@@ -27,13 +27,6 @@ public final class MenuMediator {
   /** Constant handle to the instance of this class for following the singleton pattern. */
   private static MenuMediator INSTANCE;
 
-  /*
-   We call this so that the menu won't be covered by the SWT Browser.
-  */
-  static {
-    JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-  }
-
   /** Constant handle to the `JMenuBar` instance that holds all of the `JMenu` instances. */
   private final JMenuBar MENU_BAR = new JMenuBar();
 
