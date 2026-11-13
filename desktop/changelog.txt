@@ -168,6 +168,7 @@ FrostWire 7.1.3 NOV/07/2026
    - update:The Library lists up to 100,000 files per folder scan (was 250,000), so a huge Torrent Data folder can't use up the memory of older computers
    - jlibtorrent: libtorrent objects FrostWire no longer uses (torrent info, status, entries, lists) are freed automatically instead of leaking native memory for as long as the app runs
    - jlibtorrent: Torrents whose file names have emoji or other characters outside the basic plane download with the right names, and text that isn't valid UTF-8 can no longer corrupt libtorrent's JNI layer
+   - fix:Opening the Library or the first-run setup wizard could freeze FrostWire for good; the startup warm-up no longer leaves a half-built key binding entry for the Nimbus look and feel to copy (#1554)
    - jlibtorrent: a programming mistake that uses a libtorrent object after freeing it now shows up as an error instead of closing the app
    - jlibtorrent: the copies of the libtorrent library that older versions left in the temp folder on every start (13-30 MB each) are deleted
    - jlibtorrent: the native library is extracted once and reused instead of copied out on every start (#1382)
