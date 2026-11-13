@@ -336,7 +336,8 @@ dependencies {
     def is_arm64 = arch == "aarch64" || arch == "arm64"
 
     // jlibtorrent 2.1.2.0 is not on Maven until its release is published: until then build with
-    // -PlocalJlibtorrent, which uses the jars frostwire-jlibtorrent built next to this checkout.
+    // -PlocalJlibtorrent, which uses the jars frostwire-jlibtorrent built next to this checkout
+    // (or the directory given with -PlocalJlibtorrentDir=/path/to/jars, e.g. a downloaded GitHub release).
     def use_maven_jlibtorrent = !project.hasProperty('localJlibtorrent')
 
     if (use_maven_jlibtorrent) {
@@ -366,7 +367,7 @@ dependencies {
     } else {
         // assume use has frostwire-jlibtorrent project checked out (dev mode) at the same level as the frostwire project
         // we are currently at frostwire/desktop
-        def jlibtorrent_built_jars_path = '../../frostwire-jlibtorrent/build/libs'
+        def jlibtorrent_built_jars_path = project.findProperty('localJlibtorrentDir') ?: '../../frostwire-jlibtorrent/build/libs'
         System.out.println("Using jlibtorrent jars from development environment at ${jlibtorrent_built_jars_path}")
 
         def main_jar = files("${jlibtorrent_built_jars_path}/jlibtorrent-${jlibtorrent_version}.jar")
@@ -521,7 +522,7 @@ dependencies {
     if (project.hasProperty('localJlibtorrent')) {
         // Only the natives frostwire-jlibtorrent has built here (see the jlibtorrent dependency above)
         ['linux-x86_64', 'linux-arm64', 'macosx-arm64', 'macosx-x86_64'].each { platform ->
-            def jar = file("../../frostwire-jlibtorrent/build/libs/jlibtorrent-${platform}-${ext.jlibtorrent_version}.jar")
+            def jar = file("${project.findProperty('localJlibtorrentDir') ?: '../../frostwire-jlibtorrent/build/libs'}/jlibtorrent-${platform}-${ext.jlibtorrent_version}.jar")
             if (jar.exists()) {
                 icebridgeCloudNatives files(jar)
             }
