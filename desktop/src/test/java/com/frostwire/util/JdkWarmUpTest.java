@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
@@ -311,22 +312,75 @@ class JdkWarmUpTest {
         new UIDefaults.LazyInputMap(new Object[] {"ctrl C", "copy", "shift F10", "postPopup"}));
     defaults.put("Label.font", "not an input map");
 
-    JdkWarmUp.resolveInputMaps(defaults);
+    assertEquals(1, JdkWarmUp.resolveInputMaps(defaults));
 
-    Object stored =
-        defaults.entrySet().stream()
-            .filter(e -> e.getKey().equals("RootPane.ancestorInputMap"))
-            .findFirst()
-            .orElseThrow()
-            .getValue();
-    InputMap built = assertInstanceOf(InputMap.class, stored, "the binding map is still lazy");
-    assertEquals("copy", built.get(KeyStroke.getKeyStroke("ctrl C")));
+    // The EDT builds its own map from the lazy value, now without reflecting.
+    InputMap onEdt = assertInstanceOf(InputMap.class, defaults.get("RootPane.ancestorInputMap"));
+    assertEquals("copy", onEdt.get(KeyStroke.getKeyStroke("ctrl C")));
     String source =
         Files.readString(Path.of("src/main/java/com/frostwire/util/JdkWarmUp.java"))
             .replaceAll("\\s+", "");
     assertTrue(
         source.contains("resolveInputMaps(UIManager.getLookAndFeelDefaults());"),
         "the startup warm-up calls it");
+  }
+
+  /**
+   * While UIDefaults.get builds a lazy value it stores a PENDING marker under the key. Nimbus
+   * copies the raw table into its per-component styles when the EDT styles its first component,
+   * which it did while the warm-up built the key binding maps: the copy kept the marker, and the
+   * EDT waited forever for it building the Library's split pane and table header and the setup
+   * wizard's text area (Icebase #ff7daaf00779, #c11d7cbc82ac, #275c959430a5). The table must hold
+   * the lazy value the whole time the warm-up builds from it.
+   */
+  @Test
+  void buildingTheKeyBindingMapsNeverLeavesAPendingMarkerForTheEdt() throws Exception {
+    CountDownLatch building = new CountDownLatch(1);
+    CountDownLatch release = new CountDownLatch(1);
+    UIDefaults.LazyInputMap lazy =
+        new UIDefaults.LazyInputMap(new Object[] {"ctrl C", "copy"}) {
+          @Override
+          public Object createValue(UIDefaults table) {
+            if (Thread.currentThread().getName().equals("warm-up")) {
+              building.countDown();
+              try {
+                release.await(10, TimeUnit.SECONDS);
+              } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+              }
+            }
+            return super.createValue(table);
+          }
+        };
+    UIDefaults defaults = new UIDefaults();
+    defaults.put("SplitPane.ancestorInputMap", lazy);
+    Thread warmUp = new Thread(() -> JdkWarmUp.resolveInputMaps(defaults), "warm-up");
+    warmUp.setDaemon(true);
+    warmUp.start();
+    UIDefaults style = new UIDefaults();
+    try {
+      assertTrue(building.await(10, TimeUnit.SECONDS), "the warm-up didn't build the map");
+      // What Nimbus's getDefaultsForPrefix copies: the raw value, while the warm-up builds.
+      Object raw =
+          defaults.entrySet().stream()
+              .filter(e -> e.getKey().equals("SplitPane.ancestorInputMap"))
+              .findFirst()
+              .orElseThrow()
+              .getValue();
+      style.put("ancestorInputMap", raw);
+      assertSame(lazy, raw, "the table held UIDefaults' PENDING marker during the build");
+    } finally {
+      release.countDown();
+      warmUp.join(10_000);
+    }
+    AtomicReference<Object> read = new AtomicReference<>();
+    Thread edt =
+        new Thread(() -> read.set(style.get("ancestorInputMap")), "style lookup on the EDT");
+    edt.setDaemon(true);
+    edt.start();
+    edt.join(5_000);
+    assertFalse(edt.isAlive(), "the style's lookup waits for a value no thread will store");
+    assertInstanceOf(InputMap.class, read.get());
   }
 
   /**

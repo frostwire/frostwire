@@ -1093,17 +1093,29 @@ public final class JdkWarmUp {
    * Builds the look and feel's key binding maps (its {@code *InputMap} entries, lazy until first
    * read). The main window's root pane read the first of them on the EDT, parsing each binding into
    * a KeyStroke, whose key code AWTKeyStroke looks up by reflection on KeyEvent (Icebase
-   * #2aac34fbc637, frostwire/frostwire#1482). An InputMap is not a component, and UIDefaults
-   * replaces each lazy value with what it built, so the EDT reads the built map.
+   * #2aac34fbc637, frostwire/frostwire#1482). AWTKeyStroke caches each key code it looks up, so the
+   * EDT's own parse no longer reflects.
+   *
+   * <p>Each map is built from its lazy value directly and discarded, like {@link #createPainters},
+   * never through {@code defaults.get(key)}: while UIDefaults builds a lazy value it stores a
+   * private PENDING marker under the key, and Nimbus copies the raw table into its per-component
+   * styles the first time the EDT styles a component (the splash's, while this step runs). A copy
+   * taken in that window kept the marker for good, and the component's style waited forever for a
+   * value no thread would ever store: the EDT froze in UIDefaults.getFromHashtable building the
+   * Library's split pane and table header and the setup wizard's text area (Icebase #ff7daaf00779,
+   * #c11d7cbc82ac, #275c959430a5). Returns how many maps were built.
    */
-  static void resolveInputMaps(UIDefaults defaults) {
+  static int resolveInputMaps(UIDefaults defaults) {
+    int built = 0;
     for (Map.Entry<?, ?> entry : List.copyOf(defaults.entrySet())) {
       if (entry.getKey() instanceof String key
           && key.endsWith("InputMap")
-          && entry.getValue() instanceof UIDefaults.LazyInputMap) {
-        defaults.get(key);
+          && entry.getValue() instanceof UIDefaults.LazyInputMap inputMap) {
+        inputMap.createValue(defaults);
+        built++;
       }
     }
+    return built;
   }
 
   /**
