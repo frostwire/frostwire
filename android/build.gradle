@@ -402,7 +402,18 @@ dependencies {
 
     // One Android library (AAR): the Java classes, every ABI's native library (abiFilters picks
     // which go in the APK) and its own R8 keep rules.
-    implementation 'com.frostwire:jlibtorrent-android:2.0.15.3@aar'
+    //
+    // jlibtorrent 2.1.2.0 is not on the Maven mirror until its release is deployed there: until then build
+    // with -PlocalJlibtorrent, which uses jlibtorrent-android-<version>.aar from ../../frostwire-jlibtorrent/build/libs
+    // (or from the directory given with -PlocalJlibtorrentDir=/path/to/dir, e.g. a downloaded GitHub release).
+    def jlibtorrentVersion = '2.1.2.0'
+    if (project.hasProperty('localJlibtorrent')) {
+        def jlibtorrentDir = project.findProperty('localJlibtorrentDir') ?: '../../frostwire-jlibtorrent/build/libs'
+        logger.lifecycle("Using jlibtorrent AAR from ${jlibtorrentDir}")
+        implementation files("${jlibtorrentDir}/jlibtorrent-android-${jlibtorrentVersion}.aar")
+    } else {
+        implementation "com.frostwire:jlibtorrent-android:${jlibtorrentVersion}@aar"
+    }
 
     // Netty for IceBridge rUDP transport (in-process daemon on Android)
     implementation('io.netty:netty-all:4.2.19.Final') {
