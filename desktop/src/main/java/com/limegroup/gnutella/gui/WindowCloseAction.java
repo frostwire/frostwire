@@ -36,8 +36,19 @@ enum WindowCloseAction {
     return savesSettingsInBackground;
   }
 
+  /**
+   * @param guiBuilt false when the start failed before the main window's mediator was built: the
+   *     window can still be closed then, and closing it exits.
+   */
   static WindowCloseAction decide(
-      boolean minimizeToTray, boolean trayUsable, boolean macOSX, boolean fromFrame) {
+      boolean guiBuilt,
+      boolean minimizeToTray,
+      boolean trayUsable,
+      boolean macOSX,
+      boolean fromFrame) {
+    if (!guiBuilt) {
+      return SHUTDOWN;
+    }
     if (minimizeToTray) {
       return trayUsable ? HIDE_TO_TRAY : MINIMIZE;
     }

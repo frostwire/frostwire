@@ -1150,6 +1150,8 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.LanguageUtilsDisplayableLocalesTest"
         includeTestsMatching "com.limegroup.gnutella.gui.util.CoalescingBackgroundSaveTest"
         includeTestsMatching "com.limegroup.gnutella.gui.WindowCloseActionTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.GUIMediatorShutdownTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.SplashWindowFailedInitializeTest"
         includeTestsMatching "com.limegroup.gnutella.gui.FinalizerShutdownThreadTest"
         includeTestsMatching "com.limegroup.gnutella.gui.InitializerTrayIconTest"
         includeTestsMatching "com.limegroup.gnutella.gui.LoginItemTest"

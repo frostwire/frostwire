@@ -174,7 +174,15 @@ public final class GUIMediator {
 
   /** Accessor for whether or not the GUIMediator has been constructed yet. */
   public static boolean isConstructed() {
-    return _instance != null;
+    return instanceIfConstructed() != null;
+  }
+
+  /**
+   * The mediator, or null when it was never built. For the exit paths: {@link #instance()} would
+   * build the whole main window there when the start failed before building it.
+   */
+  static synchronized GUIMediator instanceIfConstructed() {
+    return _instance;
   }
 
   /**
@@ -444,8 +452,11 @@ public final class GUIMediator {
    * progress are complete.
    */
   public static void close(boolean fromFrame) {
+    // The window can be closed after a start that failed before the mediator was built: exit then,
+    // there is nothing to hide to the tray or keep running.
+    boolean guiBuilt = isConstructed();
     boolean minimizeToTray = ApplicationSettings.MINIMIZE_TO_TRAY.getValue();
-    if (!OSUtils.isMacOSX() && ApplicationSettings.SHOW_HIDE_EXIT_DIALOG.getValue()) {
+    if (guiBuilt && !OSUtils.isMacOSX() && ApplicationSettings.SHOW_HIDE_EXIT_DIALOG.getValue()) {
       HideExitDialog dlg = new HideExitDialog(getAppFrame());
       dlg.setVisible(true);
       int result = dlg.getResult();
@@ -457,6 +468,7 @@ public final class GUIMediator {
     }
     WindowCloseAction action =
         WindowCloseAction.decide(
+            guiBuilt,
             minimizeToTray,
             OSUtils.supportsTray() && ResourceManager.instance().isTrayIconAvailable(),
             OSUtils.isMacOSX(),
@@ -489,8 +501,20 @@ public final class GUIMediator {
 
   /** Shutdown the program cleanly. */
   public static void shutdown() {
-    instance().timer.stopTimer();
-    Finalizer.shutdown();
+    shutdown(Finalizer::shutdown);
+  }
+
+  /**
+   * Stops the refresh timer if the mediator was built, then runs {@code finalizerShutdown}. Never
+   * builds the mediator: after a start that failed before building it, closing the window built the
+   * main window and its menus here, which failed on the half-built splash.
+   */
+  static void shutdown(Runnable finalizerShutdown) {
+    GUIMediator mediator = instanceIfConstructed();
+    if (mediator != null) {
+      mediator.timer.stopTimer();
+    }
+    finalizerShutdown.run();
   }
 
   /**

@@ -24,7 +24,7 @@ class WindowCloseActionTest {
   void hidingToTheTraySavesInTheBackground() {
     for (boolean mac : new boolean[] {false, true}) {
       for (boolean fromFrame : new boolean[] {false, true}) {
-        WindowCloseAction action = WindowCloseAction.decide(true, true, mac, fromFrame);
+        WindowCloseAction action = WindowCloseAction.decide(true, true, true, mac, fromFrame);
         assertEquals(WindowCloseAction.HIDE_TO_TRAY, action);
         assertTrue(action.savesSettingsInBackground());
       }
@@ -33,7 +33,7 @@ class WindowCloseActionTest {
 
   @Test
   void macCloseButtonHidesAndSavesInTheBackground() {
-    WindowCloseAction action = WindowCloseAction.decide(false, true, true, true);
+    WindowCloseAction action = WindowCloseAction.decide(true, false, true, true, true);
     assertEquals(WindowCloseAction.HIDE_WINDOW, action);
     assertTrue(action.savesSettingsInBackground());
   }
@@ -43,12 +43,12 @@ class WindowCloseActionTest {
     // Windows/Linux close button, the Close menu item, and the macOS quit event.
     for (boolean mac : new boolean[] {false, true}) {
       for (boolean tray : new boolean[] {false, true}) {
-        WindowCloseAction action = WindowCloseAction.decide(false, tray, mac, false);
+        WindowCloseAction action = WindowCloseAction.decide(true, false, tray, mac, false);
         assertEquals(WindowCloseAction.SHUTDOWN, action);
         assertFalse(action.savesSettingsInBackground());
       }
     }
-    WindowCloseAction closeButton = WindowCloseAction.decide(false, true, false, true);
+    WindowCloseAction closeButton = WindowCloseAction.decide(true, false, true, false, true);
     assertEquals(WindowCloseAction.SHUTDOWN, closeButton);
     assertFalse(closeButton.savesSettingsInBackground());
   }
@@ -57,7 +57,7 @@ class WindowCloseActionTest {
   void minimizeToTrayWithoutATrayMinimizesAndSavesInTheBackground() {
     for (boolean mac : new boolean[] {false, true}) {
       for (boolean fromFrame : new boolean[] {false, true}) {
-        WindowCloseAction action = WindowCloseAction.decide(true, false, mac, fromFrame);
+        WindowCloseAction action = WindowCloseAction.decide(true, true, false, mac, fromFrame);
         assertEquals(WindowCloseAction.MINIMIZE, action);
         assertTrue(action.savesSettingsInBackground());
       }

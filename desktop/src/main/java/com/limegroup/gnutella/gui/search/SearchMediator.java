@@ -180,6 +180,14 @@ public final class SearchMediator {
     return instance;
   }
 
+  /**
+   * The mediator, or null when it was never built. For shutdown: {@link #instance()} would build
+   * the search UI there, after a start that failed before building it.
+   */
+  public static SearchMediator instanceIfConstructed() {
+    return instance;
+  }
+
   /** Update the search title's tab given the token id and the new title */
   public void updateSearchPanelTitle(final long token, final String title) {
     GUIMediator.safeInvokeLater(

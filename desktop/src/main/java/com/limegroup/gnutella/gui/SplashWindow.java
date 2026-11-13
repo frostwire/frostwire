@@ -19,6 +19,7 @@
 package com.limegroup.gnutella.gui;
 
 import com.frostwire.util.InMemoryImageIO;
+import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
 import java.awt.*;
@@ -38,7 +39,19 @@ public final class SplashWindow {
   /** The sole instance of the SplashWindow */
   private static SplashWindow INSTANCE;
 
+  private static final Logger LOG = Logger.getLogger(SplashWindow.class);
+
   private final AtomicBoolean initialized = new AtomicBoolean(false);
+
+  /**
+   * Set when {@link #initialize()} threw: the window and the glass pane may never have been built,
+   * so every later call is skipped instead of failing on them. The failure itself already reached
+   * the caller of {@link #begin()}.
+   */
+  private volatile boolean failedToInitialize;
+
+  /** Builds the window; {@link #initialize()} except in tests. */
+  private final Runnable initializer;
 
   /** Constant handle to the glass pane that handles drawing text on top of the splash screen. */
   private volatile StatusComponent glassPane;
@@ -51,6 +64,15 @@ public final class SplashWindow {
    * unbounded growth.
    */
   private final Map<String, BufferedImage> osIconCache = new FixedsizeForgetfulHashMap<>(20);
+
+  private SplashWindow() {
+    this.initializer = this::initialize;
+  }
+
+  /** For tests: a splash whose build is {@code initializer}. */
+  SplashWindow(Runnable initializer) {
+    this.initializer = initializer;
+  }
 
   /** Returns the single instance of the SplashWindow. */
   public static synchronized SplashWindow instance() {
@@ -186,7 +208,12 @@ public final class SplashWindow {
     if (initialized.getAndSet(true)) return;
     runLater(
         () -> {
-          initialize();
+          try {
+            initializer.run();
+          } catch (Throwable t) {
+            failedToInitialize = true;
+            throw t;
+          }
           splashWindow.toFront();
           splashWindow.setVisible(true);
           glassPane.setVisible(true);
@@ -208,7 +235,15 @@ public final class SplashWindow {
   }
 
   private void runLater(Runnable runner) {
-    if (initialized.get()) GUIMediator.safeInvokeAndWait(runner);
+    if (initialized.get())
+      GUIMediator.safeInvokeAndWait(
+          () -> {
+            if (failedToInitialize) {
+              LOG.info("Splash failed to initialize, skipping a call to it");
+              return;
+            }
+            runner.run();
+          });
   }
 
   public void dispose() {

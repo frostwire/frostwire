@@ -34,7 +34,12 @@ public final class Finalizer {
         () -> NotifyUserProxy.instance().hideTrayIcon(),
         () -> {
           VPNStatusRefresher.getInstance().shutdown();
-          SearchMediator.instance().shutdown();
+          // Not instance(): it would build the search UI after a start that failed before that,
+          // and fail there before the core below shuts down.
+          SearchMediator searchMediator = SearchMediator.instanceIfConstructed();
+          if (searchMediator != null) {
+            searchMediator.shutdown();
+          }
           LimeWireCore.instance().getLifecycleManager().shutdown(null);
         },
         () -> System.exit(0));
