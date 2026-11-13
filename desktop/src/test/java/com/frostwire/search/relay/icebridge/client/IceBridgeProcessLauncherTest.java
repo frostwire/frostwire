@@ -10,6 +10,7 @@ package com.frostwire.search.relay.icebridge.client;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.icebridge.IceBridgeControlPortAnnouncement;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -155,17 +156,24 @@ class IceBridgeProcessLauncherTest {
             .start();
     Files.writeString(
         new File(tmp.toFile(), "icebridge-child.pid").toPath(), String.valueOf(orphan.pid()));
-    // Wait for the orphan to bind the rUDP port.
+    // Wait for the orphan to have bound its ports: it announces its control port after it starts.
+    // Probing by binding the rUDP port ourselves raced the orphan's own "is the port free?" check,
+    // which then saw it busy and exited (a desktop tests failure on CI, 4b6be54e0).
+    File orphanStdout = new File(tmp.toFile(), "orphan-stdout.log");
     boolean orphanUp = false;
-    for (int i = 0; i < 100 && !orphanUp; i++) {
-      try (java.net.DatagramSocket probe = new java.net.DatagramSocket(orphanRudp)) {
-        // port still free — orphan not up yet
-      } catch (IOException busy) {
-        orphanUp = true;
+    for (int i = 0; i < 300 && !orphanUp && orphan.isAlive(); i++) {
+      orphanUp =
+          orphanStdout.isFile()
+              && IceBridgeControlPortAnnouncement.parse(Files.readString(orphanStdout.toPath()))
+                  > 0;
+      if (!orphanUp) {
+        Thread.sleep(100);
       }
-      Thread.sleep(100);
     }
-    assertTrue(orphanUp, "orphan never bound the rUDP port");
+    assertTrue(
+        orphanUp,
+        "orphan never started: "
+            + Files.readString(new File(tmp.toFile(), "orphan-stderr.log").toPath()));
     try {
       // Fresh launcher, same identity dir + same rUDP port as the orphan holds.
       launcher = new IceBridgeProcessLauncher(jar, identityFile, 0, orphanRudp, "BOTH");
