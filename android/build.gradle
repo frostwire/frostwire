@@ -403,10 +403,10 @@ dependencies {
     // One Android library (AAR): the Java classes, every ABI's native library (abiFilters picks
     // which go in the APK) and its own R8 keep rules.
     //
-    // jlibtorrent 2.1.2.0 is not on the Maven mirror until its release is deployed there: until then build
-    // with -PlocalJlibtorrent, which uses jlibtorrent-android-<version>.aar from ../../frostwire-jlibtorrent/build/libs
+    // -PlocalJlibtorrent builds against a jlibtorrent that isn't on the Maven mirror yet: it uses
+    // jlibtorrent-android-<version>.aar from ../../frostwire-jlibtorrent/build/libs
     // (or from the directory given with -PlocalJlibtorrentDir=/path/to/dir, e.g. a downloaded GitHub release).
-    def jlibtorrentVersion = '2.1.2.0'
+    def jlibtorrentVersion = '2.1.2.1'
     if (project.hasProperty('localJlibtorrent')) {
         def jlibtorrentDir = project.findProperty('localJlibtorrentDir') ?: '../../frostwire-jlibtorrent/build/libs'
         logger.lifecycle("Using jlibtorrent AAR from ${jlibtorrentDir}")

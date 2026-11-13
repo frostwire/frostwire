@@ -328,15 +328,15 @@ dependencies {
     implementation 'io.netty:netty-all:4.2.19.Final'
 
     // Also used by icebridgeCloudNatives / icebridgeJar multi-arch packaging below.
-    ext.jlibtorrent_version = '2.1.2.0'
+    ext.jlibtorrent_version = '2.1.2.1'
     def jlibtorrent_version = ext.jlibtorrent_version
 
     def os = OperatingSystem.current()
     def arch = System.getProperty('os.arch').toLowerCase()
     def is_arm64 = arch == "aarch64" || arch == "arm64"
 
-    // jlibtorrent 2.1.2.0 is not on Maven until its release is published: until then build with
-    // -PlocalJlibtorrent, which uses the jars frostwire-jlibtorrent built next to this checkout
+    // -PlocalJlibtorrent builds against a jlibtorrent that isn't on Maven yet: the jars frostwire-jlibtorrent
+    // built next to this checkout
     // (or the directory given with -PlocalJlibtorrentDir=/path/to/jars, e.g. a downloaded GitHub release).
     def use_maven_jlibtorrent = !project.hasProperty('localJlibtorrent')
 

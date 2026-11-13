@@ -408,13 +408,7 @@ public final class BTEngine extends SessionManager {
           session_params params = session_params.read_session_params(n);
           buffer.clear(); // prevents GC
           SessionParams result = new SessionParams(params);
-          if (OSUtils.isMacOSX() || OSUtils.isLinux()) {
-            // Use POSIX disk I/O on macOS and Linux to avoid signal handler conflicts
-            // with memory-mapped I/O (SIGBUS/SIGSEGV errors leak to Java)
-            result.setPosixDiskIO();
-          } else {
-            result.setDefaultDiskIO();
-          }
+          applyDiskIo(result);
           return result;
         } else {
           LOG.error("Can't decode session state data: " + ec.message());
@@ -429,16 +423,39 @@ public final class BTEngine extends SessionManager {
     }
   }
 
+  /** The disk I/O back-end FrostWire asks libtorrent for. */
+  enum DiskIo {
+    POSIX,
+    MMAP,
+    DEFAULT
+  }
+
+  /**
+   * macOS, Linux and Android keep the single-threaded POSIX back-end: memory-mapped I/O turns disk
+   * errors into SIGBUS/SIGSEGV signals that leak to Java and crash the process. Windows keeps the
+   * memory-mapped files it used with libtorrent 2.0: libtorrent 2.1 made its new multi-threaded
+   * pread() back-end the default, so asking for "the default" would have switched Windows silently.
+   * Other systems get libtorrent's default.
+   */
+  static DiskIo diskIoFor(boolean macOrLinux, boolean windows) {
+    if (macOrLinux) {
+      return DiskIo.POSIX;
+    }
+    return windows ? DiskIo.MMAP : DiskIo.DEFAULT;
+  }
+
+  private static void applyDiskIo(SessionParams params) {
+    switch (diskIoFor(OSUtils.isMacOSX() || OSUtils.isLinux(), OSUtils.isWindows())) {
+      case POSIX -> params.setPosixDiskIO();
+      case MMAP -> params.setMMapDiskIO();
+      default -> params.setDefaultDiskIO();
+    }
+  }
+
   private SessionParams defaultParams() {
     SettingsPack sp = defaultSettings();
     SessionParams params = new SessionParams(sp);
-    if (OSUtils.isMacOSX() || OSUtils.isLinux()) {
-      // Use POSIX disk I/O on macOS and Linux to avoid signal handler conflicts
-      // with memory-mapped I/O (SIGBUS/SIGSEGV errors leak to Java)
-      params.setPosixDiskIO();
-    } else {
-      params.setDefaultDiskIO();
-    }
+    applyDiskIo(params);
     return params;
   }
 
