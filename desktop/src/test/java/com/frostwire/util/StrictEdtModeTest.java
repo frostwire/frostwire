@@ -674,6 +674,44 @@ class StrictEdtModeTest {
     assertFalse(StrictEdtMode.isNativeMenuShow(null));
   }
 
+  /**
+   * A modal dialog's native loop (WDialogPeer.showModal) returns only when the user closes the
+   * dialog: the event that opened it is not a stall (Icebase #20673ed7668e, Windows 11).
+   */
+  @Test
+  void anOpenModalDialogIsTaggedNativeModal() {
+    StackTraceElement[] stack = {
+      frame("sun.awt.windows.WDialogPeer", "showModal"),
+      frame("sun.awt.windows.WDialogPeer", "realShow"),
+      frame("java.awt.Dialog", "setVisible"),
+      frame("com.frostwire.gui.bittorrent.TorrentFetcherDownload", "lambda$downloadTorrent$0"),
+      frame("java.awt.event.InvocationEvent", "dispatch"),
+      frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
+    };
+
+    assertTrue(StrictEdtMode.isNativeModalDialogShow(stack));
+    assertEquals(StrictEdtMode.NATIVE_MODAL_TAG, StrictEdtMode.reportTag("", stack, true));
+  }
+
+  @Test
+  void appWorkWhileAModalDialogIsShownIsNotTaggedNativeModal() {
+    StackTraceElement[] appAboveDialog = {
+      frame("java.io.FileInputStream", "readBytes"),
+      frame("com.frostwire.gui.bittorrent.SomeListener", "componentShown"),
+      frame("sun.awt.windows.WDialogPeer", "showModal"),
+      frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
+    };
+    StackTraceElement[] otherNative = {
+      frame("sun.awt.windows.WToolkit", "sync"),
+      frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
+    };
+
+    assertFalse(StrictEdtMode.isNativeModalDialogShow(appAboveDialog));
+    assertEquals("", StrictEdtMode.reportTag("", appAboveDialog, true));
+    assertFalse(StrictEdtMode.isNativeModalDialogShow(otherNative));
+    assertFalse(StrictEdtMode.isNativeModalDialogShow(null));
+  }
+
   @Test
   void cancelledStallTimersLeaveTheWatchdogQueueImmediately() {
     ScheduledThreadPoolExecutor scheduler = StrictEdtMode.newWatchdogScheduler();

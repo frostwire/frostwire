@@ -422,6 +422,9 @@ public final class StrictEdtMode {
     if (isNativeMenuShow(stack)) {
       return NATIVE_MENU_TAG;
     }
+    if (isNativeModalDialogShow(stack)) {
+      return NATIVE_MODAL_TAG;
+    }
     if (isJdkShellFolderStall(stack)) {
       return SHELL_FOLDER_TAG;
     }
@@ -467,6 +470,7 @@ public final class StrictEdtMode {
   static final String EARLY_SAMPLE_TAG = "early-sample:";
   static final String RENDER_QUEUE_TAG = "render-queue:";
   static final String NATIVE_MENU_TAG = "native-menu:";
+  static final String NATIVE_MODAL_TAG = "native-modal:";
 
   /**
    * True when the EDT is waiting for a native Windows popup menu to close: {@code
@@ -478,6 +482,25 @@ public final class StrictEdtMode {
    * <p>Thread-safe: stateless stack inspection.
    */
   static boolean isNativeMenuShow(StackTraceElement[] stack) {
+    return isNativeLoop(stack, "sun.awt.windows.WPopupMenuPeer", "_show");
+  }
+
+  /**
+   * True when the EDT is inside a modal dialog's native loop: {@code WDialogPeer.showModal} returns
+   * only when the user closes the dialog, so the event that opened it "stalls" for as long as the
+   * dialog stays open (the torrent-details dialog of a torrent link, Icebase #20673ed7668e,
+   * frostwire/frostwire#1547). Only the frames above the native call count: an app frame there is
+   * app work and is not tagged.
+   *
+   * <p>Thread-safe: stateless stack inspection.
+   */
+  static boolean isNativeModalDialogShow(StackTraceElement[] stack) {
+    return isNativeLoop(stack, "sun.awt.windows.WDialogPeer", "showModal");
+  }
+
+  /** The stack's innermost frames, up to the first watchdog or app frame, include this call. */
+  private static boolean isNativeLoop(
+      StackTraceElement[] stack, String nativeClass, String nativeMethod) {
     if (stack == null) {
       return false;
     }
@@ -494,8 +517,7 @@ public final class StrictEdtMode {
           return false;
         }
       }
-      if ("sun.awt.windows.WPopupMenuPeer".equals(className)
-          && "_show".equals(frame.getMethodName())) {
+      if (nativeClass.equals(className) && nativeMethod.equals(frame.getMethodName())) {
         return true;
       }
     }
