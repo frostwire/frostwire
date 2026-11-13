@@ -23,9 +23,11 @@ import com.frostwire.bittorrent.SessionLimits;
 import com.frostwire.gui.theme.PlatformFonts;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.LabeledComponent;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import java.awt.*;
 import java.text.NumberFormat;
 import java.util.Hashtable;
+import java.util.function.Consumer;
 import javax.swing.*;
 
 public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
@@ -136,6 +138,9 @@ public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
     updateSpeedLabel(UPLOAD_SLIDER, UPLOAD_SLIDER_LABEL);
   }
 
+  /** Where the engine's work runs; see {@link TorrentConnectionPaneItem#background}. */
+  static Consumer<Runnable> background = BackgroundQueuedExecutorService::schedule;
+
   @Override
   public boolean applyOptions() {
     int newUpload = UPLOAD_SLIDER.getValue();
@@ -147,8 +152,14 @@ public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
     if (newDownload == MAX_SLIDER_VALUE) {
       newDownload = 0;
     }
-    BTEngine.getInstance().downloadRateLimit(newDownload * 1024);
-    BTEngine.getInstance().uploadRateLimit(newUpload * 1024);
+    final int downloadBytesPerSecond = newDownload * 1024;
+    final int uploadBytesPerSecond = newUpload * 1024;
+    // The session can take seconds to answer: not on the EDT (frostwire/frostwire#1546)
+    background.accept(
+        () -> {
+          BTEngine.getInstance().downloadRateLimit(downloadBytesPerSecond);
+          BTEngine.getInstance().uploadRateLimit(uploadBytesPerSecond);
+        });
     DOWNLOAD_SLIDER.setValue((newDownload == 0) ? MAX_SLIDER_VALUE : newDownload);
     UPLOAD_SLIDER.setValue((newUpload == 0) ? MAX_SLIDER_VALUE : newUpload);
     updateSpeedLabel(UPLOAD_SLIDER, UPLOAD_SLIDER_LABEL);

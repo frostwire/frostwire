@@ -22,8 +22,10 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.SessionLimits;
 import com.frostwire.jlibtorrent.SettingsPack;
 import com.limegroup.gnutella.gui.*;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.ConnectionSettings;
 import com.limegroup.gnutella.settings.SharingSettings;
+import java.util.function.Consumer;
 import javax.swing.*;
 
 public final class TorrentConnectionPaneItem extends AbstractPaneItem {
@@ -140,48 +142,74 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
     MAX_ACTIVE_SEEDS_FIELD.setValue(limits.maxActiveSeeds());
   }
 
+  /**
+   * Where the engine's work runs: every call below goes to libtorrent's session, which can take
+   * seconds to answer on a busy or starved machine, so it is never made on the EDT (Icebase
+   * #f9e9e1f3a2e0: {@code is_dht_running} from the OK button, frostwire/frostwire#1546).
+   */
+  static Consumer<Runnable> background = BackgroundQueuedExecutorService::schedule;
+
   @Override
   public boolean applyOptions() {
-    BTEngine btEngine = BTEngine.getInstance();
-    applyDHTOptions(btEngine);
-    applyVPNDropProtectionOption(btEngine);
-    applyPeerIdConnectionOption(btEngine);
-    btEngine.maxConnections(MAX_GLOBAL_NUM_CONNECTIONS_FIELD.getValue());
-    btEngine.maxPeers(MAX_PEERS_FIELD.getValue());
-    btEngine.maxActiveDownloads(MAX_ACTIVE_DOWNLOADS_FIELD.getValue());
-    btEngine.maxActiveSeeds(MAX_ACTIVE_SEEDS_FIELD.getValue());
+    // What the user chose is read here, on the EDT; the engine gets it in the background.
+    final boolean dht = ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.isSelected();
+    final boolean vpnDropProtection = VPN_DROP_PROTECTION_CHECKBOX.isSelected();
+    final boolean allowMultipleConnections =
+        ALLOW_MULTIPLE_CONNECTIONS_PER_PID_CHECKBOX.isSelected();
+    final int connections = MAX_GLOBAL_NUM_CONNECTIONS_FIELD.getValue();
+    final int peers = MAX_PEERS_FIELD.getValue();
+    final int activeDownloads = MAX_ACTIVE_DOWNLOADS_FIELD.getValue();
+    final int activeSeeds = MAX_ACTIVE_SEEDS_FIELD.getValue();
+
+    SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.setValue(dht);
+    ConnectionSettings.VPN_DROP_PROTECTION.setValue(vpnDropProtection);
+    ConnectionSettings.ALLOW_MULTIPLE_CONNECTIONS_PER_PID.setValue(allowMultipleConnections);
+
+    background.accept(
+        () ->
+            applyToEngine(
+                BTEngine.getInstance(),
+                dht,
+                vpnDropProtection,
+                allowMultipleConnections,
+                connections,
+                peers,
+                activeDownloads,
+                activeSeeds));
     return false;
   }
 
-  private void applyDHTOptions(BTEngine btEngine) {
-    boolean dhtExpectedValue = ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.isSelected();
-    boolean dhtCurrentStatus = btEngine.isDhtRunning();
-    if (dhtCurrentStatus && !dhtExpectedValue) {
+  private static void applyToEngine(
+      BTEngine btEngine,
+      boolean dht,
+      boolean vpnDropProtection,
+      boolean allowMultipleConnections,
+      int connections,
+      int peers,
+      int activeDownloads,
+      int activeSeeds) {
+    boolean dhtRunning = btEngine.isDhtRunning();
+    if (dhtRunning && !dht) {
       btEngine.stopDht();
-      SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.setValue(false);
-    } else if (!dhtCurrentStatus && dhtExpectedValue) {
+    } else if (!dhtRunning && dht) {
       btEngine.startDht();
-      SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.setValue(true);
     }
-  }
-
-  private void applyVPNDropProtectionOption(BTEngine btEngine) {
-    boolean vpnDropProtectionSelected = VPN_DROP_PROTECTION_CHECKBOX.isSelected();
-    if (vpnDropProtectionSelected && !VPNs.isVPNActive()) {
+    if (vpnDropProtection && !VPNs.isVPNActive()) {
       btEngine.pause();
-    } else if (!vpnDropProtectionSelected && btEngine.isPausedCached()) {
+    } else if (!vpnDropProtection && btEngine.isPausedCached()) {
       btEngine.resume();
     }
-    ConnectionSettings.VPN_DROP_PROTECTION.setValue(vpnDropProtectionSelected);
-    GUIMediator.instance().getStatusLine().updateVPNDropProtectionLabelState();
-    GUIMediator.instance().getStatusLine().refresh();
-  }
-
-  private void applyPeerIdConnectionOption(BTEngine btEngine) {
-    boolean allowMultipleConnections = ALLOW_MULTIPLE_CONNECTIONS_PER_PID_CHECKBOX.isSelected();
-    ConnectionSettings.ALLOW_MULTIPLE_CONNECTIONS_PER_PID.setValue(allowMultipleConnections);
     SettingsPack settings = new SettingsPack();
     settings.allowMultipleConnectionsPerPid(allowMultipleConnections);
     btEngine.applySettings(settings);
+    btEngine.maxConnections(connections);
+    btEngine.maxPeers(peers);
+    btEngine.maxActiveDownloads(activeDownloads);
+    btEngine.maxActiveSeeds(activeSeeds);
+    GUIMediator.safeInvokeLater(
+        () -> {
+          GUIMediator.instance().getStatusLine().updateVPNDropProtectionLabelState();
+          GUIMediator.instance().getStatusLine().refresh();
+        });
   }
 }
