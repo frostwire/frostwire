@@ -112,7 +112,7 @@ public final class BTEngine extends SessionManager {
   private volatile BTEngineListener listener;
 
   // Cached paused state to avoid blocking EDT calls
-  private volatile boolean cachedPausedState = false;
+  private final PausedStateCache cachedPausedState = new PausedStateCache();
 
   // The limits and DHT state the Options window shows, for the same reason
   private final SessionLimitsCache limitsCache = new SessionLimitsCache(this::readSessionLimits);
@@ -356,10 +356,10 @@ public final class BTEngine extends SessionManager {
     ThreadExecutor.startThread(
         () -> {
           try {
-            cachedPausedState = super.isPaused();
+            cachedPausedState.initialize(super.isPaused());
           } catch (Exception e) {
             // If there's an issue getting the initial state, assume it not paused
-            cachedPausedState = false;
+            cachedPausedState.initialize(false);
           }
           try {
             limitsCache.refresh();
@@ -507,14 +507,14 @@ public final class BTEngine extends SessionManager {
   @Override
   public void pause() {
     super.pause();
-    cachedPausedState = true;
+    cachedPausedState.set(true);
   }
 
   /** Override resume method to maintain the cached state */
   @Override
   public void resume() {
     super.resume();
-    cachedPausedState = false;
+    cachedPausedState.set(false);
   }
 
   private SessionLimits readSessionLimits() {
@@ -589,7 +589,7 @@ public final class BTEngine extends SessionManager {
    * calls
    */
   public boolean isPausedCached() {
-    return cachedPausedState;
+    return cachedPausedState.get();
   }
 
   public void download(File torrent, File saveDir, boolean[] selection) {
