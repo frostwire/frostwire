@@ -222,6 +222,12 @@ public final class BTEngine extends SessionManager {
     SettingsPack sp = new SettingsPack();
     // sp.broadcastLSD(true); //setting was deprecated/removed on libtorrent 1.2.4 (Feb 10th 2020)
     sp.validateHttpsTrackers(false);
+    // TODO(maintainer, privacy): libtorrent 2.1 has WebTorrent built in and, unless told otherwise,
+    // contacts Google's STUN server (SettingsPack.DEFAULT_WEBTORRENT_STUN_SERVER,
+    // stun.l.google.com:19302) when a torrent carries wss:// trackers, and accepts WebRTC peers
+    // (maxWebtorrentOffers() defaults to 10). Decide whether FrostWire should ship
+    // sp.maxWebtorrentOffers(0) (WebRTC off) or sp.setWebtorrentStunServer(<our own STUN server>).
+    // Deliberately left at the jlibtorrent defaults until that decision is made.
     if (ctx.optimizeMemory) {
       int maxQueuedDiskBytes = sp.maxQueuedDiskBytes();
       sp.maxQueuedDiskBytes(maxQueuedDiskBytes / 2);
@@ -402,13 +408,7 @@ public final class BTEngine extends SessionManager {
           session_params params = session_params.read_session_params(n);
           buffer.clear(); // prevents GC
           SessionParams result = new SessionParams(params);
-          if (OSUtils.isMacOSX() || OSUtils.isLinux()) {
-            // Use POSIX disk I/O on macOS and Linux to avoid signal handler conflicts
-            // with memory-mapped I/O (SIGBUS/SIGSEGV errors leak to Java)
-            result.setPosixDiskIO();
-          } else {
-            result.setDefaultDiskIO();
-          }
+          applyDiskIo(result);
           return result;
         } else {
           LOG.error("Can't decode session state data: " + ec.message());
@@ -423,16 +423,39 @@ public final class BTEngine extends SessionManager {
     }
   }
 
+  /** The disk I/O back-end FrostWire asks libtorrent for. */
+  enum DiskIo {
+    POSIX,
+    MMAP,
+    DEFAULT
+  }
+
+  /**
+   * macOS, Linux and Android keep the single-threaded POSIX back-end: memory-mapped I/O turns disk
+   * errors into SIGBUS/SIGSEGV signals that leak to Java and crash the process. Windows keeps the
+   * memory-mapped files it used with libtorrent 2.0: libtorrent 2.1 made its new multi-threaded
+   * pread() back-end the default, so asking for "the default" would have switched Windows silently.
+   * Other systems get libtorrent's default.
+   */
+  static DiskIo diskIoFor(boolean macOrLinux, boolean windows) {
+    if (macOrLinux) {
+      return DiskIo.POSIX;
+    }
+    return windows ? DiskIo.MMAP : DiskIo.DEFAULT;
+  }
+
+  private static void applyDiskIo(SessionParams params) {
+    switch (diskIoFor(OSUtils.isMacOSX() || OSUtils.isLinux(), OSUtils.isWindows())) {
+      case POSIX -> params.setPosixDiskIO();
+      case MMAP -> params.setMMapDiskIO();
+      default -> params.setDefaultDiskIO();
+    }
+  }
+
   private SessionParams defaultParams() {
     SettingsPack sp = defaultSettings();
     SessionParams params = new SessionParams(sp);
-    if (OSUtils.isMacOSX() || OSUtils.isLinux()) {
-      // Use POSIX disk I/O on macOS and Linux to avoid signal handler conflicts
-      // with memory-mapped I/O (SIGBUS/SIGSEGV errors leak to Java)
-      params.setPosixDiskIO();
-    } else {
-      params.setDefaultDiskIO();
-    }
+    applyDiskIo(params);
     return params;
   }
 

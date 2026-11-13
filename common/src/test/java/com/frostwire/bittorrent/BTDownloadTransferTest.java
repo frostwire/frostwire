@@ -367,8 +367,17 @@ class BTDownloadTransferTest {
   private static boolean hasEveryPiece(File resume, int pieces) {
     try {
       entry e = entry.bdecode(Vectors.bytes2byte_vector(Files.readAllBytes(resume.toPath())));
-      String have = e.dict().get("pieces").string();
-      return have.length() == pieces && have.chars().allMatch(c -> (c & 1) == 1);
+      // libtorrent 2.1 packs the pieces we have into a bitfield, most significant bit first
+      byte[] have = Vectors.byte_vector2bytes(e.dict().get("pieces").string_bytes());
+      if (have.length != (pieces + 7) / 8) {
+        return false;
+      }
+      for (int piece = 0; piece < pieces; piece++) {
+        if ((have[piece / 8] & (0x80 >> (piece % 8))) == 0) {
+          return false;
+        }
+      }
+      return true;
     } catch (Exception notSavedYet) {
       return false;
     }

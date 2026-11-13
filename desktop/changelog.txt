@@ -1,4 +1,7 @@
 FrostWire 7.1.5 UNRELEASED
+   - new:BitTorrent engine updated to libtorrent 2.1 (jlibtorrent 2.1.2.1): many fixes for stalls and rechecks, and smaller saved resume data; each system keeps the disk access it used before (memory-mapped files on Windows, the POSIX back-end on macOS and Linux)
+   - new:WebTorrent support is built into the BitTorrent engine (torrents with wss:// trackers can find browser peers); it uses Google's STUN server by default until FrostWire's own setting is decided
+   - fix:HTTP seeds (the old BEP 17 "httpseeds" in .torrent files) are no longer supported by the engine; URL seeds (BEP 19, "url-list") keep working
    - fix:Windows: FrostWire's window no longer freezes as it appears while its icon is read from FrostWire.exe; the icon is set in the background (#1522)
    - fix:Windows: closing FrostWire while Windows is logging off or shutting down no longer leaves it running with no window; it now shuts down even when its "shutting down" window can't be shown (#1524)
    - fix:The Library lists your saved files even when one folder in them can't be read to the end (a disconnected drive, changed permissions); it used to show nothing and report a crash (#1525)
