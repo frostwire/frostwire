@@ -441,12 +441,7 @@ public final class LibraryFilesTableMediator
                 backgroundRemoveElements(listPanel, removeOptions, option).get();
             GUIMediator.safeInvokeLater(
                 () -> {
-                  for (File removedFile : removeElementsResults.removedFiles) {
-                    int row = DATA_MODEL.getRow(removedFile);
-                    if (row != -1) {
-                      DATA_MODEL.remove(row);
-                    }
-                  }
+                  DATA_MODEL.removeAll(removeElementsResults.removedFiles);
                   clearSelection();
                   if (removeElementsResults.somethingWasRemoved) {
                     LibraryMediator.instance().getLibraryExplorer().refreshSelection(true);
