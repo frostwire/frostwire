@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.IntStream;
@@ -98,12 +99,8 @@ import javax.swing.text.html.HTMLEditorKit;
 public final class JdkWarmUp {
   private static final Logger LOG = Logger.getLogger(JdkWarmUp.class);
 
-  /** Complex script text: layoutGlyphVector always goes through GlyphLayout and the shaper. */
-  private static final String SHAPING_SAMPLE =
-      "FrostWire " + new String(new int[] {0x0915, 0x094D, 0x0937}, 0, 3);
-
   /** Printable ASCII, the glyphs nearly every label measures and paints. */
-  private static final String GLYPH_SAMPLE =
+  static final String GLYPH_SAMPLE =
       IntStream.rangeClosed(' ', '~')
           .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
           .toString();
@@ -419,10 +416,16 @@ public final class JdkWarmUp {
     SPLASH_SHOWN.countDown();
   }
 
-  public static void startInBackground() {
+  /**
+   * Starts the warm-up threads.
+   *
+   * @param earlyWindowText the text the first windows show, in the user's language: the fallback
+   *     fonts it needs load before the splash (see {@link #initializeSlotsFor})
+   */
+  public static void startInBackground(Supplier<String> earlyWindowText) {
     // Two threads: the JDK steps and the app class preload.
     PROGRESS.start(2, System.nanoTime());
-    Thread warmUp = new Thread(tracked(JdkWarmUp::warmUp), "JdkWarmUp");
+    Thread warmUp = new Thread(tracked(() -> warmUp(earlyWindowText)), "JdkWarmUp");
     warmUp.setDaemon(true);
     warmUp.start();
     startAppClassPreload(SPLASH_SHOWN, SPLASH_WAIT_MS, tracked(JdkWarmUp::loadAppClasses));
@@ -490,23 +493,29 @@ public final class JdkWarmUp {
     }
   }
 
-  private static void warmUp() {
+  private static void warmUp(Supplier<String> earlyWindowText) {
     try {
       createPainters(UIManager.getDefaults(), SPLASH_PAINTER_KEY_PREFIX);
     } catch (Throwable t) {
       LOG.warn("Painter warm-up failed: " + t.getMessage(), t);
     }
     try {
-      char[] text = SHAPING_SAMPLE.toCharArray();
+      String text = earlyWindowText(earlyWindowText);
+      // layoutGlyphVector always shapes, whatever the script, so this initializes HarfBuzz.
+      char[] chars = text.toCharArray();
       PlatformFonts.dialog(Font.PLAIN, 12)
           .layoutGlyphVector(
               new FontRenderContext(null, true, true),
-              text,
+              chars,
               0,
-              text.length,
+              chars.length,
               Font.LAYOUT_LEFT_TO_RIGHT);
+      // Only the fallback slots the first windows' text needs. Every slot of every UI font is
+      // dozens of font files, each loaded under the JDK's global font lock, which the EDT building
+      // the splash, the wizard and the main window waited for (Icebase #7d83b84c37c5,
+      // #0068ec7873a2, frostwire/frostwire#1544).
       for (Font font : fallbackSlotFonts(UIManager.getDefaults())) {
-        font.canDisplay(UNMAPPED_CODE_POINT);
+        initializeSlotsFor(font, text);
       }
     } catch (Throwable t) {
       // Best effort: the first on-EDT use pays these costs instead.
@@ -656,6 +665,48 @@ public final class JdkWarmUp {
     } catch (Throwable t) {
       LOG.warn("Text layout warm-up failed: " + t.getMessage(), t);
     }
+    try {
+      // Every other fallback slot, for text in any script (file names, search results).
+      for (Font font : fallbackSlotFonts(UIManager.getDefaults())) {
+        font.canDisplay(UNMAPPED_CODE_POINT);
+      }
+    } catch (Throwable t) {
+      LOG.warn("Fallback font warm-up failed: " + t.getMessage(), t);
+    }
+  }
+
+  /**
+   * The text whose fallback slots load before the splash: the first windows' text and printable
+   * ASCII (Latin letters, digits, punctuation), or ASCII alone when the first windows' text is
+   * unavailable.
+   */
+  static String earlyWindowText(Supplier<String> earlyWindowText) {
+    try {
+      String text = earlyWindowText.get();
+      return text == null || text.isEmpty() ? GLYPH_SAMPLE : text + " " + GLYPH_SAMPLE;
+    } catch (Throwable t) {
+      LOG.warn("Early window text unavailable: " + t.getMessage(), t);
+      return GLYPH_SAMPLE;
+    }
+  }
+
+  /**
+   * Loads the font files a composite font needs to show {@code text}, and no others. A logical or
+   * look-and-feel font is a composite of a primary font and fallback "slot" fonts; each slot is one
+   * font file, loaded the first time it is consulted (CompositeFont.doDeferredInitialisation) under
+   * the JDK's global font lock. The font's metrics merge its first slots, which measuring loads.
+   * Each character is then looked up slot by slot until one maps it, loading the slots on the way:
+   * Latin text loads the primary font, and text in another script the slots up to that script's
+   * font. A character no slot maps loads them all, as the same text on the EDT would.
+   */
+  static void initializeSlotsFor(Font font, String text) {
+    Graphics2D g = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).createGraphics();
+    try {
+      g.getFontMetrics(font).getAscent();
+    } finally {
+      g.dispose();
+    }
+    text.codePoints().distinct().forEach(font::canDisplay);
   }
 
   /** The desktop's text antialiasing hints, or null when the toolkit has none. */

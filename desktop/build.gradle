@@ -1075,6 +1075,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.TipOfTheDayPreloadTest"
         includeTestsMatching "com.limegroup.gnutella.gui.AssociationCheckThreadTest"
         includeTestsMatching "com.limegroup.gnutella.gui.SplashWindowIconCacheTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.EarlyWindowTextTest"
         includeTestsMatching "com.limegroup.gnutella.gui.TipOfTheDayHtmlFontTest"
         includeTestsMatching "com.limegroup.gnutella.gui.StatusLineEngineNotReadyTest"
         includeTestsMatching "com.limegroup.gnutella.gui.options.panes.TorrentSaveFolderPaneItemTest"

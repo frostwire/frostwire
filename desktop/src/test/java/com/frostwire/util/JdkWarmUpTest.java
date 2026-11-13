@@ -125,6 +125,70 @@ class JdkWarmUpTest {
         fonts.stream().map(f -> f.getFontName() + "/" + f.getStyle()).distinct().count());
   }
 
+  /**
+   * Before the splash, each UI font loads only the fallback slots its first windows' text needs: a
+   * character is looked up slot by slot until one maps it, so asking for the text's characters
+   * loads the slots up to its script's font. The unmapped code point the warm-up used walked every
+   * slot of every UI font, dozens of font files under the JDK's global font lock, while the EDT
+   * waited for that lock to build the wizard and the main window (Icebase #7d83b84c37c5,
+   * #0068ec7873a2, frostwire/frostwire#1544).
+   */
+  @Test
+  void initializeSlotsForLooksUpOnlyTheTextsCharacters() {
+    List<Integer> asked = new ArrayList<>();
+    Font font =
+        new Font(Font.DIALOG, Font.BOLD, 12) {
+          @Override
+          public boolean canDisplay(int codePoint) {
+            asked.add(codePoint);
+            return super.canDisplay(codePoint);
+          }
+        };
+    String text = "Next >> 次へ Next";
+
+    JdkWarmUp.initializeSlotsFor(font, text);
+
+    assertEquals(text.codePoints().distinct().boxed().toList(), asked);
+    assertFalse(asked.contains(0x0378), "walked every slot");
+  }
+
+  @Test
+  void beforeTheSplashTheFontsLoadOnlyTheSlotsOfTheFirstWindowsText() throws Exception {
+    String source = warmUpSource();
+    String beforeSplash =
+        source.substring(0, source.indexOf("awaitSplashShown(SPLASH_SHOWN")).replaceAll("\\s+", "");
+
+    assertTrue(
+        beforeSplash.contains(
+            "for(Fontfont:fallbackSlotFonts(UIManager.getDefaults())){initializeSlotsFor(font,text);}"),
+        "the UI fonts (Dialog bold included, #1329) don't load the first windows' slots");
+    assertTrue(
+        beforeSplash.contains("Stringtext=earlyWindowText(earlyWindowText);"),
+        "the slots are not those of the first windows' text");
+    for (String sweep :
+        List.of(
+            "UNMAPPED_CODE_POINT", "SCRIPT_GLYPH_SAMPLE", "warmUpTextLayout(", "SHAPING_SAMPLE")) {
+      assertFalse(beforeSplash.contains(sweep), sweep + " loads every slot before the splash");
+    }
+  }
+
+  @Test
+  void theEarlyWindowTextAddsLatinDigitsAndPunctuation() {
+    String ascii = JdkWarmUp.GLYPH_SAMPLE;
+    assertEquals("Weiter >> " + ascii, JdkWarmUp.earlyWindowText(() -> "Weiter >>"));
+    assertEquals(ascii, JdkWarmUp.earlyWindowText(() -> null));
+    assertEquals(
+        ascii,
+        JdkWarmUp.earlyWindowText(
+            () -> {
+              throw new IllegalStateException("no translations");
+            }));
+    assertTrue(ascii.contains("0123456789"));
+    for (char c : ".,:;!?()%".toCharArray()) {
+      assertTrue(ascii.indexOf(c) >= 0, "missing " + c);
+    }
+  }
+
   @Test
   void distinctFontsOfEmptyDefaultsIsEmpty() {
     assertTrue(JdkWarmUp.distinctFonts(new UIDefaults()).isEmpty());
@@ -1232,7 +1296,7 @@ class JdkWarmUpTest {
         Files.readString(
             Path.of(System.getProperty("user.dir"))
                 .resolve("src/main/java/com/frostwire/util/JdkWarmUp.java"));
-    int warmUp = source.indexOf("private static void warmUp() {");
+    int warmUp = source.indexOf("private static void warmUp(Supplier<String> earlyWindowText) {");
     int end = source.indexOf("\n  }\n", warmUp);
 
     assertTrue(warmUp >= 0 && end > warmUp, "warmUp() not found");
@@ -1318,7 +1382,9 @@ class JdkWarmUpTest {
                 Path.of(System.getProperty("user.dir"))
                     .resolve("src/main/java/com/frostwire/util/JdkWarmUp.java"))
             .replaceAll("\\s+", "");
-    String start = all.substring(all.indexOf("publicstaticvoidstartInBackground(){"));
+    String start =
+        all.substring(
+            all.indexOf("publicstaticvoidstartInBackground(Supplier<String>earlyWindowText){"));
     start = start.substring(0, start.indexOf("}") + 1);
     assertTrue(
         start.contains("startAppClassPreload(SPLASH_SHOWN,SPLASH_WAIT_MS,"),
@@ -1370,7 +1436,7 @@ class JdkWarmUpTest {
         Files.readString(
             Path.of(System.getProperty("user.dir"))
                 .resolve("src/main/java/com/frostwire/util/JdkWarmUp.java"));
-    int warmUp = source.indexOf("private static void warmUp() {");
+    int warmUp = source.indexOf("private static void warmUp(Supplier<String> earlyWindowText) {");
     int end = source.indexOf("\n  }\n", warmUp);
     assertTrue(warmUp >= 0 && end > warmUp, "warmUp() not found");
     return source.substring(warmUp, end);

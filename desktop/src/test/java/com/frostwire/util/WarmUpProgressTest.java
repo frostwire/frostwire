@@ -61,7 +61,7 @@ class WarmUpProgressTest {
     String code =
         new String(Files.readAllBytes(source), StandardCharsets.UTF_8).replaceAll("\\s+", "");
     assertTrue(code.contains("PROGRESS.start(2,System.nanoTime());"));
-    assertTrue(code.contains("newThread(tracked(JdkWarmUp::warmUp),\"JdkWarmUp\")"));
+    assertTrue(code.contains("newThread(tracked(()->warmUp(earlyWindowText)),\"JdkWarmUp\")"));
     assertTrue(
         code.contains(
             "startAppClassPreload(SPLASH_SHOWN,SPLASH_WAIT_MS,tracked(JdkWarmUp::loadAppClasses))"));

@@ -54,7 +54,7 @@ class SkinMenuWarmUpTest {
                     .resolve("src/main/java/com/frostwire/util/JdkWarmUp.java"),
                 StandardCharsets.UTF_8)
             .replaceAll("\\s+", "");
-    int warmUp = source.indexOf("privatestaticvoidwarmUp(){");
+    int warmUp = source.indexOf("privatestaticvoidwarmUp(Supplier<String>earlyWindowText){");
     assertTrue(warmUp >= 0);
     assertTrue(
         source.indexOf("SkinMenu.warmUpPopupMenuAccess();", warmUp) > warmUp,
