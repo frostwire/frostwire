@@ -6636,3 +6636,19 @@ msgstr "imniżżel"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
 msgid "Participation:"
 msgstr "Parteċipazzjoni:"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
+msgid "FrostWire can't start"
+msgstr "FrostWire ma jistax jibda"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
+msgid "FrostWire's files are damaged, so it can't start. This can happen when an installation or an update was interrupted, or when a security program changed the files."
+msgstr "Il-files ta' FrostWire huma bil-ħsara, għalhekk ma jistax jibda. Dan jista' jiġri meta installazzjoni jew aġġornament ikun interrott, jew meta programm tas-sigurtà jbiddel il-files."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
+msgid "Please download FrostWire again from the address below and install it, even if FrostWire is already installed. Your settings are kept in your user folder, not in FrostWire's program folder."
+msgstr "Jekk jogħġbok niżżel FrostWire mill-ġdid mill-indirizz hawn taħt u installah, anki jekk FrostWire diġà huwa installat. L-issettings tiegħek jinżammu fil-folder tal-utent tiegħek, mhux fil-folder tal-programm ta' FrostWire."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
+msgid "Download FrostWire"
+msgstr "Niżżel FrostWire"

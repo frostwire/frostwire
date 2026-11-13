@@ -35,19 +35,23 @@ final class SearchResultMenu {
     if (lines.length == 0) {
       return popupMenu;
     }
-    // Now check to see if any of the table lines are different classes
-    // In this case we need to show a message that only similar
-    for (int i = 1; i < lines.length; i++) {
-      if (!lines[i - 1].isSameKindAs(lines[i])) {
-        // Bail! Bail!
-        // Just pick the first similar ones, since we're
-        // lost as to what to do otherwise...
-        SearchResultDataLine[] newLines = new SearchResultDataLine[i - 1];
-        System.arraycopy(lines, 0, newLines, 0, i - 1);
-        lines = newLines;
-        break;
+    // A menu acts on results of one kind: keep the first results that are the same kind as the
+    // first one.
+    lines = leadingSameKind(lines, SearchResultDataLine::isSameKindAs);
+    return lines[0].getSearchResult().createMenu(popupMenu, lines, PANEL);
+  }
+
+  /**
+   * The items from the first one up to, not including, the first item that is not of the same kind
+   * as the one before it. Never empty for a non-empty array: the first item is always kept (the
+   * code this replaces kept one item too few, and none when the first two differed, #1532).
+   */
+  static <T> T[] leadingSameKind(T[] items, java.util.function.BiPredicate<T, T> sameKind) {
+    for (int i = 1; i < items.length; i++) {
+      if (!sameKind.test(items[i - 1], items[i])) {
+        return java.util.Arrays.copyOf(items, i);
       }
     }
-    return lines[0].getSearchResult().createMenu(popupMenu, lines, PANEL);
+    return items;
   }
 }

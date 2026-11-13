@@ -6733,3 +6733,19 @@ msgstr "ਡਾਊਨਲੋਡ ਹੋ ਗਿਆ"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
 msgid "Participation:"
 msgstr "ਭਾਗੀਦਾਰੀ:"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
+msgid "FrostWire can't start"
+msgstr "FrostWire ਸ਼ੁਰੂ ਨਹੀਂ ਹੋ ਸਕਦਾ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
+msgid "FrostWire's files are damaged, so it can't start. This can happen when an installation or an update was interrupted, or when a security program changed the files."
+msgstr "FrostWire ਦੀਆਂ ਫ਼ਾਈਲਾਂ ਖ਼ਰਾਬ ਹੋ ਗਈਆਂ ਹਨ, ਇਸ ਲਈ ਇਹ ਸ਼ੁਰੂ ਨਹੀਂ ਹੋ ਸਕਦਾ। ਅਜਿਹਾ ਉਦੋਂ ਹੋ ਸਕਦਾ ਹੈ ਜਦੋਂ ਇੰਸਟਾਲੇਸ਼ਨ ਜਾਂ ਅੱਪਡੇਟ ਵਿਚਕਾਰੇ ਰੁਕ ਗਈ ਹੋਵੇ, ਜਾਂ ਕਿਸੇ ਸੁਰੱਖਿਆ ਪ੍ਰੋਗਰਾਮ ਨੇ ਫ਼ਾਈਲਾਂ ਬਦਲ ਦਿੱਤੀਆਂ ਹੋਣ।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
+msgid "Please download FrostWire again from the address below and install it, even if FrostWire is already installed. Your settings are kept in your user folder, not in FrostWire's program folder."
+msgstr "ਕਿਰਪਾ ਕਰਕੇ ਹੇਠਾਂ ਦਿੱਤੇ ਪਤੇ ਤੋਂ FrostWire ਦੁਬਾਰਾ ਡਾਊਨਲੋਡ ਕਰੋ ਅਤੇ ਇੰਸਟਾਲ ਕਰੋ, ਭਾਵੇਂ FrostWire ਪਹਿਲਾਂ ਹੀ ਇੰਸਟਾਲ ਹੋਵੇ। ਤੁਹਾਡੀਆਂ ਸੈਟਿੰਗਾਂ ਤੁਹਾਡੇ ਯੂਜ਼ਰ ਫੋਲਡਰ ਵਿੱਚ ਸੰਭਾਲੀਆਂ ਰਹਿੰਦੀਆਂ ਹਨ, FrostWire ਦੇ ਪ੍ਰੋਗਰਾਮ ਫੋਲਡਰ ਵਿੱਚ ਨਹੀਂ।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
+msgid "Download FrostWire"
+msgstr "FrostWire ਡਾਊਨਲੋਡ ਕਰੋ"

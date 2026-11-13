@@ -351,6 +351,27 @@ class JdkWarmUpTest {
   }
 
   /**
+   * Building the warm-up's popup menu adds {@code PopupMenu.actionMap} (and two look and feel class
+   * keys) to the UI tables. The first Nimbus style the EDT validates, the splash's first panel,
+   * copies those tables once, and a key added meanwhile made the copy throw
+   * ConcurrentModificationException: Nimbus's defaults were left half built, so every later
+   * component failed too, FatalBugManager's dialog with a NullPointerException (Icebase
+   * #721dc3021809, #90e72cf67632, Mac OS X 15.8, uptime 3 s). The popup menu step therefore runs
+   * after the splash is showing.
+   */
+  @Test
+  void thePopupMenuWarmUpRunsAfterTheSplashIsShowing() throws Exception {
+    String source = warmUpSource();
+
+    int popupMenus = source.indexOf("warmUpPopupMenus();");
+    int splashWait = source.indexOf("awaitSplashShown(SPLASH_SHOWN");
+
+    assertTrue(splashWait >= 0 && popupMenus >= 0, "warmUp() lost a step");
+    assertTrue(
+        popupMenus > splashWait, "it builds a JPopupMenu while the EDT may be building the splash");
+  }
+
+  /**
    * The Swing splash shows its image in an ImageIcon, whose static initializer ran on the EDT while
    * the splash was built (Icebase #e45e1beac54a, frostwire/frostwire#1323).
    */
@@ -750,6 +771,23 @@ class JdkWarmUpTest {
    * checkbox per search engine.
    */
   @Test
+  void warmUpInitializesTheStatusBarsLayoutClasses() throws Exception {
+    // StatusLine builds its panel with a GridBagLayout inside MainFrame's constructor, so the JDK
+    // read the class from its module image on the EDT (Icebase #5309675dbc2c, GitHub #1538).
+    assertTrue(JdkWarmUp.CLASSES_TO_INITIALIZE.contains("java.awt.GridBagLayout"));
+    assertTrue(JdkWarmUp.CLASSES_TO_INITIALIZE.contains("java.awt.GridBagConstraints"));
+    for (String name : List.of("java.awt.GridBagLayout", "java.awt.GridBagConstraints")) {
+      Class.forName(name, true, JdkWarmUp.class.getClassLoader());
+    }
+    String statusLine =
+        java.nio.file.Files.readString(
+            java.nio.file.Path.of("src/main/java/com/limegroup/gnutella/gui/StatusLine.java"));
+    assertTrue(
+        statusLine.contains("new GridBagLayout()"),
+        "the warm-up entry exists because the status bar builds one on the EDT");
+  }
+
+  @Test
   void warmUpCreatesTheSearchOptionsPanelsNimbusPainters() throws Exception {
     javax.swing.UIDefaults nimbus = new NimbusLookAndFeel().getDefaults();
     for (String prefix : JdkWarmUp.SEARCH_OPTIONS_PAINTER_KEY_PREFIXES) {
@@ -757,6 +795,8 @@ class JdkWarmUpTest {
     }
     assertTrue(JdkWarmUp.SEARCH_OPTIONS_PAINTER_KEY_PREFIXES.contains("Slider"));
     assertTrue(JdkWarmUp.SEARCH_OPTIONS_PAINTER_KEY_PREFIXES.contains("CheckBox["));
+    // The separator next to the file type buttons (Icebase #60a32635447a).
+    assertTrue(JdkWarmUp.SEARCH_OPTIONS_PAINTER_KEY_PREFIXES.contains("Separator["));
     assertTrue(
         warmUpSource()
             .replaceAll("\\s+", "")
@@ -785,6 +825,23 @@ class JdkWarmUpTest {
    * rasterized, so the main window's first paint did it through GDI on the EDT (Icebase
    * #53d09edfad4a, #05ccc2dc9c89, GitHub #1467). The buttons and the warm-up share one constant.
    */
+  @Test
+  void warmUpRasterizesTheTransferDetailLinkFont() throws Exception {
+    // Plain 13 pt, used only by that link: building the transfer details the first time
+    // rasterized it through GDI on the EDT (Icebase #b89319ed13f7, GitHub #1537).
+    assertTrue(
+        JdkWarmUp.mainWindowPlatformFonts().contains(PlatformFonts.TRANSFER_DETAIL_LINK),
+        JdkWarmUp.mainWindowPlatformFonts()::toString);
+    assertTrue(PlatformFonts.TRANSFER_DETAIL_LINK.getSize() == 13);
+    String component =
+        java.nio.file.Files.readString(
+            java.nio.file.Path.of(
+                "src/main/java/com/frostwire/gui/components/transfers/TransferDetailComponent.java"));
+    assertTrue(
+        component.contains("hideLink.setFont(PlatformFonts.TRANSFER_DETAIL_LINK)"),
+        "the link and the warm-up share one constant");
+  }
+
   @Test
   void warmUpRasterizesTheDonationButtonFont() throws Exception {
     assertTrue(

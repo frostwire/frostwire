@@ -71,6 +71,11 @@ class GUILoader {
       initializer.initialize(args, frame);
     } catch (Throwable err) {
       hideSplash(frame);
+      if (DamagedInstallation.isDamaged(err)) {
+        CrashReportSpooler.recordSync(err);
+        DamagedInstallation.show();
+        System.exit(1);
+      }
       try {
         CrashReportSpooler.recordSync(err);
         FatalBugManager.handleFatalBug(err);

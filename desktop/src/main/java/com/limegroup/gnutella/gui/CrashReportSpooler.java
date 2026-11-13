@@ -32,6 +32,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.limewire.util.CommonUtils;
 
@@ -259,6 +260,12 @@ public final class CrashReportSpooler {
       GcWindow gcWindow,
       StallCpu.Window cpuWindow) {
     try {
+      // Counted even when the report is throttled: the session still stalled.
+      LivePresenceHeartbeat.stallRecorded();
+    } catch (Throwable ignored) {
+      // Presence is best effort.
+    }
+    try {
       if (!tryAcquire("strictmode:" + sanitizeViolationClass(violationClass))) {
         LOG.debug("Throttled anonymous strictmode report");
         return;
@@ -279,6 +286,11 @@ public final class CrashReportSpooler {
 
   /** Queues an anonymous EDT watchdog report for Icebase. No-op until {@link #start()}. */
   public static void recordWatchdog(int missedHeartbeats) {
+    try {
+      LivePresenceHeartbeat.stallRecorded();
+    } catch (Throwable ignored) {
+      // Presence is best effort.
+    }
     try {
       if (!tryAcquire("watchdog")) {
         LOG.debug("Throttled anonymous watchdog report");
@@ -598,6 +610,9 @@ public final class CrashReportSpooler {
    * of the message.
    */
   static String missingClass(Throwable problem) {
+    if (problem instanceof ClassFormatError) {
+      return malformedClass(problem);
+    }
     if (!(problem instanceof NoClassDefFoundError)
         && !(problem instanceof ClassNotFoundException)) {
       return null;
@@ -614,6 +629,28 @@ public final class CrashReportSpooler {
     String name = message.replace('/', '.');
     return name.length() <= 200 && CLASS_NAME.matcher(name).matches() ? name : null;
   }
+
+  /**
+   * The class a ClassFormatError says it could not define, from the JVM's message ("Incompatible
+   * magic value 1 in class file com/foo/Bar"), as a dotted class name, or null when the message
+   * names none (a "Truncated class file" does not). Only a Java class name is reported
+   * (frostwire/frostwire#1541).
+   */
+  private static String malformedClass(Throwable problem) {
+    String message = problem.getMessage();
+    if (message == null) {
+      return null;
+    }
+    Matcher matcher = MALFORMED_CLASS_FILE.matcher(message);
+    if (!matcher.find()) {
+      return null;
+    }
+    String name = matcher.group(1).replace('/', '.');
+    return name.length() <= 200 && CLASS_NAME.matcher(name).matches() ? name : null;
+  }
+
+  private static final Pattern MALFORMED_CLASS_FILE =
+      Pattern.compile("class file ([A-Za-z0-9_$./]+)");
 
   /**
    * What an OutOfMemoryError ran out of, from the JVM's message, or null for any other problem.

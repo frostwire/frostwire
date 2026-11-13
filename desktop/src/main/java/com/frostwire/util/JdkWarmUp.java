@@ -194,7 +194,14 @@ public final class JdkWarmUp {
           // frostwire/frostwire#1506).
           "javax.swing.plaf.basic.BasicTreeUI",
           "javax.swing.plaf.synth.SynthTreeUI",
-          "javax.swing.tree.DefaultTreeCellRenderer");
+          "javax.swing.tree.DefaultTreeCellRenderer",
+          // The status bar is the first user of GridBagLayout: StatusLine's constructor builds its
+          // panel with one and its cells with GridBagConstraints, inside MainFrame's constructor
+          // on the EDT. The JDK read them from its module image there on a 1-CPU computer, 5
+          // minutes after the warm-up had finished (Icebase #5309675dbc2c,
+          // frostwire/frostwire#1538).
+          "java.awt.GridBagLayout",
+          "java.awt.GridBagConstraints");
 
   /**
    * Windows-only JDK classes initialized like {@link #CLASSES_TO_INITIALIZE}. The first right-click
@@ -364,9 +371,11 @@ public final class JdkWarmUp {
 
   /**
    * Painters of the search options panel, built on the first search: its range sliders (the slider,
-   * its thumb and its track) and a checkbox per search engine.
+   * its thumb and its track), a checkbox per search engine, and the separator next to the file type
+   * buttons (Icebase #60a32635447a, frostwire/frostwire#1419).
    */
-  static final List<String> SEARCH_OPTIONS_PAINTER_KEY_PREFIXES = List.of("Slider", "CheckBox[");
+  static final List<String> SEARCH_OPTIONS_PAINTER_KEY_PREFIXES =
+      List.of("Slider", "CheckBox[", "Separator[");
 
   /**
    * Painters of the menu bar and its menus, built with the main window: each menu item's first
@@ -568,11 +577,6 @@ public final class JdkWarmUp {
       LOG.warn("Menu accessor warm-up failed: " + t.getMessage(), t);
     }
     try {
-      warmUpPopupMenus();
-    } catch (Throwable t) {
-      LOG.warn("Popup menu warm-up failed: " + t.getMessage(), t);
-    }
-    try {
       warmUpDataTransfer();
     } catch (Throwable t) {
       LOG.warn("Data transfer warm-up failed: " + t.getMessage(), t);
@@ -593,6 +597,17 @@ public final class JdkWarmUp {
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       return;
+    }
+    try {
+      // After the splash, not before: this builds a JPopupMenu, which adds PopupMenu.actionMap to
+      // the
+      // look and feel's table. The first Nimbus style the EDT validates (the splash's first panel)
+      // copies that table once, and a key added meanwhile made the copy throw
+      // ConcurrentModificationException, which left Nimbus's defaults half built and failed every
+      // later component, FatalBugManager's dialog included (Icebase #721dc3021809, #90e72cf67632).
+      warmUpPopupMenus();
+    } catch (Throwable t) {
+      LOG.warn("Popup menu warm-up failed: " + t.getMessage(), t);
     }
     try {
       Map<?, ?> desktopHints = desktopFontHints();
@@ -659,7 +674,9 @@ public final class JdkWarmUp {
         PlatformFonts.sansSerif(Font.BOLD, 10),
         PlatformFonts.sansSerif(Font.PLAIN, 12),
         // The donation buttons (frostwire/frostwire#1467).
-        PlatformFonts.DIALOG_BOLD);
+        PlatformFonts.DIALOG_BOLD,
+        // The transfer details' "hide" link (frostwire/frostwire#1537).
+        PlatformFonts.TRANSFER_DETAIL_LINK);
   }
 
   /**

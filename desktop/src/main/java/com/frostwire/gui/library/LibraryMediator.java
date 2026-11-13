@@ -45,6 +45,7 @@ public class LibraryMediator {
   private LibrarySearch librarySearch;
   private CardLayout _tablesViewLayout = new CardLayout();
   private JPanel _tablesPanel;
+  private final OnDemandView libraryView;
   private final Map<Object, Integer> scrollbarValues;
   private Object lastSelectedKey;
   private AbstractLibraryTableMediator<?, ?, ?> lastSelectedMediator;
@@ -56,8 +57,10 @@ public class LibraryMediator {
     idScanned = new HashSet<>();
     getComponent(); // creates MAIN_PANEL
     scrollbarValues = new HashMap<>();
-    // Defer split pane creation to avoid EDT violation from LibraryFilesTableMediator class loading
-    SwingUtilities.invokeLater(this::initializeSplitPane);
+    // The folder tree, cover art panel and files table are built the first time the Library is
+    // shown or used, not at startup: building them (and loading their classes) in one EDT event
+    // while the app starts froze slow computers that never opened the tab (#1530).
+    libraryView = new OnDemandView(MAIN_PANEL, this::initializeSplitPane);
   }
 
   private void initializeSplitPane() {
@@ -127,6 +130,7 @@ public class LibraryMediator {
   private void showView() {
     GUIMediator.safeInvokeAndWait(
         () -> {
+          libraryView.ensureBuilt();
           rememberScrollbarsOnMediators();
           _tablesViewLayout.show(_tablesPanel, LibraryMediator.FILES_TABLE_KEY);
         });

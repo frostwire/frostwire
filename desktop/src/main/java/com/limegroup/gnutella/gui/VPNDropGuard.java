@@ -29,7 +29,16 @@ import javax.swing.*;
 import net.miginfocom.swing.MigLayout;
 
 public class VPNDropGuard implements VPNStatusRefresher.VPNStatusListener {
-  private static boolean lastKnownVPNStatus = false;
+  // Written on the EDT, read where the protection is applied.
+  private static volatile boolean lastKnownVPNStatus = false;
+
+  /**
+   * Where a status report applies the protection: the shared background queue, never the caller,
+   * which is the EDT. Pausing and resuming the engine wait for libtorrent's session thread and
+   * froze the window while it was busy (#1535).
+   */
+  static java.util.function.Consumer<Runnable> background =
+      BackgroundQueuedExecutorService::schedule;
 
   private static boolean canUseBitTorrent(boolean showExplanationDialog) {
     return canUseBitTorrent(showExplanationDialog, null);
@@ -166,6 +175,6 @@ public class VPNDropGuard implements VPNStatusRefresher.VPNStatusListener {
   @Override
   public void onStatusUpdated(boolean vpnIsOn) {
     lastKnownVPNStatus = vpnIsOn;
-    applyVPNDropProtection();
+    background.accept(VPNDropGuard::applyVPNDropProtection);
   }
 }

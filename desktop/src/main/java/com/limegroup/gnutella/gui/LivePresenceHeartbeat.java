@@ -38,6 +38,9 @@ public final class LivePresenceHeartbeat {
   /** Icebase's limit for crash_reports. */
   static final int MAX_CRASH_REPORTS = 1000;
 
+  /** Icebase's limit for stall_reports. */
+  static final int MAX_STALL_REPORTS = 1000;
+
   /** What Icebase accepts for app_version and app_build. */
   private static final Pattern RELEASE_TOKEN = Pattern.compile("[A-Za-z0-9._-]{1,32}");
 
@@ -50,6 +53,7 @@ public final class LivePresenceHeartbeat {
           });
   private static final String SESSION_ID = newSessionId();
   private static final AtomicInteger CRASH_REPORTS = new AtomicInteger();
+  private static final AtomicInteger STALL_REPORTS = new AtomicInteger();
   private static final AtomicBoolean SUCCESS_LOGGED = new AtomicBoolean();
   private static final AtomicBoolean FAILURE_LOGGED = new AtomicBoolean();
   private static volatile HttpClient client;
@@ -82,6 +86,23 @@ public final class LivePresenceHeartbeat {
    */
   static void crashRecorded() {
     countCrash();
+    sendNow();
+  }
+
+  /**
+   * Counts an EDT stall report this session recorded (StrictMode or watchdog), throttled or not,
+   * for Icebase's stall-free sessions. The session's first one sends a heartbeat right away, off
+   * the calling thread, so the session counts as stalled even if the app doesn't live to the next
+   * minute's heartbeat; the rest go out with the regular heartbeats.
+   */
+  static void stallRecorded() {
+    int before = STALL_REPORTS.getAndUpdate(count -> Math.min(count + 1, MAX_STALL_REPORTS));
+    if (before == 0) {
+      sendNow();
+    }
+  }
+
+  private static void sendNow() {
     HttpClient http = client;
     if (http != null) {
       try {
@@ -96,6 +117,10 @@ public final class LivePresenceHeartbeat {
     return CRASH_REPORTS.get();
   }
 
+  static int stallReports() {
+    return STALL_REPORTS.get();
+  }
+
   private static void countCrash() {
     CRASH_REPORTS.getAndUpdate(count -> Math.min(count + 1, MAX_CRASH_REPORTS));
   }
@@ -104,14 +129,15 @@ public final class LivePresenceHeartbeat {
     return payload(
         FrostWireUtils.getFrostWireVersion(),
         Integer.toString(FrostWireUtils.getBuildNumber()),
-        CRASH_REPORTS.get());
+        CRASH_REPORTS.get(),
+        STALL_REPORTS.get());
   }
 
   /**
    * The heartbeat body. A version or build Icebase would reject falls back to the session id alone,
    * so a malformed version string never costs the live counters.
    */
-  static String payload(String appVersion, String appBuild, int crashReports) {
+  static String payload(String appVersion, String appBuild, int crashReports, int stallReports) {
     if (appVersion == null
         || appBuild == null
         || !RELEASE_TOKEN.matcher(appVersion).matches()
@@ -124,7 +150,8 @@ public final class LivePresenceHeartbeat {
             SESSION_ID,
             appVersion,
             appBuild,
-            Math.max(0, Math.min(crashReports, MAX_CRASH_REPORTS))));
+            Math.max(0, Math.min(crashReports, MAX_CRASH_REPORTS)),
+            Math.max(0, Math.min(stallReports, MAX_STALL_REPORTS))));
   }
 
   private static void send(HttpClient http) {
@@ -164,12 +191,15 @@ public final class LivePresenceHeartbeat {
     private final String app_version;
     private final String app_build;
     private final int crash_reports;
+    private final int stall_reports;
 
-    private ReleasePayload(String sessionId, String appVersion, String appBuild, int crashReports) {
+    private ReleasePayload(
+        String sessionId, String appVersion, String appBuild, int crashReports, int stallReports) {
       this.session_id = sessionId;
       this.app_version = appVersion;
       this.app_build = appBuild;
       this.crash_reports = crashReports;
+      this.stall_reports = stallReports;
     }
   }
 }

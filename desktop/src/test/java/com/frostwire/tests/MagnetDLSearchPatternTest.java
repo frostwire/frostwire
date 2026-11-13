@@ -34,6 +34,7 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -45,6 +46,14 @@ import org.junit.jupiter.api.Test;
 public final class MagnetDLSearchPatternTest {
   private static final Logger LOG = Logger.getLogger(MagnetDLSearchPatternTest.class);
 
+  /**
+   * Searches the live site, so it runs only with {@code ./gradlew test -Plive}: whenever the site
+   * moves or goes down it fails every push to master for a reason unrelated to the push, as it did
+   * on 2026-11-12 when its domain started redirecting to a site with no search API
+   * (frostwire/frostwire#1533, same as GitHub #1440 did for YouTube). The parser tests below stay
+   * in CI.
+   */
+  @Tag("live")
   @Test
   public void magnetdlSearchTest() {
     String searchTerm = "ubuntu";

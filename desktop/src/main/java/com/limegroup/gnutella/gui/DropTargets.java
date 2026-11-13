@@ -33,7 +33,7 @@ public final class DropTargets {
    * {@link JOptionPane#showInputDialog(Component, Object, String, int, javax.swing.Icon, Object[],
    * Object)} with a text field, for a dialog whose window registers for no drag-and-drop:
    * JOptionPane builds and shows that dialog itself, so its text field's drop target can't be
-   * removed first. Builds the same dialog and removes it before showing it.
+   * removed first. Builds the same dialog and removes it before the dialog is realized.
    *
    * @param initialValue the text the field starts with, or null
    * @return the text entered, or null if the dialog was cancelled or closed
@@ -43,6 +43,9 @@ public final class DropTargets {
     JOptionPane pane = new JOptionPane(message, messageType, JOptionPane.OK_CANCEL_OPTION);
     pane.setWantsInput(true);
     pane.setInitialSelectionValue(initialValue);
+    // Before createDialog: it packs the dialog, which realizes it, and a text field that still
+    // has its drop target then registers it with the OS (#1536).
+    removeAll(pane);
     JDialog dialog = pane.createDialog(parent, title);
     pane.selectInitialValue();
     removeAll(dialog);

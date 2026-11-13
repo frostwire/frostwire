@@ -6,6 +6,16 @@ FrostWire 7.1.5 UNRELEASED
    - fix:Starting FrostWire on a slow computer no longer stalls while the main window's header is laid out for the first time; that setup happens at startup in the background (#1527)
    - fix:Options > Library: the Remove button is no longer left enabled after you deselect a folder, where clicking it caused an error (#1528)
    - fix:Opening Options, switching to its Torrent and IP Filter pages, and closing it no longer freeze the window while the BitTorrent engine is busy; the limits it shows are kept ready instead of being asked from the engine each time (#1529)
+   - fix:Starting FrostWire on a slow computer no longer freezes while the Library tab is prepared in the background; the Library is now built the first time you open it (#1530)
+   - fix:Right-clicking a selection of search results of different kinds (a torrent and a stream, for example) shows the menu for the first results of one kind again; it used to show nothing and report an error (#1532)
+   - fix:The first search on a slow computer no longer stalls while the separator of the search options is prepared; that happens at startup in the background with the rest of that panel (#1419)
+   - fix:The first time FrostWire runs on a computer with a single CPU, its window stays responsive while its IceBridge identity is created; that work now runs at low priority instead of taking the whole processor for minutes (#1534)
+   - fix:On computers with one or two processors, FrostWire's search helper process now starts with a small footprint, using less memory and processor time while the window is busy starting (#1512)
+   - fix:Starting FrostWire on a slow computer no longer stalls while the status bar's layout classes are read from Java's module image; they are loaded at startup in the background (#1538)
+   - fix:The window no longer freezes when your VPN connects or drops while VPN-Drop protection pauses or resumes your transfers; that happens in the background (#1535)
+   - fix:Error and input dialogs no longer ask Windows to register for drag and drop before they open, which could freeze the window for seconds on a slow computer (#1536)
+   - fix:Opening the transfer details for the first time on a slow computer no longer freezes while the font of its "hide" link is prepared; that happens at startup in the background (#1537)
+   - new:The anonymous presence heartbeat now also says how many freeze reports this session recorded, so Icebase can show EDT stall-free sessions per release next to crash-free sessions; it still has no installation or user id
 
 FrostWire 7.1.4 NOV/10/2026
    - fix:Freeze reports sent when the whole computer stalled, not FrostWire, are labeled as such so they stop hiding real problems (#1512)
@@ -48,6 +58,7 @@ FrostWire 7.1.4 NOV/10/2026
 
 FrostWire 7.1.3 NOV/07/2026
    - fix:A crash report that fails to save no longer leaves an empty temporary file in FrostWire's settings folder, and files left by earlier versions are cleaned up (#1493)
+   - fix:The "Support FrostWire Today" tip now opens frostwire.com/give, where every way to support FrostWire is listed, instead of a shortcut straight to PayPal
    - fix:The setup wizard's social page no longer freezes while its icons load; they are loaded in the background before the wizard opens (#1491)
    - fix:Building the first search field on a cold start no longer reads its suggestion classes from disk while the window waits (#1492)
    - fix:Building the search field no longer freezes the window on some Windows PCs while its larger font is drawn for the first time; the font is now prepared at startup (#1490)
@@ -67,6 +78,7 @@ FrostWire 7.1.3 NOV/07/2026
    - fix:The first search no longer freezes the window on slow computers while the Download, Details and Stop buttons load their icons: they load at startup, in the background (#1486)
    - fix:With the Dark or Light Flat theme, building the main window and its tabs no longer pauses while Java loads the theme's borders, layouts and icons: they load at startup, in the background (#1488)
    - fix:Opening the Library, Search and Transfers screens no longer pauses while Java loads their tag readers, background helpers and other parts: they load at startup, in the background (#1489)
+   - fix:FrostWire no longer crashes right after it starts, on a fast start, with a ConcurrentModificationException while its splash window is built (and then a second error in the Fatal Error dialog); the popup menu warm-up now waits until the splash is showing (#1539)
    - fix:macOS: YouTube and other Telluride downloads now start instantly instead of taking about 9 seconds each time (Telluride build 48, macOS packaging)
    - fix:A torrent you add no longer sometimes loses track of its saved .torrent file, which left the transfer without the license and payment details the torrent carries
    - fix:MCP: searches and search notifications work right after FrostWire starts with the MCP server on, without restarting the MCP server
@@ -76,6 +88,7 @@ FrostWire 7.1.3 NOV/07/2026
    - fix:Downloading a magnet link no longer leaves an empty fw_dummy file in your temp folder each time
    - fix:MCP: AI agents that check tool definitions no longer reject the relay status, relay metrics and clear-logs tools
    - fix:MCP: error replies to requests without an id carry "id": null, as JSON-RPC requires, so strict AI agents can read them
+   - fix:Hovering a table cell with cut-off text no longer reports an error when some of the table's columns are hidden; the tooltip is measured with the visible column, not the model one (#1540)
    - fix:MCP: malformed JSON sent to the MCP server gets a parse error back instead of a dropped connection
    - fix:Torrents that use only the new BitTorrent v2 format download only the files you picked; sometimes all of their files downloaded
    - fix:A transfer you paused stays paused after restarting FrostWire; the pause was often forgotten and the transfer started again
@@ -85,6 +98,7 @@ FrostWire 7.1.3 NOV/07/2026
    - fix:Create Torrent: picking a Creative Commons license works again instead of failing with an error, and torrents made with one by older FrostWire versions show their license again
    - fix:MCP: text settings changed with frostwire_settings_set, such as the IceBridge remote URL, are saved as sent instead of wrapped in quotes, and numbers or true/false sent as text are accepted
    - fix:Smart search's crawl cache database releases its SQLite file when it is closed (it stayed open), and saving to it returns the saved row's id instead of always 1
+   - fix:When FrostWire's own files are damaged (a class it can't read), it now says so in plain words and offers a button to download FrostWire again, instead of an error dialog full of technical details; Icebase reports name the damaged class when the JVM does (#1541)
    - fix:Security: on macOS, "Show in Finder" passes the file path to its script as an argument, so a crafted file name can no longer inject AppleScript
    - fix:macOS: FrostWire starts and works on a Mac where the Lucida Grande font is missing or disabled (it crashed at the splash screen); its fonts and Java's built-in fonts fall back to Helvetica Neue (#1484)
    - windows-launcher: DLLs in the folder FrostWire is started from are no longer loaded: the current folder is out of the DLL search order and Java's jvm.dll is loaded by its full path

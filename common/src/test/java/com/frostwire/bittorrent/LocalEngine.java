@@ -32,6 +32,8 @@ import java.lang.reflect.Constructor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -39,6 +41,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -304,6 +307,49 @@ final class LocalEngine implements AutoCloseable {
           }
           skipped.add(String.valueOf(dl.getName()));
         }
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new AssertionError(e);
+      }
+    }
+
+    /**
+     * Every download in {@code names}, in whatever order they arrive, skipping others. A restore
+     * announces the transfers in the order the file system lists their files, which is not
+     * alphabetical on every file system: waiting for them one by one with {@link #next} consumed
+     * the later one while waiting for the earlier one, and timed out (a desktop tests run on CI,
+     * 58f0a82fd).
+     */
+    static Map<String, BTDownload> nextEach(BlockingQueue<BTDownload> queue, String... names) {
+      return nextEach(queue, BTDownload::getName, TimeUnit.SECONDS.toNanos(TIMEOUT_SECONDS), names);
+    }
+
+    static <T> Map<String, T> nextEach(
+        BlockingQueue<T> queue, Function<T, String> nameOf, long timeoutNanos, String... names) {
+      java.util.Set<String> missing = new LinkedHashSet<>(List.of(names));
+      Map<String, T> found = new LinkedHashMap<>();
+      List<String> skipped = new java.util.ArrayList<>();
+      long deadline = System.nanoTime() + timeoutNanos;
+      try {
+        while (!missing.isEmpty()) {
+          long left = deadline - System.nanoTime();
+          T item = left > 0 ? queue.poll(left, TimeUnit.NANOSECONDS) : null;
+          assertNotNull(
+              item,
+              "timed out waiting for downloads named "
+                  + missing
+                  + "; seen: "
+                  + found.keySet()
+                  + "; skipped: "
+                  + skipped);
+          String name = String.valueOf(nameOf.apply(item));
+          if (missing.remove(name)) {
+            found.put(name, item);
+          } else {
+            skipped.add(name);
+          }
+        }
+        return found;
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
         throw new AssertionError(e);
