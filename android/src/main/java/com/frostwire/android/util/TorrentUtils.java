@@ -164,8 +164,7 @@ public final class TorrentUtils {
           };
       create_file_entry_vector files;
       try {
-        files =
-            libtorrent.list_files_ex(file.getAbsolutePath(), acceptAll, new create_flags_t());
+        files = libtorrent.list_files_ex(file.getAbsolutePath(), acceptAll, new create_flags_t());
       } finally {
         acceptAll.delete();
       }
