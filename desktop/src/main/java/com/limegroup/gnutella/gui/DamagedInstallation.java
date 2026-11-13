@@ -65,15 +65,29 @@ public final class DamagedInstallation {
         && "java.util.zip.ZipError".equals(problem.getClass().getName());
   }
 
-  /** The plain message users see. */
+  /** The plain message users see, in the user's language when the translations can be read. */
   static String message() {
-    return "FrostWire's files are damaged, so it can't start.\n\n"
-        + "This can happen when an installation or an update was interrupted, "
-        + "or when a security program changed the files.\n\n"
-        + "Please download FrostWire again from\n"
-        + DOWNLOAD_URL
-        + "\nand install it, even if FrostWire is already installed. "
-        + "Your settings are kept in your user folder, not in FrostWire's program folder.";
+    return tr(
+            "FrostWire's files are damaged, so it can't start. This can happen when an installation or an update was interrupted, or when a security program changed the files.")
+        + "\n\n"
+        + tr(
+            "Please download FrostWire again from the address below and install it, even if FrostWire is already installed. Your settings are kept in your user folder, not in FrostWire's program folder.")
+        + "\n\n"
+        + DOWNLOAD_URL;
+  }
+
+  /**
+   * The text in the user's language, or as written (English) when I18n or its translations cannot
+   * be loaded: they live in the jar that may be the damaged one. Named {@code tr} so the string
+   * extraction and the translations completeness test see its literals.
+   */
+  private static String tr(String english) {
+    try {
+      String text = I18n.tr(english);
+      return text == null || text.isBlank() ? english : text;
+    } catch (Throwable unreadable) {
+      return english;
+    }
   }
 
   /**
@@ -86,12 +100,12 @@ public final class DamagedInstallation {
       return;
     }
     try {
-      Object[] options = {"Download FrostWire", "Close"};
+      Object[] options = {tr("Download FrostWire"), tr("Close")};
       int choice =
           JOptionPane.showOptionDialog(
               null,
               message(),
-              "FrostWire can't start",
+              tr("FrostWire can't start"),
               JOptionPane.DEFAULT_OPTION,
               JOptionPane.ERROR_MESSAGE,
               null,

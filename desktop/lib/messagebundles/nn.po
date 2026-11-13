@@ -6907,3 +6907,19 @@ msgstr "lasta ned"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
 msgid "Participation:"
 msgstr "Deltaking:"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
+msgid "FrostWire can't start"
+msgstr "FrostWire kan ikkje starte"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
+msgid "FrostWire's files are damaged, so it can't start. This can happen when an installation or an update was interrupted, or when a security program changed the files."
+msgstr "Filene til FrostWire er skadde, så programmet kan ikkje starte. Dette kan skje viss ei installering eller oppdatering vart avbroten, eller viss eit tryggingsprogram har endra filene."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
+msgid "Please download FrostWire again from the address below and install it, even if FrostWire is already installed. Your settings are kept in your user folder, not in FrostWire's program folder."
+msgstr "Last ned FrostWire på nytt frå adressa nedanfor og installer det, sjølv om FrostWire allereie er installert. Innstillingane dine ligg i brukarmappa di, ikkje i programmappa til FrostWire."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
+msgid "Download FrostWire"
+msgstr "Last ned FrostWire"

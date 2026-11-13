@@ -7126,3 +7126,19 @@ msgstr "다운로드됨"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
 msgid "Participation:"
 msgstr "참여도:"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
+msgid "FrostWire can't start"
+msgstr "FrostWire를 시작할 수 없습니다"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
+msgid "FrostWire's files are damaged, so it can't start. This can happen when an installation or an update was interrupted, or when a security program changed the files."
+msgstr "FrostWire 파일이 손상되어 시작할 수 없습니다. 설치나 업데이트가 중간에 중단되었거나 보안 프로그램이 파일을 변경했을 때 이런 일이 생길 수 있습니다."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
+msgid "Please download FrostWire again from the address below and install it, even if FrostWire is already installed. Your settings are kept in your user folder, not in FrostWire's program folder."
+msgstr "FrostWire가 이미 설치되어 있더라도 아래 주소에서 FrostWire를 다시 다운로드하여 설치해 주세요. 설정은 FrostWire 프로그램 폴더가 아니라 사용자 폴더에 보관됩니다."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
+msgid "Download FrostWire"
+msgstr "FrostWire 다운로드"
