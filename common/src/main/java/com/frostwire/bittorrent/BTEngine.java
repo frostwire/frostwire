@@ -222,6 +222,12 @@ public final class BTEngine extends SessionManager {
     SettingsPack sp = new SettingsPack();
     // sp.broadcastLSD(true); //setting was deprecated/removed on libtorrent 1.2.4 (Feb 10th 2020)
     sp.validateHttpsTrackers(false);
+    // TODO(maintainer, privacy): libtorrent 2.1 has WebTorrent built in and, unless told otherwise,
+    // contacts Google's STUN server (SettingsPack.DEFAULT_WEBTORRENT_STUN_SERVER,
+    // stun.l.google.com:19302) when a torrent carries wss:// trackers, and accepts WebRTC peers
+    // (maxWebtorrentOffers() defaults to 10). Decide whether FrostWire should ship
+    // sp.maxWebtorrentOffers(0) (WebRTC off) or sp.setWebtorrentStunServer(<our own STUN server>).
+    // Deliberately left at the jlibtorrent defaults until that decision is made.
     if (ctx.optimizeMemory) {
       int maxQueuedDiskBytes = sp.maxQueuedDiskBytes();
       sp.maxQueuedDiskBytes(maxQueuedDiskBytes / 2);
