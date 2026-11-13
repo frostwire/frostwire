@@ -138,6 +138,7 @@ FrostWire 7.1.3 NOV/07/2026
    - fix:Opening a magnet link while FrostWire is already running no longer changes its name or trackers — the forwarded link was decoded twice, turning + into spaces and %25 into a bare %
    - fix:Opening a magnet link whose name contains a lone % (like "50% off") no longer fails — a % that isn't part of an escape is kept as is, the way browsers do
    - fix:Search results from TPB, 1337x, Torrentz2 and Nyaa no longer show a size of 0 for files of a terabyte or more, or negative sizes from a broken page — all engines parse sizes in one place
+   - fix:Create New Torrent opens tall enough to show its progress bar and its Save and Close buttons; it is sized from its content instead of a fixed size (#1549)
    - fix:Opening Transfers with a transfer selected no longer lets the Transfer Detail pane cover the whole list of transfers; the pane is sized once the tab has been laid out (#1548)
    - fix:The Pirate Bay results with base32 or reordered magnet links get their correct info hash (#1408)
    - fix:On computers set to Turkish or Azeri, Nyaa search results show their sizes again, IceBridge client mode is respected and distributed search finds the same peers as everyone else (#1407)

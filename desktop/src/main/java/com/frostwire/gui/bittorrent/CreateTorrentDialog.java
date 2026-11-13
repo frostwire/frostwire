@@ -132,7 +132,6 @@ public class CreateTorrentDialog extends JDialog {
     initContainersLayouts();
     initComponents();
     setLocationRelativeTo(frame);
-    pack();
   }
 
   // Note: This dedup fix should be upstreamed to Entry.fromMap() in jlibtorrent.
@@ -195,16 +194,46 @@ public class CreateTorrentDialog extends JDialog {
         this,
         new TransferHandlerDropTargetListener(
             new FileOrFolderTransferHandler(this::onContentDropped)));
+    // Sized from its content: the tabs grew (private torrent, comment, piece size, torrent type,
+    // the Advanced tab) and a fixed preferred size cut off the progress bar and the Save and Close
+    // buttons until the dialog was resized by hand (frostwire/frostwire#1549).
     pack();
-    setMinimumSize(getSize());
+    Dimension size =
+        initialSize(
+            getSize(), MINIMUM_DIALOG_DIMENSIONS, usableScreenBounds(getGraphicsConfiguration()));
+    setMinimumSize(size);
+    setSize(size);
+  }
+
+  /**
+   * The dialog's first size: what its content asks for, never smaller than {@code minimum}, and
+   * never taller or wider than the screen's usable area.
+   */
+  static Dimension initialSize(Dimension packed, Dimension minimum, Rectangle screen) {
+    int width = Math.max(packed.width, minimum.width);
+    int height = Math.max(packed.height, minimum.height);
+    if (screen != null && screen.width > 0 && screen.height > 0) {
+      width = Math.min(width, screen.width);
+      height = Math.min(height, screen.height);
+    }
+    return new Dimension(width, height);
+  }
+
+  private static Rectangle usableScreenBounds(GraphicsConfiguration gc) {
+    if (gc == null) {
+      return null;
+    }
+    Rectangle bounds = gc.getBounds();
+    Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(gc);
+    return new Rectangle(
+        bounds.x + insets.left,
+        bounds.y + insets.top,
+        bounds.width - insets.left - insets.right,
+        bounds.height - insets.top - insets.bottom);
   }
 
   private void initDialogSettings() {
     setTitle(I18n.tr("Create New Torrent"));
-    setSize(MINIMUM_DIALOG_DIMENSIONS);
-    setMinimumSize(MINIMUM_DIALOG_DIMENSIONS);
-    setPreferredSize(MINIMUM_DIALOG_DIMENSIONS);
-    // setMaximumSize(MINIMUM_DIALOG_DIMENSIONS);
     setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
     setModalityType(ModalityType.MODELESS);
     GUIUtils.addHideAction((JComponent) container);
