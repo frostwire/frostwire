@@ -1106,6 +1106,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.tables.AbstractActionsRendererTest"
         includeTestsMatching "com.limegroup.gnutella.gui.tables.SeedsHolderTest"
         includeTestsMatching "com.limegroup.gnutella.gui.tables.LimeJTableHiddenColumnTooltipTest"
+        includeTestsMatching "com.frostwire.gui.tabs.TransfersTabDividerTest"
         includeTestsMatching "com.frostwire.gui.library.OnceReadyTest"
         includeTestsMatching "com.frostwire.gui.library.LibraryActionsHolderTest"
         includeTestsMatching "com.frostwire.gui.library.RemoveLibraryDirectoryActionTest"

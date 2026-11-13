@@ -142,15 +142,47 @@ public final class TransfersTab extends AbstractTab {
     transferDetailComponent.setVisible(true);
     transferDetailComponent.updateData(selected);
     if (!transferDetailComponentWasAlreadyVisible) {
-      Container parent = transferDetailSplitter.getParent();
-      int h = parent.getSize().height;
-      lastSplitterLocationWithDetailsVisible = 2 * h / 3;
-      // special case of too much space
-      if (h > 800) {
-        lastSplitterLocationWithDetailsVisible = h - 500;
-      }
-      transferDetailSplitter.setDividerLocation(lastSplitterLocationWithDetailsVisible);
+      placeDetailsDivider(
+          transferDetailSplitter,
+          transferDetailSplitter.getParent(),
+          location -> lastSplitterLocationWithDetailsVisible = location);
     }
+  }
+
+  /**
+   * Where the divider goes when the details open, for a parent this tall: the transfers get two
+   * thirds, or all but 500 px on a tall window.
+   */
+  static int detailsDividerLocation(int parentHeight) {
+    return parentHeight > 800 ? parentHeight - 500 : 2 * parentHeight / 3;
+  }
+
+  /**
+   * Places the divider from the parent's height, once the parent has one. The Transfers tab is
+   * added to the window the first time it is shown, and a transfer selected at startup opened the
+   * details right then, before the tab was laid out: the parent's height was 0, so the divider went
+   * to 0 and the details covered the transfers (frostwire/frostwire#1548).
+   */
+  static void placeDetailsDivider(
+      JSplitPane splitter, Container parent, java.util.function.IntConsumer placed) {
+    if (parent.getHeight() > 0) {
+      int location = detailsDividerLocation(parent.getHeight());
+      splitter.setDividerLocation(location);
+      placed.accept(location);
+      return;
+    }
+    parent.addComponentListener(
+        new ComponentAdapter() {
+          @Override
+          public void componentResized(ComponentEvent e) {
+            if (parent.getHeight() > 0) {
+              parent.removeComponentListener(this);
+              int location = detailsDividerLocation(parent.getHeight());
+              splitter.setDividerLocation(location);
+              placed.accept(location);
+            }
+          }
+        });
   }
 
   private void setTransfersFilterModeListener(
