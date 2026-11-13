@@ -6986,3 +6986,19 @@ msgstr "請從下方網址重新下載 FrostWire 並安裝，即使您已經安�
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
 msgid "Download FrostWire"
 msgstr "下載 FrostWire"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "Seed finished downloads."
+msgstr "為已完成下載的源代碼做種。"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "BitTorrent users on the internet will be able to download file chunks of the data your torrents seed. (Recommended)"
+msgstr "網上的BitTorrent用戶將能下載您的源代碼做種的數據文件塊。（建議使用）"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "Don't seed finished downloads."
+msgstr "勿為已完成下載的源代碼做種。"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "BitTorrent users on the internet may only download file chunks of that torrent from you while you're downloading its data files. Some trackers will penalize this Leeching behavior."
+msgstr "網上的BitTorrent用戶只能在您下載著源代碼的數據文件時，從您處下載該源代碼的文件塊。一些跟蹤器將不利於此下載性能。"

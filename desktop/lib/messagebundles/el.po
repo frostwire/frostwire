@@ -7256,3 +7256,19 @@ msgstr "Κατεβάστε ξανά το FrostWire από την παρακάτ�
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
 msgid "Download FrostWire"
 msgstr "Λήψη του FrostWire"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "Seed finished downloads."
+msgstr "Σπόρων τελειώσει λήψεις."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "BitTorrent users on the internet will be able to download file chunks of the data your torrents seed. (Recommended)"
+msgstr "BitTorrent οι χρήστες στο διαδίκτυο θα είναι σε θέση για να κατεβάσετε το αρχείο κομμάτια των δεδομένων σας torrents σπόρων προς σπορά. (Συνιστάται)"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "Don't seed finished downloads."
+msgstr "Μην σπόρων ολοκληρωμένες λήψεις."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "BitTorrent users on the internet may only download file chunks of that torrent from you while you're downloading its data files. Some trackers will penalize this Leeching behavior."
+msgstr "BitTorrent οι χρήστες στο Διαδίκτυο μπορεί να μόνο κατεβάσετε αυτό το torrent αρχείο κομμάτια από εσάς ενώ πραγματοποιείτε λήψη της αρχεία δεδομένων. Ορισμένοι ιχνηλάτες θα τιμωρήσουν αυτή τη συμπεριφορά Leeching."

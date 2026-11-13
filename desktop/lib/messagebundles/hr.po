@@ -7260,3 +7260,19 @@ msgstr "Ponovno preuzmite FrostWire s adrese u nastavku i instalirajte ga, čak 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
 msgid "Download FrostWire"
 msgstr "Preuzmi FrostWire"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "Seed finished downloads."
+msgstr "Dijeli završena torrent preuzimanja."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "BitTorrent users on the internet will be able to download file chunks of the data your torrents seed. (Recommended)"
+msgstr "BitTorrent korisnici na internetu će preuzimati samo dijelove datoteka od torrenta koje dijelite. (preporučeno)"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "Don't seed finished downloads."
+msgstr "Ne dijeli završena torrent preuzimanja."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "BitTorrent users on the internet may only download file chunks of that torrent from you while you're downloading its data files. Some trackers will penalize this Leeching behavior."
+msgstr "BitTorrent korisnici na internetu će preuzimati samo dijelove datoteka torrenta od vas dok vi preuzimate njegove podatkovne datoteke. Neki pratitelji će ovakvo ponašanje dijeljenja kazniti."

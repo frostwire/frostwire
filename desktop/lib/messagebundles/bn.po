@@ -7103,3 +7103,19 @@ msgstr "অনুগ্রহ করে নিচের ঠিকানা থ�
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
 msgid "Download FrostWire"
 msgstr "FrostWire ডাউনলোড করুন"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "Seed finished downloads."
+msgstr "বীজ ডাউনলোড শেষ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "BitTorrent users on the internet will be able to download file chunks of the data your torrents seed. (Recommended)"
+msgstr "ইন্টারনেটে বিট-টরেন্ট ব্যবহারকারীরা আপনার টরেন্ট বীড ডাটা ফাইলের অংশগুলি ডাউনলোড করতে সক্ষম হবে। (প্রস্তাবিত)"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "Don't seed finished downloads."
+msgstr "শেষ ডাউনলোড শেষ না"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "BitTorrent users on the internet may only download file chunks of that torrent from you while you're downloading its data files. Some trackers will penalize this Leeching behavior."
+msgstr "ইন্টারনেটে বিট-টরেন্ট ব্যবহারকারীরা আপনি ডাউনলোড করার সময় শুধুমাত্র আপনার থেকে যে ঝরনা ফাইল অংশ ডাউনলোড ডাউনলোড ডাটা ফাইল.কিছু ট্র্যাকাররা এই খারাপ আচরণ দমন করবে."

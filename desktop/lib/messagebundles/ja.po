@@ -7216,3 +7216,19 @@ msgstr "FrostWireがすでにインストールされている場合でも、下
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
 msgid "Download FrostWire"
 msgstr "FrostWireをダウンロード"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "Seed finished downloads."
+msgstr "シードは、トレントのダウンロードを終了しました。"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "BitTorrent users on the internet will be able to download file chunks of the data your torrents seed. (Recommended)"
+msgstr "ネット上のBitTorrentユーザーは、あなたのトレンド・シード・データのチャンク・ファイルをダウンロードできます。(推奨)"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "Don't seed finished downloads."
+msgstr "終了したトレントのダウンロードをシードしないでください。"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "BitTorrent users on the internet may only download file chunks of that torrent from you while you're downloading its data files. Some trackers will penalize this Leeching behavior."
+msgstr "ネット上のBitTorrentユーザーは、あなたがそのデータ・ファイルをダウンロード中、あなたからそのトレントのチャンク・ファイルだけダウンロードしているかもしれません。一部のトラッカーは、このリーチ行為にペナルティを課します。"

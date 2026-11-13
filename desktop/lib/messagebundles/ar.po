@@ -7085,3 +7085,19 @@ msgstr "يرجى تنزيل FrostWire مرة أخرى من العنوان أدن
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
 msgid "Download FrostWire"
 msgstr "تنزيل FrostWire"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "Seed finished downloads."
+msgstr "تم الانتهاء من رفع الملفات ."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "BitTorrent users on the internet will be able to download file chunks of the data your torrents seed. (Recommended)"
+msgstr "BitTorrentسوف يتمكن مستخدمي على الإنترنت من تحميل أجزاء الملفات من مرفوعات تورينت. (موصى به)"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "Don't seed finished downloads."
+msgstr "لا ترفع تحميلات التورينت المنتهية ."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "BitTorrent users on the internet may only download file chunks of that torrent from you while you're downloading its data files. Some trackers will penalize this Leeching behavior."
+msgstr "BitTorrent ربما يستطيع مستخدمي الإنترنت من تحميل أجزاء الملف لهذا التورينت من بينما تقوم بتحميل ملفات بياناته. سوف تقوم بعض المتتبعات ب ر سلوك التحميل هذا."

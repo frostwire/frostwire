@@ -7226,3 +7226,19 @@ msgstr "Ju lutemi shkarkojeni FrostWire përsëri nga adresa më poshtë dhe ins
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
 msgid "Download FrostWire"
 msgstr "Shkarko FrostWire"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "Seed finished downloads."
+msgstr "Mbinc shkarkimet e përfunduara."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "BitTorrent users on the internet will be able to download file chunks of the data your torrents seed. (Recommended)"
+msgstr "Përdoruesit BitTorrent në internet do të jenë në gjendje të shkarkojnë pjesë skedari të të dhënave që torrent-at tuaj mbincin. (Rekomanduar)"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "Don't seed finished downloads."
+msgstr "Mos e mbijë shkarkimin e përfunduar."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "BitTorrent users on the internet may only download file chunks of that torrent from you while you're downloading its data files. Some trackers will penalize this Leeching behavior."
+msgstr "Përdoruesit e BitTorrent në internet mund të shkarkoj vetëm copëzat e skedarëve të atij torrent-i nga ju ndërsa po shkarkoni të dhënat e tij skedarë. Disa kërkuesit do ta ndëshkojnë këtë sjellje Leeching."

@@ -7213,3 +7213,19 @@ msgstr "Vui lòng tải FrostWire về lại từ địa chỉ bên dưới và 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
 msgid "Download FrostWire"
 msgstr "Tải FrostWire về"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "Seed finished downloads."
+msgstr "Gieo rắc tải xong."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "BitTorrent users on the internet will be able to download file chunks of the data your torrents seed. (Recommended)"
+msgstr "Người dùng BitTorrent trên Internet sẽ có thể Để tải xuống các tập tin dữ liệu của bạn torrents hạt. (Đề nghị)"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "Don't seed finished downloads."
+msgstr "Không tải xuống đã hoàn tất."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "BitTorrent users on the internet may only download file chunks of that torrent from you while you're downloading its data files. Some trackers will penalize this Leeching behavior."
+msgstr "Người dùng BitTorrent trên Internet có thể chỉ tải xuống tập tin torrent của torrent đó từ bạn trong khi bạn tải về nó hồ sơ dữ liệu. Một số người theo dõi sẽ phạt hành vi xấu này."

@@ -7310,3 +7310,19 @@ msgstr "Paki-download muli ang FrostWire mula sa address sa ibaba at i-install i
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
 msgid "Download FrostWire"
 msgstr "I-download ang FrostWire"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "Seed finished downloads."
+msgstr "I-seed ang mga tapos nang download."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "BitTorrent users on the internet will be able to download file chunks of the data your torrents seed. (Recommended)"
+msgstr "Makakapag-download ang mga BitTorrent user sa internet ng mga piraso ng data mula sa mga torrent na sine-seed mo. (Inirerekomenda)"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "Don't seed finished downloads."
+msgstr "Huwag i-seed ang mga tapos nang download."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "BitTorrent users on the internet may only download file chunks of that torrent from you while you're downloading its data files. Some trackers will penalize this Leeching behavior."
+msgstr "Makakapag-download lamang ang mga BitTorrent user ng mga piraso ng torrent mula sa iyo habang dina-download mo ang mga data file nito. Paparusahan ng ilang tracker ang Leeching na ito."

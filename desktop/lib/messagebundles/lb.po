@@ -6688,3 +6688,19 @@ msgstr "Luet FrostWire w.e.g. nach eng Kéier vun der Adress hei ënnendrënner 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
 msgid "Download FrostWire"
 msgstr "FrostWire eroflueden"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "Seed finished downloads."
+msgstr "Seeden fäerdeg Eroflueden."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "BitTorrent users on the internet will be able to download file chunks of the data your torrents seed. (Recommended)"
+msgstr "BitTorrent-Benotzer um Internet kënnen Dateistécker vun den Donnéeën eroflueden déi deng Torrents seeden. (Empfielt)"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "Don't seed finished downloads."
+msgstr "Fäerdeg Eroflueden net seeden."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
+msgid "BitTorrent users on the internet may only download file chunks of that torrent from you while you're downloading its data files. Some trackers will penalize this Leeching behavior."
+msgstr "BitTorrent-Benotzer um Internet kënnen just Dateistécker vun deem Torrent vun der eroflueden wärend s du séng Donnéeën-Dateien erofleeds. E puer Tracker bestrofen dëst Leech-Verhalen."
