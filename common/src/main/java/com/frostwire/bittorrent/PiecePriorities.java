@@ -16,45 +16,48 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.gui.components.transfers;
+package com.frostwire.bittorrent;
 
-import com.frostwire.gui.theme.SkinMenuItem;
-import com.frostwire.gui.theme.SkinPopupMenu;
-import com.frostwire.gui.theme.SkinRadioButtonMenuItem;
 import com.frostwire.jlibtorrent.Priority;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.util.Logger;
-import com.limegroup.gnutella.gui.I18n;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 
 /**
- * Reads and changes the download priority of a single piece from the Pieces tab
- * (frostwire/frostwire#1485). Every libtorrent call runs on the {@code background} executor, the
- * results come back through the {@code edt} one: the handle is JNI and the click arrives on the
- * EDT.
+ * Reads and changes the download priority of a single piece from a transfer's Pieces view, on
+ * desktop and Android (frostwire/frostwire#1485). Every libtorrent call runs on the {@code
+ * background} executor, the results come back through the {@code ui} one: the handle is JNI and the
+ * click or tap arrives on the UI thread.
  */
-final class PiecePriorities {
+public final class PiecePriorities {
   private static final Logger LOG = Logger.getLogger(PiecePriorities.class);
 
   /**
    * The priorities offered for a piece. libtorrent downloads 0 never, 1 (jlibtorrent's NORMAL) as
    * its lowest, 4 by default and 7 first.
    */
-  static final Priority[] CHOICES = {
+  private static final Priority[] CHOICES = {
     Priority.IGNORE, Priority.NORMAL, Priority.FOUR, Priority.SEVEN
   };
 
   /** How a piece that isn't downloaded yet is marked on the hive. */
-  static final int MARK_NONE = 0;
+  public static final int MARK_NONE = 0;
 
-  static final int MARK_SKIP = 1;
-  static final int MARK_HIGH = 2;
+  public static final int MARK_SKIP = 1;
+  public static final int MARK_HIGH = 2;
 
-  /** The piece operations the Pieces tab needs, so tests can stand in for the JNI handle. */
-  interface PieceHandle {
+  /** What a priority is called in the UI; each app translates these its own way. */
+  public enum Label {
+    UNKNOWN,
+    DONT_DOWNLOAD,
+    LOW,
+    NORMAL,
+    HIGH
+  }
+
+  /** The piece operations the Pieces view needs, so tests can stand in for the JNI handle. */
+  public interface PieceHandle {
     boolean isValid();
 
     boolean havePiece(int piece);
@@ -64,18 +67,23 @@ final class PiecePriorities {
     void piecePriority(int piece, Priority priority);
   }
 
-  /** What the popup menu shows for a piece. */
-  record PieceState(int piece, boolean downloaded, Priority priority) {}
+  /** What the priority choices show for a piece. */
+  public record PieceState(int piece, boolean downloaded, Priority priority) {}
 
   private final Executor background;
-  private final Executor edt;
+  private final Executor ui;
 
-  PiecePriorities(Executor background, Executor edt) {
+  public PiecePriorities(Executor background, Executor ui) {
     this.background = background;
-    this.edt = edt;
+    this.ui = ui;
   }
 
-  static PieceHandle of(TorrentHandle handle) {
+  /** The priorities offered for a piece, lowest first, a new array on each call. */
+  public static Priority[] choices() {
+    return CHOICES.clone();
+  }
+
+  public static PieceHandle of(TorrentHandle handle) {
     return new PieceHandle() {
       @Override
       public boolean isValid() {
@@ -100,10 +108,10 @@ final class PiecePriorities {
   }
 
   /**
-   * Reads whether {@code piece} is downloaded and its priority off the EDT, then hands the result
-   * to {@code onEdt} on the EDT. Nothing is handed over if the handle is gone.
+   * Reads whether {@code piece} is downloaded and its priority on the background executor, then
+   * hands the result to {@code onUi} on the UI one. Nothing is handed over if the handle is gone.
    */
-  void lookup(PieceHandle handle, int piece, Consumer<PieceState> onEdt) {
+  public void lookup(PieceHandle handle, int piece, Consumer<PieceState> onUi) {
     background.execute(
         () -> {
           PieceState state;
@@ -116,15 +124,16 @@ final class PiecePriorities {
             LOG.warn("Could not read the state of piece " + piece, t);
             return;
           }
-          edt.execute(() -> onEdt.accept(state));
+          ui.execute(() -> onUi.accept(state));
         });
   }
 
   /**
-   * Sets the priority of {@code piece} off the EDT, unless it got downloaded meanwhile, then runs
-   * {@code afterChange} on that same background thread, e.g. to refresh the tab.
+   * Sets the priority of {@code piece} on the background executor, unless it got downloaded
+   * meanwhile, then runs {@code afterChange} on that same background thread, e.g. to refresh the
+   * view.
    */
-  void apply(PieceHandle handle, int piece, Priority priority, Runnable afterChange) {
+  public void apply(PieceHandle handle, int piece, Priority priority, Runnable afterChange) {
     background.execute(
         () -> {
           try {
@@ -142,56 +151,49 @@ final class PiecePriorities {
         });
   }
 
-  /**
-   * The popup menu for a piece: one item per {@link #CHOICES}, the current one selected. A
-   * downloaded piece's priority no longer matters, so its items are disabled.
-   */
-  static JPopupMenu createMenu(PieceState state, Consumer<Priority> onChoice) {
-    JPopupMenu menu = new SkinPopupMenu();
-    JMenuItem title =
-        new SkinMenuItem(
-            I18n.tr(
-                "Piece #{0}: {1}",
-                String.format("%,d", state.piece()),
-                state.downloaded() ? I18n.tr("downloaded") : describe(state.priority())));
-    title.setEnabled(false);
-    menu.add(title);
-    menu.addSeparator();
-    for (Priority choice : CHOICES) {
-      JMenuItem item = new SkinRadioButtonMenuItem(label(choice), choice == state.priority());
-      item.setEnabled(!state.downloaded());
-      item.addActionListener(e -> onChoice.accept(choice));
-      menu.add(item);
-    }
-    return menu;
-  }
-
-  /** Menu label of a priority, priorities between the offered ones go to the nearest level. */
-  static String label(Priority priority) {
+  /** What a priority is called, priorities between the offered ones go to the nearest level. */
+  public static Label label(Priority priority) {
     if (priority == null) {
-      return I18n.tr("Unknown");
+      return Label.UNKNOWN;
     }
     int level = priority.swig();
     if (level <= 0) {
-      return I18n.tr("Don't Download");
+      return Label.DONT_DOWNLOAD;
     }
     if (level < 4) {
-      return I18n.tr("Low");
+      return Label.LOW;
     }
     if (level == 4) {
-      return I18n.tr("Normal");
+      return Label.NORMAL;
     }
-    return I18n.tr("High");
+    return Label.HIGH;
   }
 
-  /** Like {@link #label} with the libtorrent level for the in-between ones, e.g. "High (5)". */
-  static String describe(Priority priority) {
+  /**
+   * Whether {@code priority} is one of the offered ones. The others are shown with their libtorrent
+   * level, e.g. "High (5)".
+   */
+  public static boolean isChoice(Priority priority) {
     for (Priority choice : CHOICES) {
       if (choice == priority) {
-        return label(priority);
+        return true;
       }
     }
-    return priority == null ? label(null) : label(priority) + " (" + priority.swig() + ")";
+    return false;
+  }
+
+  /**
+   * Index in {@link #choices()} of the offered priority that {@code priority} is shown as, e.g.
+   * level 5 is shown as High; -1 for an unknown priority.
+   */
+  public static int choiceIndex(Priority priority) {
+    Label label = label(priority);
+    for (int i = 0; i < CHOICES.length; i++) {
+      if (label(CHOICES[i]) == label) {
+        return i;
+      }
+    }
+    return -1;
   }
 
   /**
@@ -200,7 +202,7 @@ final class PiecePriorities {
    * libtorrent's default is 4, so every level from 1 to 4 is a normal download and keeps the empty
    * cube's color.
    */
-  static int mark(int level) {
+  public static int mark(int level) {
     if (level <= 0) {
       return MARK_SKIP;
     }

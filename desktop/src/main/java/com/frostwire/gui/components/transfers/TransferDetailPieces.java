@@ -18,6 +18,7 @@
 
 package com.frostwire.gui.components.transfers;
 
+import com.frostwire.bittorrent.PiecePriorities;
 import com.frostwire.gui.bittorrent.BittorrentDownload;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.jlibtorrent.FileSlice;
@@ -148,7 +149,7 @@ public final class TransferDetailPieces extends JPanel
           if (bittorrentDownload != download || !hexHivePanel.isShowing()) {
             return;
           }
-          PiecePriorities.createMenu(
+          PiecePriorityMenu.createMenu(
                   state,
                   priority ->
                       piecePriorities.apply(
@@ -305,7 +306,7 @@ public final class TransferDetailPieces extends JPanel
       if (availability != null && piece < availability.length) {
         rows.put(I18n.tr("Peers with it"), String.valueOf(availability[piece]));
       }
-      rows.put(I18n.tr("Priority"), PiecePriorities.describe(handle.piecePriority(piece)));
+      rows.put(I18n.tr("Priority"), PiecePriorityMenu.describe(handle.piecePriority(piece)));
       Sha1Hash hash = info.hashForPiece(piece);
       if (hash != null && !hash.isAllZeros()) {
         // v2-only torrents carry no per-piece SHA-1

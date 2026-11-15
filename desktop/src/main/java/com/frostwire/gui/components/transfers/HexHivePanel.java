@@ -18,6 +18,7 @@
 
 package com.frostwire.gui.components.transfers;
 
+import com.frostwire.bittorrent.PiecePriorities;
 import com.frostwire.util.Logger;
 import java.awt.BasicStroke;
 import java.awt.Color;

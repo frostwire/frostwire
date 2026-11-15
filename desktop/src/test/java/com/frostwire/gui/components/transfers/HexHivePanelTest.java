@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.frostwire.bittorrent.PiecePriorities;
 import com.limegroup.gnutella.gui.CountingRepaintManager;
 import java.awt.Color;
 import java.awt.Graphics2D;
