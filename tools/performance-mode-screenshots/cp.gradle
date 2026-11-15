@@ -1,0 +1,5 @@
+allprojects {
+  tasks.register('printRuntimeCp') {
+    doLast { println "CP=" + project.sourceSets.main.runtimeClasspath.asPath }
+  }
+}
