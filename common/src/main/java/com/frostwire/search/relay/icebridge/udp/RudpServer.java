@@ -11,6 +11,7 @@ import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.util.Logger;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
@@ -18,7 +19,11 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.nio.NioDatagramChannel;
+import io.netty.util.NetUtil;
 import io.netty.util.concurrent.DefaultThreadFactory;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.StandardProtocolFamily;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadFactory;
@@ -85,9 +90,66 @@ public final class RudpServer implements AutoCloseable {
                     ch.pipeline().addLast(new RudpPacketCodec()).addLast(new PacketHandler());
                   }
                 });
-    channel = bootstrap.bind(config.host(), port).sync().channel();
+    channel = bind(bootstrap, config.host(), port);
     manager.setChannel(channel);
     LOG.info("IceBridge rUDP server listening on " + config.host() + ":" + actualPort());
+  }
+
+  /**
+   * Bind the rUDP socket so that no IPv4-only socket of another program shares its port.
+   *
+   * <p>Netty opens a dual-stack IPv6 socket, and an IPv4 host such as {@code 0.0.0.0} binds it to
+   * the IPv6 wildcard. On macOS neither an ephemeral nor an explicit dual-stack bind is checked
+   * against IPv4-only sockets: it succeeds on a port another program already holds as {@code
+   * 0.0.0.0:port}, and the kernel then hands every IPv4 datagram for that port to the other socket.
+   * The node is up but deaf to IPv4 peers: their requests are "sent" and never arrive, so a mesh
+   * metadata fetch waits out its whole timeout.
+   *
+   * <p>So the port is first claimed with an IPv4 socket, whose bind the kernel does check against
+   * IPv4 owners: a configured port another program holds fails here like any port in use, and an
+   * ephemeral port is one no IPv4 socket holds. The dual-stack socket binds that port while the
+   * claim still holds it. Where the kernel refuses that overlap (Linux, Windows, an IPv4-only
+   * stack) it binds once the claim is released, and that kernel checks IPv4 owners itself.
+   */
+  static Channel bind(Bootstrap bootstrap, String host, int port) throws InterruptedException {
+    if (!NetUtil.isValidIpV4Address(host)) {
+      return bootstrap.bind(host, port).sync().channel();
+    }
+    java.nio.channels.DatagramChannel claim = claimIpv4Port(host, port);
+    try {
+      int claimed = ((InetSocketAddress) claim.socket().getLocalSocketAddress()).getPort();
+      ChannelFuture overlapping = bootstrap.bind(host, claimed).await();
+      if (overlapping.isSuccess()) {
+        return overlapping.channel();
+      }
+      closeQuietly(claim);
+      return bootstrap.bind(host, claimed).sync().channel();
+    } finally {
+      closeQuietly(claim);
+    }
+  }
+
+  private static java.nio.channels.DatagramChannel claimIpv4Port(String host, int port) {
+    java.nio.channels.DatagramChannel claim = null;
+    try {
+      claim = java.nio.channels.DatagramChannel.open(StandardProtocolFamily.INET);
+      claim.bind(new InetSocketAddress(host, port));
+      return claim;
+    } catch (IOException e) {
+      closeQuietly(claim);
+      throw new IllegalStateException("rUDP port " + port + " is not available on " + host, e);
+    }
+  }
+
+  private static void closeQuietly(java.nio.channels.DatagramChannel claim) {
+    if (claim == null) {
+      return;
+    }
+    try {
+      claim.close();
+    } catch (IOException ignored) {
+      // The claim only ever reserved the port.
+    }
   }
 
   public int port() {

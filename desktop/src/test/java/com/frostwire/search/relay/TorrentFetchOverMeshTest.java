@@ -83,6 +83,44 @@ class TorrentFetchOverMeshTest {
   }
 
   /**
+   * Another program's IPv4-only socket already holds the holder's rUDP port. On macOS the holder's
+   * dual-stack bind used to succeed anyway, and every IPv4 datagram for that port then went to the
+   * other socket: the requester's requests were accepted locally and never reached the holder, so
+   * the fetch waited out its whole timeout. In the full suite the same happened by chance whenever
+   * an ephemeral port was one some IPv4 socket on the machine held. The holder must either refuse
+   * the port or really receive on it.
+   */
+  @Test
+  void holderNeverSharesItsRudpPortWithAnotherIpv4Socket() throws Exception {
+    try (java.nio.channels.DatagramChannel other =
+        java.nio.channels.DatagramChannel.open(java.net.StandardProtocolFamily.INET)) {
+      other.bind(new java.net.InetSocketAddress("0.0.0.0", 0));
+      int taken = ((java.net.InetSocketAddress) other.getLocalAddress()).getPort();
+      Instance requester = startInstance("shadow-requester");
+      Instance holder;
+      try {
+        holder = startInstance("shadowed-holder", taken);
+      } catch (IllegalStateException refused) {
+        return; // the port is in use, as on any other platform
+      }
+      crossRegister(requester, holder);
+      byte[] torrentBytes = TestTorrentMetadata.bytes(1000);
+      holder.provider.delegate = infoHash1 -> infoHash1 == null ? null : torrentBytes;
+
+      byte[] fetched =
+          MeshTorrentMetadataFetcher.fetch(
+              requester.transport,
+              requester.identity,
+              holder.identity.ed25519PubRaw(),
+              TestTorrentMetadata.infoHash(),
+              10_000);
+
+      assertNotNull(fetched, "a holder bound to a port must receive the requests sent to it");
+      assertArrayEquals(torrentBytes, fetched);
+    }
+  }
+
+  /**
    * frostwire/frostwire#1504: a chunk lost above rUDP (here: the requester's delivery of chunk 1)
    * is asked for again, and the holder resends it, long before the 10 s timeout.
    */
@@ -311,6 +349,10 @@ class TorrentFetchOverMeshTest {
   }
 
   private Instance startInstance(String label) throws Exception {
+    return startInstance(label, 0);
+  }
+
+  private Instance startInstance(String label, int rudpPort) throws Exception {
     Path tmpDir = Files.createTempDirectory("frostwire-torrentfetch-" + label + "-");
     Path identityFile = tmpDir.resolve("identity.dat");
 
@@ -319,7 +361,7 @@ class TorrentFetchOverMeshTest {
 
     IceBridgeConfig config =
         IceBridgeConfig.newBuilder()
-            .rudpPort(0)
+            .rudpPort(rudpPort)
             .controlHttpPort(0)
             .role(IceBridgeConfig.Role.BOTH)
             .maxPeers(100)
