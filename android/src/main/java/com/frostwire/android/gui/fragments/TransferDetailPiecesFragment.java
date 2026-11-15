@@ -1,6 +1,5 @@
 /*
- *     Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- *  *            Marcelina Knitter (@marcelinkaaa)
+ *     Created by Angel Leon (@gubatron)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
  *
  *     This program is free software: you can redistribute it and/or modify
@@ -26,7 +25,9 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 import com.frostwire.android.gui.views.HexHiveView;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.bittorrent.PiecePriorities;
 import com.frostwire.jlibtorrent.PieceIndexBitfield;
+import com.frostwire.jlibtorrent.Priority;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.TorrentStatus;
@@ -42,7 +43,7 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
   private TextView piecesNumberTextView;
   private TextView pieceSizeTextView;
   private HexHiveView<PieceIndexBitfield> hexHiveView;
-  private HexHiveView.HexDataAdapter<PieceIndexBitfield> hexDataAdapter;
+  private PieceAdapter hexDataAdapter;
   //    private ProgressBar progressBar;
   private int totalPieces;
   private String pieceSizeString;
@@ -106,9 +107,16 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
 
     final TorrentStatus status;
     final TorrentInfo torrentInfo;
+    final byte[] priorityMarks;
     try {
       status = currentTorrentHandle.status(TorrentHandle.QUERY_PIECES);
       torrentInfo = currentTorrentHandle.torrentFile();
+      PieceIndexBitfield downloaded = status != null ? status.pieces() : null;
+      // a downloaded piece is drawn full whatever its priority
+      priorityMarks =
+          downloaded == null || downloaded.isAllSet()
+              ? null
+              : readPriorityMarks(currentTorrentHandle);
     } catch (Throwable t) {
       LOG.warn("Skipping pieces update because torrent status is unavailable", t);
       return;
@@ -125,13 +133,29 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
     SystemUtils.postToUIThread(
         () ->
             applyPiecesData(
-                expectedInfoHash, pieces, piecesCount, totalPiecesValue, pieceSizeValue));
+                expectedInfoHash,
+                pieces,
+                priorityMarks,
+                piecesCount,
+                totalPiecesValue,
+                pieceSizeValue));
+  }
+
+  /** The hive mark of each piece by its priority, see {@link PiecePriorities#mark}. */
+  private static byte[] readPriorityMarks(TorrentHandle handle) {
+    Priority[] priorities = handle.piecePriorities();
+    byte[] marks = new byte[priorities.length];
+    for (int i = 0; i < priorities.length; i++) {
+      marks[i] = (byte) PiecePriorities.mark(priorities[i].swig());
+    }
+    return marks;
   }
 
   @SuppressWarnings("unchecked")
   private void applyPiecesData(
       String expectedInfoHash,
       PieceIndexBitfield pieces,
+      byte[] priorityMarks,
       long piecesCount,
       int totalPiecesValue,
       String pieceSizeValue) {
@@ -168,6 +192,7 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
     } else if (piecesCount >= 0) {
       hexDataAdapter.updateData(pieces);
     }
+    hexDataAdapter.setPriorityMarks(priorityMarks);
 
     if (hexHiveView != null && hexDataAdapter != null) {
       hexHiveView.updateData(hexDataAdapter);
@@ -177,11 +202,13 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
     }
   }
 
-  private static final class PieceAdapter
-      implements HexHiveView.HexDataAdapter<PieceIndexBitfield> {
+  static final class PieceAdapter implements HexHiveView.HexDataAdapter<PieceIndexBitfield> {
     private PieceIndexBitfield pieceIndexBitfield;
     private final int totalPieces;
     private int downloadedPieces;
+
+    /** Read by the render thread, null when every piece is downloaded. */
+    private volatile byte[] priorityMarks;
 
     public PieceAdapter(int totalPieces, PieceIndexBitfield pieces) {
       this.totalPieces = totalPieces;
@@ -207,6 +234,18 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
     @Override
     public boolean isFull(int hexOffset) {
       return totalPieces == downloadedPieces || pieceIndexBitfield.getBit(hexOffset);
+    }
+
+    void setPriorityMarks(byte[] marks) {
+      priorityMarks = marks;
+    }
+
+    @Override
+    public int priorityMark(int hexOffset) {
+      byte[] marks = priorityMarks;
+      return marks != null && hexOffset >= 0 && hexOffset < marks.length
+          ? marks[hexOffset]
+          : PiecePriorities.MARK_NONE;
     }
   }
 }

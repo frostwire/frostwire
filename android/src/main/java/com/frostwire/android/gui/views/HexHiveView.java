@@ -33,6 +33,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.frostwire.android.R;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.bittorrent.PiecePriorities;
 import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import com.frostwire.util.Logger;
 import com.frostwire.util.TaskThrottle;
@@ -56,10 +57,18 @@ public class HexHiveView<T> extends View {
     return hexHiveRenderExecutor;
   }
 
+  static final int SKIPPED_COLOR = 0xffe53935;
+  static final int HIGH_PRIORITY_COLOR = 0xffffb74d;
+
   private Paint bitmapPaint;
   private Paint hexagonBorderPaint;
   private CubePaint emptyHexPaint;
   private CubePaint fullHexPaint;
+
+  /** Pieces not downloaded yet set to Don't Download (red) or High (orange), like on desktop. */
+  private CubePaint skippedHexPaint;
+
+  private CubePaint highPriorityHexPaint;
   private DrawingProperties DP;
   private volatile Bitmap compressedBitmap;
 
@@ -140,6 +149,9 @@ public class HexHiveView<T> extends View {
     hexagonBorderPaint.setStrokeWidth(0);
     emptyHexPaint = new CubePaint(emptyColor, 10);
     fullHexPaint = new CubePaint(fullColor, 20);
+    // Normal and Low keep the empty cube's color
+    skippedHexPaint = new CubePaint(SKIPPED_COLOR, 20);
+    highPriorityHexPaint = new CubePaint(HIGH_PRIORITY_COLOR, 20);
   }
 
   @Override
@@ -195,6 +207,14 @@ public class HexHiveView<T> extends View {
     int getFullHexagonsCount();
 
     boolean isFull(int hexOffset);
+
+    /**
+     * How a piece that isn't full is marked, one of the {@code PiecePriorities.MARK_*} values; read
+     * on the render thread.
+     */
+    default int priorityMark(int hexOffset) {
+      return PiecePriorities.MARK_NONE;
+    }
   }
 
   /**
@@ -360,16 +380,27 @@ public class HexHiveView<T> extends View {
       for (int pieceIndex = 0; pieceIndex < DP.numHexs; pieceIndex++) {
         DP.centerOf(pieceIndex, shapes.center);
         drawHexagon(
-            DP,
-            shapes,
-            canvas,
-            hexagonBorderPaint,
-            (adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint),
-            drawCubes);
+            DP, shapes, canvas, hexagonBorderPaint, paintFor(adapter, pieceIndex), drawCubes);
       }
       compressedBitmap = bitmap;
     } catch (Exception e) {
       LOG.error("asyncDraw failed with exception: " + e.getMessage(), e);
+    }
+  }
+
+  /** A downloaded piece is full whatever its priority, the others are tinted by it. */
+  @SuppressWarnings("rawtypes")
+  private CubePaint paintFor(HexDataAdapter adapter, int piece) {
+    if (adapter.isFull(piece)) {
+      return fullHexPaint;
+    }
+    switch (adapter.priorityMark(piece)) {
+      case PiecePriorities.MARK_SKIP:
+        return skippedHexPaint;
+      case PiecePriorities.MARK_HIGH:
+        return highPriorityHexPaint;
+      default:
+        return emptyHexPaint;
     }
   }
 

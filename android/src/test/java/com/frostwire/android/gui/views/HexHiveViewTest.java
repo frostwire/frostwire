@@ -19,6 +19,7 @@
 package com.frostwire.android.gui.views;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.robolectric.Shadows.shadowOf;
 
@@ -29,6 +30,7 @@ import android.graphics.Point;
 import android.os.Looper;
 import android.view.View;
 import androidx.test.core.app.ApplicationProvider;
+import com.frostwire.bittorrent.PiecePriorities;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -60,6 +62,35 @@ public class HexHiveViewTest {
           FULL,
           bitmap.getPixel(center.x, center.y) | 0xff000000);
     }
+  }
+
+  @Test
+  public void piecesThatWontDownloadAreRedAndHighPriorityOnesOrange() throws Exception {
+    int[] marks = {
+      PiecePriorities.MARK_NONE, PiecePriorities.MARK_SKIP, PiecePriorities.MARK_HIGH,
+    };
+    // past 600 pieces the cubes are flat, the whole cube has its base color
+    int pieces = 900;
+    HexHiveView<Void> view = newView();
+    Adapter adapter = new Adapter(pieces, piece -> piece >= 3 && piece < 6);
+    adapter.marks = piece -> marks[piece % 3];
+    Bitmap bitmap = render(view, adapter);
+
+    int empty = pixelAt(view, bitmap, 0);
+    assertNotEquals(HexHiveView.SKIPPED_COLOR, empty);
+    assertNotEquals(HexHiveView.HIGH_PRIORITY_COLOR, empty);
+    assertEquals(HexHiveView.SKIPPED_COLOR, pixelAt(view, bitmap, 1));
+    assertEquals(HexHiveView.HIGH_PRIORITY_COLOR, pixelAt(view, bitmap, 2));
+    // a downloaded piece shows as downloaded whatever its priority
+    for (int piece = 3; piece < 6; piece++) {
+      assertEquals("piece " + piece, FULL, pixelAt(view, bitmap, piece));
+    }
+  }
+
+  private static int pixelAt(HexHiveView<Void> view, Bitmap bitmap, int piece) {
+    Point center = new Point();
+    assertTrue(view.pieceCenter(piece, center));
+    return bitmap.getPixel(center.x, center.y) | 0xff000000;
   }
 
   static HexHiveView<Void> newView() {
@@ -96,9 +127,14 @@ public class HexHiveViewTest {
     boolean test(int piece);
   }
 
+  interface PieceMark {
+    int mark(int piece);
+  }
+
   static final class Adapter implements HexHiveView.HexDataAdapter<Void> {
     private final int pieces;
     private final PieceTest full;
+    PieceMark marks = piece -> PiecePriorities.MARK_NONE;
 
     Adapter(int pieces, PieceTest full) {
       this.pieces = pieces;
@@ -125,6 +161,11 @@ public class HexHiveViewTest {
     @Override
     public boolean isFull(int hexOffset) {
       return full.test(hexOffset);
+    }
+
+    @Override
+    public int priorityMark(int hexOffset) {
+      return marks.mark(hexOffset);
     }
   }
 }
