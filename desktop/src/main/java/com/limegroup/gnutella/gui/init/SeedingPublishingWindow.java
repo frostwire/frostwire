@@ -102,10 +102,17 @@ final class SeedingPublishingWindow extends SetupWindow {
             mainPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+    // No frame around the page: the skin draws one around a scroll pane unless it has a border.
+    scroll.setBorder(BorderFactory.createEmptyBorder());
+    scroll.setViewportBorder(null);
     scroll.setOpaque(false);
     scroll.getViewport().setOpaque(false);
     scroll.getVerticalScrollBar().setUnitIncrement(16);
-    setSetupComponent(scroll);
+    // The page's padding goes on a plain panel around the scroll pane.
+    JPanel page = new JPanel(new BorderLayout());
+    page.setOpaque(false);
+    page.add(scroll, BorderLayout.CENTER);
+    setSetupComponent(page);
   }
 
   private static JComponent note(String text) {
