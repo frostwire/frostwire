@@ -1,3 +1,6 @@
+FrostWire Android UNRELEASED
+  - new:Pieces tab: tap a piece to see its details (state, size, byte range, peers, SHA-1, files) and change its download priority; Don't Download pieces are drawn red and High ones orange, like on desktop; torrents with more than 1,200 pieces now show all of them (#1566)
+
 FrostWire 3.2.4 build 780 NOV/09/2026
   - new:BitTorrent engine updated to libtorrent 2.1 (jlibtorrent 2.1.2.1): many fixes for stalls and rechecks, and smaller saved resume data; disk access stays on the POSIX back-end it used before; WebTorrent support is built in and uses the STUN server of Google by default until the FrostWire setting is decided
   - fix:Torrent details and peer catalogs fetched from other FrostWire users over IceBridge no longer fail after a long wait when one piece of the answer is lost on the way; the missing piece is requested again (#1504)
