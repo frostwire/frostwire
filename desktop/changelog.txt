@@ -1,4 +1,5 @@
 FrostWire 7.1.5 UNRELEASED
+   - fix: Shift+Left/Right in an empty search box no longer throws StateInvariantError — the prompt field asks the text views for caret moves before its first paint
    - new:BitTorrent engine updated to libtorrent 2.1 (jlibtorrent 2.1.2.1): many fixes for stalls and rechecks, and smaller saved resume data; each system keeps the disk access it used before (memory-mapped files on Windows, the POSIX back-end on macOS and Linux)
    - new:WebTorrent support is built into the BitTorrent engine (torrents with wss:// trackers can find browser peers); it uses Google's STUN server by default until FrostWire's own setting is decided
    - fix:HTTP seeds (the old BEP 17 "httpseeds" in .torrent files) are no longer supported by the engine; URL seeds (BEP 19, "url-list") keep working
