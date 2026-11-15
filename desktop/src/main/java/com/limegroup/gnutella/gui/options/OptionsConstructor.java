@@ -68,6 +68,7 @@ public final class OptionsConstructor {
   private static final String RESULTS_KEY = "OPTIONS_RESULTS_MAIN_TITLE";
   private static final String ADVANCED_KEY = "OPTIONS_ADVANCED_MAIN_TITLE";
   private static final String PREFERENCING_KEY = "OPTIONS_PREFERENCING_MAIN_TITLE";
+  private static final String CRASH_REPORTS_KEY = "OPTIONS_CRASH_REPORTS_MAIN_TITLE";
   private static final String FIREWALL_KEY = "OPTIONS_FIREWALL_MAIN_TITLE";
   private static final String GUI_KEY = "OPTIONS_GUI_MAIN_TITLE";
   private static final String STARTUP_KEY = "OPTIONS_STARTUP_MAIN_TITLE";
@@ -259,6 +260,11 @@ public final class OptionsConstructor {
         PREFERENCING_KEY,
         I18n.tr("Updates"),
         AutomaticInstallerDownloadPaneItem.class);
+    addOption(
+        ADVANCED_KEY,
+        CRASH_REPORTS_KEY,
+        IcebaseReportsText.optionsNodeTitle(),
+        IcebaseReportsPaneItem.class);
     addOption(ADVANCED_KEY, FIREWALL_KEY, I18n.tr("Firewall"), RouterConfigurationPaneItem.class);
     addOption(
         ADVANCED_KEY, PROXY_KEY, I18n.tr("Proxy"), ProxyPaneItem.class, ProxyLoginPaneItem.class);
