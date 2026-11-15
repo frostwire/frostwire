@@ -1,4 +1,5 @@
 FrostWire 7.1.5 UNRELEASED
+   - fix:FrostWire no longer stalls while building the splash screen or the Library's first table on slow disks — their Swing classes are initialized off the EDT
    - fix:tables, labels and bold captions no longer freeze the window the first time they show text in another script or in bold — the post-window font sweep now creates each fallback font's strike and scaler (reading the font file) in the background
    - fix:hovering the empty area right of a table's last column no longer throws an error from the tooltip — LimeJTable shows no tooltip when the mouse is over no cell
    - fix:Copy Magnet no longer freezes the window while libtorrent builds the magnet link — the magnet is built in the background and copied to the clipboard on the UI thread
