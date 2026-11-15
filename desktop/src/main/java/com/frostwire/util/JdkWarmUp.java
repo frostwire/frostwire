@@ -204,6 +204,17 @@ public final class JdkWarmUp {
           "java.awt.GridBagConstraints");
 
   /**
+   * Classes initialized like {@link #CLASSES_TO_INITIALIZE}, but only once the splash is showing,
+   * so that on 1- and 2-CPU machines they don't compete with the EDT building it
+   * (frostwire/frostwire#1534). BasicTableUI's static initializer builds the TransferHandler every
+   * table shares; it ran on the EDT in LimeJTable's constructor as the Library's file table was
+   * built, on a 4-CPU machine with the warm-up finished (Icebase #750e1c9c3dc7,
+   * frostwire/frostwire#1563).
+   */
+  static final List<String> MAIN_WINDOW_CLASSES_TO_INITIALIZE =
+      List.of("javax.swing.plaf.basic.BasicTableUI");
+
+  /**
    * Windows-only JDK classes initialized like {@link #CLASSES_TO_INITIALIZE}. The first right-click
    * on the tray icon created the AWT popup menu's peer, and WPopupMenuPeer's superclass
    * WMenuItemPeer looked up AWT's localization bundle in its static initializer on the EDT (Icebase
@@ -265,9 +276,16 @@ public final class JdkWarmUp {
 
   /** Initializes the splash's classes in order; call off the EDT before the splash. */
   public static void initializeSplashClasses() {
-    for (String className : splashClassesToInitialize(OSUtils.isWindows())) {
+    initializeClasses(splashClassesToInitialize(OSUtils.isWindows()));
+  }
+
+  /**
+   * Initializes each class, in order, and loads (without initializing) its nested classes, which
+   * its first instance creates, e.g. BasicRootPaneUI's RootPaneInputMap and BasicTextUI's RootView.
+   */
+  static void initializeClasses(List<String> classNames) {
+    for (String className : classNames) {
       try {
-        // Nested classes too, e.g. BasicRootPaneUI's RootPaneInputMap.
         Class.forName(className).getDeclaredClasses();
       } catch (Throwable t) {
         LOG.warn("Warm-up of " + className + " failed: " + t.getMessage(), t);
@@ -601,15 +619,7 @@ public final class JdkWarmUp {
     } catch (Throwable t) {
       LOG.warn("Painter warm-up failed: " + t.getMessage(), t);
     }
-    for (String className : classesToInitialize(OSUtils.isWindows())) {
-      try {
-        // Nested classes are loaded too (not initialized): the first instance creates some of
-        // them, e.g. BasicTextUI's RootView and UpdateHandler.
-        Class.forName(className).getDeclaredClasses();
-      } catch (Throwable t) {
-        LOG.warn("Warm-up of " + className + " failed: " + t.getMessage(), t);
-      }
-    }
+    initializeClasses(classesToInitialize(OSUtils.isWindows()));
     try {
       // The first right-click menu built a SkinMenu, whose reflective field accessor the JVM
       // generated on the EDT (GitHub #1439).
@@ -650,6 +660,7 @@ public final class JdkWarmUp {
     } catch (Throwable t) {
       LOG.warn("Popup menu warm-up failed: " + t.getMessage(), t);
     }
+    initializeClasses(MAIN_WINDOW_CLASSES_TO_INITIALIZE);
     try {
       Map<?, ?> desktopHints = desktopFontHints();
       for (Font font : mainWindowPlatformFonts()) {

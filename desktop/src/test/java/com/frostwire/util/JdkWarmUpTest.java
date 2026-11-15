@@ -524,10 +524,16 @@ class JdkWarmUpTest {
                     .resolve("src/main/java/com/frostwire/util/JdkWarmUp.java"))
             .replaceAll("\\s+", "");
     String splash = source.substring(source.indexOf("publicstaticvoidinitializeSplashClasses(){"));
-    splash = splash.substring(0, splash.indexOf("LOG.warn"));
+    splash = splash.substring(0, splash.indexOf("}"));
     assertTrue(
-        splash.contains("Class.forName(className).getDeclaredClasses();"),
-        "the splash pre-step doesn't load nested classes");
+        splash.contains("initializeClasses(splashClassesToInitialize(OSUtils.isWindows()));"),
+        "the splash pre-step doesn't initialize the splash classes");
+    String initialize =
+        source.substring(source.indexOf("staticvoidinitializeClasses(List<String>classNames){"));
+    initialize = initialize.substring(0, initialize.indexOf("LOG.warn"));
+    assertTrue(
+        initialize.contains("Class.forName(className).getDeclaredClasses();"),
+        "initializeClasses doesn't load nested classes");
   }
 
   /**
@@ -579,6 +585,31 @@ class JdkWarmUpTest {
             List.of(
                 "javax.swing.plaf.basic.BasicTreeUI", "javax.swing.tree.DefaultTreeCellRenderer")));
     assertNestedClassIsWarmedUp("javax.swing.plaf.synth.SynthTreeUI", "SynthTreeCellRenderer");
+  }
+
+  /**
+   * BasicTableUI's static initializer builds the TransferHandler every table shares, and ran on the
+   * EDT in LimeJTable's constructor as the Library's file table was built (Icebase #750e1c9c3dc7,
+   * frostwire/frostwire#1563). It is initialized once the splash is showing, not while the EDT
+   * builds it (frostwire/frostwire#1534).
+   */
+  @Test
+  void theTableUiIsInitializedByTheWarmUpAfterTheSplashIsShowing() throws Exception {
+    String tableUi = "javax.swing.plaf.basic.BasicTableUI";
+    assertTrue(
+        JdkWarmUp.MAIN_WINDOW_CLASSES_TO_INITIALIZE.contains(tableUi),
+        tableUi + " is not warmed up");
+    assertFalse(JdkWarmUp.CLASSES_TO_INITIALIZE.contains(tableUi), "warmed up before the splash");
+    assertTrue(
+        Arrays.stream(Class.forName(tableUi).getDeclaredClasses())
+            .anyMatch(c -> c.getSimpleName().equals("TableTransferHandler")),
+        "TableTransferHandler is not a nested class of " + tableUi + " on this JDK");
+
+    String source = warmUpSource();
+    int splashWait = source.indexOf("awaitSplashShown(SPLASH_SHOWN");
+    int mainWindowClasses = source.indexOf("initializeClasses(MAIN_WINDOW_CLASSES_TO_INITIALIZE);");
+    assertTrue(splashWait >= 0 && mainWindowClasses >= 0, "warmUp() lost a step");
+    assertTrue(mainWindowClasses > splashWait, "initialized while the EDT may build the splash");
   }
 
   private static void assertNestedClassIsWarmedUp(String outer, String nested) throws Exception {
@@ -755,6 +786,9 @@ class JdkWarmUpTest {
   @Test
   void everyClassToInitializeExistsAndLoads() {
     for (String className : JdkWarmUp.CLASSES_TO_INITIALIZE) {
+      assertDoesNotThrow(() -> Class.forName(className), className);
+    }
+    for (String className : JdkWarmUp.MAIN_WINDOW_CLASSES_TO_INITIALIZE) {
       assertDoesNotThrow(() -> Class.forName(className), className);
     }
   }
