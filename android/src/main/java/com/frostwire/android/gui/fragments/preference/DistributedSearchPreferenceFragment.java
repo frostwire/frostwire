@@ -137,7 +137,14 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
     super.onPause();
   }
 
+  /**
+   * Also the callback of relay stack restarts, which can finish after the screen is gone: then it
+   * does nothing.
+   */
   private void refreshAll() {
+    if (!isAdded()) {
+      return;
+    }
     refreshIdentityInfo();
     refreshPeerList();
     refreshStackStatus();
@@ -775,9 +782,8 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
           String summary =
               IdentityLifecycle.summaryText(
                   identity, karma != null ? karma.text() : notAvailable, shared);
-          if (getActivity() != null) {
-            getActivity().runOnUiThread(() -> copyToClipboard(summary));
-          }
+          // copyToClipboard does nothing once the screen is gone.
+          SystemUtils.postToUIThread(() -> copyToClipboard(summary));
         });
   }
 
@@ -1062,8 +1068,8 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
   private void restartRelayStack(Runnable after) {
     EngineForegroundService svc = EngineForegroundService.getInstance();
     if (svc == null) {
-      if (after != null && getActivity() != null) {
-        getActivity().runOnUiThread(after);
+      if (after != null) {
+        SystemUtils.postToUIThread(after);
       }
       return;
     }
