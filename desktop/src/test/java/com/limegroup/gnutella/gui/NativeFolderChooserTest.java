@@ -22,6 +22,8 @@ import java.lang.reflect.Proxy;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -31,6 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -191,5 +194,29 @@ class NativeFolderChooserTest {
     int jFileChooser = handler.indexOf("getDirectoryChooser(titleKey, approveKey", getInput);
     assertTrue(getInput > 0 && nativeDialog > getInput, "getInput doesn't ask for the native one");
     assertTrue(nativeDialog < jFileChooser, "getInput builds a JFileChooser before the native one");
+  }
+
+  /**
+   * Besides FileChooserHandler, only SendFileProgressDialog shows a JFileChooser: it picks a file
+   * or a folder in one dialog, which Windows' dialogs can't.
+   */
+  @Test
+  void choosersAreShownByFileChooserHandler() throws IOException {
+    Set<String> direct = new TreeSet<>();
+    try (Stream<Path> files = Files.walk(Path.of("src/main/java"))) {
+      for (Path file :
+          (Iterable<Path>) files.filter(p -> p.toString().endsWith(".java"))::iterator) {
+        String source = Files.readString(file, StandardCharsets.UTF_8);
+        if (source.contains("new NoDropFileChooser(") || source.contains("new JFileChooser(")) {
+          direct.add(file.getFileName().toString());
+        }
+      }
+    }
+    assertEquals(
+        Set.of(
+            "FileChooserHandler.java",
+            "IceBridgeConsoleWindow.java",
+            "SendFileProgressDialog.java"),
+        direct);
   }
 }

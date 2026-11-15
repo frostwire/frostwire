@@ -94,7 +94,7 @@ class PartialFilesDialog extends JDialog {
   /** {@code contents} are read by the caller, off the EDT ({@link #contentsOf}). */
   PartialFilesDialog(JFrame frame, Contents contents, String name) {
     super(frame, I18n.tr("Select files to download"));
-    // Its Change Folder button opens a JFileChooser, which waits on the Windows shell on the EDT
+    // Its Change Folder button can open a JFileChooser, which waits on the Windows shell on the EDT
     // (frostwire/frostwire#1411).
     ShellFolderWarmUp.warmUpForDirectoryChooser();
     this.contents = contents;
@@ -224,11 +224,12 @@ class PartialFilesDialog extends JDialog {
   }
 
   private void onChangeFolder() {
-    JFileChooser chooser = new NoDropFileChooser(saveFolder);
-    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-    chooser.setDialogTitle(I18n.tr("Select Download Folder"));
-    if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-      File selected = chooser.getSelectedFile();
+    // On Windows, FileChooserHandler shows the native folder dialog off the EDT: a JFileChooser
+    // waits on the shell on the EDT (frostwire/frostwire#1564).
+    File selected =
+        FileChooserHandler.getInputDirectory(
+            this, I18n.tr("Select Download Folder"), I18n.tr("Select"), saveFolder, null);
+    if (selected != null) {
       saveFolder = selected;
       saveFolderLabel.setText(selected.getAbsolutePath());
       saveFolderLabel.setToolTipText(selected.getAbsolutePath());
