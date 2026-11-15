@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui.tables;
 
+import com.frostwire.gui.PerformanceMode;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.GUIUtils;
@@ -285,6 +286,11 @@ public class LimeJTable extends JTable implements JSortTable {
     }
   }
 
+  /** Whether rows show their preview tooltips: when the table's setting allows, never in Lite. */
+  static boolean showsRowPreviews(boolean displayTooltipsSetting) {
+    return displayTooltipsSetting && !PerformanceMode.isLite();
+  }
+
   /** Sets the internal tooltip text for use with the next createToolTip. */
   public String getToolTipText(MouseEvent e) {
     Point p = e.getPoint();
@@ -309,8 +315,9 @@ public class LimeJTable extends JTable implements JSortTable {
     boolean isClippable = (col > -1 && row > -1) && dlm.isClippable(colModel);
     boolean forceTooltip = (col > -1 && row > -1) && dlm.isTooltipRequired(row, col);
     // If the user doesn't want tooltips, only display
-    // them if the column is too small (and data is clipped)
-    if (!tableSettings.DISPLAY_TOOLTIPS.getValue() && !forceTooltip) {
+    // them if the column is too small (and data is clipped). Lite shows no row previews either,
+    // such as a transfer's eleven-line summary (frostwire/frostwire#1555).
+    if (!showsRowPreviews(tableSettings.DISPLAY_TOOLTIPS.getValue()) && !forceTooltip) {
       if (isClippable) return clippedToolTip(row, col, colModel);
       else return null;
     }
