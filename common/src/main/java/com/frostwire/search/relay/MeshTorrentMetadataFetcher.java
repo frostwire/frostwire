@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
@@ -26,6 +27,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -140,6 +142,9 @@ public final class MeshTorrentMetadataFetcher
 
   private final byte[] nonce;
   private final CountDownLatch done = new CountDownLatch(1);
+
+  /** Completes with {@link #done}, so a request send can be awaited together with the answer. */
+  private final CompletableFuture<Void> finished = new CompletableFuture<>();
 
   /** Nonces of every request this fetch sent; the first is {@link #nonce}. Guarded by this. */
   private final List<byte[]> nonces = new ArrayList<>();
@@ -438,10 +443,14 @@ public final class MeshTorrentMetadataFetcher
   }
 
   /**
-   * Sign a request under {@code requestNonce} and send it on the bounded sender pool, waiting at
-   * most until the deadline. Marks activity so the next re-request waits a full interval.
+   * Sign a request under {@code requestNonce} and send it on the bounded sender pool. Waits for the
+   * local send to be accepted only until the holder has answered, or at most one re-request
+   * interval: a slow send acknowledgement (a starved control port under load) must neither hide an
+   * answer that already arrived nor hold off the re-requests. Marks activity so the next re-request
+   * waits a full interval.
    *
-   * @return false when the request could not be built, the pool is saturated, or the send failed
+   * @return false when the request could not be built, the pool is saturated, or the send failed;
+   *     true when it was accepted or is still in flight
    */
   private boolean sendRequest(byte[] requestNonce, byte[] have) throws Exception {
     TorrentMetadataRequest request = buildSignedRequest(requestNonce, have);
@@ -452,16 +461,34 @@ public final class MeshTorrentMetadataFetcher
     DistributedSearchTransport.SendOperation operation =
         transport.createSend(holderPub, MeshProtocolId.METADATA, payload, deadlineNanos);
     operations.add(operation);
-    Future<Boolean> sent = submitOrNull(operation::execute);
+    CompletableFuture<Boolean> accepted = new CompletableFuture<>();
+    Future<Boolean> sent =
+        submitOrNull(
+            () -> {
+              boolean ok = false;
+              try {
+                ok = operation.execute();
+                return ok;
+              } finally {
+                accepted.complete(ok);
+              }
+            });
     if (sent == null) {
       return false;
     }
     sends.add(sent);
-    boolean ok = sent.get(Math.max(1, deadlineNanos - System.nanoTime()), TimeUnit.NANOSECONDS);
+    long waitNanos =
+        Math.min(
+            deadlineNanos - System.nanoTime(), TimeUnit.MILLISECONDS.toNanos(RE_REQUEST_AFTER_MS));
+    try {
+      CompletableFuture.anyOf(accepted, finished).get(Math.max(1, waitNanos), TimeUnit.NANOSECONDS);
+    } catch (TimeoutException stillInFlight) {
+      // The holder's answer or the next re-request decides.
+    }
     synchronized (this) {
       lastActivityNanos = System.nanoTime();
     }
-    return ok;
+    return !accepted.isDone() || accepted.getNow(false);
   }
 
   /**
@@ -568,7 +595,7 @@ public final class MeshTorrentMetadataFetcher
               + " ih="
               + Hex.encode(infoHash));
       failed = true;
-      done.countDown();
+      finish();
       return;
     }
     if (!Arrays.equals(response.nonce(), nonce)) {
@@ -581,7 +608,7 @@ public final class MeshTorrentMetadataFetcher
       if (!Arrays.equals(previous.canonicalBytes(), response.canonicalBytes())
           || !Arrays.equals(previous.data(), response.data())) {
         failed = true;
-        done.countDown();
+        finish();
       }
       return;
     }
@@ -593,7 +620,7 @@ public final class MeshTorrentMetadataFetcher
             && (index > finalIndex || response.isFinalChunk() && index != finalIndex))
         || response.isFinalChunk() && chunks.keySet().stream().anyMatch(i -> i > index)) {
       failed = true;
-      done.countDown();
+      finish();
       return;
     }
     payloadDigest = response.payloadDigest();
@@ -604,8 +631,14 @@ public final class MeshTorrentMetadataFetcher
       finalIndex = index;
     }
     if (finalIndex >= 0 && chunks.size() == finalIndex + 1) {
-      done.countDown();
+      finish();
     }
+  }
+
+  /** End the wait for chunks: complete, failed, or answered with a holder error. */
+  private void finish() {
+    done.countDown();
+    finished.complete(null);
   }
 
   private boolean isOwnNonce(byte[] candidate) {

@@ -116,6 +116,34 @@ class MeshTorrentMetadataFetcherLossRecoveryTest {
   }
 
   /**
+   * The holder's answer completes the fetch even while the local send of the request is still not
+   * acknowledged (a starved control port under load): the fetch must not wait out its timeout on
+   * its own send.
+   */
+  @Test
+  void answerCompletesTheFetchWhileTheRequestSendIsStillPending() throws Exception {
+    IdentityKeys holder = IdentityKeys.generate(0);
+    byte[] torrent = TestTorrentMetadata.bytes(1000);
+    LossyHolderTransport transport = new LossyHolderTransport(holder, torrent);
+    transport.stallSendAfterAnswerMs = 60_000;
+
+    long start = System.nanoTime();
+    byte[] fetched =
+        MeshTorrentMetadataFetcher.fetch(
+            transport,
+            IdentityKeys.generate(0),
+            holder.ed25519PubRaw(),
+            TestTorrentMetadata.infoHash(),
+            TIMEOUT_MS);
+    long elapsedMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+
+    assertArrayEquals(torrent, fetched, "the answer arrived; the pending send must not hide it");
+    assertTrue(elapsedMs < RECOVERY_BOUND_MS, "fetch took " + elapsedMs + "ms");
+    assertEquals(1, transport.requests.size(), "an answered fetch needs no re-request");
+    assertTrue(transport.listeners.isEmpty());
+  }
+
+  /**
    * Fake holder: answers each request with holder-signed chunks for that request's nonce, honors
    * the {@code have} bitmap like {@code IncomingSearchRequestHandler}, and can lose frames.
    */
@@ -128,6 +156,7 @@ class MeshTorrentMetadataFetcherLossRecoveryTest {
     int dropChunkOnFirstRequest = -1;
     boolean swallowFirstRequest;
     boolean swallowAll;
+    long stallSendAfterAnswerMs;
 
     LossyHolderTransport(IdentityKeys holder, byte[] torrent) {
       this.holder = holder;
@@ -168,7 +197,13 @@ class MeshTorrentMetadataFetcherLossRecoveryTest {
                 holder.ed25519PubRaw(), wire, System.currentTimeMillis(), MeshProtocolId.METADATA);
           }
         }
+        if (stallSendAfterAnswerMs > 0) {
+          Thread.sleep(stallSendAfterAnswerMs); // the fetcher's cleanup interrupts this
+        }
         return true;
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        return false;
       } catch (Exception e) {
         throw new RuntimeException(e);
       }

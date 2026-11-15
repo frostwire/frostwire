@@ -136,6 +136,51 @@ class TorrentFetchOverMeshTest {
     assertTrue(elapsed < 8_000, "signed NOT_FOUND should fast-fallback, took " + elapsed + "ms");
   }
 
+  /** A NOT_FOUND fetch whose first request is lost above rUDP still falls back fast. */
+  @Test
+  void notFoundFallsBackFastWhenTheFirstRequestIsLost() throws Exception {
+    assertNotFoundFallsBackFastOver(ChunkDroppingTransport::losingFirstRequest);
+  }
+
+  /** A NOT_FOUND fetch whose signed NOT_FOUND reply is lost above rUDP still falls back fast. */
+  @Test
+  void notFoundFallsBackFastWhenTheNotFoundReplyIsLost() throws Exception {
+    assertNotFoundFallsBackFastOver(ChunkDroppingTransport::losingFirstError);
+  }
+
+  /**
+   * The holder's signed NOT_FOUND ends the fetch even while the fetcher's own send of the request
+   * has not been acknowledged yet (a starved local control port under load).
+   */
+  @Test
+  void notFoundFallsBackFastWhileTheRequestSendIsStillPending() throws Exception {
+    assertNotFoundFallsBackFastOver(ChunkDroppingTransport::stallingFirstSend);
+  }
+
+  private void assertNotFoundFallsBackFastOver(
+      java.util.function.Function<DistributedSearchTransport, ChunkDroppingTransport> loss)
+      throws Exception {
+    Instance requester = startInstance("lossy-nf-requester");
+    Instance holder = startInstance("lossy-nf-holder");
+    crossRegister(requester, holder);
+    byte[] infoHash = new byte[20];
+    new SecureRandom().nextBytes(infoHash);
+    holder.provider.delegate = infoHash1 -> null; // holder does not have it
+    ChunkDroppingTransport lossy = loss.apply(requester.transport);
+
+    long start = System.currentTimeMillis();
+    byte[] fetched =
+        MeshTorrentMetadataFetcher.fetch(
+            lossy, requester.identity, holder.identity.ed25519PubRaw(), infoHash, 10_000);
+    long elapsed = System.currentTimeMillis() - start;
+
+    assertTrue(lossy.dropped.get(), "the test must actually lose a frame");
+    assertNull(fetched, "NOT_FOUND must yield null");
+    assertTrue(
+        elapsed < 7_000,
+        "a lost or stalled request/reply must not cost the timeout, took " + elapsed + "ms");
+  }
+
   @Test
   void cachedMetadataIsWithdrawnWithoutRestartingHolder() throws Exception {
     Instance requester = startInstance("withdraw-requester");
@@ -323,18 +368,52 @@ class TorrentFetchOverMeshTest {
     return new Instance(identity, directory, client, transport, provider, server.rudpPort());
   }
 
-  /** Delegates to a real transport but loses the first METADATA chunk with one index. */
+  /**
+   * Delegates to a real transport but loses one METADATA frame above rUDP: the first chunk with one
+   * index, the first request the fetcher sends, or the first signed holder error frame.
+   */
   private static final class ChunkDroppingTransport implements DistributedSearchTransport {
     private final DistributedSearchTransport delegate;
     private final int dropIndex;
+    private final boolean dropFirstRequest;
+    private final boolean dropFirstError;
+    private final boolean stallFirstSend;
     final java.util.concurrent.atomic.AtomicBoolean dropped =
         new java.util.concurrent.atomic.AtomicBoolean();
     private final java.util.Map<PayloadListener, PayloadListener> wrapped =
         new java.util.concurrent.ConcurrentHashMap<>();
 
     ChunkDroppingTransport(DistributedSearchTransport delegate, int dropIndex) {
+      this(delegate, dropIndex, false, false, false);
+    }
+
+    private ChunkDroppingTransport(
+        DistributedSearchTransport delegate,
+        int dropIndex,
+        boolean dropFirstRequest,
+        boolean dropFirstError,
+        boolean stallFirstSend) {
       this.delegate = delegate;
       this.dropIndex = dropIndex;
+      this.dropFirstRequest = dropFirstRequest;
+      this.dropFirstError = dropFirstError;
+      this.stallFirstSend = stallFirstSend;
+    }
+
+    static ChunkDroppingTransport losingFirstRequest(DistributedSearchTransport delegate) {
+      return new ChunkDroppingTransport(delegate, -1, true, false, false);
+    }
+
+    static ChunkDroppingTransport losingFirstError(DistributedSearchTransport delegate) {
+      return new ChunkDroppingTransport(delegate, -1, false, true, false);
+    }
+
+    /**
+     * Delivers the first request but stalls its local send acknowledgement until the deadline, as a
+     * starved control port (or a slow {@code /send}) does under load.
+     */
+    static ChunkDroppingTransport stallingFirstSend(DistributedSearchTransport delegate) {
+      return new ChunkDroppingTransport(delegate, -1, false, false, true);
     }
 
     @Override
@@ -345,7 +424,43 @@ class TorrentFetchOverMeshTest {
     @Override
     public SendOperation createSend(
         byte[] targetPub, int protocolId, byte[] payload, long deadlineNanos) {
-      return delegate.createSend(targetPub, protocolId, payload, deadlineNanos);
+      if (dropFirstRequest
+          && protocolId == com.frostwire.search.relay.icebridge.MeshProtocolId.METADATA
+          && dropped.compareAndSet(false, true)) {
+        // Accepted for delivery, then lost before it reaches the holder.
+        return new SendOperation() {
+          @Override
+          public boolean execute() {
+            return true;
+          }
+
+          @Override
+          public void cancel() {}
+        };
+      }
+      SendOperation real = delegate.createSend(targetPub, protocolId, payload, deadlineNanos);
+      if (stallFirstSend
+          && protocolId == com.frostwire.search.relay.icebridge.MeshProtocolId.METADATA
+          && dropped.compareAndSet(false, true)) {
+        return new SendOperation() {
+          @Override
+          public boolean execute() {
+            boolean ok = real.execute();
+            try {
+              Thread.sleep(Math.max(0, (deadlineNanos - System.nanoTime()) / 1_000_000L));
+            } catch (InterruptedException e) {
+              Thread.currentThread().interrupt();
+            }
+            return ok;
+          }
+
+          @Override
+          public void cancel() {
+            real.cancel();
+          }
+        };
+      }
+      return real;
     }
 
     @Override
@@ -364,8 +479,9 @@ class TorrentFetchOverMeshTest {
                 TorrentMetadataResponse chunk =
                     SearchPayloadCodec.decodeTorrentMetadataResponse(payload);
                 if (chunk != null
-                    && !chunk.isError()
-                    && chunk.chunkIndex() == dropIndex
+                    && (chunk.isError()
+                        ? dropFirstError
+                        : !dropFirstRequest && !dropFirstError && chunk.chunkIndex() == dropIndex)
                     && dropped.compareAndSet(false, true)) {
                   return;
                 }
