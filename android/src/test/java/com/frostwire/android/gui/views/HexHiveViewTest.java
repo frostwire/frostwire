@@ -28,9 +28,12 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.os.Looper;
+import android.view.MotionEvent;
 import android.view.View;
 import androidx.test.core.app.ApplicationProvider;
 import com.frostwire.bittorrent.PiecePriorities;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -62,6 +65,93 @@ public class HexHiveViewTest {
           FULL,
           bitmap.getPixel(center.x, center.y) | 0xff000000);
     }
+  }
+
+  @Test
+  public void aPointMapsToThePieceWhoseCubeItIsIn() {
+    for (int pieces : new int[] {1, 7, 40, 600, 1500, 5000}) {
+      HexHiveView<Void> view = newView();
+      view.updateData(new Adapter(pieces, piece -> false));
+      Point center = new Point();
+      Point next = new Point();
+      assertTrue(view.pieceCenter(0, center));
+      // half the distance between two neighbors is the cube's inner radius
+      float inner = pieces == 1 ? 10 : 0;
+      if (pieces > 1) {
+        assertTrue(view.pieceCenter(1, next));
+        inner = (next.x - center.x) / 2f;
+      }
+      for (int piece = 0; piece < pieces; piece++) {
+        assertTrue(view.pieceCenter(piece, center));
+        String where = pieces + " pieces, piece " + piece;
+        assertEquals(where, piece, view.pieceAt(center.x, center.y));
+        // off center, still inside the cube
+        assertEquals(where, piece, view.pieceAt(center.x + inner * 0.8f, center.y));
+        assertEquals(where, piece, view.pieceAt(center.x - inner * 0.8f, center.y));
+        assertEquals(where, piece, view.pieceAt(center.x, center.y - inner * 0.8f));
+        assertEquals(where, piece, view.pieceAt(center.x, center.y + inner * 0.8f));
+      }
+      assertTrue(view.pieceCenter(pieces - 1, center));
+      // a single piece is one big cube in the middle of the view
+      float belowLastRow = pieces == 1 ? HEIGHT / 2f : inner * 6;
+      assertEquals("below the last row", -1, view.pieceAt(center.x, center.y + belowLastRow));
+      assertEquals("the top left corner", -1, view.pieceAt(0, 0));
+    }
+  }
+
+  @Test
+  public void aPointIsNoPieceBeforeTheHiveIsLaidOut() {
+    HexHiveView<Void> view = new HexHiveView<>(ApplicationProvider.getApplicationContext(), null);
+    assertEquals(-1, view.pieceAt(10, 10));
+  }
+
+  @Test
+  public void aTapSelectsThePieceUnderItAndADragDoesNot() {
+    HexHiveView<Void> view = newView();
+    view.updateData(new Adapter(100, piece -> false));
+    List<Integer> tapped = new ArrayList<>();
+    view.setOnPieceTapListener(tapped::add);
+    Point center = new Point();
+    assertTrue(view.pieceCenter(42, center));
+
+    touch(view, MotionEvent.ACTION_DOWN, center.x, center.y);
+    touch(view, MotionEvent.ACTION_UP, center.x + 1, center.y);
+    assertEquals(List.of(42), tapped);
+    assertEquals(42, view.getSelectedPiece());
+
+    // a drag across the hive is a scroll or a swipe, not a tap
+    assertTrue(view.pieceCenter(7, center));
+    touch(view, MotionEvent.ACTION_DOWN, center.x, center.y);
+    touch(view, MotionEvent.ACTION_MOVE, center.x + 100, center.y);
+    touch(view, MotionEvent.ACTION_UP, center.x + 100, center.y);
+    assertEquals(List.of(42), tapped);
+    assertEquals(42, view.getSelectedPiece());
+
+    // a tap off the cubes clears the selection
+    touch(view, MotionEvent.ACTION_DOWN, 0, 0);
+    touch(view, MotionEvent.ACTION_UP, 0, 0);
+    assertEquals(List.of(42, -1), tapped);
+    assertEquals(-1, view.getSelectedPiece());
+  }
+
+  @Test
+  public void theSelectedPieceIsHighlighted() throws Exception {
+    HexHiveView<Void> view = newView();
+    Adapter adapter = new Adapter(900, piece -> piece == 2);
+    Bitmap before = render(view, adapter);
+    assertNotEquals(HexHiveView.SELECTED_COLOR, pixelAt(view, before, 2));
+
+    view.setSelectedPiece(2);
+    Bitmap after = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
+    view.draw(new Canvas(after));
+    assertEquals(HexHiveView.SELECTED_COLOR, pixelAt(view, after, 2));
+    assertEquals(pixelAt(view, before, 400), pixelAt(view, after, 400));
+  }
+
+  private static void touch(View view, int action, float x, float y) {
+    MotionEvent event = MotionEvent.obtain(0, 0, action, x, y, 0);
+    view.dispatchTouchEvent(event);
+    event.recycle();
   }
 
   @Test

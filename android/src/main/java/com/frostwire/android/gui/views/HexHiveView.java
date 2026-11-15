@@ -28,7 +28,10 @@ import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.TypedValue;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.frostwire.android.R;
@@ -59,6 +62,47 @@ public class HexHiveView<T> extends View {
 
   static final int SKIPPED_COLOR = 0xffe53935;
   static final int HIGH_PRIORITY_COLOR = 0xffffb74d;
+
+  /** The tapped piece is drawn like desktop's hovered one: an orange cube, a darker outline. */
+  static final int SELECTED_COLOR = 0xffff9800;
+
+  private static final int SELECTED_BORDER_COLOR = 0xffb35c00;
+
+  /** Told which piece was tapped, on the UI thread. */
+  public interface OnPieceTapListener {
+    /**
+     * @param piece the tapped piece, now the selected one, or -1 for a tap off the pieces, which
+     *     clears the selection
+     */
+    void onPieceTapped(int piece);
+  }
+
+  private OnPieceTapListener pieceTapListener;
+  private int selectedPiece = -1;
+
+  /** The selected piece is drawn on the UI thread, these are its own shapes and paints. */
+  private final Shapes selectionShapes = new Shapes();
+
+  private final Paint selectedFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+  private final Paint selectedBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+  /**
+   * The selected cube is drawn at least this big, in pixels: a big torrent's cubes are a few pixels
+   * wide, too small to see which one a finger picked.
+   */
+  private final float minSelectedSideLength;
+
+  private final int touchSlop;
+  private float downX;
+  private float downY;
+
+  /** Whether the touch going on can still be a tap, no drag or scroll moved it too far. */
+  private boolean tapPending;
+
+  /** Where the last tap ended, NaN once it was handled. */
+  private float tapX = Float.NaN;
+
+  private float tapY = Float.NaN;
 
   private Paint bitmapPaint;
   private Paint hexagonBorderPaint;
@@ -121,6 +165,91 @@ public class HexHiveView<T> extends View {
             r.getColor(R.color.basic_blue_highlight, theme));
     typedArray.recycle();
     initPaints(borderColor, emptyColor, fullColor);
+    selectedFillPaint.setStyle(Paint.Style.FILL);
+    selectedFillPaint.setColor(SELECTED_COLOR);
+    selectedBorderPaint.setStyle(Paint.Style.STROKE);
+    selectedBorderPaint.setColor(SELECTED_BORDER_COLOR);
+    selectedBorderPaint.setStrokeWidth(
+        TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, r.getDisplayMetrics()));
+    minSelectedSideLength =
+        TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, r.getDisplayMetrics());
+    touchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
+  }
+
+  /** Who to tell when a piece is tapped, null for nobody (then the hive takes no touches). */
+  public void setOnPieceTapListener(OnPieceTapListener listener) {
+    pieceTapListener = listener;
+  }
+
+  /** The piece drawn as selected, -1 for none. */
+  public int getSelectedPiece() {
+    return selectedPiece;
+  }
+
+  /** Draws {@code piece} as selected, -1 for none. */
+  public void setSelectedPiece(int piece) {
+    if (piece != selectedPiece) {
+      selectedPiece = piece;
+      invalidate();
+    }
+  }
+
+  /**
+   * @return the piece whose cube is at ({@code x}, {@code y}) in view coordinates, or -1 for none
+   *     (padding, past a row's last cube, below the last row, or no layout yet)
+   */
+  public int pieceAt(float x, float y) {
+    DrawingProperties dp = DP;
+    return dp != null ? dp.pieceAt(x, y) : -1;
+  }
+
+  @Override
+  public boolean onTouchEvent(MotionEvent event) {
+    if (pieceTapListener == null || !isEnabled()) {
+      return super.onTouchEvent(event);
+    }
+    switch (event.getActionMasked()) {
+      case MotionEvent.ACTION_DOWN:
+        downX = event.getX();
+        downY = event.getY();
+        tapPending = true;
+        return true;
+      case MotionEvent.ACTION_MOVE:
+        if (Math.abs(event.getX() - downX) > touchSlop
+            || Math.abs(event.getY() - downY) > touchSlop) {
+          tapPending = false;
+        }
+        return true;
+      case MotionEvent.ACTION_UP:
+        if (tapPending) {
+          tapPending = false;
+          tapX = event.getX();
+          tapY = event.getY();
+          performClick();
+        }
+        return true;
+      case MotionEvent.ACTION_CANCEL:
+        tapPending = false;
+        return true;
+      default:
+        return true;
+    }
+  }
+
+  /** A tap selects the piece under it and tells the listener. */
+  @Override
+  public boolean performClick() {
+    boolean handled = super.performClick();
+    // an accessibility click has no spot on the hive, it picks no piece
+    if (pieceTapListener == null || Float.isNaN(tapX)) {
+      return handled;
+    }
+    int piece = pieceAt(tapX, tapY);
+    tapX = Float.NaN;
+    tapY = Float.NaN;
+    setSelectedPiece(piece);
+    pieceTapListener.onPieceTapped(piece);
+    return true;
   }
 
   public boolean ready() {
@@ -161,6 +290,32 @@ public class HexHiveView<T> extends View {
     if (compressedBitmap != null) {
       canvas.drawBitmap(compressedBitmap, 0, 0, bitmapPaint);
     }
+    drawSelectedPiece(canvas);
+  }
+
+  /** Drawn over the rendered hive, so selecting a piece needs no new render. */
+  private void drawSelectedPiece(Canvas canvas) {
+    DrawingProperties dp = DP;
+    if (dp == null
+        || compressedBitmap == null
+        || selectedPiece < 0
+        || selectedPiece >= dp.numHexs) {
+      return;
+    }
+    dp.centerOf(selectedPiece, selectionShapes.center);
+    float sideLength = Math.max(dp.hexSideLength, minSelectedSideLength);
+    Path path = selectionShapes.path;
+    path.reset();
+    for (int i = 0; i < 7; i++) {
+      getHexCorner(selectionShapes.corner, selectionShapes.center, i, sideLength);
+      if (i == 0) {
+        path.moveTo(selectionShapes.corner.x, selectionShapes.corner.y);
+      } else {
+        path.lineTo(selectionShapes.corner.x, selectionShapes.corner.y);
+      }
+    }
+    canvas.drawPath(path, selectedFillPaint);
+    canvas.drawPath(path, selectedBorderPaint);
   }
 
   public void updateData(HexDataAdapter<T> hexDataAdapter) {
@@ -348,6 +503,44 @@ public class HexHiveView<T> extends View {
         count++;
       }
       return count;
+    }
+
+    /**
+     * The piece whose center is nearest to ({@code x}, {@code y}) and no farther than a cube's
+     * corners, -1 for none. The nearest center is the cube the point is in: cubes tile the hive.
+     */
+    int pieceAt(float x, float y) {
+      if (numHexs <= 0) {
+        return -1;
+      }
+      Point candidate = new Point();
+      int nearest = -1;
+      float nearestDistance = Float.MAX_VALUE;
+      int firstRow = numHexs == 1 ? 0 : Math.round((y - evenRowOrigin.y) / rowStep) - 1;
+      for (int row = Math.max(0, firstRow); row <= firstRow + 2; row++) {
+        boolean evenRow = row % 2 == 0;
+        int rowLength = evenRow ? evenRowCount : oddRowCount;
+        int firstX = evenRow ? evenRowOrigin.x : oddRowOrigin.x;
+        int firstColumn = numHexs == 1 ? 0 : Math.round((x - firstX) / columnStep) - 1;
+        for (int column = Math.max(0, firstColumn);
+            column <= firstColumn + 2 && column < rowLength;
+            column++) {
+          int piece =
+              (row / 2) * (evenRowCount + oddRowCount) + (evenRow ? 0 : evenRowCount) + column;
+          if (piece >= numHexs) {
+            break;
+          }
+          centerOf(piece, candidate);
+          float dx = x - candidate.x;
+          float dy = y - candidate.y;
+          float distance = dx * dx + dy * dy;
+          if (distance < nearestDistance) {
+            nearestDistance = distance;
+            nearest = piece;
+          }
+        }
+      }
+      return nearestDistance <= hexSideLength * hexSideLength ? nearest : -1;
     }
 
     /** Sets {@code out} to the center of {@code piece}'s cube. */
