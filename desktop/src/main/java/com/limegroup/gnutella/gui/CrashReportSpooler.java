@@ -7,6 +7,7 @@
 
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.gui.PerformanceSuggestion;
 import com.frostwire.jlibtorrent.LibTorrent;
 import com.frostwire.search.telluride.TellurideBuild;
 import com.frostwire.util.HttpClientFactory;
@@ -265,6 +266,7 @@ public final class CrashReportSpooler {
     } catch (Throwable ignored) {
       // Presence is best effort.
     }
+    PerformanceSuggestion.stallRecorded();
     try {
       if (!tryAcquire("strictmode:" + sanitizeViolationClass(violationClass))) {
         LOG.debug("Throttled anonymous strictmode report");
@@ -291,6 +293,7 @@ public final class CrashReportSpooler {
     } catch (Throwable ignored) {
       // Presence is best effort.
     }
+    PerformanceSuggestion.stallRecorded();
     try {
       if (!tryAcquire("watchdog")) {
         LOG.debug("Throttled anonymous watchdog report");
