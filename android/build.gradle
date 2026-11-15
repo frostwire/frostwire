@@ -297,7 +297,10 @@ android {
                 jvmArgs '-Xshare:off'
                 filter {
                     excludeTestsMatching "com.frostwire.android.gui.dialogs.*"
-                    excludeTestsMatching "com.frostwire.android.gui.views.*"
+                    // The view tests from before the views package ran (NavigationViewSafetyTest boots
+                    // MainApplication); view tests with a plain Application run.
+                    excludeTestsMatching "com.frostwire.android.gui.views.NavigationViewSafetyTest"
+                    excludeTestsMatching "com.frostwire.android.gui.views.TransferDetailBlindCastRegressionTest"
                     // The fragment tests that boot MainApplication; tests that run with a plain
                     // Application (application = Application.class) don't hang and aren't excluded.
                     excludeTestsMatching "com.frostwire.android.gui.fragments.SearchFragmentSearchBoxStructureTest"
