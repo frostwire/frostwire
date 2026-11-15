@@ -309,7 +309,31 @@ public abstract class PromptTextUI extends TextUI {
   public int getNextVisualPositionFrom(
       JTextComponent t, int pos, Bias b, int direction, Bias[] biasRet)
       throws BadLocationException {
-    return delegate.getNextVisualPositionFrom(t, pos, b, direction, biasRet);
+    int next = delegate.getNextVisualPositionFrom(t, pos, b, direction, biasRet);
+    if (next != -1) {
+      return next;
+    }
+    // BasicTextUI answers -1 until it has painted once, and paint() draws the prompt instead of
+    // the delegate while the field is empty. A Shift+arrow then moved the caret's dot to -1 and
+    // DefaultCaret threw StateInvariantError (frostwire/frostwire#1560). Ask the delegate's views
+    // directly, the way BasicTextUI does once painted.
+    Rectangle alloc = SwingUtilities.calculateInnerArea(t, null);
+    if (alloc.width <= 0 || alloc.height <= 0) {
+      return pos;
+    }
+    Document doc = t.getDocument();
+    if (doc instanceof AbstractDocument) {
+      ((AbstractDocument) doc).readLock();
+    }
+    try {
+      View rootView = delegate.getRootView(t);
+      rootView.setSize(alloc.width, alloc.height);
+      return rootView.getNextVisualPositionFrom(pos, b, alloc, direction, biasRet);
+    } finally {
+      if (doc instanceof AbstractDocument) {
+        ((AbstractDocument) doc).readUnlock();
+      }
+    }
   }
 
   public View getRootView(JTextComponent t) {
