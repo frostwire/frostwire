@@ -6668,3 +6668,23 @@ msgstr "Don't seed finished downloads."
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
 msgid "BitTorrent users on the internet may only download file chunks of that torrent from you while you're downloading its data files. Some trackers will penalize this Leeching behavior."
 msgstr "BitTorrent users on the internet may only download file chunks of that torrent from you while you're downloading its data files. Some trackers will penalize this Leeching behavior."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Crash Reports"
+msgstr "Rapporti tal-waqgħat"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Anonymous Crash and Freeze Reports"
+msgstr "Rapporti anonimi ta' waqgħat u ffriżar"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Send anonymous crash and freeze reports to Icebase, our bug tracker"
+msgstr "Ibgħat rapporti anonimi ta' waqgħat u ffriżar lil Icebase, is-sistema tagħna għat-traċċar tal-bugs"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "A report is made when FrostWire crashes or freezes. It holds version numbers (FrostWire, Java, your system), memory, CPU and thread statistics, uptime, and where in the code it happened (class, method and line). Never error messages, your user name, file names, searches, downloads or anything that identifies you. Our server sees your IP address, as any server does, but does not store it. FrostWire also tells Icebase once a minute that it is running and whether it crashed or froze, so we can count sessions without problems. Most crashes and freezes we fix are found this way, often before anyone writes in."
+msgstr "Rapport isir meta FrostWire jaqa' jew jiffriża. Fih in-numri tal-verżjoni (FrostWire, Java, is-sistema tiegħek), statistika tal-memorja, tas-CPU u tal-ħjut, il-ħin li ilu jaħdem, u fejn fil-kodiċi ġara (klassi, metodu u linja). Qatt messaġġi ta' żball, l-isem tal-utent tiegħek, ismijiet ta' fajls, tfittxijiet, downloads jew xi ħaġa li tidentifikak. Is-server tagħna jara l-indirizz IP tiegħek, bħal kull server, iżda ma jaħżnux. FrostWire jgħid ukoll lil Icebase darba kull minuta li qed jaħdem u jekk waqax jew iffriżax, biex inkunu nistgħu ngħoddu s-sessjonijiet mingħajr problemi. Il-biċċa l-kbira tal-waqgħat u l-iffriżar li nirranġaw insibuhom hekk, spiss qabel ma xi ħadd jiktbilna."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "You can change this later in Tools > Options > Advanced > Crash Reports."
+msgstr "Tista' tbiddel dan aktar tard f'Għodod > Għażliet > Advanced > Rapporti tal-waqgħat."

@@ -7158,3 +7158,23 @@ msgstr "완료된 토렌트 다운로드를 배포하지 않음."
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
 msgid "BitTorrent users on the internet may only download file chunks of that torrent from you while you're downloading its data files. Some trackers will penalize this Leeching behavior."
 msgstr "BitTorrent 사용자는 귀하가 데이터 파일을 다운로드하는 동안에만 파일 부부분을 다운로드 할 수 있습니다. 일부 트랙커들은 해당 동작에 벌칙을 수행할 수 있습니다."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Crash Reports"
+msgstr "충돌 보고서"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Anonymous Crash and Freeze Reports"
+msgstr "익명 충돌 및 멈춤 보고서"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Send anonymous crash and freeze reports to Icebase, our bug tracker"
+msgstr "버그 추적 시스템인 Icebase에 익명 충돌 및 멈춤 보고서 보내기"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "A report is made when FrostWire crashes or freezes. It holds version numbers (FrostWire, Java, your system), memory, CPU and thread statistics, uptime, and where in the code it happened (class, method and line). Never error messages, your user name, file names, searches, downloads or anything that identifies you. Our server sees your IP address, as any server does, but does not store it. FrostWire also tells Icebase once a minute that it is running and whether it crashed or froze, so we can count sessions without problems. Most crashes and freezes we fix are found this way, often before anyone writes in."
+msgstr "보고서는 FrostWire가 충돌하거나 멈출 때 만들어집니다. 보고서에는 버전 번호(FrostWire, Java, 사용 중인 시스템), 메모리·CPU·스레드 통계, 실행 시간, 그리고 문제가 발생한 코드 위치(클래스, 메서드, 줄)가 들어 있습니다. 오류 메시지, 사용자 이름, 파일 이름, 검색어, 다운로드 또는 사용자를 식별할 수 있는 정보는 절대 포함되지 않습니다. 우리 서버는 다른 모든 서버와 마찬가지로 IP 주소를 보지만 저장하지 않습니다. 또한 FrostWire는 1분에 한 번 Icebase에 실행 중이라는 것과 충돌하거나 멈췄는지를 알려, 문제 없이 끝난 세션 수를 셀 수 있게 합니다. 우리가 고치는 충돌과 멈춤의 대부분은 이렇게 발견되며, 누군가 연락하기 전에 발견되는 경우도 많습니다."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "You can change this later in Tools > Options > Advanced > Crash Reports."
+msgstr "나중에 도구 > 옵션 > 고급 > 충돌 보고서에서 변경할 수 있습니다."

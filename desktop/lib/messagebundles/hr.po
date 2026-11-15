@@ -7276,3 +7276,23 @@ msgstr "Ne dijeli završena torrent preuzimanja."
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
 msgid "BitTorrent users on the internet may only download file chunks of that torrent from you while you're downloading its data files. Some trackers will penalize this Leeching behavior."
 msgstr "BitTorrent korisnici na internetu će preuzimati samo dijelove datoteka torrenta od vas dok vi preuzimate njegove podatkovne datoteke. Neki pratitelji će ovakvo ponašanje dijeljenja kazniti."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Crash Reports"
+msgstr "Izvješća o rušenju"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Anonymous Crash and Freeze Reports"
+msgstr "Anonimna izvješća o rušenju i zamrzavanju"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Send anonymous crash and freeze reports to Icebase, our bug tracker"
+msgstr "Šalji anonimna izvješća o rušenju i zamrzavanju u Icebase, naš sustav za praćenje grešaka"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "A report is made when FrostWire crashes or freezes. It holds version numbers (FrostWire, Java, your system), memory, CPU and thread statistics, uptime, and where in the code it happened (class, method and line). Never error messages, your user name, file names, searches, downloads or anything that identifies you. Our server sees your IP address, as any server does, but does not store it. FrostWire also tells Icebase once a minute that it is running and whether it crashed or froze, so we can count sessions without problems. Most crashes and freezes we fix are found this way, often before anyone writes in."
+msgstr "Izvješće nastaje kada se FrostWire sruši ili zamrzne. Sadrži brojeve verzija (FrostWire, Java, vaš sustav), statistiku memorije, procesora i dretvi, vrijeme rada te mjesto u kodu gdje se to dogodilo (klasa, metoda i redak). Nikada poruke o pogreškama, vaše korisničko ime, nazive datoteka, pretraživanja, preuzimanja ni bilo što što vas identificira. Naš poslužitelj vidi vašu IP adresu, kao i svaki poslužitelj, ali je ne sprema. FrostWire također jednom u minuti javlja Icebaseu da radi te je li se srušio ili zamrznuo, kako bismo mogli brojati sesije bez problema. Većinu rušenja i zamrzavanja koja popravimo pronađemo na ovaj način, često prije nego što nam itko napiše."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "You can change this later in Tools > Options > Advanced > Crash Reports."
+msgstr "Ovo možete promijeniti kasnije u Alati > Postavke > Napredne postavke > Izvješća o rušenju."

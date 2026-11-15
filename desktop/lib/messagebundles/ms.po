@@ -7307,3 +7307,23 @@ msgstr "Tidak benih muat turun selesai."
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
 msgid "BitTorrent users on the internet may only download file chunks of that torrent from you while you're downloading its data files. Some trackers will penalize this Leeching behavior."
 msgstr "Mungkin pengguna BitTorrent di internet hanya download ketulan fail torrent itu daripada anda semasa anda sedang memuat turun dan fail data. Sesetengah penjejak akan menghukum kelakuan Leeching ini."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Crash Reports"
+msgstr "Laporan Ranap"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Anonymous Crash and Freeze Reports"
+msgstr "Laporan Ranap dan Beku Tanpa Nama"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Send anonymous crash and freeze reports to Icebase, our bug tracker"
+msgstr "Hantar laporan ranap dan beku tanpa nama kepada Icebase, penjejak pepijat kami"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "A report is made when FrostWire crashes or freezes. It holds version numbers (FrostWire, Java, your system), memory, CPU and thread statistics, uptime, and where in the code it happened (class, method and line). Never error messages, your user name, file names, searches, downloads or anything that identifies you. Our server sees your IP address, as any server does, but does not store it. FrostWire also tells Icebase once a minute that it is running and whether it crashed or froze, so we can count sessions without problems. Most crashes and freezes we fix are found this way, often before anyone writes in."
+msgstr "Laporan dibuat apabila FrostWire ranap atau beku. Ia mengandungi nombor versi (FrostWire, Java, sistem anda), statistik memori, CPU dan bebenang, masa berjalan, dan di mana dalam kod ia berlaku (kelas, kaedah dan baris). Tidak sekali-kali mesej ralat, nama pengguna anda, nama fail, carian, muat turun atau apa-apa yang mengenal pasti anda. Pelayan kami melihat alamat IP anda, seperti mana-mana pelayan, tetapi tidak menyimpannya. FrostWire juga memberitahu Icebase sekali seminit bahawa ia sedang berjalan dan sama ada ia ranap atau beku, supaya kami boleh mengira sesi tanpa masalah. Kebanyakan ranap dan beku yang kami baiki ditemui dengan cara ini, selalunya sebelum sesiapa menulis kepada kami."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "You can change this later in Tools > Options > Advanced > Crash Reports."
+msgstr "Anda boleh menukar ini kemudian di Alat > Pilihan > Lanjutan > Laporan Ranap."

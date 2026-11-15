@@ -7002,3 +7002,23 @@ msgstr "勿為已完成下載的源代碼做種。"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
 msgid "BitTorrent users on the internet may only download file chunks of that torrent from you while you're downloading its data files. Some trackers will penalize this Leeching behavior."
 msgstr "網上的BitTorrent用戶只能在您下載著源代碼的數據文件時，從您處下載該源代碼的文件塊。一些跟蹤器將不利於此下載性能。"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Crash Reports"
+msgstr "當機報告"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Anonymous Crash and Freeze Reports"
+msgstr "匿名當機與凍結報告"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Send anonymous crash and freeze reports to Icebase, our bug tracker"
+msgstr "傳送匿名當機與凍結報告至我們的錯誤追蹤系統 Icebase"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "A report is made when FrostWire crashes or freezes. It holds version numbers (FrostWire, Java, your system), memory, CPU and thread statistics, uptime, and where in the code it happened (class, method and line). Never error messages, your user name, file names, searches, downloads or anything that identifies you. Our server sees your IP address, as any server does, but does not store it. FrostWire also tells Icebase once a minute that it is running and whether it crashed or froze, so we can count sessions without problems. Most crashes and freezes we fix are found this way, often before anyone writes in."
+msgstr "當 FrostWire 當機或凍結時，會產生一份報告。報告包含版本號碼（FrostWire、Java、你的系統）、記憶體、CPU 與執行緒統計、執行時間，以及問題發生在程式碼中的位置（類別、方法與行號）。報告絕不包含錯誤訊息、你的使用者名稱、檔案名稱、搜尋內容、下載內容，或任何能識別你身分的資訊。我們的伺服器和任何伺服器一樣會看到你的 IP 位址，但不會儲存。FrostWire 也會每分鐘告訴 Icebase 一次它正在執行，以及是否曾當機或凍結，讓我們能統計沒有問題的工作階段。我們修正的大多數當機與凍結都是這樣發現的，常常在有人來信之前。"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "You can change this later in Tools > Options > Advanced > Crash Reports."
+msgstr "你之後可以在 工具 > 選項 > 高級 > 當機報告 中更改此設定。"

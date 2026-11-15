@@ -7003,3 +7003,23 @@ msgstr "Don't seed finished downloads."
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
 msgid "BitTorrent users on the internet may only download file chunks of that torrent from you while you're downloading its data files. Some trackers will penalize this Leeching behavior."
 msgstr "BitTorrent users on the internet may only download file chunks of that torrent from you while you're downloading its data files. Some trackers will penalize this Leeching behavior."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Crash Reports"
+msgstr "Tuairiscí tuairteála"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Anonymous Crash and Freeze Reports"
+msgstr "Tuairiscí gan ainm ar thuairteanna agus reoite"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Send anonymous crash and freeze reports to Icebase, our bug tracker"
+msgstr "Seol tuairiscí gan ainm ar thuairteanna agus reoite chuig Icebase, ár rianaire fabhtanna"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "A report is made when FrostWire crashes or freezes. It holds version numbers (FrostWire, Java, your system), memory, CPU and thread statistics, uptime, and where in the code it happened (class, method and line). Never error messages, your user name, file names, searches, downloads or anything that identifies you. Our server sees your IP address, as any server does, but does not store it. FrostWire also tells Icebase once a minute that it is running and whether it crashed or froze, so we can count sessions without problems. Most crashes and freezes we fix are found this way, often before anyone writes in."
+msgstr "Cruthaítear tuairisc nuair a thuairteálann nó a reonn FrostWire. Bíonn inti uimhreacha leagain (FrostWire, Java, do chóras), staitisticí cuimhne, CPU agus snáitheanna, an t-am rite, agus an áit sa chód ar tharla sé (aicme, modh agus líne). Ní bhíonn teachtaireachtaí earráide, d'ainm úsáideora, ainmneacha comhad, cuardaigh, íoslódálacha ná aon rud a d'aithneodh thú inti riamh. Feiceann ár bhfreastalaí do sheoladh IP, mar a fheiceann aon fhreastalaí, ach ní stórálann sé é. Insíonn FrostWire do Icebase freisin uair sa nóiméad go bhfuil sé ag rith agus ar thuairteáil nó ar reoigh sé, ionas gur féidir linn seisiúin gan fadhbanna a chomhaireamh. Aimsítear an chuid is mó de na tuairteanna agus na reoite a dheisímid ar an mbealach seo, go minic sula scríobhann aon duine chugainn."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "You can change this later in Tools > Options > Advanced > Crash Reports."
+msgstr "Is féidir leat é seo a athrú níos déanaí in Uirlisí > Roghanna > Ardroghanna > Tuairiscí tuairteála."

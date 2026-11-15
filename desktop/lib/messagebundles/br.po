@@ -6624,3 +6624,23 @@ msgstr "Don't seed finished downloads."
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
 msgid "BitTorrent users on the internet may only download file chunks of that torrent from you while you're downloading its data files. Some trackers will penalize this Leeching behavior."
 msgstr "BitTorrent users on the internet may only download file chunks of that torrent from you while you're downloading its data files. Some trackers will penalize this Leeching behavior."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Crash Reports"
+msgstr "Danevelloù sac'hadenn"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Anonymous Crash and Freeze Reports"
+msgstr "Danevelloù dizanv a sac'hadennoù hag a skornadennoù"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Send anonymous crash and freeze reports to Icebase, our bug tracker"
+msgstr "Kas danevelloù dizanv a sac'hadennoù hag a skornadennoù da Icebase, hon heulier fazioù"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "A report is made when FrostWire crashes or freezes. It holds version numbers (FrostWire, Java, your system), memory, CPU and thread statistics, uptime, and where in the code it happened (class, method and line). Never error messages, your user name, file names, searches, downloads or anything that identifies you. Our server sees your IP address, as any server does, but does not store it. FrostWire also tells Icebase once a minute that it is running and whether it crashed or froze, so we can count sessions without problems. Most crashes and freezes we fix are found this way, often before anyone writes in."
+msgstr "Un danevell a vez savet pa sac'h pe pa skorn FrostWire. Enni ez eus niverennoù handelv (FrostWire, Java, ho reizhiad), stadegoù memor, CPU ha neudennoù, an amzer ma oa o treiñ, hag al lec'h er c'hod ma c'hoarvezas (klas, hentenn ha linenn). Biskoazh kemennadennoù fazi, hoc'h anv implijer, anvioù restroù, klaskoù, pellgargadurioù pe tra ebet a c'hallfe ho tiskouez. Hor servijer a wel ho chomlec'h IP, evel n'eus forzh peseurt servijer, met ne vir ket anezhañ. FrostWire a lavar ivez da Icebase ur wech bep munutenn emañ o treiñ hag hag-eñ eo sac'het pe skornet, evit ma c'hallfemp kontañ an dalc'hoù hep kudenn. Al lodenn vrasañ eus ar sac'hadennoù hag ar skornadennoù a reizhomp a gaver evel-se, alies a-raok ma skriv den ebet deomp."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "You can change this later in Tools > Options > Advanced > Crash Reports."
+msgstr "Gallout a rit cheñch an dra-se diwezhatoc'h e Binvioù > Dibaboù > Advanced > Danevelloù sac'hadenn."
