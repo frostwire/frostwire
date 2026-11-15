@@ -7,6 +7,7 @@
 
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.gui.PerformanceMode;
 import com.frostwire.gui.PerformanceSuggestion;
 import com.frostwire.jlibtorrent.LibTorrent;
 import com.frostwire.search.telluride.TellurideBuild;
@@ -729,6 +730,14 @@ public final class CrashReportSpooler {
     private final Boolean warmup_done;
 
     private final Long warmup_ms;
+
+    /**
+     * "full" or "lite", and whether Automatic chose it, so reports compare by mode
+     * (frostwire/frostwire#1555).
+     */
+    private final String performance_mode;
+
+    private final boolean performance_mode_auto;
     private final String exception_class;
 
     /** Null, and then left out of the JSON, for anything but an OutOfMemoryError. */
@@ -783,6 +792,8 @@ public final class CrashReportSpooler {
       WarmUpProgress.Snapshot warmUp = JdkWarmUp.progress();
       this.warmup_done = warmUp == null ? null : warmUp.done();
       this.warmup_ms = warmUp == null ? null : warmUp.elapsedMs();
+      this.performance_mode = PerformanceMode.reportValue();
+      this.performance_mode_auto = PerformanceMode.isAutomatic();
       this.exception_class = exceptionClass;
       this.oom_kind = oomKind;
       this.missing_class = missingClass;
@@ -838,6 +849,14 @@ public final class CrashReportSpooler {
     private final Boolean warmup_done;
 
     private final Long warmup_ms;
+
+    /**
+     * "full" or "lite", and whether Automatic chose it, so reports compare by mode
+     * (frostwire/frostwire#1555).
+     */
+    private final String performance_mode;
+
+    private final boolean performance_mode_auto;
     private final String violation_class;
     private final int violation_count;
     private final Frame[] stack_frames;
@@ -902,6 +921,8 @@ public final class CrashReportSpooler {
       WarmUpProgress.Snapshot warmUp = JdkWarmUp.progress();
       this.warmup_done = warmUp == null ? null : warmUp.done();
       this.warmup_ms = warmUp == null ? null : warmUp.elapsedMs();
+      this.performance_mode = PerformanceMode.reportValue();
+      this.performance_mode_auto = PerformanceMode.isAutomatic();
       this.violation_class = violationClass;
       this.violation_count = violationCount;
       this.stack_frames = stackFrames;
@@ -953,6 +974,14 @@ public final class CrashReportSpooler {
     private final Boolean warmup_done;
 
     private final Long warmup_ms;
+
+    /**
+     * "full" or "lite", and whether Automatic chose it, so reports compare by mode
+     * (frostwire/frostwire#1555).
+     */
+    private final String performance_mode;
+
+    private final boolean performance_mode_auto;
     private final int missed_heartbeats;
     private final String report_nonce;
 
@@ -996,6 +1025,8 @@ public final class CrashReportSpooler {
       WarmUpProgress.Snapshot warmUp = JdkWarmUp.progress();
       this.warmup_done = warmUp == null ? null : warmUp.done();
       this.warmup_ms = warmUp == null ? null : warmUp.elapsedMs();
+      this.performance_mode = PerformanceMode.reportValue();
+      this.performance_mode_auto = PerformanceMode.isAutomatic();
       this.missed_heartbeats = missedHeartbeats;
       this.report_nonce = nonce;
     }
