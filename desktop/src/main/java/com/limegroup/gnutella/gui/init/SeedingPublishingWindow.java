@@ -19,6 +19,8 @@
 package com.limegroup.gnutella.gui.init;
 
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.IcebaseReports;
+import com.limegroup.gnutella.gui.IcebaseReportsText;
 import com.limegroup.gnutella.settings.SearchEnginesSettings;
 import java.awt.*;
 import javax.swing.*;
@@ -26,7 +28,8 @@ import javax.swing.*;
 /**
  * First-run/update wizard page explaining that seeding a torrent publishes it, and asking two
  * separate questions: whether to join the IceBridge network (search, and be found by keyword), and
- * whether to also share the whole catalog so people can browse it and crawlers can index it.
+ * whether to also share the whole catalog so people can browse it and crawlers can index it. A
+ * third, unrelated choice asks whether to send anonymous crash and freeze reports to Icebase.
  */
 final class SeedingPublishingWindow extends SetupWindow {
   /** Line width inside the 700px page: its 10px side padding, the bullet and a safety margin. */
@@ -36,6 +39,7 @@ final class SeedingPublishingWindow extends SetupWindow {
 
   private JCheckBox _joinNetwork;
   private JCheckBox _shareCatalog;
+  private JCheckBox _icebaseReports;
 
   /** Creates the window and its components. */
   SeedingPublishingWindow(SetupManager manager) {
@@ -82,10 +86,26 @@ final class SeedingPublishingWindow extends SetupWindow {
     // Sharing the catalog only makes sense on the network: leaving it disables the second choice.
     _joinNetwork.addItemListener(e -> _shareCatalog.setEnabled(_joinNetwork.isSelected()));
     mainPanel.add(_shareCatalog, row);
+    mainPanel.add(note(SeedingPublishingText.catalogNote()), row);
+    mainPanel.add(Box.createVerticalStrut(10), row);
+
+    _icebaseReports = new JCheckBox(IcebaseReportsText.label());
+    _icebaseReports.setSelected(IcebaseReports.enabled());
+    mainPanel.add(_icebaseReports, row);
+    mainPanel.add(note(IcebaseReportsText.note()), row);
     GridBagConstraints last = (GridBagConstraints) row.clone();
     last.weighty = 1;
-    mainPanel.add(note(SeedingPublishingText.catalogNote()), last);
-    setSetupComponent(mainPanel);
+    mainPanel.add(note(IcebaseReportsText.whereToChangeIt()), last);
+    // A language whose explanations run longer than the page scrolls instead of being cut off.
+    JScrollPane scroll =
+        new JScrollPane(
+            mainPanel,
+            ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+    scroll.setOpaque(false);
+    scroll.getViewport().setOpaque(false);
+    scroll.getVerticalScrollBar().setUnitIncrement(16);
+    setSetupComponent(scroll);
   }
 
   private static JComponent note(String text) {
@@ -95,13 +115,14 @@ final class SeedingPublishingWindow extends SetupWindow {
   }
 
   /**
-   * Persists both choices. Loading happens in {@link #createWindow()}, which is called every time
-   * the page is opened.
+   * Persists the three choices. Loading happens in {@link #createWindow()}, which is called every
+   * time the page is opened.
    */
   @Override
   public void applySettings(boolean loadCoreComponents) {
-    if (_joinNetwork != null && _shareCatalog != null) {
-      SeedingPublishingChoices.save(_joinNetwork.isSelected(), _shareCatalog.isSelected());
+    if (_joinNetwork != null && _shareCatalog != null && _icebaseReports != null) {
+      SeedingPublishingChoices.save(
+          _joinNetwork.isSelected(), _shareCatalog.isSelected(), _icebaseReports.isSelected());
     }
   }
 
