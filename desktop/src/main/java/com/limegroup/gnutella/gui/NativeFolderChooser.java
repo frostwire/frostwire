@@ -102,10 +102,13 @@ final class NativeFolderChooser {
       return null;
     }
     try {
-      if (picker == null) {
-        picker = pickerFactory.get();
+      Picker p = picker;
+      if (p == null) {
+        // Loading JNA unpacks and loads its native library: disk work, kept off the EDT too.
+        p = callOffEdt(pickerFactory::get, executor.get());
+        picker = p;
       }
-      Callable<File> dialog = picker.prepare(ownerOf(parent), title, initialDirectory);
+      Callable<File> dialog = p.prepare(ownerOf(parent), title, initialDirectory);
       return new Choice(callOffEdt(dialog, executor.get()));
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();

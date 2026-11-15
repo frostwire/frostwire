@@ -141,8 +141,9 @@ class NativeFolderChooserTest {
   }
 
   /**
-   * The dialog is shown on the picker's thread, and the EDT keeps dispatching events while it is
-   * open: the fake dialog stays open until the EDT has run an event posted after it opened.
+   * The native library is loaded and the dialog is shown on the picker's thread, and the EDT keeps
+   * dispatching events while the dialog is open: the fake dialog stays open until the EDT has run
+   * an event posted after it opened.
    */
   @Test
   void theDialogRunsOffTheEdtWhileTheEdtKeepsDispatching() throws Exception {
@@ -166,7 +167,14 @@ class NativeFolderChooserTest {
             return dialog;
           }
         };
-    NativeFolderChooser chooser = chooser(true, () -> picker);
+    AtomicReference<Thread> loadedOn = new AtomicReference<>();
+    NativeFolderChooser chooser =
+        chooser(
+            true,
+            () -> {
+              loadedOn.set(Thread.currentThread());
+              return picker;
+            });
     AtomicReference<NativeFolderChooser.Choice> choice = new AtomicReference<>();
 
     EventQueue.invokeAndWait(
@@ -175,6 +183,8 @@ class NativeFolderChooserTest {
           choice.set(chooser.choose(null, "Select Folder", null));
         });
 
+    assertNotNull(loadedOn.get());
+    assertNotSame(edt.get(), loadedOn.get(), "JNA must not be loaded on the EDT");
     assertSame(edt.get(), preparedOn.get(), "the owner window is read on the EDT");
     assertNotNull(shownOn.get());
     assertNotSame(edt.get(), shownOn.get(), "the native dialog must not run on the EDT");
