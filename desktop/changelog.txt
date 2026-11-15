@@ -1,4 +1,5 @@
 FrostWire 7.1.5 UNRELEASED
+   - fix:clicking OK in Options no longer freezes the window re-applying I2P, proxy, firewall and network interface settings to libtorrent — they are applied only when changed, in the background
    - fix:clicking OK in Options no longer freezes while FrostWire checks the Torrent Files folder on disk when you didn't change it — the folder is checked only when its path changed
    - new:Performance mode (Options > Advanced > Performance): Automatic, Full or Lite. Lite turns off animations, cover art until clicked, live re-sorting of search results, row preview tooltips and the warm-up's font sweep, and refreshes tables less often; downloads, seeding and searches are never slowed. Automatic picks Lite on weak machines, and Full suggests Lite when the UI keeps freezing.
    - fix:mesh .torrent fetches no longer wait out the full timeout when the local IceBridge is slow to confirm the request — the fetch finishes as soon as the holder answers
