@@ -178,4 +178,23 @@ class OptionsEngineApplyOffEdtTest {
     assertEquals(1080, applied.getInteger(settings_pack.int_types.proxy_port.swigValue()));
     assertEquals("user", applied.getString(settings_pack.string_types.proxy_username.swigValue()));
   }
+
+  @Test
+  void theLoginPageLeavesTheEngineAloneWhenNothingChanged() throws Exception {
+    saveProxy();
+    onTheEdt(() -> ProxyLoginPaneItem.apply("user", "secret", true));
+    assertEquals(List.of(), calls);
+  }
+
+  @Test
+  void theLoginPageAppliesAChangeInTheBackgroundWithTheSavedProxy() throws Exception {
+    saveProxy();
+    onTheEdt(() -> ProxyLoginPaneItem.apply("user", "secret", false));
+    assertEquals(List.of("applySettings@" + BACKGROUND), calls);
+    assertEquals(
+        settings_pack.proxy_type_t.http.swigValue(),
+        applied.getInteger(settings_pack.int_types.proxy_type.swigValue()));
+    assertEquals(
+        "proxy.example", applied.getString(settings_pack.string_types.proxy_hostname.swigValue()));
+  }
 }

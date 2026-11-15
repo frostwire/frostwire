@@ -18,9 +18,6 @@
 
 package com.limegroup.gnutella.gui.options.panes;
 
-import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.jlibtorrent.SettingsPack;
-import com.frostwire.jlibtorrent.swig.settings_pack;
 import com.limegroup.gnutella.gui.GUIUtils.SizePolicy;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.LabeledComponent;
@@ -115,32 +112,26 @@ public final class ProxyLoginPaneItem extends AbstractPaneItem {
    * a setting could not be applied.
    */
   public boolean applyOptions() {
-    final String username = PROXY_USERNAME_FIELD.getText();
-    final String password = PROXY_PASSWORD_FIELD.getText();
-    final boolean authenticate = CHECK_BOX.isSelected();
+    apply(PROXY_USERNAME_FIELD.getText(), PROXY_PASSWORD_FIELD.getText(), CHECK_BOX.isSelected());
+    return false;
+  }
+
+  /**
+   * Saves the page's choices and, only when one of them changed, applies the proxy and its login to
+   * the engine in the background, never on the EDT (frostwire/frostwire#1568).
+   */
+  static void apply(String username, String password, boolean authenticate) {
+    boolean changed =
+        !ConnectionSettings.PROXY_USERNAME.getValue().equals(username)
+            || !ConnectionSettings.PROXY_PASS.getValue().equals(password)
+            || ConnectionSettings.PROXY_AUTHENTICATE.getValue() != authenticate;
+    if (!changed) {
+      return;
+    }
     ConnectionSettings.PROXY_USERNAME.setValue(username);
     ConnectionSettings.PROXY_PASS.setValue(password);
     ConnectionSettings.PROXY_AUTHENTICATE.setValue(authenticate);
-    SettingsPack settings = new SettingsPack();
-    if (authenticate) {
-      int connectionMethod = ConnectionSettings.CONNECTION_METHOD.getValue();
-      settings.setInteger(
-          settings_pack.int_types.proxy_type.swigValue(),
-          settings_pack.proxy_type_t.http_pw.swigValue());
-      if (connectionMethod == ConnectionSettings.C_HTTP_PROXY) {
-        settings.setInteger(
-            settings_pack.int_types.proxy_type.swigValue(),
-            settings_pack.proxy_type_t.http_pw.swigValue());
-      } else if (connectionMethod == ConnectionSettings.C_SOCKS5_PROXY) {
-        settings.setInteger(
-            settings_pack.int_types.proxy_type.swigValue(),
-            settings_pack.proxy_type_t.socks5_pw.swigValue());
-      }
-    }
-    settings.setString(settings_pack.string_types.proxy_username.swigValue(), username);
-    settings.setString(settings_pack.string_types.proxy_password.swigValue(), password);
-    BTEngine.getInstance().applySettings(settings);
-    return false;
+    EngineSettings.apply(ProxyPaneItem::fillProxySettings);
   }
 
   public boolean isDirty() {
