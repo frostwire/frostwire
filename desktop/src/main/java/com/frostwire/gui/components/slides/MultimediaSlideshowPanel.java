@@ -18,6 +18,7 @@
 
 package com.frostwire.gui.components.slides;
 
+import com.frostwire.gui.theme.Animations;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
@@ -133,7 +134,8 @@ public class MultimediaSlideshowPanel extends JPanel implements SlideshowPanel {
                     new SlideshowPanelControls(MultimediaSlideshowPanel.this),
                     BorderLayout.PAGE_END);
               }
-              if (!slides1.isEmpty()) {
+              // In Lite the first slide stays; the controls still switch slides.
+              if (!slides1.isEmpty() && Animations.enabled()) {
                 timer = new Timer("SlideShow Timer");
                 timer.schedule(new SlideSwitcher(), slides1.get(0).duration);
               }

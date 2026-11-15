@@ -25,6 +25,7 @@ import com.frostwire.gui.searchfield.GoogleSearchField;
 import com.frostwire.gui.searchfield.SearchField;
 import com.frostwire.gui.tabs.LibraryTab;
 import com.frostwire.gui.tabs.Tab;
+import com.frostwire.gui.theme.Animations;
 import com.frostwire.gui.theme.PlatformFonts;
 import com.frostwire.gui.theme.SkinApplicationHeaderUI;
 import com.frostwire.gui.theme.ThemeMediator;
@@ -377,8 +378,8 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
     logoPanel.setVisible(!show);
     updateButton.setVisible(show);
     if (show) {
-      // Start animating the button for 30 seconds.
-      if (updateButtonAnimationStartedTimestamp == -1) {
+      // Start animating the button for 30 seconds; in Lite it shows without blinking.
+      if (updateButtonAnimationStartedTimestamp == -1 && Animations.enabled()) {
         startUpdateButtonIntermittentAnimation();
       }
     }

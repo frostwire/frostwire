@@ -9,6 +9,7 @@ package com.limegroup.gnutella.gui.options.panes;
 
 import com.frostwire.gui.PerformanceMode;
 import com.frostwire.gui.PerformanceMode.Choice;
+import com.frostwire.gui.theme.Animations;
 import com.limegroup.gnutella.gui.BoxPanel;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.ApplicationSettings;
@@ -77,6 +78,7 @@ public final class PerformancePaneItem extends AbstractPaneItem {
   static boolean apply(Choice choice) {
     if (choice != savedChoice()) {
       PerformanceMode.choose(choice);
+      Animations.applyToLookAndFeel();
     }
     return false;
   }
