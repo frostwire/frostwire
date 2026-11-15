@@ -6680,3 +6680,51 @@ msgstr "No comparteixis les descàrregues acabades."
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
 msgid "BitTorrent users on the internet may only download file chunks of that torrent from you while you're downloading its data files. Some trackers will penalize this Leeching behavior."
 msgstr "Els usuaris només podran baixar trossos d'aquest torrent mentre el descarregues. Alguns trackers penalitzen aquest leeching."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java
+msgid "Performance"
+msgstr "Rendiment"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Performance Mode"
+msgstr "Mode de rendiment"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Lite turns off animations, cover art, live sorting and other visual extras to keep FrostWire responsive. Downloads, seeding and searches are never slowed down."
+msgstr "Lleuger desactiva les animacions, les caràtules, l’ordenació en directe i altres extres visuals perquè FrostWire respongui ràpid. Les baixades, la compartició i les cerques mai no s’alenteixen."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Automatic (recommended)"
+msgstr "Automàtic (recomanat)"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Full"
+msgstr "Complet"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Lite"
+msgstr "Lleuger"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Automatic picks Lite on slow computers when FrostWire starts. Full and Lite apply right away."
+msgstr "Automàtic tria Lleuger als ordinadors lents quan s’inicia FrostWire. Complet i Lleuger s’apliquen a l’instant."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Running now: Full"
+msgstr "En ús ara: Complet"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Running now: Lite"
+msgstr "En ús ara: Lleuger"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/library/LibraryCoverArtPanel.java
+msgid "Click to show the cover art"
+msgstr "Feu clic per mostrar la caràtula"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
+msgid "FrostWire is pausing often on this computer. Try Lite mode"
+msgstr "FrostWire s’atura sovint en aquest ordinador. Proveu el mode Lleuger"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
+msgid "Dismiss"
+msgstr "Descarta"

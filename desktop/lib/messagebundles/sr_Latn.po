@@ -6895,3 +6895,51 @@ msgstr "Don't seed finished downloads."
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
 msgid "BitTorrent users on the internet may only download file chunks of that torrent from you while you're downloading its data files. Some trackers will penalize this Leeching behavior."
 msgstr "BitTorrent users on the internet may only download file chunks of that torrent from you while you're downloading its data files. Some trackers will penalize this Leeching behavior."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java
+msgid "Performance"
+msgstr "Performanse"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Performance Mode"
+msgstr "Režim performansi"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Lite turns off animations, cover art, live sorting and other visual extras to keep FrostWire responsive. Downloads, seeding and searches are never slowed down."
+msgstr "Laki režim isključuje animacije, omote, sortiranje uživo i druge vizuelne dodatke da bi FrostWire brzo reagovao. Preuzimanja, sidovanje i pretrage se nikad ne usporavaju."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Automatic (recommended)"
+msgstr "Automatski (preporučeno)"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Full"
+msgstr "Puni"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Lite"
+msgstr "Laki"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Automatic picks Lite on slow computers when FrostWire starts. Full and Lite apply right away."
+msgstr "Automatski bira Laki na sporim računarima pri pokretanju FrostWire-a. Puni i Laki se primenjuju odmah."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Running now: Full"
+msgstr "Sada radi: Puni"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Running now: Lite"
+msgstr "Sada radi: Laki"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/library/LibraryCoverArtPanel.java
+msgid "Click to show the cover art"
+msgstr "Kliknite da prikažete omot"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
+msgid "FrostWire is pausing often on this computer. Try Lite mode"
+msgstr "FrostWire često zastaje na ovom računaru. Probajte režim Laki"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
+msgid "Dismiss"
+msgstr "Zatvori"

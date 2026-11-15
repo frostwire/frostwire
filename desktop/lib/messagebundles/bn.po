@@ -7119,3 +7119,51 @@ msgstr "শেষ ডাউনলোড শেষ না"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
 msgid "BitTorrent users on the internet may only download file chunks of that torrent from you while you're downloading its data files. Some trackers will penalize this Leeching behavior."
 msgstr "ইন্টারনেটে বিট-টরেন্ট ব্যবহারকারীরা আপনি ডাউনলোড করার সময় শুধুমাত্র আপনার থেকে যে ঝরনা ফাইল অংশ ডাউনলোড ডাউনলোড ডাটা ফাইল.কিছু ট্র্যাকাররা এই খারাপ আচরণ দমন করবে."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java
+msgid "Performance"
+msgstr "কর্মক্ষমতা"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Performance Mode"
+msgstr "কর্মক্ষমতা মোড"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Lite turns off animations, cover art, live sorting and other visual extras to keep FrostWire responsive. Downloads, seeding and searches are never slowed down."
+msgstr "FrostWire দ্রুত রাখতে লাইট অ্যানিমেশন, কভার আর্ট, লাইভ সাজানো ও অন্যান্য ভিজ্যুয়াল সুবিধা বন্ধ করে। ডাউনলোড, সিডিং ও অনুসন্ধান কখনো ধীর হয় না।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Automatic (recommended)"
+msgstr "স্বয়ংক্রিয় (প্রস্তাবিত)"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Full"
+msgstr "পূর্ণ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Lite"
+msgstr "লাইট"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Automatic picks Lite on slow computers when FrostWire starts. Full and Lite apply right away."
+msgstr "FrostWire চালু হলে ধীর কম্পিউটারে স্বয়ংক্রিয় লাইট বেছে নেয়। পূর্ণ ও লাইট সঙ্গে সঙ্গে চালু হয়।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Running now: Full"
+msgstr "এখন চলছে: পূর্ণ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Running now: Lite"
+msgstr "এখন চলছে: লাইট"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/library/LibraryCoverArtPanel.java
+msgid "Click to show the cover art"
+msgstr "কভার আর্ট দেখাতে ক্লিক করুন"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
+msgid "FrostWire is pausing often on this computer. Try Lite mode"
+msgstr "এই কম্পিউটারে FrostWire প্রায়ই থমকে যাচ্ছে। লাইট মোড চেষ্টা করুন"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
+msgid "Dismiss"
+msgstr "বন্ধ করুন"
