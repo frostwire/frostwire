@@ -265,6 +265,121 @@ class JdkWarmUpTest {
     assertTrue(scripts.contains(Character.UnicodeScript.ARABIC), scripts.toString());
   }
 
+  /**
+   * Loading a slot reads its character map, not its scaler: the first table cell, label or bold
+   * caption with text in the slot's script created the slot font's strike and scaler, reading the
+   * font file, on the EDT (Icebase #b1a05774f024, #0bf97dd98611, #392d07638e23,
+   * frostwire/frostwire#1562). The sweep creates them, after the main window shows, for the fonts
+   * text paints with and their bold.
+   */
+  @Test
+  void theSweepCreatesEverySlotsStrikeForTheTextFontsAndTheirBold() throws Exception {
+    String sweep =
+        methodSource("private static void sweepFallbackFonts() {").replaceAll("\\s+", "");
+    assertTrue(
+        sweep.contains(
+            "for(Fontfont:slotStrikeFonts(UIManager.getDefaults())){"
+                + "initializeAllSlots(font,JdkWarmUp::releaseFontLock);"
+                + "int[]codePoints=oneCodePointPerSlot(font,candidates);"
+                + "for(AffineTransformtransform:glyphTransforms(screenTransform())){"
+                + "createSlotStrikes(font,desktopHints,transform,codePoints,"
+                + "JdkWarmUp::releaseFontLock);"),
+        "the sweep doesn't create each slot's strike for the text fonts");
+    assertFalse(warmUpSource().contains("createSlotStrikes"), "slot strikes before the splash");
+
+    UIDefaults defaults = new UIDefaults();
+    Font label = new FontUIResource(Font.SANS_SERIF, Font.PLAIN, 13);
+    defaults.put("Label.font", label);
+    defaults.put("Table.font", new FontUIResource(label.deriveFont(15f)));
+    Set<Font> fonts = JdkWarmUp.slotStrikeFonts(defaults);
+    assertTrue(fonts.containsAll(JdkWarmUp.textFonts(defaults)), fonts::toString);
+    assertTrue(fonts.contains(label.deriveFont(Font.BOLD)), "the bold label font");
+    assertTrue(fonts.contains(label.deriveFont(Font.BOLD, 15f)), "the bold table font");
+    assertTrue(fonts.containsAll(JdkWarmUp.mainWindowPlatformFonts()), fonts::toString);
+  }
+
+  /**
+   * The sweep measures one code point of each slot the font maps any candidate with, so every slot
+   * the script sample reaches gets its strike, and no slot is measured twice.
+   */
+  @Test
+  void oneCodePointPerSlotCoversEverySlotOfTheCandidatesOnce() {
+    Font font = new Font(Font.DIALOG, Font.PLAIN, 12);
+    int[] candidates = JdkWarmUp.slotCandidateCodePoints();
+    int[] codePoints = JdkWarmUp.oneCodePointPerSlot(font, candidates);
+
+    Set<Integer> measured = new HashSet<>();
+    for (int cp : codePoints) {
+      assertTrue(font.canDisplay(cp), Integer.toHexString(cp));
+      assertTrue(measured.add(slotOf(font, cp)), "slot measured twice: " + Integer.toHexString(cp));
+    }
+    Set<Integer> expected = new HashSet<>();
+    for (int cp : candidates) {
+      if (font.canDisplay(cp)) {
+        expected.add(slotOf(font, cp));
+      }
+    }
+    JdkWarmUp.SCRIPT_GLYPH_SAMPLE
+        .codePoints()
+        .filter(cp -> Character.isLetter(cp) && font.canDisplay(cp))
+        .forEach(cp -> expected.add(slotOf(font, cp)));
+    assertEquals(expected, measured);
+  }
+
+  private static int slotOf(Font font, int codePoint) {
+    return font.createGlyphVector(
+                new java.awt.font.FontRenderContext(null, true, true),
+                Character.toString(codePoint))
+            .getGlyphCode(0)
+        >>> 24;
+  }
+
+  /** A letter of every script and code points spread over each block, never the same twice. */
+  @Test
+  void slotCandidatesSpanEveryScriptAndBlock() {
+    int[] candidates = JdkWarmUp.slotCandidateCodePoints();
+    assertEquals(candidates.length, Arrays.stream(candidates).distinct().count(), "duplicates");
+    Set<Character.UnicodeScript> scripts = new HashSet<>();
+    Set<Character.UnicodeBlock> blocks = new HashSet<>();
+    for (int cp : candidates) {
+      assertFalse(Character.isWhitespace(cp) || Character.isISOControl(cp), "invisible " + cp);
+      scripts.add(Character.UnicodeScript.of(cp));
+      blocks.add(Character.UnicodeBlock.of(cp));
+    }
+    for (Character.UnicodeScript script :
+        List.of(
+            Character.UnicodeScript.MALAYALAM,
+            Character.UnicodeScript.SINHALA,
+            Character.UnicodeScript.TAMIL,
+            Character.UnicodeScript.ETHIOPIC,
+            Character.UnicodeScript.HAN)) {
+      assertTrue(scripts.contains(script), "missing " + script);
+    }
+    assertTrue(blocks.contains(Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B));
+    assertTrue(blocks.contains(Character.UnicodeBlock.MATHEMATICAL_OPERATORS));
+    assertTrue(blocks.contains(Character.UnicodeBlock.EMOTICONS));
+    // Scanning every code point instead took over a minute per font.
+    assertTrue(candidates.length < 5_000, "candidates: " + candidates.length);
+  }
+
+  @Test
+  void createSlotStrikesMeasuresEachCodePointAndPausesAfterEach() {
+    Font font = new Font(Font.DIALOG, Font.PLAIN, 12);
+    int[] codePoints = JdkWarmUp.oneCodePointPerSlot(font, JdkWarmUp.slotCandidateCodePoints());
+    List<Thread> pauses = new ArrayList<>();
+    for (AffineTransform transform :
+        JdkWarmUp.glyphTransforms(AffineTransform.getScaleInstance(1.5, 1.5))) {
+      JdkWarmUp.createSlotStrikes(
+          font,
+          Map.of(
+              RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB),
+          transform,
+          codePoints,
+          () -> pauses.add(Thread.currentThread()));
+    }
+    assertEquals(2 * codePoints.length, pauses.size());
+  }
+
   @Test
   void theEarlyWindowTextAddsLatinDigitsAndPunctuation() {
     String ascii = JdkWarmUp.GLYPH_SAMPLE;

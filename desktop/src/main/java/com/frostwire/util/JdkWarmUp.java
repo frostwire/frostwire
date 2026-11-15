@@ -722,8 +722,9 @@ public final class JdkWarmUp {
 
   /**
    * Loads every fallback slot of every UI font, for text in any script (file names, search results
-   * and suggestions), then rasterizes {@link #SCRIPT_GLYPH_SAMPLE} and resolves fonts for complex
-   * text ({@link #warmUpTextLayout}), which consult those slots too.
+   * and suggestions), creates the slots' strikes for the fonts text paints with ({@link
+   * #createSlotStrikes}), then rasterizes {@link #SCRIPT_GLYPH_SAMPLE} and resolves fonts for
+   * complex text ({@link #warmUpTextLayout}), which consult those slots too.
    */
   private static void sweepFallbackFonts() {
     try {
@@ -732,6 +733,19 @@ public final class JdkWarmUp {
       }
     } catch (Throwable t) {
       LOG.warn("Fallback font warm-up failed: " + t.getMessage(), t);
+    }
+    try {
+      Map<?, ?> desktopHints = desktopFontHints();
+      int[] candidates = slotCandidateCodePoints();
+      for (Font font : slotStrikeFonts(UIManager.getDefaults())) {
+        initializeAllSlots(font, JdkWarmUp::releaseFontLock);
+        int[] codePoints = oneCodePointPerSlot(font, candidates);
+        for (AffineTransform transform : glyphTransforms(screenTransform())) {
+          createSlotStrikes(font, desktopHints, transform, codePoints, JdkWarmUp::releaseFontLock);
+        }
+      }
+    } catch (Throwable t) {
+      LOG.warn("Fallback font strike warm-up failed: " + t.getMessage(), t);
     }
     try {
       Map<?, ?> desktopHints = desktopFontHints();
@@ -777,6 +791,122 @@ public final class JdkWarmUp {
     for (int codePoint : SLOT_SWEEP_CODE_POINTS) {
       font.canDisplay(codePoint);
       pause.run();
+    }
+  }
+
+  /**
+   * The fonts whose fallback slot strikes the sweep creates: the {@link #textFonts}, their bold
+   * (captions and matches bolded with deriveFont: GUIUtils.setBoldText,
+   * TransferDetailPieces.boldCaption, MatchHighlightingCellRenderer) and the {@link
+   * #mainWindowPlatformFonts} (the header's tabs, the donation buttons).
+   */
+  static Set<Font> slotStrikeFonts(UIDefaults defaults) {
+    Set<Font> fonts = new LinkedHashSet<>();
+    for (Font font : textFonts(defaults)) {
+      fonts.add(font);
+      fonts.add(font.deriveFont(Font.BOLD));
+    }
+    fonts.addAll(mainWindowPlatformFonts());
+    return fonts;
+  }
+
+  /** Code points spread over each Unicode block among {@link #slotCandidateCodePoints}. */
+  private static final int CODE_POINTS_PER_BLOCK = 8;
+
+  /**
+   * Code points to find each fallback slot by: the first letter of each script and {@link
+   * #CODE_POINTS_PER_BLOCK} visible code points spread over each Unicode block, about 3,000. A slot
+   * font covers a script or some blocks, not always from their first code point; looking up every
+   * code point instead took over a minute per font.
+   */
+  static int[] slotCandidateCodePoints() {
+    Set<Character.UnicodeScript> scripts = new HashSet<>();
+    Set<Integer> candidates = new LinkedHashSet<>();
+    Map<Character.UnicodeBlock, List<Integer>> blocks = new LinkedHashMap<>();
+    for (int cp = ' '; cp <= Character.MAX_CODE_POINT; cp++) {
+      Character.UnicodeBlock block = Character.UnicodeBlock.of(cp);
+      if (block == null || !isVisible(cp)) {
+        continue;
+      }
+      blocks.computeIfAbsent(block, b -> new ArrayList<>()).add(cp);
+      if (Character.isLetter(cp) && scripts.add(Character.UnicodeScript.of(cp))) {
+        candidates.add(cp);
+      }
+    }
+    for (List<Integer> codePoints : blocks.values()) {
+      for (int i = 0; i < CODE_POINTS_PER_BLOCK; i++) {
+        candidates.add(codePoints.get(i * codePoints.size() / CODE_POINTS_PER_BLOCK));
+      }
+    }
+    return candidates.stream().mapToInt(Integer::intValue).toArray();
+  }
+
+  private static boolean isVisible(int codePoint) {
+    return switch (Character.getType(codePoint)) {
+      case Character.UNASSIGNED,
+          Character.CONTROL,
+          Character.FORMAT,
+          Character.SURROGATE,
+          Character.PRIVATE_USE,
+          Character.SPACE_SEPARATOR,
+          Character.LINE_SEPARATOR,
+          Character.PARAGRAPH_SEPARATOR ->
+          false;
+      default -> true;
+    };
+  }
+
+  /**
+   * One code point the font displays from each slot that maps any of {@code candidates}, in
+   * candidate order. A composite font's glyph code carries the slot that maps it in its top byte
+   * (sun.font.CompositeGlyphMapper, and CCompositeGlyphMapper on macOS); any other font is one
+   * slot.
+   */
+  static int[] oneCodePointPerSlot(Font font, int[] candidates) {
+    FontRenderContext frc = new FontRenderContext(null, true, true);
+    Map<Integer, Integer> bySlot = new LinkedHashMap<>();
+    for (int codePoint : candidates) {
+      if (font.canDisplay(codePoint)) {
+        int glyph = font.createGlyphVector(frc, Character.toString(codePoint)).getGlyphCode(0);
+        bySlot.putIfAbsent(glyph >>> 24, codePoint);
+      }
+    }
+    return bySlot.values().stream().mapToInt(Integer::intValue).toArray();
+  }
+
+  /**
+   * Measures and draws each code point in the font at the transform, with the desktop's text hints,
+   * calling {@code pause} after each. Text in a fallback slot creates that slot font's strike for
+   * the font's size, style, transform and hints, and the strike the slot font's scaler, which reads
+   * the font file (FreetypeFontScaler.initNativeScaler). Loading the slot ({@link
+   * #initializeAllSlots}) reads only its character map, so the first table cell, label or bold
+   * caption with text in the slot's script did the rest on the EDT (Icebase #b1a05774f024,
+   * #0bf97dd98611, #d9a5167fe941, frostwire/frostwire#1562).
+   */
+  static void createSlotStrikes(
+      Font font,
+      Map<?, ?> desktopHints,
+      AffineTransform transform,
+      int[] codePoints,
+      Runnable pause) {
+    int scale =
+        (int) Math.ceil(Math.max(1, Math.max(transform.getScaleX(), transform.getScaleY())));
+    BufferedImage image = new BufferedImage(64 * scale, 64 * scale, BufferedImage.TYPE_INT_RGB);
+    Graphics2D g = image.createGraphics();
+    try {
+      g.transform(transform);
+      if (desktopHints != null) {
+        g.addRenderingHints(desktopHints);
+      }
+      g.setFont(font);
+      for (int codePoint : codePoints) {
+        String text = Character.toString(codePoint);
+        g.getFontMetrics().stringWidth(text);
+        g.drawString(text, 0, 48);
+        pause.run();
+      }
+    } finally {
+      g.dispose();
     }
   }
 
