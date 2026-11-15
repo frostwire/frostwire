@@ -7272,6 +7272,7 @@ msgstr "Tidak dimuat turun"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/PiecePriorities.java
 msgid "downloaded"
 msgstr "telah dimuat turun"
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
 msgid "Participation:"
 msgstr "Penyertaan:"
@@ -7327,6 +7328,7 @@ msgstr "Laporan dibuat apabila FrostWire ranap atau beku. Ia mengandungi nombor 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
 msgid "You can change this later in Tools > Options > Advanced > Crash Reports."
 msgstr "Anda boleh menukar ini kemudian di Alat > Pilihan > Lanjutan > Laporan Ranap."
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java
 msgid "Performance"
 msgstr "Prestasi"

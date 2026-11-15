@@ -6826,6 +6826,7 @@ msgstr "Ekki sótt"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/PiecePriorities.java
 msgid "downloaded"
 msgstr "sótt"
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
 msgid "Participation:"
 msgstr "Þátttaka:"
@@ -6881,6 +6882,7 @@ msgstr "Skýrsla verður til þegar FrostWire hrynur eða frýs. Hún inniheldur
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
 msgid "You can change this later in Tools > Options > Advanced > Crash Reports."
 msgstr "Þú getur breytt þessu síðar í Verkfæri > Stillingar > Advanced > Hrunskýrslur."
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java
 msgid "Performance"
 msgstr "Afköst"

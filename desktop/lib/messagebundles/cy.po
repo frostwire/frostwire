@@ -6820,6 +6820,7 @@ msgstr "Heb ei lwytho i lawr"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/PiecePriorities.java
 msgid "downloaded"
 msgstr "wedi’i lwytho i lawr"
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
 msgid "Participation:"
 msgstr "Cyfranogiad:"
@@ -6875,6 +6876,7 @@ msgstr "Caiff adroddiad ei greu pan fydd FrostWire yn chwalu neu'n rhewi. Mae'n 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
 msgid "You can change this later in Tools > Options > Advanced > Crash Reports."
 msgstr "Gallwch newid hyn yn nes ymlaen yn Offer > Opsiynau > Uwch > Adroddiadau chwalu."
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java
 msgid "Performance"
 msgstr "Perfformiad"

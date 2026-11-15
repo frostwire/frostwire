@@ -6860,6 +6860,7 @@ msgstr "Ne preuzima se"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/PiecePriorities.java
 msgid "downloaded"
 msgstr "preuzeto"
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
 msgid "Participation:"
 msgstr "Učešće:"
@@ -6915,6 +6916,7 @@ msgstr "Izveštaj nastaje kada se FrostWire sruši ili zamrzne. Sadrži brojeve 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
 msgid "You can change this later in Tools > Options > Advanced > Crash Reports."
 msgstr "Ovo možete promeniti kasnije u Alatke > Podešavanja > Napredno > Izveštaji o padovima."
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java
 msgid "Performance"
 msgstr "Performanse"

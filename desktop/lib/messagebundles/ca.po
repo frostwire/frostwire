@@ -6645,6 +6645,7 @@ msgstr "No es descarrega"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/PiecePriorities.java
 msgid "downloaded"
 msgstr "descarregada"
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
 msgid "Participation:"
 msgstr "Participació:"
@@ -6700,6 +6701,7 @@ msgstr "Es crea un informe quan el FrostWire falla o es bloqueja. Conté número
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
 msgid "You can change this later in Tools > Options > Advanced > Crash Reports."
 msgstr "Pots canviar-ho més endavant a Eines > Opcions > Avançat > Informes de fallades."
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java
 msgid "Performance"
 msgstr "Rendiment"

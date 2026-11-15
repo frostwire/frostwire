@@ -7291,6 +7291,7 @@ msgstr "Hindi dina-download"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/PiecePriorities.java
 msgid "downloaded"
 msgstr "na-download na"
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
 msgid "Participation:"
 msgstr "Pakikilahok:"
@@ -7346,6 +7347,7 @@ msgstr "Gumagawa ng ulat kapag nag-crash o nag-freeze ang FrostWire. Naglalaman 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
 msgid "You can change this later in Tools > Options > Advanced > Crash Reports."
 msgstr "Maaari mo itong baguhin mamaya sa Tools > Pagpipilian > Pinauna > Mga Ulat ng Pag-crash."
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java
 msgid "Performance"
 msgstr "Pagganap"

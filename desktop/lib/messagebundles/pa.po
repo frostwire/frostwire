@@ -6730,6 +6730,7 @@ msgstr "ਡਾਊਨਲੋਡ ਨਹੀਂ ਹੋ ਰਿਹਾ"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/PiecePriorities.java
 msgid "downloaded"
 msgstr "ਡਾਊਨਲੋਡ ਹੋ ਗਿਆ"
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
 msgid "Participation:"
 msgstr "ਭਾਗੀਦਾਰੀ:"
@@ -6785,6 +6786,7 @@ msgstr "ਜਦੋਂ FrostWire ਕ੍ਰੈਸ਼ ਹੁੰਦਾ ਹੈ ਜਾ�
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
 msgid "You can change this later in Tools > Options > Advanced > Crash Reports."
 msgstr "ਤੁਸੀਂ ਇਸਨੂੰ ਬਾਅਦ ਵਿੱਚ ਟੂਲ > ਓਪਸ਼ੰਜ਼ > ਹੋਰ ਜਾਨਕਾਰੀ > ਕ੍ਰੈਸ਼ ਰਿਪੋਰਟਾਂ ਵਿੱਚ ਬਦਲ ਸਕਦੇ ਹੋ।"
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java
 msgid "Performance"
 msgstr "ਕਾਰਗੁਜ਼ਾਰੀ"

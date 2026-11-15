@@ -6721,6 +6721,7 @@ msgstr "Word nie afgelaai nie"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/PiecePriorities.java
 msgid "downloaded"
 msgstr "afgelaai"
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
 msgid "Participation:"
 msgstr "Deelname:"
@@ -6776,6 +6777,7 @@ msgstr "'n Verslag word gemaak wanneer FrostWire ineenstort of vries. Dit bevat 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
 msgid "You can change this later in Tools > Options > Advanced > Crash Reports."
 msgstr "Jy kan dit later verander in Gereedskap > Opsies > Gevorderd > Ineenstortingverslae."
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java
 msgid "Performance"
 msgstr "Prestasie"

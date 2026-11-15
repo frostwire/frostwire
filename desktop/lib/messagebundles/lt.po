@@ -6620,6 +6620,7 @@ msgstr "Nesiunčiama"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/PiecePriorities.java
 msgid "downloaded"
 msgstr "atsiųsta"
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
 msgid "Participation:"
 msgstr "Dalyvavimas:"
@@ -6675,6 +6676,7 @@ msgstr "Ataskaita sukuriama, kai FrostWire lūžta arba užstringa. Joje yra ver
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
 msgid "You can change this later in Tools > Options > Advanced > Crash Reports."
 msgstr "Tai galite pakeisti vėliau skiltyje Įrankiai > Parinktys > Advanced > Lūžimų ataskaitos."
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java
 msgid "Performance"
 msgstr "Našumas"

@@ -6958,6 +6958,7 @@ msgstr "Nem töltődik le"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/PiecePriorities.java
 msgid "downloaded"
 msgstr "letöltve"
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
 msgid "Participation:"
 msgstr "Részvétel:"
@@ -7013,6 +7014,7 @@ msgstr "Jelentés akkor készül, amikor a FrostWire összeomlik vagy lefagy. Ta
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
 msgid "You can change this later in Tools > Options > Advanced > Crash Reports."
 msgstr "Ezt később az Eszközök > Beállítások > Haladó > Összeomlás-jelentések menüben módosíthatod."
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java
 msgid "Performance"
 msgstr "Teljesítmény"

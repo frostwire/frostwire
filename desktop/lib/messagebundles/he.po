@@ -6539,6 +6539,7 @@ msgstr "לא מורד"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/PiecePriorities.java
 msgid "downloaded"
 msgstr "הורדה"
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
 msgid "Participation:"
 msgstr "השתתפות:"
@@ -6594,6 +6595,7 @@ msgstr "דוח נוצר כאשר FrostWire קורס או נתקע. הוא כול
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
 msgid "You can change this later in Tools > Options > Advanced > Crash Reports."
 msgstr "ניתן לשנות זאת מאוחר יותר ב־כלים > אפשרויות > מתקדם > דוחות קריסה."
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java
 msgid "Performance"
 msgstr "ביצועים"

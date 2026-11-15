@@ -6633,6 +6633,7 @@ msgstr "Mhux qed titniżżel"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/PiecePriorities.java
 msgid "downloaded"
 msgstr "imniżżel"
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
 msgid "Participation:"
 msgstr "Parteċipazzjoni:"
@@ -6688,6 +6689,7 @@ msgstr "Rapport isir meta FrostWire jaqa' jew jiffriża. Fih in-numri tal-verżj
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
 msgid "You can change this later in Tools > Options > Advanced > Crash Reports."
 msgstr "Tista' tbiddel dan aktar tard f'Għodod > Għażliet > Advanced > Rapporti tal-waqgħat."
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java
 msgid "Performance"
 msgstr "Prestazzjoni"

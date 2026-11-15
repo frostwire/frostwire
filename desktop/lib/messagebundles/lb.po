@@ -6669,6 +6669,7 @@ msgstr "Gëtt net erofgelueden"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/PiecePriorities.java
 msgid "downloaded"
 msgstr "erofgelueden"
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java
 msgid "Participation:"
 msgstr "Bedeelegung:"
@@ -6724,6 +6725,7 @@ msgstr "E Bericht entsteet, wann FrostWire ofstierzt oder blockéiert. En enthä
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
 msgid "You can change this later in Tools > Options > Advanced > Crash Reports."
 msgstr "Dir kënnt dat méi spéit ënner Geräter > Optiounen > Erweidert > Ofstuerzberichter änneren."
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java
 msgid "Performance"
 msgstr "Leeschtung"
