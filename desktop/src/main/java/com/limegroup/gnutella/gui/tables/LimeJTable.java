@@ -290,6 +290,11 @@ public class LimeJTable extends JTable implements JSortTable {
     Point p = e.getPoint();
     int row = rowAtPoint(p);
     int col = columnAtPoint(p);
+    // -1 past the last column or row: no cell, so no renderer to ask and no tooltip
+    if (row < 0 || col < 0) {
+      tips = EMPTY_STRING_ARRAY;
+      return null;
+    }
     TableCellRenderer cellRenderer = getCellRenderer(row, col);
     if (cellRenderer instanceof FWAbstractJPanelTableCellRenderer) {
       FWAbstractJPanelTableCellRenderer renderer = (FWAbstractJPanelTableCellRenderer) cellRenderer;
