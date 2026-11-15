@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.limegroup.gnutella.gui.IcebaseReportsText;
 import com.limegroup.gnutella.gui.init.SeedingPublishingText;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -69,6 +70,35 @@ class SetupWizardTranslationsTest {
     return null;
   }
 
+  /** frostwire/frostwire#1565: the Icebase reports choice, in the wizard and its Options pane. */
+  private static List<String> icebaseReportsMsgids() {
+    return List.of(
+        IcebaseReportsText.optionsNodeTitle(),
+        IcebaseReportsText.paneTitle(),
+        IcebaseReportsText.label(),
+        IcebaseReportsText.note(),
+        IcebaseReportsText.whereToChangeIt());
+  }
+
+  /** The menu path keeps its four steps, and "Icebase" is never translated. */
+  @Test
+  void everyLanguageKeepsTheIcebaseNameAndTheMenuPath() throws Exception {
+    for (Path file : catalogs()) {
+      String lang = file.getFileName().toString().replace(".po", "");
+      if (ENGLISH.contains(lang)) {
+        continue;
+      }
+      String catalog = Files.readString(file, StandardCharsets.UTF_8);
+      String node = msgstr(catalog, IcebaseReportsText.optionsNodeTitle());
+      String where = msgstr(catalog, IcebaseReportsText.whereToChangeIt());
+      assertEquals(3, where.split(" > ", -1).length - 1, lang + ": " + where);
+      assertTrue(where.contains(node), lang + " names the pane differently: " + where);
+      assertTrue(msgstr(catalog, IcebaseReportsText.label()).contains("Icebase"), lang);
+      assertTrue(msgstr(catalog, IcebaseReportsText.note()).contains("Icebase"), lang);
+      assertTrue(msgstr(catalog, IcebaseReportsText.note()).contains("IP"), lang);
+    }
+  }
+
   @Test
   void sourceStringsMatchTheCatalogKeys() {
     List<String> points = SeedingPublishingText.distributedSearchPoints();
@@ -84,6 +114,7 @@ class SetupWizardTranslationsTest {
     msgids.add(SeedingPublishingText.joinNetworkNote());
     msgids.add(SeedingPublishingText.catalogLabel());
     msgids.add(SeedingPublishingText.catalogNote());
+    msgids.addAll(icebaseReportsMsgids());
     List<Path> files = catalogs();
     assertTrue(files.size() >= 61, "expected every language catalog, found " + files.size());
     for (Path file : files) {

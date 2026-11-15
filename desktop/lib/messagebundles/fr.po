@@ -7459,3 +7459,23 @@ msgstr "Ne partagez pas les téléchargements terminés."
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
 msgid "BitTorrent users on the internet may only download file chunks of that torrent from you while you're downloading its data files. Some trackers will penalize this Leeching behavior."
 msgstr "Les utilisateurs BitTorrent sur Internet ne pourront télécharger des morceaux de ce torrent depuis votre poste que pendant que vous en téléchargez les fichiers de données. Certains trackers pénaliseront ce comportement de passager clandestin (leeching)."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Crash Reports"
+msgstr "Rapports de plantage"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Anonymous Crash and Freeze Reports"
+msgstr "Rapports anonymes de plantage et de blocage"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Send anonymous crash and freeze reports to Icebase, our bug tracker"
+msgstr "Envoyer des rapports anonymes de plantage et de blocage à Icebase, notre outil de suivi des bogues"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "A report is made when FrostWire crashes or freezes. It holds version numbers (FrostWire, Java, your system), memory, CPU and thread statistics, uptime, and where in the code it happened (class, method and line). Never error messages, your user name, file names, searches, downloads or anything that identifies you. Our server sees your IP address, as any server does, but does not store it. FrostWire also tells Icebase once a minute that it is running and whether it crashed or froze, so we can count sessions without problems. Most crashes and freezes we fix are found this way, often before anyone writes in."
+msgstr "Un rapport est créé lorsque FrostWire plante ou se bloque. Il contient les numéros de version (FrostWire, Java, votre système), des statistiques sur la mémoire, le processeur et les threads, la durée de fonctionnement et l'endroit du code où cela s'est produit (classe, méthode et ligne). Jamais de messages d'erreur, votre nom d'utilisateur, de noms de fichiers, de recherches, de téléchargements ni rien qui vous identifie. Notre serveur voit votre adresse IP, comme tout serveur, mais ne l'enregistre pas. FrostWire indique aussi à Icebase une fois par minute qu'il fonctionne et s'il a planté ou s'est bloqué, afin que nous puissions compter les sessions sans problème. La plupart des plantages et blocages que nous corrigeons sont découverts ainsi, souvent avant que quiconque nous écrive."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "You can change this later in Tools > Options > Advanced > Crash Reports."
+msgstr "Vous pourrez modifier ce choix plus tard dans Outils > Options > Avancées > Rapports de plantage."

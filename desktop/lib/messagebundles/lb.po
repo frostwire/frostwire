@@ -6704,3 +6704,23 @@ msgstr "Fäerdeg Eroflueden net seeden."
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java
 msgid "BitTorrent users on the internet may only download file chunks of that torrent from you while you're downloading its data files. Some trackers will penalize this Leeching behavior."
 msgstr "BitTorrent-Benotzer um Internet kënnen just Dateistécker vun deem Torrent vun der eroflueden wärend s du séng Donnéeën-Dateien erofleeds. E puer Tracker bestrofen dëst Leech-Verhalen."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Crash Reports"
+msgstr "Ofstuerzberichter"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Anonymous Crash and Freeze Reports"
+msgstr "Anonym Ofstuerz- a Blockéierungsberichter"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "Send anonymous crash and freeze reports to Icebase, our bug tracker"
+msgstr "Anonym Ofstuerz- a Blockéierungsberichter un Icebase, eise Bugtracker, schécken"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "A report is made when FrostWire crashes or freezes. It holds version numbers (FrostWire, Java, your system), memory, CPU and thread statistics, uptime, and where in the code it happened (class, method and line). Never error messages, your user name, file names, searches, downloads or anything that identifies you. Our server sees your IP address, as any server does, but does not store it. FrostWire also tells Icebase once a minute that it is running and whether it crashed or froze, so we can count sessions without problems. Most crashes and freezes we fix are found this way, often before anyone writes in."
+msgstr "E Bericht entsteet, wann FrostWire ofstierzt oder blockéiert. En enthält Versiounsnummeren (FrostWire, Java, Äre System), Statistiken iwwer Späicher, CPU an Threads, d'Lafzäit an d'Plaz am Code, wou et geschitt ass (Klass, Method a Linn). Ni Feelermeldungen, Äre Benotzernumm, Dateinimm, Sichen, Downloads oder soss eppes, wat Iech identifizéiert. Eise Server gesäit Är IP-Adress, wéi all Server, mee späichert se net. FrostWire seet Icebase och eemol pro Minutt, datt et leeft an ob et ofgestierzt oder blockéiert ass, fir datt mir d'Sessiounen ouni Problemer zielen kënnen. Déi meescht Ofstierz a Blockéierungen, déi mir fléckelen, ginn esou fonnt, dacks ier iergendeen eis schreift."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
+msgid "You can change this later in Tools > Options > Advanced > Crash Reports."
+msgstr "Dir kënnt dat méi spéit ënner Geräter > Optiounen > Erweidert > Ofstuerzberichter änneren."
