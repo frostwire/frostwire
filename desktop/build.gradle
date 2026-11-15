@@ -1084,6 +1084,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.options.panes.KarmaDatabasePathTest"
         includeTestsMatching "com.limegroup.gnutella.gui.options.panes.IdentityLocalKarmaTest"
         includeTestsMatching "com.limegroup.gnutella.gui.options.panes.TorrentOptionsApplyOffEdtTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.options.panes.IcebaseReportsPaneItemTest"
         includeTestsMatching "com.limegroup.gnutella.gui.VPNStatusButtonRefreshTest"
         includeTestsMatching "com.limegroup.gnutella.gui.VPNWarningLabelBoldTest"
         includeTestsMatching "com.limegroup.gnutella.gui.VPNDropProtectionLinkTest"
