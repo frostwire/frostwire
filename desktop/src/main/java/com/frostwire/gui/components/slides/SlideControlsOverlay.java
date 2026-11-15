@@ -30,11 +30,8 @@ import com.limegroup.gnutella.gui.actions.AbstractAction;
 import com.limegroup.gnutella.gui.actions.LimeAction;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 import net.miginfocom.swing.MigLayout;
@@ -52,21 +49,11 @@ final class SlideControlsOverlay extends JPanel {
   private static final int SOCIAL_BAR_HEIGHT = 55;
   private final SlidePanelController controller;
   private final Composite overlayComposite;
-  private BufferedImage cachedBackground;
-  private int lastWidth = -1;
-  private int lastHeight = -1;
 
   SlideControlsOverlay(SlidePanelController controller) {
     this.controller = controller;
     this.overlayComposite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, BACKGROUND_ALPHA);
     setupUI();
-    addComponentListener(
-        new ComponentAdapter() {
-          @Override
-          public void componentResized(ComponentEvent e) {
-            invalidateCache();
-          }
-        });
   }
 
   private void setupUI() {
@@ -219,74 +206,35 @@ final class SlideControlsOverlay extends JPanel {
     }
   }
 
-  private void invalidateCache() {
-    if (cachedBackground != null) {
-      cachedBackground.flush();
-      cachedBackground = null;
-    }
-    // Note: repaint() is not needed here as component resize automatically triggers repaint
-  }
-
-  private BufferedImage getOrCreateCachedBackground() {
-    int width = getWidth();
-    int height = getHeight();
-
-    // Check for invalid dimensions first
+  /**
+   * Paints the translucent fill and the social bar straight into {@code g}. They are two
+   * rectangles, so there is nothing worth caching, and an image the size of the overlay ran the
+   * heap out (Icebase #9792a7e430d2): the fills are clipped to the damaged area and allocate
+   * nothing, whatever size the overlay has.
+   */
+  static void paintOverlayBackground(
+      Graphics g, int width, int height, Color background, Composite overlayComposite) {
     if (width <= 0 || height <= 0) {
-      return null;
+      return;
     }
+    Graphics2D g2d = (Graphics2D) g.create();
+    try {
+      g2d.setComposite(overlayComposite);
+      g2d.setColor(background);
+      g2d.fillRect(0, 0, width, height);
 
-    boolean needsRecreation =
-        cachedBackground == null || lastWidth != width || lastHeight != height;
-
-    if (needsRecreation) {
-      // Dispose of old cached image to free memory before creating new one
-      if (cachedBackground != null) {
-        cachedBackground.flush();
-      }
-
-      cachedBackground = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-      Graphics2D g2d = cachedBackground.createGraphics();
-      try {
-        Color background = getBackground();
-
-        // Draw overlay with alpha composite
-        g2d.setComposite(overlayComposite);
-        g2d.setColor(background);
-        g2d.fillRect(0, 0, width, height);
-
-        // Draw social bar
-        g2d.setComposite(AlphaComposite.SrcOver);
-        g2d.setColor(Color.BLACK);
-        g2d.fillRect(0, height - SOCIAL_BAR_HEIGHT, width, SOCIAL_BAR_HEIGHT);
-      } finally {
-        g2d.dispose();
-      }
-
-      lastWidth = width;
-      lastHeight = height;
+      g2d.setComposite(AlphaComposite.SrcOver);
+      g2d.setColor(Color.BLACK);
+      g2d.fillRect(0, height - SOCIAL_BAR_HEIGHT, width, SOCIAL_BAR_HEIGHT);
+    } finally {
+      g2d.dispose();
     }
-
-    return cachedBackground;
   }
 
   @Override
   public void paint(Graphics g) {
-    BufferedImage bg = getOrCreateCachedBackground();
-    if (bg != null) {
-      g.drawImage(bg, 0, 0, null);
-    }
+    paintOverlayBackground(g, getWidth(), getHeight(), getBackground(), overlayComposite);
     super.paint(g);
-  }
-
-  @Override
-  public void removeNotify() {
-    // Clean up cached image when component is removed from container
-    if (cachedBackground != null) {
-      cachedBackground.flush();
-      cachedBackground = null;
-    }
-    super.removeNotify();
   }
 
   private static final class InstallAction extends AbstractAction {
