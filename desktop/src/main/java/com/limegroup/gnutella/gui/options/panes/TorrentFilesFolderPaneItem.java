@@ -24,6 +24,7 @@ import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.SharingSettings;
 import java.io.File;
 import java.io.IOException;
+import java.util.function.Consumer;
 
 /**
  * @author gubatron
@@ -46,16 +47,36 @@ public final class TorrentFilesFolderPaneItem extends AbstractPaneItem {
 
   @Override
   public boolean applyOptions() throws IOException {
-    if (!COMPONENT.isTorrentFilesFolderPathValid(true)) {
-      GUIMediator.showError(TorrentFilesFolderComponent.getError());
+    return applyIfChanged(
+        SharingSettings.TORRENTS_DIR_SETTING.getValueAsString(),
+        COMPONENT,
+        GUIMediator::showError,
+        this::updateDefaultTorrentFilesFolder);
+  }
+
+  /**
+   * Applies the folder typed in {@code component} if it differs from {@code currentFolder}. Options
+   * are applied on the EDT and every Apply reaches every pane, so the folder is only checked on
+   * disk when the user actually changed it.
+   *
+   * @return whether the folder changed
+   * @throws IOException if the changed folder is not usable; the error was shown
+   */
+  static boolean applyIfChanged(
+      String currentFolder,
+      TorrentFilesFolderComponent component,
+      Consumer<String> showError,
+      Consumer<File> applyFolder)
+      throws IOException {
+    if (currentFolder.equals(component.getTorrentFilesFolderPath())) {
+      return false;
+    }
+    if (!component.isTorrentFilesFolderPathValid(true)) {
+      showError.accept(TorrentFilesFolderComponent.getError());
       throw new IOException();
     }
-    boolean dirty = isDirty();
-    if (dirty) {
-      final File newTorrentFilesFolder = new File(COMPONENT.getTorrentFilesFolderPath());
-      updateDefaultTorrentFilesFolder(newTorrentFilesFolder);
-    }
-    return dirty;
+    applyFolder.accept(new File(component.getTorrentFilesFolderPath()));
+    return true;
   }
 
   private void updateDefaultTorrentFilesFolder(File newTorrentFilesFolder) {

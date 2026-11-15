@@ -35,7 +35,7 @@ import org.limewire.util.CommonUtils;
  * @author gubatron
  * @author aldenml
  */
-public final class TorrentFilesFolderComponent extends JPanel {
+public class TorrentFilesFolderComponent extends JPanel {
   private static String errorMessage;
   private final JTextField folderTextField;
 
@@ -100,11 +100,11 @@ public final class TorrentFilesFolderComponent extends JPanel {
 
   public boolean isTorrentFilesFolderPathValid(boolean checkExist) {
     // has to be non empty, writeable, must be a folder
-    if (folderTextField.getText().trim().length() == 0) {
+    String path = getTorrentFilesFolderPath().trim();
+    if (path.isEmpty()) {
       errorMessage = I18n.tr("You forgot to enter a path for the Torrent Files Folder.");
       return false;
     }
-    String path = folderTextField.getText().trim();
     File folder = new File(path);
     return isTorrentFilesFolderPathValid(checkExist, folder);
   }
