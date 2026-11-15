@@ -89,4 +89,12 @@ public interface BTDownload {
   boolean canPreview();
 
   File getPreviewFile();
+
+  /**
+   * The magnet link to copy for this transfer, or null if it has none. It can ask the libtorrent
+   * session, so never call it on the EDT.
+   */
+  default String getMagnetUri() {
+    return null;
+  }
 }

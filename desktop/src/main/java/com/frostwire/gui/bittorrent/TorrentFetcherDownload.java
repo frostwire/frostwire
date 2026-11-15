@@ -130,6 +130,11 @@ public class TorrentFetcherDownload implements BTDownload {
     return uri;
   }
 
+  @Override
+  public String getMagnetUri() {
+    return uri != null && uri.startsWith("magnet") ? uri : null;
+  }
+
   public long getSize() {
     return -1;
   }

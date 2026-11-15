@@ -18,7 +18,6 @@
 
 package com.frostwire.gui.bittorrent;
 
-import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.gui.library.LibraryMediator;
 import com.frostwire.gui.library.LibraryUtils;
 import com.frostwire.util.Logger;
@@ -28,8 +27,11 @@ import com.limegroup.gnutella.gui.DialogOption;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.actions.LimeAction;
+import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.StringJoiner;
+import java.util.function.Consumer;
 import javax.swing.*;
 
 /**
@@ -288,25 +290,36 @@ final class BTDownloadActions {
     }
 
     public void performAction() {
-      BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
-      StringBuilder str = new StringBuilder();
-      for (int i = 0; i < downloaders.length; i++) {
-        BTDownload d = downloaders[i];
-        if (d instanceof BittorrentDownload btDownload) {
-          String magnetUri = btDownload.makeMagnetUri();
-          str.append(magnetUri);
-          str.append(BTEngine.getInstance().magnetPeers());
-          if (i < downloaders.length - 1) {
-            str.append(System.lineSeparator());
-          }
-        } else if (d instanceof TorrentFetcherDownload tfd) {
-          if (tfd.getUri().startsWith("magnet")) {
-            str = new StringBuilder(tfd.getUri());
-          }
-        }
-      }
-      GUIMediator.setClipboardContent(str.toString());
+      copyMagnets(
+          BTDownloadMediator.instance().getSelectedDownloaders(), GUIMediator::setClipboardContent);
     }
+  }
+
+  /**
+   * Builds the magnet links of {@code downloads}, one per line, on a background worker: libtorrent
+   * makes a magnet by asking its session thread for the torrent's metadata, which waits until the
+   * session is free (Icebase #1ad3acfaed4f). Then hands them to {@code copy} on the EDT.
+   */
+  static void copyMagnets(BTDownload[] downloads, Consumer<String> copy) {
+    DesktopParallelExecutor.execute(
+        () -> {
+          StringJoiner magnets = new StringJoiner(System.lineSeparator());
+          for (BTDownload download : downloads) {
+            try {
+              String magnet = download.getMagnetUri();
+              if (magnet != null) {
+                magnets.add(magnet);
+              }
+            } catch (RuntimeException e) {
+              // a torrent removed since it was selected
+              LOG.warn("Can't make the magnet of a transfer: " + e.getMessage());
+            }
+          }
+          if (magnets.length() > 0) {
+            String text = magnets.toString();
+            GUIMediator.safeInvokeLater(() -> copy.accept(text));
+          }
+        });
   }
 
   private static class CopyInfoHashAction extends RefreshingAction {

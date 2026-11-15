@@ -370,8 +370,10 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
     return item;
   }
 
-  String makeMagnetUri() {
-    return dl.magnetUri();
+  /** Asks the libtorrent session for the torrent's metadata: not on the EDT. */
+  @Override
+  public String getMagnetUri() {
+    return dl.magnetUri() + BTEngine.getInstance().magnetPeers();
   }
 
   TorrentInfo getTorrentInfo() {
