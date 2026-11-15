@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.frostwire.gui.PerformanceMode;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.File;
@@ -58,6 +59,30 @@ class CrashReportSpoolerReportTypesTest {
     assertEquals(List.of("name", "cpu_ms"), List.copyOf(busiest.keySet()));
     assertEquals("SearchManager-crawlExecutor-thread-N", busiest.get("name").getAsString());
     assertEquals(2210, busiest.get("cpu_ms").getAsInt());
+  }
+
+  /** Icebase compares reports by performance mode (frostwire/frostwire#1555). */
+  @Test
+  void everyReportCarriesThePerformanceMode() {
+    try {
+      PerformanceMode.resolve(
+          PerformanceMode.Choice.AUTOMATIC, new PerformanceMode.MachineFacts(2, 2048, 300, 90_000));
+      File spoolDir = new File(tempDir.toFile(), "performance-mode");
+      CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.1.5", 338, "");
+      spooler.spoolStrictMode("com.example.BlockingCall", 1);
+      JsonObject json = spooledJson(spoolDir.toPath());
+      assertEquals("lite", json.get("performance_mode").getAsString());
+      assertTrue(json.get("performance_mode_auto").getAsBoolean());
+
+      PerformanceMode.resolve(PerformanceMode.Choice.FULL, null);
+      File fullDir = new File(tempDir.toFile(), "performance-mode-full");
+      new CrashReportSpooler(fullDir, null, "7.1.5", 338, "").spoolWatchdog(3);
+      JsonObject full = spooledJson(fullDir.toPath());
+      assertEquals("full", full.get("performance_mode").getAsString());
+      assertFalse(full.get("performance_mode_auto").getAsBoolean());
+    } finally {
+      PerformanceMode.resolve(PerformanceMode.Choice.FULL, null);
+    }
   }
 
   @Test
@@ -126,6 +151,8 @@ class CrashReportSpoolerReportTypesTest {
                 "thread_peak",
                 "thread_groups",
                 "uptime_s",
+                "performance_mode",
+                "performance_mode_auto",
                 "violation_class",
                 "violation_count",
                 "report_nonce"));
@@ -221,6 +248,8 @@ class CrashReportSpoolerReportTypesTest {
                 "thread_peak",
                 "thread_groups",
                 "uptime_s",
+                "performance_mode",
+                "performance_mode_auto",
                 "missed_heartbeats",
                 "report_nonce"));
 
