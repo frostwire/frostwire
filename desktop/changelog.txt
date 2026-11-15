@@ -1,4 +1,5 @@
 FrostWire 7.1.5 UNRELEASED
+   - fix:mesh .torrent fetches no longer wait out the full timeout when the local IceBridge is slow to confirm the request — the fetch finishes as soon as the holder answers
    - new:users can opt out of anonymous Icebase crash and freeze reports — a third choice on the setup wizard's Seeding & Publishing page and Tools > Options > Advanced > Crash Reports; turning it off stops every report upload and the presence heartbeat and deletes reports waiting on disk; translated into every language
    - fix:FrostWire no longer freezes on Windows while you pick a folder on a slow, network or removable drive — folder pickers use Windows' native folder dialog off the EDT (JNA) instead of Swing's JFileChooser
    - fix:FrostWire no longer stalls while building the splash screen or the Library's first table on slow disks — their Swing classes are initialized off the EDT
