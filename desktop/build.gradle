@@ -401,6 +401,15 @@ dependencies {
     }
 
     implementation fileTree(dir: 'lib/jars', include: ['*.jar'], exclude: ['frostwire.jar'])
+    // JNA for the native Windows folder picker (WindowsFolderPicker). Only Windows runs it, so only a
+    // Windows build packs it (with its jnidispatch.dll) into frostwire.jar; elsewhere it is only
+    // compiled against.
+    def jna = 'net.java.dev.jna:jna:5.19.1'
+    compileOnly jna
+    testCompileOnly jna
+    if (os.isWindows()) {
+        implementation jna
+    }
     // FlatLaf for dark theme support
     implementation 'com.formdev:flatlaf:3.7.2'
     testImplementation platform('org.junit:junit-bom:5.14.4')
@@ -503,6 +512,8 @@ jar {
     ].collect { icebridge + it })
 
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    // JNA (Windows builds only) carries jnidispatch for ~25 platforms; frostwire.jar keeps Windows'.
+    exclude { it.path ==~ /com\/sun\/jna\/(?!win32-)[^\/]+-[^\/]+(\/.*)?/ }
 
     manifest {
         // The bundled SWIG jlibtorrent binding actually calls JNI. Grant the JVM's required
@@ -549,6 +560,8 @@ tasks.register('icebridgeJar', Jar) {
     exclude('com/limegroup/gnutella/gui/**')
     exclude('com/frostwire/gui/**')
     exclude('com/frostwire/desktop/**')
+    // JNA only serves the desktop GUI's Windows folder picker.
+    exclude('com/sun/jna/**')
 
     from sourceSets.main.output
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
@@ -574,6 +587,8 @@ tasks.register('crawlerJar', Jar) {
     exclude('com/limegroup/gnutella/gui/**')
     exclude('com/frostwire/gui/**')
     exclude('com/frostwire/desktop/**')
+    // JNA only serves the desktop GUI's Windows folder picker.
+    exclude('com/sun/jna/**')
 
     from sourceSets.main.output
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
@@ -1059,6 +1074,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.NativeFileIconPixelsTest"
         includeTestsMatching "com.limegroup.gnutella.gui.IconManagerNativeInitTest"
         includeTestsMatching "com.limegroup.gnutella.gui.NativeUiChooserTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.NativeFolderChooserTest"
         includeTestsMatching "com.limegroup.gnutella.gui.shell.ShellAssociationManagerThreadingTest"
         includeTestsMatching "com.limegroup.gnutella.gui.ImageManipulatorCacheTest"
         includeTestsMatching "com.limegroup.gnutella.gui.icebridge.IceBridgeTrafficGraphTest"

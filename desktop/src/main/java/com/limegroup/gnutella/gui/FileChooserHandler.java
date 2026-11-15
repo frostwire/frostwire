@@ -203,8 +203,16 @@ public final class FileChooserHandler {
    * @return the file or <code>null</code> when the user cancelled the dialog
    */
   public static File getSaveAsFile(String titleKey, File suggestedFile, final FileFilter filter) {
-    FileDialog dialog =
-        new FileDialog(GUIMediator.getAppFrame(), I18n.tr(titleKey), FileDialog.SAVE);
+    return getSaveAsFile(GUIMediator.getAppFrame(), titleKey, suggestedFile, filter);
+  }
+
+  /**
+   * Same as {@link #getSaveAsFile(String, File, FileFilter)}, with the dialog owned by {@code
+   * owner}.
+   */
+  public static File getSaveAsFile(
+      Frame owner, String titleKey, File suggestedFile, final FileFilter filter) {
+    FileDialog dialog = new FileDialog(owner, I18n.tr(titleKey), FileDialog.SAVE);
     dialog.setDirectory(suggestedFile.getParent());
     dialog.setFile(suggestedFile.getName());
     if (filter != null) {
@@ -302,6 +310,19 @@ public final class FileChooserHandler {
       @SuppressWarnings("SameParameterValue") boolean allowMultiSelect,
       final FileFilter filter) {
     if (mode == JFileChooser.DIRECTORIES_ONLY && !OSUtils.isAnyMac()) {
+      // Windows' own folder dialog, off the EDT: a JFileChooser asks the shell about each folder on
+      // the EDT and froze FrostWire on slow drives (frostwire/frostwire#1564). It picks one folder.
+      NativeFolderChooser.Choice choice =
+          NativeFolderChooser.instance()
+              .choose(
+                  parent,
+                  I18n.tr(titleKey),
+                  directory != null ? directory : getLastInputDirectory());
+      if (choice != null) {
+        if (choice.folder() == null) return null;
+        setLastInputDirectory(choice.folder());
+        return Collections.singletonList(choice.folder());
+      }
       JFileChooser fileChooser = getDirectoryChooser(titleKey, approveKey, directory, mode, filter);
       fileChooser.setMultiSelectionEnabled(allowMultiSelect);
       try {
