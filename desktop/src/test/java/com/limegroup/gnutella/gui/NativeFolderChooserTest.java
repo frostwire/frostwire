@@ -212,11 +212,6 @@ class NativeFolderChooserTest {
         }
       }
     }
-    assertEquals(
-        Set.of(
-            "FileChooserHandler.java",
-            "IceBridgeConsoleWindow.java",
-            "SendFileProgressDialog.java"),
-        direct);
+    assertEquals(Set.of("FileChooserHandler.java", "SendFileProgressDialog.java"), direct);
   }
 }

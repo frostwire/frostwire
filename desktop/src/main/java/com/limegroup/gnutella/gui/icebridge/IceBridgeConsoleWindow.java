@@ -15,9 +15,9 @@ import com.frostwire.search.relay.icebridge.client.IceBridgeClient;
 import com.frostwire.search.relay.icebridge.client.IceBridgeSearchTransport;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.DropTargets;
+import com.limegroup.gnutella.gui.FileChooserHandler;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.NoDropFileChooser;
 import com.limegroup.gnutella.gui.ShellFolderWarmUp;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -49,7 +49,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -60,7 +59,6 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -124,8 +122,7 @@ public final class IceBridgeConsoleWindow {
   private boolean paused;
 
   private IceBridgeConsoleWindow() {
-    // Its Save log button opens a JFileChooser, which waits on the Windows shell on the EDT
-    // (frostwire/frostwire#1411).
+    // Its Save log button opens a FileChooserHandler chooser (frostwire/frostwire#1411).
     ShellFolderWarmUp.warmUpForDirectoryChooser();
     buildUi();
     seedFromLog();
@@ -418,13 +415,17 @@ public final class IceBridgeConsoleWindow {
   }
 
   private void saveToFile() {
-    JFileChooser chooser = new NoDropFileChooser();
-    chooser.setDialogTitle(I18n.tr("Save IceBridge Console"));
-    chooser.setFileFilter(new FileNameExtensionFilter(I18n.tr("Log files"), "log", "txt"));
-    if (chooser.showSaveDialog(frame) != JFileChooser.APPROVE_OPTION) {
+    // The native save dialog: a JFileChooser waits on the Windows shell on the EDT
+    // (frostwire/frostwire#1564).
+    File file =
+        FileChooserHandler.getSaveAsFile(
+            frame,
+            I18n.tr("Save IceBridge Console"),
+            new File(FileChooserHandler.getLastInputDirectory(), "icebridge-console.log"),
+            null);
+    if (file == null) {
       return;
     }
-    File file = chooser.getSelectedFile();
     String content = toText(exportOrder());
     Thread writer =
         new Thread(
