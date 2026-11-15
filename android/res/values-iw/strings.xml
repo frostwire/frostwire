@@ -696,4 +696,23 @@
     <string name="endorse_source_peer_unavailable">לא ניתן היה להמליץ על עמית המקור. בדקו את אנרגיית הקארמה הזמינה ונסו שוב.</string>
     <string name="peer_catalog_download_failed">לא ניתן להתחיל הורדה זו. יש לרענן את הקטלוג של העמית ולנסות שוב. יש לבדוק בהעברות אם קיימת כבר הורדה או שגיאה.</string>
     <string name="distributed_stack_retry_countdown">ניסיון נוסף בעוד %1$d שניות</string>
+    <!-- The Pieces tab's tapped piece (frostwire/frostwire#1566) -->
+    <string name="transfer_detail_piece_title">חתיכה #%1$s מתוך %2$s</string>
+    <string name="transfer_detail_piece_state">מצב</string>
+    <string name="transfer_detail_piece_state_downloaded">הורדה ואומתה</string>
+    <string name="transfer_detail_piece_state_downloading">בהורדה, %1$d מתוך %2$d בלוקים (%3$d התבקשו)</string>
+    <string name="transfer_detail_piece_state_not_downloading">לא מורדת</string>
+    <string name="transfer_detail_piece_state_missing">חסרה</string>
+    <string name="transfer_detail_piece_size_bytes">%1$s (%2$s בתים)</string>
+    <string name="transfer_detail_piece_byte_range">טווח בתים</string>
+    <string name="transfer_detail_piece_peers">עמיתים שיש להם אותה</string>
+    <string name="transfer_detail_piece_priority">עדיפות</string>
+    <string name="transfer_detail_piece_priority_dont_download">אל תוריד</string>
+    <string name="transfer_detail_piece_priority_low">נמוכה</string>
+    <string name="transfer_detail_piece_priority_normal">רגילה</string>
+    <string name="transfer_detail_piece_priority_high">גבוהה</string>
+    <string name="transfer_detail_piece_file">קובץ</string>
+    <string name="transfer_detail_piece_files">קבצים</string>
+    <string name="transfer_detail_piece_more_files">ועוד %1$d</string>
+    <string name="transfer_detail_piece_close">סגור את פרטי החתיכה</string>
 </resources>

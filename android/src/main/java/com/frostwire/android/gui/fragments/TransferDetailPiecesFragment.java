@@ -18,7 +18,10 @@
 
 package com.frostwire.android.gui.fragments;
 
+import android.graphics.Point;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
@@ -47,6 +50,18 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
   //    private ProgressBar progressBar;
   private int totalPieces;
   private String pieceSizeString;
+
+  /** The tapped piece's details and priority choices, over the hive. */
+  private PieceDetailsPanel piecePanel;
+
+  /** The tapped piece, -1 for none; set on the main thread, read by the background refresh. */
+  private volatile int selectedPiece = -1;
+
+  /** A piece's priority is set on a background thread, never on the main one. */
+  private final PiecePriorities piecePriorities =
+      new PiecePriorities(
+          task -> SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, task),
+          SystemUtils::postToUIThread);
 
   public TransferDetailPiecesFragment() {
     super(R.layout.fragment_transfer_detail_pieces);
@@ -77,6 +92,118 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
     //        progressBar = findView(rootView,
     // R.id.fragment_transfer_detail_pieces_indeterminate_progress_bar);
     hexHiveView = findView(rootView, R.id.fragment_transfer_detail_pieces_hexhive_view);
+    piecePanel =
+        new PieceDetailsPanel(
+            findView(rootView, R.id.view_transfer_detail_piece_panel),
+            this::onPriorityChosen,
+            this::clearSelectedPiece);
+    hexHiveView.setOnPieceTapListener(this::onPieceTapped);
+    // a new view (the tab came back) has no piece selected
+    selectedPiece = -1;
+  }
+
+  @Override
+  protected void onTransferChanged() {
+    // another transfer's pieces, the tapped one was of the previous transfer
+    clearSelectedPiece();
+  }
+
+  /** Shows the tapped piece's details once they're read off the main thread. */
+  private void onPieceTapped(int piece) {
+    selectedPiece = piece;
+    if (piecePanel == null) {
+      return;
+    }
+    if (piece < 0 || uiBittorrentDownload == null) {
+      piecePanel.hide();
+      return;
+    }
+    if (piecePanel.shownPiece() != piece) {
+      // no other piece's details while the tapped one's are read
+      piecePanel.hide();
+    }
+    placePiecePanel(piece);
+    final String infoHash = uiBittorrentDownload.getInfoHash();
+    SystemUtils.postToHandler(
+        SystemUtils.HandlerThreadName.HIGH_PRIORITY,
+        () -> {
+          PieceDetails details = readPieceDetails(infoHash, piece);
+          if (details != null) {
+            SystemUtils.postToUIThread(() -> showPieceDetails(details));
+          }
+        });
+  }
+
+  /** The panel goes to the half of the hive the piece isn't in, so the piece stays in sight. */
+  private void placePiecePanel(int piece) {
+    Point center = new Point();
+    View panel = piecePanel.getView();
+    if (!hexHiveView.pieceCenter(piece, center)
+        || !(panel.getLayoutParams() instanceof FrameLayout.LayoutParams)) {
+      return;
+    }
+    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) panel.getLayoutParams();
+    int gravity = center.y > hexHiveView.getHeight() / 2 ? Gravity.TOP : Gravity.BOTTOM;
+    if (params.gravity != gravity) {
+      params.gravity = gravity;
+      panel.setLayoutParams(params);
+    }
+  }
+
+  private void clearSelectedPiece() {
+    selectedPiece = -1;
+    if (hexHiveView != null) {
+      hexHiveView.setSelectedPiece(-1);
+    }
+    if (piecePanel != null) {
+      piecePanel.hide();
+    }
+  }
+
+  /** Sets the piece's priority off the main thread, then refreshes the hive and the panel. */
+  private void onPriorityChosen(PieceDetails details, Priority priority) {
+    TorrentHandle handle = torrentHandle;
+    if (handle == null
+        || uiBittorrentDownload == null
+        || !details.infoHash.equals(uiBittorrentDownload.getInfoHash())) {
+      return;
+    }
+    piecePriorities.apply(
+        PiecePriorities.of(handle),
+        details.piece,
+        priority,
+        () -> loadPiecesData(details.infoHash));
+  }
+
+  /** Background thread only, null if the piece can't be read now. */
+  private PieceDetails readPieceDetails(String expectedInfoHash, int piece) {
+    SystemUtils.ensureBackgroundThreadOrCrash("TransferDetailPiecesFragment::readPieceDetails");
+    if (uiBittorrentDownload == null
+        || !expectedInfoHash.equals(uiBittorrentDownload.getInfoHash())) {
+      return null;
+    }
+    TorrentHandle handle =
+        torrentHandle != null ? torrentHandle : uiBittorrentDownload.getDl().getTorrentHandle();
+    try {
+      return handle != null
+          ? PieceDetails.read(expectedInfoHash, handle, handle.torrentFile(), piece)
+          : null;
+    } catch (Throwable t) {
+      LOG.warn("Could not read the details of piece " + piece, t);
+      return null;
+    }
+  }
+
+  private void showPieceDetails(PieceDetails details) {
+    // the tab closed, the transfer changed or another piece was tapped meanwhile
+    if (!isAdded()
+        || piecePanel == null
+        || uiBittorrentDownload == null
+        || !details.infoHash.equals(uiBittorrentDownload.getInfoHash())
+        || details.piece != selectedPiece) {
+      return;
+    }
+    piecePanel.show(details);
   }
 
   @Override
@@ -108,6 +235,7 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
     final TorrentStatus status;
     final TorrentInfo torrentInfo;
     final byte[] priorityMarks;
+    final PieceDetails selectedPieceDetails;
     try {
       status = currentTorrentHandle.status(TorrentHandle.QUERY_PIECES);
       torrentInfo = currentTorrentHandle.torrentFile();
@@ -117,6 +245,12 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
           downloaded == null || downloaded.isAllSet()
               ? null
               : readPriorityMarks(currentTorrentHandle);
+      // the tapped piece's panel follows it: missing, downloading, downloaded
+      int piece = selectedPiece;
+      selectedPieceDetails =
+          piece >= 0
+              ? PieceDetails.read(expectedInfoHash, currentTorrentHandle, torrentInfo, piece)
+              : null;
     } catch (Throwable t) {
       LOG.warn("Skipping pieces update because torrent status is unavailable", t);
       return;
@@ -131,14 +265,18 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
             : pieceSizeString;
 
     SystemUtils.postToUIThread(
-        () ->
-            applyPiecesData(
-                expectedInfoHash,
-                pieces,
-                priorityMarks,
-                piecesCount,
-                totalPiecesValue,
-                pieceSizeValue));
+        () -> {
+          applyPiecesData(
+              expectedInfoHash,
+              pieces,
+              priorityMarks,
+              piecesCount,
+              totalPiecesValue,
+              pieceSizeValue);
+          if (selectedPieceDetails != null) {
+            showPieceDetails(selectedPieceDetails);
+          }
+        });
   }
 
   /** The hive mark of each piece by its priority, see {@link PiecePriorities#mark}. */

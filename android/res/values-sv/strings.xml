@@ -695,4 +695,23 @@
     <string name="endorse_source_peer_unavailable">Det gick inte att rekommendera källpeeren. Kontrollera tillgänglig karmaenergi och försök igen.</string>
     <string name="peer_catalog_download_failed">Det gick inte att starta denna nedladdning. Uppdatera nodens katalog och försök igen. Kontrollera Överföringar efter en befintlig nedladdning eller ett fel.</string>
     <string name="distributed_stack_retry_countdown">Försöker igen om %1$d s</string>
+    <!-- The Pieces tab's tapped piece (frostwire/frostwire#1566) -->
+    <string name="transfer_detail_piece_title">Bit #%1$s av %2$s</string>
+    <string name="transfer_detail_piece_state">Tillstånd</string>
+    <string name="transfer_detail_piece_state_downloaded">Hämtad och verifierad</string>
+    <string name="transfer_detail_piece_state_downloading">Hämtar, %1$d av %2$d block (%3$d begärda)</string>
+    <string name="transfer_detail_piece_state_not_downloading">Hämtas inte</string>
+    <string name="transfer_detail_piece_state_missing">Saknas</string>
+    <string name="transfer_detail_piece_size_bytes">%1$s (%2$s byte)</string>
+    <string name="transfer_detail_piece_byte_range">Byteintervall</string>
+    <string name="transfer_detail_piece_peers">Jämlikar som har den</string>
+    <string name="transfer_detail_piece_priority">Prioritet</string>
+    <string name="transfer_detail_piece_priority_dont_download">Hämta inte</string>
+    <string name="transfer_detail_piece_priority_low">Låg</string>
+    <string name="transfer_detail_piece_priority_normal">Normal</string>
+    <string name="transfer_detail_piece_priority_high">Hög</string>
+    <string name="transfer_detail_piece_file">Fil</string>
+    <string name="transfer_detail_piece_files">Filer</string>
+    <string name="transfer_detail_piece_more_files">och %1$d till</string>
+    <string name="transfer_detail_piece_close">Stäng detaljer om biten</string>
 </resources>

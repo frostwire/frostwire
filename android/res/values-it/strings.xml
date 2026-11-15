@@ -695,4 +695,23 @@
     <string name="endorse_source_peer_unavailable">Impossibile raccomandare il peer sorgente. Controlla l\'energia karma disponibile e riprova.</string>
     <string name="peer_catalog_download_failed">Impossibile avviare questo download. Aggiorna il catalogo del peer e riprova. Controlla i trasferimenti per verificare se esiste già un download o un errore.</string>
     <string name="distributed_stack_retry_countdown">Nuovo tentativo tra %1$d s</string>
+    <!-- The Pieces tab's tapped piece (frostwire/frostwire#1566) -->
+    <string name="transfer_detail_piece_title">Pezzo #%1$s di %2$s</string>
+    <string name="transfer_detail_piece_state">Stato</string>
+    <string name="transfer_detail_piece_state_downloaded">Scaricato e verificato</string>
+    <string name="transfer_detail_piece_state_downloading">Download in corso, %1$d di %2$d blocchi (%3$d richiesti)</string>
+    <string name="transfer_detail_piece_state_not_downloading">Non viene scaricato</string>
+    <string name="transfer_detail_piece_state_missing">Mancante</string>
+    <string name="transfer_detail_piece_size_bytes">%1$s (%2$s byte)</string>
+    <string name="transfer_detail_piece_byte_range">Intervallo di byte</string>
+    <string name="transfer_detail_piece_peers">Peer che lo hanno</string>
+    <string name="transfer_detail_piece_priority">Priorità</string>
+    <string name="transfer_detail_piece_priority_dont_download">Non scaricare</string>
+    <string name="transfer_detail_piece_priority_low">Bassa</string>
+    <string name="transfer_detail_piece_priority_normal">Normale</string>
+    <string name="transfer_detail_piece_priority_high">Alta</string>
+    <string name="transfer_detail_piece_file">File</string>
+    <string name="transfer_detail_piece_files">File</string>
+    <string name="transfer_detail_piece_more_files">e altri %1$d</string>
+    <string name="transfer_detail_piece_close">Chiudi i dettagli del pezzo</string>
 </resources>

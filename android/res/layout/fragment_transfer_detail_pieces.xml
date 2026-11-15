@@ -1,6 +1,5 @@
 <!--
-    Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- *            Marcelina Knitter (@marcelinkaaa)
+    Created by Angel Leon (@gubatron)
     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -98,18 +97,27 @@
             android:layout_gravity="center_vertical|center_horizontal"
             android:visibility="gone"/>
 
-        <com.frostwire.android.gui.views.HexHiveView
-            android:id="@+id/fragment_transfer_detail_pieces_hexhive_view"
+        <!-- The tapped piece's panel goes over the hive: making room for it would shrink the
+             hive and move every cube. -->
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="horizontal"
-            android:padding="15dp"
-            android:visibility="visible"
-            android:background="@color/basic_gray_light"
-            app:hexhive_hexBorderColor="@color/basic_color_dark"
-            app:hexhive_fullColor="@color/basic_blue_highlight"
-            app:hexhive_emptyColor="@color/basic_gray_light"/>
+            android:layout_weight="1">
+
+            <com.frostwire.android.gui.views.HexHiveView
+                android:id="@+id/fragment_transfer_detail_pieces_hexhive_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:padding="15dp"
+                android:visibility="visible"
+                android:background="@color/basic_gray_light"
+                app:hexhive_hexBorderColor="@color/basic_color_dark"
+                app:hexhive_fullColor="@color/basic_blue_highlight"
+                app:hexhive_emptyColor="@color/basic_gray_light"/>
+
+            <include layout="@layout/view_transfer_detail_piece_panel"/>
+        </FrameLayout>
 
     </LinearLayout>
 

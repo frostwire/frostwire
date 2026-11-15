@@ -695,4 +695,23 @@
     <string name="endorse_source_peer_unavailable">ไม่สามารถรับรองเพียร์ต้นทางได้ โปรดตรวจสอบพลังงานกรรมที่เหลืออยู่แล้วลองอีกครั้ง</string>
     <string name="peer_catalog_download_failed">ไม่สามารถเริ่มการดาวน์โหลดนี้ได้ รีเฟรชแค็ตตาล็อกของเพียร์แล้วลองอีกครั้ง ตรวจสอบการถ่ายโอนเพื่อดูการดาวน์โหลดที่มีอยู่หรือข้อผิดพลาด</string>
     <string name="distributed_stack_retry_countdown">ลองอีกครั้งใน %1$d วินาที</string>
+    <!-- The Pieces tab's tapped piece (frostwire/frostwire#1566) -->
+    <string name="transfer_detail_piece_title">ชิ้น #%1$s จาก %2$s</string>
+    <string name="transfer_detail_piece_state">สถานะ</string>
+    <string name="transfer_detail_piece_state_downloaded">ดาวน์โหลดและตรวจสอบแล้ว</string>
+    <string name="transfer_detail_piece_state_downloading">กำลังดาวน์โหลด %1$d จาก %2$d บล็อก (ร้องขอ %3$d)</string>
+    <string name="transfer_detail_piece_state_not_downloading">ไม่ดาวน์โหลด</string>
+    <string name="transfer_detail_piece_state_missing">ยังไม่มี</string>
+    <string name="transfer_detail_piece_size_bytes">%1$s (%2$s ไบต์)</string>
+    <string name="transfer_detail_piece_byte_range">ช่วงไบต์</string>
+    <string name="transfer_detail_piece_peers">เพียร์ที่มีชิ้นนี้</string>
+    <string name="transfer_detail_piece_priority">ลำดับความสำคัญ</string>
+    <string name="transfer_detail_piece_priority_dont_download">ไม่ดาวน์โหลด</string>
+    <string name="transfer_detail_piece_priority_low">ต่ำ</string>
+    <string name="transfer_detail_piece_priority_normal">ปกติ</string>
+    <string name="transfer_detail_piece_priority_high">สูง</string>
+    <string name="transfer_detail_piece_file">ไฟล์</string>
+    <string name="transfer_detail_piece_files">ไฟล์</string>
+    <string name="transfer_detail_piece_more_files">และอีก %1$d</string>
+    <string name="transfer_detail_piece_close">ปิดรายละเอียดชิ้น</string>
 </resources>

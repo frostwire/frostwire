@@ -695,4 +695,23 @@
     <string name="endorse_source_peer_unavailable">Peer-ul sursă nu a putut fi recomandat. Verifică energia karma disponibilă și încearcă din nou.</string>
     <string name="peer_catalog_download_failed">Nu s-a putut porni această descărcare. Actualizați catalogul partenerului și încercați din nou. Verificați transferurile pentru o descărcare existentă sau o eroare.</string>
     <string name="distributed_stack_retry_countdown">O nouă încercare în %1$d s</string>
+    <!-- The Pieces tab's tapped piece (frostwire/frostwire#1566) -->
+    <string name="transfer_detail_piece_title">Piesa #%1$s din %2$s</string>
+    <string name="transfer_detail_piece_state">Stare</string>
+    <string name="transfer_detail_piece_state_downloaded">Descărcată și verificată</string>
+    <string name="transfer_detail_piece_state_downloading">Se descarcă, %1$d din %2$d blocuri (%3$d solicitate)</string>
+    <string name="transfer_detail_piece_state_not_downloading">Nu se descarcă</string>
+    <string name="transfer_detail_piece_state_missing">Lipsește</string>
+    <string name="transfer_detail_piece_size_bytes">%1$s (%2$s octeți)</string>
+    <string name="transfer_detail_piece_byte_range">Interval de octeți</string>
+    <string name="transfer_detail_piece_peers">Parteneri care o au</string>
+    <string name="transfer_detail_piece_priority">Prioritate</string>
+    <string name="transfer_detail_piece_priority_dont_download">Nu descărca</string>
+    <string name="transfer_detail_piece_priority_low">Scăzută</string>
+    <string name="transfer_detail_piece_priority_normal">Normală</string>
+    <string name="transfer_detail_piece_priority_high">Ridicată</string>
+    <string name="transfer_detail_piece_file">Fișier</string>
+    <string name="transfer_detail_piece_files">Fișiere</string>
+    <string name="transfer_detail_piece_more_files">și încă %1$d</string>
+    <string name="transfer_detail_piece_close">Închide detaliile piesei</string>
 </resources>

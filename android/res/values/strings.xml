@@ -696,4 +696,23 @@
     <string name="_30_minutes">30 minutes</string>
     <string name="ad_free_30_minutes">Ad-free 30 minutes</string>
     <string name="distributed_stack_retry_countdown">Trying again in %1$d s</string>
+    <!-- The Pieces tab's tapped piece (frostwire/frostwire#1566) -->
+    <string name="transfer_detail_piece_title">Piece #%1$s of %2$s</string>
+    <string name="transfer_detail_piece_state">State</string>
+    <string name="transfer_detail_piece_state_downloaded">Downloaded and verified</string>
+    <string name="transfer_detail_piece_state_downloading">Downloading, %1$d of %2$d blocks (%3$d requested)</string>
+    <string name="transfer_detail_piece_state_not_downloading">Not downloading</string>
+    <string name="transfer_detail_piece_state_missing">Missing</string>
+    <string name="transfer_detail_piece_size_bytes">%1$s (%2$s bytes)</string>
+    <string name="transfer_detail_piece_byte_range">Byte range</string>
+    <string name="transfer_detail_piece_peers">Peers with it</string>
+    <string name="transfer_detail_piece_priority">Priority</string>
+    <string name="transfer_detail_piece_priority_dont_download">Don\'t Download</string>
+    <string name="transfer_detail_piece_priority_low">Low</string>
+    <string name="transfer_detail_piece_priority_normal">Normal</string>
+    <string name="transfer_detail_piece_priority_high">High</string>
+    <string name="transfer_detail_piece_file">File</string>
+    <string name="transfer_detail_piece_files">Files</string>
+    <string name="transfer_detail_piece_more_files">and %1$d more</string>
+    <string name="transfer_detail_piece_close">Close piece details</string>
 </resources>

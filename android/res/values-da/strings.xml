@@ -695,4 +695,23 @@
     <string name="endorse_source_peer_unavailable">Kunne ikke anbefale kildepeeren. Tjek den tilgængelige karma-energi, og prøv igen.</string>
     <string name="peer_catalog_download_failed">Kunne ikke starte denne download. Opdater peerens katalog, og prøv igen. Se under Overførsler efter en eksisterende download eller fejl.</string>
     <string name="distributed_stack_retry_countdown">Prøver igen om %1$d sek.</string>
+    <!-- The Pieces tab's tapped piece (frostwire/frostwire#1566) -->
+    <string name="transfer_detail_piece_title">Stykke #%1$s af %2$s</string>
+    <string name="transfer_detail_piece_state">Tilstand</string>
+    <string name="transfer_detail_piece_state_downloaded">Downloadet og verificeret</string>
+    <string name="transfer_detail_piece_state_downloading">Downloader, %1$d af %2$d blokke (%3$d anmodet)</string>
+    <string name="transfer_detail_piece_state_not_downloading">Downloades ikke</string>
+    <string name="transfer_detail_piece_state_missing">Mangler</string>
+    <string name="transfer_detail_piece_size_bytes">%1$s (%2$s byte)</string>
+    <string name="transfer_detail_piece_byte_range">Byteområde</string>
+    <string name="transfer_detail_piece_peers">Peers, der har det</string>
+    <string name="transfer_detail_piece_priority">Prioritet</string>
+    <string name="transfer_detail_piece_priority_dont_download">Download ikke</string>
+    <string name="transfer_detail_piece_priority_low">Lav</string>
+    <string name="transfer_detail_piece_priority_normal">Normal</string>
+    <string name="transfer_detail_piece_priority_high">Høj</string>
+    <string name="transfer_detail_piece_file">Fil</string>
+    <string name="transfer_detail_piece_files">Filer</string>
+    <string name="transfer_detail_piece_more_files">og %1$d mere</string>
+    <string name="transfer_detail_piece_close">Luk stykkedetaljer</string>
 </resources>

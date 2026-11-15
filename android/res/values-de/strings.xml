@@ -695,4 +695,23 @@
     <string name="endorse_source_peer_unavailable">Der Quell-Peer konnte nicht empfohlen werden. Prüfen Sie die verfügbare Karma-Energie und versuchen Sie es erneut.</string>
     <string name="peer_catalog_download_failed">Dieser Download konnte nicht gestartet werden. Aktualisiere den Katalog des Peers und versuche es erneut. Prüfe unter Übertragungen, ob bereits ein Download oder ein Fehler vorliegt.</string>
     <string name="distributed_stack_retry_countdown">Erneuter Versuch in %1$d s</string>
+    <!-- The Pieces tab's tapped piece (frostwire/frostwire#1566) -->
+    <string name="transfer_detail_piece_title">Stück #%1$s von %2$s</string>
+    <string name="transfer_detail_piece_state">Zustand</string>
+    <string name="transfer_detail_piece_state_downloaded">Heruntergeladen und geprüft</string>
+    <string name="transfer_detail_piece_state_downloading">Wird heruntergeladen, %1$d von %2$d Blöcken (%3$d angefordert)</string>
+    <string name="transfer_detail_piece_state_not_downloading">Wird nicht heruntergeladen</string>
+    <string name="transfer_detail_piece_state_missing">Fehlt</string>
+    <string name="transfer_detail_piece_size_bytes">%1$s (%2$s Bytes)</string>
+    <string name="transfer_detail_piece_byte_range">Bytebereich</string>
+    <string name="transfer_detail_piece_peers">Peers, die es haben</string>
+    <string name="transfer_detail_piece_priority">Priorität</string>
+    <string name="transfer_detail_piece_priority_dont_download">Nicht herunterladen</string>
+    <string name="transfer_detail_piece_priority_low">Niedrig</string>
+    <string name="transfer_detail_piece_priority_normal">Normal</string>
+    <string name="transfer_detail_piece_priority_high">Hoch</string>
+    <string name="transfer_detail_piece_file">Datei</string>
+    <string name="transfer_detail_piece_files">Dateien</string>
+    <string name="transfer_detail_piece_more_files">und %1$d weitere</string>
+    <string name="transfer_detail_piece_close">Stückdetails schließen</string>
 </resources>

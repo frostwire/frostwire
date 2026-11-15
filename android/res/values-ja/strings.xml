@@ -696,4 +696,23 @@
     <string name="endorse_source_peer_unavailable">提供元ピアを推薦できませんでした。利用可能なカルマエネルギーを確認して、もう一度お試しください。</string>
     <string name="peer_catalog_download_failed">このダウンロードを開始できませんでした。ピアのカタログを更新して再試行してください。転送画面で既存のダウンロードやエラーを確認してください。</string>
     <string name="distributed_stack_retry_countdown">%1$d 秒後に再試行します</string>
+    <!-- The Pieces tab's tapped piece (frostwire/frostwire#1566) -->
+    <string name="transfer_detail_piece_title">ピース #%1$s / %2$s</string>
+    <string name="transfer_detail_piece_state">状態</string>
+    <string name="transfer_detail_piece_state_downloaded">ダウンロード済み・検証済み</string>
+    <string name="transfer_detail_piece_state_downloading">ダウンロード中、%2$d ブロック中 %1$d (%3$d 要求済み)</string>
+    <string name="transfer_detail_piece_state_not_downloading">ダウンロードしない</string>
+    <string name="transfer_detail_piece_state_missing">未取得</string>
+    <string name="transfer_detail_piece_size_bytes">%1$s (%2$s バイト)</string>
+    <string name="transfer_detail_piece_byte_range">バイト範囲</string>
+    <string name="transfer_detail_piece_peers">保有ピア数</string>
+    <string name="transfer_detail_piece_priority">優先度</string>
+    <string name="transfer_detail_piece_priority_dont_download">ダウンロードしない</string>
+    <string name="transfer_detail_piece_priority_low">低</string>
+    <string name="transfer_detail_piece_priority_normal">標準</string>
+    <string name="transfer_detail_piece_priority_high">高</string>
+    <string name="transfer_detail_piece_file">ファイル</string>
+    <string name="transfer_detail_piece_files">ファイル</string>
+    <string name="transfer_detail_piece_more_files">他 %1$d 件</string>
+    <string name="transfer_detail_piece_close">ピースの詳細を閉じる</string>
 </resources>

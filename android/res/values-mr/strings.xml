@@ -695,4 +695,23 @@
     <string name="endorse_source_peer_unavailable">स्रोत पीअरला मान्यता देता आली नाही. उपलब्ध कर्म ऊर्जा तपासा आणि पुन्हा प्रयत्न करा.</string>
     <string name="peer_catalog_download_failed">हे डाउनलोड सुरू करता आले नाही. पीअरची सूची रीफ्रेश करा आणि पुन्हा प्रयत्न करा. विद्यमान डाउनलोड किंवा त्रुटीसाठी हस्तांतरणे तपासा.</string>
     <string name="distributed_stack_retry_countdown">%1$d सेकंदांनी पुन्हा प्रयत्न करू</string>
+    <!-- The Pieces tab's tapped piece (frostwire/frostwire#1566) -->
+    <string name="transfer_detail_piece_title">तुकडा #%1$s / %2$s</string>
+    <string name="transfer_detail_piece_state">स्थिती</string>
+    <string name="transfer_detail_piece_state_downloaded">डाउनलोड आणि सत्यापित</string>
+    <string name="transfer_detail_piece_state_downloading">डाउनलोड होत आहे, %2$d पैकी %1$d ब्लॉक (%3$d विनंती केलेले)</string>
+    <string name="transfer_detail_piece_state_not_downloading">डाउनलोड होत नाही</string>
+    <string name="transfer_detail_piece_state_missing">उपलब्ध नाही</string>
+    <string name="transfer_detail_piece_size_bytes">%1$s (%2$s बाइट)</string>
+    <string name="transfer_detail_piece_byte_range">बाइट श्रेणी</string>
+    <string name="transfer_detail_piece_peers">ज्या पीअरकडे आहे</string>
+    <string name="transfer_detail_piece_priority">प्राधान्य</string>
+    <string name="transfer_detail_piece_priority_dont_download">डाउनलोड करू नका</string>
+    <string name="transfer_detail_piece_priority_low">कमी</string>
+    <string name="transfer_detail_piece_priority_normal">सामान्य</string>
+    <string name="transfer_detail_piece_priority_high">उच्च</string>
+    <string name="transfer_detail_piece_file">फाइल</string>
+    <string name="transfer_detail_piece_files">फाइल्स</string>
+    <string name="transfer_detail_piece_more_files">आणि आणखी %1$d</string>
+    <string name="transfer_detail_piece_close">तुकड्याचे तपशील बंद करा</string>
 </resources>

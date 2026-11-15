@@ -695,4 +695,23 @@
     <string name="endorse_source_peer_unavailable">Не ўдалося падтрымаць крынічны пір. Праверце даступную карма-энергію і паспрабуйце яшчэ раз.</string>
     <string name="peer_catalog_download_failed">Не ўдалося пачаць спампоўванне. Абнавіце каталог вузла і паспрабуйце зноў. Праверце раздзел перадач на наяўнасць спампоўвання або памылкі.</string>
     <string name="distributed_stack_retry_countdown">Паўторная спроба праз %1$d с</string>
+    <!-- The Pieces tab's tapped piece (frostwire/frostwire#1566) -->
+    <string name="transfer_detail_piece_title">Кавалак #%1$s з %2$s</string>
+    <string name="transfer_detail_piece_state">Стан</string>
+    <string name="transfer_detail_piece_state_downloaded">Спампаваны і правераны</string>
+    <string name="transfer_detail_piece_state_downloading">Спампоўваецца, %1$d з %2$d блокаў (%3$d запытана)</string>
+    <string name="transfer_detail_piece_state_not_downloading">Не спампоўваецца</string>
+    <string name="transfer_detail_piece_state_missing">Адсутнічае</string>
+    <string name="transfer_detail_piece_size_bytes">%1$s (%2$s байтаў)</string>
+    <string name="transfer_detail_piece_byte_range">Дыяпазон байтаў</string>
+    <string name="transfer_detail_piece_peers">Піры, у якіх ён ёсць</string>
+    <string name="transfer_detail_piece_priority">Прыярытэт</string>
+    <string name="transfer_detail_piece_priority_dont_download">Не спампоўваць</string>
+    <string name="transfer_detail_piece_priority_low">Нізкі</string>
+    <string name="transfer_detail_piece_priority_normal">Звычайны</string>
+    <string name="transfer_detail_piece_priority_high">Высокі</string>
+    <string name="transfer_detail_piece_file">Файл</string>
+    <string name="transfer_detail_piece_files">Файлы</string>
+    <string name="transfer_detail_piece_more_files">і яшчэ %1$d</string>
+    <string name="transfer_detail_piece_close">Закрыць звесткі пра кавалак</string>
 </resources>

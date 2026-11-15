@@ -695,4 +695,23 @@
     <string name="endorse_source_peer_unavailable">Не вдалося рекомендувати пір-джерело. Перевірте доступну енергію карми та повторіть спробу.</string>
     <string name="peer_catalog_download_failed">Не вдалося почати завантаження. Оновіть каталог вузла й повторіть спробу. Перевірте розділ передач на наявність завантаження або помилки.</string>
     <string name="distributed_stack_retry_countdown">Повторна спроба через %1$d с</string>
+    <!-- The Pieces tab's tapped piece (frostwire/frostwire#1566) -->
+    <string name="transfer_detail_piece_title">Шматок #%1$s з %2$s</string>
+    <string name="transfer_detail_piece_state">Стан</string>
+    <string name="transfer_detail_piece_state_downloaded">Завантажено й перевірено</string>
+    <string name="transfer_detail_piece_state_downloading">Завантажується, %1$d з %2$d блоків (%3$d запитано)</string>
+    <string name="transfer_detail_piece_state_not_downloading">Не завантажується</string>
+    <string name="transfer_detail_piece_state_missing">Відсутній</string>
+    <string name="transfer_detail_piece_size_bytes">%1$s (%2$s байтів)</string>
+    <string name="transfer_detail_piece_byte_range">Діапазон байтів</string>
+    <string name="transfer_detail_piece_peers">Піри, які його мають</string>
+    <string name="transfer_detail_piece_priority">Пріоритет</string>
+    <string name="transfer_detail_piece_priority_dont_download">Не завантажувати</string>
+    <string name="transfer_detail_piece_priority_low">Низький</string>
+    <string name="transfer_detail_piece_priority_normal">Звичайний</string>
+    <string name="transfer_detail_piece_priority_high">Високий</string>
+    <string name="transfer_detail_piece_file">Файл</string>
+    <string name="transfer_detail_piece_files">Файли</string>
+    <string name="transfer_detail_piece_more_files">і ще %1$d</string>
+    <string name="transfer_detail_piece_close">Закрити відомості про шматок</string>
 </resources>

@@ -695,4 +695,23 @@
     <string name="endorse_source_peer_unavailable">Izvorni peer nije mogao biti preporučen. Provjerite dostupnu karma energiju i pokušajte ponovno.</string>
     <string name="peer_catalog_download_failed">Nije moguće pokrenuti ovo preuzimanje. Osvježite katalog čvora i pokušajte ponovno. Provjerite prijenose za postojeće preuzimanje ili pogrešku.</string>
     <string name="distributed_stack_retry_countdown">Novi pokušaj za %1$d s</string>
+    <!-- The Pieces tab's tapped piece (frostwire/frostwire#1566) -->
+    <string name="transfer_detail_piece_title">Komad #%1$s od %2$s</string>
+    <string name="transfer_detail_piece_state">Stanje</string>
+    <string name="transfer_detail_piece_state_downloaded">Preuzet i provjeren</string>
+    <string name="transfer_detail_piece_state_downloading">Preuzimanje, %1$d od %2$d blokova (%3$d zatraženo)</string>
+    <string name="transfer_detail_piece_state_not_downloading">Ne preuzima se</string>
+    <string name="transfer_detail_piece_state_missing">Nedostaje</string>
+    <string name="transfer_detail_piece_size_bytes">%1$s (%2$s bajtova)</string>
+    <string name="transfer_detail_piece_byte_range">Raspon bajtova</string>
+    <string name="transfer_detail_piece_peers">Peerovi koji ga imaju</string>
+    <string name="transfer_detail_piece_priority">Prioritet</string>
+    <string name="transfer_detail_piece_priority_dont_download">Ne preuzimaj</string>
+    <string name="transfer_detail_piece_priority_low">Nizak</string>
+    <string name="transfer_detail_piece_priority_normal">Normalan</string>
+    <string name="transfer_detail_piece_priority_high">Visok</string>
+    <string name="transfer_detail_piece_file">Datoteka</string>
+    <string name="transfer_detail_piece_files">Datoteke</string>
+    <string name="transfer_detail_piece_more_files">i još %1$d</string>
+    <string name="transfer_detail_piece_close">Zatvori pojedinosti komada</string>
 </resources>

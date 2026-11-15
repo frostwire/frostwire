@@ -695,4 +695,23 @@
     <string name="endorse_source_peer_unavailable">మూల పీర్‌ను ఆమోదించడం సాధ్యం కాలేదు. అందుబాటులో ఉన్న కర్మ శక్తిని తనిఖీ చేసి మళ్లీ ప్రయత్నించండి.</string>
     <string name="peer_catalog_download_failed">ఈ డౌన్‌లోడ్‌ను ప్రారంభించలేకపోయాము. పీర్ కేటలాగ్‌ను రిఫ్రెష్ చేసి మళ్లీ ప్రయత్నించండి. ఇప్పటికే ఉన్న డౌన్‌లోడ్ లేదా లోపం కోసం బదిలీలను తనిఖీ చేయండి.</string>
     <string name="distributed_stack_retry_countdown">%1$d సెకన్లలో మళ్లీ ప్రయత్నిస్తాము</string>
+    <!-- The Pieces tab's tapped piece (frostwire/frostwire#1566) -->
+    <string name="transfer_detail_piece_title">పీస్ #%1$s / %2$s</string>
+    <string name="transfer_detail_piece_state">స్థితి</string>
+    <string name="transfer_detail_piece_state_downloaded">డౌన్‌లోడ్ చేసి ధృవీకరించబడింది</string>
+    <string name="transfer_detail_piece_state_downloading">డౌన్‌లోడ్ అవుతోంది, %2$d బ్లాక్‌లలో %1$d (%3$d అభ్యర్థించబడ్డాయి)</string>
+    <string name="transfer_detail_piece_state_not_downloading">డౌన్‌లోడ్ కావడం లేదు</string>
+    <string name="transfer_detail_piece_state_missing">లేదు</string>
+    <string name="transfer_detail_piece_size_bytes">%1$s (%2$s బైట్‌లు)</string>
+    <string name="transfer_detail_piece_byte_range">బైట్ పరిధి</string>
+    <string name="transfer_detail_piece_peers">దీన్ని కలిగి ఉన్న పీర్‌లు</string>
+    <string name="transfer_detail_piece_priority">ప్రాధాన్యత</string>
+    <string name="transfer_detail_piece_priority_dont_download">డౌన్‌లోడ్ చేయవద్దు</string>
+    <string name="transfer_detail_piece_priority_low">తక్కువ</string>
+    <string name="transfer_detail_piece_priority_normal">సాధారణ</string>
+    <string name="transfer_detail_piece_priority_high">అధిక</string>
+    <string name="transfer_detail_piece_file">ఫైల్</string>
+    <string name="transfer_detail_piece_files">ఫైల్‌లు</string>
+    <string name="transfer_detail_piece_more_files">మరియు మరో %1$d</string>
+    <string name="transfer_detail_piece_close">పీస్ వివరాలను మూసివేయి</string>
 </resources>

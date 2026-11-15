@@ -695,4 +695,23 @@
     <string name="endorse_source_peer_unavailable">De bronpeer kon niet worden aanbevolen. Controleer de beschikbare karma-energie en probeer het opnieuw.</string>
     <string name="peer_catalog_download_failed">Deze download kon niet worden gestart. Vernieuw de catalogus van de peer en probeer het opnieuw. Controleer Overdrachten op een bestaande download of fout.</string>
     <string name="distributed_stack_retry_countdown">Nieuwe poging over %1$d s</string>
+    <!-- The Pieces tab's tapped piece (frostwire/frostwire#1566) -->
+    <string name="transfer_detail_piece_title">Stuk #%1$s van %2$s</string>
+    <string name="transfer_detail_piece_state">Status</string>
+    <string name="transfer_detail_piece_state_downloaded">Gedownload en geverifieerd</string>
+    <string name="transfer_detail_piece_state_downloading">Bezig met downloaden, %1$d van %2$d blokken (%3$d aangevraagd)</string>
+    <string name="transfer_detail_piece_state_not_downloading">Wordt niet gedownload</string>
+    <string name="transfer_detail_piece_state_missing">Ontbreekt</string>
+    <string name="transfer_detail_piece_size_bytes">%1$s (%2$s bytes)</string>
+    <string name="transfer_detail_piece_byte_range">Bytebereik</string>
+    <string name="transfer_detail_piece_peers">Peers die het hebben</string>
+    <string name="transfer_detail_piece_priority">Prioriteit</string>
+    <string name="transfer_detail_piece_priority_dont_download">Niet downloaden</string>
+    <string name="transfer_detail_piece_priority_low">Laag</string>
+    <string name="transfer_detail_piece_priority_normal">Normaal</string>
+    <string name="transfer_detail_piece_priority_high">Hoog</string>
+    <string name="transfer_detail_piece_file">Bestand</string>
+    <string name="transfer_detail_piece_files">Bestanden</string>
+    <string name="transfer_detail_piece_more_files">en nog %1$d</string>
+    <string name="transfer_detail_piece_close">Details van stuk sluiten</string>
 </resources>

@@ -695,4 +695,23 @@
     <string name="endorse_source_peer_unavailable">Không thể xác nhận peer nguồn. Hãy kiểm tra năng lượng karma còn lại rồi thử lại.</string>
     <string name="peer_catalog_download_failed">Không thể bắt đầu lượt tải này. Làm mới danh mục của máy ngang hàng rồi thử lại. Kiểm tra mục Truyền tải để xem lượt tải đã có hoặc lỗi.</string>
     <string name="distributed_stack_retry_countdown">Thử lại sau %1$d giây</string>
+    <!-- The Pieces tab's tapped piece (frostwire/frostwire#1566) -->
+    <string name="transfer_detail_piece_title">Mảnh #%1$s / %2$s</string>
+    <string name="transfer_detail_piece_state">Trạng thái</string>
+    <string name="transfer_detail_piece_state_downloaded">Đã tải và xác minh</string>
+    <string name="transfer_detail_piece_state_downloading">Đang tải, %1$d / %2$d khối (%3$d đã yêu cầu)</string>
+    <string name="transfer_detail_piece_state_not_downloading">Không tải</string>
+    <string name="transfer_detail_piece_state_missing">Còn thiếu</string>
+    <string name="transfer_detail_piece_size_bytes">%1$s (%2$s byte)</string>
+    <string name="transfer_detail_piece_byte_range">Dải byte</string>
+    <string name="transfer_detail_piece_peers">Số peer có mảnh này</string>
+    <string name="transfer_detail_piece_priority">Ưu tiên</string>
+    <string name="transfer_detail_piece_priority_dont_download">Không tải</string>
+    <string name="transfer_detail_piece_priority_low">Thấp</string>
+    <string name="transfer_detail_piece_priority_normal">Bình thường</string>
+    <string name="transfer_detail_piece_priority_high">Cao</string>
+    <string name="transfer_detail_piece_file">Tệp</string>
+    <string name="transfer_detail_piece_files">Tệp</string>
+    <string name="transfer_detail_piece_more_files">và %1$d tệp khác</string>
+    <string name="transfer_detail_piece_close">Đóng chi tiết mảnh</string>
 </resources>

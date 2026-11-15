@@ -695,4 +695,23 @@
     <string name="endorse_source_peer_unavailable">Kon nie die bronpeer ondersteun nie. Kontroleer die beskikbare karma-energie en probeer weer.</string>
     <string name="peer_catalog_download_failed">Kon nie hierdie aflaai begin nie. Verfris die eweknie se katalogus en probeer weer. Kyk onder Oordragte vir ’n bestaande aflaai of fout.</string>
     <string name="distributed_stack_retry_countdown">Probeer weer oor %1$d s</string>
+    <!-- The Pieces tab's tapped piece (frostwire/frostwire#1566) -->
+    <string name="transfer_detail_piece_title">Stuk #%1$s van %2$s</string>
+    <string name="transfer_detail_piece_state">Toestand</string>
+    <string name="transfer_detail_piece_state_downloaded">Afgelaai en geverifieer</string>
+    <string name="transfer_detail_piece_state_downloading">Laai tans af, %1$d van %2$d blokke (%3$d aangevra)</string>
+    <string name="transfer_detail_piece_state_not_downloading">Word nie afgelaai nie</string>
+    <string name="transfer_detail_piece_state_missing">Ontbreek</string>
+    <string name="transfer_detail_piece_size_bytes">%1$s (%2$s grepe)</string>
+    <string name="transfer_detail_piece_byte_range">Greepreeks</string>
+    <string name="transfer_detail_piece_peers">Eweknieë wat dit het</string>
+    <string name="transfer_detail_piece_priority">Prioriteit</string>
+    <string name="transfer_detail_piece_priority_dont_download">Moenie aflaai nie</string>
+    <string name="transfer_detail_piece_priority_low">Laag</string>
+    <string name="transfer_detail_piece_priority_normal">Normaal</string>
+    <string name="transfer_detail_piece_priority_high">Hoog</string>
+    <string name="transfer_detail_piece_file">Lêer</string>
+    <string name="transfer_detail_piece_files">Lêers</string>
+    <string name="transfer_detail_piece_more_files">en nog %1$d</string>
+    <string name="transfer_detail_piece_close">Sluit stukbesonderhede</string>
 </resources>

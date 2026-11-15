@@ -261,7 +261,7 @@ public class HexHiveView<T> extends View {
    *
    * @return false, leaving {@code out} alone, when there's no layout yet or no such piece
    */
-  boolean pieceCenter(int piece, Point out) {
+  public boolean pieceCenter(int piece, Point out) {
     DrawingProperties dp = DP;
     if (dp == null || piece < 0 || piece >= dp.numHexs) {
       return false;

@@ -695,4 +695,23 @@
     <string name="endorse_source_peer_unavailable">Tidak dapat menyokong peer sumber. Semak tenaga karma yang tersedia dan cuba lagi.</string>
     <string name="peer_catalog_download_failed">Tidak dapat memulakan muat turun ini. Muat semula katalog rakan dan cuba lagi. Semak Pemindahan untuk muat turun sedia ada atau ralat.</string>
     <string name="distributed_stack_retry_countdown">Mencuba lagi dalam %1$d saat</string>
+    <!-- The Pieces tab's tapped piece (frostwire/frostwire#1566) -->
+    <string name="transfer_detail_piece_title">Keping #%1$s daripada %2$s</string>
+    <string name="transfer_detail_piece_state">Keadaan</string>
+    <string name="transfer_detail_piece_state_downloaded">Dimuat turun dan disahkan</string>
+    <string name="transfer_detail_piece_state_downloading">Memuat turun, %1$d daripada %2$d blok (%3$d diminta)</string>
+    <string name="transfer_detail_piece_state_not_downloading">Tidak dimuat turun</string>
+    <string name="transfer_detail_piece_state_missing">Tiada</string>
+    <string name="transfer_detail_piece_size_bytes">%1$s (%2$s bait)</string>
+    <string name="transfer_detail_piece_byte_range">Julat bait</string>
+    <string name="transfer_detail_piece_peers">Rakan yang memilikinya</string>
+    <string name="transfer_detail_piece_priority">Keutamaan</string>
+    <string name="transfer_detail_piece_priority_dont_download">Jangan muat turun</string>
+    <string name="transfer_detail_piece_priority_low">Rendah</string>
+    <string name="transfer_detail_piece_priority_normal">Biasa</string>
+    <string name="transfer_detail_piece_priority_high">Tinggi</string>
+    <string name="transfer_detail_piece_file">Fail</string>
+    <string name="transfer_detail_piece_files">Fail</string>
+    <string name="transfer_detail_piece_more_files">dan %1$d lagi</string>
+    <string name="transfer_detail_piece_close">Tutup butiran keping</string>
 </resources>

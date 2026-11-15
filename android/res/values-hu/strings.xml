@@ -695,4 +695,23 @@
     <string name="endorse_source_peer_unavailable">A forráspeer ajánlása nem sikerült. Ellenőrizze az elérhető karma-energiát, és próbálja újra.</string>
     <string name="peer_catalog_download_failed">Nem sikerült elindítani ezt a letöltést. Frissítse a partner katalógusát, és próbálja újra. Az átviteleknél ellenőrizze, hogy van-e már letöltés vagy hiba.</string>
     <string name="distributed_stack_retry_countdown">Újrapróbálkozás %1$d másodperc múlva</string>
+    <!-- The Pieces tab's tapped piece (frostwire/frostwire#1566) -->
+    <string name="transfer_detail_piece_title">Darab #%1$s / %2$s</string>
+    <string name="transfer_detail_piece_state">Állapot</string>
+    <string name="transfer_detail_piece_state_downloaded">Letöltve és ellenőrizve</string>
+    <string name="transfer_detail_piece_state_downloading">Letöltés, %1$d / %2$d blokk (%3$d kérve)</string>
+    <string name="transfer_detail_piece_state_not_downloading">Nincs letöltés</string>
+    <string name="transfer_detail_piece_state_missing">Hiányzik</string>
+    <string name="transfer_detail_piece_size_bytes">%1$s (%2$s bájt)</string>
+    <string name="transfer_detail_piece_byte_range">Bájttartomány</string>
+    <string name="transfer_detail_piece_peers">Partnerek, akiknél megvan</string>
+    <string name="transfer_detail_piece_priority">Prioritás</string>
+    <string name="transfer_detail_piece_priority_dont_download">Ne töltse le</string>
+    <string name="transfer_detail_piece_priority_low">Alacsony</string>
+    <string name="transfer_detail_piece_priority_normal">Normál</string>
+    <string name="transfer_detail_piece_priority_high">Magas</string>
+    <string name="transfer_detail_piece_file">Fájl</string>
+    <string name="transfer_detail_piece_files">Fájlok</string>
+    <string name="transfer_detail_piece_more_files">és még %1$d</string>
+    <string name="transfer_detail_piece_close">Darab részleteinek bezárása</string>
 </resources>

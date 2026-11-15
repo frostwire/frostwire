@@ -695,4 +695,23 @@
     <string name="endorse_source_peer_unavailable">Kunne ikke anbefale kilde-peeren. Sjekk tilgjengelig karma-energi og prøv igjen.</string>
     <string name="peer_catalog_download_failed">Kunne ikke starte denne nedlastingen. Oppdater katalogen til noden og prøv igjen. Se under Overføringer etter en eksisterende nedlasting eller feil.</string>
     <string name="distributed_stack_retry_countdown">Prøver igjen om %1$d sek.</string>
+    <!-- The Pieces tab's tapped piece (frostwire/frostwire#1566) -->
+    <string name="transfer_detail_piece_title">Brikke #%1$s av %2$s</string>
+    <string name="transfer_detail_piece_state">Tilstand</string>
+    <string name="transfer_detail_piece_state_downloaded">Lastet ned og bekreftet</string>
+    <string name="transfer_detail_piece_state_downloading">Laster ned, %1$d av %2$d blokker (%3$d forespurt)</string>
+    <string name="transfer_detail_piece_state_not_downloading">Lastes ikke ned</string>
+    <string name="transfer_detail_piece_state_missing">Mangler</string>
+    <string name="transfer_detail_piece_size_bytes">%1$s (%2$s byte)</string>
+    <string name="transfer_detail_piece_byte_range">Byteområde</string>
+    <string name="transfer_detail_piece_peers">Likemenn som har den</string>
+    <string name="transfer_detail_piece_priority">Prioritet</string>
+    <string name="transfer_detail_piece_priority_dont_download">Ikke last ned</string>
+    <string name="transfer_detail_piece_priority_low">Lav</string>
+    <string name="transfer_detail_piece_priority_normal">Normal</string>
+    <string name="transfer_detail_piece_priority_high">Høy</string>
+    <string name="transfer_detail_piece_file">Fil</string>
+    <string name="transfer_detail_piece_files">Filer</string>
+    <string name="transfer_detail_piece_more_files">og %1$d til</string>
+    <string name="transfer_detail_piece_close">Lukk detaljer om brikken</string>
 </resources>

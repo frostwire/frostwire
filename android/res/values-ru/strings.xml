@@ -696,4 +696,23 @@
     <string name="endorse_source_peer_unavailable">Не удалось рекомендовать пир-источник. Проверьте доступную энергию кармы и повторите попытку.</string>
     <string name="peer_catalog_download_failed">Не удалось начать загрузку. Обновите каталог узла и повторите попытку. Проверьте раздел передач на наличие существующей загрузки или ошибки.</string>
     <string name="distributed_stack_retry_countdown">Повторная попытка через %1$d с</string>
+    <!-- The Pieces tab's tapped piece (frostwire/frostwire#1566) -->
+    <string name="transfer_detail_piece_title">Часть #%1$s из %2$s</string>
+    <string name="transfer_detail_piece_state">Состояние</string>
+    <string name="transfer_detail_piece_state_downloaded">Загружена и проверена</string>
+    <string name="transfer_detail_piece_state_downloading">Загружается, %1$d из %2$d блоков (%3$d запрошено)</string>
+    <string name="transfer_detail_piece_state_not_downloading">Не загружается</string>
+    <string name="transfer_detail_piece_state_missing">Отсутствует</string>
+    <string name="transfer_detail_piece_size_bytes">%1$s (%2$s байт)</string>
+    <string name="transfer_detail_piece_byte_range">Диапазон байтов</string>
+    <string name="transfer_detail_piece_peers">Пиры, у которых она есть</string>
+    <string name="transfer_detail_piece_priority">Приоритет</string>
+    <string name="transfer_detail_piece_priority_dont_download">Не загружать</string>
+    <string name="transfer_detail_piece_priority_low">Низкий</string>
+    <string name="transfer_detail_piece_priority_normal">Обычный</string>
+    <string name="transfer_detail_piece_priority_high">Высокий</string>
+    <string name="transfer_detail_piece_file">Файл</string>
+    <string name="transfer_detail_piece_files">Файлы</string>
+    <string name="transfer_detail_piece_more_files">и ещё %1$d</string>
+    <string name="transfer_detail_piece_close">Закрыть сведения о части</string>
 </resources>

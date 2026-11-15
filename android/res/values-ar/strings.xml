@@ -695,4 +695,23 @@
     <string name="endorse_source_peer_unavailable">تعذّرت تزكية النظير المصدر. تحقق من طاقة السمعة المتاحة وحاول مرة أخرى.</string>
     <string name="peer_catalog_download_failed">تعذر بدء هذا التنزيل. حدّث كتالوج النظير وحاول مرة أخرى. تحقق من عمليات النقل بحثًا عن تنزيل موجود أو خطأ.</string>
     <string name="distributed_stack_retry_countdown">إعادة المحاولة خلال %1$d ث</string>
+    <!-- The Pieces tab's tapped piece (frostwire/frostwire#1566) -->
+    <string name="transfer_detail_piece_title">القطعة #%1$s من %2$s</string>
+    <string name="transfer_detail_piece_state">الحالة</string>
+    <string name="transfer_detail_piece_state_downloaded">تم تنزيلها والتحقق منها</string>
+    <string name="transfer_detail_piece_state_downloading">جارٍ التنزيل، %1$d من %2$d كتلة (%3$d مطلوبة)</string>
+    <string name="transfer_detail_piece_state_not_downloading">لا يتم تنزيلها</string>
+    <string name="transfer_detail_piece_state_missing">مفقودة</string>
+    <string name="transfer_detail_piece_size_bytes">%1$s (%2$s بايت)</string>
+    <string name="transfer_detail_piece_byte_range">نطاق البايتات</string>
+    <string name="transfer_detail_piece_peers">الأقران الذين لديهم</string>
+    <string name="transfer_detail_piece_priority">الأولوية</string>
+    <string name="transfer_detail_piece_priority_dont_download">لا تنزّل</string>
+    <string name="transfer_detail_piece_priority_low">منخفضة</string>
+    <string name="transfer_detail_piece_priority_normal">عادية</string>
+    <string name="transfer_detail_piece_priority_high">عالية</string>
+    <string name="transfer_detail_piece_file">ملف</string>
+    <string name="transfer_detail_piece_files">ملفات</string>
+    <string name="transfer_detail_piece_more_files">و%1$d أخرى</string>
+    <string name="transfer_detail_piece_close">إغلاق تفاصيل القطعة</string>
 </resources>

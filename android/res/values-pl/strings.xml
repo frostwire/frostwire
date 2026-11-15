@@ -698,4 +698,23 @@
     <string name="endorse_source_peer_unavailable">Nie udało się polecić peera źródłowego. Sprawdź dostępną energię karmy i spróbuj ponownie.</string>
     <string name="peer_catalog_download_failed">Nie udało się rozpocząć pobierania. Odśwież katalog peera i spróbuj ponownie. Sprawdź w transferach, czy pobieranie już istnieje lub wystąpił błąd.</string>
     <string name="distributed_stack_retry_countdown">Ponowna próba za %1$d s</string>
+    <!-- The Pieces tab's tapped piece (frostwire/frostwire#1566) -->
+    <string name="transfer_detail_piece_title">Fragment #%1$s z %2$s</string>
+    <string name="transfer_detail_piece_state">Stan</string>
+    <string name="transfer_detail_piece_state_downloaded">Pobrany i zweryfikowany</string>
+    <string name="transfer_detail_piece_state_downloading">Pobieranie, %1$d z %2$d bloków (%3$d zażądanych)</string>
+    <string name="transfer_detail_piece_state_not_downloading">Nie jest pobierany</string>
+    <string name="transfer_detail_piece_state_missing">Brak</string>
+    <string name="transfer_detail_piece_size_bytes">%1$s (%2$s bajtów)</string>
+    <string name="transfer_detail_piece_byte_range">Zakres bajtów</string>
+    <string name="transfer_detail_piece_peers">Peery, które go mają</string>
+    <string name="transfer_detail_piece_priority">Priorytet</string>
+    <string name="transfer_detail_piece_priority_dont_download">Nie pobieraj</string>
+    <string name="transfer_detail_piece_priority_low">Niski</string>
+    <string name="transfer_detail_piece_priority_normal">Normalny</string>
+    <string name="transfer_detail_piece_priority_high">Wysoki</string>
+    <string name="transfer_detail_piece_file">Plik</string>
+    <string name="transfer_detail_piece_files">Pliki</string>
+    <string name="transfer_detail_piece_more_files">i %1$d więcej</string>
+    <string name="transfer_detail_piece_close">Zamknij szczegóły fragmentu</string>
 </resources>

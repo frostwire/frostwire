@@ -695,4 +695,23 @@
     <string name="endorse_source_peer_unavailable">ماخذ پیئر کی توثیق نہیں ہو سکی۔ دستیاب کرما توانائی چیک کریں اور دوبارہ کوشش کریں۔</string>
     <string name="peer_catalog_download_failed">یہ ڈاؤن لوڈ شروع نہیں ہو سکا۔ پیئر کا کیٹلاگ تازہ کریں اور دوبارہ کوشش کریں۔ موجودہ ڈاؤن لوڈ یا خرابی کے لیے منتقلیاں دیکھیں۔</string>
     <string name="distributed_stack_retry_countdown">%1$d سیکنڈ میں دوبارہ کوشش کریں گے</string>
+    <!-- The Pieces tab's tapped piece (frostwire/frostwire#1566) -->
+    <string name="transfer_detail_piece_title">ٹکڑا #%1$s از %2$s</string>
+    <string name="transfer_detail_piece_state">حالت</string>
+    <string name="transfer_detail_piece_state_downloaded">ڈاؤن لوڈ اور تصدیق شدہ</string>
+    <string name="transfer_detail_piece_state_downloading">ڈاؤن لوڈ ہو رہا ہے، %2$d میں سے %1$d بلاک (%3$d کی درخواست)</string>
+    <string name="transfer_detail_piece_state_not_downloading">ڈاؤن لوڈ نہیں ہو رہا</string>
+    <string name="transfer_detail_piece_state_missing">غائب</string>
+    <string name="transfer_detail_piece_size_bytes">%1$s (%2$s بائٹس)</string>
+    <string name="transfer_detail_piece_byte_range">بائٹ کی حد</string>
+    <string name="transfer_detail_piece_peers">جن پیئرز کے پاس ہے</string>
+    <string name="transfer_detail_piece_priority">ترجیح</string>
+    <string name="transfer_detail_piece_priority_dont_download">ڈاؤن لوڈ نہ کریں</string>
+    <string name="transfer_detail_piece_priority_low">کم</string>
+    <string name="transfer_detail_piece_priority_normal">عام</string>
+    <string name="transfer_detail_piece_priority_high">زیادہ</string>
+    <string name="transfer_detail_piece_file">فائل</string>
+    <string name="transfer_detail_piece_files">فائلیں</string>
+    <string name="transfer_detail_piece_more_files">اور %1$d مزید</string>
+    <string name="transfer_detail_piece_close">ٹکڑے کی تفصیلات بند کریں</string>
 </resources>

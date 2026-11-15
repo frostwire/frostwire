@@ -695,4 +695,23 @@
     <string name="endorse_source_peer_unavailable">Lähdepeeriä ei voitu suositella. Tarkista käytettävissä oleva karma-energia ja yritä uudelleen.</string>
     <string name="peer_catalog_download_failed">Tätä latausta ei voitu aloittaa. Päivitä vertaisen luettelo ja yritä uudelleen. Tarkista siirroista, onko lataus jo olemassa tai onko tapahtunut virhe.</string>
     <string name="distributed_stack_retry_countdown">Yritetään uudelleen %1$d s kuluttua</string>
+    <!-- The Pieces tab's tapped piece (frostwire/frostwire#1566) -->
+    <string name="transfer_detail_piece_title">Kappale #%1$s / %2$s</string>
+    <string name="transfer_detail_piece_state">Tila</string>
+    <string name="transfer_detail_piece_state_downloaded">Ladattu ja tarkistettu</string>
+    <string name="transfer_detail_piece_state_downloading">Ladataan, %1$d / %2$d lohkoa (%3$d pyydetty)</string>
+    <string name="transfer_detail_piece_state_not_downloading">Ei ladata</string>
+    <string name="transfer_detail_piece_state_missing">Puuttuu</string>
+    <string name="transfer_detail_piece_size_bytes">%1$s (%2$s tavua)</string>
+    <string name="transfer_detail_piece_byte_range">Tavualue</string>
+    <string name="transfer_detail_piece_peers">Vertaiset, joilla se on</string>
+    <string name="transfer_detail_piece_priority">Prioriteetti</string>
+    <string name="transfer_detail_piece_priority_dont_download">Älä lataa</string>
+    <string name="transfer_detail_piece_priority_low">Matala</string>
+    <string name="transfer_detail_piece_priority_normal">Normaali</string>
+    <string name="transfer_detail_piece_priority_high">Korkea</string>
+    <string name="transfer_detail_piece_file">Tiedosto</string>
+    <string name="transfer_detail_piece_files">Tiedostot</string>
+    <string name="transfer_detail_piece_more_files">ja %1$d muuta</string>
+    <string name="transfer_detail_piece_close">Sulje kappaleen tiedot</string>
 </resources>

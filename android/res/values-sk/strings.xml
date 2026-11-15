@@ -695,4 +695,23 @@
     <string name="endorse_source_peer_unavailable">Zdrojového peera sa nepodarilo podporiť. Skontrolujte dostupnú karma energiu a skúste to znova.</string>
     <string name="peer_catalog_download_failed">Sťahovanie sa nepodarilo spustiť. Obnovte katalóg partnera a skúste to znova. V prenosoch skontrolujte existujúce sťahovanie alebo chybu.</string>
     <string name="distributed_stack_retry_countdown">Ďalší pokus o %1$d s</string>
+    <!-- The Pieces tab's tapped piece (frostwire/frostwire#1566) -->
+    <string name="transfer_detail_piece_title">Kus #%1$s z %2$s</string>
+    <string name="transfer_detail_piece_state">Stav</string>
+    <string name="transfer_detail_piece_state_downloaded">Stiahnutý a overený</string>
+    <string name="transfer_detail_piece_state_downloading">Sťahuje sa, %1$d z %2$d blokov (%3$d vyžiadaných)</string>
+    <string name="transfer_detail_piece_state_not_downloading">Nesťahuje sa</string>
+    <string name="transfer_detail_piece_state_missing">Chýba</string>
+    <string name="transfer_detail_piece_size_bytes">%1$s (%2$s bajtov)</string>
+    <string name="transfer_detail_piece_byte_range">Rozsah bajtov</string>
+    <string name="transfer_detail_piece_peers">Peery, ktoré ho majú</string>
+    <string name="transfer_detail_piece_priority">Priorita</string>
+    <string name="transfer_detail_piece_priority_dont_download">Nesťahovať</string>
+    <string name="transfer_detail_piece_priority_low">Nízka</string>
+    <string name="transfer_detail_piece_priority_normal">Normálna</string>
+    <string name="transfer_detail_piece_priority_high">Vysoká</string>
+    <string name="transfer_detail_piece_file">Súbor</string>
+    <string name="transfer_detail_piece_files">Súbory</string>
+    <string name="transfer_detail_piece_more_files">a ďalších %1$d</string>
+    <string name="transfer_detail_piece_close">Zavrieť podrobnosti kusu</string>
 </resources>

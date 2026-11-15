@@ -86,11 +86,14 @@ public class AndroidStringResourceParityTest {
   }
 
   // Strings that are legitimately identical to English in some languages: a format string with no
-  // words, and "N torrents" where the language uses the same word.
+  // words, and "N torrents" or "N bytes" where the language uses the same word.
   private static final Set<String> MAY_MATCH_ENGLISH =
       new HashSet<>(
           java.util.Arrays.asList(
-              "distributed_peers_row", "distributed_identity_shared_torrents", "use_bitsearch"));
+              "distributed_peers_row",
+              "distributed_identity_shared_torrents",
+              "use_bitsearch",
+              "transfer_detail_piece_size_bytes"));
 
   private static final Pattern STRING_VALUE_PATTERN =
       Pattern.compile("<string\\s+name=\"([^\"]+)\"([^>]*?)>(.*?)</string>", Pattern.DOTALL);
