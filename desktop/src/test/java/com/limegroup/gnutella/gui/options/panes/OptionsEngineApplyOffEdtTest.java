@@ -62,6 +62,13 @@ class OptionsEngineApplyOffEdtTest {
     ConnectionSettings.PROXY_AUTHENTICATE,
     ConnectionSettings.PROXY_USERNAME,
     ConnectionSettings.PROXY_PASS,
+    ConnectionSettings.MANUAL_PORT_RANGE,
+    ConnectionSettings.PORT_RANGE_0,
+    ConnectionSettings.PORT_RANGE_1,
+    ConnectionSettings.NATPMP_GATEWAY,
+    ConnectionSettings.NATPMP_LEASE_DURATION,
+    ConnectionSettings.USE_CUSTOM_NETWORK_INTERFACE,
+    ConnectionSettings.CUSTOM_INETADRESS_NO_PORT,
   };
 
   /** Each engine call, as "method@thread". */
@@ -196,5 +203,36 @@ class OptionsEngineApplyOffEdtTest {
         applied.getInteger(settings_pack.int_types.proxy_type.swigValue()));
     assertEquals(
         "proxy.example", applied.getString(settings_pack.string_types.proxy_hostname.swigValue()));
+  }
+
+  private static void saveFirewall() {
+    ConnectionSettings.MANUAL_PORT_RANGE.setValue(true);
+    ConnectionSettings.PORT_RANGE_0.setValue(40000);
+    ConnectionSettings.PORT_RANGE_1.setValue(40000);
+    ConnectionSettings.NATPMP_GATEWAY.setValue("");
+    ConnectionSettings.NATPMP_LEASE_DURATION.setValue(3600);
+  }
+
+  @Test
+  void theFirewallPageLeavesTheEngineAloneWhenNothingChanged() throws Exception {
+    saveFirewall();
+    onTheEdt(() -> RouterConfigurationPaneItem.apply(true, 40000, 40000, "", 3600));
+    assertEquals(List.of(), calls);
+  }
+
+  @Test
+  void theFirewallPageAppliesANatPmpChangeInTheBackground() throws Exception {
+    saveFirewall();
+    onTheEdt(() -> RouterConfigurationPaneItem.apply(true, 40000, 40000, "192.168.1.1", 3600));
+    assertEquals(List.of("applySettings@" + BACKGROUND), calls);
+    assertEquals("192.168.1.1", applied.natpmpGateway());
+  }
+
+  @Test
+  void theFirewallPageRebindsAPortChangeInTheBackground() throws Exception {
+    saveFirewall();
+    onTheEdt(() -> RouterConfigurationPaneItem.apply(true, 40001, 40001, "", 3600));
+    assertEquals(List.of("listenInterfaces@" + BACKGROUND), calls);
+    assertEquals(40001, ConnectionSettings.PORT_RANGE_0.getValue());
   }
 }

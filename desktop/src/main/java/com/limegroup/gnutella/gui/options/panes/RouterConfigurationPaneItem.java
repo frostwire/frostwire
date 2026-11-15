@@ -21,8 +21,6 @@ package com.limegroup.gnutella.gui.options.panes;
 import static com.limegroup.gnutella.settings.ConnectionSettings.PORT_RANGE_0;
 import static com.limegroup.gnutella.settings.ConnectionSettings.PORT_RANGE_1;
 
-import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.jlibtorrent.SettingsPack;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.GUIUtils.SizePolicy;
 import com.limegroup.gnutella.settings.ConnectionSettings;
@@ -162,12 +160,10 @@ public final class RouterConfigurationPaneItem extends AbstractPaneItem {
    * @throws IOException if the options could not be applied for some reason
    */
   public boolean applyOptions() throws IOException {
-    boolean portChanged = portRangeDirty();
-    if (RANDOM_PORT.isSelected()) {
-      ConnectionSettings.MANUAL_PORT_RANGE.setValue(false);
-    } else { // PORT.isSelected()
-      int tcpRangeStart = PORT_0_FIELD.getValue();
-      int tcpRangeEnd = PORT_1_FIELD.getValue();
+    boolean manualPort = !RANDOM_PORT.isSelected();
+    int tcpRangeStart = PORT_0_FIELD.getValue();
+    int tcpRangeEnd = PORT_1_FIELD.getValue();
+    if (manualPort) {
       if (!NetworkUtils.isValidPort(tcpRangeStart, PORT_RANGE_MIN, PORT_RANGE_MAX)) {
         GUIMediator.showError(
             I18n.tr(
@@ -180,9 +176,6 @@ public final class RouterConfigurationPaneItem extends AbstractPaneItem {
         GUIMediator.showError(I18n.tr("You must enter a valid port range."));
         throw new IOException("bad port: " + tcpRangeEnd);
       }
-      ConnectionSettings.MANUAL_PORT_RANGE.setValue(true);
-      ConnectionSettings.PORT_RANGE_0.setValue(tcpRangeStart);
-      ConnectionSettings.PORT_RANGE_1.setValue(tcpRangeEnd);
     }
     String natpmpGateway = NATPMP_GATEWAY_FIELD.getText().trim();
     int natpmpLeaseDuration = NATPMP_LEASE_DURATION_FIELD.getValue();
@@ -190,25 +183,46 @@ public final class RouterConfigurationPaneItem extends AbstractPaneItem {
       GUIMediator.showError(I18n.tr("NAT-PMP lease duration must be greater than 0 seconds."));
       throw new IOException("bad NAT-PMP lease duration: " + natpmpLeaseDuration);
     }
-    ConnectionSettings.NATPMP_GATEWAY.setValue(natpmpGateway);
-    ConnectionSettings.NATPMP_LEASE_DURATION.setValue(natpmpLeaseDuration);
-    SettingsPack settings = new SettingsPack();
-    settings.natpmpGateway(natpmpGateway);
-    settings.natpmpLeaseDuration(natpmpLeaseDuration);
-    BTEngine.getInstance().applySettings(settings);
-    if (portChanged) {
-      NetworkInterfacePaneItem.rebindListenInterface();
-    }
+    apply(manualPort, tcpRangeStart, tcpRangeEnd, natpmpGateway, natpmpLeaseDuration);
     return false;
   }
 
-  private boolean portRangeDirty() {
-    if (ConnectionSettings.MANUAL_PORT_RANGE.getValue() != MANUAL_PORT.isSelected()) {
-      return true;
+  /**
+   * Saves the page's choices and applies to the engine only what changed, in the background, never
+   * on the EDT (frostwire/frostwire#1568): the NAT-PMP settings, and a rebind of the listen sockets
+   * when the port range changed.
+   */
+  static void apply(
+      boolean manualPort,
+      int tcpRangeStart,
+      int tcpRangeEnd,
+      String natpmpGateway,
+      int natpmpLeaseDuration) {
+    boolean portChanged =
+        ConnectionSettings.MANUAL_PORT_RANGE.getValue() != manualPort
+            || manualPort
+                && (ConnectionSettings.PORT_RANGE_0.getValue() != tcpRangeStart
+                    || ConnectionSettings.PORT_RANGE_1.getValue() != tcpRangeEnd);
+    boolean natpmpChanged =
+        !ConnectionSettings.NATPMP_GATEWAY.getValue().equals(natpmpGateway)
+            || ConnectionSettings.NATPMP_LEASE_DURATION.getValue() != natpmpLeaseDuration;
+    ConnectionSettings.MANUAL_PORT_RANGE.setValue(manualPort);
+    if (manualPort) {
+      ConnectionSettings.PORT_RANGE_0.setValue(tcpRangeStart);
+      ConnectionSettings.PORT_RANGE_1.setValue(tcpRangeEnd);
     }
-    return MANUAL_PORT.isSelected()
-        && (PORT_0_FIELD.getValue() != ConnectionSettings.PORT_RANGE_0.getValue()
-            || PORT_1_FIELD.getValue() != ConnectionSettings.PORT_RANGE_1.getValue());
+    ConnectionSettings.NATPMP_GATEWAY.setValue(natpmpGateway);
+    ConnectionSettings.NATPMP_LEASE_DURATION.setValue(natpmpLeaseDuration);
+    if (natpmpChanged) {
+      EngineSettings.apply(
+          settings -> {
+            settings.natpmpGateway(natpmpGateway);
+            settings.natpmpLeaseDuration(natpmpLeaseDuration);
+          });
+    }
+    if (portChanged) {
+      EngineSettings.rebindListenInterface();
+    }
   }
 
   public boolean isDirty() {
