@@ -247,6 +247,29 @@ class JdkWarmUpTest {
         "the JDK steps aren't timed");
   }
 
+  /**
+   * Lite skips the font sweep (frostwire/frostwire#1555): the warm-up then has one thread fewer, so
+   * it still reports itself done; Full sweeps.
+   */
+  @Test
+  void liteSkipsTheFontSweepAndStillFinishes() throws Exception {
+    assertEquals(3, JdkWarmUp.warmUpThreads(true));
+    assertEquals(2, JdkWarmUp.warmUpThreads(false));
+    WarmUpProgress progress = new WarmUpProgress();
+    progress.start(JdkWarmUp.warmUpThreads(false), 0);
+    progress.stepFinished(1);
+    progress.stepFinished(2);
+    assertTrue(progress.snapshot(3).done(), "without the sweep the warm-up never finishes");
+    String initializer =
+        Files.readString(
+                Path.of(System.getProperty("user.dir"))
+                    .resolve("src/main/java/com/limegroup/gnutella/gui/Initializer.java"))
+            .replaceAll("\\s+", "");
+    assertTrue(
+        initializer.contains("PerformanceMode::warmUpJdkStepsFinished,!PerformanceMode.isLite());"),
+        "the font sweep runs in Lite");
+  }
+
   @Test
   void everyFallbackSlotLoadsOnlyInTheSweepStartedForTheMainWindow() throws Exception {
     String warmUp = warmUpSource();
@@ -258,9 +281,8 @@ class JdkWarmUpTest {
     String start = methodSource("public static void startInBackground(").replaceAll("\\s+", "");
     assertTrue(
         start.contains(
-            "startFallbackFontSweep(MAIN_WINDOW_SHOWN,MAIN_WINDOW_WAIT_MS,tracked(JdkWarmUp::sweepFallbackFonts));"),
-        "startInBackground doesn't start the sweep for the main window");
-    assertTrue(start.contains("TODO(frostwire/frostwire#1555)"), "Lite mode TODO missing");
+            "if(fontSweep){startFallbackFontSweep(MAIN_WINDOW_SHOWN,MAIN_WINDOW_WAIT_MS,tracked(JdkWarmUp::sweepFallbackFonts));}"),
+        "startInBackground doesn't start the sweep for the main window, or not only when asked");
     assertTrue(
         methodSource("private static void sweepFallbackFonts() {")
             .replaceAll("\\s+", "")
@@ -1692,7 +1714,7 @@ class JdkWarmUpTest {
     String start =
         all.substring(
             all.indexOf(
-                "publicstaticvoidstartInBackground(Supplier<String>earlyWindowText,LongConsumerjdkStepsDone){"));
+                "publicstaticvoidstartInBackground(Supplier<String>earlyWindowText,LongConsumerjdkStepsDone,booleanfontSweep){"));
     start = start.substring(0, start.indexOf("}") + 1);
     assertTrue(
         start.contains("startAppClassPreload(SPLASH_SHOWN,SPLASH_WAIT_MS,"),

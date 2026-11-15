@@ -26,7 +26,7 @@ class JdkWarmUpStartupOrderTest {
       Path.of(System.getProperty("user.dir"))
           .resolve("src/main/java/com/limegroup/gnutella/gui/Initializer.java");
   private static final String START_WARM_UP =
-      "JdkWarmUp.startInBackground(EarlyWindowText::sample,PerformanceMode::warmUpJdkStepsFinished);";
+      "JdkWarmUp.startInBackground(EarlyWindowText::sample,PerformanceMode::warmUpJdkStepsFinished,!PerformanceMode.isLite());";
 
   @Test
   void warmUpStartsAfterTheLookAndFeelAndBeforeTheSplash() throws Exception {
