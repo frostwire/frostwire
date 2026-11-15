@@ -1,4 +1,6 @@
 FrostWire 7.1.5 UNRELEASED
+   - fix:hovering the empty area right of a table's last column no longer throws an error from the tooltip — LimeJTable shows no tooltip when the mouse is over no cell
+   - fix:Copy Magnet no longer freezes the window while libtorrent builds the magnet link — the magnet is built in the background and copied to the clipboard on the UI thread
    - fix:FrostWire no longer runs out of memory painting the promo slide controls at startup — the overlay paints its background directly instead of caching an image as large as itself
    - fix: Shift+Left/Right in an empty search box no longer throws StateInvariantError — the prompt field asks the text views for caret moves before its first paint
    - new:BitTorrent engine updated to libtorrent 2.1 (jlibtorrent 2.1.2.1): many fixes for stalls and rechecks, and smaller saved resume data; each system keeps the disk access it used before (memory-mapped files on Windows, the POSIX back-end on macOS and Linux)
