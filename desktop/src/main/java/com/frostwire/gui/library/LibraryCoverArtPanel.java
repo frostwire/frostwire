@@ -18,12 +18,16 @@
 
 package com.frostwire.gui.library;
 
+import com.frostwire.gui.PerformanceMode;
 import com.frostwire.gui.library.tags.TagsReader;
 import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 
@@ -37,6 +41,9 @@ public final class LibraryCoverArtPanel extends JPanel {
   private Image coverArtImage;
   private TagsReader tagsReader;
   private boolean componentListenerAdded = false;
+
+  /** Lite: a file is selected whose cover is read only once the user clicks. EDT only. */
+  private boolean coverPending;
 
   LibraryCoverArtPanel() {
     background = new BufferedImage(350, 350, BufferedImage.TYPE_INT_ARGB);
@@ -53,6 +60,13 @@ public final class LibraryCoverArtPanel extends JPanel {
             @Override
             public void componentResized(ComponentEvent e) {
               setPrivateImage(coverArtImage);
+            }
+          });
+      addMouseListener(
+          new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+              coverRequested();
             }
           });
       componentListenerAdded = true;
@@ -87,6 +101,35 @@ public final class LibraryCoverArtPanel extends JPanel {
   public void paint(Graphics g) {
     super.paint(g);
     g.drawImage(background, 0, 0, null);
+  }
+
+  /**
+   * Shows the cover of the selected file. In Lite the file's tags are read only when the user asks
+   * for the cover by clicking the panel (frostwire/frostwire#1555); until then it shows the default
+   * cover.
+   */
+  public void showCoverFor(TagsReader reader) {
+    setTagsReader(reader);
+    if (PerformanceMode.isLite()) {
+      coverPending = true;
+      setToolTipText(I18n.tr("Click to show the cover art"));
+      if (coverArtImage != defaultCoverArt) {
+        showImage(defaultCoverArt);
+      }
+    } else {
+      coverPending = false;
+      setToolTipText(null);
+      asyncRetrieveImage();
+    }
+  }
+
+  /** The user clicked the panel: in Lite, read the selected file's cover now. */
+  void coverRequested() {
+    if (coverPending && tagsReader != null) {
+      coverPending = false;
+      setToolTipText(null);
+      asyncRetrieveImage();
+    }
   }
 
   public void asyncRetrieveImage() {

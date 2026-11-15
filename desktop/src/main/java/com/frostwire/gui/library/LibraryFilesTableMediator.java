@@ -616,8 +616,7 @@ public final class LibraryFilesTableMediator
     if (sel.length == 1) {
       LibraryMediator.instance()
           .getLibraryCoverArtPanel()
-          .setTagsReader(new TagsReader(selectedFile))
-          .asyncRetrieveImage();
+          .showCoverFor(new TagsReader(selectedFile));
     }
   }
 
