@@ -20,6 +20,7 @@ package com.limegroup.gnutella.gui;
 
 import com.frostwire.bittorrent.BTContext;
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.gui.PerformanceMode;
 import com.frostwire.gui.theme.MacLogicalFonts;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.search.relay.BTEngineListenerChain;
@@ -108,6 +109,9 @@ final class Initializer {
   void initialize(String[] args, Frame awtSplash) {
     // ** THE VERY BEGINNING -- DO NOT ADD THINGS BEFORE THIS **
     preinit();
+    // Full or Lite for this session, decided here off the EDT (it may read the machine's memory)
+    // and before the look and feel and the warm-up, which both depend on it.
+    PerformanceMode.resolveAtStartup();
     // Apply the theme the user chose last time (falls back to DEFAULT)
     // IMPORTANT: Due to the introduction of the new light theme and
     // internal changes in ThemeMediator.ThemeEnum, we need to perform some
@@ -144,7 +148,7 @@ final class Initializer {
     // init, drag-and-drop cursors) off the EDT as soon as the look and feel's fonts are known; on
     // slow machines the first text measured on the EDT, the splash window's, stalled it for over 5
     // seconds when this started only after the splash was up.
-    JdkWarmUp.startInBackground(EarlyWindowText::sample);
+    JdkWarmUp.startInBackground(EarlyWindowText::sample, PerformanceMode::warmUpJdkStepsFinished);
     // Various startup tasks...
     // System.out.println("Initializer.initialize() setup callbacks and listeners");
     setupCallbacksAndListeners();

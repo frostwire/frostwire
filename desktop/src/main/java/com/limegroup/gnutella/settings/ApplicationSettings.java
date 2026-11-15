@@ -24,6 +24,7 @@ import java.io.File;
 import org.limewire.setting.BooleanSetting;
 import org.limewire.setting.FileSetting;
 import org.limewire.setting.IntSetting;
+import org.limewire.setting.LongSetting;
 import org.limewire.setting.StringSetting;
 import org.limewire.util.CommonUtils;
 
@@ -119,6 +120,24 @@ public class ApplicationSettings extends LimeProps {
   public static final StringSetting OPTIONS_LAST_SELECTED_KEY =
       FACTORY.createStringSetting(
           "OPTIONS_LAST_SELECTED_KEY", OptionsConstructor.BITTORRENT_BASIC_KEY);
+
+  /**
+   * Performance mode the user chose: AUTOMATIC (decided at each start from the machine), FULL or
+   * LITE. See com.frostwire.gui.PerformanceMode (frostwire/frostwire#1555).
+   */
+  public static final StringSetting PERFORMANCE_MODE =
+      FACTORY.createStringSetting("PERFORMANCE_MODE", "AUTOMATIC");
+
+  /**
+   * How long the startup warm-up's JDK steps took last time, in ms; 0 until one has finished.
+   * Automatic picks Lite after a very slow one.
+   */
+  public static final LongSetting LAST_WARM_UP_JDK_STEPS_MS =
+      FACTORY.createLongSetting("LAST_WARM_UP_JDK_STEPS_MS", 0);
+
+  /** Whether the user dismissed the suggestion to switch to Lite after repeated UI stalls. */
+  public static final BooleanSetting PERFORMANCE_SUGGESTION_DISMISSED =
+      FACTORY.createBooleanSetting("PERFORMANCE_SUGGESTION_DISMISSED", false);
 
   private ApplicationSettings() {}
 

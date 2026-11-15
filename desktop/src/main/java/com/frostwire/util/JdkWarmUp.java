@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.function.LongConsumer;
 import java.util.function.Supplier;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -468,11 +469,15 @@ public final class JdkWarmUp {
    *
    * @param earlyWindowText the text the first windows show, in the user's language: the fallback
    *     fonts it needs load before the splash (see {@link #initializeSlotsFor})
+   * @param jdkStepsDone told how long the JDK steps took (ms), once they finish; they run the same
+   *     whatever else the warm-up does, so the time compares from one start to the next
    */
-  public static void startInBackground(Supplier<String> earlyWindowText) {
+  public static void startInBackground(
+      Supplier<String> earlyWindowText, LongConsumer jdkStepsDone) {
     // Three threads: the JDK steps, the app class preload and the fallback font sweep.
     PROGRESS.start(3, System.nanoTime());
-    Thread warmUp = new Thread(tracked(() -> warmUp(earlyWindowText)), "JdkWarmUp");
+    Thread warmUp =
+        new Thread(tracked(timed(() -> warmUp(earlyWindowText), jdkStepsDone)), "JdkWarmUp");
     warmUp.setDaemon(true);
     warmUp.start();
     startAppClassPreload(SPLASH_SHOWN, SPLASH_WAIT_MS, tracked(JdkWarmUp::loadAppClasses));
@@ -487,6 +492,19 @@ public final class JdkWarmUp {
    */
   public static WarmUpProgress.Snapshot progress() {
     return PROGRESS.snapshot(System.nanoTime());
+  }
+
+  /** {@code step}, then {@code done} told how long it ran (ms) if it returned normally. */
+  static Runnable timed(Runnable step, LongConsumer done) {
+    return () -> {
+      long start = System.nanoTime();
+      step.run();
+      try {
+        done.accept(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start));
+      } catch (Throwable t) {
+        LOG.warn("Warm-up time not recorded: " + t.getMessage(), t);
+      }
+    };
   }
 
   /** {@code step}, counted as finished in {@link #PROGRESS} however it ends. */
