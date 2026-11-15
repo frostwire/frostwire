@@ -36,7 +36,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.limewire.util.CommonUtils;
 
-/** Stores anonymous crash reports locally and uploads them outside the failing thread. */
+/**
+ * Stores anonymous crash reports locally and uploads them outside the failing thread. Nothing is
+ * queued, spooled or uploaded while the user has opted out of Icebase reports ({@link
+ * IcebaseReports#enabled()}), and reports already on disk are deleted unsent.
+ */
 public final class CrashReportSpooler {
   private static final Logger LOG = Logger.getLogger(CrashReportSpooler.class);
   private static final Gson GSON = new Gson();
@@ -112,7 +116,7 @@ public final class CrashReportSpooler {
       if (INSTANCE == null) {
         INSTANCE =
             new CrashReportSpooler(
-                new File(CommonUtils.getUserSettingsDir(), "crash-reports"),
+                spoolDirectory(),
                 HttpClientFactory.newInstance(HttpClientFactory.HttpContext.MISC),
                 FrostWireUtils.getFrostWireVersion(),
                 FrostWireUtils.getBuildNumber());
@@ -124,8 +128,36 @@ public final class CrashReportSpooler {
     }
   }
 
+  private static File spoolDirectory() {
+    return new File(CommonUtils.getUserSettingsDir(), "crash-reports");
+  }
+
+  /**
+   * Deletes every report waiting on disk, on the uploader thread so the caller (the Options pane or
+   * the setup wizard, on the EDT) does no file I/O. Called when the user opts out of Icebase
+   * reports, so nothing recorded before is sent later.
+   */
+  public static void discardPendingReports() {
+    try {
+      UPLOAD_QUEUE.execute(
+          () -> {
+            CrashReportSpooler spooler = INSTANCE;
+            if (spooler != null) {
+              spooler.discardPending();
+            } else {
+              new CrashReportSpooler(spoolDirectory(), null, "", 0, "", () -> "").discardPending();
+            }
+          });
+    } catch (Throwable ignored) {
+      LOG.info("Unable to discard pending anonymous reports", ignored);
+    }
+  }
+
   /** Queues a synthetic anonymous report for verifying the Icebase pipeline. */
   public static void submitTestReport() {
+    if (!IcebaseReports.enabled()) {
+      return;
+    }
     try {
       start();
       CrashReportSpooler spooler = INSTANCE;
@@ -144,6 +176,9 @@ public final class CrashReportSpooler {
       LivePresenceHeartbeat.crashRecorded();
     } catch (Throwable ignored) {
       // Presence is best effort.
+    }
+    if (!IcebaseReports.enabled()) {
+      return;
     }
     try {
       String throttleKey = throttleKeyFor(problem);
@@ -166,16 +201,18 @@ public final class CrashReportSpooler {
    * unthrottled: a fatal report must never be dropped.
    */
   public static void recordSync(Throwable problem) {
-    try {
-      CrashReportSpooler spooler =
-          new CrashReportSpooler(
-              new File(CommonUtils.getUserSettingsDir(), "crash-reports"),
-              null,
-              FrostWireUtils.getFrostWireVersion(),
-              FrostWireUtils.getBuildNumber());
-      spooler.spool(problem);
-    } catch (Throwable ignored) {
-      LOG.info("Unable to synchronously spool anonymous crash report", ignored);
+    if (IcebaseReports.enabled()) {
+      try {
+        CrashReportSpooler spooler =
+            new CrashReportSpooler(
+                spoolDirectory(),
+                null,
+                FrostWireUtils.getFrostWireVersion(),
+                FrostWireUtils.getBuildNumber());
+        spooler.spool(problem);
+      } catch (Throwable ignored) {
+        LOG.info("Unable to synchronously spool anonymous crash report", ignored);
+      }
     }
     try {
       LivePresenceHeartbeat.crashRecorded();
@@ -265,6 +302,9 @@ public final class CrashReportSpooler {
     } catch (Throwable ignored) {
       // Presence is best effort.
     }
+    if (!IcebaseReports.enabled()) {
+      return;
+    }
     try {
       if (!tryAcquire("strictmode:" + sanitizeViolationClass(violationClass))) {
         LOG.debug("Throttled anonymous strictmode report");
@@ -290,6 +330,9 @@ public final class CrashReportSpooler {
       LivePresenceHeartbeat.stallRecorded();
     } catch (Throwable ignored) {
       // Presence is best effort.
+    }
+    if (!IcebaseReports.enabled()) {
+      return;
     }
     try {
       if (!tryAcquire("watchdog")) {
@@ -536,6 +579,11 @@ public final class CrashReportSpooler {
       CrashReportSpooler spooler, Consumer<CrashReportSpooler> spool, String kind) {
     UPLOAD_QUEUE.execute(
         () -> {
+          // The user may have opted out since the report was queued.
+          if (!IcebaseReports.enabled()) {
+            spooler.discardPending();
+            return;
+          }
           try {
             spool.accept(spooler);
             LOG.info("Automatically queued anonymous " + kind + " report for Icebase");
@@ -671,7 +719,15 @@ public final class CrashReportSpooler {
     return "other";
   }
 
-  private void uploadPending() {
+  /**
+   * Uploads the reports waiting on disk, oldest first, or deletes them unsent when the user has
+   * opted out of Icebase reports.
+   */
+  void uploadPending() {
+    if (!IcebaseReports.enabled()) {
+      discardPending();
+      return;
+    }
     if (client == null || !directory.isDirectory()) return;
     try (var files = Files.list(directory.toPath())) {
       files
@@ -685,11 +741,34 @@ public final class CrashReportSpooler {
 
   private void upload(Path report) {
     try {
+      // Checked for each report: the user may opt out while earlier ones are uploading.
+      if (!IcebaseReports.enabled()) {
+        Files.deleteIfExists(report);
+        return;
+      }
       String content = Files.readString(report, StandardCharsets.UTF_8);
       client.post(ENDPOINT, 6000, content, "application/json; charset=utf-8");
       Files.deleteIfExists(report);
     } catch (Throwable ignored) {
       LOG.debug("Unable to upload crash report");
+    }
+  }
+
+  /** Deletes every report, and every partly written one, waiting in the spool directory. */
+  void discardPending() {
+    if (!directory.isDirectory()) {
+      return;
+    }
+    try (var files = Files.list(directory.toPath())) {
+      files
+          .filter(
+              path -> {
+                String name = path.getFileName().toString();
+                return name.endsWith(".json") || name.endsWith(".tmp");
+              })
+          .forEach(path -> path.toFile().delete());
+    } catch (Throwable ignored) {
+      LOG.debug("Unable to discard pending crash reports");
     }
   }
 
