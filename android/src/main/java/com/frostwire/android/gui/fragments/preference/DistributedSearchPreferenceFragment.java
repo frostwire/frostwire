@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AlertDialog;
 import androidx.preference.EditTextPreference;
 import androidx.preference.ListPreference;
@@ -359,25 +360,41 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
           final int shared = identity != null ? readSharedCount() : -1;
           final IdentityKeys result = identity;
           SystemUtils.postToUIThread(
-              () -> {
-                if (result != null) {
-                  identityPathRetries = 0;
-                  applyIdentityToUi(result, karmaSummary(karma, participation), shared);
-                } else if (filePresent) {
-                  // File exists but load failed — still not "missing identity".
-                  showIdentityLoadingState();
-                  LOG.warn("identity.dat present but resolve returned null");
-                } else if (identityFile() == null && identityPathRetries < 20) {
-                  // Paths not ready yet — keep loading, schedule a retry.
-                  identityPathRetries++;
-                  showIdentityLoadingState();
-                  SystemUtils.postToUIThreadDelayed(this::refreshIdentityInfo, 300);
-                } else {
-                  identityPathRetries = 0;
-                  applyIdentityToUi(null, null, -1);
-                }
-              });
+              () -> onIdentityLoaded(result, filePresent, karma, participation, shared));
         });
+  }
+
+  /**
+   * The main-thread half of {@link #refreshIdentityInfo}: shows what the background load found.
+   * Does nothing once the fragment is no longer added (the screen was closed or rotated while the
+   * load ran), since every branch reads resources through the fragment's context.
+   */
+  @VisibleForTesting
+  void onIdentityLoaded(
+      IdentityKeys result,
+      boolean filePresent,
+      DisplayKarma karma,
+      Long participation,
+      int shared) {
+    if (!isAdded()) {
+      return;
+    }
+    if (result != null) {
+      identityPathRetries = 0;
+      applyIdentityToUi(result, karmaSummary(karma, participation), shared);
+    } else if (filePresent) {
+      // File exists but load failed — still not "missing identity".
+      showIdentityLoadingState();
+      LOG.warn("identity.dat present but resolve returned null");
+    } else if (identityFile() == null && identityPathRetries < 20) {
+      // Paths not ready yet — keep loading, schedule a retry.
+      identityPathRetries++;
+      showIdentityLoadingState();
+      SystemUtils.postToUIThreadDelayed(this::refreshIdentityInfo, 300);
+    } else {
+      identityPathRetries = 0;
+      applyIdentityToUi(null, null, -1);
+    }
   }
 
   /**
