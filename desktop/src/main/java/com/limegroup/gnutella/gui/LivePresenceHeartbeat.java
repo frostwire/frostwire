@@ -27,6 +27,10 @@ import java.util.regex.Pattern;
  * version, and how many crash reports this session has recorded. Icebase uses it for its live
  * counters and for release metrics (active sessions and crash-free sessions per release). There is
  * no installation or user identifier, and crash reports carry no session id.
+ *
+ * <p>Nothing is sent while the user has opted out of Icebase reports ({@link
+ * IcebaseReports#enabled()}): the schedule keeps running so that opting back in resumes the
+ * heartbeat without a restart.
  */
 public final class LivePresenceHeartbeat {
   private static final Logger LOG = Logger.getLogger(LivePresenceHeartbeat.class);
@@ -154,7 +158,10 @@ public final class LivePresenceHeartbeat {
             Math.max(0, Math.min(stallReports, MAX_STALL_REPORTS))));
   }
 
-  private static void send(HttpClient http) {
+  static void send(HttpClient http) {
+    if (!IcebaseReports.enabled()) {
+      return;
+    }
     try {
       http.post(ENDPOINT, TIMEOUT_MILLIS, payload(), "application/json; charset=utf-8");
       if (SUCCESS_LOGGED.compareAndSet(false, true)) {
