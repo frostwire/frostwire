@@ -35,8 +35,12 @@ abstract class SetupWindow extends JPanel {
   /** The width of the setup window. */
   static final int SETUP_WIDTH = 700;
 
-  /** The height of the setup window. */
-  static final int SETUP_HEIGHT = 520;
+  /**
+   * The height of the setup window: tall enough for the "Seeding & Publishing" page's three choices
+   * and their explanations in English (frostwire/frostwire#1565), and still small enough for a
+   * 768-pixel-high screen.
+   */
+  static final int SETUP_HEIGHT = 600;
 
   /** Constant handle to the setup manager mediator class. */
   final SetupManager _manager;
