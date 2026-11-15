@@ -20,6 +20,7 @@ package com.limegroup.gnutella.gui.search;
 
 import static com.limegroup.gnutella.gui.I18n.tr;
 
+import com.frostwire.gui.PerformanceMode;
 import com.frostwire.gui.bittorrent.TorrentUtil;
 import com.frostwire.gui.components.slides.MultimediaSlideshowPanel;
 import com.frostwire.gui.filters.TableLineFilter;
@@ -105,7 +106,9 @@ public final class SearchResultMediator
   private SchemaBox schemaBox;
   private SearchOptionsPanel searchOptionsPanel;
   private JScrollPane scrollPaneSearchOptions;
-  private boolean stopped;
+
+  /** Set when the search finishes, off the EDT; read on the EDT as results are added. */
+  private volatile boolean stopped;
 
   /**
    * Tracks result hashes already added to this panel to avoid duplicates when multiple engines
@@ -362,7 +365,27 @@ public final class SearchResultMediator
   }
 
   public void stop() {
+    boolean wasRunning = !stopped;
     stopped = true;
+    if (wasRunning && PerformanceMode.isLite()) {
+      // Lite added the results unsorted while they arrived: sort them once, after the ones
+      // already queued for the EDT.
+      GUIMediator.safeInvokeLater(this::resortNow);
+    }
+  }
+
+  /**
+   * Search results go to their sorted place as they arrive, re-ranking the table on every batch,
+   * except in Lite while the search runs: there they are added at the end and sorted once when it
+   * finishes (frostwire/frostwire#1555). Clicking a column header still sorts at any time.
+   */
+  @Override
+  protected boolean sortsWhileAdding() {
+    return super.sortsWhileAdding() && sortsLive(isStopped(), PerformanceMode.isLite());
+  }
+
+  static boolean sortsLive(boolean stopped, boolean lite) {
+    return stopped || !lite;
   }
 
   /** Determines if this can be removed. */
@@ -438,7 +461,7 @@ public final class SearchResultMediator
    */
   void karmaChanged() {
     DATA_MODEL.karmaChanged();
-    if (DATA_MODEL.ranksByKarma()) {
+    if (DATA_MODEL.ranksByKarma() && sortsLive(isStopped(), PerformanceMode.isLite())) {
       forceResort();
     }
   }

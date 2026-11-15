@@ -457,7 +457,7 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
     }
     boolean inView = TABLE.isSelectionVisible();
     int addedAt;
-    if (SETTINGS.REAL_TIME_SORT.getValue() && DATA_MODEL.isSorted()) {
+    if (sortsWhileAdding() && DATA_MODEL.isSorted()) {
       addedAt = sorted.getAsInt();
     } else if (index >= 0 && index <= DATA_MODEL.getRowCount()) {
       addedAt = at.applyAsInt(index);
@@ -467,6 +467,29 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
     // if it was added...
     fixSelection(addedAt, inView);
     return addedAt;
+  }
+
+  /**
+   * Whether a row added now goes to its sorted place: with real-time sorting on, unless a subclass
+   * defers it (search results in Lite, frostwire/frostwire#1555).
+   */
+  protected boolean sortsWhileAdding() {
+    return SETTINGS.REAL_TIME_SORT.getValue();
+  }
+
+  /**
+   * Sorts the rows by the current column now, keeping the selection, when the table is sorted and
+   * real-time sorting is on, whether or not it is showing. EDT only.
+   */
+  protected final void resortNow() {
+    if (SETTINGS.REAL_TIME_SORT.getValue() && DATA_MODEL.isSorted() && !TABLE.isEditing()) {
+      isResorting = true;
+      try {
+        sortAndMaintainSelection(-1);
+      } finally {
+        isResorting = false;
+      }
+    }
   }
 
   /** Forces the object to be added unsorted. */
