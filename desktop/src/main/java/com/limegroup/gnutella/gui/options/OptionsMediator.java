@@ -21,6 +21,7 @@ package com.limegroup.gnutella.gui.options;
 import com.frostwire.bittorrent.BTEngine;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.gui.util.BackgroundSettingsSave;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.settings.LibrarySettings;
@@ -152,7 +153,9 @@ public final class OptionsMediator {
   /** Reverts options to their defaults. */
   final void revertOptions() {
     SettingsGroupManager.instance().revertToDefault();
-    BTEngine.getInstance().revertToDefaultConfiguration();
+    // libtorrent's session can take seconds to answer: never wait for it on the EDT (#1568)
+    BackgroundQueuedExecutorService.schedule(
+        () -> BTEngine.getInstance().revertToDefaultConfiguration());
     LibrarySettings.setupInitialLibraryFolders();
     GUIMediator.showRestartDialog(
         I18n.tr("One or more options will take effect the next time FrostWire is restarted."));

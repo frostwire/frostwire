@@ -19,11 +19,14 @@
 package com.limegroup.gnutella.gui.options.panes;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.frostwire.jlibtorrent.SettingsPack;
 import com.frostwire.jlibtorrent.swig.settings_pack;
 import com.limegroup.gnutella.settings.ConnectionSettings;
 import java.lang.reflect.Proxy;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -253,5 +256,24 @@ class OptionsEngineApplyOffEdtTest {
     onTheEdt(() -> NetworkInterfacePaneItem.apply(true, "192.168.1.20"));
     assertEquals(List.of("listenInterfaces@" + BACKGROUND), calls);
     assertEquals("192.168.1.20", ConnectionSettings.CUSTOM_INETADRESS_NO_PORT.getValue());
+  }
+
+  /**
+   * The Restore Defaults button resets the session's settings in the background too. A source test,
+   * as OptionsMediator reverts every setting and shows the restart dialog.
+   */
+  @Test
+  void restoreDefaultsResetsTheEngineInTheBackground() throws Exception {
+    String source =
+        Files.readString(
+                Path.of("src/main/java/com/limegroup/gnutella/gui/options/OptionsMediator.java"))
+            .replaceAll("\\s+", "");
+    int start = source.indexOf("finalvoidrevertOptions(){");
+    assertTrue(start >= 0, "revertOptions() not found");
+    String body = source.substring(start, source.indexOf("}", start));
+    assertTrue(
+        body.contains(
+            "BackgroundQueuedExecutorService.schedule(()->BTEngine.getInstance().revertToDefaultConfiguration());"),
+        "revertOptions() resets the engine on the EDT");
   }
 }
