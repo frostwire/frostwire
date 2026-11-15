@@ -155,6 +155,9 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
   /** True once loadFinished() replaced the "Preparing FrostWire..." component. */
   private boolean centerPanelReplaced;
 
+  /** The suggestion to try Lite mode while it shows, else null. */
+  private Component performanceNotice;
+
   /** Last VPN state the bar was built for; null until the first VPN check reports. */
   private Boolean lastVpnStatus;
 
@@ -621,6 +624,64 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     gbc.fill = GridBagConstraints.NONE;
     gbc.anchor = GridBagConstraints.CENTER;
     centerPanel.add(centerComponent, gbc);
+    refresh();
+  }
+
+  /**
+   * Suggests Lite mode in the middle of the bar after repeated UI freezes
+   * (frostwire/frostwire#1555): the text opens Options &gt; Advanced &gt; Performance, the button
+   * dismisses it for good. It replaces nothing but the bar's empty middle. EDT only.
+   */
+  public void showPerformanceNotice() {
+    if (centerPanel == null || performanceNotice != null) {
+      return;
+    }
+    JLabel link = new JLabel(I18n.tr("FrostWire is pausing often on this computer. Try Lite mode"));
+    link.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    link.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseClicked(MouseEvent e) {
+            hidePerformanceNotice();
+            GUIMediator.instance().setOptionsVisible(true, OptionsConstructor.PERFORMANCE_KEY);
+          }
+        });
+    JButton dismiss = new JButton("\u00d7");
+    dismiss.setToolTipText(I18n.tr("Dismiss"));
+    dismiss.setBorderPainted(false);
+    dismiss.setContentAreaFilled(false);
+    dismiss.setFocusable(false);
+    dismiss.addActionListener(
+        e -> {
+          ApplicationSettings.PERFORMANCE_SUGGESTION_DISMISSED.setValue(true);
+          hidePerformanceNotice();
+        });
+    JPanel notice = new JPanel(new FlowLayout(FlowLayout.CENTER, 4, 0));
+    notice.setOpaque(false);
+    notice.add(link);
+    notice.add(dismiss);
+    performanceNotice = notice;
+    showInCenter(notice);
+  }
+
+  private void hidePerformanceNotice() {
+    if (performanceNotice != null) {
+      performanceNotice = null;
+      showInCenter(new JLabel());
+    }
+  }
+
+  private void showInCenter(Component component) {
+    centerPanelReplaced = true;
+    centerPanel.removeAll();
+    centerComponent = component;
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.gridx = 0;
+    gbc.gridy = 0;
+    gbc.weightx = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.CENTER;
+    centerPanel.add(component, gbc);
     refresh();
   }
 

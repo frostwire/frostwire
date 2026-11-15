@@ -21,6 +21,7 @@ package com.limegroup.gnutella.gui;
 import com.frostwire.bittorrent.BTContext;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.gui.PerformanceMode;
+import com.frostwire.gui.PerformanceSuggestion;
 import com.frostwire.gui.theme.MacLogicalFonts;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.search.relay.BTEngineListenerChain;
@@ -238,6 +239,16 @@ final class Initializer {
   private void setupCallbacksAndListeners() {
     CrashReportSpooler.start();
     LivePresenceHeartbeat.start();
+    // In Full, a session that keeps freezing suggests Lite in the status bar (#1555).
+    PerformanceSuggestion.install(
+        ApplicationSettings.PERFORMANCE_SUGGESTION_DISMISSED::getValue,
+        () ->
+            GUIMediator.safeInvokeLater(
+                () -> {
+                  if (GUIMediator.isConstructed()) {
+                    GUIMediator.instance().getStatusLine().showPerformanceNotice();
+                  }
+                }));
     // Set the error handler so we can receive core errors.
     ErrorService.setErrorCallback(new ErrorHandler());
     // Set the messaging handler so we can receive core messages

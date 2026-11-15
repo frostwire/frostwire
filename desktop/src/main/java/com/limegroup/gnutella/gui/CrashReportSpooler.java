@@ -7,6 +7,7 @@
 
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.gui.PerformanceSuggestion;
 import com.frostwire.jlibtorrent.LibTorrent;
 import com.frostwire.search.telluride.TellurideBuild;
 import com.frostwire.util.HttpClientFactory;
@@ -302,6 +303,7 @@ public final class CrashReportSpooler {
     } catch (Throwable ignored) {
       // Presence is best effort.
     }
+    PerformanceSuggestion.stallRecorded();
     if (!IcebaseReports.enabled()) {
       return;
     }
@@ -331,6 +333,7 @@ public final class CrashReportSpooler {
     } catch (Throwable ignored) {
       // Presence is best effort.
     }
+    PerformanceSuggestion.stallRecorded();
     if (!IcebaseReports.enabled()) {
       return;
     }
