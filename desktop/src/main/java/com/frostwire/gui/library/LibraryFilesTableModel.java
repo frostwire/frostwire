@@ -19,12 +19,17 @@
 package com.frostwire.gui.library;
 
 import com.frostwire.bittorrent.PaymentOptions;
+import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.tables.HashBasedDataLineModel;
 import com.limegroup.gnutella.gui.tables.SizeHolder;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Library specific DataLineModel. Uses HashBasedDataLineModel instead of BasicDataLineModel for
@@ -34,6 +39,26 @@ import java.util.List;
  * @author aldenml
  */
 final class LibraryFilesTableModel extends HashBasedDataLineModel<LibraryFilesTableDataLine, File> {
+  /** How long resolved rows gather before they are applied and repainted together. */
+  private static final long RESOLVED_ROWS_DELAY_MS = 40;
+
+  /** Applies resolved rows under the list lock, off the EDT. */
+  private static final ScheduledExecutorService RESOLVED_ROWS_FLUSHER =
+      Executors.newSingleThreadScheduledExecutor(
+          r -> {
+            Thread thread = new Thread(r, "LibraryFilesTableModel:resolved-rows");
+            thread.setDaemon(true);
+            return thread;
+          });
+
+  private final Object pendingLock = new Object();
+
+  /** Guarded by {@link #pendingLock}. */
+  private List<ResolvedFileData> pendingResolved = new ArrayList<>();
+
+  /** Guarded by {@link #pendingLock}. */
+  private boolean flushScheduled;
+
   /** */
   LibraryFilesTableModel() {
     super(LibraryFilesTableDataLine.class);
@@ -105,31 +130,86 @@ final class LibraryFilesTableModel extends HashBasedDataLineModel<LibraryFilesTa
     return get(row).getInitializeObject();
   }
 
+  /**
+   * Applies a file's size, date, license and tips found in the background, from any thread but the
+   * EDT. The rows resolved within {@link #RESOLVED_ROWS_DELAY_MS} are applied together under the
+   * list lock on the flush thread, and the EDT only gets their row events, so it never waits for
+   * the list lock while a sort or a bulk add holds it (Icebase #a09fb9913779,
+   * frostwire/frostwire#1543).
+   */
   void updateResolvedFileData(
       File file,
       SizeHolder sizeHolder,
       Date lastModified,
       String license,
       PaymentOptions paymentOptions) {
-    int row;
-    boolean shouldResort;
-
-    synchronized (getListLock()) {
-      row = getRow(file);
-      if (row == -1) {
+    synchronized (pendingLock) {
+      pendingResolved.add(
+          new ResolvedFileData(file, sizeHolder, lastModified, license, paymentOptions));
+      if (flushScheduled) {
         return;
       }
+      flushScheduled = true;
+    }
+    RESOLVED_ROWS_FLUSHER.schedule(
+        this::applyPendingResolved, RESOLVED_ROWS_DELAY_MS, TimeUnit.MILLISECONDS);
+  }
 
-      get(row).applyResolvedFileData(sizeHolder, lastModified, license, paymentOptions);
+  /** Runs on the flush thread: may wait for the list lock, the EDT doesn't. */
+  private void applyPendingResolved() {
+    List<ResolvedFileData> batch;
+    synchronized (pendingLock) {
+      batch = pendingResolved;
+      pendingResolved = new ArrayList<>();
+      flushScheduled = false;
+    }
+    int[] rows = new int[batch.size()];
+    int count = 0;
+    boolean shouldResort;
+    synchronized (getListLock()) {
+      for (ResolvedFileData data : batch) {
+        int row = getRow(data.file());
+        if (row == -1) {
+          continue;
+        }
+        get(row)
+            .applyResolvedFileData(
+                data.sizeHolder(), data.lastModified(), data.license(), data.paymentOptions());
+        rows[count++] = row;
+      }
       shouldResort =
           isSorted() && getSortColumn() == LibraryFilesTableDataLine.MODIFICATION_TIME_IDX;
     }
-
-    fireTableRowsUpdated(row, row);
+    if (count == 0) {
+      return;
+    }
+    int[] updated = Arrays.copyOf(rows, count);
+    Arrays.sort(updated);
+    GUIMediator.safeInvokeLater(() -> fireRowsUpdated(updated));
     if (shouldResort) {
       resort();
     }
   }
+
+  /** One event per run of consecutive rows. Takes no lock. */
+  private void fireRowsUpdated(int[] sortedRows) {
+    int start = sortedRows[0];
+    for (int i = 1; i <= sortedRows.length; i++) {
+      if (i == sortedRows.length || sortedRows[i] > sortedRows[i - 1] + 1) {
+        fireTableRowsUpdated(start, sortedRows[i - 1]);
+        if (i < sortedRows.length) {
+          start = sortedRows[i];
+        }
+      }
+    }
+  }
+
+  private record ResolvedFileData(
+      File file,
+      SizeHolder sizeHolder,
+      Date lastModified,
+      String license,
+      PaymentOptions paymentOptions) {}
 
   /**
    * Returns a boolean specifying whether or not specific cell in the table is editable.

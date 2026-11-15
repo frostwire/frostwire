@@ -84,20 +84,22 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
   private String _type;
 
   /** Cached SizeHolder */
-  private SizeHolder _sizeHolder;
+  private volatile SizeHolder _sizeHolder;
 
   /** Variable for the path */
   private String _path;
 
-  private Date lastModified;
-  private String license;
-  private PaymentOptions paymentOptions;
+  // Written under the model's list lock off the EDT by applyResolvedFileData; volatile for the
+  // readers that don't take that lock, such as the background sort.
+  private volatile Date lastModified;
+  private volatile String license;
+  private volatile PaymentOptions paymentOptions;
   private LibraryActionsHolder actionsHolder;
   private NameHolder nameCell;
-  private PlayableCell cachedSizeCell;
+  private volatile PlayableCell cachedSizeCell;
   private PlayableCell cachedTypeCell;
   private PlayableCell cachedPathCell;
-  private PlayableCell cachedModTimeCell;
+  private volatile PlayableCell cachedModTimeCell;
 
   /**
    * Reused while the icon is the same, so the table's change-detecting refresh only repaints a row
@@ -234,11 +236,9 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
           final Date finalModTime = modTime;
           // Confirms the name-based guess on disk; the row repaint below picks it up.
           holder.setPlayable(PlaybackUtil.isPlayableFile(file));
-          GUIMediator.safeInvokeLater(
-              () -> {
-                _model.updateResolvedFileData(
-                    initializer, finalSizeHolder, finalModTime, finalLicense, finalPaymentOptions);
-              });
+          // Not through the EDT: the model applies it under its list lock off the EDT.
+          _model.updateResolvedFileData(
+              initializer, finalSizeHolder, finalModTime, finalLicense, finalPaymentOptions);
         });
   }
 
