@@ -7292,3 +7292,50 @@ msgstr "Μια αναφορά δημιουργείται όταν το FrostWire
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
 msgid "You can change this later in Tools > Options > Advanced > Crash Reports."
 msgstr "Μπορείτε να το αλλάξετε αργότερα στα Εργαλεία > Επιλογές > Προχωρημένα > Αναφορές κατάρρευσης."
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java
+msgid "Performance"
+msgstr "Επιδόσεις"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Performance Mode"
+msgstr "Λειτουργία επιδόσεων"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Lite turns off animations, cover art, live sorting and other visual extras to keep FrostWire responsive. Downloads, seeding and searches are never slowed down."
+msgstr "Η Ελαφριά απενεργοποιεί κινούμενα εφέ, εξώφυλλα, ζωντανή ταξινόμηση και άλλα οπτικά εφέ ώστε το FrostWire να αποκρίνεται γρήγορα. Λήψεις, διαμοιρασμός και αναζητήσεις δεν επιβραδύνονται ποτέ."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Automatic (recommended)"
+msgstr "Αυτόματη (συνιστάται)"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Full"
+msgstr "Πλήρης"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Lite"
+msgstr "Ελαφριά"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Automatic picks Lite on slow computers when FrostWire starts. Full and Lite apply right away."
+msgstr "Η Αυτόματη επιλέγει Ελαφριά σε αργούς υπολογιστές κατά την εκκίνηση του FrostWire. Η Πλήρης και η Ελαφριά εφαρμόζονται αμέσως."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Running now: Full"
+msgstr "Σε χρήση: Πλήρης"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Running now: Lite"
+msgstr "Σε χρήση: Ελαφριά"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/library/LibraryCoverArtPanel.java
+msgid "Click to show the cover art"
+msgstr "Κάντε κλικ για εμφάνιση του εξωφύλλου"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
+msgid "FrostWire is pausing often on this computer. Try Lite mode"
+msgstr "Το FrostWire κολλάει συχνά σε αυτόν τον υπολογιστή. Δοκιμάστε τη λειτουργία Ελαφριά"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
+msgid "Dismiss"
+msgstr "Κλείσιμο"

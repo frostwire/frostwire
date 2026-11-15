@@ -6785,3 +6785,50 @@ msgstr "ਜਦੋਂ FrostWire ਕ੍ਰੈਸ਼ ਹੁੰਦਾ ਹੈ ਜਾ�
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/IcebaseReportsText.java
 msgid "You can change this later in Tools > Options > Advanced > Crash Reports."
 msgstr "ਤੁਸੀਂ ਇਸਨੂੰ ਬਾਅਦ ਵਿੱਚ ਟੂਲ > ਓਪਸ਼ੰਜ਼ > ਹੋਰ ਜਾਨਕਾਰੀ > ਕ੍ਰੈਸ਼ ਰਿਪੋਰਟਾਂ ਵਿੱਚ ਬਦਲ ਸਕਦੇ ਹੋ।"
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java
+msgid "Performance"
+msgstr "ਕਾਰਗੁਜ਼ਾਰੀ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Performance Mode"
+msgstr "ਕਾਰਗੁਜ਼ਾਰੀ ਮੋਡ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Lite turns off animations, cover art, live sorting and other visual extras to keep FrostWire responsive. Downloads, seeding and searches are never slowed down."
+msgstr "ਲਾਈਟ FrostWire ਨੂੰ ਤੇਜ਼ ਰੱਖਣ ਲਈ ਐਨੀਮੇਸ਼ਨ, ਕਵਰ ਆਰਟ, ਲਾਈਵ ਛਾਂਟੀ ਅਤੇ ਹੋਰ ਵਿਜ਼ੂਅਲ ਵਾਧੂ ਚੀਜ਼ਾਂ ਬੰਦ ਕਰ ਦਿੰਦਾ ਹੈ। ਡਾਊਨਲੋਡ, ਸੀਡਿੰਗ ਅਤੇ ਖੋਜਾਂ ਕਦੇ ਹੌਲੀ ਨਹੀਂ ਹੁੰਦੀਆਂ।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Automatic (recommended)"
+msgstr "ਆਟੋਮੈਟਿਕ (ਸਿਫ਼ਾਰਸ਼ੀ)"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Full"
+msgstr "ਪੂਰਾ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Lite"
+msgstr "ਲਾਈਟ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Automatic picks Lite on slow computers when FrostWire starts. Full and Lite apply right away."
+msgstr "ਆਟੋਮੈਟਿਕ FrostWire ਸ਼ੁਰੂ ਹੋਣ ਵੇਲੇ ਹੌਲੀ ਕੰਪਿਊਟਰਾਂ ’ਤੇ ਲਾਈਟ ਚੁਣਦਾ ਹੈ। ਪੂਰਾ ਅਤੇ ਲਾਈਟ ਤੁਰੰਤ ਲਾਗੂ ਹੁੰਦੇ ਹਨ।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Running now: Full"
+msgstr "ਹੁਣ ਚੱਲ ਰਿਹਾ: ਪੂਰਾ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PerformancePaneItem.java
+msgid "Running now: Lite"
+msgstr "ਹੁਣ ਚੱਲ ਰਿਹਾ: ਲਾਈਟ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/library/LibraryCoverArtPanel.java
+msgid "Click to show the cover art"
+msgstr "ਕਵਰ ਆਰਟ ਦਿਖਾਉਣ ਲਈ ਕਲਿੱਕ ਕਰੋ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
+msgid "FrostWire is pausing often on this computer. Try Lite mode"
+msgstr "FrostWire ਇਸ ਕੰਪਿਊਟਰ ’ਤੇ ਵਾਰ-ਵਾਰ ਰੁਕ ਰਿਹਾ ਹੈ। ਲਾਈਟ ਮੋਡ ਅਜ਼ਮਾਓ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
+msgid "Dismiss"
+msgstr "ਬੰਦ ਕਰੋ"
