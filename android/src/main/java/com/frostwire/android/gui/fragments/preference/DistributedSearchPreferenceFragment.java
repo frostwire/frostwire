@@ -599,7 +599,7 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
                 () -> {
                   dismiss(progress);
                   busy = false;
-                  toast(getString(R.string.distributed_identity_failed, t.getMessage()));
+                  toastFailure(R.string.distributed_identity_failed, t);
                   refreshAll();
                 });
           }
@@ -673,7 +673,7 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
           } catch (Throwable t) {
             LOG.error("Failed to restore from seed", t);
             SystemUtils.postToUIThread(
-                () -> toast(getString(R.string.distributed_identity_invalid_seed, t.getMessage())));
+                () -> toastFailure(R.string.distributed_identity_invalid_seed, t));
           }
         });
   }
@@ -685,13 +685,14 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
     // Capture resolver on the UI thread; CreateDocument already left a 0-byte
     // placeholder — we must open with "wt" and write the full payload.
     final ContentResolver resolver = requireContext().getContentResolver();
+    final String noIdentity = getString(R.string.distributed_identity_no_identity);
     SystemUtils.postToHandler(
         SystemUtils.HandlerThreadName.HIGH_PRIORITY,
         () -> {
           try {
             IdentityKeys identity = resolveIdentity();
             if (identity == null) {
-              throw new IllegalStateException(getString(R.string.distributed_identity_no_identity));
+              throw new IllegalStateException(noIdentity);
             }
             byte[] bytes = IdentityLifecycle.exportBytes(identity);
             if (bytes.length < 64) {
@@ -710,8 +711,7 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
             SystemUtils.postToUIThread(() -> toast(R.string.distributed_identity_export_ok));
           } catch (Throwable t) {
             LOG.error("Export failed", t);
-            SystemUtils.postToUIThread(
-                () -> toast(getString(R.string.distributed_identity_failed, t.getMessage())));
+            SystemUtils.postToUIThread(() -> toastFailure(R.string.distributed_identity_failed, t));
           }
         });
   }
@@ -754,8 +754,7 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
                 });
           } catch (Throwable t) {
             LOG.error("Import failed", t);
-            SystemUtils.postToUIThread(
-                () -> toast(getString(R.string.distributed_identity_failed, t.getMessage())));
+            SystemUtils.postToUIThread(() -> toastFailure(R.string.distributed_identity_failed, t));
           }
         });
   }
@@ -1103,6 +1102,19 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
     if (ctx != null) {
       Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
     }
+  }
+
+  /**
+   * Toasts {@code formatRes} with the failure's message. Background identity actions post this to
+   * the main thread, where the screen may already be gone: then it does nothing, since formatting
+   * the message needs the fragment's context.
+   */
+  @VisibleForTesting
+  void toastFailure(int formatRes, Throwable t) {
+    if (!isAdded()) {
+      return;
+    }
+    toast(getString(formatRes, t.getMessage()));
   }
 
   private static void setSummary(Preference pref, int resId) {

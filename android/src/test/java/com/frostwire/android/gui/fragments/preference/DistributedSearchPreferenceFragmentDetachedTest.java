@@ -11,7 +11,9 @@ import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 
 import android.app.Application;
+import com.frostwire.android.R;
 import com.frostwire.search.relay.IdentityKeys;
+import java.io.IOException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -36,5 +38,16 @@ public class DistributedSearchPreferenceFragmentDetachedTest {
     // real keys need jlibtorrent's native library).
     fragment.onIdentityLoaded(mock(IdentityKeys.class), true, null, null, 3);
     fragment.onIdentityLoaded(mock(IdentityKeys.class), true, null, 7L, -1);
+  }
+
+  @Test
+  public void identityActionFailureAfterDetachDoesNothing() {
+    DistributedSearchPreferenceFragment fragment = new DistributedSearchPreferenceFragment();
+    assertFalse(fragment.isAdded());
+
+    // What generate, restore, export and import post when their background work fails.
+    fragment.toastFailure(R.string.distributed_identity_failed, new IOException("disk full"));
+    fragment.toastFailure(
+        R.string.distributed_identity_invalid_seed, new IllegalArgumentException("bad word"));
   }
 }
