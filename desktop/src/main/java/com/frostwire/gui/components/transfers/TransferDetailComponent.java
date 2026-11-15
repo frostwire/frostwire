@@ -213,7 +213,7 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
 
   @Override
   public void refresh() {
-    // we're a Refresh listener of the GUIMediator, this gets invoked every 1 second
+    // we're a Refresh listener of the GUIMediator, invoked every second (every 2 s in Lite)
     // Offload expensive updateData() calls to background thread to avoid EDT blocking
     if (GUIMediator.instance().getSelectedTab() == GUIMediator.Tabs.TRANSFERS
         && isVisible()
@@ -268,7 +268,7 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
   interface TransferDetailPanel {
     void updateData(BittorrentDownload btDownload);
 
-    /** Refresh ticks (1 s) between this panel's updates while it shows. */
+    /** Refresh ticks (1 s, 2 s in Lite) between this panel's updates while it shows. */
     default int refreshEveryTicks() {
       return 1;
     }
