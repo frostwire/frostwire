@@ -81,6 +81,7 @@ public final class OptionsConstructor {
   private static final String SHARED_TORRENTS_DB_KEY = "OPTIONS_SHARED_TORRENTS_DB_MAIN_TITLE";
   public static final String ICEBRIDGE_KEY = "OPTIONS_ICEBRIDGE_MAIN_TITLE";
   private static final String NETWORK_INTERFACE_KEY = "OPTIONS_NETWORK_INTERFACE_MAIN_TITLE";
+  public static final String PERFORMANCE_KEY = "OPTIONS_PERFORMANCE_MAIN_TITLE";
   private static final String ASSOCIATIONS_KEY = "OPTIONS_ASSOCIATIONS_MAIN_TITLE";
 
   /** Handle to the top-level `JDialog</tt window that contains all of the other GUI components. */
@@ -268,6 +269,7 @@ public final class OptionsConstructor {
         NETWORK_INTERFACE_KEY,
         I18n.tr("Network Interface"),
         NetworkInterfacePaneItem.class);
+    addOption(ADVANCED_KEY, PERFORMANCE_KEY, I18n.tr("Performance"), PerformancePaneItem.class);
     if (FrostAssociations.anyAssociationsSupported()) {
       addOption(
           ADVANCED_KEY,
