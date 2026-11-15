@@ -28,5 +28,13 @@ public class BugSettings extends LimeProps {
   public static final BooleanSetting SEND_DEADLOCK_BUGS =
       FACTORY.createBooleanSetting("SEND_DEADLOCK_BUGS", true);
 
+  /**
+   * Whether anonymous crash and freeze reports, and the session heartbeat Icebase counts crash-free
+   * sessions with, are sent to Icebase. On by default; while off nothing is queued and reports
+   * already waiting on disk are deleted unsent (frostwire/frostwire#1565).
+   */
+  public static final BooleanSetting SEND_ICEBASE_REPORTS =
+      FACTORY.createBooleanSetting("SEND_ICEBASE_REPORTS", true);
+
   private BugSettings() {}
 }
