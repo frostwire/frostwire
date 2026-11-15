@@ -531,6 +531,23 @@ class JdkWarmUpTest {
   }
 
   /**
+   * The splash's StatusComponent lays out with a BoxLayout and calls GUIUtils, and the EDT loaded
+   * BoxLayout from the JDK's module image and ran GUIUtils' static initializer while building the
+   * splash on a 4-CPU machine (Icebase #9910992021ac, #977ae4aaf003, frostwire/frostwire#1563). The
+   * splash's own pre-step initializes both before the splash is built.
+   */
+  @Test
+  void theSplashStatusComponentsClassesAreInitializedBeforeTheSplash() {
+    for (String className :
+        List.of("javax.swing.BoxLayout", "com.limegroup.gnutella.gui.GUIUtils")) {
+      assertTrue(
+          JdkWarmUp.SPLASH_CLASSES_TO_INITIALIZE.contains(className),
+          className + " is not initialized before the splash");
+      assertDoesNotThrow(() -> Class.forName(className), className);
+    }
+  }
+
+  /**
    * The search field's suggestions list was the first JList: BasicListUI's static initializer ran
    * on the EDT as the first suggestions popped up (Icebase #c0e323953897,
    * frostwire/frostwire#1501).

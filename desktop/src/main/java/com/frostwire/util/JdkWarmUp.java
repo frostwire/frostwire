@@ -213,9 +213,9 @@ public final class JdkWarmUp {
       List.of("sun.awt.windows.WPopupMenuPeer");
 
   /**
-   * JDK classes the Swing splash window initializes on the EDT, initialized beforehand by the
-   * startup thread that decodes the splash image ({@link #initializeSplashClasses}): the warm-up
-   * thread runs alongside the splash and can't be relied on to get there first. ImageIcon's static
+   * Classes the Swing splash window initializes on the EDT, initialized beforehand by the startup
+   * thread that decodes the splash image ({@link #initializeSplashClasses}): the warm-up thread
+   * runs alongside the splash and can't be relied on to get there first. ImageIcon's static
    * initializer builds its shared MediaTracker and component, which a cold JVM loaded on the EDT
    * while building the splash (Icebase #e45e1beac54a, frostwire/frostwire#1323). The splash is also
    * the first native window: its screen surface registers Java2D's rendering loops, so
@@ -235,7 +235,15 @@ public final class JdkWarmUp {
           "javax.swing.plaf.basic.BasicRootPaneUI",
           // With Nimbus the root pane's UI is SynthRootPaneUI, created in SynthLookAndFeel.createUI
           // on the EDT as the splash was built (Icebase #e55c52246999).
-          "javax.swing.plaf.synth.SynthRootPaneUI");
+          "javax.swing.plaf.synth.SynthRootPaneUI",
+          // The splash's StatusComponent lays itself out with a BoxLayout and clears its opacity
+          // with GUIUtils, whose static initializer builds the number formats and size units. On
+          // a 4-CPU machine the EDT read BoxLayout from the JDK's module image and ran GUIUtils'
+          // initializer while building the splash (Icebase #9910992021ac, #977ae4aaf003,
+          // frostwire/frostwire#1563). Both are needed by the splash anyway, so this moves the
+          // work off the EDT without adding any before the splash.
+          "javax.swing.BoxLayout",
+          "com.limegroup.gnutella.gui.GUIUtils");
 
   /**
    * Windows-only splash classes, initialized after {@link #SPLASH_CLASSES_TO_INITIALIZE}: the first
@@ -255,7 +263,7 @@ public final class JdkWarmUp {
     return classes;
   }
 
-  /** Initializes the splash's JDK classes in order; call off the EDT before the splash. */
+  /** Initializes the splash's classes in order; call off the EDT before the splash. */
   public static void initializeSplashClasses() {
     for (String className : splashClassesToInitialize(OSUtils.isWindows())) {
       try {
