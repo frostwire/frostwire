@@ -211,4 +211,21 @@ class IcebaseReportsOptOutTest {
     BugSettings.SEND_ICEBASE_REPORTS.revertToDefault();
     assertTrue(BugSettings.SEND_ICEBASE_REPORTS.getValue());
   }
+
+  /**
+   * The About window's hidden test report says it was queued for Icebase; while opted out nothing
+   * is queued, so it must not say so. The window is Swing, so its source is checked.
+   */
+  @Test
+  void theAboutWindowDoesNotClaimATestReportWasQueuedWhileOptedOut() throws Exception {
+    String about =
+        Files.readString(
+                Path.of(System.getProperty("user.dir"))
+                    .resolve("src/main/java/com/limegroup/gnutella/gui/AboutWindow.java"))
+            .replaceAll("\\s+", "");
+    int gate = about.indexOf("if(!IcebaseReports.enabled()){return;}");
+    assertTrue(gate >= 0, "the test report click is not gated on the Icebase reports setting");
+    assertTrue(gate < about.indexOf("CrashReportSpooler.submitTestReport();"));
+    assertTrue(gate < about.indexOf("Ananonymoustestreportwasqueued"));
+  }
 }

@@ -54,6 +54,10 @@ final class AboutWindow {
           @Override
           public void mouseClicked(MouseEvent e) {
             super.mouseClicked(e);
+            // Opted out of Icebase reports: nothing is sent, so don't say it was queued.
+            if (!IcebaseReports.enabled()) {
+              return;
+            }
             CrashReportSpooler.submitTestReport();
             JOptionPane.showMessageDialog(
                 DIALOG,
