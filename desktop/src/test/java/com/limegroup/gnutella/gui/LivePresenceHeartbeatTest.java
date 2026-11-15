@@ -10,10 +10,15 @@ package com.limegroup.gnutella.gui;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.frostwire.util.http.HttpClient;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.limegroup.gnutella.settings.BugSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
+import java.lang.reflect.Proxy;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -123,6 +128,36 @@ class LivePresenceHeartbeatTest {
           Set.of("session_id"),
           parse(LivePresenceHeartbeat.payload(release[0], release[1], 0, 0)).keySet(),
           String.join("/", String.valueOf(release[0]), String.valueOf(release[1])));
+    }
+  }
+
+  /** frostwire/frostwire#1565: a user who opted out of Icebase reports sends no heartbeat. */
+  @Test
+  void noHeartbeatIsSentWhileOptedOutOfIcebaseReports() {
+    boolean previous = BugSettings.SEND_ICEBASE_REPORTS.getValue();
+    List<String> posts = new CopyOnWriteArrayList<>();
+    HttpClient http =
+        (HttpClient)
+            Proxy.newProxyInstance(
+                HttpClient.class.getClassLoader(),
+                new Class<?>[] {HttpClient.class},
+                (proxy, method, args) -> {
+                  if (method.getName().equals("post")) {
+                    posts.add(String.valueOf(args[0]));
+                  }
+                  return null;
+                });
+    try {
+      BugSettings.SEND_ICEBASE_REPORTS.setValue(false);
+      LivePresenceHeartbeat.send(http);
+      assertEquals(List.of(), posts);
+
+      // Opting back in resumes the heartbeat.
+      BugSettings.SEND_ICEBASE_REPORTS.setValue(true);
+      LivePresenceHeartbeat.send(http);
+      assertEquals(List.of("https://icebase.frostwire.com/presence.php"), posts);
+    } finally {
+      BugSettings.SEND_ICEBASE_REPORTS.setValue(previous);
     }
   }
 }
