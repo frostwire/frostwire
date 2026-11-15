@@ -1,6 +1,5 @@
 /*
- *     Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- *  *            Marcelina Knitter (@marcelinkaaa)
+ *     Created by Angel Leon (@gubatron)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
  *
  *     This program is free software: you can redistribute it and/or modify
@@ -117,6 +116,20 @@ public class HexHiveView<T> extends View {
 
   public boolean ready() {
     return DP != null && compressedBitmap != null;
+  }
+
+  /**
+   * Sets {@code out} to the center of {@code piece}'s cube in view coordinates.
+   *
+   * @return false, leaving {@code out} alone, when there's no layout yet or no such piece
+   */
+  boolean pieceCenter(int piece, Point out) {
+    DrawingProperties dp = DP;
+    if (dp == null || piece < 0 || piece >= dp.numHexs) {
+      return false;
+    }
+    dp.centerOf(piece, out);
+    return true;
   }
 
   private void initPaints(int borderColor, int emptyColor, int fullColor) {
@@ -270,6 +283,17 @@ public class HexHiveView<T> extends View {
 
     private final Point oddRowOrigin;
 
+    /** Distance between the centers of two cubes next to each other in a row. */
+    private final int columnStep;
+
+    /** Distance between the centers of two rows. */
+    private final int rowStep;
+
+    /** Cubes in an even row (the first is row 0) and in an odd one, which starts further right. */
+    private final int evenRowCount;
+
+    private final int oddRowCount;
+
     /**
      * Point object we'll reuse to draw hexagons (Object creation and destruction must be avoided
      * when calling onDraw())
@@ -318,6 +342,36 @@ public class HexHiveView<T> extends View {
       // calculate number of hexagons in an even row
       oddRowOrigin =
           new Point((int) (evenRowOrigin.x + (hexWidth / 2)), (int) (evenRowOrigin.y + hexHeight));
+      columnStep = Math.max(1, (int) (hexWidth + (hexBorderWidth * 4)));
+      rowStep = Math.max(1, (int) ((hexHeight / 4) * 3));
+      evenRowCount = rowCount(evenRowOrigin.x, hexBorderWidth);
+      oddRowCount = rowCount(oddRowOrigin.x, hexBorderWidth);
+    }
+
+    /** How many cubes fit in a row starting at {@code firstX}, at least one. */
+    private int rowCount(int firstX, float hexBorderWidth) {
+      int count = 1;
+      // a cube goes on the row while the right side of the next one stays inside the drawing area
+      while (firstX + (count * columnStep) + (hexWidth / 2) + (hexBorderWidth * 3) < end.x) {
+        count++;
+      }
+      return count;
+    }
+
+    /** Sets {@code out} to the center of {@code piece}'s cube. */
+    void centerOf(int piece, Point out) {
+      if (numHexs == 1) {
+        out.set(center.x, center.y);
+        return;
+      }
+      int rowPair = piece / (evenRowCount + oddRowCount);
+      int inPair = piece % (evenRowCount + oddRowCount);
+      boolean evenRow = inPair < evenRowCount;
+      int row = rowPair * 2 + (evenRow ? 0 : 1);
+      int column = evenRow ? inPair : inPair - evenRowCount;
+      out.set(
+          (evenRow ? evenRowOrigin.x : oddRowOrigin.x) + column * columnStep,
+          evenRowOrigin.y + row * rowStep);
     }
   }
 
@@ -326,49 +380,19 @@ public class HexHiveView<T> extends View {
     try {
       // with DP we don't need to think about padding offsets. We just use DP numbers for our
       // calculations
-      DP.hexCenterBuffer.set(DP.evenRowOrigin.x, DP.evenRowOrigin.y);
-      boolean evenRow = true;
-      int pieceIndex = 0;
-      float heightQuarter = DP.hexHeight / 4;
-      float threeQuarters = heightQuarter * 3;
-      // if we have just one piece to draw, we'll draw it in the center
-      if (DP.numHexs == 1) {
-        DP.hexCenterBuffer.x = DP.center.x;
-        DP.hexCenterBuffer.y = DP.center.y;
-      }
       boolean drawCubes = DP.numHexs <= 600;
       Bitmap bitmap = Bitmap.createBitmap(canvasWidth, canvasHeight, Bitmap.Config.ARGB_8888);
       Canvas canvas = new Canvas(bitmap);
-
-      // For large piece counts, draw initial batch for responsive UI, rest loads progressively
-      int hexagonsDrawn = 0;
-      final int maxHexagonsForFirstDraw = 1200; // Draw initial batch
-
-      while (pieceIndex < DP.numHexs) {
-        // Check if we should stop drawing and show partial results
-        if (hexagonsDrawn >= maxHexagonsForFirstDraw) {
-          break;
-        }
-
+      // every piece: the hive is sized for all of them, a piece left out is a hole in the hive
+      for (int pieceIndex = 0; pieceIndex < DP.numHexs; pieceIndex++) {
+        DP.centerOf(pieceIndex, DP.hexCenterBuffer);
         drawHexagon(
             DP,
             canvas,
             hexagonBorderPaint,
             (adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint),
             drawCubes);
-        hexagonsDrawn++;
-
-        pieceIndex++;
-        DP.hexCenterBuffer.x += (int) (DP.hexWidth + (hexagonBorderPaint.getStrokeWidth() * 4));
-        float rightSide =
-            DP.hexCenterBuffer.x + (DP.hexWidth / 2) + (hexagonBorderPaint.getStrokeWidth() * 3);
-        if (rightSide >= DP.end.x) {
-          evenRow = !evenRow;
-          DP.hexCenterBuffer.x = (evenRow) ? DP.evenRowOrigin.x : DP.oddRowOrigin.x;
-          DP.hexCenterBuffer.y += (int) threeQuarters;
-        }
       }
-
       compressedBitmap = bitmap;
     } catch (Exception e) {
       LOG.error("asyncDraw failed with exception: " + e.getMessage(), e);
