@@ -131,56 +131,56 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
 
   /** Applies the options currently set in this `PaneItem`. */
   public boolean applyOptions() {
-    boolean isDirty = isDirty();
-    if (!isDirty) {
-      return false;
-    }
-    ConnectionSettings.USE_CUSTOM_NETWORK_INTERFACE.setValue(CUSTOM.isSelected());
-    Enumeration<AbstractButton> buttons = GROUP.getElements();
-    while (buttons.hasMoreElements()) {
-      AbstractButton bt = buttons.nextElement();
-      if (bt.isSelected() && CUSTOM.isSelected()) {
-        Address addr = (Address) bt.getClientProperty(ADDRESS_KEY);
-        ConnectionSettings.CUSTOM_INETADRESS_NO_PORT.setValue(addr.toString());
-      }
-    }
-    rebindListenInterface();
+    apply(CUSTOM.isSelected(), selectedAddress());
     return false;
   }
 
-  static void rebindListenInterface() {
-    int randomPortInRange =
-        NetworkUtils.getPortInRange(
-            ConnectionSettings.MANUAL_PORT_RANGE.getValue(),
-            ConnectionSettings.PORT_RANGE_0.getDefaultValue(),
-            ConnectionSettings.PORT_RANGE_1.getDefaultValue(),
-            ConnectionSettings.PORT_RANGE_0.getValue(),
-            ConnectionSettings.PORT_RANGE_1.getValue());
-    String iface =
-        NetworkUtils.getLibtorrentFormattedNetworkInterface(
-            ConnectionSettings.USE_CUSTOM_NETWORK_INTERFACE.getValue(),
-            "0.0.0.0",
-            ConnectionSettings.CUSTOM_INETADRESS_NO_PORT.getValue(),
-            randomPortInRange);
-    BTEngine.getInstance().listenInterfaces(iface);
+  /**
+   * Saves the page's choices and, only when one of them changed, rebinds the engine's listen
+   * sockets in the background, never on the EDT (frostwire/frostwire#1568).
+   *
+   * @param address the address picked in the list, or null when there is none
+   */
+  static void apply(boolean custom, String address) {
+    if (!changed(custom, address)) {
+      return;
+    }
+    ConnectionSettings.USE_CUSTOM_NETWORK_INTERFACE.setValue(custom);
+    if (custom && address != null) {
+      ConnectionSettings.CUSTOM_INETADRESS_NO_PORT.setValue(address);
+    }
+    EngineSettings.rebindListenInterface();
   }
 
-  public boolean isDirty() {
-    if (ConnectionSettings.USE_CUSTOM_NETWORK_INTERFACE.getValue() != CUSTOM.isSelected()) {
+  /**
+   * Whether the choices differ from the saved settings. The address picked in the list only counts
+   * while a specific interface is used: with the box unchecked the list still has a selection (the
+   * first address), which is not a change.
+   */
+  static boolean changed(boolean custom, String address) {
+    if (ConnectionSettings.USE_CUSTOM_NETWORK_INTERFACE.getValue() != custom) {
       return true;
     }
-    String expect = ConnectionSettings.CUSTOM_INETADRESS_NO_PORT.getValue();
+    return custom
+        && address != null
+        && !address.equals(ConnectionSettings.CUSTOM_INETADRESS_NO_PORT.getValue());
+  }
+
+  /** The address of the selected button, or null when none is selected. */
+  private String selectedAddress() {
     Enumeration<AbstractButton> buttons = GROUP.getElements();
     while (buttons.hasMoreElements()) {
       AbstractButton bt = buttons.nextElement();
       if (bt.isSelected()) {
-        Address addr =
-            (Address)
-                bt.getClientProperty(ADDRESS_KEY); // this was a null table here for some reason.
-        if (addr.toString().equals(expect)) return false;
+        Address addr = (Address) bt.getClientProperty(ADDRESS_KEY);
+        return addr != null ? addr.toString() : null;
       }
     }
-    return true;
+    return null;
+  }
+
+  public boolean isDirty() {
+    return changed(CUSTOM.isSelected(), selectedAddress());
   }
 
   /** Sets the options for the fields in this `PaneItem` when the window is shown. */

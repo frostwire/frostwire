@@ -235,4 +235,23 @@ class OptionsEngineApplyOffEdtTest {
     assertEquals(List.of("listenInterfaces@" + BACKGROUND), calls);
     assertEquals(40001, ConnectionSettings.PORT_RANGE_0.getValue());
   }
+
+  @Test
+  void theNetworkInterfacePageLeavesTheEngineAloneWhenNothingChanged() throws Exception {
+    ConnectionSettings.USE_CUSTOM_NETWORK_INTERFACE.setValue(false);
+    ConnectionSettings.CUSTOM_INETADRESS_NO_PORT.setValue("0.0.0.0");
+    // with the box unchecked, the list still selects its first address
+    onTheEdt(() -> NetworkInterfacePaneItem.apply(false, "192.168.1.20"));
+    assertEquals(List.of(), calls);
+    assertEquals("0.0.0.0", ConnectionSettings.CUSTOM_INETADRESS_NO_PORT.getValue());
+  }
+
+  @Test
+  void theNetworkInterfacePageRebindsAChangeInTheBackground() throws Exception {
+    ConnectionSettings.USE_CUSTOM_NETWORK_INTERFACE.setValue(false);
+    ConnectionSettings.CUSTOM_INETADRESS_NO_PORT.setValue("0.0.0.0");
+    onTheEdt(() -> NetworkInterfacePaneItem.apply(true, "192.168.1.20"));
+    assertEquals(List.of("listenInterfaces@" + BACKGROUND), calls);
+    assertEquals("192.168.1.20", ConnectionSettings.CUSTOM_INETADRESS_NO_PORT.getValue());
+  }
 }
