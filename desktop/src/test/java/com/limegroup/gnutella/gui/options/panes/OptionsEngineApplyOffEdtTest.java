@@ -20,6 +20,8 @@ package com.limegroup.gnutella.gui.options.panes;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.frostwire.jlibtorrent.SettingsPack;
+import com.frostwire.jlibtorrent.swig.settings_pack;
 import com.limegroup.gnutella.settings.ConnectionSettings;
 import java.lang.reflect.Proxy;
 import java.util.List;
@@ -54,10 +56,19 @@ class OptionsEngineApplyOffEdtTest {
     ConnectionSettings.I2P_OUTBOUND_QUANTITY,
     ConnectionSettings.I2P_INBOUND_LENGTH,
     ConnectionSettings.I2P_OUTBOUND_LENGTH,
+    ConnectionSettings.CONNECTION_METHOD,
+    ConnectionSettings.PROXY_HOST,
+    ConnectionSettings.PROXY_PORT,
+    ConnectionSettings.PROXY_AUTHENTICATE,
+    ConnectionSettings.PROXY_USERNAME,
+    ConnectionSettings.PROXY_PASS,
   };
 
   /** Each engine call, as "method@thread". */
   private final List<String> calls = new CopyOnWriteArrayList<>();
+
+  /** The last settings pack applied. */
+  private volatile SettingsPack applied;
 
   private Consumer<Runnable> savedBackground;
   private Supplier<EngineSettings.Engine> savedEngine;
@@ -87,6 +98,9 @@ class OptionsEngineApplyOffEdtTest {
                           ? "EDT"
                           : Thread.currentThread().getName();
                   calls.add(method.getName() + "@" + thread);
+                  if (args[0] instanceof SettingsPack settings) {
+                    applied = settings;
+                  }
                   return null;
                 });
     EngineSettings.engine = () -> fake;
@@ -135,5 +149,33 @@ class OptionsEngineApplyOffEdtTest {
     onTheEdt(() -> I2PPaneItem.apply(true, "127.0.0.1", 7657, false, 3, 3, 3, 3));
     assertEquals(List.of("applySettings@" + BACKGROUND), calls);
     assertEquals(7657, ConnectionSettings.I2P_PORT.getValue());
+  }
+
+  private static void saveProxy() {
+    ConnectionSettings.CONNECTION_METHOD.setValue(ConnectionSettings.C_HTTP_PROXY);
+    ConnectionSettings.PROXY_HOST.setValue("proxy.example");
+    ConnectionSettings.PROXY_PORT.setValue(3128);
+    ConnectionSettings.PROXY_AUTHENTICATE.setValue(true);
+    ConnectionSettings.PROXY_USERNAME.setValue("user");
+    ConnectionSettings.PROXY_PASS.setValue("secret");
+  }
+
+  @Test
+  void theProxyPageLeavesTheEngineAloneWhenNothingChanged() throws Exception {
+    saveProxy();
+    onTheEdt(() -> ProxyPaneItem.apply(ConnectionSettings.C_HTTP_PROXY, "proxy.example", 3128));
+    assertEquals(List.of(), calls);
+  }
+
+  @Test
+  void theProxyPageAppliesAChangeInTheBackgroundWithTheSavedLogin() throws Exception {
+    saveProxy();
+    onTheEdt(() -> ProxyPaneItem.apply(ConnectionSettings.C_SOCKS5_PROXY, "proxy.example", 1080));
+    assertEquals(List.of("applySettings@" + BACKGROUND), calls);
+    assertEquals(
+        settings_pack.proxy_type_t.socks5_pw.swigValue(),
+        applied.getInteger(settings_pack.int_types.proxy_type.swigValue()));
+    assertEquals(1080, applied.getInteger(settings_pack.int_types.proxy_port.swigValue()));
+    assertEquals("user", applied.getString(settings_pack.string_types.proxy_username.swigValue()));
   }
 }

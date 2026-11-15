@@ -18,7 +18,6 @@
 
 package com.limegroup.gnutella.gui.options.panes;
 
-import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.SettingsPack;
 import com.frostwire.jlibtorrent.swig.settings_pack;
 import com.limegroup.gnutella.gui.*;
@@ -125,33 +124,59 @@ public final class ProxyPaneItem extends AbstractPaneItem {
     } else if (HTTP_PROXY_BUTTON.isSelected()) {
       connectionMethod = ConnectionSettings.C_HTTP_PROXY;
     }
-    final int proxyPort = PROXY_PORT_FIELD.getValue();
-    final String proxyHost = PROXY_HOST_FIELD.getText();
+    apply(connectionMethod, PROXY_HOST_FIELD.getText(), PROXY_PORT_FIELD.getValue());
+    return false;
+  }
+
+  /**
+   * Saves the page's choices and, only when one of them changed, applies the proxy to the engine in
+   * the background, never on the EDT (frostwire/frostwire#1568).
+   */
+  static void apply(int connectionMethod, String proxyHost, int proxyPort) {
+    boolean changed =
+        ConnectionSettings.CONNECTION_METHOD.getValue() != connectionMethod
+            || !ConnectionSettings.PROXY_HOST.getValue().equals(proxyHost)
+            || ConnectionSettings.PROXY_PORT.getValue() != proxyPort;
+    if (!changed) {
+      return;
+    }
     ConnectionSettings.PROXY_PORT.setValue(proxyPort);
     ConnectionSettings.CONNECTION_METHOD.setValue(connectionMethod);
     ConnectionSettings.PROXY_HOST.setValue(proxyHost);
-    SettingsPack settings = new SettingsPack();
-    if (connectionMethod == ConnectionSettings.C_NO_PROXY) {
-      settings.setInteger(
-          settings_pack.int_types.proxy_type.swigValue(),
-          settings_pack.proxy_type_t.none.swigValue());
-    } else if (connectionMethod == ConnectionSettings.C_HTTP_PROXY) {
-      settings.setInteger(
-          settings_pack.int_types.proxy_type.swigValue(),
-          settings_pack.proxy_type_t.http.swigValue());
+    EngineSettings.apply(ProxyPaneItem::fillProxySettings);
+  }
+
+  /**
+   * Fills {@code settings} with the saved proxy and its login. The Proxy and Login Details pages
+   * both apply all of it, so the proxy type always matches the saved login, whichever page changed.
+   */
+  static void fillProxySettings(SettingsPack settings) {
+    int connectionMethod = ConnectionSettings.CONNECTION_METHOD.getValue();
+    boolean authenticate = ConnectionSettings.PROXY_AUTHENTICATE.getValue();
+    settings_pack.proxy_type_t proxyType;
+    if (connectionMethod == ConnectionSettings.C_HTTP_PROXY) {
+      proxyType =
+          authenticate ? settings_pack.proxy_type_t.http_pw : settings_pack.proxy_type_t.http;
     } else if (connectionMethod == ConnectionSettings.C_SOCKS4_PROXY) {
-      settings.setInteger(
-          settings_pack.int_types.proxy_type.swigValue(),
-          settings_pack.proxy_type_t.socks4.swigValue());
+      proxyType = settings_pack.proxy_type_t.socks4;
     } else if (connectionMethod == ConnectionSettings.C_SOCKS5_PROXY) {
-      settings.setInteger(
-          settings_pack.int_types.proxy_type.swigValue(),
-          settings_pack.proxy_type_t.socks5.swigValue());
+      proxyType =
+          authenticate ? settings_pack.proxy_type_t.socks5_pw : settings_pack.proxy_type_t.socks5;
+    } else {
+      proxyType = settings_pack.proxy_type_t.none;
     }
-    settings.setString(settings_pack.string_types.proxy_hostname.swigValue(), proxyHost);
-    settings.setInteger(settings_pack.int_types.proxy_port.swigValue(), proxyPort);
-    BTEngine.getInstance().applySettings(settings);
-    return false;
+    settings.setInteger(settings_pack.int_types.proxy_type.swigValue(), proxyType.swigValue());
+    settings.setString(
+        settings_pack.string_types.proxy_hostname.swigValue(),
+        ConnectionSettings.PROXY_HOST.getValue());
+    settings.setInteger(
+        settings_pack.int_types.proxy_port.swigValue(), ConnectionSettings.PROXY_PORT.getValue());
+    settings.setString(
+        settings_pack.string_types.proxy_username.swigValue(),
+        ConnectionSettings.PROXY_USERNAME.getValue());
+    settings.setString(
+        settings_pack.string_types.proxy_password.swigValue(),
+        ConnectionSettings.PROXY_PASS.getValue());
   }
 
   public boolean isDirty() {
