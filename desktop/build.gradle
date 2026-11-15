@@ -1108,6 +1108,7 @@ test {
         includeTestsMatching "com.frostwire.gui.components.transfers.TransferDetailGeneralBoldLabelsTest"
         includeTestsMatching "com.frostwire.gui.components.transfers.TransferDetailFilesSortTest"
         includeTestsMatching "com.frostwire.gui.components.transfers.HexHivePanelTest"
+        includeTestsMatching "com.frostwire.gui.components.transfers.RefreshCadenceTest"
         includeTestsMatching "com.frostwire.gui.components.transfers.TransferDetailActionsTest"
         includeTestsMatching "com.frostwire.gui.components.transfers.TransferDetailFilesProgressTest"
         includeTestsMatching "com.frostwire.gui.components.transfers.TransferDetailFilesSelectionTest"

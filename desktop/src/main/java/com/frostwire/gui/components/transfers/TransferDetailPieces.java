@@ -98,6 +98,12 @@ public final class TransferDetailPieces extends JPanel
         });
   }
 
+  /** The hive redraws less often in Lite (frostwire/frostwire#1555). */
+  @Override
+  public int refreshEveryTicks() {
+    return RefreshCadence.piecesEveryTicks();
+  }
+
   @Override
   public void updateData(BittorrentDownload btDownload) {
     final boolean sameDownload = (bittorrentDownload == btDownload);

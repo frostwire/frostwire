@@ -56,6 +56,7 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
   private TransferDetailPanel currentComponent;
   private BittorrentDownload selectedBittorrentDownload;
   private final AtomicBoolean updateScheduled = new AtomicBoolean(false);
+  private final RefreshCadence refreshCadence = new RefreshCadence();
 
   public TransferDetailComponent(MouseAdapter hideDetailsActionListener) {
     super(new MigLayout("fill, insets 0 0 0 0", "", "[top][grow]"));
@@ -217,7 +218,8 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
     if (GUIMediator.instance().getSelectedTab() == GUIMediator.Tabs.TRANSFERS
         && isVisible()
         && currentComponent != null
-        && selectedBittorrentDownload != null) {
+        && selectedBittorrentDownload != null
+        && refreshCadence.due(currentComponent.refreshEveryTicks())) {
       if (updateScheduled.compareAndSet(false, true)) {
         final BittorrentDownload btDownloadToUpdate = selectedBittorrentDownload;
         final TransferDetailPanel panelToUpdate = currentComponent;
@@ -265,5 +267,10 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
 
   interface TransferDetailPanel {
     void updateData(BittorrentDownload btDownload);
+
+    /** Refresh ticks (1 s) between this panel's updates while it shows. */
+    default int refreshEveryTicks() {
+      return 1;
+    }
   }
 }
