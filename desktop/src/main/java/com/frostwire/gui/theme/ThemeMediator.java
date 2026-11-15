@@ -239,6 +239,8 @@ public final class ThemeMediator {
         FlatLaf.setup(new SkinFlatLightLaf());
         installFlatLightLafDefaults();
       }
+      // Lite turns FlatLaf's animations and smooth scrolling off (frostwire/frostwire#1555).
+      Animations.applyToLookAndFeel();
       currentTheme = theme;
       UISettings.UI_THEME.setValue(theme.name());
     } catch (Throwable e) {
