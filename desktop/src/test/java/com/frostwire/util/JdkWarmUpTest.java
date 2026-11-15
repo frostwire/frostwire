@@ -209,6 +209,44 @@ class JdkWarmUpTest {
     assertTrue(swept.await(5, TimeUnit.SECONDS));
   }
 
+  /**
+   * Automatic picks Lite after a slow warm-up (frostwire/frostwire#1555): the JDK steps report how
+   * long they ran, and a step that failed reports nothing.
+   */
+  @Test
+  void timedStepsReportHowLongTheyRan() throws Exception {
+    List<Long> reported = new ArrayList<>();
+    JdkWarmUp.timed(
+            () -> {
+              try {
+                Thread.sleep(20);
+              } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+              }
+            },
+            reported::add)
+        .run();
+    assertEquals(1, reported.size());
+    assertTrue(reported.get(0) >= 20, "reported " + reported.get(0) + " ms");
+
+    Runnable failing =
+        JdkWarmUp.timed(
+            () -> {
+              throw new IllegalStateException("step failed");
+            },
+            reported::add);
+    try {
+      failing.run();
+    } catch (IllegalStateException expected) {
+      // tracked() still counts the step as finished
+    }
+    assertEquals(1, reported.size(), "a failed step reported a time");
+    String start = methodSource("public static void startInBackground(").replaceAll("\\s+", "");
+    assertTrue(
+        start.contains("tracked(timed(()->warmUp(earlyWindowText),jdkStepsDone))"),
+        "the JDK steps aren't timed");
+  }
+
   @Test
   void everyFallbackSlotLoadsOnlyInTheSweepStartedForTheMainWindow() throws Exception {
     String warmUp = warmUpSource();
@@ -1653,7 +1691,8 @@ class JdkWarmUpTest {
             .replaceAll("\\s+", "");
     String start =
         all.substring(
-            all.indexOf("publicstaticvoidstartInBackground(Supplier<String>earlyWindowText){"));
+            all.indexOf(
+                "publicstaticvoidstartInBackground(Supplier<String>earlyWindowText,LongConsumerjdkStepsDone){"));
     start = start.substring(0, start.indexOf("}") + 1);
     assertTrue(
         start.contains("startAppClassPreload(SPLASH_SHOWN,SPLASH_WAIT_MS,"),
