@@ -18,8 +18,6 @@
 
 package com.limegroup.gnutella.gui.options.panes;
 
-import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.jlibtorrent.SettingsPack;
 import com.frostwire.jlibtorrent.swig.settings_pack;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.GUIUtils.SizePolicy;
@@ -178,7 +176,43 @@ public final class I2PPaneItem extends AbstractPaneItem {
       return false;
     }
 
-    // Save settings
+    apply(
+        i2pEnabled,
+        i2pHost,
+        i2pPort,
+        i2pAllowMixed,
+        inboundQty,
+        outboundQty,
+        inboundLen,
+        outboundLen);
+    return false;
+  }
+
+  /**
+   * Saves the page's choices and, only when one of them changed, applies them to the engine in the
+   * background, never on the EDT (frostwire/frostwire#1568).
+   */
+  static void apply(
+      boolean i2pEnabled,
+      String i2pHost,
+      int i2pPort,
+      boolean i2pAllowMixed,
+      int inboundQty,
+      int outboundQty,
+      int inboundLen,
+      int outboundLen) {
+    boolean changed =
+        ConnectionSettings.I2P_ENABLED.getValue() != i2pEnabled
+            || !ConnectionSettings.I2P_HOSTNAME.getValue().equals(i2pHost)
+            || ConnectionSettings.I2P_PORT.getValue() != i2pPort
+            || ConnectionSettings.I2P_ALLOW_MIXED.getValue() != i2pAllowMixed
+            || ConnectionSettings.I2P_INBOUND_QUANTITY.getValue() != inboundQty
+            || ConnectionSettings.I2P_OUTBOUND_QUANTITY.getValue() != outboundQty
+            || ConnectionSettings.I2P_INBOUND_LENGTH.getValue() != inboundLen
+            || ConnectionSettings.I2P_OUTBOUND_LENGTH.getValue() != outboundLen;
+    if (!changed) {
+      return;
+    }
     ConnectionSettings.I2P_ENABLED.setValue(i2pEnabled);
     ConnectionSettings.I2P_HOSTNAME.setValue(i2pHost);
     ConnectionSettings.I2P_PORT.setValue(i2pPort);
@@ -187,23 +221,25 @@ public final class I2PPaneItem extends AbstractPaneItem {
     ConnectionSettings.I2P_OUTBOUND_QUANTITY.setValue(outboundQty);
     ConnectionSettings.I2P_INBOUND_LENGTH.setValue(inboundLen);
     ConnectionSettings.I2P_OUTBOUND_LENGTH.setValue(outboundLen);
-
-    // Apply to BTEngine
-    SettingsPack settings = new SettingsPack();
-    if (i2pEnabled && i2pHost != null && !i2pHost.isEmpty()) {
-      settings.setString(settings_pack.string_types.i2p_hostname.swigValue(), i2pHost);
-      settings.setInteger(settings_pack.int_types.i2p_port.swigValue(), i2pPort);
-      settings.setBoolean(settings_pack.bool_types.allow_i2p_mixed.swigValue(), i2pAllowMixed);
-      settings.setInteger(settings_pack.int_types.i2p_inbound_quantity.swigValue(), inboundQty);
-      settings.setInteger(settings_pack.int_types.i2p_outbound_quantity.swigValue(), outboundQty);
-      settings.setInteger(settings_pack.int_types.i2p_inbound_length.swigValue(), inboundLen);
-      settings.setInteger(settings_pack.int_types.i2p_outbound_length.swigValue(), outboundLen);
-    } else {
-      // Disable I2P by setting empty hostname
-      settings.setString(settings_pack.string_types.i2p_hostname.swigValue(), "");
-    }
-    BTEngine.getInstance().applySettings(settings);
-    return false;
+    EngineSettings.apply(
+        settings -> {
+          if (i2pEnabled && i2pHost != null && !i2pHost.isEmpty()) {
+            settings.setString(settings_pack.string_types.i2p_hostname.swigValue(), i2pHost);
+            settings.setInteger(settings_pack.int_types.i2p_port.swigValue(), i2pPort);
+            settings.setBoolean(
+                settings_pack.bool_types.allow_i2p_mixed.swigValue(), i2pAllowMixed);
+            settings.setInteger(
+                settings_pack.int_types.i2p_inbound_quantity.swigValue(), inboundQty);
+            settings.setInteger(
+                settings_pack.int_types.i2p_outbound_quantity.swigValue(), outboundQty);
+            settings.setInteger(settings_pack.int_types.i2p_inbound_length.swigValue(), inboundLen);
+            settings.setInteger(
+                settings_pack.int_types.i2p_outbound_length.swigValue(), outboundLen);
+          } else {
+            // Disable I2P by setting empty hostname
+            settings.setString(settings_pack.string_types.i2p_hostname.swigValue(), "");
+          }
+        });
   }
 
   public boolean isDirty() {
