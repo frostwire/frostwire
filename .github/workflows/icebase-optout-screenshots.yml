@@ -1,0 +1,75 @@
+# Screenshots for frostwire/frostwire#1565 (the Icebase reports choice in the setup wizard and its
+# Options pane). Runs only on the icebase-optout-screenshots branch, which is never merged. Each
+# runner builds just the wizard page or the pane in its own frame and captures only that frame; the
+# last job commits the PNGs to tools/icebase-optout-screenshots/shots on this branch.
+name: Icebase opt-out screenshots
+
+on:
+  push:
+    branches:
+      - icebase-optout-screenshots
+    paths-ignore:
+      - 'tools/icebase-optout-screenshots/shots/**'
+  workflow_dispatch:
+
+jobs:
+  shots:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-24.04]
+    steps:
+    - uses: actions/checkout@v7
+    - uses: actions/setup-java@v6
+      with:
+        java-version: '27'
+        distribution: 'temurin'
+    - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+    - name: Build classes
+      shell: bash
+      run: cd desktop && ./gradlew classes
+    - name: Take screenshots
+      shell: bash
+      run: |
+        cd desktop
+        CP=$(./gradlew -q -I ../tools/icebase-optout-screenshots/cp.gradle printRuntimeCp | grep '^CP=' | sed 's/^CP=//')
+        mkdir -p ../shots ../demo
+        SEP=":"; [ "$RUNNER_OS" = "Windows" ] && SEP=";"
+        javac -cp "$CP" -d ../demo ../tools/icebase-optout-screenshots/com/limegroup/gnutella/gui/init/IcebaseOptOutDemo.java
+        OPENS="--add-opens=java.desktop/javax.swing=ALL-UNNAMED --add-opens=java.desktop/java.awt=ALL-UNNAMED"
+        for shot in wizard:en options:en wizard:es options:es wizard:ar options:ar; do
+          what=${shot%%:*}; lang=${shot##*:}
+          out=../shots/$RUNNER_OS-$what-$lang.png
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            xvfb-run -a -s "-screen 0 1280x800x24" java $OPENS -cp "../demo${SEP}$CP" com.limegroup.gnutella.gui.init.IcebaseOptOutDemo $what $out $lang
+          else
+            java $OPENS -cp "../demo${SEP}$CP" com.limegroup.gnutella.gui.init.IcebaseOptOutDemo $what $out $lang
+          fi
+        done
+    - uses: actions/upload-artifact@v7
+      with:
+        name: shots-${{ matrix.os }}
+        path: shots/
+
+  commit:
+    needs: shots
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v7
+    - uses: actions/download-artifact@v7
+      with:
+        path: downloaded
+    - name: Commit the screenshots to this branch
+      shell: bash
+      run: |
+        mkdir -p tools/icebase-optout-screenshots/shots
+        cp downloaded/*/*.png tools/icebase-optout-screenshots/shots/
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git add tools/icebase-optout-screenshots/shots
+        git commit -m "Icebase opt-out screenshots from GitHub's Windows and Linux runners (not for merge)"
+        git push origin HEAD:${GITHUB_REF_NAME}
