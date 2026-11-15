@@ -148,7 +148,11 @@ final class Initializer {
     // init, drag-and-drop cursors) off the EDT as soon as the look and feel's fonts are known; on
     // slow machines the first text measured on the EDT, the splash window's, stalled it for over 5
     // seconds when this started only after the splash was up.
-    JdkWarmUp.startInBackground(EarlyWindowText::sample, PerformanceMode::warmUpJdkStepsFinished);
+    // Lite skips the warm-up's font sweep after the main window shows (frostwire/frostwire#1555).
+    JdkWarmUp.startInBackground(
+        EarlyWindowText::sample,
+        PerformanceMode::warmUpJdkStepsFinished,
+        !PerformanceMode.isLite());
     // Various startup tasks...
     // System.out.println("Initializer.initialize() setup callbacks and listeners");
     setupCallbacksAndListeners();

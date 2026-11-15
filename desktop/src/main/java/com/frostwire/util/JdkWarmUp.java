@@ -471,19 +471,27 @@ public final class JdkWarmUp {
    *     fonts it needs load before the splash (see {@link #initializeSlotsFor})
    * @param jdkStepsDone told how long the JDK steps took (ms), once they finish; they run the same
    *     whatever else the warm-up does, so the time compares from one start to the next
+   * @param fontSweep whether to sweep the fallback fonts once the main window shows: not in Lite
+   *     mode (frostwire/frostwire#1555), where a script's fonts load the first time it is drawn
    */
   public static void startInBackground(
-      Supplier<String> earlyWindowText, LongConsumer jdkStepsDone) {
-    // Three threads: the JDK steps, the app class preload and the fallback font sweep.
-    PROGRESS.start(3, System.nanoTime());
+      Supplier<String> earlyWindowText, LongConsumer jdkStepsDone, boolean fontSweep) {
+    // The JDK steps, the app class preload and, unless skipped, the fallback font sweep.
+    PROGRESS.start(warmUpThreads(fontSweep), System.nanoTime());
     Thread warmUp =
         new Thread(tracked(timed(() -> warmUp(earlyWindowText), jdkStepsDone)), "JdkWarmUp");
     warmUp.setDaemon(true);
     warmUp.start();
     startAppClassPreload(SPLASH_SHOWN, SPLASH_WAIT_MS, tracked(JdkWarmUp::loadAppClasses));
-    // TODO(frostwire/frostwire#1555): skip the sweep in Lite mode.
-    startFallbackFontSweep(
-        MAIN_WINDOW_SHOWN, MAIN_WINDOW_WAIT_MS, tracked(JdkWarmUp::sweepFallbackFonts));
+    if (fontSweep) {
+      startFallbackFontSweep(
+          MAIN_WINDOW_SHOWN, MAIN_WINDOW_WAIT_MS, tracked(JdkWarmUp::sweepFallbackFonts));
+    }
+  }
+
+  /** The warm-up's threads: the font sweep's only when it runs. */
+  static int warmUpThreads(boolean fontSweep) {
+    return fontSweep ? 3 : 2;
   }
 
   /**
