@@ -61,7 +61,7 @@ public class HexHiveView<T> extends View {
   private CubePaint emptyHexPaint;
   private CubePaint fullHexPaint;
   private DrawingProperties DP;
-  private Bitmap compressedBitmap;
+  private volatile Bitmap compressedBitmap;
 
   private static float getHexWidth(float sideLength) {
     return (float) (Math.sqrt(3) * sideLength);
@@ -138,12 +138,8 @@ public class HexHiveView<T> extends View {
     hexagonBorderPaint.setStyle(Paint.Style.STROKE);
     hexagonBorderPaint.setColor(borderColor);
     hexagonBorderPaint.setStrokeWidth(0);
-    emptyHexPaint = new CubePaint(10);
-    emptyHexPaint.setColor(emptyColor);
-    emptyHexPaint.setStyle(Paint.Style.FILL);
-    fullHexPaint = new CubePaint(20);
-    fullHexPaint.setColor(fullColor);
-    fullHexPaint.setStyle(Paint.Style.FILL);
+    emptyHexPaint = new CubePaint(emptyColor, 10);
+    fullHexPaint = new CubePaint(fullColor, 20);
   }
 
   @Override
@@ -201,55 +197,46 @@ public class HexHiveView<T> extends View {
     boolean isFull(int hexOffset);
   }
 
-  private static final class CubePaint extends Paint {
-    private int baseColor = -1;
-    private int darkColor = -1;
-    private int lightColor = -1;
-    private final int shades;
+  /**
+   * The base color of a cube and its darker left and lighter top faces. Never changed once made: a
+   * render can run while another one, or the UI thread, draws with the same paints.
+   */
+  private static final class CubePaint {
+    final Paint base;
+    final Paint dark;
+    final Paint light;
 
-    CubePaint(int shades) {
-      super();
-      this.shades = shades;
+    CubePaint(int color, int shades) {
+      base = fill(color);
+      dark = fill(shade(color, -shades));
+      light = fill(shade(color, shades));
     }
 
-    @Override
-    public void setColor(int color) {
-      if (baseColor == -1) {
-        this.baseColor = color;
-        int A = (baseColor >> 24) & 0xff;
-        int R = (baseColor >> 16) & 0xff;
-        int G = (baseColor >> 8) & 0xff;
-        int B = (baseColor) & 0xff;
-        int darkR = Math.max(R - shades, 0);
-        int darkG = Math.max(G - shades, 0);
-        int darkB = Math.max(B - shades, 0);
-        int lightR = Math.min(R + shades, 0xff);
-        int lightG = Math.min(G + shades, 0xff);
-        int lightB = Math.min(B + shades, 0xff);
-        darkColor = (A & 0xff) << 24 | (darkR & 0xff) << 16 | (darkG & 0xff) << 8 | (darkB & 0xff);
-        lightColor =
-            (A & 0xff) << 24 | (lightR & 0xff) << 16 | (lightG & 0xff) << 8 | (lightB & 0xff);
-      }
-      super.setColor(color);
+    private static Paint fill(int color) {
+      Paint paint = new Paint();
+      paint.setColor(color);
+      paint.setStyle(Paint.Style.FILL);
+      return paint;
     }
 
-    public void useBaseColor() {
-      if (baseColor != -1) {
-        setColor(baseColor);
-      }
+    /** {@code color} with {@code delta} added to each of its red, green and blue components. */
+    private static int shade(int color, int delta) {
+      int a = (color >>> 24) & 0xff;
+      int r = Math.max(0, Math.min(0xff, ((color >> 16) & 0xff) + delta));
+      int g = Math.max(0, Math.min(0xff, ((color >> 8) & 0xff) + delta));
+      int b = Math.max(0, Math.min(0xff, (color & 0xff) + delta));
+      return a << 24 | r << 16 | g << 8 | b;
     }
+  }
 
-    public void useDarkColor() {
-      if (darkColor != -1) {
-        setColor(darkColor);
-      }
-    }
-
-    public void useLightColor() {
-      if (lightColor != -1) {
-        setColor(lightColor);
-      }
-    }
+  /**
+   * The point and path objects one drawing reuses for every cube, so drawing allocates nothing per
+   * cube. Each drawing has its own: two renders may overlap on the render threads.
+   */
+  private static final class Shapes {
+    final Point center = new Point(-1, -1);
+    final Point corner = new Point(-1, -1);
+    final Path path = new Path();
   }
 
   private static final class DrawingProperties {
@@ -293,21 +280,6 @@ public class HexHiveView<T> extends View {
     private final int evenRowCount;
 
     private final int oddRowCount;
-
-    /**
-     * Point object we'll reuse to draw hexagons (Object creation and destruction must be avoided
-     * when calling onDraw())
-     */
-    private final Point hexCenterBuffer = new Point(-1, -1);
-
-    /**
-     * Point object we'll reuse to draw hexagon sides (Object creation and destruction must be
-     * avoided when calling onDraw())
-     */
-    private final Point cornerBuffer = new Point(-1, -1);
-
-    /** Path object we'll reuse to draw the filled areas of the hexagons */
-    private final Path fillPathBuffer = new Path();
 
     @SuppressWarnings("rawtypes")
     DrawingProperties(
@@ -383,11 +355,13 @@ public class HexHiveView<T> extends View {
       boolean drawCubes = DP.numHexs <= 600;
       Bitmap bitmap = Bitmap.createBitmap(canvasWidth, canvasHeight, Bitmap.Config.ARGB_8888);
       Canvas canvas = new Canvas(bitmap);
+      Shapes shapes = new Shapes();
       // every piece: the hive is sized for all of them, a piece left out is a hole in the hive
       for (int pieceIndex = 0; pieceIndex < DP.numHexs; pieceIndex++) {
-        DP.centerOf(pieceIndex, DP.hexCenterBuffer);
+        DP.centerOf(pieceIndex, shapes.center);
         drawHexagon(
             DP,
+            shapes,
             canvas,
             hexagonBorderPaint,
             (adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint),
@@ -417,70 +391,67 @@ public class HexHiveView<T> extends View {
 
   private static void drawHexagon(
       final DrawingProperties DP,
+      final Shapes shapes,
       final Canvas canvas,
       final Paint borderPaint,
       final CubePaint fillPaint,
       final boolean drawCube) {
-    DP.fillPathBuffer.reset();
+    shapes.path.reset();
     for (int i = 0; i < 7; i++) {
-      getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, i, DP.hexSideLength);
+      getHexCorner(shapes.corner, shapes.center, i, DP.hexSideLength);
       if (i == 0) {
-        DP.fillPathBuffer.moveTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
+        shapes.path.moveTo(shapes.corner.x, shapes.corner.y);
       } else {
-        DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
+        shapes.path.lineTo(shapes.corner.x, shapes.corner.y);
       }
     }
-    canvas.drawPath(DP.fillPathBuffer, fillPaint);
-    canvas.drawPath(DP.fillPathBuffer, borderPaint);
-    DP.fillPathBuffer.reset();
+    canvas.drawPath(shapes.path, fillPaint.base);
+    canvas.drawPath(shapes.path, borderPaint);
+    shapes.path.reset();
     if (drawCube) {
       // LEFT FACE
       // bottom corner - 90 degrees points straight below (zero at horizon on the right side)
       // angles move clockwise. 0 is below right horizon, 1 right below the center...
 
       // make left face path
-      DP.fillPathBuffer.moveTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
-      getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 1, DP.hexSideLength);
-      DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
-      getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 2, DP.hexSideLength);
-      DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
-      getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 3, DP.hexSideLength);
-      DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
-      DP.fillPathBuffer.lineTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
-      fillPaint.useDarkColor();
+      shapes.path.moveTo(shapes.center.x, shapes.center.y);
+      getHexCorner(shapes.corner, shapes.center, 1, DP.hexSideLength);
+      shapes.path.lineTo(shapes.corner.x, shapes.corner.y);
+      getHexCorner(shapes.corner, shapes.center, 2, DP.hexSideLength);
+      shapes.path.lineTo(shapes.corner.x, shapes.corner.y);
+      getHexCorner(shapes.corner, shapes.center, 3, DP.hexSideLength);
+      shapes.path.lineTo(shapes.corner.x, shapes.corner.y);
+      shapes.path.lineTo(shapes.center.x, shapes.center.y);
       // fill left face path
-      canvas.drawPath(DP.fillPathBuffer, fillPaint);
+      canvas.drawPath(shapes.path, fillPaint.dark);
 
       // TOP FACE
       // make top face path
-      DP.fillPathBuffer.reset();
-      DP.fillPathBuffer.moveTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
-      getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 3, DP.hexSideLength);
-      DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
-      getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 4, DP.hexSideLength);
-      DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
-      getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 5, DP.hexSideLength);
-      DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
-      DP.fillPathBuffer.lineTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
-      fillPaint.useLightColor();
-      canvas.drawPath(DP.fillPathBuffer, fillPaint);
+      shapes.path.reset();
+      shapes.path.moveTo(shapes.center.x, shapes.center.y);
+      getHexCorner(shapes.corner, shapes.center, 3, DP.hexSideLength);
+      shapes.path.lineTo(shapes.corner.x, shapes.corner.y);
+      getHexCorner(shapes.corner, shapes.center, 4, DP.hexSideLength);
+      shapes.path.lineTo(shapes.corner.x, shapes.corner.y);
+      getHexCorner(shapes.corner, shapes.center, 5, DP.hexSideLength);
+      shapes.path.lineTo(shapes.corner.x, shapes.corner.y);
+      shapes.path.lineTo(shapes.center.x, shapes.center.y);
+      canvas.drawPath(shapes.path, fillPaint.light);
 
       // Now draw 3 lines from the center to corners 1,3 and 5
-      DP.fillPathBuffer.reset();
-      DP.fillPathBuffer.moveTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
-      getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 1, DP.hexSideLength);
-      DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
-      DP.fillPathBuffer.moveTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
-      getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 3, DP.hexSideLength);
-      DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
-      DP.fillPathBuffer.moveTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
-      getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 5, DP.hexSideLength);
-      DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
-      canvas.drawPath(DP.fillPathBuffer, borderPaint);
+      shapes.path.reset();
+      shapes.path.moveTo(shapes.center.x, shapes.center.y);
+      getHexCorner(shapes.corner, shapes.center, 1, DP.hexSideLength);
+      shapes.path.lineTo(shapes.corner.x, shapes.corner.y);
+      shapes.path.moveTo(shapes.center.x, shapes.center.y);
+      getHexCorner(shapes.corner, shapes.center, 3, DP.hexSideLength);
+      shapes.path.lineTo(shapes.corner.x, shapes.corner.y);
+      shapes.path.moveTo(shapes.center.x, shapes.center.y);
+      getHexCorner(shapes.corner, shapes.center, 5, DP.hexSideLength);
+      shapes.path.lineTo(shapes.corner.x, shapes.corner.y);
+      canvas.drawPath(shapes.path, borderPaint);
 
-      DP.fillPathBuffer.reset();
-      fillPaint.useBaseColor();
+      shapes.path.reset();
     }
-    DP.cornerBuffer.set(-1, -1);
   }
 }
