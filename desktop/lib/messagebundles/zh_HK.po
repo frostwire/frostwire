@@ -896,7 +896,7 @@ msgstr ""
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:69
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:116
 msgid "Piece Size"
-msgstr "Piece Size"
+msgstr "分塊大小"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:229
 msgid "Torrent Type"
@@ -1006,7 +1006,7 @@ msgstr "音軌"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:575
 msgid "Calculating piece hashes..."
-msgstr "Calculating piece hashes..."
+msgstr "正在計算分塊雜湊值..."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:581
 msgid "Generating torrent entry..."
@@ -1449,7 +1449,7 @@ msgstr "檔案"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailComponent.java:142
 msgid "Pieces"
-msgstr "Pieces"
+msgstr "分塊"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailFiles.java:71
 msgid "Show skipped files"
@@ -1683,7 +1683,7 @@ msgstr "端口："
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:70
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:122
 msgid "Total Pieces"
-msgstr "Total Pieces"
+msgstr "分塊總數"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailTrackersDataLine.java:34
 msgid "URL"
@@ -6838,7 +6838,7 @@ msgstr "兩個選項之後都可以在 工具 > 選項 > IceBridge 中更改。"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:217
 msgid "Piece"
-msgstr "區塊"
+msgstr "分塊"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:219
 #, java-format
