@@ -189,31 +189,35 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
   }
 
   /**
-   * Convenience method to generically compare any two comparable things.
-   *
-   * <p>Handles comparison uniquely for 'native' types. We want to compare strings by lowercase
-   * comparison Note that non-integer comparisons must specifically check if the difference is less
-   * or greater than 0 so that rounding won't be wrong. Of the native types, we check 'Integer'
-   * first since that's the most common, Boolean, then Double or Float, and finally, the rest will
-   * be caught in 'Number', which just uses an int comparison.
+   * Compares two sort keys of a column, never throwing. Strings compare by their primary collation
+   * key (ignoring case and accents), other keys of the same class by their natural order, and keys
+   * that aren't comparable as equal. Nulls sort first. Keys of different classes sort by class
+   * name, so one row whose key has an unexpected type keeps its place in a consistent order instead
+   * of throwing a ClassCastException out of the sort (frostwire/frostwire#1570).
    */
   @SuppressWarnings("unchecked")
   public static int compare(Object o1, Object o2) {
-    int retval;
-    if (o1 == null && o2 == null) {
-      retval = 0;
-    } else if (o1 == null) {
-      retval = -1;
-    } else if (o2 == null) {
-      retval = 1;
-    } else if (o1.getClass() == String.class) {
-      retval = StringUtils.compareFullPrimary((String) o1, (String) o2);
-    } else if (o1 instanceof java.lang.Comparable) {
-      retval = ((java.lang.Comparable<Object>) o1).compareTo(o2);
-    } else {
-      retval = 0;
+    if (o1 == o2) {
+      return 0;
     }
-    return retval;
+    if (o1 == null) {
+      return -1;
+    }
+    if (o2 == null) {
+      return 1;
+    }
+    Class<?> c1 = o1.getClass();
+    Class<?> c2 = o2.getClass();
+    if (c1 != c2) {
+      return c1.getName().compareTo(c2.getName());
+    }
+    if (c1 == String.class) {
+      return StringUtils.compareFullPrimary((String) o1, (String) o2);
+    }
+    if (o1 instanceof Comparable) {
+      return ((Comparable<Object>) o1).compareTo(o2);
+    }
+    return 0;
   }
 
   /**

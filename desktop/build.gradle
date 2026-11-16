@@ -1145,6 +1145,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.trees.FileTreeModelLeafTest"
         includeTestsMatching "com.limegroup.gnutella.gui.tables.AbstractActionsRendererTest"
         includeTestsMatching "com.limegroup.gnutella.gui.tables.SeedsHolderTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.tables.AbstractTableMediatorCompareTest"
         includeTestsMatching "com.limegroup.gnutella.gui.tables.LimeJTableHiddenColumnTooltipTest"
         includeTestsMatching "com.limegroup.gnutella.gui.tables.LimeJTableTooltipOutsideCellsTest"
         includeTestsMatching "com.limegroup.gnutella.gui.tables.LimeJTablePreviewTooltipTest"
