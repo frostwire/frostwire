@@ -19,11 +19,15 @@
 package com.frostwire.android.gui.fragments;
 
 import android.graphics.Point;
+import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 import com.frostwire.android.gui.views.HexHiveView;
@@ -43,6 +47,12 @@ import com.frostwire.util.Logger;
  */
 public final class TransferDetailPiecesFragment extends AbstractTransferDetailFragment {
   private static final Logger LOG = Logger.getLogger(TransferDetailPiecesFragment.class);
+
+  /** The selected piece and its transfer, kept when the screen is recreated. */
+  private static final String STATE_SELECTED_PIECE = "pieces_selected_piece";
+
+  private static final String STATE_SELECTED_PIECE_INFOHASH = "pieces_selected_piece_infohash";
+
   private TextView piecesNumberTextView;
   private TextView pieceSizeTextView;
   private HexHiveView<PieceIndexBitfield> hexHiveView;
@@ -57,6 +67,17 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
   /** The tapped piece, -1 for none; set on the main thread, read by the background refresh. */
   private volatile int selectedPiece = -1;
 
+  /**
+   * The piece a recreated screen had selected, -1 for none, and its transfer's info hash: it's
+   * selected again once that transfer is bound, the transfer comes back after the view does.
+   */
+  private volatile int restoredPiece = -1;
+
+  private volatile String restoredPieceInfoHash;
+
+  /** Reads the pieces off the main thread: libtorrent, or a test's own. */
+  private final PiecesReader piecesReader;
+
   /** A piece's priority is set on a background thread, never on the main one. */
   private final PiecePriorities piecePriorities =
       new PiecePriorities(
@@ -64,8 +85,65 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
           SystemUtils::postToUIThread);
 
   public TransferDetailPiecesFragment() {
+    this(null);
+  }
+
+  /** {@code reader} null reads the pieces from libtorrent. */
+  TransferDetailPiecesFragment(@Nullable PiecesReader reader) {
     super(R.layout.fragment_transfer_detail_pieces);
     totalPieces = -1;
+    piecesReader = reader != null ? reader : new LibtorrentPiecesReader();
+  }
+
+  @Override
+  public void onSaveInstanceState(@NonNull Bundle outState) {
+    super.onSaveInstanceState(outState);
+    int piece = selectedPiece;
+    String infoHash = uiBittorrentDownload != null ? uiBittorrentDownload.getInfoHash() : null;
+    if (piece < 0 || infoHash == null) {
+      // saved again before the restored selection's transfer came back
+      piece = restoredPiece;
+      infoHash = restoredPieceInfoHash;
+    }
+    // the card is open while a piece is selected: closing it clears the selection
+    if (piece >= 0 && infoHash != null) {
+      outState.putInt(STATE_SELECTED_PIECE, piece);
+      outState.putString(STATE_SELECTED_PIECE_INFOHASH, infoHash);
+    }
+  }
+
+  @Override
+  public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+    super.onViewStateRestored(savedInstanceState);
+    if (savedInstanceState == null) {
+      return;
+    }
+    int piece = savedInstanceState.getInt(STATE_SELECTED_PIECE, -1);
+    String infoHash = savedInstanceState.getString(STATE_SELECTED_PIECE_INFOHASH);
+    if (piece >= 0 && infoHash != null) {
+      restoredPiece = piece;
+      restoredPieceInfoHash = infoHash;
+      restoreSelectedPiece();
+    }
+  }
+
+  /**
+   * Selects the restored piece again once its transfer is bound, or drops it for another transfer.
+   * The next refresh reads the piece off the main thread, then highlights it and opens its card, or
+   * clears it if the transfer has no such piece.
+   */
+  private void restoreSelectedPiece() {
+    String infoHash = restoredPieceInfoHash;
+    UIBittorrentDownload download = uiBittorrentDownload;
+    if (infoHash == null || download == null) {
+      return;
+    }
+    int piece = restoredPiece;
+    restoredPieceInfoHash = null;
+    restoredPiece = -1;
+    if (infoHash.equals(download.getInfoHash())) {
+      selectedPiece = piece;
+    }
   }
 
   @Override
@@ -106,6 +184,8 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
   protected void onTransferChanged() {
     // another transfer's pieces, the tapped one was of the previous transfer
     clearSelectedPiece();
+    // a recreated screen's transfer is bound after its view is restored
+    restoreSelectedPiece();
   }
 
   /** Shows the tapped piece's details once they're read off the main thread. */
@@ -127,7 +207,7 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
     SystemUtils.postToHandler(
         SystemUtils.HandlerThreadName.HIGH_PRIORITY,
         () -> {
-          PieceDetails details = readPieceDetails(infoHash, piece);
+          PieceDetails details = piecesReader.readPieceDetails(infoHash, piece);
           if (details != null) {
             SystemUtils.postToUIThread(() -> showPieceDetails(details));
           }
@@ -175,25 +255,6 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
         () -> loadPiecesData(details.infoHash));
   }
 
-  /** Background thread only, null if the piece can't be read now. */
-  private PieceDetails readPieceDetails(String expectedInfoHash, int piece) {
-    SystemUtils.ensureBackgroundThreadOrCrash("TransferDetailPiecesFragment::readPieceDetails");
-    if (uiBittorrentDownload == null
-        || !expectedInfoHash.equals(uiBittorrentDownload.getInfoHash())) {
-      return null;
-    }
-    TorrentHandle handle =
-        torrentHandle != null ? torrentHandle : uiBittorrentDownload.getDl().getTorrentHandle();
-    try {
-      return handle != null
-          ? PieceDetails.read(expectedInfoHash, handle, handle.torrentFile(), piece)
-          : null;
-    } catch (Throwable t) {
-      LOG.warn("Could not read the details of piece " + piece, t);
-      return null;
-    }
-  }
-
   private void showPieceDetails(PieceDetails details) {
     // the tab closed, the transfer changed or another piece was tapped meanwhile
     if (!isAdded()
@@ -213,6 +274,7 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
       return;
     }
 
+    restoreSelectedPiece();
     ensureTorrentHandleAsync();
     final String infoHash = uiBittorrentDownload.getInfoHash();
     SystemUtils.postToHandler(
@@ -225,58 +287,50 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
         || !expectedInfoHash.equals(uiBittorrentDownload.getInfoHash())) {
       return;
     }
-
-    final TorrentHandle currentTorrentHandle =
-        torrentHandle != null ? torrentHandle : uiBittorrentDownload.getDl().getTorrentHandle();
-    if (currentTorrentHandle == null) {
+    // the tapped piece's panel follows it: missing, downloading, downloaded
+    final PiecesData data = piecesReader.readPieces(expectedInfoHash, selectedPiece);
+    if (data == null) {
       return;
     }
-
-    final TorrentStatus status;
-    final TorrentInfo torrentInfo;
-    final byte[] priorityMarks;
-    final PieceDetails selectedPieceDetails;
-    try {
-      status = currentTorrentHandle.status(TorrentHandle.QUERY_PIECES);
-      torrentInfo = currentTorrentHandle.torrentFile();
-      PieceIndexBitfield downloaded = status != null ? status.pieces() : null;
-      // a downloaded piece is drawn full whatever its priority
-      priorityMarks =
-          downloaded == null || downloaded.isAllSet()
-              ? null
-              : readPriorityMarks(currentTorrentHandle);
-      // the tapped piece's panel follows it: missing, downloading, downloaded
-      int piece = selectedPiece;
-      selectedPieceDetails =
-          piece >= 0
-              ? PieceDetails.read(expectedInfoHash, currentTorrentHandle, torrentInfo, piece)
-              : null;
-    } catch (Throwable t) {
-      LOG.warn("Skipping pieces update because torrent status is unavailable", t);
-      return;
-    }
-
-    final PieceIndexBitfield pieces = status != null ? status.pieces() : null;
-    final long piecesCount = pieces != null ? pieces.count() : -1;
-    final int totalPiecesValue = torrentInfo != null ? torrentInfo.numPieces() : totalPieces;
-    final String pieceSizeValue =
-        torrentInfo != null
-            ? UIUtils.getBytesInHuman(torrentInfo.pieceSizeForReq(0))
-            : pieceSizeString;
-
     SystemUtils.postToUIThread(
         () -> {
           applyPiecesData(
               expectedInfoHash,
-              pieces,
-              priorityMarks,
-              piecesCount,
-              totalPiecesValue,
-              pieceSizeValue);
-          if (selectedPieceDetails != null) {
-            showPieceDetails(selectedPieceDetails);
-          }
+              data.pieces,
+              data.priorityMarks,
+              data.piecesCount,
+              data.totalPieces >= 0 ? data.totalPieces : totalPieces,
+              data.pieceSize != null ? data.pieceSize : pieceSizeString);
+          showSelectedPiece(expectedInfoHash, data);
         });
+  }
+
+  /**
+   * Highlights the selected piece and refreshes its card; a piece restored with the screen is
+   * highlighted and its card opened here, once its details are read, or cleared if the transfer has
+   * no such piece.
+   */
+  private void showSelectedPiece(String expectedInfoHash, PiecesData data) {
+    int piece = data.selectedPiece;
+    if (piece < 0
+        || piece != selectedPiece
+        || !isAdded()
+        || uiBittorrentDownload == null
+        || !expectedInfoHash.equals(uiBittorrentDownload.getInfoHash())) {
+      return;
+    }
+    if (data.totalPieces >= 0 && piece >= data.totalPieces) {
+      clearSelectedPiece();
+      return;
+    }
+    if (data.selectedPieceDetails == null) {
+      return;
+    }
+    if (hexHiveView != null && hexHiveView.getSelectedPiece() != piece) {
+      hexHiveView.setSelectedPiece(piece);
+      placePiecePanel(piece);
+    }
+    showPieceDetails(data.selectedPieceDetails);
   }
 
   /** The hive mark of each piece by its priority, see {@link PiecePriorities#mark}. */
@@ -337,6 +391,114 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
     }
     if (piecesNumberTextView != null && piecesCount >= 0) {
       piecesNumberTextView.setText(piecesCount + "/" + totalPieces);
+    }
+  }
+
+  /** What one refresh read of a transfer's pieces, off the main thread. */
+  static final class PiecesData {
+    /** Null when libtorrent doesn't say. */
+    final PieceIndexBitfield pieces;
+
+    /** Null when every piece is downloaded, see {@link PiecePriorities#mark}. */
+    final byte[] priorityMarks;
+
+    /** Downloaded pieces, -1 when unknown. */
+    final long piecesCount;
+
+    /** -1 when unknown: a magnet's pieces before its metadata. */
+    final int totalPieces;
+
+    /** Null when unknown. */
+    final String pieceSize;
+
+    /** The piece selected when the read began, -1 for none. */
+    final int selectedPiece;
+
+    /** Null without a selected piece, or one that can't be read now. */
+    final PieceDetails selectedPieceDetails;
+
+    PiecesData(
+        PieceIndexBitfield pieces,
+        byte[] priorityMarks,
+        long piecesCount,
+        int totalPieces,
+        String pieceSize,
+        int selectedPiece,
+        PieceDetails selectedPieceDetails) {
+      this.pieces = pieces;
+      this.priorityMarks = priorityMarks;
+      this.piecesCount = piecesCount;
+      this.totalPieces = totalPieces;
+      this.pieceSize = pieceSize;
+      this.selectedPiece = selectedPiece;
+      this.selectedPieceDetails = selectedPieceDetails;
+    }
+  }
+
+  /** Reads a transfer's pieces, on a background thread only. */
+  interface PiecesReader {
+    /** Null when the transfer's pieces can't be read now. */
+    @Nullable
+    PiecesData readPieces(String infoHash, int selectedPiece);
+
+    /** Null when the piece can't be read now. */
+    @Nullable
+    PieceDetails readPieceDetails(String infoHash, int piece);
+  }
+
+  /** Reads the bound transfer's pieces from libtorrent. */
+  private final class LibtorrentPiecesReader implements PiecesReader {
+    @Override
+    public PiecesData readPieces(String infoHash, int piece) {
+      TorrentHandle handle = handle(infoHash);
+      if (handle == null) {
+        return null;
+      }
+      try {
+        TorrentStatus status = handle.status(TorrentHandle.QUERY_PIECES);
+        TorrentInfo torrentInfo = handle.torrentFile();
+        PieceIndexBitfield pieces = status != null ? status.pieces() : null;
+        // a downloaded piece is drawn full whatever its priority
+        byte[] priorityMarks =
+            pieces == null || pieces.isAllSet() ? null : readPriorityMarks(handle);
+        // null for a piece past the torrent's last one
+        PieceDetails details =
+            piece >= 0 ? PieceDetails.read(infoHash, handle, torrentInfo, piece) : null;
+        return new PiecesData(
+            pieces,
+            priorityMarks,
+            pieces != null ? pieces.count() : -1,
+            torrentInfo != null ? torrentInfo.numPieces() : -1,
+            torrentInfo != null ? UIUtils.getBytesInHuman(torrentInfo.pieceSizeForReq(0)) : null,
+            piece,
+            details);
+      } catch (Throwable t) {
+        LOG.warn("Skipping pieces update because torrent status is unavailable", t);
+        return null;
+      }
+    }
+
+    @Override
+    public PieceDetails readPieceDetails(String infoHash, int piece) {
+      SystemUtils.ensureBackgroundThreadOrCrash("TransferDetailPiecesFragment::readPieceDetails");
+      TorrentHandle handle = handle(infoHash);
+      try {
+        return handle != null
+            ? PieceDetails.read(infoHash, handle, handle.torrentFile(), piece)
+            : null;
+      } catch (Throwable t) {
+        LOG.warn("Could not read the details of piece " + piece, t);
+        return null;
+      }
+    }
+
+    /** The bound transfer's handle, null if it's another transfer's or there's none yet. */
+    private TorrentHandle handle(String infoHash) {
+      UIBittorrentDownload download = uiBittorrentDownload;
+      if (download == null || !infoHash.equals(download.getInfoHash())) {
+        return null;
+      }
+      return torrentHandle != null ? torrentHandle : download.getDl().getTorrentHandle();
     }
   }
 
