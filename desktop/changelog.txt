@@ -1,4 +1,5 @@
 FrostWire 7.1.5 UNRELEASED
+   - fix:a table's background sort no longer stops with a ClassCastException when one row's sort value has an unexpected type — sort values of different types now sort by type, nulls first
    - fix:IceBridge mesh requests no longer vanish on macOS when another app holds the rUDP port over IPv4 — the port is reserved over IPv4 before binding
    - fix:the window no longer freezes while the Library fills in file sizes and dates during a sort or a big folder load — resolved rows are applied off the EDT in 40 ms batches, and the EDT only repaints them
    - fix:clicking OK in Options no longer freezes the window re-applying I2P, proxy, firewall and network interface settings to libtorrent — they are applied only when changed, in the background
