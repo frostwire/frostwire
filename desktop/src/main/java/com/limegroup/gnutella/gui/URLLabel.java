@@ -78,7 +78,7 @@ public class URLLabel extends JLabel {
       super.setFont(null);
       return;
     }
-    Font underlined = VPNDropProtectionCheckbox.underlined(font);
+    Font underlined = LinkLabel.underlined(font);
     // A look and feel only replaces fonts it installed itself, so keep that mark.
     super.setFont(font instanceof UIResource ? new FontUIResource(underlined) : underlined);
   }

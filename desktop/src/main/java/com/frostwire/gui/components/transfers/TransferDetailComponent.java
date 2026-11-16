@@ -23,12 +23,14 @@ import com.frostwire.gui.bittorrent.BittorrentDownload;
 import com.frostwire.gui.theme.PlatformFonts;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.LinkLabel;
 import com.limegroup.gnutella.gui.RefreshListener;
 import com.limegroup.gnutella.gui.VisibleCardLayout;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.UISettings;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseListener;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.*;
@@ -60,21 +62,24 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
 
   public TransferDetailComponent(MouseAdapter hideDetailsActionListener) {
     super(new MigLayout("fill, insets 0 0 0 0", "", "[top][grow]"));
-    // Create label without HTML content to avoid EDT violation
-    JLabel hideLink = new JLabel();
-    hideLink.addMouseListener(hideDetailsActionListener);
-    JPanel labelAndLink = header(new JLabel(I18n.tr("Transfer Detail")), hideLink);
-    // Defer HTML content and font loading to avoid EDT violation
-    // HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
-    SwingUtilities.invokeLater(
-        () -> {
-          hideLink.setText("<html><a href='#'>" + I18n.tr("hide") + "</a></html>");
-          hideLink.setFont(PlatformFonts.TRANSFER_DETAIL_LINK);
-        });
+    JPanel labelAndLink =
+        header(new JLabel(I18n.tr("Transfer Detail")), hideLink(hideDetailsActionListener));
     add(labelAndLink, "left, gapleft 10px, growx");
     add(createDetailSwitcherButtons(), "push, right, wrap");
     add(createDetailComponentHolder(), "hmin 0px, span 2, grow");
     GUIMediator.addRefreshListener(this);
+  }
+
+  /**
+   * The "hide" link. Plain text drawn as a link, not {@code <html><a href='#'>}: setting HTML text
+   * built an HTML view on the EDT, the first time loading Swing's HTML and CSS support, and froze
+   * the window (frostwire/frostwire#1571).
+   */
+  static JLabel hideLink(MouseListener onClick) {
+    JLabel hideLink = new LinkLabel(I18n.tr("hide"));
+    hideLink.setFont(PlatformFonts.TRANSFER_DETAIL_LINK);
+    hideLink.addMouseListener(onClick);
+    return hideLink;
   }
 
   /**

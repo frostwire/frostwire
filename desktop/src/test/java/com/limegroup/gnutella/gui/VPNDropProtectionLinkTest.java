@@ -51,7 +51,7 @@ class VPNDropProtectionLinkTest {
   @Test
   void underlinedKeepsTheFontsFamilyStyleAndSize() {
     Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 9);
-    Font underlined = VPNDropProtectionCheckbox.underlined(font);
+    Font underlined = LinkLabel.underlined(font);
     assertEquals(font.getFamily(), underlined.getFamily());
     assertEquals(font.getStyle(), underlined.getStyle());
     assertEquals(font.getSize(), underlined.getSize());

@@ -33,6 +33,7 @@ import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.IconButton;
+import com.limegroup.gnutella.gui.LinkLabel;
 import com.limegroup.gnutella.gui.SizeStableLabel;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import java.awt.*;
@@ -65,7 +66,7 @@ public final class TransferDetailGeneral extends JPanel
   private final JLabel peersLabel;
   private final JLabel uploadSpeedLimitLabel;
   private final JLabel shareRatioLabel;
-  private final JGrayLabel saveLocationGrayLabel;
+  private final JLabel saveLocationLink;
   private final JLabel saveLocationLabel;
   private final JLabel infoHashLabel;
   private final JButton copyInfoHashButton;
@@ -213,9 +214,8 @@ public final class TransferDetailGeneral extends JPanel
     lowerPanel.setForeground(foregroundColor);
     lowerPanel.setBackground(backgroundColor.brighter());
     lowerPanel.setOpaque(true);
-    saveLocationGrayLabel =
-        new JGrayLabel("<html><a href=\"#\">" + I18n.tr("Save location") + "</a>:</html>");
-    lowerPanel.add(saveLocationGrayLabel, "split 2, gapright 10");
+    saveLocationLink = saveLocationLink();
+    lowerPanel.add(saveLocationLink, "split 2, gapright 10");
     lowerPanel.add(saveLocationLabel = new SizeStableLabel(), "gapright 60, wrap");
     final ImageIcon copy_paste_gray = GUIMediator.getThemeImage("copy_paste_gray.png");
     final ImageIcon copy_paste = GUIMediator.getThemeImage("copy_paste.png");
@@ -368,14 +368,14 @@ public final class TransferDetailGeneral extends JPanel
           }
           shareRatioLabel.setText(shareRatio);
           saveLocationLabel.setText(saveLocation);
-          MouseListener[] mouseListeners = saveLocationGrayLabel.getMouseListeners();
+          MouseListener[] mouseListeners = saveLocationLink.getMouseListeners();
           if (mouseListeners != null && mouseListeners.length > 0) {
             for (MouseListener l : mouseListeners) {
-              saveLocationGrayLabel.removeMouseListener(l);
+              saveLocationLink.removeMouseListener(l);
             }
           }
           final BittorrentDownload finalGuiBtDownload = guiBtDownload;
-          saveLocationGrayLabel.addMouseListener(
+          saveLocationLink.addMouseListener(
               new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
@@ -429,10 +429,10 @@ public final class TransferDetailGeneral extends JPanel
     checkLocalDataButton.setEnabled(true);
     shareRatioLabel.setText("");
     saveLocationLabel.setText("");
-    MouseListener[] mouseListeners = saveLocationGrayLabel.getMouseListeners();
+    MouseListener[] mouseListeners = saveLocationLink.getMouseListeners();
     if (mouseListeners != null && mouseListeners.length > 0) {
       for (MouseListener l : mouseListeners) {
-        saveLocationGrayLabel.removeMouseListener(l);
+        saveLocationLink.removeMouseListener(l);
       }
     }
     infoHashLabel.setText("");
@@ -659,6 +659,15 @@ public final class TransferDetailGeneral extends JPanel
     if (seconds < 10) time.append("0");
     time.append(seconds);
     return time.toString();
+  }
+
+  /**
+   * "Save location:", which opens the download's folder on click. Plain text drawn as a link, not
+   * {@code <html><a href="#">}: an HTML label builds an HTML view on the EDT
+   * (frostwire/frostwire#1571).
+   */
+  static JLabel saveLocationLink() {
+    return new LinkLabel(I18n.tr("Save location") + ":");
   }
 
   private static class JGrayLabel extends JLabel {
