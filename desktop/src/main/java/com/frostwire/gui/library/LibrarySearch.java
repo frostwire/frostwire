@@ -57,6 +57,11 @@ public class LibrarySearch extends JPanel {
   private String status;
 
   LibrarySearch() {
+    this(SwingUtilities::invokeLater);
+  }
+
+  /** Tests pass a scheduler that holds the field's creation, to call in before the field exists. */
+  LibrarySearch(java.util.function.Consumer<Runnable> createFieldLater) {
     setLayout(new BorderLayout());
     setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
     setMinimumSize(new Dimension(200, 20));
@@ -66,7 +71,7 @@ public class LibrarySearch extends JPanel {
     add(statusLabel, BorderLayout.CENTER);
     // Defer SearchField creation to avoid EDT violation
     // SearchField class loading and initialization blocks EDT (>2 second EDT block)
-    SwingUtilities.invokeLater(this::createSearchField);
+    createFieldLater.accept(this::createSearchField);
   }
 
   private void createSearchField() {
@@ -85,19 +90,20 @@ public class LibrarySearch extends JPanel {
         () -> {
           GUIMediator.instance().setWindow(GUIMediator.Tabs.LIBRARY);
           LibraryMediator.instance().getLibraryExplorer().selectFinishedDownloads();
-          if (searchField != null) {
-            SearchLibraryAction searchAction = new SearchLibraryAction();
-            if (displayTextOnSearchBox) {
-              if (query.length() < 50) {
-                searchField.setText(query);
-              } else {
-                searchField.setText(query.substring(0, 49));
-              }
-              searchAction.actionPerformed(null);
-            } else {
-              searchAction.actionPerformed(null, query);
-            }
-          }
+          whenSearchFieldReady(
+              field -> {
+                SearchLibraryAction searchAction = new SearchLibraryAction();
+                if (displayTextOnSearchBox) {
+                  if (query.length() < 50) {
+                    field.setText(query);
+                  } else {
+                    field.setText(query.substring(0, 49));
+                  }
+                  searchAction.actionPerformed(null);
+                } else {
+                  searchAction.actionPerformed(null, query);
+                }
+              });
         });
   }
 
@@ -111,7 +117,9 @@ public class LibrarySearch extends JPanel {
 
   public void clear() {
     setStatus("");
-    searchField.setText("");
+    // The tree can select a folder (and clear this search) before the field exists, e.g. when
+    // Transfers is shown right after start (Icebase #0ecc9b3a9246, frostwire/frostwire#1572).
+    whenSearchFieldReady(field -> field.setText(""));
     resultsCount = 0;
   }
 
@@ -165,12 +173,13 @@ public class LibrarySearch extends JPanel {
         });
   }
 
+  /** The search field, or null until it is created; prefer {@link #whenSearchFieldReady}. */
   public SearchField getSearchField() {
     return searchField;
   }
 
   void setSearchPrompt(String string) {
-    searchField.setPrompt(string);
+    whenSearchFieldReady(field -> field.setPrompt(string));
   }
 
   private static final class SearchFileFilter implements FileFilter {
