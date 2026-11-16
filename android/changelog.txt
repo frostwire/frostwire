@@ -1,4 +1,5 @@
 FrostWire Android UNRELEASED
+  - fix:the Pieces tab keeps the tapped piece and its card when the screen is recreated (theme or font change, split-screen resize, large screens, app restored after being killed) (#1566)
   - fix:crash when leaving the Distributed Search settings screen while its identity and karma were still loading, or when an identity action finished after the screen closed (#1569)
   - new:Pieces tab: tap a piece to see its details (state, size, byte range, peers, SHA-1, files) and change its download priority; Don't Download pieces are drawn red and High ones orange, like on desktop; torrents with more than 1,200 pieces now show all of them (#1566)
 
