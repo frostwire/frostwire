@@ -269,17 +269,11 @@ public final class SetupManager {
     GUIUtils.addHideAction((JComponent) container);
     BoxLayout containerLayout = new BoxLayout(container, BoxLayout.Y_AXIS);
     container.setLayout(containerLayout);
-    JPanel setupPanel = new JPanel();
-    setupPanel.setBorder(BorderFactory.createEmptyBorder(1, 0, 0, 0));
-    BoxLayout layout = new BoxLayout(setupPanel, BoxLayout.Y_AXIS);
-    setupPanel.setLayout(layout);
     Dimension d = new Dimension(SetupWindow.SETUP_WIDTH, SetupWindow.SETUP_HEIGHT);
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     dialog.setLocation((screenSize.width - d.width) / 2, (screenSize.height - d.height) / 2);
     dialog.setSize((int) d.getWidth(), (int) d.getHeight());
     // create the setup buttons panel
-    setupPanel.add(_setupWindowHolder);
-    setupPanel.add(Box.createVerticalStrut(17));
     JPanel bottomRow = new JPanel();
     bottomRow.setLayout(new BoxLayout(bottomRow, BoxLayout.X_AXIS));
     ButtonRow buttons = new ButtonRow(actions, ButtonRow.X_AXIS, ButtonRow.LEFT_GLUE);
@@ -288,13 +282,33 @@ public final class SetupManager {
     bottomRow.add(Box.createHorizontalGlue());
     bottomRow.add(buttons);
     bottomRow.setBorder(BorderFactory.createEmptyBorder(5, 10, 10, 10));
-    setupPanel.add(new Line());
-    setupPanel.add(bottomRow);
+    JPanel setupPanel = layOutBody(_setupWindowHolder, bottomRow);
     show(firstWindow);
     // add the panel and make it visible
     container.add(setupPanel);
     // Every page is laid out for this size, so the dialog is sized without building them all.
     container.setPreferredSize(new Dimension(SetupWindow.SETUP_WIDTH, SetupWindow.SETUP_HEIGHT));
+  }
+
+  /**
+   * The wizard's body: the pages on top and the button row under them. The button row always gets
+   * its full height and the pages get what is left, so a page taller than the dialog (a long
+   * translation, or a header whose wrapped description asks for a huge minimum height before it has
+   * a width) is cut off or scrolls instead of pushing the buttons below the window. A vertical
+   * {@link BoxLayout} would not shrink the pages under their minimum height, and the buttons were
+   * only reachable by resizing the window.
+   */
+  static JPanel layOutBody(JComponent pages, JComponent buttonRow) {
+    JPanel body = new JPanel(new BorderLayout());
+    body.setBorder(BorderFactory.createEmptyBorder(1, 0, 0, 0));
+    body.add(pages, BorderLayout.CENTER);
+    JPanel bottom = new JPanel();
+    bottom.setLayout(new BoxLayout(bottom, BoxLayout.Y_AXIS));
+    bottom.add(Box.createVerticalStrut(17));
+    bottom.add(new Line());
+    bottom.add(buttonRow);
+    body.add(bottom, BorderLayout.SOUTH);
+    return body;
   }
 
   /*
@@ -309,6 +323,7 @@ public final class SetupManager {
       DropTargets.removeAll(dialog.getContentPane());
       // Pack the dialog to realize components and trigger native initialization
       dialog.pack();
+      fitToPage(_currentWindow);
       SplashWindow.instance().setVisible(false);
       dialogFrame.showDialog(this::wizardClosed);
       showing = true;
@@ -517,7 +532,13 @@ public final class SetupManager {
       action.updateLanguage();
     }
     SetupWindow current = _currentWindow;
-    applySettings(current, false, ignored -> current.handleWindowOpeningEvent());
+    applySettings(
+        current,
+        false,
+        ignored -> {
+          current.handleWindowOpeningEvent();
+          fitToPage(current);
+        });
   }
 
   /** Show the specified window */
@@ -525,6 +546,51 @@ public final class SetupManager {
     window.handleWindowOpeningEvent();
     _setupWindowHolder.show(window.getKey());
     _currentWindow = window;
+    fitToPage(window);
+  }
+
+  /**
+   * Makes the dialog tall enough for {@code window}, which is only measurable once it has the
+   * dialog's width (its wrapped texts grow taller as they wrap), and never taller than the screen.
+   * The dialog never shrinks, so moving between pages doesn't make it jump. Before the dialog is
+   * packed this does nothing; {@link #packAndShowDialog()} fits the first page.
+   */
+  private void fitToPage(SetupWindow window) {
+    if (dialogFrame == null || window == null) {
+      return;
+    }
+    JDialog dialog = dialogFrame.getDialog();
+    if (!dialog.isDisplayable()) {
+      return;
+    }
+    dialog.validate();
+    GraphicsConfiguration gc = dialog.getGraphicsConfiguration();
+    Rectangle screen = gc.getBounds();
+    Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(gc);
+    int screenTop = screen.y + insets.top;
+    int screenHeight = screen.height - insets.top - insets.bottom;
+    int height =
+        heightToFit(
+            dialog.getHeight(), window.getHeight(), window.getPreferredSize().height, screenHeight);
+    if (height == dialog.getHeight()) {
+      return;
+    }
+    int y = Math.max(screenTop, Math.min(dialog.getY(), screenTop + screenHeight - height));
+    dialog.setBounds(dialog.getX(), y, dialog.getWidth(), height);
+    dialog.validate();
+  }
+
+  /**
+   * The dialog height that shows a page of {@code pagePreferred} pixels, now {@code pageHeight}
+   * tall in a {@code dialogHeight} dialog: taller by what the page is missing, at most {@code
+   * screenHeight}, and never shorter than it is.
+   */
+  static int heightToFit(int dialogHeight, int pageHeight, int pagePreferred, int screenHeight) {
+    int missing = pagePreferred - pageHeight;
+    if (missing <= 0) {
+      return dialogHeight;
+    }
+    return Math.max(dialogHeight, Math.min(dialogHeight + missing, screenHeight));
   }
 
   /**
