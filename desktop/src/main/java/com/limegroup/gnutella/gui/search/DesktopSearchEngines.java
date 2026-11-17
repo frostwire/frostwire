@@ -15,6 +15,7 @@ import com.frostwire.search.relay.RelaySearchWiring;
 import com.frostwire.util.HttpClientFactory;
 import com.limegroup.gnutella.settings.SearchEnginesSettings;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 /**
  * Desktop's search engine registry (frostwire/frostwire#1002): the shared {@link SearchEngines},
@@ -37,6 +38,16 @@ public final class DesktopSearchEngines {
           HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH));
       return registry;
     }
+  }
+
+  /**
+   * Builds the registry on {@code executor}. Startup calls it before the UI loads, so the first
+   * search finds the engines ready: built on demand, the first search tab built it on the EDT,
+   * loading every engine's classes and freezing the window (frostwire/frostwire#1573). Only the
+   * relay services asked for it at startup, and only with IceBridge on.
+   */
+  public static void prepare(Executor executor) {
+    executor.execute(DesktopSearchEngines::registry);
   }
 
   public static SearchEngines registry() {

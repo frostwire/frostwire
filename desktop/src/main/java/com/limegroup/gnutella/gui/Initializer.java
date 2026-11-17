@@ -190,6 +190,9 @@ final class Initializer {
     initializeEarlyUI();
     startSetupManager(setupManager);
     startBittorrentCore();
+    // Before the UI, so the first search doesn't build the engine list on the EDT (#1573).
+    com.limegroup.gnutella.gui.search.DesktopSearchEngines.prepare(
+        DesktopParallelExecutor::execute);
     com.frostwire.mcp.desktop.MCPStartupHook.initialize();
     // Load the UI, system tray & notification handlers,
     // and hide the splash screen & display the UI.
