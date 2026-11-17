@@ -23,8 +23,10 @@ import org.junit.jupiter.api.Test;
  * A wizard page taller than the dialog pushed the Back/Next/Cancel row below the window: after the
  * "Seeding &amp; Publishing" page got its third choice, the buttons only showed once the user
  * resized the window (frostwire/frostwire#1565). The page's header is a wrapped text area whose
- * minimum height, before it has a width, is thousands of pixels, and the vertical BoxLayout the
- * body used never shrank the page under that minimum.
+ * minimum height, before it has a width, is thousands of pixels, and the vertical BoxLayouts of the
+ * dialog's content pane and of the body never shrank the page under that minimum. The test lays out
+ * the content pane itself: the first fix only changed the body, and the content pane's BoxLayout
+ * still gave the whole body its 2,794 px minimum.
  */
 class SetupWizardButtonRowTest {
 
@@ -40,7 +42,9 @@ class SetupWizardButtonRowTest {
           buttonRow.add(new JButton("Next >>"));
           int rowHeight = buttonRow.getPreferredSize().height;
 
-          JPanel body = SetupManager.layOutBody(page, buttonRow);
+          // The dialog's content pane, as the wizard builds it.
+          JPanel body = new JPanel();
+          SetupManager.layOutBody(body, page, buttonRow);
           body.setSize(SetupWindow.SETUP_WIDTH, SetupWindow.SETUP_HEIGHT);
           layOut(body);
 
