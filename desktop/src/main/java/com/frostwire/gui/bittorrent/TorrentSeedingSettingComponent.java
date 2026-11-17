@@ -165,6 +165,9 @@ public class TorrentSeedingSettingComponent extends JPanel {
       // (frostwire/frostwire#1471).
       setDropTarget(null);
       LookAndFeel.installColorsAndFont(this, "Label.background", "Label.foreground", "Label.font");
+      // Nimbus paints a text area's background even when it isn't opaque, drawing a white strip
+      // over the panel; it honors a fully transparent background that isn't a UIResource.
+      setBackground(new Color(0, 0, 0, 0));
     }
   }
 }
