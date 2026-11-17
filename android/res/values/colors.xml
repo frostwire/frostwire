@@ -44,6 +44,8 @@
     <color name="app_background_color_dark">@color/basic_color_dark</color>
     <color name="app_background_color_dark_highlight">@color/basic_color_dark_highlight</color>
     <color name="app_background_body_light">@color/basic_gray_light</color>
+    <!-- Raised card over the page, with app_text_primary on it (the Pieces tab's piece details) -->
+    <color name="app_background_card">@android:color/white</color>
     <color name="app_background_body_dark">@color/basic_gray_medium</color>
     <color name="app_toolbar_background">@color/basic_color</color>
     <color name="app_toolbar_background_bottom">@color/basic_color_dark_highlight</color>
