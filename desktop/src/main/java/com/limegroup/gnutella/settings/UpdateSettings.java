@@ -33,6 +33,11 @@ public final class UpdateSettings extends LimeProps {
    * Whether or not it should download updates automatically. This does not mean it will install the
    * update, it'll just download the installer for the user and then let the user know next time
    * he/she restarts FrostWire.
+   *
+   * <p>No longer shown in Options: the update feed only sends a page to open (no torrent or
+   * installer URL), so {@code UpdateManager} shows its dialog and {@code InstallerUpdater} never
+   * runs. The setting stays, with whatever value a user had, as the gate of that code path in case
+   * the feed ever offers a download again.
    */
   public static final BooleanSetting AUTOMATIC_INSTALLER_DOWNLOAD =
       FACTORY.createBooleanSetting("AUTOMATIC_INSTALLER_DOWNLOAD", true);

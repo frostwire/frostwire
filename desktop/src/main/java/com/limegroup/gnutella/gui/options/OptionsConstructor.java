@@ -67,7 +67,6 @@ public final class OptionsConstructor {
   private static final String IP_FILTER_KEY = "OPTIONS_IP_FILTER_MAIN_TITLE";
   private static final String RESULTS_KEY = "OPTIONS_RESULTS_MAIN_TITLE";
   private static final String ADVANCED_KEY = "OPTIONS_ADVANCED_MAIN_TITLE";
-  private static final String PREFERENCING_KEY = "OPTIONS_PREFERENCING_MAIN_TITLE";
   private static final String CRASH_REPORTS_KEY = "OPTIONS_CRASH_REPORTS_MAIN_TITLE";
   private static final String FIREWALL_KEY = "OPTIONS_FIREWALL_MAIN_TITLE";
   private static final String GUI_KEY = "OPTIONS_GUI_MAIN_TITLE";
@@ -256,11 +255,6 @@ public final class OptionsConstructor {
     addOption(FILTERS_KEY, RESULTS_KEY, I18n.tr("Keywords"), IgnoreResultsPaneItem.class);
     // advanced options
     addGroupTreeNode(OptionsMediator.ROOT_NODE_KEY, ADVANCED_KEY, I18n.tr("Advanced"));
-    addOption(
-        ADVANCED_KEY,
-        PREFERENCING_KEY,
-        I18n.tr("Updates"),
-        AutomaticInstallerDownloadPaneItem.class);
     addOption(
         ADVANCED_KEY,
         CRASH_REPORTS_KEY,

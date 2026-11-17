@@ -1,4 +1,5 @@
 FrostWire 7.1.5 UNRELEASED
+   - change:removed the Options > Advanced > Updates page ("Download new installers for me"): FrostWire no longer downloads installers by itself, it shows the update dialog with a button that opens the download page
    - fix:the explanations under "Seed finished downloads" in the setup wizard and the BitTorrent options no longer sit on white strips — they are drawn on the panel's own background
    - fix:the splash screen no longer freezes on slow disks while Swing loads its keyboard focus classes — they are loaded before the splash is built
    - fix:IceBridge peer discovery no longer uses a whole CPU core every 30 seconds on Windows — it reads the computer's network addresses once per pass instead of once per peer it checks
