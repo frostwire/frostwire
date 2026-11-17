@@ -72,6 +72,16 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
 
   private volatile MediaTypeSavedFilesDirectoryHolder pendingMediaTypeHolder;
 
+  /**
+   * The tree's media-type holders, published once the tree is built on the EDT and empty until
+   * then. The background scan of a finished download reads them from any thread: it used to walk
+   * the Swing tree itself, so a download that finished before the Library view was first shown (the
+   * view is built lazily and {@code root} is still null) threw a NullPointerException, and a walk
+   * off the EDT can race with the tree being built. The set of holders never changes after the tree
+   * is built.
+   */
+  private volatile List<MediaTypeSavedFilesDirectoryHolder> mediaTypeHolders = List.of();
+
   LibraryExplorer() {
     // Set layout immediately so the panel can be added to parent
     setLayout(new BorderLayout());
@@ -152,6 +162,7 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
             new SavedFilesDirectoryHolder(
                 SharingSettings.TORRENT_DATA_DIR_SETTING, I18n.tr("Default Save Folder"))));
     model = new DefaultTreeModel(root);
+    mediaTypeHolders = mediaTypeHoldersIn(root);
   }
 
   private void setupTree() {
@@ -360,11 +371,20 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
     return false;
   }
 
+  /** The media-type holders of the tree; empty until the tree is built. Safe from any thread. */
   List<MediaTypeSavedFilesDirectoryHolder> getMediaTypeSavedFilesDirectoryHolders() {
+    return mediaTypeHolders;
+  }
+
+  /** The media-type holders under {@code root}, as an immutable list; empty for a null root. */
+  static List<MediaTypeSavedFilesDirectoryHolder> mediaTypeHoldersIn(DefaultMutableTreeNode root) {
+    if (root == null) {
+      return List.of();
+    }
     List<MediaTypeSavedFilesDirectoryHolder> holders = new ArrayList<>();
     Enumeration<?> e = root.depthFirstEnumeration();
     while (e.hasMoreElements()) {
-      LibraryNode node = (LibraryNode) e.nextElement();
+      Object node = e.nextElement();
       if (node instanceof DirectoryHolderNode) {
         DirectoryHolder holder = ((DirectoryHolderNode) node).getDirectoryHolder();
         if (holder instanceof MediaTypeSavedFilesDirectoryHolder) {
@@ -372,7 +392,7 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
         }
       }
     }
-    return holders;
+    return List.copyOf(holders);
   }
 
   /** Cleans the caches of all directory holders and refreshes the current selection. */

@@ -39,7 +39,7 @@ public class LibraryMediator {
   /** Singleton instance of this class. */
   private static LibraryMediator INSTANCE;
 
-  private LibraryExplorer libraryExplorer;
+  private volatile LibraryExplorer libraryExplorer;
   private LibraryCoverArtPanel libraryCoverArtPanel;
   private LibraryLeftPanel libraryLeftPanel;
   private LibrarySearch librarySearch;
@@ -103,6 +103,15 @@ public class LibraryMediator {
     if (libraryExplorer == null) {
       libraryExplorer = new LibraryExplorer();
     }
+    return libraryExplorer;
+  }
+
+  /**
+   * The Library's folder tree if it has been created, else null, without creating it. The Library
+   * view is built when it is first shown, so work that only has something to do once it exists (the
+   * scan of a finished download) must not build it, least of all off the EDT.
+   */
+  LibraryExplorer libraryExplorerIfCreated() {
     return libraryExplorer;
   }
 
@@ -212,8 +221,14 @@ public class LibraryMediator {
         }
       }
     } else {
+      // Without the Library's tree there are no holders whose cache could use the file: a holder
+      // fills its cache with a search when its folder is first selected.
+      LibraryExplorer explorer = libraryExplorerIfCreated();
+      if (explorer == null) {
+        return;
+      }
       List<MediaTypeSavedFilesDirectoryHolder> holders =
-          getLibraryExplorer().getMediaTypeSavedFilesDirectoryHolders();
+          explorer.getMediaTypeSavedFilesDirectoryHolders();
       for (MediaTypeSavedFilesDirectoryHolder holder : holders) {
         if (holder.accept(location)) {
           holder.getCache().add(location);
