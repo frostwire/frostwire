@@ -42,6 +42,7 @@ import com.limegroup.gnutella.gui.shell.FrostAssociations;
 import com.limegroup.gnutella.gui.shell.ShellAssociationManager;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.gui.util.BackgroundSettingsSave;
+import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.settings.LibrarySettings;
 import com.limegroup.gnutella.settings.QuestionsHandler;
@@ -1034,10 +1035,24 @@ public final class GUIMediator {
     }
   }
 
+  /**
+   * Puts {@code str} on the system clipboard. The write runs on a background worker: on Windows,
+   * opening the clipboard waits (with retries) while another program holds it, and callers are menu
+   * and button actions on the EDT (Icebase #8e8c062251e8, frostwire/frostwire#1579).
+   */
   public static void setClipboardContent(String str) {
+    setClipboardContentAsync(str, () -> Toolkit.getDefaultToolkit().getSystemClipboard());
+  }
+
+  /** Writes on a worker; the clipboard is looked up there too, its first use loads native code. */
+  static void setClipboardContentAsync(String str, Supplier<Clipboard> clipboard) {
+    DesktopParallelExecutor.execute(() -> setClipboardContent(str, clipboard.get()));
+  }
+
+  /** Writes {@code str} to {@code clipboard} on the calling thread. */
+  static void setClipboardContent(String str, Clipboard clipboard) {
     try {
       StringSelection data = new StringSelection(str);
-      Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
       clipboard.setContents(data, data);
     } catch (Exception e) {
       e.printStackTrace();
