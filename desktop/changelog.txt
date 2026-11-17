@@ -1,4 +1,5 @@
 FrostWire 7.1.5 UNRELEASED
+   - fix:the splash screen no longer freezes on slow disks while Swing loads its keyboard focus classes — they are loaded before the splash is built
    - fix:IceBridge peer discovery no longer uses a whole CPU core every 30 seconds on Windows — it reads the computer's network addresses once per pass instead of once per peer it checks
    - fix:the first search no longer freezes the window while the list of search engines is built — it is built in the background at startup, also with IceBridge off
    - fix:the setup wizard's Back/Next/Cancel buttons no longer disappear below the window on the Seeding & Publishing page — the buttons always keep their room, and the wizard grows to fit each page it shows
