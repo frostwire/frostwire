@@ -285,6 +285,39 @@ class ResourceManagerAnimatedImagePreloadTest {
     }
   }
 
+  /**
+   * The Library's file table built its Payment Options renderer on the EDT, which read and decoded
+   * its four icons from the jar there (Icebase #d4f9fdb2dd89, frostwire/frostwire#1578). The
+   * startup preload loads them.
+   */
+  @Test
+  void theLibraryPaymentIconsArePreloadedOffTheEdt() throws Exception {
+    ResourceManager.LIBRARY_TABLE_THEME_IMAGES.forEach(ResourceManager::forgetThemeImage);
+
+    Thread worker = new Thread(ResourceManager::preloadStartupThemeImages, "startup");
+    worker.start();
+    worker.join(30_000);
+
+    for (String name : ResourceManager.LIBRARY_TABLE_THEME_IMAGES) {
+      assertTrue(ResourceManager.isThemeImageCached(name), name + " was not preloaded");
+    }
+  }
+
+  /** The preload list names exactly the icons PaymentOptionsRenderer loads. */
+  @Test
+  void theLibraryPaymentPreloadListMatchesPaymentOptionsRenderer() throws IOException {
+    Matcher m =
+        THEME_IMAGE_LITERAL.matcher(
+            Files.readString(
+                Path.of("src/main/java/com/frostwire/gui/bittorrent/PaymentOptionsRenderer.java"),
+                StandardCharsets.UTF_8));
+    Set<String> icons = new TreeSet<>();
+    while (m.find()) {
+      icons.add(m.group(1));
+    }
+    assertEquals(new TreeSet<>(ResourceManager.LIBRARY_TABLE_THEME_IMAGES), icons);
+  }
+
   /** The preload list names exactly the icons SourceRenderer loads. */
   @Test
   void theSearchSourcePreloadListMatchesSourceRenderer() throws IOException {

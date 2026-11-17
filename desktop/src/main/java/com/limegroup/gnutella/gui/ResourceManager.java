@@ -199,15 +199,28 @@ public final class ResourceManager {
           "DOWNLOAD_CLEAR_INACTIVE");
 
   /**
+   * The icons of the Library's Payment Options column (PaymentOptionsRenderer). Its constructor
+   * loaded all four from the jar and decoded them on the EDT while the Library's file table was
+   * built, the first time the Library was shown (Icebase #d4f9fdb2dd89, frostwire/frostwire#1578).
+   */
+  static final List<String> LIBRARY_TABLE_THEME_IMAGES =
+      List.of("bitcoin_enabled", "bitcoin_disabled", "paypal_enabled", "paypal_disabled");
+
+  /**
    * Loads {@link #ANIMATED_THEME_IMAGES}, {@link #STATUS_BAR_THEME_IMAGES}, {@link
-   * #SEARCH_SOURCE_THEME_IMAGES} and the theme images behind {@link #SEARCH_BUTTON_ICONS}, {@link
-   * #LIBRARY_BUTTON_ICONS} and {@link #TRANSFER_BUTTON_ICONS} into the theme-image cache. Call it
-   * off the EDT, at startup before the main window is built, so the EDT finds them cached. Only
-   * this synchronized cache is filled; the button icon cache stays EDT-only.
+   * #SEARCH_SOURCE_THEME_IMAGES}, {@link #LIBRARY_TABLE_THEME_IMAGES} and the theme images behind
+   * {@link #SEARCH_BUTTON_ICONS}, {@link #LIBRARY_BUTTON_ICONS} and {@link #TRANSFER_BUTTON_ICONS}
+   * into the theme-image cache. Call it off the EDT, at startup before the main window is built, so
+   * the EDT finds them cached. Only this synchronized cache is filled; the button icon cache stays
+   * EDT-only.
    */
   static void preloadStartupThemeImages() {
     for (List<String> names :
-        List.of(ANIMATED_THEME_IMAGES, STATUS_BAR_THEME_IMAGES, SEARCH_SOURCE_THEME_IMAGES)) {
+        List.of(
+            ANIMATED_THEME_IMAGES,
+            STATUS_BAR_THEME_IMAGES,
+            SEARCH_SOURCE_THEME_IMAGES,
+            LIBRARY_TABLE_THEME_IMAGES)) {
       for (String name : names) {
         try {
           getThemeImage(name);
