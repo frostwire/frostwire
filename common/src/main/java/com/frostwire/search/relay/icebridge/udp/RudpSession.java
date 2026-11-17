@@ -8,6 +8,9 @@
 package com.frostwire.search.relay.icebridge.udp;
 
 import java.net.InetSocketAddress;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.NavigableMap;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -56,6 +59,21 @@ final class RudpSession {
    */
   private final ConcurrentNavigableMap<Integer, PendingPacket> pending =
       new ConcurrentSkipListMap<>(Integer::compareUnsigned);
+
+  /** Read-only view for the manager: every change goes through this session's own methods. */
+  private final NavigableMap<Integer, PendingPacket> pendingView =
+      Collections.unmodifiableNavigableMap(pending);
+
+  /**
+   * What {@link #pending} holds, in bytes and in packets, kept in step with it under this session's
+   * lock. The relay's admission check ran for every outbound packet and summed both over the queue
+   * (up to {@link #MAX_PENDING_PACKETS} entries, a skip list whose {@code size()} is a walk) of
+   * every session: about 15 % of the relay's CPU in a profile with a few stuck peers. Reading these
+   * is O(1).
+   */
+  private volatile long retainedBytes;
+
+  private volatile int pendingCount;
 
   private final LongSupplier nanoClock;
 
@@ -191,7 +209,13 @@ final class RudpSession {
         return true;
       }
     } while (!ackedThroughLocal.compareAndSet(current, ackThrough));
-    pending.headMap(ackThrough, true).clear();
+    for (Iterator<PendingPacket> it = pending.headMap(ackThrough, true).values().iterator();
+        it.hasNext(); ) {
+      PendingPacket acked = it.next();
+      it.remove();
+      retainedBytes -= retainedCost(acked);
+      pendingCount--;
+    }
     return true;
   }
 
@@ -225,22 +249,41 @@ final class RudpSession {
   }
 
   synchronized boolean addPending(int sequence, PendingPacket packet) {
-    if (pending.size() >= MAX_PENDING_PACKETS
-        || retainedBytes()
-            > MAX_RETAINED_BYTES - 2L * (packet.packet.size() + RudpAuth.SIGNATURE_LENGTH)) {
+    if (pendingCount >= MAX_PENDING_PACKETS
+        || retainedBytes > MAX_RETAINED_BYTES - retainedCost(packet)) {
       return false;
     }
-    pending.put(sequence, packet);
+    PendingPacket replaced = pending.put(sequence, packet);
+    if (replaced == null) {
+      pendingCount++;
+    } else {
+      retainedBytes -= retainedCost(replaced);
+    }
+    retainedBytes += retainedCost(packet);
     return true;
   }
 
-  synchronized long retainedBytes() {
-    long bytes = 0;
-    for (PendingPacket packet : pending.values()) {
-      // Pending owns both the plaintext packet and its cached signed wire copy.
-      bytes += 2L * (packet.packet.size() + RudpAuth.SIGNATURE_LENGTH);
+  /** Drops the pending packet with this sequence, if any. */
+  synchronized PendingPacket removePending(int sequence) {
+    PendingPacket removed = pending.remove(sequence);
+    if (removed != null) {
+      retainedBytes -= retainedCost(removed);
+      pendingCount--;
     }
-    return bytes;
+    return removed;
+  }
+
+  /** Pending owns both the plaintext packet and its cached signed wire copy. */
+  private static long retainedCost(PendingPacket packet) {
+    return 2L * (packet.packet.size() + RudpAuth.SIGNATURE_LENGTH);
+  }
+
+  long retainedBytes() {
+    return retainedBytes;
+  }
+
+  int pendingCount() {
+    return pendingCount;
   }
 
   synchronized void markSent(int sequence) {
@@ -255,6 +298,8 @@ final class RudpSession {
 
   synchronized void clear() {
     pending.clear();
+    retainedBytes = 0;
+    pendingCount = 0;
     authenticated = false;
     transcript = null;
     helloPayload = null;
@@ -264,8 +309,8 @@ final class RudpSession {
     pathChallenge = null;
   }
 
-  ConcurrentNavigableMap<Integer, PendingPacket> pending() {
-    return pending;
+  NavigableMap<Integer, PendingPacket> pending() {
+    return pendingView;
   }
 
   /** Prepare an ack packet for the highest contiguous received sequence. */

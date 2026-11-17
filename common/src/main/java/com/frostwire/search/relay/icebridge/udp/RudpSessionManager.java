@@ -364,7 +364,7 @@ public final class RudpSessionManager {
       return null;
     }
     RudpSession existing = sessionsByAddress.get(address);
-    if (existing != null && !existing.hasSequenceCapacity(1) && existing.pending().isEmpty()) {
+    if (existing != null && !existing.hasSequenceCapacity(1) && existing.pendingCount() == 0) {
       dropSession(existing);
       existing = null;
     }
@@ -494,7 +494,7 @@ public final class RudpSessionManager {
     if (closed
         || (session != null
             && (!session.hasSequenceCapacity(count)
-                || session.pending().size() + count > RudpSession.MAX_PENDING_PACKETS
+                || session.pendingCount() + count > RudpSession.MAX_PENDING_PACKETS
                 || session.retainedBytes() > RudpSession.MAX_RETAINED_BYTES - bytes))) {
       return false;
     }
@@ -502,7 +502,7 @@ public final class RudpSessionManager {
     int packets = 0;
     for (RudpSession current : sessionsByRemoteId.values()) {
       retained += current.retainedBytes();
-      packets += current.pending().size();
+      packets += current.pendingCount();
     }
     return retained <= MAX_PENDING_BYTES - bytes && packets <= MAX_PENDING_PACKETS - count;
   }
@@ -807,7 +807,7 @@ public final class RudpSessionManager {
         && session.pending().get(0).packet.type() == RudpPacket.Type.HELLO_FINISH) {
       return;
     }
-    session.pending().remove(0);
+    session.removePending(0);
     enqueue(
         session,
         new RudpPacket(RudpPacket.Type.HELLO_FINISH, packet.connectionId(), 0, 0, new byte[0]));
@@ -834,7 +834,7 @@ public final class RudpSessionManager {
     } else if (packet.type() == RudpPacket.Type.HELLO_READY && session.weAreInitiator()) {
       if (!session.isAuthenticated()) {
         session.authenticate();
-        session.pending().remove(0);
+        session.removePending(0);
         learnEndpoint(session);
       }
       flush(session);
@@ -1301,7 +1301,7 @@ public final class RudpSessionManager {
 
   synchronized int pendingCountForTest(InetSocketAddress address) {
     RudpSession session = sessionsByAddress.get(address);
-    return session == null ? 0 : session.pending().size();
+    return session == null ? 0 : session.pendingCount();
   }
 
   synchronized InetSocketAddress remoteAddressForTest(long cid) {
