@@ -1,4 +1,5 @@
 FrostWire 7.1.5 UNRELEASED
+   - fix:the first search no longer freezes the window while the list of search engines is built — it is built in the background at startup, also with IceBridge off
    - fix:the setup wizard's Back/Next/Cancel buttons no longer disappear below the window on the Seeding & Publishing page — the buttons always keep their room, and the wizard grows to fit each page it shows
    - fix:no more crash in the Library search right after start when a download opens Transfers — the search waits for its search field before clearing it or setting its prompt
    - fix:opening the transfer details right after start no longer freezes the window while its "hide" and "Save location" links are drawn — the links are plain underlined labels instead of HTML
