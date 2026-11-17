@@ -585,7 +585,11 @@ public final class RudpSessionManager {
     }
     packet =
         RudpAuth.unprotect(
-            session.remotePub(), identity.ed25519PubRaw(), session.transcript, packet);
+            session.remotePublicKey(),
+            session.remotePub(),
+            identity.ed25519PubRaw(),
+            session.transcript,
+            packet);
     if (packet == null) {
       return;
     }
@@ -888,36 +892,35 @@ public final class RudpSessionManager {
     } catch (IllegalArgumentException e) {
       return false;
     }
-    if (!Arrays.equals(frame.sourcePub(), sender.remotePub())
-        || frame.hopTtl() > IceBridgeTopology.MAX_MESH_HOP_TTL) {
+    // Each accessor of the frame copies its array: take each one once, not once per use.
+    byte[] source = frame.sourcePub();
+    if (!sender.hasRemotePub(source) || frame.hopTtl() > IceBridgeTopology.MAX_MESH_HOP_TTL) {
       return false;
     }
-    if (Arrays.equals(frame.targetPub(), identity.ed25519PubRaw())) {
-      return notifyListener(sender.remotePub(), frame.appPayload());
+    byte[] target = frame.targetPub();
+    byte[] app = frame.appPayload();
+    if (Arrays.equals(target, identity.ed25519PubRaw())) {
+      return notifyListener(sender.remotePub(), app);
     }
-    PeerRecord target = registry.lookup(frame.targetPub());
-    if (target != null) {
-      InetSocketAddress address = literalAddress(target.host(), target.rudpPort());
+    PeerRecord targetRecord = registry.lookup(target);
+    if (targetRecord != null) {
+      InetSocketAddress address = literalAddress(targetRecord.host(), targetRecord.rudpPort());
       if (isLocalRudpEndpoint(address)) {
-        return deliverToLocalPollClient(frame.targetPub(), sender.remotePub(), frame.appPayload());
+        return deliverToLocalPollClient(target, sender.remotePub(), app);
       }
-      RudpSession next = findSessionByPub(frame.targetPub());
+      RudpSession next = findSessionByPub(target);
       if (next == null) {
-        next = connectSession(address, frame.targetPub());
+        next = connectSession(address, target);
       }
       return next != null
           && queueReliable(
               next,
               RudpPacket.Type.RELAY_RESPONSE,
-              ByteBuffer.allocate(32 + frame.appPayload().length)
-                  .put(frame.sourcePub())
-                  .put(frame.appPayload())
-                  .array());
+              ByteBuffer.allocate(32 + app.length).put(source).put(app).array());
     }
     // TTL counts additional forwarding edges. A terminal recipient still
     // accepts its own target at zero; non-target nodes never forward zero.
-    return frame.hopTtl() > 0
-        && forward(frame.targetPub(), frame.appPayload(), frame.hopTtl() - 1, sender.remotePub());
+    return frame.hopTtl() > 0 && forward(target, app, frame.hopTtl() - 1, sender.remotePub());
   }
 
   private boolean forward(byte[] target, byte[] payload, int ttl, byte[] exclude) {
@@ -1178,7 +1181,7 @@ public final class RudpSessionManager {
       return found;
     }
     for (RudpSession session : sessionsByRemoteId.values()) {
-      if (Arrays.equals(pub, session.remotePub())) {
+      if (session.hasRemotePub(pub)) {
         found.add(session);
       }
     }

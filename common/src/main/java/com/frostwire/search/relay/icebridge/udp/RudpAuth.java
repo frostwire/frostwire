@@ -12,6 +12,7 @@ import com.frostwire.search.relay.icebridge.IceBridgeAuth;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
 import java.util.Arrays;
@@ -120,6 +121,16 @@ final class RudpAuth {
   }
 
   static RudpPacket unprotect(byte[] peer, byte[] local, byte[] transcript, RudpPacket packet) {
+    return unprotect(null, peer, local, transcript, packet);
+  }
+
+  /**
+   * As {@link #unprotect(byte[], byte[], byte[], RudpPacket)}, with the peer's key already parsed
+   * ({@code peerKey}, for the same {@code peer}), which spares parsing it for every packet; null
+   * parses it from {@code peer}.
+   */
+  static RudpPacket unprotect(
+      PublicKey peerKey, byte[] peer, byte[] local, byte[] transcript, RudpPacket packet) {
     byte[] payload = packet.payload();
     if (peer == null || transcript == null || payload.length < SIGNATURE_LENGTH) {
       return null;
@@ -128,12 +139,11 @@ final class RudpAuth {
     RudpPacket plain =
         new RudpPacket(
             packet.type(), packet.connectionId(), packet.sequence(), packet.ackThrough(), body);
-    return verify(
-            peer,
-            Arrays.copyOfRange(payload, body.length, payload.length),
-            packetBytes(peer, local, transcript, plain))
-        ? plain
-        : null;
+    byte[] signature = Arrays.copyOfRange(payload, body.length, payload.length);
+    byte[] signed = packetBytes(peer, local, transcript, plain);
+    boolean valid =
+        peerKey != null ? verify(peerKey, signature, signed) : verify(peer, signature, signed);
+    return valid ? plain : null;
   }
 
   private static byte[] packetBytes(
@@ -182,8 +192,16 @@ final class RudpAuth {
 
   private static boolean verify(byte[] pub, byte[] signature, byte[] bytes) {
     try {
+      return verify(IceBridgeAuth.publicKeyFromRaw(pub), signature, bytes);
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  private static boolean verify(PublicKey pub, byte[] signature, byte[] bytes) {
+    try {
       Signature verifier = IdentityKeys.softwareSignature("Ed25519");
-      verifier.initVerify(IceBridgeAuth.publicKeyFromRaw(pub));
+      verifier.initVerify(pub);
       verifier.update(bytes);
       return verifier.verify(signature);
     } catch (Exception e) {

@@ -7,7 +7,10 @@
 
 package com.frostwire.search.relay.icebridge.udp;
 
+import com.frostwire.search.relay.icebridge.IceBridgeAuth;
 import java.net.InetSocketAddress;
+import java.security.PublicKey;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.NavigableMap;
@@ -130,6 +133,38 @@ final class RudpSession {
   byte[] remotePub() {
     byte[] p = remotePub;
     return p == null ? null : p.clone();
+  }
+
+  /**
+   * Whether the peer's key is {@code pub}, without the copy {@link #remotePub()} makes: comparing
+   * every session's key to find a peer's sessions copied (and discarded) one array per session for
+   * each packet, a quarter of the relay's allocation in a profile.
+   */
+  boolean hasRemotePub(byte[] pub) {
+    byte[] p = remotePub;
+    return p != null && Arrays.equals(p, pub);
+  }
+
+  private volatile PublicKey remoteKey;
+
+  /**
+   * The peer's key as a JDK key, built on first use and kept: rebuilding it (a key factory and
+   * X.509 parsing) for every packet verified was ~5 % of the relay's CPU in a profile. The key a
+   * session is bound to never changes once set, so the cached one stays valid. Null when there is
+   * no key yet or it cannot be parsed.
+   */
+  PublicKey remotePublicKey() {
+    PublicKey key = remoteKey;
+    byte[] pub = remotePub;
+    if (key == null && pub != null) {
+      try {
+        key = IceBridgeAuth.publicKeyFromRaw(pub);
+        remoteKey = key;
+      } catch (Exception e) {
+        return null;
+      }
+    }
+    return key;
   }
 
   /**
