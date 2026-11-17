@@ -1,4 +1,5 @@
 FrostWire Android UNRELEASED
+  - change:IceBridge (Distributed Search) uses less CPU and memory for each packet it handles
   - fix:Pieces tab: the tapped piece's card is readable in the dark theme (it was white with light text)  (#1566)
   - fix:Distributed Search peer discovery uses much less CPU: it reads the phone's network addresses once per pass instead of once per peer it checks (#1574)
   - fix:the Pieces tab keeps the tapped piece and its card when the screen is recreated (theme or font change, split-screen resize, large screens, app restored after being killed) (#1566)
