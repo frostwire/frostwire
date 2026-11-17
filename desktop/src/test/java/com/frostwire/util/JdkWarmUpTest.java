@@ -614,6 +614,20 @@ class JdkWarmUpTest {
   }
 
   /**
+   * The splash's JWindow is the first root pane, and creating it made UIManager build the default
+   * LayoutFocusTraversalPolicy: SortingFocusTraversalPolicy's static initializer ran on the EDT
+   * while the system was idle, waiting on the disk (Icebase #1aefbe184b7d, #4961cab0e5c8,
+   * frostwire/frostwire#1563).
+   */
+  @Test
+  void theSplashFocusTraversalPolicyIsInitializedBeforeTheSplash() {
+    assertTrue(
+        JdkWarmUp.SPLASH_CLASSES_TO_INITIALIZE.contains("javax.swing.LayoutFocusTraversalPolicy"),
+        "the splash's focus traversal policy is not initialized before the splash");
+    assertDoesNotThrow(() -> Class.forName("javax.swing.LayoutFocusTraversalPolicy"));
+  }
+
+  /**
    * The search field's suggestions list was the first JList: BasicListUI's static initializer ran
    * on the EDT as the first suggestions popped up (Icebase #c0e323953897,
    * frostwire/frostwire#1501).

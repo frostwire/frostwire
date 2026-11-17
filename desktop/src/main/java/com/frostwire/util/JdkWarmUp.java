@@ -255,7 +255,13 @@ public final class JdkWarmUp {
           // frostwire/frostwire#1563). Both are needed by the splash anyway, so this moves the
           // work off the EDT without adding any before the splash.
           "javax.swing.BoxLayout",
-          "com.limegroup.gnutella.gui.GUIUtils");
+          "com.limegroup.gnutella.gui.GUIUtils",
+          // The splash's JWindow is the first root pane: its UI asks UIManager for the default
+          // focus traversal policy, which creates a LayoutFocusTraversalPolicy and ran
+          // SortingFocusTraversalPolicy's static initializer on the EDT, waiting on the disk with
+          // the system idle (Icebase #1aefbe184b7d, #4961cab0e5c8, frostwire/frostwire#1563).
+          // Initializing the subclass initializes its superclass too.
+          "javax.swing.LayoutFocusTraversalPolicy");
 
   /**
    * Windows-only splash classes, initialized after {@link #SPLASH_CLASSES_TO_INITIALIZE}: the first
