@@ -628,6 +628,25 @@ class JdkWarmUpTest {
   }
 
   /**
+   * The first table built read its settings file in TableSettings' static initializer on the EDT
+   * (Icebase #1811854a508b, frostwire/frostwire#1577), and the first shape a skin painted ran
+   * ShapeSpanIterator's native field-ID lookup there (Icebase #a8c1a29e4560, #1563): the startup
+   * thread initializes both once the splash shows.
+   */
+  @Test
+  void theFirstTablesSettingsAndTheShapeSpanIteratorAreInitializedOffTheEdt() {
+    for (String className :
+        List.of(
+            "com.limegroup.gnutella.gui.tables.TableSettings",
+            "sun.java2d.pipe.ShapeSpanIterator")) {
+      assertTrue(
+          JdkWarmUp.MAIN_WINDOW_CLASSES_TO_INITIALIZE.contains(className),
+          className + " is not initialized by the startup thread");
+      assertDoesNotThrow(() -> Class.forName(className), className);
+    }
+  }
+
+  /**
    * The search field's suggestions list was the first JList: BasicListUI's static initializer ran
    * on the EDT as the first suggestions popped up (Icebase #c0e323953897,
    * frostwire/frostwire#1501).

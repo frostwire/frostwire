@@ -210,10 +210,17 @@ public final class JdkWarmUp {
    * (frostwire/frostwire#1534). BasicTableUI's static initializer builds the TransferHandler every
    * table shares; it ran on the EDT in LimeJTable's constructor as the Library's file table was
    * built, on a 4-CPU machine with the warm-up finished (Icebase #750e1c9c3dc7,
+   * frostwire/frostwire#1563). TableSettings' static initializer reads the tables' settings file
+   * from disk; the first table built, whichever it is, ran it on the EDT (Icebase #1811854a508b,
+   * frostwire/frostwire#1577). ShapeSpanIterator's static initializer is a native field-ID lookup
+   * that ran on the EDT the first time a skin painted a shape (Icebase #a8c1a29e4560,
    * frostwire/frostwire#1563).
    */
   static final List<String> MAIN_WINDOW_CLASSES_TO_INITIALIZE =
-      List.of("javax.swing.plaf.basic.BasicTableUI");
+      List.of(
+          "javax.swing.plaf.basic.BasicTableUI",
+          "com.limegroup.gnutella.gui.tables.TableSettings",
+          "sun.java2d.pipe.ShapeSpanIterator");
 
   /**
    * Windows-only JDK classes initialized like {@link #CLASSES_TO_INITIALIZE}. The first right-click
