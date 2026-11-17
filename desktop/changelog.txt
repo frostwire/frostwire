@@ -1,4 +1,5 @@
 FrostWire 7.1.5 UNRELEASED
+   - fix:opening the Library for the first time no longer freezes the window on slow disks while its Payment Options icons are read — they are loaded in the background at startup
    - fix:the first table (Library, Transfers or Search) no longer freezes the window on slow disks while its settings file is read — it is read in the background at startup
    - change:the IceBridge relay uses about a fifth less CPU for each packet it handles, and allocates a quarter less memory — it no longer walks every session's queue and rebuilds the peer's key for each packet
    - change:removed the Options > Advanced > Updates page ("Download new installers for me"): FrostWire no longer downloads installers by itself, it shows the update dialog with a button that opens the download page
