@@ -29,8 +29,10 @@ class RudpRelayCgnatDeliveryStructureTest {
             "../common/src/main/java/com/frostwire/search/relay/icebridge/udp/RudpSessionManager.java");
     String compact = source.replaceAll("\\s+", "");
 
+    // handleRelay copies the frame's target once into a local (each accessor copies its array).
     assertTrue(
-        compact.contains("RudpSessionnext=findSessionByPub(frame.targetPub());"),
+        compact.contains("byte[]target=frame.targetPub();")
+            && compact.contains("RudpSessionnext=findSessionByPub(target);"),
         "RELAY delivery must locate the live session by pub, not registry host:port");
     assertTrue(
         compact.contains("Arrays.equals(packet.payload(),session.pathChallenge)")
