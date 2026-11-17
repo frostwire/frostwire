@@ -68,6 +68,15 @@ public final class PeerDiscovery {
   private volatile LongSupplier clockMs = System::currentTimeMillis;
 
   /**
+   * This machine's interface addresses. Read once per pass, not once per candidate: listing the
+   * network interfaces is expensive (on Windows it walks every adapter natively), and a pass over a
+   * crowded topic used a whole CPU core every 30 s doing it for each endpoint (Icebase
+   * #f15136ff272e, frostwire/frostwire#1574).
+   */
+  private volatile Supplier<java.util.Set<java.net.InetAddress>> machineAddresses =
+      PeerDiscovery::readMachineAddresses;
+
+  /**
    * Our currently-visible external IP supplier (e.g. BTEngine's latest external_ip alert) plus our
    * own relay port, for hairpin self-skip. Evaluated per candidate so carrier rebinds are picked
    * up. Unset = off.
@@ -164,8 +173,9 @@ public final class PeerDiscovery {
     long now = clockMs.getAsLong();
     List<DiscoveredEndpoint> preferred = new ArrayList<>();
     List<DiscoveredEndpoint> others = new ArrayList<>();
+    LocalAddresses local = new LocalAddresses(machineAddresses);
     for (DiscoveredEndpoint ep : unique.values()) {
-      if (isLocalEndpoint(ep.host)) {
+      if (isLocalEndpoint(ep.host, local)) {
         LOG.debug("Skipping likely local/self endpoint " + ep.host + ":" + ep.port);
         continue;
       }
@@ -418,7 +428,56 @@ public final class PeerDiscovery {
     }
   }
 
-  private static boolean isLocalEndpoint(String host) {
+  /** Replaces how this machine's interface addresses are read, for tests. */
+  void setMachineAddresses(Supplier<java.util.Set<java.net.InetAddress>> machineAddresses) {
+    this.machineAddresses =
+        machineAddresses != null ? machineAddresses : PeerDiscovery::readMachineAddresses;
+  }
+
+  /** This machine's interface addresses, read from the OS on first use and kept for one pass. */
+  private static final class LocalAddresses {
+    private final Supplier<java.util.Set<java.net.InetAddress>> reader;
+    private java.util.Set<java.net.InetAddress> addresses;
+
+    LocalAddresses(Supplier<java.util.Set<java.net.InetAddress>> reader) {
+      this.reader = reader;
+    }
+
+    boolean contains(java.net.InetAddress addr) {
+      if (addresses == null) {
+        java.util.Set<java.net.InetAddress> read = null;
+        try {
+          read = reader.get();
+        } catch (RuntimeException e) {
+          // interface enumeration failed; treat as no extra local addresses
+        }
+        addresses = read != null ? read : java.util.Set.of();
+      }
+      return addresses.contains(addr);
+    }
+  }
+
+  private static java.util.Set<java.net.InetAddress> readMachineAddresses() {
+    java.util.Set<java.net.InetAddress> out = new java.util.HashSet<>();
+    try {
+      for (java.util.Enumeration<java.net.NetworkInterface> ifaces =
+              java.net.NetworkInterface.getNetworkInterfaces();
+          ifaces != null && ifaces.hasMoreElements(); ) {
+        java.net.NetworkInterface iface = ifaces.nextElement();
+        for (java.net.InterfaceAddress ia : iface.getInterfaceAddresses()) {
+          java.net.InetAddress localAddr = ia.getAddress();
+          if (localAddr != null) {
+            out.add(localAddr);
+          }
+        }
+      }
+    } catch (Exception ignored) {
+      // interface enumeration failed; fall through with what was read
+    }
+    return out;
+  }
+
+  private static boolean isLocalEndpoint(String host, LocalAddresses local) {
     if (host == null || host.isEmpty()) return false;
     if ("127.0.0.1".equals(host)
         || "localhost".equalsIgnoreCase(host)
@@ -451,16 +510,8 @@ public final class PeerDiscovery {
       }
       // Exact match against this machine's interface addresses (catches the machine's own LAN/WAN
       // IPs if announced)
-      for (java.util.Enumeration<java.net.NetworkInterface> ifaces =
-              java.net.NetworkInterface.getNetworkInterfaces();
-          ifaces.hasMoreElements(); ) {
-        java.net.NetworkInterface iface = ifaces.nextElement();
-        for (java.net.InterfaceAddress ia : iface.getInterfaceAddresses()) {
-          java.net.InetAddress localAddr = ia.getAddress();
-          if (localAddr != null && localAddr.equals(addr)) {
-            return true;
-          }
-        }
+      if (local.contains(addr)) {
+        return true;
       }
     } catch (Exception ignored) {
       // resolution or interface enumeration failed; fall through
