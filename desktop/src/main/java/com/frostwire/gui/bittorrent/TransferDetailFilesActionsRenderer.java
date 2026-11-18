@@ -237,7 +237,9 @@ public class TransferDetailFilesActionsRenderer extends FWAbstractJPanelTableCel
     @Override
     public void actionPerformed(ActionEvent e) {
       File file = transferItemHolder.transferItem.getFile();
-      if (PlaybackUtil.isPlayableFile(file)) {
+      // by name: this runs on the EDT, and playInOS opens the file off it
+      // (Icebase #60d22d3398dd, frostwire/frostwire#1581)
+      if (PlaybackUtil.isPlayableFile(file.getName())) {
         GUIMediator.instance().playInOS(new MediaSource(file));
       } else {
         GUIMediator.launchFile(file);

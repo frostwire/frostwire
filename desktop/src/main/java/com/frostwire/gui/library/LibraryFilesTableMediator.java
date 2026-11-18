@@ -528,7 +528,7 @@ public final class LibraryFilesTableMediator
       return;
     }
     if (getMediaType().equals(MediaType.getAudioMediaType())
-        && PlaybackUtil.isPlayableFile(line.getFile())) {
+        && PlaybackUtil.isPlayableFile(line.getFile().getName())) {
       GUIMediator.instance().playInOS(new MediaSource(line.getFile()));
       return;
     }

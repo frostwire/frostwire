@@ -385,7 +385,9 @@ public final class GUIUtils {
       return false;
     }
     if (GUIMediator.isPlaylistVisible()) {
-      if (PlaybackUtil.isPlayableFile(file)) {
+      // by name: this runs on the EDT, and playInOS opens the file off it and reports a missing
+      // one (Icebase #60d22d3398dd, frostwire/frostwire#1581)
+      if (PlaybackUtil.isPlayableFile(file.getName())) {
         if (!isPlaying) {
           // playInOS hands the file to Launcher, which opens it off the EDT itself.
           SwingUtilities.invokeLater(() -> GUIMediator.instance().playInOS(new MediaSource(file)));

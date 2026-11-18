@@ -1162,6 +1162,7 @@ test {
         includeTestsMatching "com.frostwire.gui.library.LibraryFilesTableRowsOffEdtTest"
         includeTestsMatching "com.frostwire.gui.library.LibraryResolvedRowsOffEdtTest"
         includeTestsMatching "com.frostwire.gui.library.LibraryRowFlagsTest"
+        includeTestsMatching "com.frostwire.gui.library.PlayClickPathsDiskTest"
         includeTestsMatching "com.frostwire.gui.library.LibraryCoverArtPanelEdtTest"
         includeTestsMatching "com.frostwire.gui.library.LibraryCoverArtLiteTest"
         includeTestsMatching "com.limegroup.gnutella.gui.actions.OpenMagnetClipboardPrefillTest"
