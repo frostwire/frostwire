@@ -1,4 +1,6 @@
 FrostWire 7.1.5 UNRELEASED
+   - fix:starting FrostWire, and the Copy buttons in Options, the IceBridge windows and the search details, no longer freeze the window while another program holds the Windows clipboard — the clipboard is only touched in the background
+
    - fix:double-clicking or pressing Play on a file in the Library or in a transfer no longer freezes the window while the disk answers — whether it can be played is decided from its name, and the file is opened in the background
    - fix:hovering a tooltip no longer freezes the window while it is laid out — every tooltip is shown as plain text, so the VPN and Seeding tooltips in the status bar no longer lose time parsing HTML (they show the same words without bold)
    - fix:Copy Magnet and the other copy actions no longer freeze the window while another program is holding the Windows clipboard — the text is written in the background
