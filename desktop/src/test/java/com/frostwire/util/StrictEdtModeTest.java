@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.limegroup.gnutella.gui.CrashReportSpooler;
+import com.limegroup.gnutella.gui.StallCpu;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
@@ -726,5 +727,105 @@ class StrictEdtModeTest {
     } finally {
       scheduler.shutdownNow();
     }
+  }
+
+  private static StackTraceElement f(String cls, String method, int line) {
+    return new StackTraceElement(
+        cls, method, cls.substring(cls.lastIndexOf('.') + 1) + ".java", line);
+  }
+
+  private static StackTraceElement[] dispatch(StackTraceElement... top) {
+    StackTraceElement[] tail = {
+      f("java.awt.event.InvocationEvent", "dispatch", 323),
+      f("java.awt.EventQueue", "dispatchEventImpl", 698),
+      f("java.awt.EventQueue", "dispatchEvent", 677),
+      f("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent", 159),
+      f("java.awt.EventDispatchThread", "pumpOneEventForFilters", 203),
+      f("java.awt.EventDispatchThread", "run", 90)
+    };
+    StackTraceElement[] all = new StackTraceElement[top.length + tail.length];
+    System.arraycopy(top, 0, all, 0, top.length);
+    System.arraycopy(tail, 0, all, top.length, tail.length);
+    return all;
+  }
+
+  private static StallCpu.Window cpu(int edtMs, int systemPct) {
+    return new StallCpu.Window(edtMs, 281, systemPct, 9000, java.util.List.of());
+  }
+
+  /** Icebase #4a7293b05945 and #b979dedc6e56: 0 ms of EDT CPU, idle machine, cheap top frame. */
+  @Test
+  void aCheapFrameOnAnIdleMachineWithNoEdtCpuIsAnIdleStall() {
+    StackTraceElement[] paint =
+        dispatch(
+            f("javax.swing.JComponent", "paintChildren", 860),
+            f("javax.swing.JComponent", "paint", 1123),
+            f("javax.swing.RepaintManager", "paintDirtyRegions", 786));
+    StackTraceElement[] label =
+        dispatch(
+            f("java.awt.Component", "invalidate", 2970),
+            f("javax.swing.JComponent", "revalidate", 4919),
+            f("com.limegroup.gnutella.gui.SizeStableLabel", "revalidate", 43));
+    assertEquals(StrictEdtMode.IDLE_STALL_TAG, StrictEdtMode.idleStallTag(cpu(0, 12), "", paint));
+    assertEquals(StrictEdtMode.IDLE_STALL_TAG, StrictEdtMode.idleStallTag(cpu(0, 2), "", label));
+    assertEquals(
+        StrictEdtMode.IDLE_STALL_TAG,
+        StrictEdtMode.idleStallTag(cpu(0, 2), StrictEdtMode.EARLY_SAMPLE_TAG, label));
+  }
+
+  @Test
+  void anEdtThatWorkedOrAMachineThatWasBusyIsNeverAnIdleStall() {
+    StackTraceElement[] paint = dispatch(f("javax.swing.JComponent", "paintChildren", 860));
+    assertEquals("", StrictEdtMode.idleStallTag(cpu(93, 12), "", paint));
+    assertEquals("", StrictEdtMode.idleStallTag(cpu(1, 12), "", paint));
+    assertEquals("", StrictEdtMode.idleStallTag(cpu(0, 100), "", paint));
+    assertEquals("", StrictEdtMode.idleStallTag(null, "", paint));
+    assertEquals(
+        "",
+        StrictEdtMode.idleStallTag(
+            new StallCpu.Window(null, 1, 5, 1, java.util.List.of()), "", paint));
+  }
+
+  /** A blocked EDT also uses 0 ms of CPU: native calls, locks and I/O must stay reportable. */
+  @Test
+  void aBlockedEdtIsNeverAnIdleStall() {
+    StackTraceElement[] clipboard =
+        dispatch(
+            f("sun.awt.windows.WClipboard", "openClipboard0", -2),
+            f("sun.awt.datatransfer.SunClipboard", "setContents", 96),
+            f("com.limegroup.gnutella.gui.GUIMediator", "setClipboardContent", 1017));
+    StackTraceElement[] park =
+        dispatch(
+            f("jdk.internal.misc.Unsafe", "park", -2),
+            f("java.util.concurrent.locks.LockSupport", "park", 223),
+            f("com.limegroup.gnutella.gui.Foo", "bar", 1));
+    StackTraceElement[] io =
+        dispatch(
+            f("java.io.FileInputStream", "readBytes", 1),
+            f("com.limegroup.gnutella.gui.Foo", "bar", 1));
+    assertEquals("", StrictEdtMode.idleStallTag(cpu(0, 2), "", clipboard));
+    assertEquals("", StrictEdtMode.idleStallTag(cpu(0, 2), "", park));
+    assertEquals("", StrictEdtMode.idleStallTag(cpu(0, 2), "", io));
+  }
+
+  @Test
+  void idleStallNeverReplacesAMoreSpecificTag() {
+    StackTraceElement[] paint = dispatch(f("javax.swing.JComponent", "paintChildren", 860));
+    for (String tag :
+        new String[] {
+          StrictEdtMode.STACK_MISSED_TAG,
+          StrictEdtMode.RENDER_QUEUE_TAG,
+          StrictEdtMode.NATIVE_MENU_TAG,
+          StrictEdtMode.NATIVE_MODAL_TAG,
+          StrictEdtMode.SHELL_FOLDER_TAG,
+          StrictEdtMode.SHUTDOWN_TAG
+        }) {
+      assertEquals("", StrictEdtMode.idleStallTag(cpu(0, 2), tag, paint), tag);
+    }
+    assertEquals(
+        "",
+        StrictEdtMode.idleStallTag(
+            cpu(0, 2), "", new StackTraceElement[] {f("javax.swing.JComponent", "paint", 1)}),
+        "a stack outside the watched dispatch is not an idle stall");
   }
 }

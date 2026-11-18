@@ -319,12 +319,12 @@ public final class StrictEdtMode {
             cpuWindow.edtCpuMs(), cpuWindow.processCpuMs(), cpuWindow.systemCpuPct());
         System.err.flush();
       }
+      String windowTag = processStallTag(gcWindow, thresholdMs);
+      if (windowTag.isEmpty()) {
+        windowTag = idleStallTag(cpuWindow, report.tag(), report.stack());
+      }
       maybeQueueProductionReport(
-          processStallTag(gcWindow, thresholdMs)
-              + report.tag()
-              + event.getClass().getName()
-              + "#"
-              + event.getID(),
+          windowTag + report.tag() + event.getClass().getName() + "#" + event.getID(),
           report.stack(),
           gcWindow,
           cpuWindow);
@@ -399,6 +399,79 @@ public final class StrictEdtMode {
     long expectedWindowMs = thresholdMs - earlySampleDelayMs(thresholdMs);
     long lateMs = gcWindow.windowMs() - expectedWindowMs;
     return lateMs - gcWindow.timeMs() >= PROCESS_STALL_LATE_MS ? PROCESS_STALL_TAG : "";
+  }
+
+  static final String IDLE_STALL_TAG = "idle-stall:";
+
+  /** The most system CPU load (percent) a machine can have and still count as idle. */
+  static final int IDLE_STALL_MAX_SYSTEM_CPU_PCT = 30;
+
+  /**
+   * {@link #IDLE_STALL_TAG} when the EDT did no work during the stall and nothing explains why: it
+   * used 0 ms of CPU in the window, the machine was not starved, and the sampled stack is a plain
+   * Java frame with no native call and no wait of any kind (lock, sleep, I/O, socket) anywhere in
+   * it. A thread that is neither running nor waiting for something was not scheduled: the process
+   * was paused (sleep or hibernation, a hypervisor, an OS stall), and the stack is whatever line it
+   * stopped on. The report is kept and counted; the tag only groups it apart from stalls the app
+   * can fix. It never applies to a stack that already has a more specific tag (render queue, native
+   * menu or modal, shell folder, stack missed, process stall), only to untagged and {@link
+   * #EARLY_SAMPLE_TAG} reports, and a blocked EDT (native call, lock, I/O) never matches.
+   *
+   * <p>Thread-safe: stateless.
+   */
+  static String idleStallTag(
+      StallCpu.Window cpuWindow, String reportTag, StackTraceElement[] stack) {
+    if (cpuWindow == null
+        || cpuWindow.edtCpuMs() == null
+        || cpuWindow.edtCpuMs() != 0
+        || cpuWindow.systemCpuPct() == null
+        || cpuWindow.systemCpuPct() > IDLE_STALL_MAX_SYSTEM_CPU_PCT) {
+      return "";
+    }
+    if (!reportTag.isEmpty() && !EARLY_SAMPLE_TAG.equals(reportTag)) {
+      return "";
+    }
+    if (stack == null || stack.length == 0 || !isInsideWatchedDispatch(stack)) {
+      return "";
+    }
+    for (StackTraceElement frame : stack) {
+      if (frame == null || frame.getClassName() == null) {
+        continue;
+      }
+      if (frame.isNativeMethod() || isWaitingFrame(frame.getClassName())) {
+        return "";
+      }
+    }
+    return IDLE_STALL_TAG;
+  }
+
+  private static final String[] WAITING_FRAME_PREFIXES = {
+    "java.util.concurrent.locks.",
+    "jdk.internal.misc.Unsafe",
+    "java.lang.Object",
+    "java.lang.Thread",
+    "java.io.",
+    "java.net.",
+    "java.nio.",
+    "sun.nio.",
+    "sun.awt.SunToolkit",
+    "sun.java2d.pipe.RenderQueue",
+    "sun.java2d.d3d.",
+    "sun.java2d.opengl.",
+    "sun.java2d.metal.",
+    "sun.awt.windows.",
+    "sun.lwawt.",
+    "sun.awt.datatransfer.",
+    "java.awt.WaitDispatchSupport",
+  };
+
+  private static boolean isWaitingFrame(String className) {
+    for (String prefix : WAITING_FRAME_PREFIXES) {
+      if (className.startsWith(prefix)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
