@@ -1191,6 +1191,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.GUIMediatorShutdownTest"
         includeTestsMatching "com.limegroup.gnutella.gui.GUIMediatorClipboardTest"
         includeTestsMatching "com.limegroup.gnutella.gui.ClipboardOffEdtStructureTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.actions.OpenUrlSearchActionTest"
         includeTestsMatching "com.limegroup.gnutella.gui.SplashWindowFailedInitializeTest"
         includeTestsMatching "com.limegroup.gnutella.gui.FinalizerShutdownThreadTest"
         includeTestsMatching "com.limegroup.gnutella.gui.InitializerTrayIconTest"

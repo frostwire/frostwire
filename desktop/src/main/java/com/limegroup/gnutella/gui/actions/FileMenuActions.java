@@ -25,6 +25,7 @@ import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.search.MagnetClipboardListener;
 import com.limegroup.gnutella.gui.search.SearchInformation;
+import com.limegroup.gnutella.gui.search.SearchMediator;
 import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -264,9 +265,14 @@ public final class FileMenuActions {
         String str = pathField.getText();
         if (str.startsWith("http") && !str.endsWith(".torrent")) {
           // Cloud URL entered
-          SearchInformation searchInfo =
-              SearchInformation.createKeywordSearch(str, null, MediaType.getVideoMediaType());
-          new SearchAction(searchInfo, str).actionPerformed(null);
+          SearchAction search = cloudUrlSearchAction(str);
+          if (search == null) {
+            // the same message the search box shows; the dialog stays open to edit the address
+            GUIMediator.showMessage(
+                I18n.tr("Your search is too long. Please make your search smaller and try again."));
+            return;
+          }
+          search.actionPerformed(null);
           dismissDialog();
           return;
         }
@@ -290,6 +296,22 @@ public final class FileMenuActions {
         GUIUtils.getDisposeAction().actionPerformed(a);
       }
     }
+  }
+
+  /**
+   * The action that searches the cloud for the web address {@code url}, or null when the search box
+   * would refuse the query (it is empty or longer than the maximum query length): {@link
+   * SearchAction} throws for those, which crashed the Open dialog's OK button (Icebase
+   * #6066eb0dd91b, frostwire/frostwire#1584). The title uses a fixed key: an address containing
+   * braces or quotes is not a valid {@code MessageFormat} pattern.
+   */
+  static SearchAction cloudUrlSearchAction(String url) {
+    SearchInformation info =
+        SearchInformation.createKeywordSearch(url, null, MediaType.getVideoMediaType());
+    if (SearchMediator.validateInfo(info) != SearchMediator.QUERY_VALID) {
+      return null;
+    }
+    return new SearchAction(info, "Search for Keywords: {0}");
   }
 
   /** Exits the application. */
