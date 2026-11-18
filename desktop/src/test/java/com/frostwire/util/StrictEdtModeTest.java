@@ -828,4 +828,53 @@ class StrictEdtModeTest {
             cpu(0, 2), "", new StackTraceElement[] {f("javax.swing.JComponent", "paint", 1)}),
         "a stack outside the watched dispatch is not an idle stall");
   }
+
+  /** Icebase #2b1089fbcfa1 (D3D), #7f60e8dd6328 (Metal), #edd721963e48 and #b9b13fabccb0 (D3D). */
+  @Test
+  void gpuFlushWaitsAreRenderQueueStalls() {
+    StackTraceElement[] d3dUpdate =
+        dispatch(
+            f("java.lang.Object", "wait0", -2),
+            f("java.lang.Object", "wait", 391),
+            f("sun.java2d.d3d.D3DScreenUpdateManager", "runUpdateNow", 398),
+            f("sun.java2d.d3d.D3DBlitLoops", "IsoBlit", 356),
+            f("javax.swing.RepaintManager$PaintManager", "paintDoubleBuffered", 1533));
+    StackTraceElement[] metal =
+        dispatch(
+            f("java.lang.Object", "wait0", -2),
+            f("sun.java2d.metal.MTLRenderQueue$QueueFlusher", "flushNow", 100),
+            f("sun.java2d.metal.MTLRenderQueue", "flushNow", 80),
+            f("javax.swing.RepaintManager$PaintManager", "paintDoubleBufferedImpl", 1560));
+    StackTraceElement[] d3dFlush =
+        dispatch(
+            f("sun.java2d.d3d.D3DRenderQueue", "flushBuffer", -2),
+            f("sun.java2d.d3d.D3DRenderQueue", "flushBuffer", 154),
+            f("sun.java2d.d3d.D3DRenderQueue", "flushNow", 138),
+            f("sun.java2d.d3d.D3DBlitLoops", "Blit", 275),
+            f("com.frostwire.gui.theme.AbstractSkinPainter", "fillShapeNoAA", 106));
+    for (StackTraceElement[] stack : new StackTraceElement[][] {d3dUpdate, metal, d3dFlush}) {
+      assertTrue(StrictEdtMode.isRenderQueueLockWait(stack));
+      assertEquals(StrictEdtMode.RENDER_QUEUE_TAG, StrictEdtMode.reportTag("", stack, true));
+    }
+  }
+
+  @Test
+  void anAppFrameAboveAGpuFlushIsNotARenderQueueStall() {
+    StackTraceElement[] appWork =
+        dispatch(
+            f("com.limegroup.gnutella.gui.SomePanel", "compute", 10),
+            f("sun.java2d.d3d.D3DRenderQueue", "flushNow", 138));
+    assertFalse(StrictEdtMode.isRenderQueueLockWait(appWork));
+    StackTraceElement[] unrelatedWait =
+        dispatch(
+            f("java.lang.Object", "wait0", -2),
+            f("javax.swing.SwingWorker", "get", 20),
+            f("javax.swing.RepaintManager", "paintDirtyRegions", 786));
+    assertFalse(StrictEdtMode.isRenderQueueLockWait(unrelatedWait));
+    StackTraceElement[] otherJava2d =
+        dispatch(
+            f("sun.java2d.d3d.D3DBlitLoops", "Blit", 275),
+            f("sun.java2d.pipe.DrawImage", "blitSurfaceData", 993));
+    assertFalse(StrictEdtMode.isRenderQueueLockWait(otherJava2d));
+  }
 }

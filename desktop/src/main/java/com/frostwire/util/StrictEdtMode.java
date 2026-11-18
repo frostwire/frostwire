@@ -604,6 +604,12 @@ public final class StrictEdtMode {
    * above the lock wait count; app paint code below it (the caller) is expected, but an app frame
    * above it is not. Only the JDK takes awtLock, so app locks never match.
    *
+   * <p>The EDT also waits on the GPU without the lock: Direct3D's {@code
+   * D3DScreenUpdateManager.runUpdateNow} waits for the screen update, and the {@code RenderQueue}
+   * classes' {@code flushNow}, {@code flushAndInvokeNow} and {@code flushBuffer} (Direct3D, OpenGL,
+   * Metal) wait for the flusher or run the driver call. Those frames count too (Icebase
+   * #2b1089fbcfa1 and #7f60e8dd6328, frostwire/frostwire#1306).
+   *
    * <p>Thread-safe: stateless stack inspection.
    */
   static boolean isRenderQueueLockWait(StackTraceElement[] stack) {
@@ -624,6 +630,9 @@ public final class StrictEdtMode {
           return false;
         }
       }
+      if (isGpuFlushFrame(className, frame.getMethodName())) {
+        return true;
+      }
       if ("sun.awt.SunToolkit".equals(className) && "awtLock".equals(frame.getMethodName())) {
         waitingOnAwtLock = true;
       } else if (waitingOnAwtLock
@@ -633,6 +642,19 @@ public final class StrictEdtMode {
       }
     }
     return false;
+  }
+
+  /** A JDK Java2D frame that waits for the GPU pipeline, see {@link #isRenderQueueLockWait}. */
+  private static boolean isGpuFlushFrame(String className, String method) {
+    if (!className.startsWith("sun.java2d.")) {
+      return false;
+    }
+    if (className.endsWith("RenderQueue") || className.contains("RenderQueue$QueueFlusher")) {
+      return "flushNow".equals(method)
+          || "flushAndInvokeNow".equals(method)
+          || "flushBuffer".equals(method);
+    }
+    return className.endsWith("ScreenUpdateManager") && "runUpdateNow".equals(method);
   }
 
   /**
