@@ -1,4 +1,6 @@
 FrostWire 7.1.5 UNRELEASED
+   - fix:right-clicking files in the Library no longer freezes the window while the disk answers — the menu no longer checks every selected file on disk
+
    - fix:pressing OK in File > Open Magnet, Torrent or Video URL with a very long web address (or one with braces in it) no longer crashes — it says the search is too long and keeps the dialog open
 
    - fix:starting FrostWire, and the Copy buttons in Options, the IceBridge windows and the search details, no longer freeze the window while another program holds the Windows clipboard — the clipboard is only touched in the background
