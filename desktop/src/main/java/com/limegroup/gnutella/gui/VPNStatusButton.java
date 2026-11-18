@@ -145,24 +145,14 @@ public final class VPNStatusButton extends JPanel implements VPNStatusRefresher.
 
   private void updateIconAndToolTip(boolean vpnIsOn) {
     iconButton.setIcon(GUIMediator.getThemeImage(vpnIsOn ? "vpn_on" : "vpn_off"));
-    // Defer HTML ToolTipText to avoid EDT violation
-    // HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
-    SwingUtilities.invokeLater(
-        () -> {
-          if (vpnIsOn) {
-            iconButton.setToolTipText(
-                "<html><p width=\"260\">"
-                    + I18n.tr(
-                        "FrostWire has detected a VPN connection, your privacy is safe from prying eyes.")
-                    + "</p></html>");
-          } else {
-            iconButton.setToolTipText(
-                "<html><p width=\"260\">"
-                    + I18n.tr(
-                        "FrostWire can't detect an encrypted VPN connection, your privacy is at risk. Click icon to set up an encrypted VPN connection.")
-                    + "</p></html>");
-          }
-        });
+    // Plain text: an HTML tooltip is parsed and laid out on the EDT every time it is shown
+    // (frostwire/frostwire#1580); the tooltip UI wraps long text itself
+    iconButton.setToolTipText(
+        vpnIsOn
+            ? I18n.tr(
+                "FrostWire has detected a VPN connection, your privacy is safe from prying eyes.")
+            : I18n.tr(
+                "FrostWire can't detect an encrypted VPN connection, your privacy is at risk. Click icon to set up an encrypted VPN connection."));
   }
 
   @Override

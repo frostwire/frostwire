@@ -55,6 +55,13 @@ public final class SkinMultilineToolTipUI extends SynthToolTipUI {
     textArea.setOpaque(false);
   }
 
+  @Override
+  public void installUI(JComponent c) {
+    // table tooltips are plain text, but a row's text can start with "<html>": never build a view
+    c.putClientProperty("html.disable", Boolean.TRUE);
+    super.installUI(c);
+  }
+
   public static ComponentUI createUI(JComponent comp) {
     ThemeMediator.testComponentCreationThreadingViolation();
     return new SkinPanelUI();

@@ -319,12 +319,13 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
           @Override
           public String getToolTipText() {
             boolean seedingStatus = SharingSettings.SEED_FINISHED_TORRENTS.getValue();
+            // the translated strings carry <b> and <p>: SafeToolTipUI shows their plain text
             return "<html>"
                 + (seedingStatus
                     ? I18n.tr("<b>Seeding</b><p>completed torrent downloads.</p>")
                     : I18n.tr(
-                            "<b>Not Seeding</b><p>File chunks might be shared only during a torrent download.</p>")
-                        + "</html>");
+                        "<b>Not Seeding</b><p>File chunks might be shared only during a torrent download.</p>"))
+                + "</html>";
           }
         };
     seedingStatusButton.setText(I18n.tr("Not Seeding")); // Default text

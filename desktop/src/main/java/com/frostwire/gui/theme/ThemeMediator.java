@@ -93,7 +93,8 @@ public final class ThemeMediator {
     "TextFieldUI", // buddies / prompt skin
     "RadioButtonUI", // custom painter variant
     "LabelUI", // custom painter variant
-    "MultilineToolTipUI" // custom painter variant
+    "MultilineToolTipUI", // custom painter variant
+    "ToolTipUI" // never builds an HTML view (frostwire/frostwire#1580)
   };
 
   private ThemeMediator() {}
@@ -611,6 +612,7 @@ public final class ThemeMediator {
       UIManager.put("SplitPaneUI", "com.frostwire.gui.theme.SkinSplitPaneUI");
       UIManager.put("ApplicationHeaderUI", "com.frostwire.gui.theme.SkinApplicationHeaderUI");
       UIManager.put("MultilineToolTipUI", "com.frostwire.gui.theme.SkinMultilineToolTipUI");
+      UIManager.put("ToolTipUI", "com.frostwire.gui.theme.SafeToolTipUI");
       UIManager.put("TreeUI", "com.frostwire.gui.theme.SkinTreeUI");
       UIManager.put("TextFieldUI", "com.frostwire.gui.theme.SkinTextFieldUI");
       UIManager.put("RangeSliderUI", "com.frostwire.gui.theme.SkinRangeSliderUI");
