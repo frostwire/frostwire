@@ -1,10 +1,7 @@
 FrostWire 7.1.5 UNRELEASED
    - fix:right-clicking files in the Library no longer freezes the window while the disk answers — the menu no longer checks every selected file on disk
-
    - fix:pressing OK in File > Open Magnet, Torrent or Video URL with a very long web address (or one with braces in it) no longer crashes — it says the search is too long and keeps the dialog open
-
    - fix:starting FrostWire, and the Copy buttons in Options, the IceBridge windows and the search details, no longer freeze the window while another program holds the Windows clipboard — the clipboard is only touched in the background
-
    - fix:double-clicking or pressing Play on a file in the Library or in a transfer no longer freezes the window while the disk answers — whether it can be played is decided from its name, and the file is opened in the background
    - fix:hovering a tooltip no longer freezes the window while it is laid out — every tooltip is shown as plain text, so the VPN and Seeding tooltips in the status bar no longer lose time parsing HTML (they show the same words without bold)
    - fix:Copy Magnet and the other copy actions no longer freeze the window while another program is holding the Windows clipboard — the text is written in the background
@@ -15,7 +12,7 @@ FrostWire 7.1.5 UNRELEASED
    - fix:the explanations under "Seed finished downloads" in the setup wizard and the BitTorrent options no longer sit on white strips — they are drawn on the panel's own background
    - fix:the splash screen no longer freezes on slow disks while Swing loads its keyboard focus classes — they are loaded before the splash is built
    - fix:IceBridge peer discovery no longer uses a whole CPU core every 30 seconds on Windows — it reads the computer's network addresses once per pass instead of once per peer it checks
-   - fix:the first search no longer freezes the window while the list of search engines is built — it is built in the background at startup, also with IceBridge off
+   - fix:the first search We can do like little Ella swinging F with my G K K K K K K K K K Keep it on the down, yo, we keep it discreetThey know the ash track is really sold on ice for characterno longer freezes the window while the list of search engines is built — it is built in the background at startup, also with IceBridge off
    - fix:the setup wizard's Back/Next/Cancel buttons no longer disappear below the window on the Seeding & Publishing page — the buttons always keep their room, and the wizard grows to fit each page it shows
    - fix:no more crash in the Library search right after start when a download opens Transfers — the search waits for its search field before clearing it or setting its prompt
    - fix:opening the transfer details right after start no longer freezes the window while its "hide" and "Save location" links are drawn — the links are plain underlined labels instead of HTML
