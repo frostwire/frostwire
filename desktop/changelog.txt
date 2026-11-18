@@ -1,4 +1,5 @@
 FrostWire 7.1.5 UNRELEASED
+   - fix:hovering a tooltip no longer freezes the window while it is laid out — every tooltip is shown as plain text, so the VPN and Seeding tooltips in the status bar no longer lose time parsing HTML (they show the same words without bold)
    - fix:Copy Magnet and the other copy actions no longer freeze the window while another program is holding the Windows clipboard — the text is written in the background
    - fix:opening the Library for the first time no longer freezes the window on slow disks while its Payment Options icons are read — they are loaded in the background at startup
    - fix:the first table (Library, Transfers or Search) no longer freezes the window on slow disks while its settings file is read — it is read in the background at startup
