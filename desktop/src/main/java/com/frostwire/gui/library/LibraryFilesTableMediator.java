@@ -204,18 +204,8 @@ public final class LibraryFilesTableMediator
     menu.addSeparator();
     menu.add(new SkinMenuItem(DELETE_ACTION));
     menu.addSeparator();
+    // No file system calls here: this runs on the EDT (frostwire/frostwire#1585).
     int[] rows = TABLE.getSelectedRows();
-    boolean dirSelected = false;
-    boolean fileSelected = false;
-    for (int row : rows) {
-      File f = DATA_MODEL.get(row).getFile();
-      if (f.isDirectory()) {
-        dirSelected = true;
-        //				if (IncompleteFileManager.isTorrentFolder(f))
-        //					torrentSelected = true;
-      } else fileSelected = true;
-      if (dirSelected && fileSelected) break;
-    }
     DELETE_ACTION.setEnabled(true);
     LibraryFilesTableDataLine line = DATA_MODEL.get(rows[0]);
     menu.add(createSearchSubMenu(line));

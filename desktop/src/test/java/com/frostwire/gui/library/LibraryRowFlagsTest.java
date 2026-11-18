@@ -99,7 +99,8 @@ class LibraryRowFlagsTest {
         new String[] {
           "public List<MediaSource> getFilesView()",
           "public void handleSelection(int row)",
-          "private void launch(boolean playAudio)"
+          "private void launch(boolean playAudio)",
+          "protected JPopupMenu createPopupMenu()"
         }) {
       String body = body(mediator, method);
       for (String diskCall :
