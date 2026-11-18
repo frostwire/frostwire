@@ -33,8 +33,6 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Toolkit;
-import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
@@ -415,9 +413,7 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
       JButton copyButton = new JButton(I18n.tr("Copy to Clipboard"));
       copyButton.addActionListener(
           e -> {
-            Toolkit.getDefaultToolkit()
-                .getSystemClipboard()
-                .setContents(new StringSelection(mnemonic), null);
+            GUIMediator.setClipboardContent(mnemonic);
             copyButton.setText(I18n.tr("Copied!"));
           });
       JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -558,7 +554,7 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
     IdentityKeys identity = resolveIdentity();
     if (identity == null) return;
     String fp = Hex.encode(identity.ed25519PubRaw());
-    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(fp), null);
+    GUIMediator.setClipboardContent(fp);
     COPY_FINGERPRINT_BUTTON.setText(I18n.tr("Copied!"));
     Timer timer = new Timer(1500, e -> COPY_FINGERPRINT_BUTTON.setText(I18n.tr("Copy")));
     timer.setRepeats(false);

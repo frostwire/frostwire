@@ -41,8 +41,16 @@ import java.util.concurrent.ExecutorService;
 public class MagnetClipboardListener extends WindowAdapter {
   private static final Logger LOG = Logger.getLogger(MagnetClipboardListener.class);
   private static final MagnetClipboardListener instance = new MagnetClipboardListener();
-  // the system clipboard
-  private static final Clipboard CLIPBOARD = Toolkit.getDefaultToolkit().getSystemClipboard();
+
+  /**
+   * The system clipboard, looked up on first use. Creating it sets up the Windows clipboard (native
+   * OLE) and MainFrame, on the EDT, loads this class at startup (Icebase #51520a6e3dc2,
+   * frostwire/frostwire#1583); every use is off the EDT.
+   */
+  private static final class SystemClipboard {
+    static final Clipboard INSTANCE = Toolkit.getDefaultToolkit().getSystemClipboard();
+  }
+
   // dummy clipboard content
   private final StringSelection empty = new StringSelection("");
 
@@ -101,7 +109,7 @@ public class MagnetClipboardListener extends WindowAdapter {
    */
   public static String getMagnetOrTorrentURLFromClipboard() {
     try {
-      String clipboardText = GUIUtils.extractStringContentFromClipboard(CLIPBOARD);
+      String clipboardText = GUIUtils.extractStringContentFromClipboard(SystemClipboard.INSTANCE);
       if (clipboardText == null) {
         return "";
       }
@@ -123,7 +131,7 @@ public class MagnetClipboardListener extends WindowAdapter {
   }
 
   private void parseAndLaunch() {
-    String contents = GUIUtils.extractStringContentFromClipboard(CLIPBOARD);
+    String contents = GUIUtils.extractStringContentFromClipboard(SystemClipboard.INSTANCE);
     // could not extract the clipboard as text.
     if (contents == null) return;
     String copied = copiedText;
@@ -149,7 +157,7 @@ public class MagnetClipboardListener extends WindowAdapter {
   /** clears the clipboard from the current string */
   private void purgeClipboard() {
     try {
-      CLIPBOARD.setContents(empty, empty);
+      SystemClipboard.INSTANCE.setContents(empty, empty);
     } catch (IllegalStateException isx) {
       // do nothing
     }

@@ -27,8 +27,6 @@ import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Toolkit;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -382,9 +380,7 @@ public final class PeerCatalogWindow {
     if (entry == null || peerPub == null) {
       return;
     }
-    Toolkit.getDefaultToolkit()
-        .getSystemClipboard()
-        .setContents(new StringSelection(meshMagnet(entry, peerPub)), null);
+    GUIMediator.setClipboardContent(meshMagnet(entry, peerPub));
   }
 
   static String meshMagnet(RemoteIndexFetcher.RemoteTorrentEntry entry, byte[] peerPub) {

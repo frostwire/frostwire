@@ -25,8 +25,6 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Toolkit;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URLDecoder;
@@ -375,7 +373,7 @@ final class DistributedSearchResultDetailsWindow {
   }
 
   private static void copy(String value) {
-    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(value), null);
+    GUIMediator.setClipboardContent(value);
   }
 
   /** One labeled row. {@code value} is copied; {@code display} is what is drawn. */

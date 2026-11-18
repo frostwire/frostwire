@@ -16,6 +16,7 @@ import com.frostwire.search.relay.icebridge.client.IceBridgeSearchTransport;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.DropTargets;
 import com.limegroup.gnutella.gui.FileChooserHandler;
+import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.ShellFolderWarmUp;
@@ -23,8 +24,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Toolkit;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedWriter;
@@ -451,9 +450,7 @@ public final class IceBridgeConsoleWindow {
   }
 
   private void copyToClipboard() {
-    Toolkit.getDefaultToolkit()
-        .getSystemClipboard()
-        .setContents(new StringSelection(toText(exportOrder())), null);
+    GUIMediator.setClipboardContent(toText(exportOrder()));
   }
 
   private static String toText(List<IceBridgeEvent> events) {

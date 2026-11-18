@@ -13,11 +13,11 @@ import com.frostwire.search.relay.LocalSharedTorrent;
 import com.frostwire.search.relay.RelaySearchWiring;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
+import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 import com.limegroup.gnutella.settings.SearchEnginesSettings;
 import java.awt.*;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
@@ -248,7 +248,7 @@ public final class SharedTorrentsDatabasePaneItem extends AbstractPaneItem {
   }
 
   private static void copyToClipboard(String text) {
-    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(text), null);
+    GUIMediator.setClipboardContent(text);
   }
 
   private static String magnetLink(LocalSharedTorrent t) {

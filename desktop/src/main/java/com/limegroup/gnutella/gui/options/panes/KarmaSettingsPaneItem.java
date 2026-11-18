@@ -19,7 +19,6 @@ import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.search.DesktopSearchEngines;
 import java.awt.*;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -244,9 +243,7 @@ public final class KarmaSettingsPaneItem extends AbstractPaneItem {
     JMenuItem copyItem = new JMenuItem(I18n.tr("Copy Full Public Key"));
     copyItem.addActionListener(
         ev -> {
-          Toolkit.getDefaultToolkit()
-              .getSystemClipboard()
-              .setContents(new StringSelection(full), null);
+          GUIMediator.setClipboardContent(full);
           copyItem.setText(I18n.tr("Copied!"));
         });
     menu.add(copyItem);

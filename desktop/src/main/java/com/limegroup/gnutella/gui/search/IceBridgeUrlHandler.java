@@ -58,7 +58,15 @@ public final class IceBridgeUrlHandler {
   private static final int ED25519_PUB_HEX_LEN = 64;
   private static final int SEARCH_RESPONSE_TIMEOUT_SEC = 10;
   private static final int SEARCH_RESULT_LIMIT = 25;
-  private static final Clipboard CLIPBOARD = Toolkit.getDefaultToolkit().getSystemClipboard();
+
+  /**
+   * The system clipboard, looked up on first use: every use is off the EDT
+   * (frostwire/frostwire#1583).
+   */
+  private static final class SystemClipboard {
+    static final Clipboard INSTANCE = Toolkit.getDefaultToolkit().getSystemClipboard();
+  }
+
   private static volatile boolean registered;
 
   private IceBridgeUrlHandler() {}
@@ -147,8 +155,9 @@ public final class IceBridgeUrlHandler {
                   .addWindowListener(
                       new IceBridgeClipboardMonitor(
                           DesktopParallelExecutor::execute,
-                          () -> GUIUtils.extractStringContentFromClipboard(CLIPBOARD),
-                          () -> CLIPBOARD.setContents(new StringSelection(""), null),
+                          () ->
+                              GUIUtils.extractStringContentFromClipboard(SystemClipboard.INSTANCE),
+                          () -> SystemClipboard.INSTANCE.setContents(new StringSelection(""), null),
                           url -> GUIMediator.safeInvokeLater(() -> handle(url))));
             }
           });

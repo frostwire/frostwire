@@ -19,7 +19,6 @@ import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.search.DistributedSearchEngineWire;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import java.awt.*;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
@@ -171,7 +170,7 @@ public final class PeerDirectorySettingsPaneItem extends AbstractPaneItem {
       return;
     }
     String hex = Hex.encode(peer.peerPub());
-    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(hex), null);
+    GUIMediator.setClipboardContent(hex);
   }
 
   private void blockPeer() {
