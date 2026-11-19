@@ -64,6 +64,14 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
   private TreeSelectionListener treeSelectionListener;
 
   /**
+   * Set once the tree is built, on the EDT. The view is built lazily and the tree in an invokeLater
+   * after the constructor, so a selection requested by the click that first showed the Library
+   * (GUIMediator.setWindow) found no tree and threw a NullPointerException (Icebase #b40753ec0d46,
+   * build 338). Selections wait for it instead.
+   */
+  private final OnceReady<JTree> treeReady = new OnceReady<>();
+
+  /**
    * Collapses a burst of media-type rescan requests (e.g. one per completed download) into a single
    * running scan plus one follow-up. Otherwise the bounded DesktopParallelExecutor (4 threads + 4
    * queued) overflows and rejects the excess tasks.
@@ -151,6 +159,16 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
     add(new JScrollPane(tree));
     revalidate();
     repaint();
+    treeReady.set(tree);
+  }
+
+  /** Runs the action on the EDT once the tree exists: now when it does, otherwise after setupUI. */
+  private void whenTreeBuilt(Runnable action) {
+    if (SwingUtilities.isEventDispatchThread()) {
+      treeReady.whenReady(builtTree -> action.run());
+    } else {
+      SwingUtilities.invokeLater(() -> treeReady.whenReady(builtTree -> action.run()));
+    }
   }
 
   private void setupModel() {
@@ -275,6 +293,10 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
   }
 
   private void selectMediaTypeSavedFilesDirectoryHolderbyType(MediaType mediaType) {
+    if (tree == null) {
+      whenTreeBuilt(() -> selectMediaTypeSavedFilesDirectoryHolderbyType(mediaType));
+      return;
+    }
     try {
       LibraryNode selectedValue = (LibraryNode) tree.getLastSelectedPathComponent();
       if (selectedValue instanceof DirectoryHolderNode
@@ -320,6 +342,7 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
 
   public void selectDirectoryHolderAt(final int index) {
     if (tree == null) {
+      whenTreeBuilt(() -> selectDirectoryHolderAt(index));
       return;
     }
     if (index >= 0 && index < tree.getRowCount()) {
@@ -332,6 +355,10 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
   }
 
   public void selectFinishedDownloads() {
+    if (tree == null) {
+      whenTreeBuilt(this::selectFinishedDownloads);
+      return;
+    }
     try {
       if (selectionListenerForSameItem(SavedFilesDirectoryHolder.class)) {
         return;
