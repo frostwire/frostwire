@@ -68,7 +68,7 @@ public final class BTDownload implements BittorrentDownload {
   };
 
   private static final String EXTRA_DATA_KEY = "extra_data";
-  private static final String WAS_PAUSED_EXTRA_KEY = "was_paused";
+  static final String WAS_PAUSED_EXTRA_KEY = "was_paused";
   private final BTEngine engine;
   private final TorrentHandle th;
   private final File savePath;

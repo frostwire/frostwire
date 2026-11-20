@@ -175,6 +175,24 @@ class BTEngineNetworkPolicyTest {
   }
 
   @Test
+  void aTorrentTheUserPausedStaysPausedWhenTheHoldEnds() throws Exception {
+    local = LocalEngine.start(dir);
+    TorrentInfo ti = album("userpaused");
+    String hash = local.engine.canonicalInfoHash(ti);
+    local.engine.setNetworkMode(hash, TorrentNetworkMode.I2P_ONLY);
+    local.engine.download(ti, dir.resolve("content").toFile(), null, null);
+    BTDownload dl = LocalEngine.Events.next(local.events.added, "userpaused");
+    await(() -> local.engine.getNetworkBlockReason(hash) != null, "held back");
+    dl.pause(); // the user's own pause
+
+    local.engine.setNetworkMode(hash, TorrentNetworkMode.MIXED);
+    await(() -> local.engine.getNetworkBlockReason(hash) == null, "released");
+    Thread.sleep(1500);
+
+    assertTrue(LocalEngine.isPaused(dl), "the user's pause is respected");
+  }
+
+  @Test
   void aMixedTorrentIsNeverHeldBackWhateverI2pIsDoing() throws Exception {
     TorrentInfo ti = album("open");
     File seedData = dir.resolve("content").toFile();

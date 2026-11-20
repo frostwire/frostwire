@@ -1111,9 +1111,12 @@ public final class BTEngine extends SessionManager {
         th.unsetFlags(TorrentNetworkFlags.i2pTorrent());
       }
       if (hash != null && networkBlocked.remove(hash) != null) {
-        // We held it back and nothing does now (I2P came up, or the mode changed).
-        th.setFlags(TorrentFlags.AUTO_MANAGED);
-        th.resume();
+        // We held it back and nothing does now (I2P came up, or the mode changed). A torrent the
+        // user paused by hand stays paused.
+        if (!isUserPaused(hash)) {
+          th.setFlags(TorrentFlags.AUTO_MANAGED);
+          th.resume();
+        }
       }
     } catch (Throwable t) {
       LOG.warn("BTEngine.applyNetworkPolicy() failed", t);
@@ -1169,6 +1172,12 @@ public final class BTEngine extends SessionManager {
       return;
     }
     th.resume();
+  }
+
+  /** Whether the user last paused this torrent by hand (BTDownload.pause), not the engine. */
+  private boolean isUserPaused(String canonicalHash) {
+    Map<String, String> extra = downloadExtras.get(canonicalHash);
+    return extra != null && Boolean.parseBoolean(extra.get(BTDownload.WAS_PAUSED_EXTRA_KEY));
   }
 
   /** Applies every torrent's network policy: I2P came up, went away or the bridge failed. */
