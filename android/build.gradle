@@ -142,7 +142,7 @@ android {
         applicationId "com.frostwire.android"
         versionName project.ext.versionName
         minSdkVersion 26 // Android 8.0 Oreo
-        targetSdkVersion 34 // Android 14 (more involved upgrade, crashes on targetsdkversion 35)
+        targetSdkVersion 36 // Android 16
         multiDexEnabled = true
 
         ndk {

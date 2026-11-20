@@ -65,6 +65,14 @@ public class EdgeToEdgeWiringTest {
   }
 
   @Test
+  public void portraitScreensKeepTheirLayoutOnLargeScreensUntilTheyAreAdaptive() throws Exception {
+    // Targeting 36 ignores screenOrientation on >= 600dp; the portrait-only layouts opt out.
+    String manifest = read("AndroidManifest.xml");
+    assertTrue(manifest.contains("android:screenOrientation=\"portrait\""));
+    assertTrue(manifest.contains("android.window.PROPERTY_COMPAT_ALLOW_RESTRICTED_RESIZABILITY"));
+  }
+
+  @Test
   public void everyActivityScreenIsBuiltOnTheBaseActivityOrHasNoWindow() throws Exception {
     // Activities that extend AppCompatActivity/Activity directly do not get the insets.
     assertEquals(
