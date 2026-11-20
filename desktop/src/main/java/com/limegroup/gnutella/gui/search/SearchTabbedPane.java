@@ -57,13 +57,22 @@ final class SearchTabbedPane extends JTabbedPane {
   }
 
   void switchToTabByOffset(int offset) {
-    int oldIndex = (getSelectedIndex() < 0) ? 0 : getSelectedIndex();
-    int newIndex = (oldIndex + offset) % getTabCount();
-    // java's modulo will return negative numbers... damn you Gosling.
-    if (newIndex < 0) {
-      newIndex += getTabCount();
+    int newIndex = tabIndexByOffset(getSelectedIndex(), offset, getTabCount());
+    if (newIndex >= 0) {
+      setSelectedIndex(newIndex);
     }
-    setSelectedIndex(newIndex);
+  }
+
+  /**
+   * The index {@code offset} tabs away from {@code selectedIndex}, wrapping around the {@code
+   * tabCount} tabs, or -1 when there are no tabs. Ctrl+Tab with no search open used to take a
+   * remainder by zero (Icebase #920f70bc4d73, ArithmeticException, build 338).
+   */
+  static int tabIndexByOffset(int selectedIndex, int offset, int tabCount) {
+    if (tabCount <= 0) {
+      return -1;
+    }
+    return Math.floorMod(Math.max(selectedIndex, 0) + offset, tabCount);
   }
 
   private final class SearchTabHeader extends JPanel {
