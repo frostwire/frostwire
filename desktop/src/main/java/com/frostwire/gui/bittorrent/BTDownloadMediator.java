@@ -20,6 +20,7 @@ package com.frostwire.gui.bittorrent;
 
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.PaymentOptions;
+import com.frostwire.bittorrent.TorrentNetworkMode;
 import com.frostwire.gui.bittorrent.BTDownloadActions.PlaySingleMediaFileAction;
 import com.frostwire.gui.components.slides.Slide;
 import com.frostwire.gui.components.transfers.TransferDetailFiles;
@@ -983,6 +984,7 @@ public final class BTDownloadMediator
     try {
       boolean[] filesSelection = null;
       File saveDirFromDialog = null;
+      TorrentNetworkMode networkMode = TorrentNetworkMode.DEFAULT;
       if (partialDownload) {
         PartialFilesDialog dlg =
             new PartialFilesDialog(
@@ -993,6 +995,7 @@ public final class BTDownloadMediator
           return;
         }
         saveDirFromDialog = dlg.getSaveFolder();
+        networkMode = dlg.getNetworkMode();
       }
       if (onOpenedForUIThread != null) {
         onOpenedForUIThread.accept(opened.hash());
@@ -1003,10 +1006,15 @@ public final class BTDownloadMediator
       // #57095c0f3115).
       final File finalSaveDirFromDialog = saveDirFromDialog;
       final boolean[] finalFilesSelection = filesSelection;
+      final TorrentNetworkMode finalNetworkMode = networkMode;
       BackgroundQueuedExecutorService.schedule(
           () ->
               addOpenedTorrentFile(
-                  torrentFile, finalSaveDir, finalSaveDirFromDialog, finalFilesSelection));
+                  torrentFile,
+                  finalSaveDir,
+                  finalSaveDirFromDialog,
+                  finalFilesSelection,
+                  finalNetworkMode));
     } catch (Exception e) {
       reportTorrentOpenFailure(torrentFile, e);
     }
@@ -1014,7 +1022,11 @@ public final class BTDownloadMediator
 
   /** Background half of {@link #openTorrentFile}: never call it on the EDT. */
   private void addOpenedTorrentFile(
-      File torrentFile, File saveDir, File saveDirFromDialog, boolean[] filesSelection) {
+      File torrentFile,
+      File saveDir,
+      File saveDirFromDialog,
+      boolean[] filesSelection,
+      TorrentNetworkMode networkMode) {
     try {
       // Ensure the .torrent exists under the configured Torrents directory
       File torrentToUse = torrentFile;
@@ -1047,7 +1059,15 @@ public final class BTDownloadMediator
       }
 
       if (saveDir == null) {
-        BTEngine.getInstance().download(torrentToUse, saveDirFromDialog, filesSelection);
+        BTEngine engine = BTEngine.getInstance();
+        if (networkMode != TorrentNetworkMode.DEFAULT) {
+          // Before the torrent is added, so it is added with the mode
+          TorrentNetworkChoice.recordBeforeAdd(
+              engine.canonicalInfoHash(new TorrentInfo(torrentToUse)),
+              networkMode,
+              engine::setNetworkMode);
+        }
+        engine.download(torrentToUse, saveDirFromDialog, filesSelection);
       } else {
         final File seedTorrent = torrentToUse;
         GUIMediator.safeInvokeLater(

@@ -72,6 +72,27 @@ public final class TorrentNetworkChoice {
     }
   }
 
+  /** Where the mode chosen in a dialog is recorded: the engine's {@code setNetworkMode}. */
+  @FunctionalInterface
+  public interface ModeSink {
+    boolean set(String canonicalHash, TorrentNetworkMode mode);
+  }
+
+  /**
+   * Records the mode chosen in an add dialog before the torrent is added, so it is added with it.
+   * The default is not recorded: a torrent with no choice is already mixed, and nothing is written
+   * for it. Reads the hash through libtorrent's torrent info, not on the EDT.
+   *
+   * @return true when something was recorded
+   */
+  public static boolean recordBeforeAdd(
+      String canonicalHash, TorrentNetworkMode mode, ModeSink sink) {
+    if (canonicalHash == null || mode == null || mode == TorrentNetworkMode.DEFAULT) {
+      return false;
+    }
+    return sink.set(canonicalHash, mode);
+  }
+
   /** A combo box of {@link #MODES} that tells its listener only what the user chose. */
   public static final class NetworkCombo extends JComboBox<TorrentNetworkMode> {
     private boolean quiet;

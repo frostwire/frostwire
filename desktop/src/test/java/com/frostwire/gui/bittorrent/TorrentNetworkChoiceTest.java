@@ -69,6 +69,45 @@ class TorrentNetworkChoiceTest {
   }
 
   @Test
+  void aModeChosenInAnAddDialogIsRecordedBeforeTheAddAndTheDefaultIsNot() {
+    List<String> recorded = new ArrayList<>();
+    TorrentNetworkChoice.ModeSink sink =
+        (hash, mode) -> {
+          recorded.add(hash + "=" + mode);
+          return true;
+        };
+    String hash = "0123456789abcdef0123456789abcdef01234567";
+
+    assertFalse(TorrentNetworkChoice.recordBeforeAdd(hash, TorrentNetworkMode.MIXED, sink));
+    assertFalse(TorrentNetworkChoice.recordBeforeAdd(hash, null, sink));
+    assertFalse(TorrentNetworkChoice.recordBeforeAdd(null, TorrentNetworkMode.I2P_ONLY, sink));
+    assertTrue(recorded.isEmpty(), "nothing is written for the default or without a hash");
+
+    assertTrue(TorrentNetworkChoice.recordBeforeAdd(hash, TorrentNetworkMode.I2P_ONLY, sink));
+    assertEquals(List.of(hash + "=I2P_ONLY"), recorded);
+    assertFalse(
+        TorrentNetworkChoice.recordBeforeAdd(
+            hash, TorrentNetworkMode.CLEARNET_ONLY, (h, m) -> false),
+        "a refused record is reported");
+  }
+
+  @Test
+  void bothAddPathsRecordTheModeBeforeTheyAddTheTorrent() throws Exception {
+    java.nio.file.Path dir =
+        java.nio.file.Path.of(
+            System.getProperty("user.dir"), "src/main/java/com/frostwire/gui/bittorrent");
+    for (String file : List.of("TorrentFetcherDownload.java", "BTDownloadMediator.java")) {
+      String source = java.nio.file.Files.readString(dir.resolve(file)).replaceAll("\\s+", "");
+      int record = source.indexOf("TorrentNetworkChoice.recordBeforeAdd(");
+      assertTrue(record > 0, file + " never records the mode");
+      assertTrue(
+          source.indexOf("engine.download(", record) > record,
+          file + " must record the mode before it adds the torrent");
+      assertTrue(source.contains("dlg.getNetworkMode()"), file);
+    }
+  }
+
+  @Test
   void theComboTellsItsListenerOnlyWhatTheUserChose() {
     TorrentNetworkChoice.NetworkCombo combo = new TorrentNetworkChoice.NetworkCombo();
     List<TorrentNetworkMode> heard = new ArrayList<>();

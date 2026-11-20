@@ -18,6 +18,7 @@
 
 package com.frostwire.gui.bittorrent;
 
+import com.frostwire.bittorrent.TorrentNetworkMode;
 import com.frostwire.gui.theme.PlatformFonts;
 import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TorrentInfo;
@@ -71,6 +72,8 @@ class PartialFilesDialog extends JDialog {
   private JLabel saveFolderLabel;
   private JButton buttonChangeFolder;
   private JButton buttonResetFolder;
+  private final TorrentNetworkChoice.NetworkCombo networkCombo =
+      new TorrentNetworkChoice.NetworkCombo();
   private final File defaultSaveFolder = SharingSettings.TORRENT_DATA_DIR_SETTING.getValue();
 
   /** What the dialog shows of a torrent: its title (null if it has none) and its files. */
@@ -213,6 +216,20 @@ class PartialFilesDialog extends JDialog {
     c.anchor = GridBagConstraints.EAST;
     saveFolderPanel.add(buttonResetFolder, c);
 
+    // Which networks the torrent may use (frostwire/frostwire#1304); Mixed is what it always was
+    c = new GridBagConstraints();
+    c.gridx = 0;
+    c.gridy = 1;
+    c.anchor = GridBagConstraints.WEST;
+    c.insets = new Insets(5, 0, 0, 5);
+    saveFolderPanel.add(new JLabel(I18n.tr("Network") + ":"), c);
+    c = new GridBagConstraints();
+    c.gridx = 1;
+    c.gridy = 1;
+    c.anchor = GridBagConstraints.WEST;
+    c.insets = new Insets(5, 0, 0, 5);
+    saveFolderPanel.add(networkCombo, c);
+
     c = new GridBagConstraints();
     c.gridx = 0;
     c.gridy = 4;
@@ -246,6 +263,11 @@ class PartialFilesDialog extends JDialog {
 
   File getSaveFolder() {
     return saveFolder;
+  }
+
+  /** The network mode the user chose; Mixed unless they changed it. */
+  TorrentNetworkMode getNetworkMode() {
+    return networkCombo.getMode();
   }
 
   private void setupTable() {
