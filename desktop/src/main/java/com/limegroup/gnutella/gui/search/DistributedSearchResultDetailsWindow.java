@@ -164,10 +164,7 @@ final class DistributedSearchResultDetailsWindow {
               clearStatus.restart();
             };
         String tip = I18n.tr("Click to copy") + " " + field.label;
-        value.setToolTipText(
-            field.display.equals(field.value)
-                ? tip
-                : "<html>" + tip + "<br>" + escape(field.value) + "</html>");
+        value.setToolTipText(copyTip(tip, field));
         value.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         value.addMouseListener(
             new MouseAdapter() {
@@ -213,6 +210,15 @@ final class DistributedSearchResultDetailsWindow {
     int w = icon == null ? 16 : icon.getIconWidth();
     spacer.setPreferredSize(new java.awt.Dimension(w, 1));
     return spacer;
+  }
+
+  /**
+   * The tooltip of a copyable value: the hint, and under it the whole value when the row shows it
+   * shortened. Plain text with a line break, so a long hash is not escaped, parsed as HTML and laid
+   * out on the EDT each time the tooltip is shown.
+   */
+  static String copyTip(String tip, Field field) {
+    return field.display.equals(field.value) ? tip : tip + "\n" + field.value;
   }
 
   private static String displayHtml(Field field) {
