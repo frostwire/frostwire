@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.frostwire.gui.PerformanceMode;
+import com.frostwire.util.JdkWarmUp;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.File;
@@ -82,6 +83,43 @@ class CrashReportSpoolerReportTypesTest {
       assertFalse(full.get("performance_mode_auto").getAsBoolean());
     } finally {
       PerformanceMode.resolve(PerformanceMode.Choice.FULL, null);
+    }
+  }
+
+  /**
+   * The first text warm-up failure explains a later NoClassDefFoundError for sun.font.HBShaper, so
+   * every report type carries it when there was one (frostwire/frostwire#1587).
+   */
+  @Test
+  @SuppressWarnings("unchecked")
+  void everyReportCarriesTheFirstTextWarmUpFailure() throws Exception {
+    java.lang.reflect.Field holder = JdkWarmUp.class.getDeclaredField("FIRST_TEXT_FAILURE");
+    holder.setAccessible(true);
+    java.util.concurrent.atomic.AtomicReference<String> failure =
+        (java.util.concurrent.atomic.AtomicReference<String>) holder.get(null);
+    String before = failure.get();
+    try {
+      failure.set(null);
+      File none = new File(tempDir.toFile(), "no-warmup-failure");
+      new CrashReportSpooler(none, null, "7.1.5", 338, "").spoolStrictMode("a.B", 1);
+      assertFalse(spooledJson(none.toPath()).has("text_warmup_failure"));
+
+      failure.set("java.lang.ExceptionInInitializerError <- java.lang.UnsatisfiedLinkError: x");
+      File strict = new File(tempDir.toFile(), "warmup-failure-strict");
+      new CrashReportSpooler(strict, null, "7.1.5", 338, "").spoolStrictMode("a.B", 1);
+      File crash = new File(tempDir.toFile(), "warmup-failure-crash");
+      new CrashReportSpooler(crash, null, "7.1.5", 338, "")
+          .spool(new NoClassDefFoundError("sun/font/HBShaper"));
+      File watchdog = new File(tempDir.toFile(), "warmup-failure-watchdog");
+      new CrashReportSpooler(watchdog, null, "7.1.5", 338, "").spoolWatchdog(3);
+
+      for (File dir : new File[] {strict, crash, watchdog}) {
+        assertEquals(
+            "java.lang.ExceptionInInitializerError <- java.lang.UnsatisfiedLinkError: x",
+            spooledJson(dir.toPath()).get("text_warmup_failure").getAsString());
+      }
+    } finally {
+      failure.set(before);
     }
   }
 

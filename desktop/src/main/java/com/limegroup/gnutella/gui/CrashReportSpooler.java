@@ -817,6 +817,14 @@ public final class CrashReportSpooler {
     private final String performance_mode;
 
     private final boolean performance_mode_auto;
+
+    /**
+     * The first text warm-up failure ("Class: message <- Class: message", home and user name
+     * removed); null, and then left out of the JSON, when it never failed
+     * (frostwire/frostwire#1587).
+     */
+    private final String text_warmup_failure;
+
     private final String exception_class;
 
     /** Null, and then left out of the JSON, for anything but an OutOfMemoryError. */
@@ -873,6 +881,7 @@ public final class CrashReportSpooler {
       this.warmup_ms = warmUp == null ? null : warmUp.elapsedMs();
       this.performance_mode = PerformanceMode.reportValue();
       this.performance_mode_auto = PerformanceMode.isAutomatic();
+      this.text_warmup_failure = JdkWarmUp.firstTextWarmUpFailure();
       this.exception_class = exceptionClass;
       this.oom_kind = oomKind;
       this.missing_class = missingClass;
@@ -936,6 +945,14 @@ public final class CrashReportSpooler {
     private final String performance_mode;
 
     private final boolean performance_mode_auto;
+
+    /**
+     * The first text warm-up failure ("Class: message <- Class: message", home and user name
+     * removed); null, and then left out of the JSON, when it never failed
+     * (frostwire/frostwire#1587).
+     */
+    private final String text_warmup_failure;
+
     private final String violation_class;
     private final int violation_count;
     private final Frame[] stack_frames;
@@ -1002,6 +1019,7 @@ public final class CrashReportSpooler {
       this.warmup_ms = warmUp == null ? null : warmUp.elapsedMs();
       this.performance_mode = PerformanceMode.reportValue();
       this.performance_mode_auto = PerformanceMode.isAutomatic();
+      this.text_warmup_failure = JdkWarmUp.firstTextWarmUpFailure();
       this.violation_class = violationClass;
       this.violation_count = violationCount;
       this.stack_frames = stackFrames;
@@ -1061,6 +1079,14 @@ public final class CrashReportSpooler {
     private final String performance_mode;
 
     private final boolean performance_mode_auto;
+
+    /**
+     * The first text warm-up failure ("Class: message <- Class: message", home and user name
+     * removed); null, and then left out of the JSON, when it never failed
+     * (frostwire/frostwire#1587).
+     */
+    private final String text_warmup_failure;
+
     private final int missed_heartbeats;
     private final String report_nonce;
 
@@ -1106,6 +1132,7 @@ public final class CrashReportSpooler {
       this.warmup_ms = warmUp == null ? null : warmUp.elapsedMs();
       this.performance_mode = PerformanceMode.reportValue();
       this.performance_mode_auto = PerformanceMode.isAutomatic();
+      this.text_warmup_failure = JdkWarmUp.firstTextWarmUpFailure();
       this.missed_heartbeats = missedHeartbeats;
       this.report_nonce = nonce;
     }
