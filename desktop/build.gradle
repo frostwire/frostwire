@@ -411,7 +411,7 @@ dependencies {
         implementation jna
     }
     // FlatLaf for dark theme support
-    implementation 'com.formdev:flatlaf:3.7.2'
+    implementation 'com.formdev:flatlaf:3.8'
     testImplementation platform('org.junit:junit-bom:5.14.4')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
