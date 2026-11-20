@@ -429,7 +429,7 @@ dependencies {
     implementation 'org.bouncycastle:bcprov-jdk18on:1.87'
 
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.robolectric:robolectric:4.17'
+    testImplementation 'org.robolectric:robolectric:4.18.1'
     testImplementation 'androidx.test:core:1.7.0'
     testImplementation 'androidx.test.ext:junit:1.3.0'
     testImplementation 'androidx.media3:media3-test-utils:1.11.1'
