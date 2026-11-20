@@ -563,6 +563,10 @@ public final class BTDownload implements BittorrentDownload {
     if (!th.isValid()) {
       return;
     }
+    if (engine.isNetworkBlocked(th)) {
+      // I2P only without a usable I2P: the user's resume must not open the clearnet door.
+      return;
+    }
     extra.put(WAS_PAUSED_EXTRA_KEY, Boolean.FALSE.toString());
     th.setFlags(TorrentFlags.AUTO_MANAGED);
     th.resume();

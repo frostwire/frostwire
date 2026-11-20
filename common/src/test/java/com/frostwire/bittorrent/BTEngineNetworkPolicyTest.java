@@ -124,6 +124,98 @@ class BTEngineNetworkPolicyTest {
   }
 
   private static final String SEED = "http://127.0.0.1:9/seed/";
+
+  @Test
+  void theReasonToHoldAnI2pOnlyTorrentBackNamesWhatIsMissing() {
+    assertTrue(BTEngine.blockReason(false, null).contains("not enabled"));
+    assertTrue(
+        BTEngine.blockReason(false, "boom").contains("not enabled"), "not enabled comes first");
+    assertTrue(BTEngine.blockReason(true, "connection refused").contains("connection refused"));
+    assertEquals(null, BTEngine.blockReason(true, null));
+  }
+
+  @Test
+  void anI2pOnlyTorrentWithoutI2pNeverConnectsToAClearnetPeer() throws Exception {
+    // The control: the same transfer, mixed, finishes from the clearnet seeder.
+    TorrentInfo ti = album("closed");
+    File seedData = dir.resolve("content").toFile();
+    local = LocalEngine.start(dir);
+    com.frostwire.jlibtorrent.SessionManager seeder = LocalEngine.seed(ti, seedData);
+    try {
+      var peer = LocalEngine.endpoint(seeder);
+      String hash = local.engine.canonicalInfoHash(ti);
+      local.engine.setNetworkMode(hash, TorrentNetworkMode.I2P_ONLY);
+
+      local.engine.download(ti, dir.resolve("save").toFile(), null, java.util.List.of(peer));
+
+      BTDownload dl = LocalEngine.Events.next(local.events.added, "closed");
+      TorrentHandle th = dl.getTorrentHandle();
+      await(() -> local.engine.getNetworkBlockReason(hash) != null, "held back");
+      assertTrue(local.engine.getNetworkBlockReason(hash).contains("not enabled"));
+      await(() -> LocalEngine.isPaused(dl), "paused");
+
+      dl.resume(); // the user presses resume
+      local.engine.download(
+          ti, dir.resolve("save").toFile(), null, java.util.List.of(peer)); // and adds it again
+      Thread.sleep(3000);
+
+      assertTrue(LocalEngine.isPaused(dl), "still paused");
+      assertEquals(0, th.status(true).numPeers(), "no peer, clearnet or otherwise");
+      assertFalse(th.status(true).isSeeding() || th.status(true).isFinished());
+
+      // Choosing mixed releases it and it finishes from the seeder.
+      local.engine.setNetworkMode(hash, TorrentNetworkMode.MIXED);
+      await(() -> local.engine.getNetworkBlockReason(hash) == null, "released");
+      // (the peer given at add time was dropped while the torrent was I2P only: hand it over again)
+      th.swig().connect_peer(peer.swig());
+      await(() -> th.status(true).isSeeding(), "downloaded once allowed");
+    } finally {
+      seeder.stop();
+    }
+  }
+
+  @Test
+  void aMixedTorrentIsNeverHeldBackWhateverI2pIsDoing() throws Exception {
+    TorrentInfo ti = album("open");
+    File seedData = dir.resolve("content").toFile();
+    local = LocalEngine.start(dir);
+    com.frostwire.jlibtorrent.SessionManager seeder = LocalEngine.seed(ti, seedData);
+    try {
+      var peer = LocalEngine.endpoint(seeder);
+
+      local.engine.download(ti, dir.resolve("save").toFile(), null, java.util.List.of(peer));
+
+      BTDownload dl = LocalEngine.Events.next(local.events.added, "open");
+      assertEquals(null, local.engine.getNetworkBlockReason(local.engine.canonicalInfoHash(ti)));
+      await(() -> dl.getTorrentHandle().status(true).isSeeding(), "downloaded from the seeder");
+    } finally {
+      seeder.stop();
+    }
+  }
+
+  @Test
+  void aBridgeThatFailsHoldsAnI2pOnlyTorrentBackAndANewBridgeGetsAnotherChance() throws Exception {
+    local = LocalEngine.start(dir);
+    TorrentInfo ti = album("bridge");
+    String hash = local.engine.canonicalInfoHash(ti);
+    // I2P configured, but nothing listens on the SAM port.
+    local.engine.applySettings(
+        new SettingsPack()
+            .setString(settings_pack.string_types.i2p_hostname.swigValue(), "127.0.0.1")
+            .setInteger(settings_pack.int_types.i2p_port.swigValue(), 1));
+    local.engine.setNetworkMode(hash, TorrentNetworkMode.I2P_ONLY);
+
+    local.engine.download(ti, dir.resolve("content").toFile(), null, null);
+
+    LocalEngine.Events.next(local.events.added, "bridge");
+    await(
+        () -> {
+          String reason = local.engine.getNetworkBlockReason(hash);
+          return reason != null && reason.contains("not usable");
+        },
+        "held back because the SAM bridge failed");
+  }
+
   private static final int ALLOW_MIXED = settings_pack.bool_types.allow_i2p_mixed.swigValue();
 
   private boolean sessionAllowsMixed() {

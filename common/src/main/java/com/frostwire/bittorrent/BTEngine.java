@@ -50,6 +50,7 @@ public final class BTEngine extends SessionManager {
       new int[] {
         ADD_TORRENT.swig(),
         METADATA_RECEIVED.swig(),
+        I2P.swig(),
         LISTEN_SUCCEEDED.swig(),
         LISTEN_FAILED.swig(),
         EXTERNAL_IP.swig(),
@@ -125,6 +126,12 @@ public final class BTEngine extends SessionManager {
    * comes back when none is left.
    */
   private volatile boolean userAllowI2pMixed;
+
+  /** Canonical hash to why an I2P only torrent is paused by the engine. */
+  private final Map<String, String> networkBlocked = new ConcurrentHashMap<>();
+
+  /** The last SAM bridge error libtorrent reported; cleared when the I2P settings change. */
+  private volatile String i2pBridgeError;
 
   /** Runs everything about the network policy that touches the file or libtorrent. */
   private final ExecutorService networkPolicyQueue =
@@ -768,7 +775,7 @@ public final class BTEngine extends SessionManager {
       for (TcpEndpoint peer : params.peers()) {
         handle.swig().connect_peer(peer.swig());
       }
-      handle.resume();
+      resumeUnlessNetworkBlocked(handle);
       fireDownloadUpdate(handle);
       return;
     }
@@ -1035,6 +1042,24 @@ public final class BTEngine extends SessionManager {
       }
     }
     super.applySettings(sp);
+    if (sp != null
+        && (sp.swig().has_val(settings_pack.string_types.i2p_hostname.swigValue())
+            || sp.swig().has_val(settings_pack.int_types.i2p_port.swigValue()))) {
+      // A new bridge deserves a new chance; an I2P only torrent starts or stops accordingly.
+      i2pBridgeError = null;
+      networkPolicyQueue.execute(this::enforceAllNetworkPolicies);
+    }
+  }
+
+  private void onI2pAlert(I2pAlert alert) {
+    String message;
+    try {
+      message = alert.getError().message();
+    } catch (Throwable unreadable) {
+      message = "unknown error";
+    }
+    i2pBridgeError = message;
+    networkPolicyQueue.execute(this::enforceAllNetworkPolicies);
   }
 
   /**
@@ -1046,7 +1071,9 @@ public final class BTEngine extends SessionManager {
     if (getNetworkMode(canonicalHash) != TorrentNetworkMode.I2P_ONLY) {
       return base;
     }
-    return base.or_(TorrentNetworkFlags.i2pTorrent());
+    torrent_flags_t flags = base.or_(TorrentNetworkFlags.i2pTorrent());
+    // Held back (no I2P to use): added paused, so it never runs, not even for a moment.
+    return i2pBlockReason() == null ? flags : flags.or_(TorrentFlags.PAUSED);
   }
 
   /**
@@ -1061,7 +1088,8 @@ public final class BTEngine extends SessionManager {
       if (th == null || !th.isValid()) {
         return;
       }
-      TorrentNetworkMode mode = getNetworkMode(canonicalInfoHash(th));
+      String hash = canonicalInfoHash(th);
+      TorrentNetworkMode mode = getNetworkMode(hash);
       if (mode == TorrentNetworkMode.I2P_ONLY) {
         if (!TorrentNetworkFlags.isI2pTorrent(th)) {
           th.setFlags(TorrentNetworkFlags.i2pTorrent(), TorrentNetworkFlags.i2pTorrent());
@@ -1069,11 +1097,87 @@ public final class BTEngine extends SessionManager {
         for (String seed : th.urlSeeds()) {
           th.removeUrlSeed(seed);
         }
+        String reason = i2pBlockReason();
+        if (reason != null) {
+          // Fail closed: no I2P to talk through means no talking at all, never the clearnet.
+          if (networkBlocked.put(hash, reason) == null) {
+            LOG.warn("I2P only torrent " + hash + " is held back: " + reason);
+          }
+          th.unsetFlags(TorrentFlags.AUTO_MANAGED);
+          th.pause();
+          return;
+        }
       } else if (TorrentNetworkFlags.isI2pTorrent(th) && !hasI2pTracker(th)) {
         th.unsetFlags(TorrentNetworkFlags.i2pTorrent());
       }
+      if (hash != null && networkBlocked.remove(hash) != null) {
+        // We held it back and nothing does now (I2P came up, or the mode changed).
+        th.setFlags(TorrentFlags.AUTO_MANAGED);
+        th.resume();
+      }
     } catch (Throwable t) {
       LOG.warn("BTEngine.applyNetworkPolicy() failed", t);
+    }
+  }
+
+  /**
+   * Why an I2P only torrent must not run now, or null when it may: I2P is not configured (no SAM
+   * host), or libtorrent reported that the SAM bridge cannot be used.
+   */
+  static String blockReason(boolean i2pConfigured, String bridgeError) {
+    if (!i2pConfigured) {
+      return "I2P is not enabled. Enable it in Options > I2P to download this torrent.";
+    }
+    if (bridgeError != null) {
+      return "The I2P router (SAM bridge) is not usable: " + bridgeError;
+    }
+    return null;
+  }
+
+  private String i2pBlockReason() {
+    boolean configured = false;
+    try {
+      SettingsPack sp = swig() == null ? null : settings();
+      configured =
+          sp != null
+              && !sp.getString(settings_pack.string_types.i2p_hostname.swigValue()).isEmpty();
+    } catch (Throwable unreadable) {
+      // not configured as far as we can tell: fail closed
+    }
+    return blockReason(configured, i2pBridgeError);
+  }
+
+  /**
+   * Why the torrent with this canonical hash is held back by its network mode, or null. Memory
+   * only: UI threads may call it.
+   */
+  public String getNetworkBlockReason(String canonicalHash) {
+    return canonicalHash == null ? null : networkBlocked.get(canonicalHash);
+  }
+
+  boolean isNetworkBlocked(TorrentHandle th) {
+    if (networkBlocked.isEmpty()) {
+      return false;
+    }
+    String hash = canonicalInfoHash(th);
+    return hash != null && networkBlocked.containsKey(hash);
+  }
+
+  /** {@code th.resume()}, unless its network mode holds it back (see {@link #blockReason}). */
+  void resumeUnlessNetworkBlocked(TorrentHandle th) {
+    if (isNetworkBlocked(th)) {
+      return;
+    }
+    th.resume();
+  }
+
+  /** Applies every torrent's network policy: I2P came up, went away or the bridge failed. */
+  private void enforceAllNetworkPolicies() {
+    if (swig() == null) {
+      return;
+    }
+    for (TorrentHandle th : getTorrentHandles()) {
+      applyNetworkPolicy(th);
     }
   }
 
@@ -1452,7 +1556,7 @@ public final class BTEngine extends SessionManager {
                   + infoHashStr);
           try {
             th.prioritizeFiles(storedPriorities);
-            th.resume(); // Resume the torrent now that priorities are set
+            resumeUnlessNetworkBlocked(th); // now that priorities are set
           } catch (Throwable t) {
             LOG.warn("BTEngine.fireDownloadAdded() - unable to apply stored priorities", t);
           }
@@ -1593,7 +1697,7 @@ public final class BTEngine extends SessionManager {
         th.prioritizeFiles(wholeTorrentPriorities);
       }
       fireDownloadUpdate(th);
-      th.resume();
+      resumeUnlessNetworkBlocked(th);
     } else { // new Download (including v2-only torrents)
       if (infoHashV1 == null && priorities != null) {
         // Stored before adding: the ADD_TORRENT alert that applies them can fire before
@@ -1642,7 +1746,7 @@ public final class BTEngine extends SessionManager {
           LOG.warn("BTEngine.download() - unable to trigger initial resume save", t);
         }
         fireDownloadUpdate(th);
-        th.resume();
+        resumeUnlessNetworkBlocked(th);
       } else {
         if (infoHashV1 == null) {
           LOG.info(
@@ -1753,6 +1857,9 @@ public final class BTEngine extends SessionManager {
           applyNetworkPolicy(torrentAlert.handle());
           fireDownloadAdded(torrentAlert);
           runNextRestoreDownloadTask();
+          break;
+        case I2P:
+          onI2pAlert((I2pAlert) alert);
           break;
         case METADATA_RECEIVED:
           // A magnet's web seeds only exist once its metadata does.
