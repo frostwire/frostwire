@@ -418,7 +418,7 @@ dependencies {
     }
 
     // Netty for IceBridge rUDP transport (in-process daemon on Android)
-    implementation('io.netty:netty-all:4.2.19.Final') {
+    implementation('io.netty:netty-all:4.2.21.Final') {
         // IceBridge uses Netty NIO UDP and HTTP; its platform-specific QUIC native transports
         // are unused on Android and package duplicate per-platform license resources.
         exclude group: 'io.netty', module: 'netty-codec-native-quic'
