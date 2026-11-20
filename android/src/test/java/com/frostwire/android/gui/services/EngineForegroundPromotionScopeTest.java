@@ -64,6 +64,25 @@ public class EngineForegroundPromotionScopeTest {
     assertFalse("WorkManager is no longer used", source.contains("androidx.work"));
   }
 
+  @Test
+  public void dataSyncTimeoutAlwaysStopsTheService() throws Exception {
+    // Android 15+: after 6 hours a dataSync foreground service gets onTimeout() and must stop
+    // within seconds, or the process dies with "A foreground service of type dataSync did not
+    // stop within its timeout".
+    String source =
+        readProjectFile(
+            "src/main/java/com/frostwire/android/gui/services/EngineForegroundService.java");
+    String onTimeout = blockStartingAt(source, "public void onTimeout(int startId, int fgsType)");
+    assertTrue("EngineForegroundService must implement onTimeout(int, int)", !onTimeout.isEmpty());
+    assertTrue(
+        "the engine is paused so the transfers resume when the user comes back",
+        onTimeout.contains("Engine.instance().stopServices(true)"));
+    int finallyAt = onTimeout.indexOf("finally");
+    assertTrue(
+        "stopSelf() must run even when pausing the engine throws",
+        finallyAt > 0 && onTimeout.indexOf("stopSelf();", finallyAt) > finallyAt);
+  }
+
   private static String blockStartingAt(String source, String marker) {
     int start = source.indexOf(marker);
     if (start < 0) {

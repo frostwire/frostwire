@@ -250,6 +250,31 @@ public class EngineForegroundService extends Service implements IEngineService {
     return START_STICKY;
   }
 
+  /**
+   * Android 15+ lets a dataSync foreground service run 6 hours in a 24 hour window (the user
+   * bringing the app to the foreground resets it). When the time is up the system calls this and
+   * the service must stop within a few seconds, or the process is killed with a
+   * RemoteServiceException ("A foreground service of type dataSync did not stop within its
+   * timeout"). Transfers are paused as for a lost connection, so they resume when the user returns
+   * to the app.
+   */
+  @Override
+  public void onTimeout(int startId, int fgsType) {
+    LOG.warn(
+        "EngineForegroundService::onTimeout() - foreground service type "
+            + fgsType
+            + " reached its time limit, stopping startId="
+            + startId);
+    try {
+      Engine.instance().stopServices(true);
+    } catch (Throwable t) {
+      LOG.error("EngineForegroundService::onTimeout() - could not pause the engine", t);
+    } finally {
+      // Always stop, whatever happened above: that is what the system waits for.
+      stopSelf();
+    }
+  }
+
   private boolean tryShowPersistentNotification(
       Notification notification, boolean isNullIntentRestart, boolean isAppInForeground) {
     try {
