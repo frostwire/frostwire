@@ -25,6 +25,7 @@ import com.formdev.flatlaf.FlatLightLaf;
 import com.frostwire.gui.tabs.SearchTab;
 import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
+import com.limegroup.gnutella.gui.CrashReportSpooler;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIMediator.Tabs;
 import com.limegroup.gnutella.gui.I18n;
@@ -37,6 +38,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.function.Consumer;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.plaf.ColorUIResource;
@@ -224,30 +226,47 @@ public final class ThemeMediator {
   /**
    * Loads the theme during application startup on the current thread. This avoids blocking the EDT
    * since no Swing components exist yet.
+   *
+   * <p>A FlatLaf theme that fails to set up logs the failure, keeps it in the crash report and
+   * starts the default theme, see {@link ThemeStartup}.
    */
   public static void loadThemeAtStartup(ThemeEnum theme) {
-    try {
-      if (theme == ThemeEnum.DEFAULT) {
+    ThemeStartup.load(theme, ThemeMediator::applyThemeAtStartup, CrashReportSpooler::recordSync);
+  }
+
+  private static void applyThemeAtStartup(ThemeEnum theme, Consumer<String> step) {
+    if (theme == ThemeEnum.DEFAULT) {
+      step.accept("Nimbus look and feel");
+      try {
         UIManager.setLookAndFeel(new SkinNimbusLookAndFeel());
-        applySkinSettings();
-        setupGlobalKeyManager();
-      } else if (theme == ThemeEnum.DARK_FLAT_LAF) {
-        purgeSynthOverrides();
-        FlatLaf.setup(new SkinFlatDarkLaf());
-        installFlatDarkLafDefaults();
-      } else if (theme == ThemeEnum.LIGHT_FLAT_LAF) {
-        purgeSynthOverrides();
-        FlatLaf.setup(new SkinFlatLightLaf());
-        installFlatLightLafDefaults();
+      } catch (UnsupportedLookAndFeelException e) {
+        throw new IllegalStateException(e);
       }
-      // Lite turns FlatLaf's animations and smooth scrolling off (frostwire/frostwire#1555).
-      Animations.applyToLookAndFeel();
-      currentTheme = theme;
-      UISettings.UI_THEME.setValue(theme.name());
-    } catch (Throwable e) {
-      e.printStackTrace();
-      throw new RuntimeException("Unable to load theme at startup", e);
+      step.accept("skin settings");
+      applySkinSettings();
+      step.accept("global key manager");
+      setupGlobalKeyManager();
+    } else if (theme == ThemeEnum.DARK_FLAT_LAF) {
+      step.accept("purge synth overrides");
+      purgeSynthOverrides();
+      step.accept("FlatLaf setup");
+      FlatLaf.setup(new SkinFlatDarkLaf());
+      step.accept("FlatLaf dark defaults");
+      installFlatDarkLafDefaults();
+    } else if (theme == ThemeEnum.LIGHT_FLAT_LAF) {
+      step.accept("purge synth overrides");
+      purgeSynthOverrides();
+      step.accept("FlatLaf setup");
+      FlatLaf.setup(new SkinFlatLightLaf());
+      step.accept("FlatLaf light defaults");
+      installFlatLightLafDefaults();
     }
+    step.accept("animations");
+    // Lite turns FlatLaf's animations and smooth scrolling off (frostwire/frostwire#1555).
+    Animations.applyToLookAndFeel();
+    // The saved choice (UI_THEME) is not rewritten here: the Initializer already stored it, and
+    // the default theme started as a fallback must not replace what the user picked.
+    currentTheme = theme;
   }
 
   public static void loadDefaultTheme() {
