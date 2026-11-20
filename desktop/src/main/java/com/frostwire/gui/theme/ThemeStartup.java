@@ -28,11 +28,12 @@ final class ThemeStartup {
   }
 
   /**
-   * Loads the chosen theme; when a FlatLaf theme cannot be set up, logs the failure, hands it to
-   * {@code reportFailure} (the crash report) and applies the default theme. The user's saved choice
-   * is left alone by the caller, so a failure that is gone next launch does not cost them their
-   * theme. When the default theme cannot load either, or the failure says FrostWire's files are
-   * damaged, throws with the theme and the step that failed, and the failure as the cause.
+   * Loads the chosen theme; when a FlatLaf theme cannot be set up, logs the failure, hands the
+   * failure to {@code reportFailure} (the crash report) and applies the default theme. The user's
+   * saved choice is left alone by the caller, so a failure that is gone next launch does not cost
+   * them their theme. When the default theme cannot load either, or the failure says FrostWire's
+   * files are damaged, throws with the theme and the step that failed, and the failure as the
+   * cause.
    */
   static void load(ThemeEnum theme, Applier applier, Consumer<Throwable> reportFailure) {
     String[] step = {"starting"};
@@ -48,7 +49,9 @@ final class ThemeStartup {
         throw failure;
       }
       LOG.error(failure.getMessage() + "; starting with the default theme", failure);
-      reportFailure.accept(failure);
+      // The report keeps only the exception's own class and frames, never its cause, so it gets
+      // the real failure, not the wrapper that would hide it.
+      reportFailure.accept(e);
     }
     String[] fallbackStep = {"starting"};
     try {

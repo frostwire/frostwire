@@ -48,9 +48,7 @@ class ThemeStartupFallbackTest {
 
     assertEquals(List.of(ThemeEnum.DEFAULT), applied);
     assertEquals(1, reported.size(), "the failure must still reach the crash report");
-    assertSame(cause, reported.get(0).getCause());
-    assertTrue(reported.get(0).getMessage().contains("DARK_FLAT_LAF"));
-    assertTrue(reported.get(0).getMessage().contains("FlatLaf setup"));
+    assertSame(cause, reported.get(0), "the report needs the real failure, not a wrapper");
   }
 
   @Test
@@ -67,7 +65,7 @@ class ThemeStartupFallbackTest {
     ThemeStartup.load(ThemeEnum.LIGHT_FLAT_LAF, applier, reported::add);
 
     assertEquals(List.of(ThemeEnum.DEFAULT), applied);
-    assertSame(cause, reported.get(0).getCause());
+    assertSame(cause, reported.get(0));
   }
 
   @Test
