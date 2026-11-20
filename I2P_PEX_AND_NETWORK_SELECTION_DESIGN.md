@@ -65,6 +65,15 @@ keep the default plugins (`SessionParams.java:103-140`; `BTEngine.defaultParams(
 Note that the second rule also sets the flag from a `.torrent`'s own tracker list: setting the
 flag **off** with `set_flags` also clears it for such a torrent.
 
+**Correction found while implementing phase 1b (tested).** In 2.1 the `.i2p` tracker rule is applied
+when libtorrent loads a torrent into `add_torrent_params` (`load_torrent.cpp:255,269`,
+`magnet_uri.cpp:325`, `read_resume_data.cpp:285,362`), not by `torrent_info` itself. A `.torrent`
+with an `.i2p` tracker that goes through jlibtorrent's `TorrentInfo` and `SessionManager.download`
+is **not** flagged (the test `aTorrentWithAnI2pTrackerKeepsItsFlagWhenTheModeGoesBackToMixed` first
+asserted it was and failed). Magnets with an `.i2p` tracker and resume data are flagged. So today a
+FrostWire user adding such a `.torrent` file gets a plain clearnet torrent. Not changed by 1b, as
+MIXED must stay as it was; worth a ticket.
+
 ### 1.3 What an I2P torrent does differently
 
 All of these are conditioned on `is_i2p() && !allow_i2p_mixed`, where `allow_i2p_mixed` is a
@@ -177,7 +186,8 @@ it (`TorrentHandle.setFlags/unsetFlags`).
    option. Rule: while any torrent is `I2P_ONLY`, the engine forces `allow_i2p_mixed=false`
    regardless of the option. Consequence: an `I2P_TORRENT`-flagged torrent can then never be mixed.
    That is acceptable because of the mapping below, until upstream offers a per-torrent flag.
-7. Belt and braces for a bug or a race: `apply_ip_filter` stays on for I2P-only torrents and the
+7. (Decided against, see section 7: the session IP filter is not used.) Belt and braces for a bug
+   or a race: `apply_ip_filter` stays on for I2P-only torrents and the
    engine adds a session filter blocking all IPv4 and IPv6 only for torrents that keep the flag,
    with `MIXED` and `CLEARNET_ONLY` torrents cleared with `unsetFlags(APPLY_IP_FILTER)`. Open
    question 3: this changes how the user's real IP filter works, so it is not done silently.
@@ -256,22 +266,114 @@ Rules:
 
 - [x] **1a** Behavior-neutral foundation: `TorrentNetworkMode`, `TorrentNetworkPolicyStore`
   (persistence, canonical-key helper), tests, fuzz harness. No behavior change.
-- [ ] **1b** Engine: apply flags at add/restore/change, `allow_i2p_mixed` rule, fail-closed checks,
-  web seed removal, `BTEngine.canonicalInfoHash` delegating to the shared key function.
+- [x] **1b** Engine (see 6.1): apply flags at add/restore/change, `allow_i2p_mixed` rule,
+  fail-closed checks, web seed removal, `BTEngine.canonicalInfoHash` delegating to the shared key
+  function.
 - [ ] **2** UI: add-torrent dialog, Transfer Details, Peers table I2P column, Options wording.
 - [ ] **3** I2P PeX: verify the native extension end to end, bind `i2p_destination()`, show peers,
   follow the upstream changes (9164, per-torrent mixed flag).
 
-## 7. Open questions for the maintainer
+### 6.1 What phase 1b implemented
 
-1. Until libtorrent has a per-torrent mixed flag, should an enabled global "Allow mixed mode" win
-   (I2P-only is then best effort) or should `I2P_ONLY` win (the global option is overridden while
-   any torrent is `I2P_ONLY`)? Recommendation: `I2P_ONLY` wins, and the Options pane says so.
-2. Should `I2P_ONLY` with I2P disabled refuse to start (recommended, fail closed) or ask to enable
-   I2P?
-3. May the engine use the session IP filter as a second barrier (4.2 step 7), given the user's own
-   IP filter shares it? Recommendation: no, rely on G1/G2 workarounds and push upstream.
-4. Do we carry G1 (per-torrent mixed flag) and G2 (web seeds on I2P torrents) upstream ourselves?
+All in `common/.../bittorrent/BTEngine.java` (plus `TorrentNetworkFlags`, one `BTDownload.resume`
+guard); the Android engine shares it but nothing changes there while no torrent has a choice.
+
+- **Lifecycle.** The store is read in `start()` (never on the EDT), written on a one-thread queue
+  when a choice changes and flushed before the session stops. `getNetworkMode` and
+  `setNetworkMode` are memory-only. File: `<homeDir>/torrent-network-policy.txt`.
+  `canonicalInfoHash(TorrentInfo | InfoHash)` delegates to `TorrentNetworkPolicyStore.canonicalKey`.
+- **The flag.** `TorrentNetworkFlags.i2pTorrent()` is the one place that uses the raw SWIG constant
+  `libtorrent.getI2p_torrent()`; a one-line change when jlibtorrent adds `TorrentFlags.I2P_TORRENT`.
+- **Three enforcement points** (`applyNetworkPolicy`, idempotent, engine threads): the flag is
+  OR-ed into the add flags for files, restores and magnets (`networkAddFlags`); the `ADD_TORRENT`
+  alert and `METADATA_RECEIVED` apply the mode before anyone hears of the torrent; `setNetworkMode`
+  re-applies to the running torrent. I2P_ONLY: set the flag, remove every url seed (libtorrent 2.1
+  has no HTTP seeds any more, only BEP 19 url seeds). Other modes clear a flag left by an earlier
+  I2P_ONLY choice unless the torrent has an `.i2p` tracker (then libtorrent set it, not us).
+  CLEARNET_ONLY is stored and clears the flag but does not yet reject I2P peers (G5, best effort).
+- **Mixed mode rule (default 1).** `allow_i2p_mixed` is forced off while any torrent is I2P_ONLY,
+  at start, on a mode change, on removal of the last one, and for settings applied through
+  `BTEngine.applySettings` (the Options pane path): the user's choice is remembered in
+  `userAllowI2pMixed` and restored when none is left.
+- **Fail closed (default 2).** I2P_ONLY with no `i2p_hostname` in the live session, or after an
+  `i2p_alert` (SAM bridge unusable), is paused, recorded in `getNetworkBlockReason` (for the UI) and
+  cannot be resumed by `BTDownload.resume`, a second add or the v2 priority path; it is added paused
+  when added in that state. Released (and only if the engine held it) when the I2P settings change
+  or the mode changes.
+- **Not done on purpose (default 3):** no `ip_filter` barrier.
+
+Tests: `BTEngineNetworkPolicyTest` (real local libtorrent sessions) and
+`TorrentNetworkPolicyStoreTest`.
+
+Limits worth knowing:
+- The bridge error is sticky until the I2P settings change or the app restarts: libtorrent reports
+  failures but no "bridge is up now" event, so a recovered router needs a settings re-apply (or the
+  Options OK button) to release held torrents.
+- A torrent the user paused by hand and then switched to I2P_ONLY without I2P is released
+  (resumed) when the hold ends. Tracking "paused by the user before" is a phase 2 decision.
+- Peers passed at add time (`download(ti, ..., peers)`) are dropped by libtorrent while the torrent
+  is I2P only and are not re-added when the mode goes back to MIXED.
+- With the flag set but a missing bridge, nothing connects either way (flag + mixed off), the pause
+  is only for a clear state.
+
+### 6.2 Remaining phases
+
+- **Phase 2, UI.** Add-torrent dialog "Network" combo, Transfer Details row, Peers table I2P
+  column (needs `peer_info.i2p_destination()` or the `i2p_socket` flag), Options > I2P wording for
+  "Allow mixed mode" (now: "ignored while a torrent is I2P only"), a visible held-back state from
+  `getNetworkBlockReason`. All reads through `BTEngine.getInstanceIfReady()` and the memory-only
+  getters; `setNetworkMode` is memory-only for the caller.
+- **Phase 3, I2P PeX end to end.** Verify `i2p_pex` against a real I2P router and a second client,
+  bind `peer_info.i2p_destination()`, show peers, and track the upstream changes below.
+
+## 7. Decisions taken for phase 1b (defaults chosen, maintainer may revert in review)
+
+1. `I2P_ONLY` wins over the global "Allow mixed mode": while any torrent is I2P only the engine
+   forces `allow_i2p_mixed=false` and restores the user's setting when none is left. The Options
+   wording is phase 2.
+2. If I2P is disabled or the SAM bridge is unusable, an I2P_ONLY torrent fails closed: it is paused
+   with a reason, never started and never falls back to the clearnet (no DHT, LSD, trackers or
+   web seeds either: the flag and the removed seeds guarantee it even if a pause is missed).
+3. The session `ip_filter` is not used as a second barrier (it is shared with the user's filter).
+4. Upstream work is ours to propose later and is not started; exact proposals below.
+
+### 7.1 Upstream change proposals (not started)
+
+libtorrent (`arvidn/libtorrent`):
+- **U1, per-torrent mixed flag.** Add `torrent_flags::i2p_mixed` (or make `allow_i2p_mixed` honor a
+  per-torrent override). Replace every `is_i2p() && !settings().get_bool(allow_i2p_mixed)` with a
+  helper `torrent::i2p_only()` (sites: `torrent.cpp:770,2981,3023,3119,3153,11952`,
+  `peer_connection.cpp:1373`, `session_impl.cpp:5894`, `ut_pex.cpp:607`). Lets one session hold an
+  I2P-only and a mixed torrent, and removes our forced-off rule.
+- **U2, gate web seeds.** In `torrent::connect_to_url_seed` (and where url seeds are added)
+  return early when the torrent is I2P only, with a `peer_blocked`-style alert. Today web seeds
+  of an I2P torrent are contacted over the clearnet.
+- **U3, per-message limit for received `i2p_pex`** (arvidn/libtorrent#9164): cap the destinations
+  one `added` string may add (the checkout accepts up to 500 KiB / 32 B), e.g. at
+  `max_peer_entries`, and disconnect on more.
+- **U4, i2p PeX for mixed torrents.** `create_i2p_pex_plugin` only exists for `is_i2p()` torrents:
+  create it for any non-private torrent when I2P is configured, so a mixed torrent exchanges I2P
+  peers too (G3).
+- **U5, flag `.i2p`-tracker torrents loaded from a `torrent_info`** (the behavior found in 1.2),
+  or document it.
+- **U6, CLEARNET_ONLY:** a per-torrent "no i2p peers" flag checked in `add_i2p_peer` and
+  `peer_connection::attach` (G5).
+
+jlibtorrent (`frostwire-jlibtorrent`):
+- `TorrentFlags.I2P_TORRENT = libtorrent.getI2p_torrent()` (then `TorrentNetworkFlags` shrinks).
+- Bind `peer_info::i2p_destination()` and expose it in `PeerInfo`.
+- I2P getters/setters on `SettingsPack` (hostname, port, mixed, tunnel options) instead of raw SWIG.
+- Bind `torrent_handle::http_seeds` is not needed (2.1 has none).
+
+## 7.2 Open questions for the maintainer
+
+1. A `.torrent` file with an `.i2p` tracker is added today as a clearnet torrent (1.2). Should
+   FrostWire flag it I2P at add time (a behavior change for MIXED users who never chose I2P), or
+   leave it to the per-torrent choice?
+2. A recovered I2P router does not release held torrents until the I2P settings are re-applied
+   (6.1). Accept, or poll the SAM bridge (needs a small native or socket probe)?
+3. Should a torrent the user paused stay paused when a hold ends (needs a "user paused" bit)?
+4. Carry U1 and U2 upstream ourselves, and in which order after the pending PRs?
 
 ## 8. Unverified
 
