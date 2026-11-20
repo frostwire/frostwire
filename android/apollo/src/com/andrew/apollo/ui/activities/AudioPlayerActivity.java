@@ -31,7 +31,6 @@ import android.content.res.ColorStateList;
 import android.media.AudioManager;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -56,6 +55,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.SearchView.OnQueryTextListener;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.viewpager.widget.ViewPager;
 import com.andrew.apollo.MusicPlaybackService;
@@ -474,6 +474,7 @@ public final class AudioPlayerActivity extends AbstractActivity
   @Override
   protected void onStart() {
     super.onStart();
+    mIsPaused = false;
     final IntentFilter filter = new IntentFilter();
     // Play and pause changes
     filter.addAction(MusicPlaybackService.PLAYSTATE_CHANGED);
@@ -498,11 +499,9 @@ public final class AudioPlayerActivity extends AbstractActivity
       mPlaybackStatus = new PlaybackStatus(this);
     }
     try {
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        registerReceiver(mPlaybackStatus, filter, Context.RECEIVER_EXPORTED);
-      } else {
-        registerReceiver(mPlaybackStatus, filter);
-      }
+      // Only this app's broadcasts: exported, any app could drive the player screen.
+      ContextCompat.registerReceiver(
+          this, mPlaybackStatus, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
     } catch (Throwable t) {
       LOG.error(t.getMessage(), t);
     }
@@ -511,6 +510,14 @@ public final class AudioPlayerActivity extends AbstractActivity
   @Override
   protected void onStop() {
     super.onStop();
+    // Registered and started in onStart: a hidden player screen shouldn't keep updating its
+    // views every 250-500 ms and on every broadcast, and each restart registered the receiver
+    // again.
+    mIsPaused = true;
+    if (mTimeHandler != null) {
+      mTimeHandler.removeMessages(REFRESH_TIME);
+    }
+    BaseActivity.unregisterPlaybackStatus(this, mPlaybackStatus);
     MusicUtils.notifyForegroundStateChanged(this, false);
   }
 
