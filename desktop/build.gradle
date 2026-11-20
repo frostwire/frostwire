@@ -1171,6 +1171,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.dnd.TransferVisualizerTest"
         includeTestsMatching "com.limegroup.gnutella.gui.dnd.FileTransferableDragImageTest"
         includeTestsMatching "com.limegroup.gnutella.gui.dnd.FileOrFolderTransferHandlerTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.dnd.PasteTransferSupportTest"
         includeTestsMatching "com.limegroup.gnutella.gui.util.RestartDialogGateTest"
         includeTestsMatching "com.frostwire.gui.theme.PlatformFontsTest"
         includeTestsMatching "com.frostwire.gui.theme.AnimationsTest"

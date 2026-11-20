@@ -74,7 +74,7 @@ class LibraryFilesTableTransferHandler extends TransferHandler {
   }
 
   private boolean canImport(TransferSupport support, boolean fallback) {
-    support.setShowDropLocation(false);
+    DNDUtils.hideDropLocation(support);
     if (!mediator.getMediaType().equals(MediaType.getAudioMediaType())) {
       return fallback && fallbackTransferHandler.canImport(support);
     }

@@ -142,6 +142,26 @@ public class DNDUtils {
     return files.toArray(new File[0]);
   }
 
+  /**
+   * Stops Swing from painting its own drop indicator, for a drop only. {@code
+   * TransferSupport.setShowDropLocation} throws IllegalStateException ("Not a drop") for a paste
+   * (Ctrl+V, Edit &gt; Paste), and Swing asks {@code canImport} for pastes too.
+   */
+  public static void hideDropLocation(TransferHandler.TransferSupport support) {
+    if (support.isDrop()) {
+      support.setShowDropLocation(false);
+    }
+  }
+
+  /**
+   * The drop location of a drop, or null for a paste: {@code TransferSupport.getDropLocation}
+   * throws IllegalStateException ("Not a drop") when the transfer is not a drop.
+   */
+  public static TransferHandler.DropLocation dropLocationOrNull(
+      TransferHandler.TransferSupport support) {
+    return support.isDrop() ? support.getDropLocation() : null;
+  }
+
   public static boolean supportCanImport(
       DataFlavor dataFlavor,
       TransferHandler.TransferSupport support,
