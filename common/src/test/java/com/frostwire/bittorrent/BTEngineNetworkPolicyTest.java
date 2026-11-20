@@ -13,9 +13,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.frostwire.jlibtorrent.SettingsPack;
 import com.frostwire.jlibtorrent.TorrentBuilder;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentInfo;
+import com.frostwire.jlibtorrent.swig.settings_pack;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -122,6 +124,108 @@ class BTEngineNetworkPolicyTest {
   }
 
   private static final String SEED = "http://127.0.0.1:9/seed/";
+  private static final int ALLOW_MIXED = settings_pack.bool_types.allow_i2p_mixed.swigValue();
+
+  private boolean sessionAllowsMixed() {
+    return local.engine.settings().getBoolean(ALLOW_MIXED);
+  }
+
+  private void userSetsMixed(boolean on) {
+    local.engine.applySettings(new SettingsPack().setBoolean(ALLOW_MIXED, on));
+  }
+
+  @Test
+  void anI2pOnlyTorrentForcesMixedModeOffAndTheUsersChoiceComesBack() throws Exception {
+    local = LocalEngine.start(dir);
+    String hash = local.engine.canonicalInfoHash(album("rule"));
+    userSetsMixed(true);
+    assertTrue(sessionAllowsMixed(), "no I2P only torrent: the user's choice stands");
+
+    local.engine.setNetworkMode(hash, TorrentNetworkMode.I2P_ONLY);
+    await(() -> !sessionAllowsMixed(), "mixed mode forced off");
+
+    local.engine.setNetworkMode(hash, TorrentNetworkMode.MIXED);
+    await(this::sessionAllowsMixed, "the user's mixed mode is back");
+  }
+
+  @Test
+  void whileAnI2pOnlyTorrentExistsTheUsersOptionsChangeIsRememberedButNotApplied()
+      throws Exception {
+    local = LocalEngine.start(dir);
+    String hash = local.engine.canonicalInfoHash(album("remembered"));
+    local.engine.setNetworkMode(hash, TorrentNetworkMode.I2P_ONLY);
+
+    userSetsMixed(true);
+    assertFalse(sessionAllowsMixed(), "forced off while I2P only exists");
+
+    local.engine.setNetworkMode(hash, TorrentNetworkMode.CLEARNET_ONLY);
+    await(this::sessionAllowsMixed, "the choice made meanwhile applies once none is left");
+    userSetsMixed(false);
+    assertFalse(sessionAllowsMixed());
+  }
+
+  @Test
+  void removingTheLastI2pOnlyTorrentGivesTheUsersMixedModeBack() throws Exception {
+    local = LocalEngine.start(dir);
+    TorrentInfo ti = album("gone");
+    String hash = local.engine.canonicalInfoHash(ti);
+    userSetsMixed(true);
+    local.engine.setNetworkMode(hash, TorrentNetworkMode.I2P_ONLY);
+    await(() -> !sessionAllowsMixed(), "forced off");
+
+    local.engine.markRemoved(hash);
+
+    await(this::sessionAllowsMixed, "back after the torrent was removed");
+    assertEquals(TorrentNetworkMode.MIXED, local.engine.getNetworkMode(hash));
+  }
+
+  @Test
+  void aSettingsChangeThatLeavesMixedModeAloneDoesNotTouchIt() throws Exception {
+    local = LocalEngine.start(dir);
+    String hash = local.engine.canonicalInfoHash(album("other"));
+    userSetsMixed(true);
+    local.engine.setNetworkMode(hash, TorrentNetworkMode.I2P_ONLY);
+    await(() -> !sessionAllowsMixed(), "forced off");
+
+    local.engine.applySettings(new SettingsPack().connectionsLimit(123));
+
+    assertFalse(sessionAllowsMixed());
+    assertEquals(123, local.engine.settings().connectionsLimit());
+  }
+
+  @Test
+  void withoutAnyI2pOnlyTorrentTheSessionKeepsTheUsersMixedModeExactly() throws Exception {
+    local = LocalEngine.start(dir);
+    userSetsMixed(true);
+    local.engine.setNetworkMode(
+        local.engine.canonicalInfoHash(album("clear")), TorrentNetworkMode.CLEARNET_ONLY);
+    local.engine.setNetworkMode(
+        local.engine.canonicalInfoHash(album("mix")), TorrentNetworkMode.MIXED);
+    local.engine.setNetworkMode(
+        local.engine.canonicalInfoHash(album("mix2")), TorrentNetworkMode.MIXED);
+    assertTrue(sessionAllowsMixed());
+    userSetsMixed(false);
+    assertFalse(sessionAllowsMixed());
+  }
+
+  @Test
+  void theSessionStartsWithMixedModeOffWhenAnI2pOnlyTorrentWasSaved() throws Exception {
+    local = LocalEngine.create(dir);
+    local.ctx.i2pEnabled = true;
+    local.ctx.i2pHostname = "127.0.0.1";
+    local.ctx.i2pPort = 1; // nothing listens here: the SAM bridge is unreachable
+    local.ctx.i2pAllowMixed = true;
+    Files.writeString(
+        local.engine.networkPolicyFile().toPath(),
+        "0123456789abcdef0123456789abcdef01234567=I2P_ONLY\n");
+
+    local.engine.start();
+
+    assertFalse(sessionAllowsMixed());
+    local.engine.setNetworkMode(
+        "0123456789abcdef0123456789abcdef01234567", TorrentNetworkMode.MIXED);
+    await(this::sessionAllowsMixed, "the user's choice (mixed) is back");
+  }
 
   @Test
   void onlyAnI2pOnlyTorrentIsAddedWithTheI2pFlag() throws Exception {

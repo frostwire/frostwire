@@ -96,6 +96,7 @@ public final class BTEngine extends SessionManager {
   void markRemoved(String infoHash) {
     if (infoHash != null) {
       removedTorrents.add(infoHash);
+      forgetNetworkMode(infoHash);
     }
   }
 
@@ -116,6 +117,14 @@ public final class BTEngine extends SessionManager {
    * on shutdown.
    */
   private volatile TorrentNetworkPolicyStore networkPolicy;
+
+  /**
+   * What the user chose for "allow mixed mode (I2P + regular peers)", whatever the session has now:
+   * while a torrent is {@link TorrentNetworkMode#I2P_ONLY} the session setting is forced off (it is
+   * session-wide, so a mixed session cannot keep an I2P-only torrent I2P-only) and this is what
+   * comes back when none is left.
+   */
+  private volatile boolean userAllowI2pMixed;
 
   /** Runs everything about the network policy that touches the file or libtorrent. */
   private final ExecutorService networkPolicyQueue =
@@ -285,6 +294,7 @@ public final class BTEngine extends SessionManager {
     // jlibtorrent 2.0.12.9 and older left a copy of the native library per start; see the class.
     StaleJlibtorrentCopies.deleteInBackground();
     loadNetworkPolicy();
+    userAllowI2pMixed = ctx.i2pAllowMixed;
     SessionParams params = loadSettings();
     settings_pack sp = params.swig().getSettings();
     sp.set_str(settings_pack.string_types.listen_interfaces.swigValue(), ctx.interfaces);
@@ -323,7 +333,9 @@ public final class BTEngine extends SessionManager {
     if (ctx.i2pEnabled && ctx.i2pHostname != null && !ctx.i2pHostname.isEmpty()) {
       sp.set_str(settings_pack.string_types.i2p_hostname.swigValue(), ctx.i2pHostname);
       sp.set_int(settings_pack.int_types.i2p_port.swigValue(), ctx.i2pPort);
-      sp.set_bool(settings_pack.bool_types.allow_i2p_mixed.swigValue(), ctx.i2pAllowMixed);
+      sp.set_bool(
+          settings_pack.bool_types.allow_i2p_mixed.swigValue(),
+          effectiveAllowI2pMixed(ctx.i2pAllowMixed));
       sp.set_int(settings_pack.int_types.i2p_inbound_quantity.swigValue(), ctx.i2pInboundQuantity);
       sp.set_int(
           settings_pack.int_types.i2p_outbound_quantity.swigValue(), ctx.i2pOutboundQuantity);
@@ -366,6 +378,8 @@ public final class BTEngine extends SessionManager {
 
   @Override
   protected void onAfterStart() {
+    // The saved session may carry allow_i2p_mixed from before an I2P only torrent existed.
+    networkPolicyQueue.execute(this::refreshMixedModeRule);
     // Initialize cached paused state on start in the background thread to avoid EDT blocking
     ThreadExecutor.startThread(
         () -> {
@@ -958,9 +972,69 @@ public final class BTEngine extends SessionManager {
     networkPolicyQueue.execute(
         () -> {
           flushNetworkPolicy();
+          // First, so the session is not mixed for the moment the torrent turns I2P only.
+          refreshMixedModeRule();
           enforceNetworkPolicy(key);
         });
     return true;
+  }
+
+  /**
+   * Forgets the network mode of a torrent that is gone, and gives the user's mixed mode setting
+   * back when it was the last I2P only one.
+   */
+  private void forgetNetworkMode(String canonicalHash) {
+    TorrentNetworkPolicyStore store = networkPolicy;
+    if (store == null || canonicalHash == null) {
+      return;
+    }
+    store.remove(canonicalHash);
+    networkPolicyQueue.execute(
+        () -> {
+          flushNetworkPolicy();
+          refreshMixedModeRule();
+        });
+  }
+
+  /** The value {@code allow_i2p_mixed} must have: the user's, unless a torrent is I2P only. */
+  private boolean effectiveAllowI2pMixed(boolean userChoice) {
+    TorrentNetworkPolicyStore store = networkPolicy;
+    return userChoice && (store == null || !store.hasAny(TorrentNetworkMode.I2P_ONLY));
+  }
+
+  /** Puts {@code allow_i2p_mixed} where {@link #effectiveAllowI2pMixed} says. Engine threads. */
+  private void refreshMixedModeRule() {
+    try {
+      SettingsPack current = swig() == null ? null : settings();
+      if (current == null) {
+        return;
+      }
+      int key = settings_pack.bool_types.allow_i2p_mixed.swigValue();
+      boolean wanted = effectiveAllowI2pMixed(userAllowI2pMixed);
+      if (current.getBoolean(key) != wanted) {
+        // Not applySettings(): that would record this as the user's choice.
+        super.applySettings(new SettingsPack().setBoolean(key, wanted));
+        LOG.info("I2P mixed mode is now " + wanted + " (user's choice: " + userAllowI2pMixed + ")");
+      }
+    } catch (Throwable t) {
+      LOG.warn("BTEngine.refreshMixedModeRule() failed", t);
+    }
+  }
+
+  /**
+   * Settings applied from the Options window and elsewhere. The mixed mode choice is remembered,
+   * and kept off in the session while a torrent is I2P only.
+   */
+  @Override
+  public void applySettings(SettingsPack sp) {
+    if (sp != null) {
+      int key = settings_pack.bool_types.allow_i2p_mixed.swigValue();
+      if (sp.swig().has_val(key)) {
+        userAllowI2pMixed = sp.getBoolean(key);
+        sp.setBoolean(key, effectiveAllowI2pMixed(userAllowI2pMixed));
+      }
+    }
+    super.applySettings(sp);
   }
 
   /**
