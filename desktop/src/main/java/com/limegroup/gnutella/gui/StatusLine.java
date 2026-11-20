@@ -672,6 +672,30 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     showInCenter(notice);
   }
 
+  /**
+   * Tells the user, once, that FrostWire started with the default theme because theirs could not be
+   * loaded (frostwire/frostwire#1576). Plain text in the middle of the bar with a dismiss button;
+   * it never replaces the Lite mode suggestion. EDT only.
+   */
+  public void showThemeFallbackNotice(String message) {
+    if (centerPanel == null || performanceNotice != null) {
+      return;
+    }
+    JButton dismiss = new JButton("\u00d7");
+    dismiss.setToolTipText(I18n.tr("Dismiss"));
+    dismiss.setBorderPainted(false);
+    dismiss.setContentAreaFilled(false);
+    dismiss.setFocusable(false);
+    JPanel notice = new JPanel(new FlowLayout(FlowLayout.CENTER, 4, 0));
+    notice.setOpaque(false);
+    JLabel text = new JLabel(message);
+    text.setToolTipText(message);
+    notice.add(text);
+    notice.add(dismiss);
+    dismiss.addActionListener(e -> showInCenter(new JLabel()));
+    showInCenter(notice);
+  }
+
   private void hidePerformanceNotice() {
     if (performanceNotice != null) {
       performanceNotice = null;

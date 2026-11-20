@@ -1176,6 +1176,7 @@ test {
         includeTestsMatching "com.frostwire.gui.theme.PlatformFontsTest"
         includeTestsMatching "com.frostwire.gui.theme.AnimationsTest"
         includeTestsMatching "com.frostwire.gui.theme.ThemeStartupFallbackTest"
+        includeTestsMatching "com.frostwire.gui.theme.ThemeFallbackNoticeTest"
         includeTestsMatching "com.frostwire.gui.theme.DisabledIconsTest"
         includeTestsMatching "com.frostwire.gui.theme.MacLogicalFontsTest"
         includeTestsMatching "com.frostwire.gui.theme.BaseFileChooserUIDirectoryComboTest"

@@ -10,6 +10,7 @@ package com.frostwire.gui.theme;
 import com.frostwire.gui.theme.ThemeMediator.ThemeEnum;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.DamagedInstallation;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 /**
@@ -20,7 +21,23 @@ import java.util.function.Consumer;
 final class ThemeStartup {
   private static final Logger LOG = Logger.getLogger(ThemeStartup.class);
 
+  /** The theme that failed and was replaced by the default one, null when nothing fell back. */
+  private static final AtomicReference<String> FALLBACK_FROM = new AtomicReference<>();
+
   private ThemeStartup() {}
+
+  /**
+   * The name of the theme that could not be loaded at startup and was replaced by the default
+   * theme, or null when no fallback happened. The first fallback of the launch is the one kept.
+   */
+  static String fallbackFrom() {
+    return FALLBACK_FROM.get();
+  }
+
+  /** Forgets the recorded fallback; for tests only. */
+  static void resetFallback() {
+    FALLBACK_FROM.set(null);
+  }
 
   /** Applies a theme at startup; names each step it starts so a failure says where it was. */
   interface Applier {
@@ -68,5 +85,6 @@ final class ThemeStartup {
       LOG.error(failure.getMessage(), failure);
       throw failure;
     }
+    FALLBACK_FROM.compareAndSet(null, theme.name());
   }
 }
