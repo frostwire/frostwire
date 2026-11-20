@@ -35,6 +35,18 @@ public final class ToolTipText {
   }
 
   /**
+   * Like {@link #toPlain} for a string that carries markup without being an {@code <html>}
+   * document, such as a translation with {@code <b>} or {@code <p>} in it. Text with no markup, or
+   * null, is returned as it is.
+   */
+  public static String plain(String text) {
+    if (text == null || text.indexOf('<') < 0) {
+      return text;
+    }
+    return toPlain(isHtml(text) ? text : "<html>" + text);
+  }
+
+  /**
    * The text of {@code text} without markup: {@code <br>} and the end of a block ({@code </p>},
    * {@code </div>}, {@code </li>}, {@code </tr>}, headings) become line breaks, list items get a
    * bullet, other tags are dropped, entities are decoded, whitespace inside a paragraph collapses

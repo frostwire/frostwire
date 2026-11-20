@@ -32,6 +32,17 @@ class ToolTipTextTest {
   }
 
   @Test
+  void plainStripsMarkupFromAStringThatIsNotAnHtmlDocument() {
+    assertEquals(
+        "Seeding\ncompleted torrent downloads.",
+        ToolTipText.plain("<b>Seeding</b><p>completed torrent downloads.</p>"));
+    assertEquals("a\nb", ToolTipText.plain("<html>a<br>b</html>"));
+    assertEquals("no markup", ToolTipText.plain("no markup"));
+    assertEquals("a\nb", ToolTipText.plain("a\nb"), "plain line breaks are kept");
+    assertNull(ToolTipText.plain(null));
+  }
+
+  @Test
   void blocksListsAndEntitiesAreHandled() {
     assertEquals(
         "Title\n• one\n• two",
