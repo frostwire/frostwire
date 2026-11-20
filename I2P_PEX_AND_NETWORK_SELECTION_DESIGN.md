@@ -282,3 +282,24 @@ Rules:
 - Runtime behavior with a real I2P router (no router was available): everything above is from
   source reading.
 - `session_impl` SAM reconnect on `i2p_hostname` change versus torrents already added.
+
+## How other BitTorrent clients handle I2P (research, 2026-11-20)
+
+Sources are project docs, wikis and forum threads, not our own tests; verify against each release before relying on a cell. "Not found" means the search turned up nothing, not that it is absent.
+
+| Client | I2P support | How it connects | Network choice | Mixed (I2P + clearnet) | Caveats reported |
+|---|---|---|---|---|---|
+| **qBittorrent** (4.6+, libtorrent) | Experimental, since 4.6 (Oct 2023) | SAM bridge (usually 127.0.0.1:7656; i2pd has SAM on by default, Java I2P does not) | Global only: Preferences > Connection > I2P; no per-torrent choice found | "Mixed mode" checkbox, session-wide (libtorrent `allow_i2p_mixed`); with it on, I2P torrents also use the clearnet | 2023 reports of serious bugs and of tracker announces stopping after a while over SAM; users advise anonymous mode and proxy options to avoid leaks; libtorrent does not support SAM v3.3 |
+| **BiglyBT** (and Vuze lineage) | Yes, through the "I2P Helper" plugin (installs on demand) | Bundled or external router through the plugin | **Per download**: each download picks networks Public / I2P / Tor (also scriptable, `setnetworks`); an availability check per torrent | Chosen per download; mixed and I2P-only swarms are kept apart to avoid correlating activity | No Message Stream Encryption on non-public networks; update downloads always enable the public network; plugin bandwidth limits are global to I2P |
+| **I2PSnark** (bundled with the I2P router, also I2P+ standalone) | Native, the reference I2P client | I2CP (i2pd needs I2CP enabled) | I2P only by design | No clearnet announces or peers | Mostly no uTP and no UDP trackers |
+| **Deluge** (libtorrent) | Through libtorrent's I2P proxy type | SAM via libtorrent | Global; mixed mode only through the deluge-ltconfig plugin, not the GUI | Session-wide `allow_i2p_mixed` | Worked with a patched libtorrent in a 2022 thread, minor issues |
+| **Tixati** | I2P trackers mentioned | not found | not found | not found | Peer-level support not documented in what I found |
+| **Transmission**, **rTorrent** | not found | not found | not found | not found | none |
+
+What this means for FrostWire (libtorrent 2.1, same stack as qBittorrent and Deluge):
+- Our building block is the same as qBittorrent's (SAM through libtorrent, session-wide mixed mode), so a per-torrent choice, which only BiglyBT offers today, is a real differentiator, but with libtorrent it can only be enforced by forcing `allow_i2p_mixed` off while any torrent is I2P-only, as described above.
+- BiglyBT's separation of mixed and I2P-only swarms is the behavior to copy for I2P-only torrents (no clearnet peers, trackers, DHT, LSD or web seeds for that torrent, fail closed).
+- BiglyBT states plainly that MSE is not used over I2P; our UI should say the same.
+- qBittorrent's problems (announces stopping over SAM, leaks when mixed mode is on) are the failure modes to test.
+
+Sources: qBittorrent issue #16257 and forum threads; i2pd and I2P project filesharing docs (docs.i2pd.website, i2p.net/docs/applications/bittorrent); BiglyBT wiki "I2P" (github.com/BiglySoftware/BiglyBT/wiki/I2P) and wiki.biglybt.com/w/I2P; ghacks and itsfoss coverage of qBittorrent 4.6.
