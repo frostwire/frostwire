@@ -19,6 +19,7 @@
 package com.frostwire.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -109,12 +110,24 @@ class BackgroundPriorityTest {
 
   @Test
   void theDesktopMinesItsIdentityAtBackgroundPriority() throws Exception {
-    String source =
+    // Since #1534 the identity is loaded (or mined) by DeferredRelayIdentity, after startup, on its
+    // own thread; the mining itself must still go through BackgroundPriority.
+    String deferred =
+        Files.readString(
+                Path.of("src/main/java/com/limegroup/gnutella/gui/DeferredRelayIdentity.java"))
+            .replaceAll("\\s+", "");
+    assertTrue(
+        deferred.contains("BackgroundPriority.call(loader::load)"),
+        "the identity must not be mined at normal priority");
+
+    String initializer =
         Files.readString(Path.of("src/main/java/com/limegroup/gnutella/gui/Initializer.java"))
             .replaceAll("\\s+", "");
-
     assertTrue(
-        source.contains("BackgroundPriority.call(()->IdentityKeys.loadOrCreate(identityFile))"),
-        "prepareRelayStack must not mine the identity at the startup thread's normal priority");
+        initializer.contains("()->IdentityKeys.loadOrCreate(identityFile)"),
+        "Initializer must hand the real loader to DeferredRelayIdentity");
+    assertFalse(
+        initializer.contains("BackgroundPriority.call(()->IdentityKeys.loadOrCreate"),
+        "Initializer must not mine the identity itself, on the startup thread");
   }
 }
