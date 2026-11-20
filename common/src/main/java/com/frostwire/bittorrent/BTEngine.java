@@ -49,6 +49,7 @@ public final class BTEngine extends SessionManager {
   private static final int[] INNER_LISTENER_TYPES =
       new int[] {
         ADD_TORRENT.swig(),
+        METADATA_RECEIVED.swig(),
         LISTEN_SUCCEEDED.swig(),
         LISTEN_FAILED.swig(),
         EXTERNAL_IP.swig(),
@@ -758,7 +759,10 @@ public final class BTEngine extends SessionManager {
       return;
     }
     rememberSourcePeer(infoHash, distributedSourcePeerPub);
-    super.download(magnetUri, saveDir, flags);
+    super.download(
+        magnetUri,
+        saveDir,
+        flags == null ? null : networkAddFlags(canonicalInfoHash(infoHash), flags));
   }
 
   public void download(TorrentCrawledSearchResult sr, File saveDir) {
@@ -950,8 +954,86 @@ public final class BTEngine extends SessionManager {
     if (store == null || !store.set(canonicalHash, mode)) {
       return false;
     }
-    networkPolicyQueue.execute(this::flushNetworkPolicy);
+    String key = TorrentNetworkPolicyStore.canonicalKey(canonicalHash, null);
+    networkPolicyQueue.execute(
+        () -> {
+          flushNetworkPolicy();
+          enforceNetworkPolicy(key);
+        });
     return true;
+  }
+
+  /**
+   * The flags to add a torrent with: {@code base}, plus the I2P torrent flag when the torrent is
+   * {@link TorrentNetworkMode#I2P_ONLY}, so libtorrent never sees it as a clearnet torrent, not
+   * even for the moment before {@link #applyNetworkPolicy}. Other modes get {@code base} as is.
+   */
+  torrent_flags_t networkAddFlags(String canonicalHash, torrent_flags_t base) {
+    if (getNetworkMode(canonicalHash) != TorrentNetworkMode.I2P_ONLY) {
+      return base;
+    }
+    return base.or_(TorrentNetworkFlags.i2pTorrent());
+  }
+
+  /**
+   * Brings one torrent's libtorrent state in line with its network mode: I2P only means the I2P
+   * torrent flag and no web seeds (libtorrent contacts web seeds over the clearnet whatever the
+   * flag says); any other mode clears a flag left over from an earlier I2P only choice. A torrent
+   * that is natively I2P (its own {@code .i2p} tracker) keeps the flag. Idempotent; runs on engine
+   * threads, never the EDT.
+   */
+  void applyNetworkPolicy(TorrentHandle th) {
+    try {
+      if (th == null || !th.isValid()) {
+        return;
+      }
+      TorrentNetworkMode mode = getNetworkMode(canonicalInfoHash(th));
+      if (mode == TorrentNetworkMode.I2P_ONLY) {
+        if (!TorrentNetworkFlags.isI2pTorrent(th)) {
+          th.setFlags(TorrentNetworkFlags.i2pTorrent(), TorrentNetworkFlags.i2pTorrent());
+        }
+        for (String seed : th.urlSeeds()) {
+          th.removeUrlSeed(seed);
+        }
+      } else if (TorrentNetworkFlags.isI2pTorrent(th) && !hasI2pTracker(th)) {
+        th.unsetFlags(TorrentNetworkFlags.i2pTorrent());
+      }
+    } catch (Throwable t) {
+      LOG.warn("BTEngine.applyNetworkPolicy() failed", t);
+    }
+  }
+
+  /**
+   * True when one of the torrent's trackers is an {@code .i2p} host. libtorrent flags such torrents
+   * itself (a magnet with one, resume data of one), and the flag is then not ours to clear.
+   */
+  private static boolean hasI2pTracker(TorrentHandle th) {
+    try {
+      for (AnnounceEntry tracker : th.trackers()) {
+        String host = java.net.URI.create(tracker.url()).getHost();
+        if (host != null && host.toLowerCase(Locale.ROOT).endsWith(".i2p")) {
+          return true;
+        }
+      }
+    } catch (Throwable unreadable) {
+      // a tracker URL libtorrent accepts but java.net does not: keep the flag, fail closed
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Applies the network policy of the torrent with this canonical hash, if it is in the session.
+   */
+  private void enforceNetworkPolicy(String canonicalHash) {
+    if (swig() == null) {
+      return;
+    }
+    for (TorrentHandle th : getTorrentHandles()) {
+      if (canonicalHash.equals(canonicalInfoHash(th))) {
+        applyNetworkPolicy(th);
+      }
+    }
   }
 
   /**
@@ -1456,7 +1538,13 @@ public final class BTEngine extends SessionManager {
         }
       }
       // Adds paused to avoid the race where default priorities are used
-      download(ti, saveDir, resumeFile, priorities, peers, TorrentFlags.PAUSED);
+      download(
+          ti,
+          saveDir,
+          resumeFile,
+          priorities,
+          peers,
+          networkAddFlags(canonicalInfoHash(ti), TorrentFlags.PAUSED));
 
       // For v2-only torrents, we can't find by v1 hash, so we need to find it differently
       // We'll wait a bit and then look for it by iterating through handles or rely on alerts
@@ -1467,6 +1555,8 @@ public final class BTEngine extends SessionManager {
 
       if (th != null) {
         LOG.info("BTEngine.download() - new download - torrent_handle found in session");
+        // Still paused: the seeds go before th.resume() below lets libtorrent contact them.
+        applyNetworkPolicy(th);
         // Re-apply priorities on the handle to be 100% sure they stick
         if (priorities != null && priorities.length == ti.numFiles()) {
           th.prioritizeFiles(priorities);
@@ -1585,8 +1675,14 @@ public final class BTEngine extends SessionManager {
       switch (type) {
         case ADD_TORRENT:
           TorrentAlert<?> torrentAlert = (TorrentAlert<?>) alert;
+          // Before anyone hears of the torrent: restored and magnet torrents included.
+          applyNetworkPolicy(torrentAlert.handle());
           fireDownloadAdded(torrentAlert);
           runNextRestoreDownloadTask();
+          break;
+        case METADATA_RECEIVED:
+          // A magnet's web seeds only exist once its metadata does.
+          applyNetworkPolicy(((TorrentAlert<?>) alert).handle());
           break;
         case LISTEN_SUCCEEDED:
           onListenSucceeded((ListenSucceededAlert) alert);
@@ -1628,7 +1724,14 @@ public final class BTEngine extends SessionManager {
     @Override
     public void run() {
       try {
-        download(new TorrentInfo(torrent), saveDir, resume, priorities, null, TorrentFlags.PAUSED);
+        TorrentInfo ti = new TorrentInfo(torrent);
+        download(
+            ti,
+            saveDir,
+            resume,
+            priorities,
+            null,
+            networkAddFlags(canonicalInfoHash(ti), TorrentFlags.PAUSED));
       } catch (Throwable e) {
         LOG.error(
             "Unable to restore download from previous session. (" + torrent.getAbsolutePath() + ")",
