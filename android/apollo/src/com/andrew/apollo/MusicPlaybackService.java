@@ -308,7 +308,7 @@ public class MusicPlaybackService extends MediaSessionService {
   private volatile boolean mIsSupposedToBePlaying = false;
   private boolean mQueueIsSaveable = true;
   private boolean mPausedByTransientLossOfFocus = false;
-  private boolean musicPlaybackActivityInForeground = false;
+  private volatile boolean musicPlaybackActivityInForeground = false;
   MediaSession mMediaSession;
   private int mCardId;
   private int mFailedSongsInARow = 0; // player thread
@@ -517,14 +517,8 @@ public class MusicPlaybackService extends MediaSessionService {
     if (intent != null) {
       final String action = intent.getAction();
 
-      if (intent.hasExtra(NOW_IN_FOREGROUND)) {
-        musicPlaybackActivityInForeground = intent.getBooleanExtra(NOW_IN_FOREGROUND, false);
-        updateNotification();
-      }
-
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        handleCommandIntent(intent);
-      }
+      // Not only on Android 12+: before, commands delivered by startService() were dropped on 8-11.
+      handleCommandIntent(intent);
 
       if (SHUTDOWN_ACTION.equals(action)) {
         return START_NOT_STICKY;
@@ -749,8 +743,25 @@ public class MusicPlaybackService extends MediaSessionService {
     SystemUtils.exceptionSafePost(handler, () -> handleCommand(intent));
   }
 
+  /**
+   * Records whether a music screen is in the foreground, when the intent says so ({@code
+   * NOW_IN_FOREGROUND}), and refreshes the notification. MusicUtils sends it through
+   * handleCommandIntent(), which used to ignore it, so the flag never left false.
+   */
+  void applyForegroundState(Intent intent) {
+    if (intent.hasExtra(NOW_IN_FOREGROUND)) {
+      musicPlaybackActivityInForeground = intent.getBooleanExtra(NOW_IN_FOREGROUND, false);
+      updateNotification();
+    }
+  }
+
+  boolean isMusicActivityInForeground() {
+    return musicPlaybackActivityInForeground;
+  }
+
   /** {@link #handleCommandIntent(Intent)}'s work; on the player thread, after initService. */
   private void handleCommand(Intent intent) {
+    applyForegroundState(intent);
     final String action = intent.getAction();
     final String command = SERVICECMD.equals(action) ? intent.getStringExtra(CMDNAME) : null;
 
