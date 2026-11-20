@@ -1127,6 +1127,7 @@ test {
         includeTestsMatching "com.frostwire.gui.components.transfers.TransferDetailFilesShareTest"
         includeTestsMatching "com.frostwire.gui.components.transfers.KeyedRowSyncTest"
         includeTestsMatching "com.frostwire.gui.components.transfers.TransferDetailHeaderTest"
+        includeTestsMatching "com.frostwire.gui.components.transfers.TransferDetailPeersI2pTest"
         includeTestsMatching "com.frostwire.gui.components.transfers.TransferDetailLinksTest"
         includeTestsMatching "com.frostwire.gui.components.transfers.TransferDetailGeneralBoldLabelsTest"
         includeTestsMatching "com.frostwire.gui.components.transfers.TransferDetailFilesSortTest"
