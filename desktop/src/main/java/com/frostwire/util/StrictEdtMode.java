@@ -492,7 +492,7 @@ public final class StrictEdtMode {
     if (isRenderQueueLockWait(stack)) {
       return RENDER_QUEUE_TAG;
     }
-    if (isNativeMenuShow(stack) || isNativeCursorLookup(stack)) {
+    if (isNativeWindowCall(stack)) {
       return NATIVE_MENU_TAG;
     }
     if (isNativeModalDialogShow(stack)) {
@@ -546,34 +546,49 @@ public final class StrictEdtMode {
   static final String NATIVE_MODAL_TAG = "native-modal:";
 
   /**
-   * True when the EDT is waiting for a native Windows popup menu to close: {@code
-   * WPopupMenuPeer._show} has the toolkit thread run the menu's modal loop ({@code TrackPopupMenu})
-   * and returns only when the user dismisses the menu, so the stall lasts as long as the menu stays
-   * open (the tray icon's menu, frostwire/frostwire#1499). Only the frames above the native call
-   * count: an app frame there is app work while the menu is shown and is not tagged.
+   * The native window calls grouped under {@link #NATIVE_MENU_TAG}, as {class, method} pairs: each
+   * one asks the AWT-Windows toolkit thread to do something and waits for it, so the EDT stalls
+   * whenever that thread is busy or blocked, with no app work involved (frostwire/frostwire#1552).
+   * Adding a call is one line here.
    *
-   * <p>Thread-safe: stateless stack inspection.
+   * <ul>
+   *   <li>{@code WPopupMenuPeer._show} runs the native menu's modal loop and returns only when the
+   *       user dismisses it (the tray icon's menu, frostwire/frostwire#1499);
+   *   <li>{@code WGlobalCursorManager.findHeavyweightUnderCursor} and {@code setCursor}, reached
+   *       from {@code Component.updateCursorImmediately}, for example on every {@code
+   *       Container.validate} (Icebase #0207d9b0209b, #0ab7e5a75f25, #5a5796b0a26d);
+   *   <li>{@code WComponentPeer.hide} (Icebase #6766a5018c2b) and {@code getLocationOnScreen}
+   *       (#c36b43eff471, #37c8cfe0aa82);
+   *   <li>{@code WCanvasPeer.create}, the native window of a medium-weight popup's panel (Icebase
+   *       #2bb3702e758c);
+   *   <li>{@code WPopupMenuPeer.createMenu}, creating the tray icon's menu (Icebase #8ac10f3d3031),
+   *       and {@code WMenuPeer.createMenu}/{@code createSubMenu}, creating a menu or submenu.
+   * </ul>
+   *
+   * Deliberately absent: {@code WComponentPeer.pShow}, {@code WWindowPeer.setFocusableWindow} and
+   * {@code WDialogPeer.createAwtDialog} (not part of the maintainer's decision).
    */
-  static boolean isNativeMenuShow(StackTraceElement[] stack) {
-    return isNativeLoop(stack, "sun.awt.windows.WPopupMenuPeer", "_show");
-  }
+  private static final String[][] NATIVE_WINDOW_CALLS = {
+    {"sun.awt.windows.WPopupMenuPeer", "_show"},
+    {"sun.awt.windows.WGlobalCursorManager", "findHeavyweightUnderCursor"},
+    {"sun.awt.windows.WGlobalCursorManager", "setCursor"},
+    {"sun.awt.windows.WComponentPeer", "hide"},
+    {"sun.awt.windows.WComponentPeer", "getLocationOnScreen"},
+    {"sun.awt.windows.WCanvasPeer", "create"},
+    {"sun.awt.windows.WPopupMenuPeer", "createMenu"},
+    {"sun.awt.windows.WMenuPeer", "createMenu"},
+    {"sun.awt.windows.WMenuPeer", "createSubMenu"},
+  };
 
   /**
-   * True when the EDT is inside the AWT-Windows cursor manager's native calls: {@code
-   * WGlobalCursorManager.findHeavyweightUnderCursor} and {@code setCursor} ask the toolkit thread
-   * for the window under the cursor (or set the cursor) and wait for the answer, so they stall
-   * whenever that thread is busy or blocked, like the native menu and window calls grouped under
-   * {@link #NATIVE_MENU_TAG}. Swing reaches them from {@code Component.updateCursorImmediately},
-   * for example on every {@code Container.validate}, with no app frame involved (Icebase
-   * #0207d9b0209b and #0ab7e5a75f25, frostwire/frostwire#1552). The report is kept and uploaded;
-   * only its title prefix changes. Only the frames above the native call count: an app frame there
-   * is app work and is not tagged.
+   * True when the EDT is inside one of the {@link #NATIVE_WINDOW_CALLS}. Only the frames above the
+   * native call count: an app frame there is app work while the call is made and is not tagged. The
+   * report is kept and uploaded; only its title prefix changes.
    *
    * <p>Thread-safe: stateless stack inspection.
    */
-  static boolean isNativeCursorLookup(StackTraceElement[] stack) {
-    return isNativeLoop(
-        stack, "sun.awt.windows.WGlobalCursorManager", "findHeavyweightUnderCursor", "setCursor");
+  static boolean isNativeWindowCall(StackTraceElement[] stack) {
+    return isNativeLoop(stack, NATIVE_WINDOW_CALLS);
   }
 
   /**
@@ -586,12 +601,14 @@ public final class StrictEdtMode {
    * <p>Thread-safe: stateless stack inspection.
    */
   static boolean isNativeModalDialogShow(StackTraceElement[] stack) {
-    return isNativeLoop(stack, "sun.awt.windows.WDialogPeer", "showModal");
+    return isNativeLoop(stack, new String[][] {{"sun.awt.windows.WDialogPeer", "showModal"}});
   }
 
-  /** The stack's innermost frames, up to the first watchdog or app frame, include this call. */
-  private static boolean isNativeLoop(
-      StackTraceElement[] stack, String nativeClass, String... nativeMethods) {
+  /**
+   * The stack's innermost frames, up to the first watchdog or app frame, include one of these
+   * {class, method} calls.
+   */
+  private static boolean isNativeLoop(StackTraceElement[] stack, String[][] nativeCalls) {
     if (stack == null) {
       return false;
     }
@@ -608,11 +625,9 @@ public final class StrictEdtMode {
           return false;
         }
       }
-      if (nativeClass.equals(className)) {
-        for (String nativeMethod : nativeMethods) {
-          if (nativeMethod.equals(frame.getMethodName())) {
-            return true;
-          }
+      for (String[] call : nativeCalls) {
+        if (call[0].equals(className) && call[1].equals(frame.getMethodName())) {
+          return true;
         }
       }
     }

@@ -652,7 +652,7 @@ class StrictEdtModeTest {
       frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
     };
 
-    assertTrue(StrictEdtMode.isNativeMenuShow(stack));
+    assertTrue(StrictEdtMode.isNativeWindowCall(stack));
     assertEquals(StrictEdtMode.NATIVE_MENU_TAG, StrictEdtMode.reportTag("", stack, true));
   }
 
@@ -669,10 +669,10 @@ class StrictEdtModeTest {
       frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
     };
 
-    assertFalse(StrictEdtMode.isNativeMenuShow(appAboveMenu));
+    assertFalse(StrictEdtMode.isNativeWindowCall(appAboveMenu));
     assertEquals("", StrictEdtMode.reportTag("", appAboveMenu, true));
-    assertFalse(StrictEdtMode.isNativeMenuShow(noMenu));
-    assertFalse(StrictEdtMode.isNativeMenuShow(null));
+    assertFalse(StrictEdtMode.isNativeWindowCall(noMenu));
+    assertFalse(StrictEdtMode.isNativeWindowCall(null));
   }
 
   /**
@@ -697,8 +697,8 @@ class StrictEdtModeTest {
       frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
     };
 
-    assertTrue(StrictEdtMode.isNativeCursorLookup(stack));
-    assertTrue(StrictEdtMode.isNativeCursorLookup(setCursor));
+    assertTrue(StrictEdtMode.isNativeWindowCall(stack));
+    assertTrue(StrictEdtMode.isNativeWindowCall(setCursor));
     assertEquals(StrictEdtMode.NATIVE_MENU_TAG, StrictEdtMode.reportTag("", stack, true));
     StrictEdtMode.StallReport report = StrictEdtMode.stallReport("", stack, true, null);
     assertEquals(StrictEdtMode.NATIVE_MENU_TAG, report.tag());
@@ -722,10 +722,162 @@ class StrictEdtModeTest {
       frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
     };
 
-    assertFalse(StrictEdtMode.isNativeCursorLookup(appAboveLookup));
+    assertFalse(StrictEdtMode.isNativeWindowCall(appAboveLookup));
     assertEquals("", StrictEdtMode.reportTag("", appAboveLookup, true));
-    assertFalse(StrictEdtMode.isNativeCursorLookup(otherNative));
-    assertFalse(StrictEdtMode.isNativeCursorLookup(null));
+    assertFalse(StrictEdtMode.isNativeWindowCall(otherNative));
+    assertFalse(StrictEdtMode.isNativeWindowCall(null));
+  }
+
+  private static final String WATCHDOG_FRAME =
+      "com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue";
+
+  /** One stack per native window call of frostwire/frostwire#1552, the call on top, as reported. */
+  private static StackTraceElement[][] nativeWindowCallStacks() {
+    return new StackTraceElement[][] {
+      {
+        frame("sun.awt.windows.WComponentPeer", "hide"),
+        frame("java.awt.Component", "hide"),
+        frame("java.awt.Window", "hide"),
+        frame("com.frostwire.gui.TipOfTheDayMediator", "constructDialog"),
+        frame(WATCHDOG_FRAME, "dispatchEvent")
+      },
+      {
+        frame("sun.awt.windows.WComponentPeer", "getLocationOnScreen"),
+        frame("java.awt.Component", "getLocationOnScreen"),
+        frame("javax.swing.ToolTipManager", "showTipWindow"),
+        frame("java.awt.event.InvocationEvent", "dispatch"),
+        frame(WATCHDOG_FRAME, "dispatchEvent")
+      },
+      {
+        frame("sun.awt.windows.WCanvasPeer", "create"),
+        frame("sun.awt.windows.WPanelPeer", "<init>"),
+        frame("java.awt.Panel", "addNotify"),
+        frame("javax.swing.JLayeredPane", "add"),
+        frame("javax.swing.PopupFactory$MediumWeightPopup", "show"),
+        frame("javax.swing.ToolTipManager", "showTipWindow"),
+        frame(WATCHDOG_FRAME, "dispatchEvent")
+      },
+      {
+        frame("sun.awt.windows.WPopupMenuPeer", "createMenu"),
+        frame("sun.awt.windows.WPopupMenuPeer", "<init>"),
+        frame("java.awt.PopupMenu", "addNotify"),
+        frame("sun.awt.windows.WTrayIconPeer", "showPopupMenu"),
+        frame(WATCHDOG_FRAME, "dispatchEvent")
+      },
+      {
+        frame("sun.awt.windows.WMenuPeer", "createMenu"),
+        frame("sun.awt.windows.WMenuPeer", "<init>"),
+        frame("java.awt.Menu", "addNotify"),
+        frame(WATCHDOG_FRAME, "dispatchEvent")
+      },
+      {
+        frame("sun.awt.windows.WMenuPeer", "createSubMenu"),
+        frame("sun.awt.windows.WMenuPeer", "<init>"),
+        frame("java.awt.Menu", "addNotify"),
+        frame(WATCHDOG_FRAME, "dispatchEvent")
+      },
+    };
+  }
+
+  /**
+   * The other native window calls of frostwire/frostwire#1552 get the same tag as the cursor
+   * lookup, and the report (stack and title otherwise) is kept.
+   */
+  @Test
+  void everyNativeWindowCallIsTaggedNativeMenuAndTheReportIsKept() {
+    for (StackTraceElement[] stack : nativeWindowCallStacks()) {
+      String call = stack[0].getClassName() + "." + stack[0].getMethodName();
+      assertTrue(StrictEdtMode.isNativeWindowCall(stack), call);
+      assertEquals(StrictEdtMode.NATIVE_MENU_TAG, StrictEdtMode.reportTag("", stack, true), call);
+      StrictEdtMode.StallReport report = StrictEdtMode.stallReport("", stack, true, null);
+      assertEquals(StrictEdtMode.NATIVE_MENU_TAG, report.tag(), call);
+      assertSame(stack, report.stack(), call);
+      StrictEdtMode.StallReport early =
+          StrictEdtMode.stallReport("", new StackTraceElement[0], false, stack);
+      assertEquals(
+          StrictEdtMode.EARLY_SAMPLE_TAG + StrictEdtMode.NATIVE_MENU_TAG, early.tag(), call);
+      assertSame(stack, early.stack(), call);
+    }
+  }
+
+  @Test
+  void appWorkAboveAnyNativeWindowCallIsNotTagged() {
+    for (StackTraceElement[] stack : nativeWindowCallStacks()) {
+      String call = stack[0].getClassName() + "." + stack[0].getMethodName();
+      StackTraceElement[] withApp = new StackTraceElement[stack.length + 1];
+      withApp[0] = frame("com.frostwire.gui.SomeLayout", "layoutContainer");
+      System.arraycopy(stack, 0, withApp, 1, stack.length);
+      assertFalse(StrictEdtMode.isNativeWindowCall(withApp), call);
+      assertEquals("", StrictEdtMode.reportTag("", withApp, true), call);
+      for (String app : new String[] {"com.limegroup.gnutella.X", "org.limewire.Y"}) {
+        withApp[0] = frame(app, "run");
+        assertFalse(StrictEdtMode.isNativeWindowCall(withApp), call + " " + app);
+      }
+      StackTraceElement[] watchdogAbove = new StackTraceElement[stack.length + 1];
+      watchdogAbove[0] = frame(WATCHDOG_FRAME, "doWork");
+      System.arraycopy(stack, 0, watchdogAbove, 1, stack.length);
+      assertFalse(StrictEdtMode.isNativeWindowCall(watchdogAbove), call);
+    }
+  }
+
+  @Test
+  void callsOutsideTheMaintainerDecisionAreNotTaggedNativeMenu() {
+    String[][] excluded = {
+      {"sun.awt.windows.WComponentPeer", "pShow"},
+      {"sun.awt.windows.WWindowPeer", "setFocusableWindow"},
+      {"sun.awt.windows.WDialogPeer", "createAwtDialog"},
+      {"sun.awt.windows.WComponentPeer", "show"},
+      {"sun.awt.windows.WCanvasPeer", "other"},
+    };
+    for (String[] call : excluded) {
+      StackTraceElement[] stack = {
+        frame(call[0], call[1]),
+        frame("java.awt.Window", "show"),
+        frame(WATCHDOG_FRAME, "dispatchEvent")
+      };
+      assertFalse(StrictEdtMode.isNativeWindowCall(stack), call[0] + "." + call[1]);
+      assertEquals("", StrictEdtMode.reportTag("", stack, true), call[0] + "." + call[1]);
+    }
+  }
+
+  @Test
+  void nativeWindowCallPrecedenceKeepsEveryOtherTag() {
+    StackTraceElement[] nativeCall = nativeWindowCallStacks()[0];
+    StackTraceElement[] renderQueueAndNative = {
+      frame("sun.awt.SunToolkit", "awtLock"),
+      frame("sun.java2d.pipe.RenderQueue", "lock"),
+      nativeCall[0],
+      frame(WATCHDOG_FRAME, "dispatchEvent")
+    };
+    StackTraceElement[] modalAndNative = {
+      nativeCall[0],
+      frame("sun.awt.windows.WDialogPeer", "showModal"),
+      frame(WATCHDOG_FRAME, "dispatchEvent")
+    };
+    StackTraceElement[] modalOnly = {
+      frame("sun.awt.windows.WDialogPeer", "showModal"), frame(WATCHDOG_FRAME, "dispatchEvent")
+    };
+    // A native window call under a nested modal loop: the call is the innermost stall.
+    assertTrue(StrictEdtMode.isNativeWindowCall(modalAndNative));
+    assertEquals(StrictEdtMode.NATIVE_MENU_TAG, StrictEdtMode.reportTag("", modalAndNative, true));
+    assertEquals(StrictEdtMode.NATIVE_MODAL_TAG, StrictEdtMode.reportTag("", modalOnly, true));
+    // The render-queue wait is checked first and wins, as it always did.
+    assertEquals(
+        StrictEdtMode.RENDER_QUEUE_TAG, StrictEdtMode.reportTag("", renderQueueAndNative, true));
+    // A caller's tag wins over everything; a missed stack is stack-missed, not native-menu.
+    assertEquals("shutdown:", StrictEdtMode.reportTag("shutdown:", nativeCall, true));
+    assertEquals(StrictEdtMode.STACK_MISSED_TAG, StrictEdtMode.reportTag("", nativeCall, false));
+  }
+
+  @Test
+  void nullAndEmptyStacksAreNotNativeWindowCalls() {
+    assertFalse(StrictEdtMode.isNativeWindowCall(null));
+    assertFalse(StrictEdtMode.isNativeWindowCall(new StackTraceElement[0]));
+    assertFalse(StrictEdtMode.isNativeWindowCall(new StackTraceElement[] {null}));
+    assertEquals(StrictEdtMode.STACK_MISSED_TAG, StrictEdtMode.reportTag("", null, true));
+    assertEquals(
+        StrictEdtMode.STACK_MISSED_TAG,
+        StrictEdtMode.reportTag("", new StackTraceElement[0], true));
   }
 
   /**
