@@ -319,11 +319,8 @@ public final class UpdateManager implements Serializable {
         (msg.getMessageType().equals("update"))
             ? I18n.tr("New FrostWire Update Available")
             : I18n.tr("FrostWire Team Announcement");
-    int optionType = JOptionPane.CANCEL_OPTION;
-    // check if there's an URL to link to
     if (msg.getUrl() != null && !msg.getUrl().trim().equals("")) {
       LOG.info("showUpdateMessage():\t" + msg.getUrl());
-      optionType |= JOptionPane.OK_OPTION;
     }
     String[] options = new String[3];
     if (msg.getTorrent() != null) {
@@ -333,7 +330,6 @@ public final class UpdateManager implements Serializable {
     }
     options[OPTION_LATER] = I18n.tr("Thanks, but not now");
     options[OPTION_OPEN_URL] = I18n.tr("Go to webpage");
-    final int finalOptionType = optionType;
     final String[] finalOptions = options;
 
     String updateMessage = "";
@@ -353,16 +349,7 @@ public final class UpdateManager implements Serializable {
         () -> {
           LOG.info(
               "UpdateManager.showUpdateMessage() showing option dialog for " + finalUpdateMessage);
-          int result =
-              JOptionPane.showOptionDialog(
-                  null,
-                  finalUpdateMessage,
-                  title,
-                  finalOptionType,
-                  JOptionPane.INFORMATION_MESSAGE,
-                  null, // Icon
-                  finalOptions, // Options[]
-                  null); // Initial value (Object)
+          int result = UpdateMessageDialog.show(title, finalUpdateMessage, finalOptions);
           if (result == OPTION_OPEN_URL) {
             GUIMediator.openURL(msg.getUrl());
           } else if (result == OPTION_DOWNLOAD_TORRENT) {
