@@ -34,9 +34,32 @@ public final class MusicUriUtils {
       return path;
     }
     try {
-      return "file://" + UrlUtils.decode(path);
+      return "file://" + escapeForUri(UrlUtils.decode(path));
     } catch (Throwable t) {
-      return "file://" + path;
+      return "file://" + escapeForUri(path);
     }
+  }
+
+  /**
+   * Escapes what would end a file URI's path early or be read as an escape: '#' and '?' (a song
+   * named "Track #1.mp3" opened "Track " and failed) and '%'. Uri.getPath() decodes them back.
+   */
+  static String escapeForUri(String filePath) {
+    StringBuilder escaped = null;
+    for (int i = 0; i < filePath.length(); i++) {
+      final char c = filePath.charAt(i);
+      final String replacement = c == '%' ? "%25" : c == '#' ? "%23" : c == '?' ? "%3F" : null;
+      if (replacement != null && escaped == null) {
+        escaped = new StringBuilder(filePath.length() + 8).append(filePath, 0, i);
+      }
+      if (escaped != null) {
+        if (replacement != null) {
+          escaped.append(replacement);
+        } else {
+          escaped.append(c);
+        }
+      }
+    }
+    return escaped == null ? filePath : escaped.toString();
   }
 }

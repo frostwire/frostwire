@@ -70,6 +70,19 @@ public class MultiPlayerResolveUriTest {
   }
 
   @Test
+  public void hashAndQuestionMarkInTheFileNameStayInThePath() {
+    String result = MusicUriUtils.resolveUriString("/storage/emulated/0/Music/Track #1 - Why?.mp3");
+    assertTrue(result, result.endsWith("Track %231 - Why%3F.mp3"));
+    assertTrue(!result.contains("#") && !result.contains("?"));
+  }
+
+  @Test
+  public void aLiteralPercentInTheFileNameIsKept() {
+    String result = MusicUriUtils.resolveUriString("/storage/emulated/0/Music/100% Hits.mp3");
+    assertTrue(result, result.endsWith("100%25 Hits.mp3"));
+  }
+
+  @Test
   public void nullPath_returnsNull() {
     assertNull(MusicUriUtils.resolveUriString(null));
   }
