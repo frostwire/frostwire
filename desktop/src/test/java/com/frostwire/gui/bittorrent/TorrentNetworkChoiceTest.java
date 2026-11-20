@@ -108,6 +108,31 @@ class TorrentNetworkChoiceTest {
   }
 
   @Test
+  void theOptionsNotesExplainTheMixedModeOverrideAndTheBestEffortInPlainText() {
+    String mixed = TorrentNetworkChoice.mixedModeNote();
+    String clearnet = TorrentNetworkChoice.clearnetNote();
+    assertTrue(mixed.contains("I2P only") && mixed.contains("mixed mode stays off"), mixed);
+    assertTrue(clearnet.contains("best effort"), clearnet);
+    javax.swing.JTextArea note = TorrentNetworkChoice.plainNote(mixed);
+    assertEquals(mixed, note.getText());
+    assertFalse(note.isEditable());
+    assertTrue(note.getLineWrap() && note.getWrapStyleWord());
+    assertFalse(mixed.contains("<") || clearnet.contains("<"));
+  }
+
+  @Test
+  void theOptionsPaneShowsBothNotes() throws Exception {
+    String source =
+        java.nio.file.Files.readString(
+                java.nio.file.Path.of(
+                    System.getProperty("user.dir"),
+                    "src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java"))
+            .replaceAll("\\s+", "");
+    assertTrue(source.contains("TorrentNetworkChoice.mixedModeNote()"));
+    assertTrue(source.contains("TorrentNetworkChoice.clearnetNote()"));
+  }
+
+  @Test
   void theComboTellsItsListenerOnlyWhatTheUserChose() {
     TorrentNetworkChoice.NetworkCombo combo = new TorrentNetworkChoice.NetworkCombo();
     List<TorrentNetworkMode> heard = new ArrayList<>();

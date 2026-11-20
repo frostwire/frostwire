@@ -16,6 +16,8 @@ import java.util.function.Consumer;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComboBox;
 import javax.swing.JList;
+import javax.swing.JTextArea;
+import javax.swing.UIManager;
 
 /**
  * The text and the combo box of the per-torrent network choice (frostwire/frostwire#1304), shared
@@ -70,6 +72,31 @@ public final class TorrentNetworkChoice {
       default:
         return I18n.tr("On hold: the I2P router is not reachable. Check Options > I2P.");
     }
+  }
+
+  /** Options > I2P: what an I2P only torrent does to the mixed mode checkbox above. */
+  public static String mixedModeNote() {
+    return I18n.tr(
+        "While a torrent is set to I2P only, mixed mode stays off for all torrents, whatever is checked here.");
+  }
+
+  /** Options > I2P: what Clearnet only does and does not promise. */
+  public static String clearnetNote() {
+    return I18n.tr(
+        "A torrent set to Clearnet only is best effort: I2P peers are not refused for it yet.");
+  }
+
+  /** A read-only, wrapping plain-text note for an options pane (never an HTML label). */
+  public static JTextArea plainNote(String text) {
+    JTextArea note = new JTextArea(text);
+    note.setEditable(false);
+    note.setFocusable(false);
+    note.setLineWrap(true);
+    note.setWrapStyleWord(true);
+    note.setOpaque(false);
+    note.setBorder(null);
+    note.setFont(UIManager.getFont("Label.font"));
+    return note;
   }
 
   /** Where the mode chosen in a dialog is recorded: the engine's {@code setNetworkMode}. */
