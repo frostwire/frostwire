@@ -96,6 +96,7 @@ final class Initializer {
 
   private final java.util.List<AutoCloseable> relayResources = new java.util.ArrayList<>();
   private KarmaChainTable relayKarmaTable;
+  private volatile DeferredRelayIdentity relayIdentity;
   private final DesktopRelayLifecycle relayLifecycle =
       new DesktopRelayLifecycle(this::closeRelayResources, this::closeRelayStore);
 
@@ -204,23 +205,18 @@ final class Initializer {
     loadLateTasksForUI();
     // Start the core & run any queued control requests, and load DAAP.
     // System.out.println("Initializer.initialize() start core");
-    Runnable startRelay = prepareRelayStack();
+    prepareRelayStack();
     IceBridgeUrlHandler.register();
     startCore(limeWireCore);
-    if (startRelay != null) {
-      try {
-        DesktopParallelExecutor.execute(startRelay);
-      } catch (java.util.concurrent.RejectedExecutionException e) {
-        com.frostwire.util.Logger.getLogger(Initializer.class)
-            .warn("Relay startup rejected; distributed search disabled", e);
-      }
-    }
     runQueuedRequests(limeWireCore);
     if (OSUtils.isMacOSX()) {
       MacEventHandler.instance();
     }
     // Run any after-init tasks.
     postinit();
+    // Last of all, and never before: the identity is mined in the background only once the UI is
+    // up and the saved downloads are loaded (frostwire/frostwire#1534).
+    startRelayIdentityLoading();
   }
 
   /** Initializes the very early things. */
@@ -489,15 +485,12 @@ final class Initializer {
   }
 
   /**
-   * Opens the local index and installs its auto-indexer. Returns optional public-network startup
-   * work to run on a worker only after saved downloads have been restored.
-   *
-   * <p>Runs before {@link #startCore(LimeWireCore)} so the indexer is already installed when saved
-   * downloads are restored and their {@code downloadAdded} events fire. {@code
-   * BTEngineListenerChain.install} appends the {@code DownloadManagerImpl} listener later without
-   * disturbing the indexer.
+   * Opens the local index. The identity is NOT loaded here: on a first run it is mined, which takes
+   * minutes on a single-CPU computer, so {@link #startRelayIdentityLoading()} does it after startup
+   * is over (frostwire/frostwire#1534). Saved downloads are restored without the torrent indexer;
+   * once the identity is ready {@link #installRelayWithIdentity} installs it and re-indexes them.
    */
-  private Runnable prepareRelayStack() {
+  private void prepareRelayStack() {
     com.frostwire.util.Logger relayLog = com.frostwire.util.Logger.getLogger(Initializer.class);
     try {
       File homeDir =
@@ -509,32 +502,53 @@ final class Initializer {
       relayLog.info("Opening local index at: " + dbFile.getAbsolutePath());
       LocalIndexTable localIndex = LocalIndexTable.open(dbFile);
       relayLog.info("Local index opened, size=" + localIndex.size());
+      LocalSearchEngineWire.setIndex(localIndex);
 
-      // 2. Load or generate the node's Ed25519 / X25519 identity.
+      // 2. The node's Ed25519 / X25519 identity, loaded or mined once startup is over.
       File identityFile =
           com.frostwire.search.relay.RelayConstants.identityFile(CommonUtils.getUserSettingsDir());
-      relayLog.info("Loading identity from: " + identityFile.getAbsolutePath());
-      // With no identity yet (a first run), this mines one: about a million key generations in a
-      // tight loop. At this thread's normal priority that took the only CPU of a single-CPU
-      // computer for minutes, right after the window appeared (#1534).
-      IdentityKeys identity =
-          com.frostwire.util.BackgroundPriority.call(() -> IdentityKeys.loadOrCreate(identityFile));
-      relayLog.info("Identity loaded, nodeId=" + com.frostwire.util.Hex.encode(identity.nodeId()));
-
-      // 3. Install the auto-indexer on BTEngine (chains onto any
-      //    listener already present; DownloadManagerImpl is added later).
-      BTEngine btEngine = BTEngine.getInstance();
-      SharedTorrentIndexerInstaller.install(
-          btEngine, localIndex, identity, LocalSearchEngineWire::indexChanged);
-      relayLog.info("SharedTorrentIndexer installed");
-
-      LocalSearchEngineWire.setIndex(localIndex);
-      // Public networking must not delay saved-transfer restoration. Recheck settings
-      // on the worker before constructing any listener, advertiser or discovery job.
-      return () -> startRelayParticipation(() -> startRelayServices(localIndex, identity));
+      relayLog.info("Identity will be loaded from: " + identityFile.getAbsolutePath());
+      relayIdentity =
+          new DeferredRelayIdentity(
+              () -> IdentityKeys.loadOrCreate(identityFile),
+              identity -> installRelayWithIdentity(localIndex, identity));
     } catch (Exception e) {
       relayLog.warn("Failed to prepare local index; distributed search disabled", e);
-      return null;
+    }
+  }
+
+  /** Starts loading the identity in the background; call only when startup is over. */
+  private void startRelayIdentityLoading() {
+    DeferredRelayIdentity pending = relayIdentity;
+    if (pending != null) {
+      pending.startAfterStartup();
+    }
+  }
+
+  /**
+   * Runs on the identity thread when the identity is ready: installs the auto-indexer, indexes the
+   * downloads restored before it existed, and starts the public relay services on a worker.
+   */
+  private void installRelayWithIdentity(LocalIndex localIndex, IdentityKeys identity) {
+    com.frostwire.util.Logger relayLog = com.frostwire.util.Logger.getLogger(Initializer.class);
+    relayLog.info("Identity ready, nodeId=" + com.frostwire.util.Hex.encode(identity.nodeId()));
+    BTEngine btEngine = BTEngine.getInstance();
+    com.frostwire.search.relay.SharedTorrentIndexer indexer =
+        SharedTorrentIndexerInstaller.install(
+            btEngine, localIndex, identity, LocalSearchEngineWire::indexChanged);
+    relayLog.info("SharedTorrentIndexer installed");
+    try {
+      // Saved downloads were restored before the indexer existed, so their downloadAdded events
+      // were missed.
+      indexer.indexExisting(com.frostwire.mcp.desktop.adapters.TransferAdapter.getAllDownloads());
+    } catch (Throwable t) {
+      relayLog.warn("Could not index the restored downloads; new ones are still indexed", t);
+    }
+    try {
+      DesktopParallelExecutor.execute(
+          () -> startRelayParticipation(() -> startRelayServices(localIndex, identity)));
+    } catch (java.util.concurrent.RejectedExecutionException e) {
+      relayLog.warn("Relay startup rejected; distributed search disabled", e);
     }
   }
 

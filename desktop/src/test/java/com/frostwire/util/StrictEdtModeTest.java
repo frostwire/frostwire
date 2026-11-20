@@ -676,6 +676,59 @@ class StrictEdtModeTest {
   }
 
   /**
+   * The cursor lookup asks the AWT-Windows toolkit thread for the window under the cursor and
+   * waits; no app frame is involved (Icebase #0207d9b0209b, frostwire/frostwire#1552).
+   */
+  @Test
+  void aNativeCursorLookupIsTaggedNativeMenuAndTheReportIsKept() {
+    StackTraceElement[] stack = {
+      frame("sun.awt.windows.WGlobalCursorManager", "findHeavyweightUnderCursor"),
+      frame("sun.awt.GlobalCursorManager", "findHeavyweightUnderCursor"),
+      frame("java.awt.Component", "updateCursorImmediately"),
+      frame("java.awt.Container", "validate"),
+      frame("javax.swing.RepaintManager", "validateInvalidComponents"),
+      frame("java.awt.event.InvocationEvent", "dispatch"),
+      frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
+    };
+    StackTraceElement[] setCursor = {
+      frame("sun.awt.windows.WGlobalCursorManager", "setCursor"),
+      frame("sun.awt.GlobalCursorManager", "_updateCursor"),
+      frame("java.awt.Component", "updateCursorImmediately"),
+      frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
+    };
+
+    assertTrue(StrictEdtMode.isNativeCursorLookup(stack));
+    assertTrue(StrictEdtMode.isNativeCursorLookup(setCursor));
+    assertEquals(StrictEdtMode.NATIVE_MENU_TAG, StrictEdtMode.reportTag("", stack, true));
+    StrictEdtMode.StallReport report = StrictEdtMode.stallReport("", stack, true, null);
+    assertEquals(StrictEdtMode.NATIVE_MENU_TAG, report.tag());
+    assertSame(stack, report.stack());
+    StrictEdtMode.StallReport early =
+        StrictEdtMode.stallReport("", new StackTraceElement[0], false, stack);
+    assertEquals(StrictEdtMode.EARLY_SAMPLE_TAG + StrictEdtMode.NATIVE_MENU_TAG, early.tag());
+    assertSame(stack, early.stack());
+  }
+
+  @Test
+  void appWorkAboveANativeCursorLookupIsNotTaggedNativeMenu() {
+    StackTraceElement[] appAboveLookup = {
+      frame("java.io.FileInputStream", "readBytes"),
+      frame("com.frostwire.gui.SomeLayout", "layoutContainer"),
+      frame("sun.awt.windows.WGlobalCursorManager", "findHeavyweightUnderCursor"),
+      frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
+    };
+    StackTraceElement[] otherNative = {
+      frame("sun.awt.windows.WToolkit", "sync"),
+      frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
+    };
+
+    assertFalse(StrictEdtMode.isNativeCursorLookup(appAboveLookup));
+    assertEquals("", StrictEdtMode.reportTag("", appAboveLookup, true));
+    assertFalse(StrictEdtMode.isNativeCursorLookup(otherNative));
+    assertFalse(StrictEdtMode.isNativeCursorLookup(null));
+  }
+
+  /**
    * A modal dialog's native loop (WDialogPeer.showModal) returns only when the user closes the
    * dialog: the event that opened it is not a stall (Icebase #20673ed7668e, Windows 11).
    */

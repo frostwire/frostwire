@@ -163,7 +163,7 @@ public final class ResourceManager {
           "archive_source",
           "tpb_source",
           "zooqle_source",
-          "magnetdl_source",
+          "apibay_source",
           "seeding_small_source",
           "1337_source");
 

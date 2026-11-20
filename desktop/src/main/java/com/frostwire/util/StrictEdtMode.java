@@ -492,7 +492,7 @@ public final class StrictEdtMode {
     if (isRenderQueueLockWait(stack)) {
       return RENDER_QUEUE_TAG;
     }
-    if (isNativeMenuShow(stack)) {
+    if (isNativeMenuShow(stack) || isNativeCursorLookup(stack)) {
       return NATIVE_MENU_TAG;
     }
     if (isNativeModalDialogShow(stack)) {
@@ -559,6 +559,24 @@ public final class StrictEdtMode {
   }
 
   /**
+   * True when the EDT is inside the AWT-Windows cursor manager's native calls: {@code
+   * WGlobalCursorManager.findHeavyweightUnderCursor} and {@code setCursor} ask the toolkit thread
+   * for the window under the cursor (or set the cursor) and wait for the answer, so they stall
+   * whenever that thread is busy or blocked, like the native menu and window calls grouped under
+   * {@link #NATIVE_MENU_TAG}. Swing reaches them from {@code Component.updateCursorImmediately},
+   * for example on every {@code Container.validate}, with no app frame involved (Icebase
+   * #0207d9b0209b and #0ab7e5a75f25, frostwire/frostwire#1552). The report is kept and uploaded;
+   * only its title prefix changes. Only the frames above the native call count: an app frame there
+   * is app work and is not tagged.
+   *
+   * <p>Thread-safe: stateless stack inspection.
+   */
+  static boolean isNativeCursorLookup(StackTraceElement[] stack) {
+    return isNativeLoop(
+        stack, "sun.awt.windows.WGlobalCursorManager", "findHeavyweightUnderCursor", "setCursor");
+  }
+
+  /**
    * True when the EDT is inside a modal dialog's native loop: {@code WDialogPeer.showModal} returns
    * only when the user closes the dialog, so the event that opened it "stalls" for as long as the
    * dialog stays open (the torrent-details dialog of a torrent link, Icebase #20673ed7668e,
@@ -573,7 +591,7 @@ public final class StrictEdtMode {
 
   /** The stack's innermost frames, up to the first watchdog or app frame, include this call. */
   private static boolean isNativeLoop(
-      StackTraceElement[] stack, String nativeClass, String nativeMethod) {
+      StackTraceElement[] stack, String nativeClass, String... nativeMethods) {
     if (stack == null) {
       return false;
     }
@@ -590,8 +608,12 @@ public final class StrictEdtMode {
           return false;
         }
       }
-      if (nativeClass.equals(className) && nativeMethod.equals(frame.getMethodName())) {
-        return true;
+      if (nativeClass.equals(className)) {
+        for (String nativeMethod : nativeMethods) {
+          if (nativeMethod.equals(frame.getMethodName())) {
+            return true;
+          }
+        }
       }
     }
     return false;

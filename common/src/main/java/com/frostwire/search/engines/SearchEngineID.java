@@ -16,7 +16,7 @@ public enum SearchEngineID {
   ONE337X_ID,
   NYAA_ID,
   TORRENTZ2_ID,
-  MAGNETDL_ID,
+  APIBAY_ID,
   TELLURIDE_ID,
   YT_ID,
   TORRENTSCSV_ID,

@@ -84,7 +84,7 @@ class SearchEnginesTest {
             SearchEngineID.INTERNET_ARCHIVE_ID,
             SearchEngineID.BITSEARCH_ID,
             SearchEngineID.KNABEN_ID,
-            SearchEngineID.MAGNETDL_ID,
+            SearchEngineID.APIBAY_ID,
             SearchEngineID.NYAA_ID,
             SearchEngineID.ONE337X_ID,
             SearchEngineID.TPB_ID,

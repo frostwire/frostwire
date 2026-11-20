@@ -40,7 +40,7 @@ public final class AndroidSearchEngineAdapter implements SearchEngineAdapter {
     PREFERENCE_KEYS.put(SearchEngineID.ONE337X_ID, Constants.PREF_KEY_SEARCH_USE_ONE337X);
     PREFERENCE_KEYS.put(SearchEngineID.NYAA_ID, Constants.PREF_KEY_SEARCH_USE_NYAA);
     PREFERENCE_KEYS.put(SearchEngineID.TORRENTZ2_ID, Constants.PREF_KEY_SEARCH_USE_TORRENTZ2);
-    PREFERENCE_KEYS.put(SearchEngineID.MAGNETDL_ID, Constants.PREF_KEY_SEARCH_USE_MAGNETDL);
+    PREFERENCE_KEYS.put(SearchEngineID.APIBAY_ID, Constants.PREF_KEY_SEARCH_USE_APIBAY);
     PREFERENCE_KEYS.put(
         SearchEngineID.TELLURIDE_ID, Constants.PREF_KEY_SEARCH_USE_TELLURIDE_COURIER);
     PREFERENCE_KEYS.put(SearchEngineID.YT_ID, Constants.PREF_KEY_SEARCH_USE_YT);

@@ -50,7 +50,12 @@ final class LibraryFilesTransferHandler extends TransferHandler {
   @Override
   public boolean canImport(TransferSupport support) {
     try {
-      LibraryNode node = getNodeFromLocation(support.getDropLocation());
+      // a paste (Ctrl+V on the tree) has no drop location and nothing to import
+      DropLocation location = DNDUtils.dropLocationOrNull(support);
+      if (location == null) {
+        return false;
+      }
+      LibraryNode node = getNodeFromLocation(location);
       if (!(node instanceof DirectoryHolderNode)) {
         return false;
       }

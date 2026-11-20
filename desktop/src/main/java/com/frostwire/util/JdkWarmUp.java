@@ -582,34 +582,134 @@ public final class JdkWarmUp {
     }
   }
 
+  /** A text warm-up step that may fail with anything, including a linkage error. */
+  @FunctionalInterface
+  interface TextStep {
+    void run() throws Throwable;
+  }
+
+  private static final int MAX_FAILURE_CAUSES = 5;
+  private static final int MAX_FAILURE_MESSAGE_CHARS = 200;
+  private static final int MAX_FAILURE_CHARS = 800;
+
+  private static final java.util.concurrent.atomic.AtomicReference<String> FIRST_TEXT_FAILURE =
+      new java.util.concurrent.atomic.AtomicReference<>();
+
+  /**
+   * The first text warm-up failure of this run, as {@code Class: message <- Class: message ...}
+   * down the cause chain (bounded, home directory and user name removed), or null when the text
+   * warm-up never failed. A NoClassDefFoundError for {@code sun.font.HBShaper} means its static
+   * initializer failed once before, and that first failure (ExceptionInInitializerError,
+   * UnsatisfiedLinkError) is what explains it; crash and StrictMode reports carry it so one report
+   * is enough to diagnose (frostwire/frostwire#1587).
+   */
+  public static String firstTextWarmUpFailure() {
+    return FIRST_TEXT_FAILURE.get();
+  }
+
+  /**
+   * Runs the text warm-up. It stays best effort: a failure is logged and swallowed (the first
+   * on-EDT use pays these costs instead), but the first one is kept for {@link
+   * #firstTextWarmUpFailure()}. Package-private so tests can force a failure.
+   */
+  static void warmUpText(TextStep step) {
+    try {
+      step.run();
+    } catch (Throwable t) {
+      LOG.warn("Text warm-up failed: " + t.getMessage(), t);
+      try {
+        FIRST_TEXT_FAILURE.compareAndSet(
+            null,
+            describeFailure(t, System.getProperty("user.home"), System.getProperty("user.name")));
+      } catch (Throwable ignored) {
+        // Recording the failure must never change the warm-up's behavior.
+      }
+    }
+  }
+
+  /** Test seam: forgets the recorded failure. */
+  static void clearFirstTextWarmUpFailure() {
+    FIRST_TEXT_FAILURE.set(null);
+  }
+
+  /**
+   * {@code problem}'s class and message and those of its causes (at most {@value
+   * #MAX_FAILURE_CAUSES}, each message at most {@value #MAX_FAILURE_MESSAGE_CHARS} characters, all
+   * at most {@value #MAX_FAILURE_CHARS}), with {@code home} and {@code user} replaced by {@code
+   * <home>} and {@code <user>} so no personal path is reported.
+   */
+  static String describeFailure(Throwable problem, String home, String user) {
+    StringBuilder text = new StringBuilder();
+    Throwable current = problem;
+    for (int i = 0; i < MAX_FAILURE_CAUSES && current != null; i++) {
+      if (i > 0) {
+        text.append(" <- ");
+      }
+      text.append(current.getClass().getName());
+      String message = current.getMessage();
+      if (message != null) {
+        text.append(": ").append(truncate(scrub(message, home, user), MAX_FAILURE_MESSAGE_CHARS));
+      }
+      current = current.getCause() == current ? null : current.getCause();
+    }
+    return printableAscii(truncate(text.toString(), MAX_FAILURE_CHARS));
+  }
+
+  /**
+   * Icebase accepts only printable ASCII in this field and rejects the whole report otherwise, and
+   * Windows error messages are localized: every other character becomes '?'.
+   */
+  private static String printableAscii(String text) {
+    StringBuilder ascii = new StringBuilder(text.length());
+    for (int i = 0; i < text.length(); i++) {
+      char c = text.charAt(i);
+      ascii.append(c >= 0x20 && c <= 0x7e ? c : '?');
+    }
+    return ascii.toString();
+  }
+
+  private static String scrub(String text, String home, String user) {
+    String scrubbed = text;
+    if (home != null && !home.isBlank()) {
+      scrubbed = scrubbed.replace(home, "<home>");
+      scrubbed = scrubbed.replace(home.replace('\\', '/'), "<home>");
+    }
+    if (user != null && user.length() >= 3) {
+      scrubbed = scrubbed.replace(user, "<user>");
+    }
+    return scrubbed;
+  }
+
+  private static String truncate(String text, int max) {
+    return text.length() <= max ? text : text.substring(0, max - 3) + "...";
+  }
+
   private static void warmUp(Supplier<String> earlyWindowText) {
     try {
       createPainters(UIManager.getDefaults(), SPLASH_PAINTER_KEY_PREFIX);
     } catch (Throwable t) {
       LOG.warn("Painter warm-up failed: " + t.getMessage(), t);
     }
-    try {
-      String text = earlyWindowText(earlyWindowText);
-      // layoutGlyphVector always shapes, whatever the script, so this initializes HarfBuzz.
-      char[] chars = text.toCharArray();
-      PlatformFonts.dialog(Font.PLAIN, 12)
-          .layoutGlyphVector(
-              new FontRenderContext(null, true, true),
-              chars,
-              0,
-              chars.length,
-              Font.LAYOUT_LEFT_TO_RIGHT);
-      // Only the fallback slots the first windows' text needs. Every slot of every UI font is
-      // dozens of font files, each loaded under the JDK's global font lock, which the EDT building
-      // the splash, the wizard and the main window waited for (Icebase #7d83b84c37c5,
-      // #0068ec7873a2, frostwire/frostwire#1544).
-      for (Font font : fallbackSlotFonts(UIManager.getDefaults())) {
-        initializeSlotsFor(font, text);
-      }
-    } catch (Throwable t) {
-      // Best effort: the first on-EDT use pays these costs instead.
-      LOG.warn("Text warm-up failed: " + t.getMessage(), t);
-    }
+    warmUpText(
+        () -> {
+          String text = earlyWindowText(earlyWindowText);
+          // layoutGlyphVector always shapes, whatever the script, so this initializes HarfBuzz.
+          char[] chars = text.toCharArray();
+          PlatformFonts.dialog(Font.PLAIN, 12)
+              .layoutGlyphVector(
+                  new FontRenderContext(null, true, true),
+                  chars,
+                  0,
+                  chars.length,
+                  Font.LAYOUT_LEFT_TO_RIGHT);
+          // Only the fallback slots the first windows' text needs. Every slot of every UI font is
+          // dozens of font files, each loaded under the JDK's global font lock, which the EDT
+          // building the splash, the wizard and the main window waited for (Icebase #7d83b84c37c5,
+          // #0068ec7873a2, frostwire/frostwire#1544).
+          for (Font font : fallbackSlotFonts(UIManager.getDefaults())) {
+            initializeSlotsFor(font, text);
+          }
+        });
     try {
       Font label = UIManager.getFont("Label.font");
       if (label != null) {

@@ -36,13 +36,18 @@ import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.JPanel;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
@@ -686,6 +691,200 @@ class HexHivePanelTest {
     assertTrue(red > 0xc0 && green < 0x80 && blue < 0x80, "skipped piece is not red");
     for (int piece = 4; piece < 6; piece++) {
       assertEquals(topFaces[3], topFaces[piece], "downloaded piece " + piece + " was tinted");
+    }
+  }
+
+  // ---- frostwire/frostwire#1582: the EDT never waits for a render worker ----
+
+  private static final long EDT_DEADLINE_SECONDS = 5;
+
+  /** A render worker parked inside its merge, where it used to hold the bitmap lock. */
+  private static final class ParkedWorker {
+    final CountDownLatch parked = new CountDownLatch(1);
+    final CountDownLatch release = new CountDownLatch(1);
+    volatile Thread thread;
+
+    void attachTo(HexHivePanel panel) {
+      panel.beforeBatchMergeHook =
+          () -> {
+            thread = Thread.currentThread();
+            parked.countDown();
+            try {
+              release.await(30, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+              Thread.currentThread().interrupt();
+            }
+          };
+    }
+  }
+
+  private static ExecutorService newFakeEdt() {
+    return Executors.newSingleThreadExecutor(r -> new Thread(r, "fake-edt-hexhive-test"));
+  }
+
+  /**
+   * Runs {@code work} on the fake EDT and fails if it doesn't return while the worker is parked.
+   */
+  private static void assertReturnsWhileWorkerParked(
+      ExecutorService edt, ParkedWorker worker, String what, Runnable work) throws Exception {
+    Thread[] caller = new Thread[1];
+    Future<?> done =
+        edt.submit(
+            () -> {
+              caller[0] = Thread.currentThread();
+              work.run();
+            });
+    try {
+      done.get(EDT_DEADLINE_SECONDS, TimeUnit.SECONDS);
+    } catch (TimeoutException e) {
+      throw new AssertionError(what + " waited for the render worker parked mid-merge", e);
+    }
+    assertEquals("fake-edt-hexhive-test", caller[0].getName());
+    assertTrue(caller[0] != worker.thread, "the caller must not be the render worker");
+  }
+
+  @Test
+  void refreshAndPaintDoNotWaitForAWorkerMergingABatch() throws Exception {
+    HexHivePanel panel = newPanel();
+    ParkedWorker worker = new ParkedWorker();
+    ExecutorService edt = newFakeEdt();
+    try {
+      worker.attachTo(panel);
+      panel.updateData(adapter(300));
+      assertTrue(worker.parked.await(10, TimeUnit.SECONDS), "no render reached its merge");
+      assertReturnsWhileWorkerParked(
+          edt, worker, "updateData", () -> panel.updateData(adapter(301)));
+      assertReturnsWhileWorkerParked(edt, worker, "paint", () -> paint(panel, 300, 400));
+    } finally {
+      worker.release.countDown();
+      edt.shutdownNow();
+    }
+    awaitRender(panel);
+  }
+
+  @Test
+  void relayoutDoesNotWaitForAWorkerMergingABatch() throws Exception {
+    HexHivePanel panel = newPanel();
+    ParkedWorker worker = new ParkedWorker();
+    ExecutorService edt = newFakeEdt();
+    try {
+      worker.attachTo(panel);
+      panel.updateData(adapter(300));
+      assertTrue(worker.parked.await(10, TimeUnit.SECONDS), "no render reached its merge");
+      Object before = get(panel, "bitmap");
+      assertReturnsWhileWorkerParked(
+          edt,
+          worker,
+          "updateData with a new layout",
+          () -> {
+            panel.setSize(420, 400);
+            panel.updateData(adapter(300));
+          });
+      assertTrue(get(panel, "bitmap") != before, "the new layout must have its own bitmap");
+    } finally {
+      worker.release.countDown();
+      edt.shutdownNow();
+    }
+    BufferedImage bitmap = awaitRender(panel);
+    // the layout's width is the canvas minus the paddings
+    assertEquals(410, bitmap.getWidth());
+  }
+
+  @Test
+  void scrollingTheBackingWindowDoesNotWaitForAWorkerMergingABatch() throws Exception {
+    HexHivePanel panel = newPanel();
+    JViewport viewport = viewportFor(panel, 600, 300, adapter(3000));
+    int contentHeight = (int) get(get(panel, "drawingProperties"), "height");
+    ParkedWorker worker = new ParkedWorker();
+    ExecutorService edt = newFakeEdt();
+    try {
+      worker.attachTo(panel);
+      panel.updateData(adapter(3000));
+      assertTrue(worker.parked.await(10, TimeUnit.SECONDS), "no render reached its merge");
+      int originBefore = (int) get(panel, "bitmapOriginY");
+      assertReturnsWhileWorkerParked(
+          edt,
+          worker,
+          "updateData after scrolling away from the window",
+          () -> {
+            viewport.setViewPosition(new Point(0, contentHeight - 300));
+            panel.updateData(adapter(3000));
+          });
+      assertTrue((int) get(panel, "bitmapOriginY") > originBefore, "the window must have moved");
+    } finally {
+      worker.release.countDown();
+      edt.shutdownNow();
+    }
+    awaitRender(panel);
+  }
+
+  @Test
+  void repaintAndUpdateStressHasNoDeadlockAndNoTornSnapshot() throws Exception {
+    HexHivePanel panel = newPanel();
+    ExecutorService edt = newFakeEdt();
+    ExecutorService readers = Executors.newFixedThreadPool(2);
+    AtomicBoolean stop = new AtomicBoolean();
+    int[] widths = {300, 380, 460};
+    int[] totals = {200, 350, 500};
+    int cycleCount = 300;
+    try {
+      List<Future<?>> watchers = new ArrayList<>();
+      for (int i = 0; i < 2; i++) {
+        watchers.add(
+            readers.submit(
+                () -> {
+                  while (!stop.get()) {
+                    HexHivePanel.BackingSnapshot snapshot = panel.backingSnapshot();
+                    if (snapshot.bitmap != null) {
+                      // every field of one snapshot must describe the same bitmap
+                      assertEquals(snapshot.layoutWidth, snapshot.bitmap.getWidth());
+                      assertEquals(snapshot.windowHeight, snapshot.bitmap.getHeight());
+                      Rectangle window =
+                          new Rectangle(
+                              0, snapshot.originY, snapshot.layoutWidth, snapshot.windowHeight);
+                      assertTrue(
+                          snapshot.renderedArea.isEmpty()
+                              || window.contains(snapshot.renderedArea.getBounds()),
+                          "rendered area outside its window");
+                    }
+                  }
+                }));
+      }
+      Future<?> cycles =
+          edt.submit(
+              () -> {
+                for (int i = 0; i < cycleCount; i++) {
+                  panel.setSize(widths[i % 3], 400);
+                  panel.updateData(adapter(totals[(i / 3) % 3]));
+                  paint(panel, panel.getWidth(), 400);
+                }
+              });
+      cycles.get(60, TimeUnit.SECONDS);
+      stop.set(true);
+      for (Future<?> watcher : watchers) {
+        watcher.get(10, TimeUnit.SECONDS);
+      }
+    } finally {
+      stop.set(true);
+      edt.shutdownNow();
+      readers.shutdownNow();
+    }
+    awaitRender(panel);
+    settle(panel);
+
+    HexHivePanel fresh = newPanel();
+    fresh.setSize(panel.getWidth(), 400);
+    fresh.updateData(adapter(totals[((cycleCount - 1) / 3) % 3]));
+    awaitRender(fresh);
+    settle(fresh);
+    BufferedImage expected = paint(fresh, panel.getWidth(), 400);
+    BufferedImage actual = paint(panel, panel.getWidth(), 400);
+    for (int y = 0; y < expected.getHeight(); y++) {
+      for (int x = 0; x < expected.getWidth(); x++) {
+        if (expected.getRGB(x, y) != actual.getRGB(x, y)) {
+          throw new AssertionError("torn pixel at " + x + "," + y);
+        }
+      }
     }
   }
 

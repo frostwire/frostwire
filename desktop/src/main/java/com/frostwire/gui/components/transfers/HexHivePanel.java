@@ -69,7 +69,16 @@ public class HexHivePanel extends JPanel implements Scrollable {
   private static final Logger LOG = Logger.getLogger(HexHivePanel.class);
   private final boolean forceCubes;
   private final Object drawingPropertiesLock = new Object();
+
+  /**
+   * Guards the backing bitmap's bookkeeping only: which bitmap, window, layout and generation are
+   * current. It is held for a few field reads or writes, never while allocating, drawing or
+   * combining areas, because the EDT takes it on every refresh and paint ("lock the map, not the
+   * work", frostwire/frostwire#1582). Pixel work happens outside it, on a bitmap captured under it,
+   * and is published only if the bitmap is still current.
+   */
   private final Object bitmapLock = new Object();
+
   private final Object renderLock = new Object();
   private final int topPadding;
   private final int rightPadding;
@@ -128,7 +137,20 @@ public class HexHivePanel extends JPanel implements Scrollable {
   private static final int FALLBACK_VIEWPORT_HEIGHT = 600;
 
   private volatile double renderScale = 1.0;
-  private final Area renderedArea = new Area();
+
+  /**
+   * Content-space area of the backing window whose pixels are final. Never mutated once published:
+   * writers copy, change the copy and swap the reference under {@link #bitmapLock}, so readers (the
+   * EDT painting) use it without locking.
+   */
+  private volatile Area renderedArea = new Area();
+
+  /**
+   * Test seam: run by the render worker right before it draws a finished batch into the backing
+   * bitmap, where it used to hold {@link #bitmapLock}. Lets a test park the worker mid-merge and
+   * check the EDT doesn't wait for it. Null in production.
+   */
+  volatile Runnable beforeBatchMergeHook;
 
   /**
    * How long the width must stay put before the rows re-wrap. Re-wrapping moves every piece, so
@@ -541,7 +563,7 @@ public class HexHivePanel extends JPanel implements Scrollable {
     synchronized (bitmapLock) {
       bitmap = null;
       bitmapWindowGeneration++;
-      renderedArea.reset();
+      renderedArea = new Area();
     }
     synchronized (renderLock) {
       pendingRenderRequest = null;
@@ -823,71 +845,102 @@ public class HexHivePanel extends JPanel implements Scrollable {
    * @return the content-space rectangle the backing bitmap covers
    */
   private Rectangle ensureBackingBitmap(DrawingProperties snapshot, Rectangle visibleRect) {
-    boolean changed = false;
-    Rectangle window;
-    synchronized (bitmapLock) {
-      int windowHeight = backingWindowHeight(snapshot.height, visibleRect.height);
-      if (bitmap == null || bitmapLayout == null || !bitmapLayout.hasSameLayout(snapshot)) {
-        // a fresh bitmap: pixels of the previous layout outside the new rows would linger. Keep the
-        // previous one to paint under it meanwhile, unless it never got rendered (rapid resizes):
-        // then the older, rendered one is still the better picture.
-        if (bitmap != null && (previousBitmap == null || !renderedArea.isEmpty())) {
-          previousBitmap = bitmap;
-          previousOriginY = bitmapOriginY;
-          previousScale = bitmapScale;
+    while (true) {
+      // Decide under the lock, build the new bitmap outside it, commit under it again: the render
+      // worker and the EDT only ever wait for each other's field reads and writes.
+      final int generation;
+      final int windowHeight;
+      final int originY;
+      final boolean fresh;
+      final BufferedImage oldBitmap;
+      final int oldOriginY;
+      final double oldScale;
+      final Area oldRendered;
+      synchronized (bitmapLock) {
+        generation = bitmapWindowGeneration;
+        windowHeight = backingWindowHeight(snapshot.height, visibleRect.height);
+        oldBitmap = bitmap;
+        oldOriginY = bitmapOriginY;
+        oldScale = bitmapScale;
+        oldRendered = renderedArea;
+        fresh = bitmap == null || bitmapLayout == null || !bitmapLayout.hasSameLayout(snapshot);
+        if (fresh
+            || windowHeight != bitmapWindowHeight
+            || !backingWindowCovers(
+                bitmapOriginY, bitmapWindowHeight, snapshot.height, visibleRect)) {
+          originY = anchorBackingWindow(snapshot.height, windowHeight, visibleRect);
+        } else {
+          return new Rectangle(0, bitmapOriginY, snapshot.width, bitmapWindowHeight);
         }
+      }
+      final BufferedImage target;
+      final Area kept;
+      if (fresh) {
         int deviceWidth = Math.max(1, toDevice(snapshot.width, snapshot.scale));
         int deviceHeight = deviceWindowHeight(windowHeight, snapshot.scale);
-        bitmap = createOpaqueImage(deviceWidth, deviceHeight);
-        bitmapScale = snapshot.scale;
-        bitmapLayout = snapshot;
-        bitmapOriginY = anchorBackingWindow(snapshot.height, windowHeight, visibleRect);
-        bitmapWindowHeight = windowHeight;
-        bitmapWindowGeneration++;
-        Graphics2D graphics = bitmap.createGraphics();
+        target = createOpaqueImage(deviceWidth, deviceHeight);
+        Graphics2D graphics = target.createGraphics();
         graphics.setPaint(backgroundColor);
         graphics.fillRect(0, 0, deviceWidth, deviceHeight);
         graphics.dispose();
-        renderedArea.reset();
-        changed = true;
-      } else if (windowHeight != bitmapWindowHeight
-          || !backingWindowCovers(
-              bitmapOriginY, bitmapWindowHeight, snapshot.height, visibleRect)) {
-        int originY = anchorBackingWindow(snapshot.height, windowHeight, visibleRect);
-        moveBackingWindow(snapshot, originY, windowHeight);
+        kept = new Area();
+      } else {
+        target = movedBackingWindow(oldBitmap, oldOriginY, oldScale, originY, windowHeight);
+        kept = new Area(oldRendered);
+        kept.intersect(new Area(new Rectangle(0, originY, snapshot.width, windowHeight)));
       }
-      window = new Rectangle(0, bitmapOriginY, snapshot.width, bitmapWindowHeight);
+      final Rectangle window;
+      synchronized (bitmapLock) {
+        if (generation != bitmapWindowGeneration) {
+          // cleared meanwhile, decide again
+          continue;
+        }
+        if (fresh) {
+          // a fresh bitmap: pixels of the previous layout outside the new rows would linger. Keep
+          // the previous one to paint under it meanwhile, unless it never got rendered (rapid
+          // resizes): then the older, rendered one is still the better picture.
+          if (bitmap != null && (previousBitmap == null || !renderedArea.isEmpty())) {
+            previousBitmap = bitmap;
+            previousOriginY = bitmapOriginY;
+            previousScale = bitmapScale;
+          }
+          bitmapScale = snapshot.scale;
+          bitmapLayout = snapshot;
+        }
+        bitmap = target;
+        bitmapOriginY = originY;
+        bitmapWindowHeight = windowHeight;
+        bitmapWindowGeneration++;
+        renderedArea = kept;
+        window = new Rectangle(0, bitmapOriginY, snapshot.width, bitmapWindowHeight);
+      }
+      if (fresh) {
+        SwingUtilities.invokeLater(
+            () -> {
+              revalidate();
+              repaint();
+            });
+      }
+      return window;
     }
-    if (changed) {
-      SwingUtilities.invokeLater(
-          () -> {
-            revalidate();
-            repaint();
-          });
-    }
-    return window;
   }
 
   /**
-   * Re-anchors the backing window at {@code originY}, keeping the pixels of the rows the old and
-   * new windows share. Must hold {@link #bitmapLock}.
+   * A new bitmap for the window re-anchored at {@code originY}, keeping the pixels of the rows the
+   * old and new windows share. Always a new image: the render worker may still be drawing into the
+   * old one, and what it draws there after this copy is dropped, never published as rendered.
    */
-  private void moveBackingWindow(DrawingProperties snapshot, int originY, int windowHeight) {
-    double scale = bitmapScale;
-    int deviceWidth = bitmap.getWidth();
+  private BufferedImage movedBackingWindow(
+      BufferedImage old, int oldOriginY, double scale, int originY, int windowHeight) {
+    int deviceWidth = old.getWidth();
     int deviceHeight = deviceWindowHeight(windowHeight, scale);
     // device row the old window's first row lands on in the new one
-    int shift = toDevice(bitmapOriginY, scale) - toDevice(originY, scale);
-    BufferedImage target =
-        bitmap.getHeight() == deviceHeight ? bitmap : createOpaqueImage(deviceWidth, deviceHeight);
+    int shift = toDevice(oldOriginY, scale) - toDevice(originY, scale);
+    BufferedImage target = createOpaqueImage(deviceWidth, deviceHeight);
     Graphics2D graphics = target.createGraphics();
-    if (target == bitmap) {
-      graphics.copyArea(0, 0, deviceWidth, deviceHeight, 0, shift);
-    } else {
-      graphics.drawImage(bitmap, 0, shift, null);
-    }
+    graphics.drawImage(old, 0, shift, null);
     int keptTop = Math.max(0, shift);
-    int keptBottom = Math.min(deviceHeight, shift + bitmap.getHeight());
+    int keptBottom = Math.min(deviceHeight, shift + old.getHeight());
     graphics.setPaint(backgroundColor);
     if (keptBottom <= keptTop) {
       graphics.fillRect(0, 0, deviceWidth, deviceHeight);
@@ -896,11 +949,7 @@ public class HexHivePanel extends JPanel implements Scrollable {
       graphics.fillRect(0, keptBottom, deviceWidth, deviceHeight - keptBottom);
     }
     graphics.dispose();
-    bitmap = target;
-    bitmapOriginY = originY;
-    bitmapWindowHeight = windowHeight;
-    bitmapWindowGeneration++;
-    renderedArea.intersect(new Area(new Rectangle(0, originY, snapshot.width, windowHeight)));
+    return target;
   }
 
   private void requestFocusedRender(
@@ -920,23 +969,27 @@ public class HexHivePanel extends JPanel implements Scrollable {
     }
     boolean needsPriorityRender;
     boolean needsTargetRender;
+    final boolean hasBitmap;
+    final Area rendered;
     synchronized (bitmapLock) {
-      boolean visibleCovered =
-          visibleBounds.isEmpty()
-              || renderedArea.contains(
-                  visibleBounds.x, visibleBounds.y, visibleBounds.width, visibleBounds.height);
-      needsPriorityRender =
-          force
-              || bitmap == null
-              || !visibleCovered
-              || !renderedArea.contains(
-                  priorityBounds.x, priorityBounds.y, priorityBounds.width, priorityBounds.height);
-      needsTargetRender =
-          force
-              || bitmap == null
-              || !renderedArea.contains(
-                  targetBounds.x, targetBounds.y, targetBounds.width, targetBounds.height);
+      hasBitmap = bitmap != null;
+      rendered = renderedArea;
     }
+    boolean visibleCovered =
+        visibleBounds.isEmpty()
+            || rendered.contains(
+                visibleBounds.x, visibleBounds.y, visibleBounds.width, visibleBounds.height);
+    needsPriorityRender =
+        force
+            || !hasBitmap
+            || !visibleCovered
+            || !rendered.contains(
+                priorityBounds.x, priorityBounds.y, priorityBounds.width, priorityBounds.height);
+    needsTargetRender =
+        force
+            || !hasBitmap
+            || !rendered.contains(
+                targetBounds.x, targetBounds.y, targetBounds.width, targetBounds.height);
     if (needsPriorityRender) {
       enqueueRender(new RenderRequest(adapter, drawingProperties, priorityBounds, true));
     } else if (needsTargetRender) {
@@ -1033,19 +1086,62 @@ public class HexHivePanel extends JPanel implements Scrollable {
         return;
       }
     }
-    synchronized (bitmapLock) {
-      // The batches only cover the rows' cubes. The padding around them is already background,
-      // count it as rendered too, or the visible area never looks covered and every paint queues
-      // yet another render. Only valid if the window didn't move while the batches were merged.
-      if (bitmapWindowGeneration == windowGeneration
-          && bitmapLayout != null
-          && bitmapLayout.hasSameLayout(drawingProperties)) {
-        renderedArea.add(
-            new Area(
-                renderBounds.intersection(
-                    new Rectangle(0, bitmapOriginY, drawingProperties.width, bitmapWindowHeight))));
+    // The batches only cover the rows' cubes. The padding around them is already background,
+    // count it as rendered too, or the visible area never looks covered and every paint queues
+    // yet another render. Only valid if the window didn't move while the batches were merged.
+    publishRendered(null, windowGeneration, drawingProperties, renderBounds, true);
+  }
+
+  /**
+   * Marks {@code bounds} as rendered, if the backing bitmap is still the one the pixels were drawn
+   * for. The area is combined outside {@link #bitmapLock} and swapped in under it.
+   *
+   * @param expectedBitmap the bitmap that was drawn into, or null if only the generation matters
+   * @param clipToWindow whether to keep only the part inside the current window
+   * @return false if the bitmap, window or layout changed, nothing was marked
+   */
+  private boolean publishRendered(
+      BufferedImage expectedBitmap,
+      int expectedGeneration,
+      DrawingProperties layout,
+      Rectangle bounds,
+      boolean clipToWindow) {
+    while (true) {
+      final Area current;
+      final Rectangle added;
+      synchronized (bitmapLock) {
+        if (!isCurrentBacking(expectedBitmap, expectedGeneration, layout)) {
+          return false;
+        }
+        current = renderedArea;
+        added =
+            clipToWindow
+                ? bounds.intersection(
+                    new Rectangle(0, bitmapOriginY, layout.width, bitmapWindowHeight))
+                : bounds;
       }
+      Area next = new Area(current);
+      next.add(new Area(added));
+      synchronized (bitmapLock) {
+        if (!isCurrentBacking(expectedBitmap, expectedGeneration, layout)) {
+          return false;
+        }
+        if (renderedArea == current) {
+          renderedArea = next;
+          return true;
+        }
+      }
+      // the area was replaced meanwhile, combine again
     }
+  }
+
+  /** Must hold {@link #bitmapLock}. */
+  private boolean isCurrentBacking(
+      BufferedImage expectedBitmap, int expectedGeneration, DrawingProperties layout) {
+    return (expectedBitmap == null || bitmap == expectedBitmap)
+        && bitmapWindowGeneration == expectedGeneration
+        && bitmapLayout != null
+        && bitmapLayout.hasSameLayout(layout);
   }
 
   private BufferedImage createOpaqueImage(int width, int height) {
@@ -1257,26 +1353,37 @@ public class HexHivePanel extends JPanel implements Scrollable {
       int sourceDeviceY,
       Rectangle mergeBounds) {
     double scale = drawingProperties.scale;
-    final Rectangle merged;
-    synchronized (bitmapLock) {
-      if (bitmap == null
-          || bitmapLayout == null
-          || !bitmapLayout.hasSameLayout(drawingProperties)) {
-        return false;
+    while (true) {
+      final BufferedImage target;
+      final int generation;
+      final int deviceOriginY;
+      final Rectangle merged;
+      synchronized (bitmapLock) {
+        if (bitmap == null
+            || bitmapLayout == null
+            || !bitmapLayout.hasSameLayout(drawingProperties)) {
+          return false;
+        }
+        // the window may have moved since this batch was requested, keep only what still fits
+        merged =
+            mergeBounds.intersection(
+                new Rectangle(0, bitmapOriginY, drawingProperties.width, bitmapWindowHeight));
+        if (merged.isEmpty()) {
+          return true;
+        }
+        target = bitmap;
+        generation = bitmapWindowGeneration;
+        deviceOriginY = toDevice(bitmapOriginY, scale);
       }
-      // the window may have moved since this batch was requested, keep only what still fits
-      merged =
-          mergeBounds.intersection(
-              new Rectangle(0, bitmapOriginY, drawingProperties.width, bitmapWindowHeight));
-      if (merged.isEmpty()) {
-        return true;
+      Runnable hook = beforeBatchMergeHook;
+      if (hook != null) {
+        hook.run();
       }
-      int deviceOriginY = toDevice(bitmapOriginY, scale);
       int destX1 = toDevice(merged.x, scale);
       int destY1 = toDevice(merged.y, scale);
       int destX2 = toDevice(merged.x + merged.width, scale);
       int destY2 = toDevice(merged.y + merged.height, scale);
-      Graphics2D graphics = bitmap.createGraphics();
+      Graphics2D graphics = target.createGraphics();
       graphics.drawImage(
           renderedBitmap,
           destX1,
@@ -1289,10 +1396,13 @@ public class HexHivePanel extends JPanel implements Scrollable {
           destY2 - sourceDeviceY,
           null);
       graphics.dispose();
-      renderedArea.add(new Area(merged));
+      if (publishRendered(target, generation, drawingProperties, merged, false)) {
+        SwingUtilities.invokeLater(() -> repaint(merged.x, merged.y, merged.width, merged.height));
+        return true;
+      }
+      // the bitmap was replaced or the window moved while drawing: draw again into the current
+      // one, or give up if the layout itself changed
     }
-    SwingUtilities.invokeLater(() -> repaint(merged.x, merged.y, merged.width, merged.height));
-    return true;
   }
 
   @Override
@@ -1344,39 +1454,56 @@ public class HexHivePanel extends JPanel implements Scrollable {
       snapshotProperties = drawingProperties;
       adapterSnapshot = latestAdapter;
     }
-    boolean scaleChanged;
-    synchronized (bitmapLock) {
-      scaleChanged = Math.abs(deviceScale - bitmapScale) > 0.001;
-    }
+    boolean scaleChanged = Math.abs(deviceScale - backingSnapshot().scale) > 0.001;
     boolean rescale = scaleChanged && renderScale != deviceScale;
     if (!rescale && snapshotProperties != null && adapterSnapshot != null) {
       // moves the backing window to the visible rows before it's blitted
       requestFocusedRender(snapshotProperties, adapterSnapshot, false);
     }
-    synchronized (bitmapLock) {
-      scaleChanged = Math.abs(deviceScale - bitmapScale) > 0.001;
-      if (bitmap != null) {
-        // only what the new bitmap covers: below its last row is plain background
-        Rectangle window = new Rectangle(0, bitmapOriginY, bitmapLayout.width, bitmapWindowHeight);
-        Rectangle visible = getVisibleRect().intersection(window);
-        if (previousBitmap != null
-            && (visible.isEmpty()
-                || renderedArea.contains(visible.x, visible.y, visible.width, visible.height))) {
-          previousBitmap = null;
+    // Blit from a snapshot taken under the tiny lock: the render worker keeps merging batches
+    // into the bitmap meanwhile and the EDT never waits for that.
+    BackingSnapshot backing = backingSnapshot();
+    if (backing.bitmap != null) {
+      BufferedImage previousBitmap = backing.previousBitmap;
+      // only what the new bitmap covers: below its last row is plain background
+      Rectangle window =
+          new Rectangle(0, backing.originY, backing.layoutWidth, backing.windowHeight);
+      Rectangle visible = getVisibleRect().intersection(window);
+      Area rendered = backing.renderedArea;
+      if (previousBitmap != null
+          && (visible.isEmpty()
+              || rendered.contains(visible.x, visible.y, visible.width, visible.height))) {
+        synchronized (bitmapLock) {
+          if (this.previousBitmap == previousBitmap) {
+            this.previousBitmap = null;
+          }
         }
-        if (previousBitmap != null) {
-          // the new layout is still rendering: show the last picture, the new rows over it
-          Graphics2D previous = (Graphics2D) g2d.create();
-          previous.clip(window);
-          blit(previous, transform, deviceScale, previousBitmap, previousOriginY, previousScale);
-          previous.dispose();
-          Graphics2D rendered = (Graphics2D) g2d.create();
-          rendered.clip(renderedArea);
-          blit(rendered, transform, deviceScale, bitmap, bitmapOriginY, bitmapScale);
-          rendered.dispose();
-        } else {
-          blit(g2d, transform, deviceScale, bitmap, bitmapOriginY, bitmapScale);
-        }
+        previousBitmap = null;
+      }
+      if (previousBitmap != null) {
+        // the new layout is still rendering: show the last picture, the new rows over it
+        Graphics2D previous = (Graphics2D) g2d.create();
+        previous.clip(window);
+        blit(
+            previous,
+            transform,
+            deviceScale,
+            previousBitmap,
+            backing.previousOriginY,
+            backing.previousScale);
+        previous.dispose();
+        Graphics2D renderedGraphics = (Graphics2D) g2d.create();
+        renderedGraphics.clip(rendered);
+        blit(
+            renderedGraphics,
+            transform,
+            deviceScale,
+            backing.bitmap,
+            backing.originY,
+            backing.scale);
+        renderedGraphics.dispose();
+      } else {
+        blit(g2d, transform, deviceScale, backing.bitmap, backing.originY, backing.scale);
       }
     }
     paintHoveredHex(g2d, snapshotProperties);
@@ -1386,6 +1513,59 @@ public class HexHivePanel extends JPanel implements Scrollable {
         final HexDataAdapter<?> adapter = adapterSnapshot;
         SwingUtilities.invokeLater(() -> updateData(adapter));
       }
+    }
+  }
+
+  /**
+   * One consistent view of the backing bitmap's bookkeeping, read under {@link #bitmapLock} and
+   * immutable afterwards ({@code renderedArea} is never mutated once published). The bitmap's
+   * pixels are not part of the snapshot: the render worker may still be merging batches into them.
+   */
+  static final class BackingSnapshot {
+    final BufferedImage bitmap;
+    final BufferedImage previousBitmap;
+    final int originY;
+    final int windowHeight;
+    final double scale;
+    final int previousOriginY;
+    final double previousScale;
+    final int layoutWidth;
+    final Area renderedArea;
+
+    private BackingSnapshot(
+        BufferedImage bitmap,
+        BufferedImage previousBitmap,
+        int originY,
+        int windowHeight,
+        double scale,
+        int previousOriginY,
+        double previousScale,
+        int layoutWidth,
+        Area renderedArea) {
+      this.bitmap = bitmap;
+      this.previousBitmap = previousBitmap;
+      this.originY = originY;
+      this.windowHeight = windowHeight;
+      this.scale = scale;
+      this.previousOriginY = previousOriginY;
+      this.previousScale = previousScale;
+      this.layoutWidth = layoutWidth;
+      this.renderedArea = renderedArea;
+    }
+  }
+
+  BackingSnapshot backingSnapshot() {
+    synchronized (bitmapLock) {
+      return new BackingSnapshot(
+          bitmap,
+          previousBitmap,
+          bitmapOriginY,
+          bitmapWindowHeight,
+          bitmapScale,
+          previousOriginY,
+          previousScale,
+          bitmapLayout != null ? bitmapLayout.width : 0,
+          renderedArea);
     }
   }
 

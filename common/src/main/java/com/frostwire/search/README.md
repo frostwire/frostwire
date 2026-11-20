@@ -163,7 +163,7 @@ result.getTorrentUrl().ifPresent(url -> {
 
 See any of the existing `*/SearchPattern.java` implementations under
 `com.frostwire.search.*` (e.g. `yt/YTSearchPattern.java`,
-`magnetdl/MagnetDLSearchPattern.java`) for a complete example of a
+`apibay/ApiBaySearchPattern.java`) for a complete example of a
 flat `SearchPattern` migration. Each pattern implements the
 `SearchPattern` interface directly with no abstract base class chain.
 

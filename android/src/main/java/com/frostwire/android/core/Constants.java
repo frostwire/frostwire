@@ -111,7 +111,9 @@ public final class Constants {
   public static final String PREF_KEY_SEARCH_USE_TPB = "frostwire.prefs.search.use_tpb";
   public static final String PREF_KEY_SEARCH_USE_ONE337X = "frostwire.prefs.search.use_one337x";
   public static final String PREF_KEY_SEARCH_USE_TORRENTZ2 = "frostwire.prefs.search.use_torrentz2";
-  public static final String PREF_KEY_SEARCH_USE_MAGNETDL = "frostwire.prefs.search.use_magnetdl";
+  // The stored key keeps its MagnetDL-era name so the user's choice survives the rename to ApiBay
+  // (frostwire/frostwire#1533).
+  public static final String PREF_KEY_SEARCH_USE_APIBAY = "frostwire.prefs.search.use_magnetdl";
   public static final String PREF_KEY_SEARCH_USE_TELLURIDE_COURIER =
       "frostwire.prefs.search.use_telluride_courier";
   public static final String PREF_KEY_SEARCH_USE_YT = "frostwire.prefs.search.use_yt";

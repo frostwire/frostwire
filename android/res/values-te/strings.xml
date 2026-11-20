@@ -497,7 +497,7 @@
     <string name="dummy_content_description" translatable="false">[dummy description]</string>
     <string name="http_download_status_uncompressing">కంప్రెస్ చేయడం</string>
     <string name="bittorrent" translatable="false">BitTorrent</string>
-    <string name="use_magnetdl">MagnetDL ఉపయోగించండి</string>
+    <string name="use_apibay">ApiBay ఉపయోగించండి</string>
     <string name="use_torrentscsv">TorrentCSVని ఉపయోగించండి</string>
     <string name="transfer_status_demuxing">డీమక్సింగ్</string>
     <string name="dummy_author" translatable="false">[Author]</string>

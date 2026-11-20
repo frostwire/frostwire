@@ -106,7 +106,7 @@ class SettingsToolsTest {
             "nyaa",
             "1337x",
             "torrentz2",
-            "magnetdl",
+            "apibay",
             "torrentscsv",
             "knaben",
             "bitsearch",
