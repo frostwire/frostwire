@@ -390,6 +390,135 @@ class CrashReportSpoolerReportTypesTest {
     assertNotEquals(first, second);
   }
 
+  private JsonObject crashJson(String name, Throwable problem) {
+    File dir = new File(tempDir.toFile(), name);
+    new CrashReportSpooler(dir, null, "7.1.5", 338, "").spool(problem);
+    return spooledJson(dir.toPath());
+  }
+
+  private static Throwable chain(int depth, Throwable leaf) {
+    Throwable current = leaf;
+    for (int i = 0; i < depth; i++) {
+      current = new RuntimeException("wrapper " + i + " /Users/someone/secret", current);
+    }
+    return current;
+  }
+
+  /** The real failure behind a wrapper is lost without it (frostwire/frostwire#1576). */
+  @Test
+  void crashReportCarriesTheRootCauseClassAndFramesButNotItsMessage() {
+    UnsatisfiedLinkError root = new UnsatisfiedLinkError("/Users/someone/lib.dylib not found");
+    root.setStackTrace(
+        new StackTraceElement[] {
+          new StackTraceElement("com.frostwire.Native", "load", "Native.java", 7),
+          new StackTraceElement("com.frostwire.Boot", "main", "Boot.java", 9)
+        });
+    Throwable outer =
+        new RuntimeException("Unable to load theme", new IllegalStateException("mid", root));
+
+    JsonObject json = crashJson("cause-chain", outer);
+
+    assertEquals(RuntimeException.class.getName(), json.get("exception_class").getAsString());
+    assertEquals(UnsatisfiedLinkError.class.getName(), json.get("cause_class").getAsString());
+    var frames = json.getAsJsonArray("cause_frames");
+    assertEquals(2, frames.size());
+    assertEquals(Set.of("class", "method", "line"), frames.get(0).getAsJsonObject().keySet());
+    assertEquals(
+        "com.frostwire.Native", frames.get(0).getAsJsonObject().get("class").getAsString());
+    assertEquals("load", frames.get(0).getAsJsonObject().get("method").getAsString());
+    assertEquals(7, frames.get(0).getAsJsonObject().get("line").getAsInt());
+    assertFalse(json.toString().contains("someone"));
+    assertFalse(json.toString().contains("Unable to load theme"));
+  }
+
+  @Test
+  void crashReportWithoutACauseLeavesOutTheCauseFields() {
+    JsonObject json = crashJson("no-cause", new IllegalStateException("alone"));
+    assertFalse(json.has("cause_class"));
+    assertFalse(json.has("cause_frames"));
+  }
+
+  @Test
+  void aCauseCycleTerminatesAtTheLastNewCause() {
+    RuntimeException a = new RuntimeException("a");
+    IllegalStateException b = new IllegalStateException("b", a);
+    a.initCause(b);
+
+    JsonObject json = crashJson("cycle", a);
+
+    assertEquals(IllegalStateException.class.getName(), json.get("cause_class").getAsString());
+  }
+
+  @Test
+  void aSelfCausedExceptionHasNoCauseFields() {
+    // initCause(this) is illegal; a cycle through itself is only reachable via a subclass.
+    Throwable looping =
+        new RuntimeException("loop") {
+          @Override
+          public synchronized Throwable getCause() {
+            return this;
+          }
+        };
+    assertFalse(crashJson("self-cause", looping).has("cause_class"));
+  }
+
+  @Test
+  void aDeepChainStopsAtTenHops() {
+    Throwable leaf = new Error("leaf");
+    // 15 wrappers above the leaf: the 10th cause below the outer one is a wrapper, not the leaf.
+    Throwable outer = chain(15, leaf);
+    Throwable expected = outer;
+    for (int i = 0; i < 10; i++) {
+      expected = expected.getCause();
+    }
+    assertNotEquals(leaf, expected);
+    expected.setStackTrace(
+        new StackTraceElement[] {new StackTraceElement("com.frostwire.Tenth", "run", "T.java", 1)});
+
+    JsonObject json = crashJson("deep", outer);
+
+    assertEquals(RuntimeException.class.getName(), json.get("cause_class").getAsString());
+    assertEquals(
+        "com.frostwire.Tenth",
+        json.getAsJsonArray("cause_frames").get(0).getAsJsonObject().get("class").getAsString());
+  }
+
+  @Test
+  void causeFramesUseTheStackFramesCap() {
+    Error root = new Error("deep stack");
+    StackTraceElement[] many = new StackTraceElement[100];
+    Arrays.fill(many, new StackTraceElement("com.frostwire.Example", "run", "Example.java", 42));
+    root.setStackTrace(many);
+
+    JsonObject json = crashJson("cap", new RuntimeException("outer", root));
+
+    assertEquals(64, json.getAsJsonArray("cause_frames").size());
+  }
+
+  @Test
+  void causeClassIsPrintableAsciiAtMostTwoHundredChars() {
+    Throwable root = new Exception() {};
+    JsonObject json = crashJson("ascii", new RuntimeException(root));
+    String cause = json.get("cause_class").getAsString();
+    assertTrue(cause.length() <= 200);
+    assertTrue(cause.chars().allMatch(c -> c >= 0x20 && c <= 0x7E));
+    assertEquals(root.getClass().getName(), cause);
+  }
+
+  @Test
+  void strictmodeAndWatchdogReportsNeverCarryTheCauseFields() {
+    File strict = new File(tempDir.toFile(), "cause-strict");
+    new CrashReportSpooler(strict, null, "7.1.5", 338, "")
+        .spoolStrictMode("a.B", 1, new StackTraceElement[0]);
+    File watchdog = new File(tempDir.toFile(), "cause-watchdog");
+    new CrashReportSpooler(watchdog, null, "7.1.5", 338, "").spoolWatchdog(3);
+    for (File dir : new File[] {strict, watchdog}) {
+      JsonObject json = spooledJson(dir.toPath());
+      assertFalse(json.has("cause_class"));
+      assertFalse(json.has("cause_frames"));
+    }
+  }
+
   private static JsonObject spooledJson(Path directory) {
     return spooledJson(directory, 0);
   }
