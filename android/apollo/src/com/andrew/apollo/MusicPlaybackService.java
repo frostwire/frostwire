@@ -898,36 +898,58 @@ public class MusicPlaybackService extends MediaSessionService {
       stopSimplePlayer();
     }
     if (!path.equals(justStoppedFile)) {
-      final String pathCopy = path;
+      ExoPlayer preview = null;
       try {
-        mSimplePlayer = new ExoPlayer.Builder(this).build();
-        mSimplePlayer.setMediaItem(MediaItem.fromUri(Uri.parse(path)));
-        mSimplePlayer.prepare();
-        mSimplePlayer.play();
-        mSimplePlayerPlayingFile = path;
-        mSimplePlayer.addListener(
-            new Player.Listener() {
-              @Override
-              public void onPlaybackStateChanged(int state) {
-                if (state == Player.STATE_ENDED) {
-                  mSimplePlayerPlayingFile = null;
-                  notifySimpleStopped(pathCopy);
-                  if (mSimplePlayer != null) {
-                    mSimplePlayer.release();
-                    mSimplePlayer = null;
+        preview = new ExoPlayer.Builder(this).build();
+        final ExoPlayer thisPreview = preview;
+        preview.setMediaItem(MediaItem.fromUri(Uri.parse(path)));
+        preview.addListener(
+            previewEndListener(
+                () -> {
+                  // A newer preview may have replaced this one already.
+                  if (mSimplePlayer == thisPreview) {
+                    stopSimplePlayer();
+                  } else {
+                    stopAndRelease(thisPreview);
                   }
-                }
-              }
-            });
+                }));
+        mSimplePlayer = preview;
+        mSimplePlayerPlayingFile = path;
+        preview.prepare();
+        preview.play();
       } catch (Throwable t) {
         LOG.error("playSimple() error: " + t.getMessage(), t);
-        if (mSimplePlayer != null) {
-          mSimplePlayer.release();
-          mSimplePlayer = null;
+        if (preview != null) {
+          stopAndRelease(preview);
+          if (mSimplePlayer == preview) {
+            mSimplePlayer = null;
+            mSimplePlayerPlayingFile = null;
+          }
         }
-        mSimplePlayerPlayingFile = null;
       }
     }
+  }
+
+  /**
+   * Runs {@code onFinished} when a preview ends or fails: a preview that can't be opened (missing
+   * file, unsupported format) never ended before, so it stayed in the UI as playing and its player
+   * leaked.
+   */
+  static Player.Listener previewEndListener(final Runnable onFinished) {
+    return new Player.Listener() {
+      @Override
+      public void onPlaybackStateChanged(int state) {
+        if (state == Player.STATE_ENDED) {
+          onFinished.run();
+        }
+      }
+
+      @Override
+      public void onPlayerError(@NonNull PlaybackException error) {
+        LOG.warn("Preview failed: " + error.getMessage());
+        onFinished.run();
+      }
+    };
   }
 
   public void stopSimplePlayer() {
