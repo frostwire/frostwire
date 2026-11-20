@@ -35,6 +35,7 @@ import java.io.File;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
 import java.util.function.Supplier;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -107,6 +108,17 @@ public final class BTEngine extends SessionManager {
 
   /** Runs just before {@link #ensureResumeTorrentFile} writes; tests interleave a writer here. */
   volatile Runnable beforeResumeTorrentBackfill = () -> {};
+
+  /**
+   * The per-torrent network choice (frostwire/frostwire#1304). Memory-only reads and writes, safe
+   * on the EDT; the file is read in {@link #start()} and written on {@link #networkPolicyQueue} and
+   * on shutdown.
+   */
+  private volatile TorrentNetworkPolicyStore networkPolicy;
+
+  /** Runs everything about the network policy that touches the file or libtorrent. */
+  private final ExecutorService networkPolicyQueue =
+      ExecutorsHelper.newProcessingQueue("BTEngine-NetworkPolicy");
 
   private final Queue<RestoreDownloadTask> restoreDownloadsQueue;
   private volatile BTEngineListener listener;
@@ -271,6 +283,7 @@ public final class BTEngine extends SessionManager {
   public void start() {
     // jlibtorrent 2.0.12.9 and older left a copy of the native library per start; see the class.
     StaleJlibtorrentCopies.deleteInBackground();
+    loadNetworkPolicy();
     SessionParams params = loadSettings();
     settings_pack sp = params.swig().getSettings();
     sp.set_str(settings_pack.string_types.listen_interfaces.swigValue(), ctx.interfaces);
@@ -373,6 +386,7 @@ public final class BTEngine extends SessionManager {
 
   @Override
   protected void onBeforeStop() {
+    flushNetworkPolicy();
     removeListener(innerListener);
     stateSaver.saveAndStop();
   }
@@ -897,33 +911,76 @@ public final class BTEngine extends SessionManager {
     return new File(ctx.homeDir, infoHash + ".resume");
   }
 
+  /** File of the per-torrent network choices, in the home folder next to the resume files. */
+  File networkPolicyFile() {
+    return new File(ctx.homeDir, "torrent-network-policy.txt");
+  }
+
+  /** Reads the network policy file. Called from {@link #start()}, never from the EDT. */
+  private void loadNetworkPolicy() {
+    TorrentNetworkPolicyStore store = new TorrentNetworkPolicyStore(networkPolicyFile());
+    store.load();
+    networkPolicy = store;
+  }
+
+  private void flushNetworkPolicy() {
+    TorrentNetworkPolicyStore store = networkPolicy;
+    if (store != null) {
+      store.flushIfDirty();
+    }
+  }
+
   /**
-   * Canonical persistence hash used to name BOTH the session .torrent and its .resume sidecar: v1
-   * when the torrent has one, else v2. Hybrid/v2 torrents used to record the .torrent under v1
-   * ({@code ti.infoHashV1()}) but the resume under {@code torrent_handle.infoHash()} (v2), so
-   * restore looked up {@code <v1>.resume}, found nothing, and fell back to the default data dir.
+   * The network mode chosen for the torrent with this canonical hash ({@link #canonicalInfoHash});
+   * {@link TorrentNetworkMode#DEFAULT} when it has none or the engine has not started. Memory only:
+   * UI threads may call it.
+   */
+  public TorrentNetworkMode getNetworkMode(String canonicalHash) {
+    TorrentNetworkPolicyStore store = networkPolicy;
+    return store == null ? TorrentNetworkMode.DEFAULT : store.get(canonicalHash);
+  }
+
+  /**
+   * Records the torrent's network mode and writes the policy file in the background. Memory only
+   * for the caller, so the EDT may call it. Returns false when the engine has not started, the hash
+   * is not valid or the store is full.
+   */
+  public boolean setNetworkMode(String canonicalHash, TorrentNetworkMode mode) {
+    TorrentNetworkPolicyStore store = networkPolicy;
+    if (store == null || !store.set(canonicalHash, mode)) {
+      return false;
+    }
+    networkPolicyQueue.execute(this::flushNetworkPolicy);
+    return true;
+  }
+
+  /**
+   * Canonical persistence hash used to name BOTH the session .torrent and its .resume sidecar, and
+   * to key every other sidecar such as the network policy: v1 when the torrent has one, else v2.
+   * Hybrid/v2 torrents used to record the .torrent under v1 ({@code ti.infoHashV1()}) but the
+   * resume under {@code torrent_handle.infoHash()} (v2), so restore looked up {@code <v1>.resume},
+   * found nothing, and fell back to the default data dir. The rule itself lives in {@link
+   * TorrentNetworkPolicyStore#canonicalKey}, the single implementation.
    */
   String canonicalInfoHash(TorrentInfo ti) {
     if (ti == null) {
       return null;
     }
+    String v1 = null;
+    String v2 = null;
     try {
-      Sha1Hash v1 = ti.infoHashV1();
-      if (v1 != null) {
-        return v1.toString().toLowerCase();
-      }
+      Sha1Hash h = ti.infoHashV1();
+      v1 = h == null ? null : h.toString();
     } catch (Throwable ignored) {
       // fall through to v2
     }
     try {
-      Sha256Hash v2 = ti.infoHashV2();
-      if (v2 != null && !v2.isAllZeros()) {
-        return v2.toString().toLowerCase();
-      }
+      Sha256Hash h = ti.infoHashV2();
+      v2 = h == null ? null : h.toString();
     } catch (Throwable ignored) {
       // no usable hash
     }
-    return null;
+    return TorrentNetworkPolicyStore.canonicalKey(v1, v2);
   }
 
   String canonicalInfoHash(TorrentHandle th) {
@@ -950,11 +1007,9 @@ public final class BTEngine extends SessionManager {
       return null;
     }
     try {
-      if (hashes.hasV1()) {
-        return hashes.getV1().toString().toLowerCase(Locale.ROOT);
-      }
-      Sha256Hash v2 = hashes.getV2();
-      return v2 == null || v2.isAllZeros() ? null : v2.toString().toLowerCase(Locale.ROOT);
+      String v1 = hashes.hasV1() ? hashes.getV1().toString() : null;
+      Sha256Hash v2 = hashes.hasV2() ? hashes.getV2() : null;
+      return TorrentNetworkPolicyStore.canonicalKey(v1, v2 == null ? null : v2.toString());
     } catch (Throwable unavailable) {
       return null;
     }

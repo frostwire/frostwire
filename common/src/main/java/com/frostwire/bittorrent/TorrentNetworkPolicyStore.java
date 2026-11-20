@@ -111,6 +111,19 @@ public final class TorrentNetworkPolicyStore {
     }
   }
 
+  /** True when at least one torrent is in {@code mode}. Memory only, no copy. */
+  public boolean hasAny(TorrentNetworkMode mode) {
+    if (mode == null || mode == TorrentNetworkMode.DEFAULT) {
+      return false;
+    }
+    for (TorrentNetworkMode m : modes.values()) {
+      if (m == mode) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /** A sorted, read-only copy of every non-default entry. */
   public Map<String, TorrentNetworkMode> snapshot() {
     return Collections.unmodifiableMap(new TreeMap<>(modes));
