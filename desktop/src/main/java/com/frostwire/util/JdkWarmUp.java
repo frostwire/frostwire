@@ -652,7 +652,20 @@ public final class JdkWarmUp {
       }
       current = current.getCause() == current ? null : current.getCause();
     }
-    return truncate(text.toString(), MAX_FAILURE_CHARS);
+    return printableAscii(truncate(text.toString(), MAX_FAILURE_CHARS));
+  }
+
+  /**
+   * Icebase accepts only printable ASCII in this field and rejects the whole report otherwise, and
+   * Windows error messages are localized: every other character becomes '?'.
+   */
+  private static String printableAscii(String text) {
+    StringBuilder ascii = new StringBuilder(text.length());
+    for (int i = 0; i < text.length(); i++) {
+      char c = text.charAt(i);
+      ascii.append(c >= 0x20 && c <= 0x7e ? c : '?');
+    }
+    return ascii.toString();
   }
 
   private static String scrub(String text, String home, String user) {

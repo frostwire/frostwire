@@ -102,4 +102,15 @@ class JdkWarmUpTextFailureTest {
     assertTrue(text.contains("<home>/x"), text);
     assertTrue(text.contains("<user> at"), text);
   }
+
+  @Test
+  void theDescriptionIsPrintableAsciiBecauseTheServerRejectsAnythingElse() {
+    String described =
+        JdkWarmUp.describeFailure(
+            new UnsatisfiedLinkError("No se puede encontrar el m\u00f3dulo\n\u65e5\u672c\t"),
+            "C:\\Users\\nobody",
+            "nobody");
+    assertTrue(described.matches("[\\x20-\\x7e]+"), described);
+    assertTrue(described.startsWith("java.lang.UnsatisfiedLinkError: No se puede encontrar el m"));
+  }
 }
