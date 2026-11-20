@@ -93,7 +93,7 @@ tasks.named('spotlessApply') { finalizedBy 'formatCommon' }
 // ./gradlew test jacocoTestReport writes build/reports/jacoco/test/html/index.html and the XML CI
 // summarizes. The fuzz and live-site tasks don't count.
 jacoco {
-    toolVersion = '0.8.13'
+    toolVersion = '0.8.16'
 }
 
 // Coverage may only go up. CI runs the verification after the tests. Raise the minimums as coverage
