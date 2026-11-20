@@ -6730,3 +6730,47 @@ msgid ""
 "FrostWire started with the default theme because your theme {0} could not be "
 "loaded. Logs and error reports are in {1}"
 msgstr "FrostWire paleista su numatytąja tema, nes nepavyko įkelti jūsų temos {0}. Žurnalai ir pranešimai apie klaidas yra {1}"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java
+msgid "Network"
+msgstr "Tinklas"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "Mixed"
+msgstr "Mišrus"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "I2P only"
+msgstr "Tik I2P"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "Clearnet only"
+msgstr "Tik įprastas internetas"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "Use regular internet and I2P peers, as FrostWire always has."
+msgstr "Naudoti įprasto interneto ir I2P bendraamžius, kaip FrostWire visada darė."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "Only use I2P peers. Needs I2P enabled in Options, and web seeds are not used. While any torrent is I2P only, mixed mode is off for all torrents."
+msgstr "Naudoti tik I2P bendraamžius. Reikia, kad I2P būtų įjungtas skiltyje Parinktys, o žiniatinklio šaltiniai nenaudojami. Kol bent vienas torentas nustatytas tik I2P, mišrus režimas išjungtas visiems torentams."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "Only use regular internet peers. Best effort: FrostWire does not refuse I2P peers for this torrent yet."
+msgstr "Naudoti tik įprasto interneto bendraamžius. Geriausiomis pastangomis: FrostWire dar neatmeta I2P bendraamžių šiam torentui."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "On hold: I2P is not enabled. Turn it on in Options > I2P."
+msgstr "Sulaikyta: I2P neįjungtas. Įjunkite skiltyje Parinktys > I2P."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "On hold: the I2P router is not reachable. Check Options > I2P."
+msgstr "Sulaikyta: I2P maršrutizatorius nepasiekiamas. Patikrinkite Parinktys > I2P."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "While a torrent is set to I2P only, mixed mode stays off for all torrents, whatever is checked here."
+msgstr "Kol bent vienas torentas nustatytas tik I2P, mišrus režimas lieka išjungtas visiems torentams, nesvarbu, kas čia pažymėta."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "A torrent set to Clearnet only is best effort: I2P peers are not refused for it yet."
+msgstr "Torentas, nustatytas tik įprastam internetui, veikia geriausiomis pastangomis: I2P bendraamžiai jam dar neatmetami."

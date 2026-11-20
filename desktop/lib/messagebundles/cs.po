@@ -7210,3 +7210,47 @@ msgid ""
 "FrostWire started with the default theme because your theme {0} could not be "
 "loaded. Logs and error reports are in {1}"
 msgstr "FrostWire se spustil s výchozím motivem, protože se nepodařilo načíst váš motiv {0}. Protokoly a hlášení o chybách jsou v {1}"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java
+msgid "Network"
+msgstr "Síť"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "Mixed"
+msgstr "Smíšená"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "I2P only"
+msgstr "Pouze I2P"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "Clearnet only"
+msgstr "Pouze běžný internet"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "Use regular internet and I2P peers, as FrostWire always has."
+msgstr "Používat protějšky z běžného internetu i z I2P, jako to FrostWire dělal vždy."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "Only use I2P peers. Needs I2P enabled in Options, and web seeds are not used. While any torrent is I2P only, mixed mode is off for all torrents."
+msgstr "Používat pouze protějšky z I2P. Vyžaduje zapnuté I2P v Možnosti, webové zdroje se nepoužívají. Dokud je některý torrent pouze I2P, je smíšený režim vypnutý pro všechny torrenty."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "Only use regular internet peers. Best effort: FrostWire does not refuse I2P peers for this torrent yet."
+msgstr "Používat pouze protějšky z běžného internetu. Podle možností: FrostWire zatím protějšky z I2P pro tento torrent neodmítá."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "On hold: I2P is not enabled. Turn it on in Options > I2P."
+msgstr "Pozastaveno: I2P není zapnuté. Zapněte ho v Možnosti > I2P."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "On hold: the I2P router is not reachable. Check Options > I2P."
+msgstr "Pozastaveno: router I2P není dostupný. Zkontrolujte Možnosti > I2P."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "While a torrent is set to I2P only, mixed mode stays off for all torrents, whatever is checked here."
+msgstr "Dokud je některý torrent nastaven na pouze I2P, zůstává smíšený režim vypnutý pro všechny torrenty, bez ohledu na to, co je zde zaškrtnuto."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "A torrent set to Clearnet only is best effort: I2P peers are not refused for it yet."
+msgstr "Torrent nastavený na pouze běžný internet funguje podle možností: protějšky z I2P se pro něj zatím neodmítají."
