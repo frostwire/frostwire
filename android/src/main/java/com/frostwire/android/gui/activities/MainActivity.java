@@ -224,6 +224,15 @@ public class MainActivity extends AbstractActivity
     return intent != null && intent.getBooleanExtra("gohome-frostwire", false);
   }
 
+  /**
+   * The navigation drawer sits beside the content and the NavigationView applies the system bar
+   * insets to itself, so only the content column is padded here.
+   */
+  @Override
+  protected View getInsetsTarget() {
+    return findView(R.id.activity_main_parent_layout);
+  }
+
   @Override
   protected void initComponents(Bundle savedInstanceState) {
     if (isShutdown()) {

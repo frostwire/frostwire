@@ -201,13 +201,13 @@
         <activity
                 android:name="com.andrew.apollo.ui.activities.HomeActivity"
                 android:screenOrientation="portrait"
-                android:windowSoftInputMode="adjustPan" />
+                android:windowSoftInputMode="adjustResize" />
         <activity
                 android:name="com.andrew.apollo.ui.activities.AudioPlayerActivity"
                 android:screenOrientation="portrait"
                 android:label="@string/frostwire_player"
                 android:launchMode="singleTop"
-                android:windowSoftInputMode="adjustPan"
+                android:windowSoftInputMode="adjustResize"
                 android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

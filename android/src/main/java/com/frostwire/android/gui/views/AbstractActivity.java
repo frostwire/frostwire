@@ -20,6 +20,7 @@ package com.frostwire.android.gui.views;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.Gravity;
@@ -28,6 +29,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import androidx.activity.EdgeToEdge;
+import androidx.activity.SystemBarStyle;
 import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
@@ -38,6 +41,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.util.EdgeToEdgeInsets;
 import com.frostwire.android.util.Debug;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -135,6 +139,36 @@ public abstract class AbstractActivity extends AppCompatActivity {
     setContentView(layoutResId);
     initComponents(savedInstanceState);
     setToolbar();
+    installEdgeToEdge();
+  }
+
+  /**
+   * Windows are edge-to-edge (enforced when targeting Android 15, no opt-out at 16): draw behind
+   * the system bars and keep the content clear of them. Only the toolbar's colored bar reaches the
+   * top of the screen, so with a toolbar the status bar icons are light.
+   */
+  private void installEdgeToEdge() {
+    Toolbar toolbar = findToolbar();
+    EdgeToEdge.enable(
+        this,
+        toolbar != null
+            ? SystemBarStyle.dark(Color.TRANSPARENT)
+            : SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT),
+        SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT));
+    View content = getInsetsTarget();
+    if (content != null) {
+      EdgeToEdgeInsets.install(content, toolbar);
+    }
+  }
+
+  /**
+   * The view that is kept clear of the system bars, the display cutout and the keyboard. The whole
+   * content by default; a screen that has views which handle insets themselves (a navigation
+   * drawer) returns just the part that does not.
+   */
+  @Nullable
+  protected View getInsetsTarget() {
+    return findViewById(android.R.id.content);
   }
 
   @Override
