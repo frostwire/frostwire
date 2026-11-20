@@ -40,7 +40,7 @@ public final class DesktopSearchEngineAdapter implements SearchEngineAdapter {
     SETTINGS.put(SearchEngineID.ONE337X_ID, SearchEnginesSettings.ONE337X_SEARCH_ENABLED);
     SETTINGS.put(SearchEngineID.NYAA_ID, SearchEnginesSettings.NYAA_SEARCH_ENABLED);
     SETTINGS.put(SearchEngineID.TORRENTZ2_ID, SearchEnginesSettings.TORRENTZ2_SEARCH_ENABLED);
-    SETTINGS.put(SearchEngineID.MAGNETDL_ID, SearchEnginesSettings.MAGNETDL_ENABLED);
+    SETTINGS.put(SearchEngineID.APIBAY_ID, SearchEnginesSettings.APIBAY_ENABLED);
     SETTINGS.put(SearchEngineID.TELLURIDE_ID, SearchEnginesSettings.TELLURIDE_ENABLED);
     SETTINGS.put(SearchEngineID.YT_ID, SearchEnginesSettings.YT_SEARCH_ENABLED);
     SETTINGS.put(SearchEngineID.TORRENTSCSV_ID, SearchEnginesSettings.TORRENTSCSV_SEARCH_ENABLED);

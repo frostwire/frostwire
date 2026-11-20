@@ -44,7 +44,7 @@
     <string name="dummy_action" translatable="false">[Action]</string>
     <string name="dummy_content_description" translatable="false">[dummy description]</string>
     <string name="bittorrent" translatable="false">BitTorrent</string>
-    <string name="use_magnetdl">Использовать MagnetDL</string>
+    <string name="use_apibay">Использовать ApiBay</string>
     <string name="dummy_author" translatable="false">[Author]</string>
     <string name="dummy_build" translatable="false">[build number]</string>
     <string name="yt_dlp_dummy_build" translatable="false">[yt_dlp build number]</string>

@@ -10,13 +10,13 @@ package com.frostwire.search.engines;
 import com.frostwire.search.CrawlingStrategy;
 import com.frostwire.search.SearchPattern;
 import com.frostwire.search.SearchPerformerFactory;
+import com.frostwire.search.apibay.ApiBaySearchPattern;
 import com.frostwire.search.bitsearch.BitsearchSearchPattern;
 import com.frostwire.search.frostclick.FrostClickSearchPattern;
 import com.frostwire.search.frostclick.UserAgent;
 import com.frostwire.search.internetarchive.InternetArchiveCrawlingStrategy;
 import com.frostwire.search.internetarchive.InternetArchiveSearchPattern;
 import com.frostwire.search.knaben.KnabenSearchPattern;
-import com.frostwire.search.magnetdl.MagnetDLSearchPattern;
 import com.frostwire.search.nyaa.NyaaSearchPattern;
 import com.frostwire.search.one337x.One337xCrawlingStrategy;
 import com.frostwire.search.one337x.One337xSearchPattern;
@@ -123,7 +123,7 @@ public final class SearchEngines {
                 INTERNET_ARCHIVE_TIMEOUT),
             web(SearchEngineID.BITSEARCH_ID, "Bitsearch", BitsearchSearchPattern::new),
             web(SearchEngineID.KNABEN_ID, "Knaben", KnabenSearchPattern::new),
-            web(SearchEngineID.MAGNETDL_ID, "magnetdl", MagnetDLSearchPattern::new),
+            web(SearchEngineID.APIBAY_ID, "ApiBay", ApiBaySearchPattern::new),
             web(SearchEngineID.NYAA_ID, "Nyaa", NyaaSearchPattern::new),
             web(
                 SearchEngineID.ONE337X_ID,

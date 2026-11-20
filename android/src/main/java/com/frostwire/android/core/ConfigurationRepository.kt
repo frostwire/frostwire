@@ -426,7 +426,7 @@ object ConfigurationRepository {
         m[Constants.PREF_KEY_SEARCH_USE_NYAA] = true
         m[Constants.PREF_KEY_SEARCH_USE_TPB] = true
         m[Constants.PREF_KEY_SEARCH_USE_TORRENTZ2] = true
-        m[Constants.PREF_KEY_SEARCH_USE_MAGNETDL] = true
+        m[Constants.PREF_KEY_SEARCH_USE_APIBAY] = true
         m[Constants.PREF_KEY_SEARCH_USE_ONE337X] = true
         m[Constants.PREF_KEY_SEARCH_USE_BITSEARCH] = true
         m[Constants.PREF_KEY_SEARCH_USE_BTDIGG] = true

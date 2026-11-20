@@ -76,7 +76,7 @@
     <CheckBoxPreference
         android:key="frostwire.prefs.search.use_magnetdl"
         android:layout="@layout/view_preference_search_engine"
-        android:title="@string/use_magnetdl"
+        android:title="@string/use_apibay"
         android:defaultValue="true" />
     <CheckBoxPreference
         android:key="frostwire.prefs.search.use_nyaa"

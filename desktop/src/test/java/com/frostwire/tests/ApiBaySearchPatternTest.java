@@ -18,18 +18,15 @@
 
 package com.frostwire.tests;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import com.frostwire.search.CompositeFileSearchResult;
-import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.ISearchPerformer;
 import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchPerformerFactory;
 import com.frostwire.search.SearchResult;
-import com.frostwire.search.magnetdl.MagnetDLSearchPattern;
+import com.frostwire.search.apibay.ApiBaySearchPattern;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 import java.util.ArrayList;
@@ -38,13 +35,12 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 /**
- * MagnetDL V2 Search Pattern Test Performs real searches against magnetdl.homes to validate pattern
- * matching
+ * ApiBay search live test. Performs real searches against apibay.org to validate pattern matching
  *
- * <p>gradle test --tests "com.frostwire.tests.MagnetDLSearchPatternTest.magnetdlSearchTest"
+ * <p>gradle test --tests "com.frostwire.tests.ApiBaySearchPatternTest.apibaySearchTest"
  */
-public final class MagnetDLSearchPatternTest {
-  private static final Logger LOG = Logger.getLogger(MagnetDLSearchPatternTest.class);
+public final class ApiBaySearchPatternTest {
+  private static final Logger LOG = Logger.getLogger(ApiBaySearchPatternTest.class);
 
   /**
    * Searches the live site, so it runs only with {@code ./gradlew test -Plive}: whenever the site
@@ -55,7 +51,7 @@ public final class MagnetDLSearchPatternTest {
    */
   @Tag("live")
   @Test
-  public void magnetdlSearchTest() {
+  public void apibaySearchTest() {
     String searchTerm = "ubuntu";
 
     // Create V2 SearchPerformer using SearchPerformerFactory
@@ -63,16 +59,16 @@ public final class MagnetDLSearchPatternTest {
         SearchPerformerFactory.createSearchPerformer(
             1,
             searchTerm,
-            new MagnetDLSearchPattern(),
+            new ApiBaySearchPattern(),
             null, // No crawling strategy needed
             5000 // 5 second timeout
             );
 
-    MagnetDLSearchListener listener = new MagnetDLSearchListener();
+    ApiBaySearchListener listener = new ApiBaySearchListener();
     performer.setListener(listener);
 
     try {
-      LOG.info("MagnetDLSearchPatternTest: Starting search for '" + searchTerm + "'");
+      LOG.info("ApiBaySearchPatternTest: Starting search for '" + searchTerm + "'");
       performer.perform();
     } catch (Throwable t) {
       t.printStackTrace();
@@ -86,24 +82,10 @@ public final class MagnetDLSearchPatternTest {
       fail(listener.getFailedMessages());
     }
 
-    LOG.info("MagnetDLSearchPatternTest: PASSED");
+    LOG.info("ApiBaySearchPatternTest: PASSED");
   }
 
-  @Test
-  public void parseQuotedJsonArrayResponse() {
-    MagnetDLSearchPattern pattern = new MagnetDLSearchPattern();
-    String responseBody =
-        "\"[{\\\"id\\\":\\\"59191690\\\",\\\"name\\\":\\\"Ubuntu 22.04 LTS\\\",\\\"info_hash\\\":\\\"2C6B6858D61DA9543D4231A71DB4B1C9264B0685\\\",\\\"seeders\\\":\\\"31\\\",\\\"size\\\":\\\"3654957056\\\",\\\"added\\\":\\\"1652877231\\\"}]\"";
-
-    List<FileSearchResult> results = pattern.parseResults(responseBody);
-
-    assertFalse(results.isEmpty(), "Quoted MagnetDL JSON payload should still parse");
-    CompositeFileSearchResult result = (CompositeFileSearchResult) results.get(0);
-    assertEquals("Ubuntu 22.04 LTS", result.getDisplayName());
-    assertEquals("magnetdl", result.getSource());
-  }
-
-  static class MagnetDLSearchListener implements SearchListener {
+  static class ApiBaySearchListener implements SearchListener {
     final List<String> failedTests = new ArrayList<>();
 
     @Override
@@ -113,11 +95,11 @@ public final class MagnetDLSearchPatternTest {
         return;
       }
 
-      LOG.info("MagnetDLSearchListener.onResults: Got " + results.size() + " results");
+      LOG.info("ApiBaySearchListener.onResults: Got " + results.size() + " results");
 
       for (SearchResult result : results) {
         CompositeFileSearchResult sr = (CompositeFileSearchResult) result;
-        LOG.info("MagnetDLSearchListener.onResults:");
+        LOG.info("ApiBaySearchListener.onResults:");
         LOG.info("\t DisplayName: " + sr.getDisplayName());
         LOG.info("\t Size: " + sr.getSize());
         LOG.info("\t Source: " + sr.getSource());

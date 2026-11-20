@@ -501,7 +501,7 @@
     <string name="dummy_action" translatable="false">[Action]</string>
     <string name="dummy_content_description" translatable="false">[dummy description]</string>
     <string name="bittorrent" translatable="false">BitTorrent</string>
-    <string name="use_magnetdl">使用 MagnetDL</string>
+    <string name="use_apibay">使用 ApiBay</string>
     <string name="use_torrentscsv">使用 TorrentsCSV</string>
     <string name="dummy_author" translatable="false">[Author]</string>
     <string name="i2p_settings">I2P 设置</string>

@@ -71,7 +71,7 @@ public class SettingsAdapter {
         engines.addProperty("nyaa", SearchEnginesSettings.NYAA_SEARCH_ENABLED.getValue());
         engines.addProperty("1337x", SearchEnginesSettings.ONE337X_SEARCH_ENABLED.getValue());
         engines.addProperty("torrentz2", SearchEnginesSettings.TORRENTZ2_SEARCH_ENABLED.getValue());
-        engines.addProperty("magnetdl", SearchEnginesSettings.MAGNETDL_ENABLED.getValue());
+        engines.addProperty("apibay", SearchEnginesSettings.APIBAY_ENABLED.getValue());
         engines.addProperty("yt", SearchEnginesSettings.YT_SEARCH_ENABLED.getValue());
         engines.addProperty(
             "torrentscsv", SearchEnginesSettings.TORRENTSCSV_SEARCH_ENABLED.getValue());
@@ -175,7 +175,7 @@ public class SettingsAdapter {
     map.put("NYAA_SEARCH_ENABLED", SearchEnginesSettings.NYAA_SEARCH_ENABLED);
     map.put("ONE337X_SEARCH_ENABLED", SearchEnginesSettings.ONE337X_SEARCH_ENABLED);
     map.put("TORRENTZ2_SEARCH_ENABLED", SearchEnginesSettings.TORRENTZ2_SEARCH_ENABLED);
-    map.put("MAGNETDL_ENABLED", SearchEnginesSettings.MAGNETDL_ENABLED);
+    map.put("APIBAY_ENABLED", SearchEnginesSettings.APIBAY_ENABLED);
     map.put("YT_SEARCH_ENABLED", SearchEnginesSettings.YT_SEARCH_ENABLED);
     map.put("TORRENTSCSV_SEARCH_ENABLED", SearchEnginesSettings.TORRENTSCSV_SEARCH_ENABLED);
     map.put("KNABEN_SEARCH_ENABLED", SearchEnginesSettings.KNABEN_SEARCH_ENABLED);

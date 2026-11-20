@@ -76,7 +76,7 @@ public class SettingsSetTool implements MCPTool {
       allowed.add("NYAA_SEARCH_ENABLED");
       allowed.add("ONE337X_SEARCH_ENABLED");
       allowed.add("TORRENTZ2_SEARCH_ENABLED");
-      allowed.add("MAGNETDL_ENABLED");
+      allowed.add("APIBAY_ENABLED");
       allowed.add("YT_SEARCH_ENABLED");
       allowed.add("TORRENTSCSV_SEARCH_ENABLED");
       allowed.add("KNABEN_SEARCH_ENABLED");

@@ -498,7 +498,7 @@
     <string name="dummy_action" translatable="false">[Action]</string>
     <string name="dummy_content_description" translatable="false">[dummy description]</string>
     <string name="bittorrent" translatable="false">BitTorrent</string>
-    <string name="use_magnetdl">Använd MagnetDL</string>
+    <string name="use_apibay">Använd ApiBay</string>
     <string name="use_torrentscsv">Använd TorrentsCSV</string>
     <string name="dummy_author" translatable="false">[Author]</string>
     <string name="i2p_settings">I2P Inställningar</string>

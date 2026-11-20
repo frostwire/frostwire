@@ -45,8 +45,16 @@ public class SearchEnginesSettings extends LimeProps {
       FACTORY.createBooleanSetting("TORRENTZ2_SEARCH_ENABLED", true);
   public static final BooleanSetting NYAA_SEARCH_ENABLED =
       FACTORY.createBooleanSetting("NYAA_SEARCH_ENABLED", true);
-  public static final BooleanSetting MAGNETDL_ENABLED =
+
+  /**
+   * Stored under this name before the engine became ApiBay (frostwire/frostwire#1533). It is still
+   * registered so that a user's choice survives: the ApiBay setting defaults to it.
+   */
+  private static final BooleanSetting LEGACY_MAGNETDL_ENABLED =
       FACTORY.createBooleanSetting("MAGNETDL_ENABLED", true);
+
+  public static final BooleanSetting APIBAY_ENABLED =
+      FACTORY.createBooleanSetting("APIBAY_ENABLED", LEGACY_MAGNETDL_ENABLED.getValue());
   public static final BooleanSetting TELLURIDE_ENABLED =
       (BooleanSetting) FACTORY.createBooleanSetting("TELLURIDE_ENABLED", true).setAlwaysSave(true);
   public static final BooleanSetting YT_SEARCH_ENABLED =
