@@ -6643,3 +6643,9 @@ msgstr "FrostWire נעצר לעיתים קרובות במחשב זה. נסה א�
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
 msgid "Dismiss"
 msgstr "סגור"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/ThemeFallbackNotice.java
+msgid ""
+"FrostWire started with the default theme because your theme {0} could not be "
+"loaded. Logs and error reports are in {1}"
+msgstr "FrostWire הופעל עם ערכת הנושא ברירת המחדל מפני שלא ניתן היה לטעון את ערכת הנושא {0} שלך. יומני הרישום ודוחות השגיאה נמצאים ב-{1}"

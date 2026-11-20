@@ -6737,3 +6737,9 @@ msgstr "FrostWire qed jieqaf spiss fuq dan il-kompjuter. Ipprova l-modalità Ħa
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
 msgid "Dismiss"
 msgstr "Agħlaq"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/ThemeFallbackNotice.java
+msgid ""
+"FrostWire started with the default theme because your theme {0} could not be "
+"loaded. Logs and error reports are in {1}"
+msgstr "FrostWire beda bit-tema awtomatika minħabba li t-tema tiegħek {0} ma setgħetx titgħabba. Il-logs u r-rapporti tal-iżbalji jinsabu f''{1}"

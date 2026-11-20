@@ -7015,3 +7015,9 @@ msgstr "FrostWire 在這台電腦上經常卡住。試試精簡模式"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
 msgid "Dismiss"
 msgstr "關閉"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/ThemeFallbackNotice.java
+msgid ""
+"FrostWire started with the default theme because your theme {0} could not be "
+"loaded. Logs and error reports are in {1}"
+msgstr "由於無法載入您的主題 {0}，FrostWire 已使用預設主題啟動。記錄檔與錯誤報告位於 {1}"

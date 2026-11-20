@@ -7032,3 +7032,9 @@ msgstr "FrostWire pysähtelee usein tällä tietokoneella. Kokeile tilaa Kevyt"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
 msgid "Dismiss"
 msgstr "Sulje"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/ThemeFallbackNotice.java
+msgid ""
+"FrostWire started with the default theme because your theme {0} could not be "
+"loaded. Logs and error reports are in {1}"
+msgstr "FrostWire käynnistyi oletusteemalla, koska teemaa {0} ei voitu ladata. Lokit ja virheraportit ovat kansiossa {1}"

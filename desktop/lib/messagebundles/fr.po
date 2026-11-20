@@ -7528,3 +7528,9 @@ msgstr "FrostWire se fige souvent sur cet ordinateur. Essayez le mode Léger"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
 msgid "Dismiss"
 msgstr "Fermer"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/ThemeFallbackNotice.java
+msgid ""
+"FrostWire started with the default theme because your theme {0} could not be "
+"loaded. Logs and error reports are in {1}"
+msgstr "FrostWire a démarré avec le thème par défaut, car votre thème {0} n''a pas pu être chargé. Les journaux et les rapports d''erreur se trouvent dans {1}"
