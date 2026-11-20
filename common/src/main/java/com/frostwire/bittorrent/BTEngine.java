@@ -1174,6 +1174,25 @@ public final class BTEngine extends SessionManager {
     th.resume();
   }
 
+  /** Why an I2P only torrent is held back, for a UI that shows its own (translated) text. */
+  public enum NetworkHold {
+    /** No I2P router is configured. */
+    I2P_NOT_ENABLED,
+    /** One is configured, but libtorrent cannot use its SAM bridge. */
+    BRIDGE_NOT_USABLE
+  }
+
+  /** The hold on the torrent with this canonical hash, or null. Memory only. */
+  public NetworkHold getNetworkHold(String canonicalHash) {
+    String reason = getNetworkBlockReason(canonicalHash);
+    if (reason == null) {
+      return null;
+    }
+    return reason.equals(blockReason(false, null))
+        ? NetworkHold.I2P_NOT_ENABLED
+        : NetworkHold.BRIDGE_NOT_USABLE;
+  }
+
   /** Whether the user last paused this torrent by hand (BTDownload.pause), not the engine. */
   private boolean isUserPaused(String canonicalHash) {
     Map<String, String> extra = downloadExtras.get(canonicalHash);
@@ -1231,7 +1250,7 @@ public final class BTEngine extends SessionManager {
    * found nothing, and fell back to the default data dir. The rule itself lives in {@link
    * TorrentNetworkPolicyStore#canonicalKey}, the single implementation.
    */
-  String canonicalInfoHash(TorrentInfo ti) {
+  public String canonicalInfoHash(TorrentInfo ti) {
     if (ti == null) {
       return null;
     }

@@ -499,6 +499,32 @@ public final class BTDownload implements BittorrentDownload {
     return null;
   }
 
+  /**
+   * This torrent's network mode (frostwire/frostwire#1304). Reads the torrent's hash through
+   * libtorrent: not on the EDT.
+   */
+  public TorrentNetworkMode getNetworkMode() {
+    return engine.getNetworkMode(engine.canonicalInfoHash(th));
+  }
+
+  /**
+   * Chooses this torrent's network mode and applies it in the background. Reads the torrent's hash
+   * through libtorrent: not on the EDT.
+   *
+   * @return false when the mode could not be recorded
+   */
+  public boolean setNetworkMode(TorrentNetworkMode mode) {
+    return engine.setNetworkMode(engine.canonicalInfoHash(th), mode);
+  }
+
+  /**
+   * Why the engine holds this I2P only torrent back, or null when it does not. Reads the torrent's
+   * hash through libtorrent: not on the EDT.
+   */
+  public BTEngine.NetworkHold getNetworkHold() {
+    return engine.getNetworkHold(engine.canonicalInfoHash(th));
+  }
+
   public String getInfoHash() {
     try {
       return th.infoHash().toString().toLowerCase();

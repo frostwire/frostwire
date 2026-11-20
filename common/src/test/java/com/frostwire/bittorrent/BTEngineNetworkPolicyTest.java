@@ -175,6 +175,28 @@ class BTEngineNetworkPolicyTest {
   }
 
   @Test
+  void aDownloadReadsAndChangesItsOwnNetworkModeAndSaysWhyItIsHeld() throws Exception {
+    local = LocalEngine.start(dir);
+    TorrentInfo ti = album("viadownload");
+    local.engine.download(ti, dir.resolve("content").toFile(), null, null);
+    BTDownload dl = LocalEngine.Events.next(local.events.added, "viadownload");
+    assertEquals(TorrentNetworkMode.MIXED, dl.getNetworkMode());
+    assertEquals(null, dl.getNetworkHold());
+
+    assertTrue(dl.setNetworkMode(TorrentNetworkMode.I2P_ONLY));
+
+    assertEquals(TorrentNetworkMode.I2P_ONLY, dl.getNetworkMode());
+    await(() -> dl.getNetworkHold() == BTEngine.NetworkHold.I2P_NOT_ENABLED, "held: no I2P");
+    local.engine.applySettings(
+        new SettingsPack()
+            .setString(settings_pack.string_types.i2p_hostname.swigValue(), "127.0.0.1")
+            .setInteger(settings_pack.int_types.i2p_port.swigValue(), 1));
+    await(
+        () -> dl.getNetworkHold() == BTEngine.NetworkHold.BRIDGE_NOT_USABLE,
+        "held: the bridge is unusable");
+  }
+
+  @Test
   void aTorrentTheUserPausedStaysPausedWhenTheHoldEnds() throws Exception {
     local = LocalEngine.start(dir);
     TorrentInfo ti = album("userpaused");
