@@ -531,7 +531,11 @@ public class MusicPlaybackService extends MediaSessionService {
       }
     }
 
-    // completeWakefulIntent removed — no longer using WakefulBroadcastReceiver
+    // Media3 acts on the media button and notification-action intents delivered here: its
+    // MediaSessionService.onStartCommand hands them to the session's player. Without this call the
+    // notification's play/pause/next/previous buttons (Android 8-12 draw them from these intents)
+    // and a headset's button, when sent to the service, did nothing.
+    super.onStartCommand(intent, flags, startId);
     return START_STICKY;
   }
 
