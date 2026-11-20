@@ -7379,3 +7379,9 @@ msgstr "FrostWire stockt auf diesem Computer oft. Probieren Sie den Modus Leicht
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
 msgid "Dismiss"
 msgstr "Schließen"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/ThemeFallbackNotice.java
+msgid ""
+"FrostWire started with the default theme because your theme {0} could not be "
+"loaded. Logs and error reports are in {1}"
+msgstr "FrostWire wurde mit dem Standard-Design gestartet, weil Ihr Design {0} nicht geladen werden konnte. Protokolle und Fehlerberichte befinden sich in {1}"

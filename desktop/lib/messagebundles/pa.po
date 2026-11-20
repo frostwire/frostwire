@@ -6834,3 +6834,9 @@ msgstr "FrostWire ਇਸ ਕੰਪਿਊਟਰ ’ਤੇ ਵਾਰ-ਵਾਰ ਰ
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
 msgid "Dismiss"
 msgstr "ਬੰਦ ਕਰੋ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/ThemeFallbackNotice.java
+msgid ""
+"FrostWire started with the default theme because your theme {0} could not be "
+"loaded. Logs and error reports are in {1}"
+msgstr "FrostWire ਡਿਫ਼ਾਲਟ ਥੀਮ ਨਾਲ ਸ਼ੁਰੂ ਹੋਇਆ ਕਿਉਂਕਿ ਤੁਹਾਡੀ ਥੀਮ {0} ਲੋਡ ਨਹੀਂ ਹੋ ਸਕੀ। ਲਾਗ ਅਤੇ ਗਲਤੀ ਰਿਪੋਰਟਾਂ {1} ਵਿੱਚ ਹਨ"

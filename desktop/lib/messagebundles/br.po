@@ -6693,3 +6693,9 @@ msgstr "FrostWire a ehan alies war an urzhiataer-mañ. Klaskit ar mod Skañv"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
 msgid "Dismiss"
 msgstr "Serriñ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/ThemeFallbackNotice.java
+msgid ""
+"FrostWire started with the default theme because your theme {0} could not be "
+"loaded. Logs and error reports are in {1}"
+msgstr "FrostWire a zo loc''het gant an tem dre ziouer peogwir n''eo ket bet gallet kargañ ho tem {0}. Ar marilhoù hag ar rapor fazioù a zo e {1}"

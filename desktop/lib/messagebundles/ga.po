@@ -7072,3 +7072,9 @@ msgstr "Bíonn FrostWire ag stopadh go minic ar an ríomhaire seo. Bain triail a
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
 msgid "Dismiss"
 msgstr "Dún"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/ThemeFallbackNotice.java
+msgid ""
+"FrostWire started with the default theme because your theme {0} could not be "
+"loaded. Logs and error reports are in {1}"
+msgstr "Thosaigh FrostWire leis an téama réamhshocraithe toisc nach bhféadfaí do théama {0} a luchtú. Tá na logaí agus na tuarascálacha earráide i {1}"

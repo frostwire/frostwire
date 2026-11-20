@@ -531,7 +531,11 @@ public class MusicPlaybackService extends MediaSessionService {
       }
     }
 
-    // completeWakefulIntent removed — no longer using WakefulBroadcastReceiver
+    // Media3 acts on the media button and notification-action intents delivered here: its
+    // MediaSessionService.onStartCommand hands them to the session's player. Without this call the
+    // notification's play/pause/next/previous buttons (Android 8-12 draw them from these intents)
+    // and a headset's button, when sent to the service, did nothing.
+    super.onStartCommand(intent, flags, startId);
     return START_STICKY;
   }
 
@@ -894,36 +898,58 @@ public class MusicPlaybackService extends MediaSessionService {
       stopSimplePlayer();
     }
     if (!path.equals(justStoppedFile)) {
-      final String pathCopy = path;
+      ExoPlayer preview = null;
       try {
-        mSimplePlayer = new ExoPlayer.Builder(this).build();
-        mSimplePlayer.setMediaItem(MediaItem.fromUri(Uri.parse(path)));
-        mSimplePlayer.prepare();
-        mSimplePlayer.play();
-        mSimplePlayerPlayingFile = path;
-        mSimplePlayer.addListener(
-            new Player.Listener() {
-              @Override
-              public void onPlaybackStateChanged(int state) {
-                if (state == Player.STATE_ENDED) {
-                  mSimplePlayerPlayingFile = null;
-                  notifySimpleStopped(pathCopy);
-                  if (mSimplePlayer != null) {
-                    mSimplePlayer.release();
-                    mSimplePlayer = null;
+        preview = new ExoPlayer.Builder(this).build();
+        final ExoPlayer thisPreview = preview;
+        preview.setMediaItem(MediaItem.fromUri(Uri.parse(path)));
+        preview.addListener(
+            previewEndListener(
+                () -> {
+                  // A newer preview may have replaced this one already.
+                  if (mSimplePlayer == thisPreview) {
+                    stopSimplePlayer();
+                  } else {
+                    stopAndRelease(thisPreview);
                   }
-                }
-              }
-            });
+                }));
+        mSimplePlayer = preview;
+        mSimplePlayerPlayingFile = path;
+        preview.prepare();
+        preview.play();
       } catch (Throwable t) {
         LOG.error("playSimple() error: " + t.getMessage(), t);
-        if (mSimplePlayer != null) {
-          mSimplePlayer.release();
-          mSimplePlayer = null;
+        if (preview != null) {
+          stopAndRelease(preview);
+          if (mSimplePlayer == preview) {
+            mSimplePlayer = null;
+            mSimplePlayerPlayingFile = null;
+          }
         }
-        mSimplePlayerPlayingFile = null;
       }
     }
+  }
+
+  /**
+   * Runs {@code onFinished} when a preview ends or fails: a preview that can't be opened (missing
+   * file, unsupported format) never ended before, so it stayed in the UI as playing and its player
+   * leaked.
+   */
+  static Player.Listener previewEndListener(final Runnable onFinished) {
+    return new Player.Listener() {
+      @Override
+      public void onPlaybackStateChanged(int state) {
+        if (state == Player.STATE_ENDED) {
+          onFinished.run();
+        }
+      }
+
+      @Override
+      public void onPlayerError(@NonNull PlaybackException error) {
+        LOG.warn("Preview failed: " + error.getMessage());
+        onFinished.run();
+      }
+    };
   }
 
   public void stopSimplePlayer() {

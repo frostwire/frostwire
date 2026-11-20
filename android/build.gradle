@@ -374,7 +374,7 @@ dependencies {
     implementation 'androidx.browser:browser:1.10.0'
     implementation 'androidx.core:core:1.19.1'
     implementation 'androidx.exifinterface:exifinterface:1.4.2'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.11.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.11.1'
     implementation 'androidx.preference:preference:1.2.1'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.2.0'
     implementation 'androidx.vectordrawable:vectordrawable-animated:1.2.0'
@@ -391,7 +391,7 @@ dependencies {
     implementation 'androidx.viewpager2:viewpager2:1.1.0'
 
     // Firebase Crashlytics
-    implementation platform('com.google.firebase:firebase-bom:35.1.0')
+    implementation platform('com.google.firebase:firebase-bom:35.2.0')
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
@@ -418,7 +418,7 @@ dependencies {
     }
 
     // Netty for IceBridge rUDP transport (in-process daemon on Android)
-    implementation('io.netty:netty-all:4.2.19.Final') {
+    implementation('io.netty:netty-all:4.2.21.Final') {
         // IceBridge uses Netty NIO UDP and HTTP; its platform-specific QUIC native transports
         // are unused on Android and package duplicate per-platform license resources.
         exclude group: 'io.netty', module: 'netty-codec-native-quic'
@@ -426,10 +426,10 @@ dependencies {
 
     // Software Ed25519 KeyFactory/Signature — AndroidKeyStore cannot import
     // jlibtorrent PKCS#8 seeds (API 34+ InvalidKeySpecException).
-    implementation 'org.bouncycastle:bcprov-jdk18on:1.86'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.87'
 
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.robolectric:robolectric:4.17'
+    testImplementation 'org.robolectric:robolectric:4.18.1'
     testImplementation 'androidx.test:core:1.7.0'
     testImplementation 'androidx.test.ext:junit:1.3.0'
     testImplementation 'androidx.media3:media3-test-utils:1.11.1'

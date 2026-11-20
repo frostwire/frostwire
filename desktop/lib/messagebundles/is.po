@@ -6930,3 +6930,9 @@ msgstr "FrostWire hikstar oft á þessari tölvu. Prófaðu Létt ham"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
 msgid "Dismiss"
 msgstr "Loka"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/ThemeFallbackNotice.java
+msgid ""
+"FrostWire started with the default theme because your theme {0} could not be "
+"loaded. Logs and error reports are in {1}"
+msgstr "FrostWire ræstist með sjálfgefnu þemanu vegna þess að ekki tókst að hlaða þemað þitt {0}. Atburðaskrár og villuskýrslur eru í {1}"

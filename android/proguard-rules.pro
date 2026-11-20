@@ -241,3 +241,13 @@
 -dontwarn jdk.jfr.Label
 -dontwarn jdk.jfr.MemoryAddress
 -dontwarn jdk.jfr.Name
+
+
+# Netty 4.2.21 adds a Java 24+ cleaner (java.lang.foreign), a ProcessHandle pid lookup and
+# JFR allocator events. Netty selects them only on JDKs that have them (PlatformDependent
+# reports Android as Java 8 and skips them), so the references are never resolved on Android.
+-dontwarn java.lang.Module
+-dontwarn java.lang.ProcessHandle
+-dontwarn java.lang.foreign.**
+-dontwarn jdk.jfr.FlightRecorderListener
+-dontwarn jdk.jfr.Registered

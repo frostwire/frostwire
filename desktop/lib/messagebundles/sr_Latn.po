@@ -6964,3 +6964,9 @@ msgstr "FrostWire često zastaje na ovom računaru. Probajte režim Laki"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
 msgid "Dismiss"
 msgstr "Zatvori"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/ThemeFallbackNotice.java
+msgid ""
+"FrostWire started with the default theme because your theme {0} could not be "
+"loaded. Logs and error reports are in {1}"
+msgstr "FrostWire je pokrenut sa podrazumevanom temom jer se vaša tema {0} nije mogla učitati. Dnevnici i izveštaji o greškama nalaze se u {1}"

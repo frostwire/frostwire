@@ -7301,3 +7301,9 @@ msgstr "このコンピューターでは FrostWire が頻繁に停止してい�
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
 msgid "Dismiss"
 msgstr "閉じる"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/ThemeFallbackNotice.java
+msgid ""
+"FrostWire started with the default theme because your theme {0} could not be "
+"loaded. Logs and error reports are in {1}"
+msgstr "テーマ {0} を読み込めなかったため、FrostWire は既定のテーマで起動しました。ログとエラーレポートは {1} にあります"

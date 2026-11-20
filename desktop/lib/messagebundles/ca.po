@@ -6749,3 +6749,9 @@ msgstr "FrostWire s’atura sovint en aquest ordinador. Proveu el mode Lleuger"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
 msgid "Dismiss"
 msgstr "Descarta"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/ThemeFallbackNotice.java
+msgid ""
+"FrostWire started with the default theme because your theme {0} could not be "
+"loaded. Logs and error reports are in {1}"
+msgstr "FrostWire s''ha iniciat amb el tema predeterminat perquè no s''ha pogut carregar el vostre tema {0}. Els registres i els informes d''error són a {1}"

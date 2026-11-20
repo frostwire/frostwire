@@ -6836,3 +6836,9 @@ msgstr "FrostWire peatub selles arvutis sageli. Proovi režiimi Kerge"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
 msgid "Dismiss"
 msgstr "Sulge"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/ThemeFallbackNotice.java
+msgid ""
+"FrostWire started with the default theme because your theme {0} could not be "
+"loaded. Logs and error reports are in {1}"
+msgstr "FrostWire käivitus vaiketeemaga, sest teie teemat {0} ei õnnestunud laadida. Logid ja veateated asuvad kaustas {1}"

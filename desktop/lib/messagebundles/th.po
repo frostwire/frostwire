@@ -7255,3 +7255,9 @@ msgstr "FrostWire ค้างบ่อยบนคอมพิวเตอร�
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
 msgid "Dismiss"
 msgstr "ปิด"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/ThemeFallbackNotice.java
+msgid ""
+"FrostWire started with the default theme because your theme {0} could not be "
+"loaded. Logs and error reports are in {1}"
+msgstr "FrostWire เริ่มทำงานด้วยธีมเริ่มต้น เพราะไม่สามารถโหลดธีม {0} ของคุณได้ บันทึกและรายงานข้อผิดพลาดอยู่ใน {1}"

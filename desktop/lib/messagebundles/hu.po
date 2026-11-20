@@ -7062,3 +7062,9 @@ msgstr "A FrostWire gyakran megakad ezen a gépen. Próbáld ki a Könnyű módo
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
 msgid "Dismiss"
 msgstr "Bezárás"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/ThemeFallbackNotice.java
+msgid ""
+"FrostWire started with the default theme because your theme {0} could not be "
+"loaded. Logs and error reports are in {1}"
+msgstr "A FrostWire az alapértelmezett témával indult el, mert a(z) {0} témát nem sikerült betölteni. A naplók és a hibajelentések itt találhatók: {1}"

@@ -93,7 +93,7 @@ tasks.named('spotlessApply') { finalizedBy 'formatCommon' }
 // ./gradlew test jacocoTestReport writes build/reports/jacoco/test/html/index.html and the XML CI
 // summarizes. The fuzz and live-site tasks don't count.
 jacoco {
-    toolVersion = '0.8.13'
+    toolVersion = '0.8.16'
 }
 
 // Coverage may only go up. CI runs the verification after the tests. Raise the minimums as coverage
@@ -321,11 +321,11 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.15.0'
     implementation 'com.squareup.okhttp3:okhttp:5.5.1'
     implementation 'com.googlecode.gettext-commons:gettext-commons:0.9.8'
-    implementation 'org.xerial:sqlite-jdbc:3.53.4.0'
-    implementation 'org.bouncycastle:bcpkix-jdk18on:1.86'
+    implementation 'org.xerial:sqlite-jdbc:3.54.1.0'
+    implementation 'org.bouncycastle:bcpkix-jdk18on:1.87'
 
     // Netty for IceBridge relay daemon (shared by desktop control path and headless server fat jar)
-    implementation 'io.netty:netty-all:4.2.19.Final'
+    implementation 'io.netty:netty-all:4.2.21.Final'
 
     // Also used by icebridgeCloudNatives / icebridgeJar multi-arch packaging below.
     ext.jlibtorrent_version = '2.1.2.1'
@@ -411,7 +411,7 @@ dependencies {
         implementation jna
     }
     // FlatLaf for dark theme support
-    implementation 'com.formdev:flatlaf:3.7.2'
+    implementation 'com.formdev:flatlaf:3.8'
     testImplementation platform('org.junit:junit-bom:5.14.4')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -1176,6 +1176,7 @@ test {
         includeTestsMatching "com.frostwire.gui.theme.PlatformFontsTest"
         includeTestsMatching "com.frostwire.gui.theme.AnimationsTest"
         includeTestsMatching "com.frostwire.gui.theme.ThemeStartupFallbackTest"
+        includeTestsMatching "com.frostwire.gui.theme.ThemeFallbackNoticeTest"
         includeTestsMatching "com.frostwire.gui.theme.DisabledIconsTest"
         includeTestsMatching "com.frostwire.gui.theme.MacLogicalFontsTest"
         includeTestsMatching "com.frostwire.gui.theme.BaseFileChooserUIDirectoryComboTest"
@@ -1195,6 +1196,8 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.GUIMediatorShutdownTest"
         includeTestsMatching "com.limegroup.gnutella.gui.GUIMediatorClipboardTest"
         includeTestsMatching "com.limegroup.gnutella.gui.ClipboardOffEdtStructureTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.TooltipsAreNotHtmlStructureTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.StatusLineSeedingToolTipTest"
         includeTestsMatching "com.limegroup.gnutella.gui.actions.OpenUrlSearchActionTest"
         includeTestsMatching "com.limegroup.gnutella.gui.SplashWindowFailedInitializeTest"
         includeTestsMatching "com.limegroup.gnutella.gui.FinalizerShutdownThreadTest"

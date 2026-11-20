@@ -7227,3 +7227,9 @@ msgstr "이 컴퓨터에서 FrostWire가 자주 멈춥니다. 라이트 모드�
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
 msgid "Dismiss"
 msgstr "닫기"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/ThemeFallbackNotice.java
+msgid ""
+"FrostWire started with the default theme because your theme {0} could not be "
+"loaded. Logs and error reports are in {1}"
+msgstr "테마 {0}을(를) 불러올 수 없어 FrostWire가 기본 테마로 시작되었습니다. 로그와 오류 보고서는 {1}에 있습니다"

@@ -7397,3 +7397,9 @@ msgstr "FrostWire hapert vaak op deze computer. Probeer de modus Licht"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
 msgid "Dismiss"
 msgstr "Sluiten"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/ThemeFallbackNotice.java
+msgid ""
+"FrostWire started with the default theme because your theme {0} could not be "
+"loaded. Logs and error reports are in {1}"
+msgstr "FrostWire is gestart met het standaardthema omdat uw thema {0} niet kon worden geladen. Logbestanden en foutrapporten staan in {1}"

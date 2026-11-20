@@ -23,6 +23,7 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.gui.PerformanceMode;
 import com.frostwire.gui.PerformanceSuggestion;
 import com.frostwire.gui.theme.MacLogicalFonts;
+import com.frostwire.gui.theme.ThemeFallbackNotice;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.search.relay.BTEngineListenerChain;
 import com.frostwire.search.relay.BlockHeaderSource;
@@ -217,6 +218,25 @@ final class Initializer {
     // Last of all, and never before: the identity is mined in the background only once the UI is
     // up and the saved downloads are loaded (frostwire/frostwire#1534).
     startRelayIdentityLoading();
+    showThemeFallbackNotice();
+  }
+
+  /**
+   * After the main window is up, tells the user once that their theme could not be loaded and the
+   * default one is running (frostwire/frostwire#1576). Queued after startup, never on the way to
+   * the window; shows nothing when no fallback happened.
+   */
+  private void showThemeFallbackNotice() {
+    String message = ThemeFallbackNotice.takeMessage();
+    if (message == null) {
+      return;
+    }
+    GUIMediator.safeInvokeLater(
+        () -> {
+          if (GUIMediator.isConstructed()) {
+            GUIMediator.instance().getStatusLine().showThemeFallbackNotice(message);
+          }
+        });
   }
 
   /** Initializes the very early things. */

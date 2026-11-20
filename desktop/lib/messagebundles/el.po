@@ -7341,3 +7341,9 @@ msgstr "Το FrostWire κολλάει συχνά σε αυτόν τον υπολ
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
 msgid "Dismiss"
 msgstr "Κλείσιμο"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/ThemeFallbackNotice.java
+msgid ""
+"FrostWire started with the default theme because your theme {0} could not be "
+"loaded. Logs and error reports are in {1}"
+msgstr "Το FrostWire ξεκίνησε με το προεπιλεγμένο θέμα επειδή δεν ήταν δυνατή η φόρτωση του θέματός σας {0}. Τα αρχεία καταγραφής και οι αναφορές σφαλμάτων βρίσκονται στο {1}"

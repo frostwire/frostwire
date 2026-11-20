@@ -23,6 +23,7 @@ import com.frostwire.gui.bittorrent.BTDownloadMediator;
 import com.frostwire.gui.theme.IconRepainter;
 import com.frostwire.gui.theme.SkinCheckBoxMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
+import com.frostwire.gui.theme.ToolTipText;
 import com.limegroup.gnutella.gui.actions.LimeAction;
 import com.limegroup.gnutella.gui.options.OptionsConstructor;
 import com.limegroup.gnutella.gui.options.OptionsMediator;
@@ -313,19 +314,25 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     socialButton.addActionListener(arg0 -> GUIMediator.openURL(url));
   }
 
+  /**
+   * Plain text, a line break between the title and the explanation: the translations carry {@code
+   * <b>} and {@code <p>}, and a tooltip that starts with {@code <html>} is parsed and laid out on
+   * the EDT each time it is shown.
+   */
+  static String seedingToolTipText(boolean seeding) {
+    return ToolTipText.plain(
+        seeding
+            ? I18n.tr("<b>Seeding</b><p>completed torrent downloads.</p>")
+            : I18n.tr(
+                "<b>Not Seeding</b><p>File chunks might be shared only during a torrent download.</p>"));
+  }
+
   private void createSeedingStatusLabel() {
     seedingStatusButton =
         new IconButton("", "SEEDING", true) {
           @Override
           public String getToolTipText() {
-            boolean seedingStatus = SharingSettings.SEED_FINISHED_TORRENTS.getValue();
-            // the translated strings carry <b> and <p>: SafeToolTipUI shows their plain text
-            return "<html>"
-                + (seedingStatus
-                    ? I18n.tr("<b>Seeding</b><p>completed torrent downloads.</p>")
-                    : I18n.tr(
-                        "<b>Not Seeding</b><p>File chunks might be shared only during a torrent download.</p>"))
-                + "</html>";
+            return seedingToolTipText(SharingSettings.SEED_FINISHED_TORRENTS.getValue());
           }
         };
     seedingStatusButton.setText(I18n.tr("Not Seeding")); // Default text
@@ -662,6 +669,30 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     notice.add(link);
     notice.add(dismiss);
     performanceNotice = notice;
+    showInCenter(notice);
+  }
+
+  /**
+   * Tells the user, once, that FrostWire started with the default theme because theirs could not be
+   * loaded (frostwire/frostwire#1576). Plain text in the middle of the bar with a dismiss button;
+   * it never replaces the Lite mode suggestion. EDT only.
+   */
+  public void showThemeFallbackNotice(String message) {
+    if (centerPanel == null || performanceNotice != null) {
+      return;
+    }
+    JButton dismiss = new JButton("\u00d7");
+    dismiss.setToolTipText(I18n.tr("Dismiss"));
+    dismiss.setBorderPainted(false);
+    dismiss.setContentAreaFilled(false);
+    dismiss.setFocusable(false);
+    JPanel notice = new JPanel(new FlowLayout(FlowLayout.CENTER, 4, 0));
+    notice.setOpaque(false);
+    JLabel text = new JLabel(message);
+    text.setToolTipText(message);
+    notice.add(text);
+    notice.add(dismiss);
+    dismiss.addActionListener(e -> showInCenter(new JLabel()));
     showInCenter(notice);
   }
 

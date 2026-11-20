@@ -7240,3 +7240,9 @@ msgstr "FrostWire stopper ofte opp på denne datamaskinen. Prøv Lett-modus"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
 msgid "Dismiss"
 msgstr "Lukk"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/ThemeFallbackNotice.java
+msgid ""
+"FrostWire started with the default theme because your theme {0} could not be "
+"loaded. Logs and error reports are in {1}"
+msgstr "FrostWire startet med standardtemaet fordi temaet ditt {0} ikke kunne lastes inn. Logger og feilrapporter finnes i {1}"

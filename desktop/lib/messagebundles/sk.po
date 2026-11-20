@@ -7038,3 +7038,9 @@ msgstr "FrostWire sa na tomto počítači často zasekáva. Skúste režim Ľahk
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
 msgid "Dismiss"
 msgstr "Zavrieť"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/ThemeFallbackNotice.java
+msgid ""
+"FrostWire started with the default theme because your theme {0} could not be "
+"loaded. Logs and error reports are in {1}"
+msgstr "FrostWire sa spustil s predvolenou témou, pretože sa nepodarilo načítať vašu tému {0}. Protokoly a hlásenia o chybách sú v {1}"

@@ -7298,3 +7298,9 @@ msgstr "FrostWire hay bị khựng trên máy tính này. Hãy thử chế độ
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java
 msgid "Dismiss"
 msgstr "Đóng"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/ThemeFallbackNotice.java
+msgid ""
+"FrostWire started with the default theme because your theme {0} could not be "
+"loaded. Logs and error reports are in {1}"
+msgstr "FrostWire đã khởi động với giao diện mặc định vì không thể tải giao diện {0} của bạn. Nhật ký và báo cáo lỗi nằm trong {1}"

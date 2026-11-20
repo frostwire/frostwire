@@ -26,8 +26,11 @@ import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -49,6 +52,7 @@ public final class CrashReportSpooler {
   private static final String ENDPOINT = "https://icebase.frostwire.com/";
   private static final int MAX_REPORTS = 5;
   private static final int MAX_FRAMES = 64;
+  private static final int MAX_CAUSE_HOPS = 10;
   // Per-key flood control on the Icebase path: at most THROTTLE_MAX_PER_KEY reports
   // per key per rolling THROTTLE_WINDOW_MILLIS window. Fail open on any internal error.
   private static final int THROTTLE_MAX_PER_KEY = 5;
@@ -443,6 +447,7 @@ public final class CrashReportSpooler {
 
   private CrashReport reportFor(Throwable problem) {
     Frame[] frames = framesFor(problem.getStackTrace());
+    Throwable root = rootCause(problem);
     return new CrashReport(
         appVersion,
         appBuild,
@@ -463,7 +468,29 @@ public final class CrashReportSpooler {
         oomKind(problem),
         missingClass(problem),
         frames,
+        root == null ? null : sanitizeViolationClass(root.getClass().getName()),
+        root == null ? null : framesFor(root.getStackTrace()),
         UUID.randomUUID().toString().replace("-", ""));
+  }
+
+  /**
+   * The deepest cause of {@code problem}, following {@link Throwable#getCause()} at most {@link
+   * #MAX_CAUSE_HOPS} times and stopping at a cycle; null when it has no cause, so the report leaves
+   * out the cause fields. Only the class and frames of the result are reported, never its message
+   * (frostwire/frostwire#1576).
+   */
+  static Throwable rootCause(Throwable problem) {
+    Set<Throwable> seen = Collections.newSetFromMap(new IdentityHashMap<>());
+    seen.add(problem);
+    Throwable root = problem;
+    for (int hop = 0; hop < MAX_CAUSE_HOPS; hop++) {
+      Throwable cause = root.getCause();
+      if (cause == null || !seen.add(cause)) {
+        break;
+      }
+      root = cause;
+    }
+    return root == problem ? null : root;
   }
 
   private static Frame[] framesFor(StackTraceElement[] trace) {
@@ -834,6 +861,14 @@ public final class CrashReportSpooler {
     private final String missing_class;
 
     private final Frame[] stack_frames;
+
+    /**
+     * The root cause's class and top frames, never its message; both null, and then left out of the
+     * JSON, when the exception has no cause (frostwire/frostwire#1576).
+     */
+    private final String cause_class;
+
+    private final Frame[] cause_frames;
     private final String report_nonce;
 
     private CrashReport(
@@ -856,6 +891,8 @@ public final class CrashReportSpooler {
         String oomKind,
         String missingClass,
         Frame[] stackFrames,
+        String causeClass,
+        Frame[] causeFrames,
         String nonce) {
       this.app_version = appVersion;
       this.app_build = Integer.toString(appBuild);
@@ -886,6 +923,8 @@ public final class CrashReportSpooler {
       this.oom_kind = oomKind;
       this.missing_class = missingClass;
       this.stack_frames = stackFrames;
+      this.cause_class = causeClass;
+      this.cause_frames = causeFrames;
       this.report_nonce = nonce;
     }
   }
