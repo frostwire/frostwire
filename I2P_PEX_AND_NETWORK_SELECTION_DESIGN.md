@@ -269,7 +269,8 @@ Rules:
 - [x] **1b** Engine (see 6.1): apply flags at add/restore/change, `allow_i2p_mixed` rule,
   fail-closed checks, web seed removal, `BTEngine.canonicalInfoHash` delegating to the shared key
   function.
-- [ ] **2** UI: add-torrent dialog, Transfer Details, Peers table I2P column, Options wording.
+- [x] **2** UI (see 6.3): select-files dialog, Transfer Details row, Peers table I2P marker,
+  Options wording.
 - [ ] **3** I2P PeX: verify the native extension end to end, bind `i2p_destination()`, show peers,
   follow the upstream changes (9164, per-torrent mixed flag).
 
@@ -309,8 +310,8 @@ Limits worth knowing:
 - The bridge error is sticky until the I2P settings change or the app restarts: libtorrent reports
   failures but no "bridge is up now" event, so a recovered router needs a settings re-apply (or the
   Options OK button) to release held torrents.
-- A torrent the user paused by hand and then switched to I2P_ONLY without I2P is released
-  (resumed) when the hold ends. Tracking "paused by the user before" is a phase 2 decision.
+- A torrent the user paused by hand stays paused when a hold ends (phase 2: the engine reads the
+  `was_paused` bit `BTDownload.pause()` records).
 - Peers passed at add time (`download(ti, ..., peers)`) are dropped by libtorrent while the torrent
   is I2P only and are not re-added when the mode goes back to MIXED.
 - With the flag set but a missing bridge, nothing connects either way (flag + mixed off), the pause
@@ -365,15 +366,55 @@ jlibtorrent (`frostwire-jlibtorrent`):
 - I2P getters/setters on `SettingsPack` (hostname, port, mixed, tunnel options) instead of raw SWIG.
 - Bind `torrent_handle::http_seeds` is not needed (2.1 has none).
 
-## 7.2 Open questions for the maintainer
+## 7.2 Maintainer-pending defaults and questions
 
-1. A `.torrent` file with an `.i2p` tracker is added today as a clearnet torrent (1.2). Should
-   FrostWire flag it I2P at add time (a behavior change for MIXED users who never chose I2P), or
-   leave it to the per-torrent choice?
-2. A recovered I2P router does not release held torrents until the I2P settings are re-applied
-   (6.1). Accept, or poll the SAM bridge (needs a small native or socket probe)?
-3. Should a torrent the user paused stay paused when a hold ends (needs a "user paused" bit)?
-4. Carry U1 and U2 upstream ourselves, and in which order after the pending PRs?
+Defaults chosen for phase 2, the maintainer may revert them in review:
+
+1. A `.torrent` with an `.i2p` tracker is NOT flagged I2P at add time (it is added as a clearnet
+   torrent, as today, 1.2): no MIXED behavior change. It is left to the per-torrent choice.
+2. The bridge error is sticky until the I2P settings are re-applied (known limit): libtorrent posts
+   no "bridge is up" event, so held torrents are released when the settings are applied again
+   (Options OK) or the app restarts.
+3. A torrent the user paused by hand is not resumed when a hold ends (a "user paused" bit, done).
+4. Upstream U1 (per-torrent mixed flag) and U2 (web-seed gating) stay proposals, not started.
+5. CLEARNET_ONLY stays best effort until U6: the UI says so in its tooltip and in Options > I2P.
+
+Still open:
+
+1. Should the hold text come with the engine's detail (the SAM error message) or stay the two
+   translated sentences? Now: the two sentences; the detail is only in the log.
+2. Should the add dialog be shown for every add, not only the partial (select files) one? Today a
+   plain add has no dialog, so the choice there is made in Transfer Details after the add, and the
+   torrent is added as MIXED first.
+
+### 6.3 What phase 2 implemented (desktop only)
+
+- `TorrentNetworkChoice` (desktop): labels, plain-text tooltips, the on-hold texts, the Options
+  notes, a combo box that reports only the user's choice, and `recordBeforeAdd`. No HTML anywhere.
+- **Transfer Details:** a "Network:" row (`TransferNetworkRow`) with Mixed / I2P only / Clearnet only
+  and, for a held I2P-only torrent, why (`BTEngine.NetworkHold`: I2P not enabled, or router not
+  reachable). The mode is read in `updateData` (already off the EDT) and the user's pick is applied
+  on `BackgroundQueuedExecutorService`; the periodic refresh never writes it back.
+- **Select-files dialog** (torrent files and magnets added with a selection): a "Network:" combo,
+  Mixed by default, recorded before the torrent is added.
+- **Peers table:** the `i2p_socket` flag (bit 16) shows `i` in the Flags column and
+  `i2p://destination-not-available` in the address column. The destination is not bound
+  (`peer_info::i2p_destination()`), so none is shown.
+- **Options > I2P:** two plain notes under "Allow mixed mode": I2P only keeps mixed mode off for all
+  torrents while one exists, and Clearnet only is best effort.
+- **Engine:** the user-paused bit, `BTDownload.getNetworkMode/setNetworkMode/getNetworkHold`.
+- Eleven strings in `frostwire.pot` and all 61 catalogs (AI translations, native review wanted).
+
+Not tested without a display: how the row, the dialog combo and the Options notes look and lay out
+(sizes, theme), the combo's popup, and the translated strings' fit. Their logic is tested headless.
+
+### 6.4 What is left: phase 3
+
+- A jlibtorrent binding for `peer_info::i2p_destination()` (then the Peers table can show the
+  `.b32.i2p` address) and `TorrentFlags.I2P_TORRENT` (then `TorrentNetworkFlags` becomes one line).
+- An end-to-end test with a real I2P router and a second client: I2P PeX itself (`i2p_pex`) is
+  libtorrent's own and untested here. No router is available in this environment.
+- The upstream proposals U1-U6 (7.1) when the maintainer wants them started.
 
 ## 8. Unverified
 
