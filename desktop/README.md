@@ -224,7 +224,6 @@ Frostwire Desktop is offered under the [GNU General Public License Version 3 (GP
 ### Official FrostWire sites
 
 [Main Website Frostwire.com](https://www.frostwire.com) |
-[FrostWire SubReddit](https://reddit.com/frostwire) |
 [FrostWire Discord Chatrooms](https://www.frostwire.com/chat) |
 [Facebook](http://www.facebook.com/FrostWireOfficial) |
 [Twitter @frostwire](https://twitter.com/frostwire) |

@@ -100,11 +100,6 @@ final class HelpMenu extends AbstractMenu {
             I18n.tr("Talk to other users, get help and help others, talk to developers")));
     addMenuItem(
         new OpenLinkAction(
-            "https://reddit.com/r/frostwire",
-            I18n.tr("Reddit"),
-            I18n.tr("Access the FrostWire Subreddit")));
-    addMenuItem(
-        new OpenLinkAction(
             "https://twitter.com/frostwire",
             I18n.tr("Follow us on Twitter"),
             I18n.tr("Follow us on Twitter")));

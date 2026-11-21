@@ -2983,11 +2983,11 @@ msgstr ""
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:34
 #, java-format
 msgid ""
-"<h2>Join the FrostWire Community</h2><ul><li><a href=\"{0}\">Discord Chat</"
-"a></li><li><a href=\"{1}\">Reddit</a></li></ul>"
+"<h2>Join the FrostWire Community</h2><ul><li><a href=\"{0}\">Discord C"
+"hat</a></li></ul>"
 msgstr ""
-"<h2>Sluit aan by die FrostWire-gemeenskap</h2><ul><li><a "
-"href=\"{0}\">Discord-klets</a></li><li><a href=\"{1}\">Reddit</a></li></ul>"
+"<h2>Sluit aan by die FrostWire-gemeenskap</h2><ul><li><a href=\"{0}\">"
+"Discord-klets</a></li></ul>"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:35
 msgid ""
@@ -4027,14 +4027,6 @@ msgstr "Discord-klets"
 msgid "Talk to other users, get help and help others, talk to developers"
 msgstr ""
 "Praat met ander gebruikers, kry hulp en help ander, praat met ontwikkelaars"
-
-#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/HelpMenu.java:69
-msgid "Reddit"
-msgstr "Reddit"
-
-#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/HelpMenu.java:69
-msgid "Access the FrostWire Subreddit"
-msgstr "Toegang tot die FrostWire-subreddit"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/HelpMenu.java:70
 msgid "Follow us on Twitter"

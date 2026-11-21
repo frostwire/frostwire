@@ -42,8 +42,8 @@ class TipOfTheDayMessages {
       I18n.tr(
           "You can change the look and feel of FrostWire by going to View &gt; Use Small Icons, Show Icon Text and Increase-Decrease the Font Size."),
       I18n.tr(
-          "<h2>Join the FrostWire Community</h2><ul><li><a href=\"{0}\">Discord Chat</a></li><li><a href=\"{1}\">Reddit</a></li></ul>",
-          "https://www.frostwire.com/chat", "https://reddit.com/r/frostwire"),
+          "<h2>Join the FrostWire Community</h2><ul><li><a href=\"{0}\">Discord Chat</a></li></ul>",
+          "https://www.frostwire.com/chat"),
       I18n.tr(
           "You can sort your search results by clicking on a column. The most useful column to sort by is the 'Seeds' column if you are looking for a torrent, Seeds represents an approximate number of computers that have the entire file and are online."),
       I18n.tr(

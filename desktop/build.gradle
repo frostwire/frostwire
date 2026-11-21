@@ -1197,6 +1197,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.GUIMediatorClipboardTest"
         includeTestsMatching "com.limegroup.gnutella.gui.ClipboardOffEdtStructureTest"
         includeTestsMatching "com.limegroup.gnutella.gui.TooltipsAreNotHtmlStructureTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.NoRedditLinksTest"
         includeTestsMatching "com.limegroup.gnutella.gui.StatusLineSeedingToolTipTest"
         includeTestsMatching "com.limegroup.gnutella.gui.actions.OpenUrlSearchActionTest"
         includeTestsMatching "com.limegroup.gnutella.gui.SplashWindowFailedInitializeTest"

@@ -46,11 +46,9 @@ public class SocialRecommendationsWindow extends SetupWindow {
   private static final String CHECK_ICON = "SOCIAL_MEDIA_CHECK";
   private static final String TWITTER_ICON = "SOCIAL_WIZARD_TWITTER";
   private static final String FACEBOOK_ICON = "SOCIAL_WIZARD_FACEBOOK";
-  private static final String REDDIT_ICON = "SOCIAL_WIZARD_REDDIT";
 
   /** The button icons this page shows. */
-  public static final List<String> ICONS =
-      List.of(CHECK_ICON, TWITTER_ICON, FACEBOOK_ICON, REDDIT_ICON);
+  public static final List<String> ICONS = List.of(CHECK_ICON, TWITTER_ICON, FACEBOOK_ICON);
 
   /**
    * Reads and decodes this page's icons from the jar into the theme-image cache. Building the page
@@ -74,9 +72,6 @@ public class SocialRecommendationsWindow extends SetupWindow {
         "alignx center");
     mainPanel.add(
         createSocialButton(FACEBOOK_ICON, GUIConstants.FACEBOOK_FROSTWIRE_URL, socialButtonW),
-        "alignx center");
-    mainPanel.add(
-        createSocialButton(REDDIT_ICON, GUIConstants.REDDIT_FROSTWIRE_URL, socialButtonW),
         "alignx center");
     setSetupComponent(mainPanel);
   }
