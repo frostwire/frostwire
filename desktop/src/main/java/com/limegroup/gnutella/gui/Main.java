@@ -96,6 +96,9 @@ public class Main {
           "FrostWire requires a graphical desktop session; no display is available. Exiting.");
       System.exit(1);
     }
+    // First of all, before any AWT or Swing text: HBShaper must be known to work before the first
+    // layout, or the JDK is switched to its JNI shaper (frostwire/frostwire#1587).
+    com.frostwire.util.TextShapingGuard.install();
     System.setProperty("sun.awt.noerasebackground", "true");
     // On Linux/KDE, set the AWT application class name to "FrostWire" so that
     // KDE Plasma shows "FrostWire" instead of "JavaEmbeddedFrame" in the system tray.

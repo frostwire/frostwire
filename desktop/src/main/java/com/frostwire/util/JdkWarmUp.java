@@ -617,13 +617,20 @@ public final class JdkWarmUp {
       step.run();
     } catch (Throwable t) {
       LOG.warn("Text warm-up failed: " + t.getMessage(), t);
-      try {
-        FIRST_TEXT_FAILURE.compareAndSet(
-            null,
-            describeFailure(t, System.getProperty("user.home"), System.getProperty("user.name")));
-      } catch (Throwable ignored) {
-        // Recording the failure must never change the warm-up's behavior.
-      }
+      recordTextFailure(t);
+    }
+  }
+
+  /**
+   * Keeps the first text failure of this run for {@link #firstTextWarmUpFailure()}; never throws.
+   */
+  static void recordTextFailure(Throwable t) {
+    try {
+      FIRST_TEXT_FAILURE.compareAndSet(
+          null,
+          describeFailure(t, System.getProperty("user.home"), System.getProperty("user.name")));
+    } catch (Throwable ignored) {
+      // Recording the failure must never change the caller's behavior.
     }
   }
 
