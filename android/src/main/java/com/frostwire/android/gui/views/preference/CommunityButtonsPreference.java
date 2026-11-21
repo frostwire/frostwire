@@ -54,8 +54,6 @@ public class CommunityButtonsPreference extends Preference {
         (ImageButton) holder.findViewById(R.id.view_preference_community_facebook_button);
     ImageButton githubButton =
         (ImageButton) holder.findViewById(R.id.view_preference_community_github_button);
-    ImageButton redditButton =
-        (ImageButton) holder.findViewById(R.id.view_preference_community_reddit_button);
     ImageButton chatButton =
         (ImageButton) holder.findViewById(R.id.view_preference_community_slack_button);
     ImageButton twitterButton =
@@ -65,7 +63,6 @@ public class CommunityButtonsPreference extends Preference {
     UIUtils.setupClickUrl(blogButton, Constants.FROSTWIRE_BLOG_URL + referrerParam);
     UIUtils.setupClickUrl(facebookButton, Constants.SOCIAL_URL_FACEBOOK_PAGE + referrerParam);
     UIUtils.setupClickUrl(twitterButton, Constants.SOCIAL_URL_TWITTER_PAGE + referrerParam);
-    UIUtils.setupClickUrl(redditButton, Constants.SOCIAL_URL_REDDIT_PAGE + referrerParam);
     UIUtils.setupClickUrl(githubButton, Constants.SOCIAL_URL_GITHUB_PAGE + referrerParam);
     UIUtils.setupClickUrl(chatButton, Constants.SOCIAL_URL_SLACK_PAGE + referrerParam);
 

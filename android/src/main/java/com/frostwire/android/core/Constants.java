@@ -279,7 +279,7 @@ public final class Constants {
   public static final String FROSTWIRE_MORE_RESULTS = "https://www.frostwire.com/more.results";
   public static final String SERVER_PROMOTIONS_URL =
       "https://update.frostwire.com/o.php?" + FROM_URL_PARAMETERS;
-  public static final String SUPPORT_URL = "https://www.reddit.com/r/FrostWire/";
+  public static final String SUPPORT_URL = "https://www.frostwire.com/chat";
   public static final String TERMS_OF_USE_URL = "https://www.frostwire.com/terms";
   public static final String ALL_FEATURED_DOWNLOADS_URL =
       "https://www.frostwire.com/featured-downloads/";
@@ -302,7 +302,6 @@ public final class Constants {
       "https://www.facebook.com/FrostwireOfficial";
 
   public static final String SOCIAL_URL_TWITTER_PAGE = "https://x.com/frostwire";
-  public static final String SOCIAL_URL_REDDIT_PAGE = "https://reddit.com/r/frostwire";
   public static final String SOCIAL_URL_GITHUB_PAGE = "https://github.com/frostwire/frostwire";
   public static final String SOCIAL_URL_SLACK_PAGE = "http://www.frostwire.com/chat";
 

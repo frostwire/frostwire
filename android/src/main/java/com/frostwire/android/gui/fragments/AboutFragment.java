@@ -109,14 +109,12 @@ public final class AboutFragment extends AbstractFragment {
 
     ImageButton facebookButton = findView(rootView, R.id.fragment_about_facebook_button);
     ImageButton twitterButton = findView(rootView, R.id.fragment_about_twitter_button);
-    ImageButton redditButton = findView(rootView, R.id.fragment_about_reddit_button);
     ImageButton githubButton = findView(rootView, R.id.fragment_about_github_button);
     ImageButton slackButton = findView(rootView, R.id.fragment_about_slack_button);
 
     String referrerParam = "?ref=android_about";
     setupClickUrl(facebookButton, Constants.SOCIAL_URL_FACEBOOK_PAGE + referrerParam);
     setupClickUrl(twitterButton, Constants.SOCIAL_URL_TWITTER_PAGE + referrerParam);
-    setupClickUrl(redditButton, Constants.SOCIAL_URL_REDDIT_PAGE + referrerParam);
     setupClickUrl(githubButton, Constants.SOCIAL_URL_GITHUB_PAGE + referrerParam);
     setupClickUrl(slackButton, Constants.SOCIAL_URL_SLACK_PAGE + referrerParam);
 

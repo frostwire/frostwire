@@ -651,15 +651,12 @@ public final class UIUtils {
     socialLinksDialog.setOnDismissListener(dismissListener);
     ImageButton fbButton = customView.findViewById(R.id.view_social_buttons_facebook_button);
     ImageButton twitterButton = customView.findViewById(R.id.view_social_buttons_twitter_button);
-    ImageButton redditButton = customView.findViewById(R.id.view_social_buttons_reddit_button);
     final String referrerParam =
         "?ref=android_" + ((referrerContextSuffix != null) ? referrerContextSuffix.trim() : "");
     fbButton.setOnClickListener(
         v -> UIUtils.openURL(v.getContext(), Constants.SOCIAL_URL_FACEBOOK_PAGE + referrerParam));
     twitterButton.setOnClickListener(
         v -> UIUtils.openURL(v.getContext(), Constants.SOCIAL_URL_TWITTER_PAGE + referrerParam));
-    redditButton.setOnClickListener(
-        v -> UIUtils.openURL(v.getContext(), Constants.SOCIAL_URL_REDDIT_PAGE + referrerParam));
     if (showInstallationCompleteSection) {
       LinearLayout installationCompleteLayout =
           customView.findViewById(R.id.view_social_buttons_installation_complete_layout);

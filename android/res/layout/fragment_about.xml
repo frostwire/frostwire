@@ -113,17 +113,6 @@
                     app:tint="@color/app_icon_primary"/>
 
                 <ImageButton
-                    android:id="@+id/fragment_about_reddit_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="20dp"
-                    android:background="@color/transparent"
-                    android:src="@drawable/about_social_reddit"
-                    android:contentDescription="@null"
-                    app:tint="@color/app_icon_primary"/>
-
-                <ImageButton
                     android:id="@+id/fragment_about_github_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

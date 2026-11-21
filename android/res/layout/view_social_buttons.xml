@@ -106,17 +106,6 @@
                 android:contentDescription="@null"
                 android:scaleType="fitCenter"
                 android:src="@drawable/social_wizard_twitter" />
-
-
-            <ImageButton
-                android:id="@+id/view_social_buttons_reddit_button"
-                android:layout_width="0dp"
-                android:layout_height="60dp"
-                android:layout_weight="0.22"
-                android:background="@color/transparent"
-                android:contentDescription="@null"
-                android:scaleType="fitCenter"
-                android:src="@drawable/social_wizard_reddit" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>
