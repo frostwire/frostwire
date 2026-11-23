@@ -134,9 +134,13 @@ public final class TransfersTab extends AbstractTab {
     transferDetailComponent.setVisible(false);
   }
 
-  private void showTransferDetailsComponent(BittorrentDownload selected) {
+  /**
+   * @return true when the details panel was hidden and has just been opened, the only time the
+   *     split needs a new layout; refreshing a panel that is already open changes no sizes
+   */
+  private boolean showTransferDetailsComponent(BittorrentDownload selected) {
     if (!dedicatedTransfersTabAvailable) {
-      return;
+      return false;
     }
     boolean transferDetailComponentWasAlreadyVisible = transferDetailComponent.isVisible();
     transferDetailComponent.setVisible(true);
@@ -147,6 +151,7 @@ public final class TransfersTab extends AbstractTab {
           transferDetailSplitter.getParent(),
           location -> lastSplitterLocationWithDetailsVisible = location);
     }
+    return !transferDetailComponentWasAlreadyVisible;
   }
 
   /**
@@ -318,11 +323,14 @@ public final class TransfersTab extends AbstractTab {
           || selected instanceof TorrentFetcherDownload) {
         hideTransferDetailsComponent();
       } else if (selected instanceof BittorrentDownload bittorrentDownload) {
-        showTransferDetailsComponent(bittorrentDownload);
         // Opening the details panel shrinks the table above it and can cover the selected row, so
         // lay the split out now and then scroll to the row. safeInvokeLater runs right away on the
-        // EDT, so deferring the scroll through it scrolled before the table shrank.
-        transferDetailSplitter.validate();
+        // EDT, so deferring the scroll through it scrolled before the table shrank. When the panel
+        // was already open (a finishing transfer re-selects its row) nothing resized, and
+        // validating the split cost 320 ms of EDT CPU (Icebase #90055439c0c4).
+        if (showTransferDetailsComponent(bittorrentDownload)) {
+          transferDetailSplitter.validate();
+        }
         downloadMediator.ensureDownloadVisible(bittorrentDownload);
       }
     }

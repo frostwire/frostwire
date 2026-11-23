@@ -1151,6 +1151,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.tables.LimeJTableTooltipOutsideCellsTest"
         includeTestsMatching "com.limegroup.gnutella.gui.tables.LimeJTablePreviewTooltipTest"
         includeTestsMatching "com.frostwire.gui.tabs.TransfersTabDividerTest"
+        includeTestsMatching "com.frostwire.gui.tabs.TransfersTabSelectionValidatesOnlyOnOpenTest"
         includeTestsMatching "com.frostwire.gui.library.OnceReadyTest"
         includeTestsMatching "com.frostwire.gui.updates.UpdateMessageDialogTest"
         includeTestsMatching "com.frostwire.gui.library.LibrarySelectBeforeTreeTest"
