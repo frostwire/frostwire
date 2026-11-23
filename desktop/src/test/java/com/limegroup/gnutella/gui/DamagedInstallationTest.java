@@ -38,6 +38,30 @@ class DamagedInstallationTest {
   }
 
   @Test
+  void aMissingClassOfFrostWireItselfMeansADamagedInstallation() {
+    assertTrue(
+        DamagedInstallation.isDamaged(new NoClassDefFoundError("com/limegroup/gnutella/gui/I18n")));
+    assertTrue(
+        DamagedInstallation.isDamaged(new NoClassDefFoundError("com/frostwire/util/UrlUtils")));
+    assertTrue(
+        DamagedInstallation.isDamaged(new NoClassDefFoundError("org/limewire/util/OSUtils")));
+    assertTrue(
+        DamagedInstallation.isDamaged(
+            new ExceptionInInitializerError(
+                new NoClassDefFoundError("com/limegroup/gnutella/gui/I18n"))));
+  }
+
+  @Test
+  void aMissingJdkClassOrAFailedInitializerIsNotCalledDamage() {
+    assertFalse(DamagedInstallation.isDamaged(new NoClassDefFoundError("sun/nio/ch/Net")));
+    assertFalse(
+        DamagedInstallation.isDamaged(
+            new NoClassDefFoundError(
+                "Could not initialize class com.limegroup.gnutella.gui.I18n")));
+    assertFalse(DamagedInstallation.isDamaged(new NoClassDefFoundError()));
+  }
+
+  @Test
   void aDamagedClassBehindOtherErrorsIsStillFound() {
     Throwable wrapped =
         new ExceptionInInitializerError(

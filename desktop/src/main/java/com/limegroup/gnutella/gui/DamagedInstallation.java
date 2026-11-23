@@ -42,7 +42,7 @@ public final class DamagedInstallation {
   /** Whether the problem, or something it was caused by, says FrostWire's files are damaged. */
   public static boolean isDamaged(Throwable problem) {
     for (int depth = 0; problem != null && depth < 8; depth++) {
-      if (isMalformedClass(problem) || isZipError(problem)) {
+      if (isMalformedClass(problem) || isZipError(problem) || isMissingOwnClass(problem)) {
         return true;
       }
       problem = problem.getCause();
@@ -57,6 +57,26 @@ public final class DamagedInstallation {
   private static boolean isMalformedClass(Throwable problem) {
     return problem instanceof ClassFormatError
         && !(problem instanceof UnsupportedClassVersionError);
+  }
+
+  /**
+   * A NoClassDefFoundError for one of FrostWire's own classes, which the JVM cannot find or read in
+   * the jar it loaded the rest from (Icebase #a7f2ecbc9597: {@code com/limegroup/gnutella/gui/I18n}
+   * missing 13 s after start, frostwire/frostwire#1541). The JDK's own classes are not ours to
+   * blame, and "Could not initialize class X" means X's static initializer failed once, which can
+   * be a bug in it, not damage.
+   */
+  private static boolean isMissingOwnClass(Throwable problem) {
+    if (!(problem instanceof NoClassDefFoundError)) {
+      return false;
+    }
+    String message = problem.getMessage();
+    if (message == null) {
+      return false;
+    }
+    return message.startsWith("com/limegroup/")
+        || message.startsWith("com/frostwire/")
+        || message.startsWith("org/limewire/");
   }
 
   /** ZipError is deprecated for removal: named, not referenced, so it compiles on any JDK. */

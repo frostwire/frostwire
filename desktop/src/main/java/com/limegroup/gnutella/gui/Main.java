@@ -99,6 +99,9 @@ public class Main {
     // First of all, before any AWT or Swing text: HBShaper must be known to work before the first
     // layout, or the JDK is switched to its JNI shaper (frostwire/frostwire#1587).
     com.frostwire.util.TextShapingGuard.install();
+    // The JDK classes that have failed on some Windows machines, initialized here so the first
+    // failure is kept instead of only the late NoClassDefFoundError (frostwire/frostwire#1587).
+    com.frostwire.util.JdkClassProbe.install();
     System.setProperty("sun.awt.noerasebackground", "true");
     // On Linux/KDE, set the AWT application class name to "FrostWire" so that
     // KDE Plasma shows "FrostWire" instead of "JavaEmbeddedFrame" in the system tray.

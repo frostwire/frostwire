@@ -12,6 +12,8 @@ FrostWire 7.1.6 UNRELEASED
    - fix:the Pieces tab refreshes without waiting for its animation to finish drawing
    - fix:the first date cell no longer freezes the window while the date format for your language is built; it is built in the background at startup (#1563)
    - fix:freeze reports tell apart the stalls that come from the Windows window system (cursor lookups, showing windows, popup menus) from stalls caused by FrostWire (#1552)
+   - fix:when FrostWire's own files are missing or unreadable at startup (an interrupted install or update, a security program), it says so and offers the download page instead of closing without a word (#1541)
+   - fix:crash and freeze reports include the first failure of the JDK parts that have failed to start on some Windows computers (networking, files, JPEG, text), so the cause can be told apart (#1587)
    - fix:crash reports now say the first error that caused the crash, so failures that look the same can be told apart
    - update:FrostWire no longer links to reddit.com; find us on Discord, X, Facebook and Instagram
    - update:newer versions of the libraries FrostWire uses: sqlite, FlatLaf, Netty and Bouncy Castle
