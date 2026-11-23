@@ -735,6 +735,26 @@ class StrictEdtModeTest {
   private static StackTraceElement[][] nativeWindowCallStacks() {
     return new StackTraceElement[][] {
       {
+        frame("sun.awt.windows.WComponentPeer", "pShow"),
+        frame("sun.awt.windows.WComponentPeer", "show"),
+        frame("java.awt.Component", "show"),
+        frame("com.limegroup.gnutella.gui.GUIMediator", "setAppVisible"),
+        frame(WATCHDOG_FRAME, "dispatchEvent")
+      },
+      {
+        frame("sun.awt.windows.WWindowPeer", "getScreenImOn"),
+        frame("sun.awt.windows.WWindowPeer", "checkDisplayChange"),
+        frame("java.awt.Window", "show"),
+        frame(WATCHDOG_FRAME, "dispatchEvent")
+      },
+      {
+        frame("sun.awt.windows.WComponentPeer", "addNativeDropTarget"),
+        frame("sun.awt.windows.WComponentPeer", "start"),
+        frame("java.awt.Frame", "addNotify"),
+        frame("com.limegroup.gnutella.gui.LimeJFrame", "addNotify"),
+        frame(WATCHDOG_FRAME, "dispatchEvent")
+      },
+      {
         frame("sun.awt.windows.WComponentPeer", "hide"),
         frame("java.awt.Component", "hide"),
         frame("java.awt.Window", "hide"),
@@ -823,7 +843,6 @@ class StrictEdtModeTest {
   @Test
   void callsOutsideTheMaintainerDecisionAreNotTaggedNativeMenu() {
     String[][] excluded = {
-      {"sun.awt.windows.WComponentPeer", "pShow"},
       {"sun.awt.windows.WWindowPeer", "setFocusableWindow"},
       {"sun.awt.windows.WDialogPeer", "createAwtDialog"},
       {"sun.awt.windows.WComponentPeer", "show"},

@@ -562,11 +562,15 @@ public final class StrictEdtMode {
    *   <li>{@code WCanvasPeer.create}, the native window of a medium-weight popup's panel (Icebase
    *       #2bb3702e758c);
    *   <li>{@code WPopupMenuPeer.createMenu}, creating the tray icon's menu (Icebase #8ac10f3d3031),
-   *       and {@code WMenuPeer.createMenu}/{@code createSubMenu}, creating a menu or submenu.
+   *       and {@code WMenuPeer.createMenu}/{@code createSubMenu}, creating a menu or submenu;
+   *   <li>{@code WComponentPeer.pShow}, showing a window or dialog (Icebase #dc79ef979b03,
+   *       #a1f9553d4623), {@code WWindowPeer.getScreenImOn} (#bcf919f0e79e) and {@code
+   *       WComponentPeer.addNativeDropTarget}, registering a frame's native drop target
+   *       (#bdcd85ffe9a8), added on the maintainer's OK of 2026-11-22.
    * </ul>
    *
-   * Deliberately absent: {@code WComponentPeer.pShow}, {@code WWindowPeer.setFocusableWindow} and
-   * {@code WDialogPeer.createAwtDialog} (not part of the maintainer's decision).
+   * Deliberately absent: {@code WWindowPeer.setFocusableWindow} and {@code
+   * WDialogPeer.createAwtDialog} (not part of the maintainer's decision).
    */
   private static final String[][] NATIVE_WINDOW_CALLS = {
     {"sun.awt.windows.WPopupMenuPeer", "_show"},
@@ -578,6 +582,9 @@ public final class StrictEdtMode {
     {"sun.awt.windows.WPopupMenuPeer", "createMenu"},
     {"sun.awt.windows.WMenuPeer", "createMenu"},
     {"sun.awt.windows.WMenuPeer", "createSubMenu"},
+    {"sun.awt.windows.WComponentPeer", "pShow"},
+    {"sun.awt.windows.WWindowPeer", "getScreenImOn"},
+    {"sun.awt.windows.WComponentPeer", "addNativeDropTarget"},
   };
 
   /**
