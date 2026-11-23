@@ -1199,6 +1199,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.TooltipsAreNotHtmlStructureTest"
         includeTestsMatching "com.limegroup.gnutella.gui.NoRedditLinksTest"
         includeTestsMatching "com.limegroup.gnutella.gui.GUIUtilsDateFormatWarmUpTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.FileChooserLastDirectoryTest"
         includeTestsMatching "com.limegroup.gnutella.gui.StatusLineSeedingToolTipTest"
         includeTestsMatching "com.limegroup.gnutella.gui.actions.OpenUrlSearchActionTest"
         includeTestsMatching "com.limegroup.gnutella.gui.SplashWindowFailedInitializeTest"

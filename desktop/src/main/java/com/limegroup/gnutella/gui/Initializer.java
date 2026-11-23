@@ -487,6 +487,8 @@ final class Initializer {
     DesktopParallelExecutor.execute(com.limegroup.gnutella.gui.search.SchemaBox::prepareIcons);
     // The first date cell builds the date format for the app's language; do that off the EDT.
     DesktopParallelExecutor.execute(GUIUtils::warmUpDateTimeFormat);
+    // The file choosers start in the last directory; find out off the EDT that it still exists.
+    DesktopParallelExecutor.execute(FileChooserHandler::getLastInputDirectory);
     GUIMediator.safeInvokeAndWait(
         () -> {
           GUIMediator.setSplashScreenString(I18n.tr("Loading Internationalization Support..."));

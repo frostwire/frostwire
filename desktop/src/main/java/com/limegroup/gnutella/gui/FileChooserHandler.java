@@ -42,12 +42,52 @@ import org.limewire.util.CommonUtils;
 public final class FileChooserHandler {
   private FileChooserHandler() {}
 
-  /** Returns the last directory that was used in a FileChooser. */
+  /** What was found out about the saved directory: its path and whether it is a directory. */
+  record Resolution(String path, boolean usable) {}
+
+  /** The last answer from the disk about the saved directory, or null before the first one. */
+  private static final java.util.concurrent.atomic.AtomicReference<Resolution> RESOLVED =
+      new java.util.concurrent.atomic.AtomicReference<>();
+
+  /**
+   * Returns the last directory that was used in a FileChooser. Asking the disk whether it still
+   * exists can take seconds when it is on a disconnected network drive or a sleeping disk, so on
+   * the EDT this never does: it uses what an earlier lookup found, and until there is one it
+   * answers with the current directory and looks in the background (Icebase #a8bcddbf3e81,
+   * #597016347eb8, frostwire/frostwire#1411). Other threads look themselves, which also warms the
+   * answer for the EDT ({@link ShellFolderWarmUp} does it ahead of the first chooser).
+   */
   public static File getLastInputDirectory() {
-    File dir = ApplicationSettings.LAST_FILECHOOSER_DIRECTORY.getValue();
-    if (dir == null || dir.getPath().equals("") || !dir.exists() || !dir.isDirectory())
+    return resolveLastInputDirectory(
+        ApplicationSettings.LAST_FILECHOOSER_DIRECTORY.getValue(),
+        SwingUtilities.isEventDispatchThread(),
+        dir -> dir.exists() && dir.isDirectory(),
+        com.limegroup.gnutella.gui.util.DesktopParallelExecutor::execute,
+        RESOLVED);
+  }
+
+  /** The decision behind {@link #getLastInputDirectory()}, with its disk and thread seams. */
+  static File resolveLastInputDirectory(
+      File saved,
+      boolean onEdt,
+      java.util.function.Predicate<File> isDirectory,
+      java.util.function.Consumer<Runnable> background,
+      java.util.concurrent.atomic.AtomicReference<Resolution> resolved) {
+    if (saved == null || saved.getPath().isEmpty()) {
       return CommonUtils.getCurrentDirectory();
-    else return dir;
+    }
+    String path = saved.getPath();
+    Resolution known = resolved.get();
+    if (known != null && known.path().equals(path)) {
+      return known.usable() ? saved : CommonUtils.getCurrentDirectory();
+    }
+    if (!onEdt) {
+      boolean usable = isDirectory.test(saved);
+      resolved.set(new Resolution(path, usable));
+      return usable ? saved : CommonUtils.getCurrentDirectory();
+    }
+    background.accept(() -> resolved.set(new Resolution(path, isDirectory.test(saved))));
+    return CommonUtils.getCurrentDirectory();
   }
 
   /** Sets the last directory that was used for the FileChooser. */
@@ -55,8 +95,10 @@ public final class FileChooserHandler {
     if (file != null) {
       if (!file.exists() || !file.isDirectory()) file = file.getParentFile();
       if (file != null) {
-        if (file.exists() && file.isDirectory())
+        if (file.exists() && file.isDirectory()) {
           ApplicationSettings.LAST_FILECHOOSER_DIRECTORY.setValue(file);
+          RESOLVED.set(new Resolution(file.getPath(), true));
+        }
       }
     }
   }
