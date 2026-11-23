@@ -60,7 +60,7 @@ class WarmUpProgressTest {
     }
     String code =
         new String(Files.readAllBytes(source), StandardCharsets.UTF_8).replaceAll("\\s+", "");
-    assertTrue(code.contains("PROGRESS.start(warmUpThreads(fontSweep),System.nanoTime());"));
+    assertTrue(code.contains("PROGRESS.start(warmUpThreads(),System.nanoTime());"));
     assertTrue(
         code.contains(
             "newThread(tracked(timed(()->warmUp(earlyWindowText),jdkStepsDone)),\"JdkWarmUp\")"));

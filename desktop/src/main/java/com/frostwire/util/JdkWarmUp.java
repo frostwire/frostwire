@@ -580,7 +580,7 @@ public final class JdkWarmUp {
   public static void startInBackground(
       Supplier<String> earlyWindowText, LongConsumer jdkStepsDone, boolean fontSweep) {
     // The JDK steps, the app class preload and, unless skipped, the fallback font sweep.
-    PROGRESS.start(warmUpThreads(fontSweep), System.nanoTime());
+    PROGRESS.start(warmUpThreads(), System.nanoTime());
     Thread warmUp =
         new Thread(tracked(timed(() -> warmUp(earlyWindowText), jdkStepsDone)), "JdkWarmUp");
     warmUp.setDaemon(true);
@@ -589,12 +589,18 @@ public final class JdkWarmUp {
     if (fontSweep) {
       startFallbackFontSweep(
           MAIN_WINDOW_SHOWN, MAIN_WINDOW_WAIT_MS, tracked(JdkWarmUp::sweepFallbackFonts));
+    } else {
+      // Lite: not the whole sweep, but the glyphs of the scripts the tables and labels show
+      startFallbackFontSweep(
+          MAIN_WINDOW_SHOWN, MAIN_WINDOW_WAIT_MS, tracked(JdkWarmUp::sweepFallbackFontsLite));
     }
   }
 
-  /** The warm-up's threads: the font sweep's only when it runs. */
-  static int warmUpThreads(boolean fontSweep) {
-    return fontSweep ? 3 : 2;
+  /**
+   * The warm-up's threads: the JDK steps, the app class preload and a font sweep (full or Lite).
+   */
+  static int warmUpThreads() {
+    return 3;
   }
 
   /**
@@ -1040,6 +1046,32 @@ public final class JdkWarmUp {
       LOG.warn("Clipping warm-up failed: " + t.getMessage(), t);
     }
   }
+
+  /**
+   * What Lite does instead of {@link #sweepFallbackFonts()} (frostwire/frostwire#1562, #1555):
+   * rasterizes {@link #SCRIPT_GLYPH_SAMPLE} for the table and label fonts only, so the first glyph
+   * of each script the Library table and the labels show (file names, search results) no longer
+   * reads that script's font file on the EDT. It leaves out the slot-by-slot loading with pauses,
+   * the strikes of every slot and the text layout, the costly parts of the full sweep.
+   */
+  private static void sweepFallbackFontsLite() {
+    try {
+      Map<?, ?> desktopHints = desktopFontHints();
+      int fonts = 0;
+      for (Font font : textFonts(UIManager.getDefaults())) {
+        if (fonts++ >= LITE_SWEEP_FONTS) {
+          break;
+        }
+        rasterizeGlyphs(font, desktopHints, SCRIPT_GLYPH_SAMPLE);
+        releaseFontLock();
+      }
+    } catch (Throwable t) {
+      LOG.warn("Lite script glyph warm-up failed: " + t.getMessage(), t);
+    }
+  }
+
+  /** How many of the text fonts (the table and label ones come first) Lite rasterizes. */
+  static final int LITE_SWEEP_FONTS = 2;
 
   /**
    * One letter of each script of {@link #SCRIPT_GLYPH_SAMPLE}, in its order, then {@link

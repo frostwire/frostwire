@@ -15,6 +15,7 @@ FrostWire 7.1.6 UNRELEASED
    - fix:when FrostWire's own files are missing or unreadable at startup (an interrupted install or update, a security program), it says so and offers the download page instead of closing without a word (#1541)
    - fix:crash and freeze reports include the first failure of the JDK parts that have failed to start on some Windows computers (networking, files, JPEG, text), so the cause can be told apart (#1587)
    - fix:the first text on screen no longer freezes the window on slow computers while Windows loads fonts: the fonts, bold and larger sizes, the setup wizard's language names and the characters outside Latin text are prepared in the background at startup (#1562)
+   - fix:Lite mode no longer skips preparing the characters of other languages' scripts: file names and search results in Arabic, Hebrew, Thai, Korean, Japanese or Chinese no longer freeze the window the first time they are drawn (#1562)
    - fix:more of Swing's menus, sliders, progress bars, table headers and FrostWire's own screens are prepared in the background at startup, so opening them the first time no longer waits on the disk (#1563)
    - fix:tooltips near the edge of the window stay inside it, so Windows doesn't have to create a separate window for them (#1552)
    - fix:the window's icon is prepared at every size Windows asks for, so moving FrostWire to another screen no longer stalls while the icon is resized (#1552)

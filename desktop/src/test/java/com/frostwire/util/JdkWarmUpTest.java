@@ -248,18 +248,31 @@ class JdkWarmUpTest {
   }
 
   /**
-   * Lite skips the font sweep (frostwire/frostwire#1555): the warm-up then has one thread fewer, so
-   * it still reports itself done; Full sweeps.
+   * Lite runs a cheap subset of the font sweep (frostwire/frostwire#1555, #1562): the warm-up has
+   * the same three threads in both modes, and finishes when all three are done.
    */
   @Test
-  void liteSkipsTheFontSweepAndStillFinishes() throws Exception {
-    assertEquals(3, JdkWarmUp.warmUpThreads(true));
-    assertEquals(2, JdkWarmUp.warmUpThreads(false));
+  void liteRunsTheCheapFontSweepAndStillFinishes() throws Exception {
+    assertEquals(3, JdkWarmUp.warmUpThreads());
     WarmUpProgress progress = new WarmUpProgress();
-    progress.start(JdkWarmUp.warmUpThreads(false), 0);
+    progress.start(JdkWarmUp.warmUpThreads(), 0);
     progress.stepFinished(1);
     progress.stepFinished(2);
-    assertTrue(progress.snapshot(3).done(), "without the sweep the warm-up never finishes");
+    assertFalse(progress.snapshot(3).done(), "the Lite sweep is a step too");
+    progress.stepFinished(3);
+    assertTrue(progress.snapshot(4).done());
+    String start = methodSource("public static void startInBackground(").replaceAll("\\s+", "");
+    assertTrue(
+        start.contains("}else{")
+            && start.contains(
+                "startFallbackFontSweep(MAIN_WINDOW_SHOWN,MAIN_WINDOW_WAIT_MS,tracked(JdkWarmUp::sweepFallbackFontsLite));"),
+        "Lite doesn't start its cheap sweep");
+    assertTrue(JdkWarmUp.LITE_SWEEP_FONTS >= 1 && JdkWarmUp.LITE_SWEEP_FONTS <= 3);
+    String liteSweep =
+        methodSource("private static void sweepFallbackFontsLite() {").replaceAll("\\s+", "");
+    assertTrue(liteSweep.contains("rasterizeGlyphs(font,desktopHints,SCRIPT_GLYPH_SAMPLE)"));
+    assertFalse(liteSweep.contains("initializeAllSlots"), "Lite loads every slot");
+    assertFalse(liteSweep.contains("createSlotStrikes"), "Lite creates every slot's strike");
     String initializer =
         Files.readString(
                 Path.of(System.getProperty("user.dir"))
