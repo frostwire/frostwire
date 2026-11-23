@@ -31,6 +31,7 @@ public final class GUIConstants {
   public static final String FROSTWIRE_CHAT_URL = "https://www.frostwire.com/chat";
 
   static final String FROSTWIRE_64x64_ICON = "frostwire64x64";
+  static final String FROSTWIRE_256x256_ICON = "frostwire256x256";
 
   /** Constant for the path to the LimeWire Windows launcher. */
   static final File FROSTWIRE_EXE_FILE = new File("FrostWire.exe").getAbsoluteFile();

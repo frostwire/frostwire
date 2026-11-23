@@ -69,14 +69,18 @@ public class LimeJFrame extends JFrame {
     if (OSUtils.isMacOSX()) {
       setupPopupHide();
     }
-    // Defer icon loading to avoid EDT blocking with file I/O
-    SwingUtilities.invokeLater(this::loadWindowIcon);
+    // Scaling the icons and loading the image is off the EDT; only setIconImages runs on it.
+    BackgroundQueuedExecutorService.schedule(this::loadWindowIcon);
   }
 
+  /**
+   * Gives the frame the icon at every size Windows asks for, so a move to another monitor or DPI
+   * rescales nothing on the EDT (Icebase #20253365e913, frostwire/frostwire#1552).
+   */
   private void loadWindowIcon() {
     try {
-      ImageIcon limeIcon = GUIMediator.getThemeImage(GUIConstants.FROSTWIRE_64x64_ICON);
-      setIconImage(limeIcon.getImage());
+      List<Image> images = WindowIconImages.get();
+      SwingUtilities.invokeLater(() -> setIconImages(images));
     } catch (Exception e) {
       e.printStackTrace();
     }

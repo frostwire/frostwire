@@ -141,6 +141,9 @@ public class Main {
     // Popups and tooltips are lightweight (Swing's default): they used to be forced heavyweight to
     // stay above the SWT Browser and the MPlayer canvas, both gone; as native windows, every
     // tooltip and menu waited on Windows' toolkit thread (frostwire/frostwire#1552).
+    // Tooltips near the window's edge are moved inside it: Swing makes a tooltip that does not fit
+    // a medium-weight popup, which creates a native Panel peer (Icebase #2bb3702e758c).
+    WindowBoundTooltips.install();
 
     // System.out.println("1: Main.main("+args+")");
     // make sure jlibtorrent is statically loaded on time to avoid jni symbols not found issues.
