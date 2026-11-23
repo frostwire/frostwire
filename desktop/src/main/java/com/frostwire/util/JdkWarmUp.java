@@ -220,7 +220,65 @@ public final class JdkWarmUp {
       List.of(
           "javax.swing.plaf.basic.BasicTableUI",
           "com.limegroup.gnutella.gui.tables.TableSettings",
-          "sun.java2d.pipe.ShapeSpanIterator");
+          "sun.java2d.pipe.ShapeSpanIterator",
+          // First table header, slider, checkbox, panel and option pane UIs: their static
+          // initializers and nested handlers ran on the EDT as LimeJTable, the range sliders and
+          // the first skin-painted components were built (Icebase #038ff4bbd94a, #5ee5baad9fef,
+          // #c138dc2807da, #0fe9d0c88973, #5c9893e5c9b2, frostwire/frostwire#1563).
+          "javax.swing.plaf.basic.BasicTableHeaderUI",
+          "javax.swing.plaf.synth.SynthTableUI",
+          "javax.swing.plaf.basic.BasicSliderUI",
+          "javax.swing.plaf.synth.SynthSliderUI",
+          "javax.swing.plaf.synth.SynthCheckBoxUI",
+          "javax.swing.plaf.synth.SynthPanelUI",
+          "javax.swing.plaf.synth.SynthOptionPaneUI",
+          // LimeJTable and LimeTextField construction put the first client property, whose key
+          // enum is initialized on first use (Icebase #e250f20360df, #37b7cd4d814c).
+          "javax.swing.ClientPropertyKey",
+          // The menus: AbstractMenu subclasses (File, Tools...) build the first menu items, check
+          // box items and popup listeners, and the menu bar asks for its UI class (Icebase
+          // #44c8a7f53248, #60e1d151c7b1, #34282a047132, #e9a42b3db5e5, #7a620bcd7ff9,
+          // #1ac3727ce86b, #ecaed150006d, #863ff8e60cce). BasicPopupMenuUI's nested
+          // MenuKeyboardHelper is loaded with it (initializeClasses loads nested classes).
+          "javax.swing.JMenuBar",
+          "javax.swing.JMenuItem",
+          "javax.swing.JCheckBoxMenuItem",
+          "javax.swing.plaf.basic.BasicPopupMenuUI",
+          "javax.swing.ToolTipManager",
+          // LanguagePanel's first viewport and the tool tip manager's delay queue (Icebase
+          // #ce64a2783f63, #cb5a61cb7e48).
+          "java.util.concurrent.DelayQueue",
+          "javax.swing.JViewport",
+          // Borders, tree selection, Swing timers and the HTML text views a first dialog lays out
+          // (Icebase #c9c36d0281fb, #ac2423d55bd3, #29498b835d5d, #0fc77957dde0, #12548d75e971,
+          // #337810905345).
+          "javax.swing.border.MatteBorder",
+          "javax.swing.tree.DefaultTreeSelectionModel",
+          "javax.swing.Timer",
+          "javax.swing.text.GlyphView",
+          "javax.swing.text.AbstractDocument",
+          // Java2D shapes the skins paint: area flattening and Path2D bounds (Icebase
+          // #e620bd61432a, #0ee55ff55bd4).
+          "java.awt.geom.Area",
+          "java.awt.geom.Path2D",
+          // The ranking of the first search result batch loaded PerformersHelper (common's jar)
+          // on the EDT (Icebase #b3732fb24421). Its static state is a stopword set and a pattern.
+          "com.frostwire.search.PerformersHelper");
+
+  /**
+   * JDK-internal classes whose names change between JDK releases, initialized after {@link
+   * #MAIN_WINDOW_CLASSES_TO_INITIALIZE} and skipped without a warning when this JDK lacks them.
+   * Marlin's RendererContext is created per thread the first time the thread paints an antialiased
+   * shape (Icebase #9bbf9bfe7c49, frostwire/frostwire#1563): the instance is a per-thread context
+   * and can't be warmed from this thread, but its classes and the rendering engine's can.
+   */
+  static final List<String> OPTIONAL_JDK_CLASSES_TO_INITIALIZE =
+      List.of(
+          "sun.java2d.pipe.RenderingEngine",
+          "sun.java2d.marlin.MarlinProperties",
+          "sun.java2d.marlin.RendererContext",
+          "sun.java2d.marlin.DMarlinRenderingEngine",
+          "sun.java2d.marlin.MarlinRenderingEngine");
 
   /**
    * Windows-only JDK classes initialized like {@link #CLASSES_TO_INITIALIZE}. The first right-click
@@ -268,7 +326,16 @@ public final class JdkWarmUp {
           // SortingFocusTraversalPolicy's static initializer on the EDT, waiting on the disk with
           // the system idle (Icebase #1aefbe184b7d, #4961cab0e5c8, frostwire/frostwire#1563).
           // Initializing the subclass initializes its superclass too.
-          "javax.swing.LayoutFocusTraversalPolicy");
+          "javax.swing.LayoutFocusTraversalPolicy",
+          // The splash's StatusComponent builds a JProgressBar (its Synth UI, the Basic handler
+          // and the range model) and its layout a Box.Filler, on the EDT, with the warm-up not
+          // finished on slow machines (Icebase #ff8c88492d2e, #feaa3907753f, #1969053f78dd,
+          // frostwire/frostwire#1563). Needed by the splash anyway, so this adds no work before it.
+          "javax.swing.DefaultBoundedRangeModel",
+          "javax.swing.JProgressBar",
+          "javax.swing.plaf.basic.BasicProgressBarUI",
+          "javax.swing.plaf.synth.SynthProgressBarUI",
+          "javax.swing.Box");
 
   /**
    * Windows-only splash classes, initialized after {@link #SPLASH_CLASSES_TO_INITIALIZE}: the first
@@ -277,6 +344,19 @@ public final class JdkWarmUp {
    */
   static final List<String> WINDOWS_SPLASH_CLASSES_TO_INITIALIZE =
       List.of("sun.java2d.windows.GDIWindowSurfaceData");
+
+  /** Initializes {@code classNames} in order, silently skipping those this JDK doesn't have. */
+  static void initializeOptionalClasses(List<String> classNames) {
+    for (String className : classNames) {
+      try {
+        Class.forName(className).getDeclaredClasses();
+      } catch (ClassNotFoundException | LinkageError e) {
+        // Not in this JDK release.
+      } catch (Throwable t) {
+        LOG.warn("Warm-up of " + className + " failed: " + t.getMessage(), t);
+      }
+    }
+  }
 
   /** The classes {@link #initializeSplashClasses} initializes: Windows-only ones too if asked. */
   static List<String> splashClassesToInitialize(boolean windows) {
@@ -394,7 +474,17 @@ public final class JdkWarmUp {
           "com.limegroup.gnutella.gui.options.panes",
           // Their subpackages: the options tree's model and the IP filter pane.
           "com.limegroup.gnutella.gui.trees",
-          "com.limegroup.gnutella.gui.options.panes.ipfilter");
+          "com.limegroup.gnutella.gui.options.panes.ipfilter",
+          // Last, after everything the first windows need: classes directly in com.frostwire.gui
+          // (LocaleLabel, AlphaIcon...), components.slides (MultimediaSlideshowPanel, built by the
+          // Search tab) and filters, which no listed package covers (Icebase #29498b835d5d,
+          // #ceec9dce6d9e, frostwire/frostwire#1563). SearchMediator, SearchResultDisplayer,
+          // LibraryExplorer, UpdateManager, SearchField, DisabledIcons (gui.theme, a splash
+          // package) and FixedsizeForgetfulHashMap (org.limewire.collection) are already in
+          // packages above.
+          "com.frostwire.gui",
+          "com.frostwire.gui.components.slides",
+          "com.frostwire.gui.filters");
 
   /** Synth-based looks (Nimbus) map every delegate key to this class, which creates "Synth"+key. */
   private static final String SYNTH_LOOK_AND_FEEL = "javax.swing.plaf.synth.SynthLookAndFeel";
@@ -807,6 +897,7 @@ public final class JdkWarmUp {
       LOG.warn("Popup menu warm-up failed: " + t.getMessage(), t);
     }
     initializeClasses(MAIN_WINDOW_CLASSES_TO_INITIALIZE);
+    initializeOptionalClasses(OPTIONAL_JDK_CLASSES_TO_INITIALIZE);
     try {
       Map<?, ?> desktopHints = desktopFontHints();
       for (Font font : mainWindowPlatformFonts()) {

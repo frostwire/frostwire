@@ -876,6 +876,104 @@ class JdkWarmUpTest {
     assertFalse(classes.contains("sun.java2d.windows.GDIWindowSurfaceData"));
   }
 
+  /** First-use Swing/JDK class init folded into frostwire/frostwire#1563 (many Icebase ids). */
+  @Test
+  void theFirstUseSwingAndJdkClassesAreInitializedAfterTheSplash() {
+    for (String className :
+        List.of(
+            "javax.swing.plaf.basic.BasicTableHeaderUI",
+            "javax.swing.plaf.basic.BasicSliderUI",
+            "javax.swing.plaf.synth.SynthSliderUI",
+            "javax.swing.plaf.synth.SynthCheckBoxUI",
+            "javax.swing.ClientPropertyKey",
+            "javax.swing.JMenuBar",
+            "javax.swing.JMenuItem",
+            "javax.swing.JCheckBoxMenuItem",
+            "javax.swing.plaf.basic.BasicPopupMenuUI",
+            "javax.swing.ToolTipManager",
+            "java.util.concurrent.DelayQueue",
+            "java.awt.geom.Area",
+            "com.frostwire.search.PerformersHelper")) {
+      assertTrue(
+          JdkWarmUp.MAIN_WINDOW_CLASSES_TO_INITIALIZE.contains(className),
+          className + " is not initialized by the startup thread");
+    }
+  }
+
+  @Test
+  void theSplashProgressBarClassesAreInitializedBeforeTheSplash() {
+    for (String className :
+        List.of(
+            "javax.swing.JProgressBar",
+            "javax.swing.plaf.basic.BasicProgressBarUI",
+            "javax.swing.plaf.synth.SynthProgressBarUI",
+            "javax.swing.DefaultBoundedRangeModel",
+            "javax.swing.Box")) {
+      assertTrue(
+          JdkWarmUp.SPLASH_CLASSES_TO_INITIALIZE.contains(className),
+          className + " is not initialized before the splash");
+    }
+  }
+
+  @Test
+  void theSearchTabsSlideshowAndTheGuiPackageAreLoadedWithTheAppClasses() {
+    for (String pkg :
+        List.of(
+            "com.frostwire.gui",
+            "com.frostwire.gui.components.slides",
+            "com.frostwire.gui.filters")) {
+      assertTrue(JdkWarmUp.APP_PACKAGES_TO_LOAD.contains(pkg), pkg + " is not preloaded");
+    }
+  }
+
+  @Test
+  void theAppClassesTheEdtLoadedOnFirstUseAreInAPreloadedPackage() throws Exception {
+    List<String> packages = new ArrayList<>(JdkWarmUp.APP_PACKAGES_TO_LOAD);
+    packages.addAll(JdkWarmUp.SPLASH_PACKAGES_TO_LOAD);
+    for (String className :
+        List.of(
+            "com.limegroup.gnutella.gui.search.SearchMediator",
+            "com.limegroup.gnutella.gui.search.SearchResultDisplayer",
+            "com.limegroup.gnutella.gui.search.SearchResultDataLine",
+            "com.limegroup.gnutella.gui.ResourceManager",
+            "org.limewire.collection.FixedsizeForgetfulHashMap",
+            "com.frostwire.gui.theme.DisabledIcons",
+            "com.frostwire.gui.components.slides.MultimediaSlideshowPanel",
+            "com.frostwire.gui.library.LibraryExplorer",
+            "com.frostwire.gui.updates.UpdateManager",
+            "com.frostwire.gui.searchfield.SearchField",
+            "com.frostwire.gui.searchfield.MatchHighlightingCellRenderer",
+            "com.limegroup.gnutella.gui.StatusLine")) {
+      Class<?> c = Class.forName(className, false, getClass().getClassLoader());
+      assertTrue(packages.contains(c.getPackageName()), className + " is not preloaded");
+    }
+  }
+
+  @Test
+  void everyListedFirstUseClassExistsOrIsOptional() {
+    for (String className : JdkWarmUp.SPLASH_CLASSES_TO_INITIALIZE) {
+      assertDoesNotThrow(() -> Class.forName(className), className);
+    }
+    // Optional JDK-internal classes are skipped safely, present or not, and never throw.
+    assertDoesNotThrow(
+        () ->
+            JdkWarmUp.initializeOptionalClasses(
+                List.of("no.such.Clazz", "sun.java2d.marlin.RendererContext")));
+    assertDoesNotThrow(
+        () -> JdkWarmUp.initializeOptionalClasses(JdkWarmUp.OPTIONAL_JDK_CLASSES_TO_INITIALIZE));
+    assertTrue(
+        JdkWarmUp.OPTIONAL_JDK_CLASSES_TO_INITIALIZE.contains("sun.java2d.marlin.RendererContext"));
+  }
+
+  @Test
+  void theOptionalJdkClassesAreInitializedRightAfterTheMainWindowClasses() throws Exception {
+    String source = methodSource("private static void warmUp(").replaceAll("\\s+", "");
+    assertTrue(
+        source.contains(
+            "initializeClasses(MAIN_WINDOW_CLASSES_TO_INITIALIZE);"
+                + "initializeOptionalClasses(OPTIONAL_JDK_CLASSES_TO_INITIALIZE);"));
+  }
+
   @Test
   void everyClassToInitializeExistsAndLoads() {
     for (String className : JdkWarmUp.CLASSES_TO_INITIALIZE) {
