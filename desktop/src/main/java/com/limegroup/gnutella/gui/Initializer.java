@@ -485,6 +485,8 @@ final class Initializer {
     IconManager.instance();
     // The search tab's media-type buttons filter their icons; do it before the first search tab.
     DesktopParallelExecutor.execute(com.limegroup.gnutella.gui.search.SchemaBox::prepareIcons);
+    // The first date cell builds the date format for the app's language; do that off the EDT.
+    DesktopParallelExecutor.execute(GUIUtils::warmUpDateTimeFormat);
     GUIMediator.safeInvokeAndWait(
         () -> {
           GUIMediator.setSplashScreenString(I18n.tr("Loading Internationalization Support..."));

@@ -157,6 +157,16 @@ public final class GUIUtils {
     return NUMBER_FORMAT0.format(rate) + " " + GENERAL_UNIT_KBPSEC;
   }
 
+  /**
+   * Builds the full datetime format now, off the EDT: the first date cell would build it while
+   * painting, and its {@code SimpleDateFormat} loads the date format data for the app's language
+   * from the JDK. {@code JdkWarmUp} warms the OS format locale, which is not the app's when the
+   * user picked another language (Icebase #eb4413b6ce97, frostwire/frostwire#1563).
+   */
+  static void warmUpDateTimeFormat() {
+    getFullDateTimeFormat().format(new java.util.Date(0));
+  }
+
   /** Gets the full datetime formatter. */
   public static DateFormat getFullDateTimeFormat() {
     DateFormat format = FULL_DATETIME_FORMAT;
