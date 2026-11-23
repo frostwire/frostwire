@@ -1,3 +1,20 @@
+FrostWire 7.1.6 UNRELEASED
+   - fix:clicking the Library tab for the first time right after starting FrostWire no longer fails with an error (#1586)
+   - fix:pressing the tab-switch shortcut when no search is open no longer fails with an error (#1588)
+   - fix:text no longer fails to draw for the rest of the session on a computer where the JDK's text shaper cannot start; FrostWire switches to the older shaper at startup and says so in its crash reports (#1587)
+   - fix:search: MagnetDL's dead proxy is replaced by ApiBay (apibay.org), a search engine that works
+   - fix:pasting on the Library tree or into the Library file table no longer logs a "Not a drop" error
+   - fix:starting FrostWire no longer waits on the computer while it creates the IceBridge identity; it is created in the background once FrostWire has started (#1534)
+   - fix:if the chosen theme cannot be loaded, FrostWire starts with the default theme and tells you once in the status bar, instead of failing to start
+   - fix:the update popup can be resized and its text wraps to the window
+   - fix:tooltips are plain text, so hovering them no longer parses HTML on the window's thread
+   - fix:the Pieces tab refreshes without waiting for its animation to finish drawing
+   - fix:the first date cell no longer freezes the window while the date format for your language is built; it is built in the background at startup (#1563)
+   - fix:freeze reports tell apart the stalls that come from the Windows window system (cursor lookups, showing windows, popup menus) from stalls caused by FrostWire (#1552)
+   - fix:crash reports now say the first error that caused the crash, so failures that look the same can be told apart
+   - update:FrostWire no longer links to reddit.com; find us on Discord, X, Facebook and Instagram
+   - update:newer versions of the libraries FrostWire uses: sqlite, FlatLaf, Netty and Bouncy Castle
+
 FrostWire 7.1.5 NOV/19/2026
    - update:The Windows, macOS and Linux installers bundle the OpenJDK 27.0.1.1 security update.
    - fix:right-clicking files in the Library no longer freezes the window while the disk answers — the menu no longer checks every selected file on disk
