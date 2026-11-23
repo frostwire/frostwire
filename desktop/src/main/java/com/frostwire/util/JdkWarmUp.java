@@ -818,6 +818,12 @@ public final class JdkWarmUp {
       LOG.warn("Glyph warm-up failed: " + t.getMessage(), t);
     }
     try {
+      // Derived fonts (bold captions, the splash status label, the slide overlay) and their faces.
+      FontWarmUps.loadDerivedFaces(UIManager.getDefaults());
+    } catch (Throwable t) {
+      LOG.warn("Derived font warm-up failed: " + t.getMessage(), t);
+    }
+    try {
       warmUpNumberFormat(formatLocale());
     } catch (Throwable t) {
       LOG.warn("Number format warm-up failed: " + t.getMessage(), t);
@@ -913,6 +919,18 @@ public final class JdkWarmUp {
       }
     } catch (Throwable t) {
       LOG.warn("Text font glyph warm-up failed: " + t.getMessage(), t);
+    }
+    try {
+      Map<?, ?> desktopHints = desktopFontHints();
+      FontWarmUps.rasterizeVariants(UIManager.getDefaults(), desktopHints);
+      // The setup wizard's language list, on a first run only.
+      List<String> names = FontWarmUps.languageNamesOnFirstRun();
+      if (!names.isEmpty()) {
+        FontWarmUps.warmUpLanguageNames(
+            names, FontWarmUps.languageListFonts(UIManager.getDefaults()), desktopHints);
+      }
+    } catch (Throwable t) {
+      LOG.warn("Derived font glyph warm-up failed: " + t.getMessage(), t);
     }
     try {
       warmUpDateFormatAndCollation(formatLocale(), Locale.getDefault());
@@ -1015,6 +1033,11 @@ public final class JdkWarmUp {
       warmUpTextLayout();
     } catch (Throwable t) {
       LOG.warn("Text layout warm-up failed: " + t.getMessage(), t);
+    }
+    try {
+      FontWarmUps.warmUpClipping(UIManager.getDefaults());
+    } catch (Throwable t) {
+      LOG.warn("Clipping warm-up failed: " + t.getMessage(), t);
     }
   }
 
