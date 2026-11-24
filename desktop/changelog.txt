@@ -1,4 +1,5 @@
 FrostWire 7.1.6 UNRELEASED
+   - fix:starting FrostWire on Windows no longer freezes the splash while FlatLaf's native library is copied to the temp folder, and the first menu no longer builds the tooltip manager on the interface thread (#1330, #1563)
    - fix:clicking the Library tab for the first time right after starting FrostWire no longer fails with an error (#1586)
    - fix:pressing the tab-switch shortcut when no search is open no longer fails with an error (#1588)
    - fix:text no longer fails to draw for the rest of the session on a computer where the JDK's text shaper cannot start; FrostWire switches to the older shaper at startup and says so in its crash reports (#1587)
