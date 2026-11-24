@@ -39,6 +39,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.SwingUtilities;
 import org.limewire.util.CommonUtils;
 
 /**
@@ -128,6 +129,7 @@ public final class CrashReportSpooler {
                 FrostWireUtils.getBuildNumber());
       }
       CrashReportSpooler spooler = INSTANCE;
+      UPLOAD_QUEUE.execute(spooler::tellurideBuild);
       UPLOAD_QUEUE.execute(spooler::uploadPending);
     } catch (Throwable ignored) {
       LOG.info("Unable to initialize anonymous crash reporting", ignored);
@@ -587,12 +589,30 @@ public final class CrashReportSpooler {
     }
   }
 
+  /** The Telluride build once a thread other than the EDT has looked it up, or null. */
+  private volatile String tellurideBuildResolved;
+
+  /**
+   * The Telluride build for a report. The first lookup runs the Telluride launcher as a process,
+   * which can take seconds (Icebase #d8f5dd69c221: the fatal-bug path built a report on the EDT and
+   * spawned it there), so on the EDT it is never started: the value is "unavailable" until a
+   * background thread has looked it up ({@link #start()} does it at startup).
+   */
   private String tellurideBuild() {
-    try {
-      return tellurideBuild.get();
-    } catch (Throwable ignored) {
+    String resolved = tellurideBuildResolved;
+    if (resolved != null) {
+      return resolved;
+    }
+    if (SwingUtilities.isEventDispatchThread()) {
       return "unavailable";
     }
+    try {
+      resolved = tellurideBuild.get();
+    } catch (Throwable ignored) {
+      resolved = "unavailable";
+    }
+    tellurideBuildResolved = resolved;
+    return resolved;
   }
 
   private static String detectTellurideBuild() {

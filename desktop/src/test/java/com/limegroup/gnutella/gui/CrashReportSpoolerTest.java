@@ -425,4 +425,61 @@ class CrashReportSpoolerTest {
   }
 
   private static final class ReportThreadProbe extends RuntimeException {}
+
+  /**
+   * The fatal-bug path builds a report on the EDT, and the first Telluride lookup runs a process
+   * (Icebase #d8f5dd69c221, frostwire/frostwire#1395): on the EDT it is never started, and a lookup
+   * made on another thread is used afterwards.
+   */
+  @Test
+  void aReportBuiltOnTheEdtDoesNotRunTheTellurideLookup() throws Exception {
+    Path directory = Files.createTempDirectory("frostwire-crash-spool-telluride");
+    java.util.concurrent.atomic.AtomicInteger lookups =
+        new java.util.concurrent.atomic.AtomicInteger();
+    CrashReportSpooler spooler =
+        new CrashReportSpooler(
+            directory.toFile(),
+            null,
+            "7.1.6",
+            339,
+            "",
+            () -> {
+              lookups.incrementAndGet();
+              return "48";
+            });
+
+    javax.swing.SwingUtilities.invokeAndWait(() -> spooler.spool(new IllegalStateException("edt")));
+
+    assertEquals(0, lookups.get(), "the process was started on the EDT");
+    Path first = Files.list(directory).findFirst().orElseThrow();
+    assertEquals(
+        "unavailable",
+        JsonParser.parseString(Files.readString(first))
+            .getAsJsonObject()
+            .get("telluride_build")
+            .getAsString());
+    Files.delete(first);
+
+    spooler.spool(new IllegalStateException("worker"));
+    assertEquals(1, lookups.get());
+    javax.swing.SwingUtilities.invokeAndWait(
+        () -> spooler.spool(new IllegalStateException("edt2")));
+    assertEquals(1, lookups.get(), "the value found off the EDT is reused");
+    String telluride =
+        Files.list(directory)
+            .map(
+                f -> {
+                  try {
+                    return JsonParser.parseString(Files.readString(f))
+                        .getAsJsonObject()
+                        .get("telluride_build")
+                        .getAsString();
+                  } catch (Exception e) {
+                    throw new RuntimeException(e);
+                  }
+                })
+            .distinct()
+            .collect(Collectors.joining(","));
+    assertEquals("48", telluride);
+  }
 }
