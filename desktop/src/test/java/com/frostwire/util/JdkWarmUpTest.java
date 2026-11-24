@@ -905,6 +905,9 @@ class JdkWarmUpTest {
             "javax.swing.plaf.basic.BasicPopupMenuUI",
             "javax.swing.ToolTipManager",
             "java.util.concurrent.DelayQueue",
+            "javax.swing.JSlider",
+            "java.awt.MultipleGradientPaint",
+            "java.awt.LinearGradientPaint",
             "java.awt.geom.Area",
             "com.frostwire.search.PerformersHelper")) {
       assertTrue(

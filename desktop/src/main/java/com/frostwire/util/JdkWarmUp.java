@@ -249,6 +249,11 @@ public final class JdkWarmUp {
           // #ce64a2783f63, #cb5a61cb7e48).
           "java.util.concurrent.DelayQueue",
           "javax.swing.JViewport",
+          // The range slider (JSlider's change listener) and the skin's gradients (Icebase
+          // #411e1dbc4e52, #9801898b03f2, build 338).
+          "javax.swing.JSlider",
+          "java.awt.MultipleGradientPaint",
+          "java.awt.LinearGradientPaint",
           // Borders, tree selection, Swing timers and the HTML text views a first dialog lays out
           // (Icebase #c9c36d0281fb, #ac2423d55bd3, #29498b835d5d, #0fc77957dde0, #12548d75e971,
           // #337810905345).
@@ -278,7 +283,11 @@ public final class JdkWarmUp {
           "sun.java2d.marlin.MarlinProperties",
           "sun.java2d.marlin.RendererContext",
           "sun.java2d.marlin.DMarlinRenderingEngine",
-          "sun.java2d.marlin.MarlinRenderingEngine");
+          "sun.java2d.marlin.MarlinRenderingEngine",
+          // The reflection helper behind the shutdown window's first dialog (Icebase
+          // #b2975f5ce266, ShutdownWindow.new -> MethodUtil.invoke); not exported, skipped if
+          // absent.
+          "sun.reflect.misc.MethodUtil");
 
   /**
    * Windows-only JDK classes initialized like {@link #CLASSES_TO_INITIALIZE}. The first right-click
