@@ -900,6 +900,8 @@ class JdkWarmUpTest {
             "javax.swing.plaf.synth.SynthCheckBoxUI",
             "javax.swing.ClientPropertyKey",
             "javax.swing.JMenuBar",
+            "javax.swing.JMenu",
+            "javax.swing.JPopupMenu",
             "javax.swing.JMenuItem",
             "javax.swing.JCheckBoxMenuItem",
             "javax.swing.plaf.basic.BasicPopupMenuUI",

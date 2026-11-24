@@ -241,6 +241,9 @@ public final class JdkWarmUp {
           // #1ac3727ce86b, #ecaed150006d, #863ff8e60cce). BasicPopupMenuUI's nested
           // MenuKeyboardHelper is loaded with it (initializeClasses loads nested classes).
           "javax.swing.JMenuBar",
+          // SkinMenu extends JMenu: the first menu of a session (Icebase #c873deaa7142, build 338).
+          "javax.swing.JMenu",
+          "javax.swing.JPopupMenu",
           "javax.swing.JMenuItem",
           "javax.swing.JCheckBoxMenuItem",
           "javax.swing.plaf.basic.BasicPopupMenuUI",
