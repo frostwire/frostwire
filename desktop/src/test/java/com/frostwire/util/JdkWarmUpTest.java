@@ -868,6 +868,50 @@ class JdkWarmUpTest {
     assertDoesNotThrow(JdkWarmUp::initializeSplashClasses);
   }
 
+  /** Icebase #4c2a010a8600: the shared ToolTipManager was first built on the EDT by a menu. */
+  @Test
+  public void mainWindowWarmUpBuildsTheSharedToolTipManager() throws IOException {
+    String source =
+        Files.readString(
+                Path.of(System.getProperty("user.dir"))
+                    .resolve("src/main/java/com/frostwire/util/JdkWarmUp.java"))
+            .replaceAll("\\s+", "");
+    String step =
+        source.substring(source.indexOf("initializeClasses(MAIN_WINDOW_CLASSES_TO_INITIALIZE);"));
+    step = step.substring(0, step.indexOf("rasterizeGlyphs"));
+    assertTrue(step.contains("warmUpToolTipManager();"), "the main-window step skips the tooltips");
+    assertDoesNotThrow(JdkWarmUp::warmUpToolTipManager);
+    assertNotNull(javax.swing.ToolTipManager.sharedInstance());
+  }
+
+  /**
+   * Icebase #33dcf3f555cc: with FlatLaf installed on Windows the splash's root pane asked
+   * FlatNativeWindowBorder whether native borders are supported, which extracted and loaded
+   * FlatLaf's DLL on the EDT. The splash pre-step does that off the EDT.
+   */
+  @Test
+  public void splashPreStepLoadsFlatLafNativeWindowBorderOffTheEdt() throws IOException {
+    String source =
+        Files.readString(
+                Path.of(System.getProperty("user.dir"))
+                    .resolve("src/main/java/com/frostwire/util/JdkWarmUp.java"))
+            .replaceAll("\\s+", "");
+    String splash = source.substring(source.indexOf("publicstaticvoidinitializeSplashClasses(){"));
+    splash = splash.substring(0, splash.indexOf("staticvoidwarmFlatLafNativeWindowBorder"));
+    assertTrue(
+        splash.contains("warmFlatLafNativeWindowBorder(UIManager.getLookAndFeel())"),
+        "the splash pre-step doesn't warm FlatLaf's native window border");
+    assertTrue(
+        source.contains("FlatNativeWindowBorder.isSupported();"),
+        "the warm-up doesn't ask FlatNativeWindowBorder");
+    assertDoesNotThrow(() -> JdkWarmUp.warmFlatLafNativeWindowBorder(null));
+    assertDoesNotThrow(
+        () ->
+            JdkWarmUp.warmFlatLafNativeWindowBorder(new javax.swing.plaf.metal.MetalLookAndFeel()));
+    assertDoesNotThrow(
+        () -> JdkWarmUp.warmFlatLafNativeWindowBorder(new com.formdev.flatlaf.FlatLightLaf()));
+  }
+
   /**
    * The splash is FrostWire's first native window, and creating its screen surface registered
    * Java2D's rendering loops (GraphicsPrimitiveMgr) and, on Windows, the GDI blit loops

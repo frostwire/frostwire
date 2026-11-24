@@ -8,6 +8,7 @@
 package com.frostwire.util;
 
 import com.formdev.flatlaf.FlatLaf;
+import com.formdev.flatlaf.ui.FlatNativeWindowBorder;
 import com.frostwire.gui.theme.PlatformFonts;
 import com.frostwire.gui.theme.SkinMenu;
 import java.awt.Font;
@@ -384,9 +385,43 @@ public final class JdkWarmUp {
     return classes;
   }
 
+  /**
+   * Builds the shared ToolTipManager (its timers) off the EDT: the main window's first menu item
+   * with a tooltip created it in AbstractMenu's constructor on the EDT (Icebase #4c2a010a8600).
+   */
+  static void warmUpToolTipManager() {
+    try {
+      javax.swing.ToolTipManager.sharedInstance();
+    } catch (Throwable t) {
+      LOG.warn("Tooltip manager warm-up failed: " + t.getMessage(), t);
+    }
+  }
+
   /** Initializes the splash's classes in order; call off the EDT before the splash. */
   public static void initializeSplashClasses() {
     initializeClasses(splashClassesToInitialize(OSUtils.isWindows()));
+    if (OSUtils.isWindows()) {
+      warmFlatLafNativeWindowBorder(UIManager.getLookAndFeel());
+    }
+  }
+
+  /**
+   * With FlatLaf installed on Windows, the first JRootPane's UI asks FlatNativeWindowBorder whether
+   * native window borders are supported, and that extracts FlatLaf's native DLL from the jar to the
+   * temp directory and loads it. The splash is the first JRootPane, so that I/O ran on the EDT
+   * while it was built, and antivirus scanning of the new DLL stalled it (Icebase #33dcf3f555cc, 4
+   * reports, 0 ms EDT CPU, frostwire/frostwire#1330 was the same extraction on a theme switch). Ask
+   * here, off the EDT, so the splash finds the answer cached. Nimbus loads no native code.
+   */
+  static void warmFlatLafNativeWindowBorder(LookAndFeel lookAndFeel) {
+    if (!(lookAndFeel instanceof FlatLaf)) {
+      return;
+    }
+    try {
+      FlatNativeWindowBorder.isSupported();
+    } catch (Throwable t) {
+      LOG.warn("Warm-up of FlatLaf's native window border failed: " + t.getMessage(), t);
+    }
   }
 
   /**
@@ -926,6 +961,7 @@ public final class JdkWarmUp {
     }
     initializeClasses(MAIN_WINDOW_CLASSES_TO_INITIALIZE);
     initializeOptionalClasses(OPTIONAL_JDK_CLASSES_TO_INITIALIZE);
+    warmUpToolTipManager();
     try {
       Map<?, ?> desktopHints = desktopFontHints();
       for (Font font : mainWindowPlatformFonts()) {
