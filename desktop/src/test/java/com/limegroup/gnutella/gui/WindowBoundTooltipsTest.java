@@ -8,6 +8,7 @@
 package com.limegroup.gnutella.gui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Dimension;
@@ -74,5 +75,26 @@ class WindowBoundTooltipsTest {
         Files.readString(Path.of("src/main/java/com/limegroup/gnutella/gui/LimeJFrame.java"));
     assertTrue(src.contains("setIconImages(images)"));
     assertTrue(src.contains("BackgroundQueuedExecutorService.schedule(this::loadWindowIcon)"));
+  }
+
+  /**
+   * A context menu that did not fit inside the window became a heavy-weight popup, and
+   * Window.setBounds -> WComponentPeer.reshape stalled the EDT (Icebase #2265554a402a,
+   * frostwire/frostwire#1552): table and tree context menus are kept inside the window too, not
+   * submenus or text fields' popups.
+   */
+  @Test
+  void contextMenusOfTablesAndTreesAreKeptInsideTheirWindowButSubmenusAreNot() {
+    assertTrue(WindowBoundTooltips.isContextMenuInvoker(new javax.swing.JTable()));
+    assertTrue(WindowBoundTooltips.isContextMenuInvoker(new javax.swing.JTree()));
+    assertFalse(WindowBoundTooltips.isContextMenuInvoker(new javax.swing.JMenu("sub")));
+    assertFalse(WindowBoundTooltips.isContextMenuInvoker(new javax.swing.JMenuBar()));
+    assertFalse(WindowBoundTooltips.isContextMenuInvoker(new javax.swing.JTextField()));
+    assertFalse(WindowBoundTooltips.isContextMenuInvoker(null));
+    assertTrue(WindowBoundTooltips.keepsInsideItsWindow(new javax.swing.JToolTip()));
+    assertFalse(
+        WindowBoundTooltips.keepsInsideItsWindow(new javax.swing.JPopupMenu()),
+        "a popup menu without an invoker is not a context menu");
+    assertFalse(WindowBoundTooltips.keepsInsideItsWindow(new javax.swing.JLabel()));
   }
 }

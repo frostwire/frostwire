@@ -12,16 +12,21 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Window;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JPopupMenu;
 import javax.swing.JToolTip;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
 import javax.swing.SwingUtilities;
+import javax.swing.text.JTextComponent;
 
 /**
  * A PopupFactory that keeps tooltips inside their window. Swing makes a tooltip that does not fit
  * inside the window a medium-weight popup, whose JLayeredPane.add creates a native Panel peer on
  * the EDT (WCanvasPeer.create, Icebase #2bb3702e758c, frostwire/frostwire#1552). Moved to fit, it
- * stays a lightweight component. Other popups (menus, the search suggestions) are untouched.
+ * stays a lightweight component. The same goes for the context menus of tables and trees; submenus
+ * and the search suggestions are untouched.
  */
 public final class WindowBoundTooltips extends PopupFactory {
 
@@ -33,7 +38,7 @@ public final class WindowBoundTooltips extends PopupFactory {
   @Override
   public Popup getPopup(Component owner, Component contents, int x, int y)
       throws IllegalArgumentException {
-    if (contents instanceof JToolTip && owner != null) {
+    if (owner != null && keepsInsideItsWindow(contents)) {
       Window window = SwingUtilities.getWindowAncestor(owner);
       if (window != null && window.isShowing()) {
         Point p = clamp(x, y, contents.getPreferredSize(), window.getBounds());
@@ -42,6 +47,28 @@ public final class WindowBoundTooltips extends PopupFactory {
       }
     }
     return super.getPopup(owner, contents, x, y);
+  }
+
+  /**
+   * Tooltips, and the context menus of tables and trees (a JPopupMenu whose invoker is not a menu
+   * or a text field): a context menu that does not fit inside the window is a heavy-weight popup
+   * whose Window.setBounds -> WComponentPeer.reshape runs on the EDT (Icebase #2265554a402a,
+   * handlePopupMenu). Submenus stay where their parent menu puts them, and the text fields'
+   * suggestion popups are untouched.
+   */
+  static boolean keepsInsideItsWindow(Component contents) {
+    if (contents instanceof JToolTip) {
+      return true;
+    }
+    return contents instanceof JPopupMenu menu && isContextMenuInvoker(menu.getInvoker());
+  }
+
+  /** Whether a popup menu invoked from {@code invoker} is a top level context menu. */
+  static boolean isContextMenuInvoker(Component invoker) {
+    return invoker != null
+        && !(invoker instanceof JMenu)
+        && !(invoker instanceof JMenuBar)
+        && !(invoker instanceof JTextComponent);
   }
 
   /**
