@@ -246,15 +246,23 @@ public abstract class PromptTextUI extends TextUI {
   @Override
   public Rectangle2D modelToView2D(JTextComponent t, int pos, Bias bias)
       throws BadLocationException {
+    // null is a valid answer: the field has no size yet (BasicTextUI has no visible editor
+    // rectangle), as when the input method asks where the text is before the first layout
+    // (Icebase #3f551650418a, #77a49f4595e1, #81d2da1eec70, #f473c4f738fc: NullPointerException).
     if (shouldPaintPrompt(t)) {
-      return getPromptComponent(t).getUI().modelToView2D(t, pos, bias).getBounds();
+      return bounds(getPromptComponent(t).getUI().modelToView2D(t, pos, bias));
     } else {
       try {
-        return delegate.modelToView2D(t, pos, bias).getBounds();
-      } catch (Throwable npe) {
+        return bounds(delegate.modelToView2D(t, pos, bias));
+      } catch (NullPointerException npe) {
         return delegate.modelToView2D(t, pos, bias);
       }
     }
+  }
+
+  /** The integer bounds of {@code r}, or null when there is none. */
+  static Rectangle2D bounds(Rectangle2D r) {
+    return r == null ? null : r.getBounds();
   }
 
   // ********************* Delegate methods *************************///
