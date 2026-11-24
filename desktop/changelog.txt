@@ -20,6 +20,8 @@ FrostWire 7.1.6 UNRELEASED
    - fix:tooltips near the edge of the window stay inside it, so Windows doesn't have to create a separate window for them (#1552)
    - fix:the window's icon is prepared at every size Windows asks for, so moving FrostWire to another screen no longer stalls while the icon is resized (#1552)
    - fix:when a finishing download is selected again with its details open, the window is no longer laid out again (#1563)
+   - fix:typing in the search field with a Windows input method (IME) no longer crashes when the input method asks where the text is before the field has a size (#1591)
+   - fix:when FrostWire has to report a crash, the window no longer freezes while it checks the Telluride version (#1592)
    - fix:crash reports now say the first error that caused the crash, so failures that look the same can be told apart
    - update:FrostWire no longer links to reddit.com; find us on Discord, X, Facebook and Instagram
    - update:newer versions of the libraries FrostWire uses: sqlite, FlatLaf, Netty and Bouncy Castle
