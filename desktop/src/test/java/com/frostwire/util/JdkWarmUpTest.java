@@ -2091,4 +2091,15 @@ class JdkWarmUpTest {
       }
     }
   }
+
+  @Test
+  void theOptionalListHasTheShutdownHelperAndTheD3DPaints() {
+    assertTrue(
+        JdkWarmUp.OPTIONAL_JDK_CLASSES_TO_INITIALIZE.contains("sun.reflect.misc.MethodUtil"));
+    assertTrue(JdkWarmUp.OPTIONAL_JDK_CLASSES_TO_INITIALIZE.contains("sun.java2d.d3d.D3DPaints"));
+    assertDoesNotThrow(
+        () ->
+            JdkWarmUp.initializeOptionalClasses(
+                List.of("sun.java2d.d3d.D3DPaints", "sun.no.Such.Class")));
+  }
 }

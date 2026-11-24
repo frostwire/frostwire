@@ -287,7 +287,11 @@ public final class JdkWarmUp {
           // The reflection helper behind the shutdown window's first dialog (Icebase
           // #b2975f5ce266, ShutdownWindow.new -> MethodUtil.invoke); not exported, skipped if
           // absent.
-          "sun.reflect.misc.MethodUtil");
+          "sun.reflect.misc.MethodUtil",
+          // Direct3D's paint registry, initialized the first time the EDT paints a gradient with
+          // the D3D pipeline (Icebase #8a8c42b77f5a, ProgressBarPainter -> D3DPaints.<clinit>);
+          // Windows only, skipped on other systems.
+          "sun.java2d.d3d.D3DPaints");
 
   /**
    * Windows-only JDK classes initialized like {@link #CLASSES_TO_INITIALIZE}. The first right-click
