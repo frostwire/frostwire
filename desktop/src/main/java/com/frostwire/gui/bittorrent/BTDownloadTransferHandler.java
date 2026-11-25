@@ -27,12 +27,15 @@ import com.limegroup.gnutella.gui.search.SearchMediator;
 import com.limegroup.gnutella.gui.search.SearchResultDataLine;
 import com.limegroup.gnutella.gui.search.SearchResultMediator;
 import com.limegroup.gnutella.gui.search.SearchResultTransferable;
+import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 import java.util.function.Supplier;
 import javax.swing.*;
 
@@ -103,13 +106,31 @@ final class BTDownloadTransferHandler extends LimeTransferHandler {
   }
 
   /**
-   * Walking a download's folder (and finding its incomplete parts) touches the disk, so it waits
-   * until a drop target asks for the files instead of running on the EDT when the drag starts.
+   * Walking a download's folder (and finding its incomplete parts) touches the disk, so it never
+   * runs on the EDT when the drag starts, and it starts on a background thread, not when a drop
+   * target asks. macOS asks on the EDT (the toolkit translates the data in a PeerEvent), so the
+   * walk started then froze the window for as long as the folder took to list (Icebase
+   * #5ca136ac5d64: 2.4 s of EDT CPU); by the time the user drops, the background walk is usually
+   * done and the target gets the list at once.
    */
   static FileTransferable transferableFor(BTDownload[] downloads, Supplier<Set<File>> ignorable) {
     BTDownload[] dragged = downloads.clone();
-    return FileTransferable.listedOnDrop(
-        () -> listFiles(dragged, ignorable.get()), () -> saveLocations(dragged));
+    FutureTask<List<File>> listing = new FutureTask<>(() -> listFiles(dragged, ignorable.get()));
+    DesktopParallelExecutor.execute(listing);
+    return FileTransferable.listedOnDrop(() -> listed(listing), () -> saveLocations(dragged));
+  }
+
+  /** The background walk's files, waiting for it if the target asked before it finished. */
+  private static List<File> listed(FutureTask<List<File>> listing) {
+    try {
+      return listing.get();
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      return new ArrayList<>();
+    } catch (ExecutionException e) {
+      LOG.error("Error listing the dragged transfers' files", e);
+      return new ArrayList<>();
+    }
   }
 
   /** The transfers' own folders or files, for the drag image: known without touching the disk. */

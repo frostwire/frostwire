@@ -20,6 +20,9 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -29,6 +32,11 @@ class BTDownloadTransferHandlerTest {
   @TempDir Path dir;
 
   private static BTDownload savedAt(File saveLocation, AtomicInteger diskTouches) {
+    return savedAt(saveLocation, diskTouches, ConcurrentHashMap.newKeySet());
+  }
+
+  private static BTDownload savedAt(
+      File saveLocation, AtomicInteger diskTouches, Set<Thread> callers) {
     return (BTDownload)
         Proxy.newProxyInstance(
             BTDownload.class.getClassLoader(),
@@ -36,6 +44,7 @@ class BTDownloadTransferHandlerTest {
             (proxy, method, args) -> {
               if ("getSaveLocation".equals(method.getName())) {
                 diskTouches.incrementAndGet();
+                callers.add(Thread.currentThread());
                 return saveLocation;
               }
               return null;
@@ -44,34 +53,40 @@ class BTDownloadTransferHandlerTest {
 
   /**
    * Dragging a transfer used to walk its whole folder on the EDT when the drag started (Icebase
-   * #f8ab9e82200f). The walk now waits until a drop target asks for the files.
+   * #f8ab9e82200f), and later when a drop target asked for the files, which macOS does on the EDT
+   * (Icebase #5ca136ac5d64). The walk now starts on a background thread as the drag begins, so the
+   * target finds it done.
    */
   @Test
-  void filesAreListedWhenDroppedNotWhenTheDragStarts() throws Exception {
+  void filesAreListedInTheBackgroundFromTheStartOfTheDrag() throws Exception {
     Path album = Files.createDirectories(dir.resolve("album/disc 1"));
     File track = Files.createFile(album.resolve("01.mp3")).toFile();
     File partial = Files.createFile(album.resolve("02.mp3")).toFile();
     File single = Files.createFile(dir.resolve("movie.mp4")).toFile();
     AtomicInteger diskTouches = new AtomicInteger();
     AtomicInteger ignorableLookups = new AtomicInteger();
+    Thread dragThread = Thread.currentThread();
+    Set<Thread> walkers = ConcurrentHashMap.newKeySet();
+    CountDownLatch walked = new CountDownLatch(1);
 
     FileTransferable transferable =
         BTDownloadTransferHandler.transferableFor(
             new BTDownload[] {
-              savedAt(dir.resolve("album").toFile(), diskTouches), savedAt(single, diskTouches)
+              savedAt(dir.resolve("album").toFile(), diskTouches, walkers),
+              savedAt(single, diskTouches, walkers)
             },
             () -> {
               ignorableLookups.incrementAndGet();
+              walked.countDown();
               return new HashSet<>(Set.of(partial));
             });
     transferable.getTransferDataFlavors();
 
-    assertEquals(0, diskTouches.get(), "starting the drag must not touch the downloads");
-    assertEquals(0, ignorableLookups.get());
-
+    assertTrue(walked.await(10, TimeUnit.SECONDS), "the walk never started on its own");
     @SuppressWarnings("unchecked")
     List<File> dropped = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
     assertEquals(List.of(track, single), dropped);
+    assertFalse(walkers.contains(dragThread), "the walk ran on the thread that started the drag");
 
     transferable.getTransferData(DataFlavor.javaFileListFlavor);
     assertEquals(2, diskTouches.get(), "listed once");
@@ -88,14 +103,18 @@ class BTDownloadTransferHandlerTest {
     Path album = Files.createDirectories(dir.resolve("album/disc 1"));
     Files.createFile(album.resolve("01.mp3"));
     AtomicInteger diskTouches = new AtomicInteger();
+    Set<Thread> walkers = ConcurrentHashMap.newKeySet();
     FileTransferable transferable =
         BTDownloadTransferHandler.transferableFor(
-            new BTDownload[] {savedAt(dir.resolve("album").toFile(), diskTouches)}, HashSet::new);
+            new BTDownload[] {savedAt(dir.resolve("album").toFile(), diskTouches, walkers)},
+            HashSet::new);
     BTDownloadTransferHandler handler = new BTDownloadTransferHandler();
 
     assertFalse(handler.canImport(null, transferable.getTransferDataFlavors()));
     assertFalse(handler.importData(null, transferable));
-    assertEquals(0, diskTouches.get(), "the drop must not list the transfer's files");
+    // The drag's own background walk may touch the disk, but never this (EDT) thread.
+    assertFalse(
+        walkers.contains(Thread.currentThread()), "the drop listed the transfer's files itself");
   }
 
   /** Files dragged from other applications still drop on the transfers list. */
