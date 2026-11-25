@@ -295,7 +295,15 @@ public final class JdkWarmUp {
           // Direct3D's paint registry, initialized the first time the EDT paints a gradient with
           // the D3D pipeline (Icebase #8a8c42b77f5a, ProgressBarPainter -> D3DPaints.<clinit>);
           // Windows only, skipped on other systems.
-          "sun.java2d.d3d.D3DPaints");
+          "sun.java2d.d3d.D3DPaints",
+          // The anti-aliased shape pipeline Nimbus's and the skins' painters fill and draw
+          // through: its classes and the native MaskBlit lookup ran on the EDT the first time a
+          // progress bar painted (Icebase #163e75738185 AlphaPaintPipe.startSequence, #fff67e91c0fb
+          // MaskBlit, #ac1856c09d92 PixelToParallelogramConverter.draw).
+          "sun.java2d.pipe.PixelToParallelogramConverter",
+          "sun.java2d.pipe.AAShapePipe",
+          "sun.java2d.pipe.AlphaPaintPipe",
+          "sun.java2d.loops.MaskBlit");
 
   /**
    * Windows-only JDK classes initialized like {@link #CLASSES_TO_INITIALIZE}. The first right-click

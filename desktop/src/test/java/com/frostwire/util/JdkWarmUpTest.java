@@ -868,6 +868,22 @@ class JdkWarmUpTest {
     assertDoesNotThrow(JdkWarmUp::initializeSplashClasses);
   }
 
+  /** Icebase #163e75738185, #fff67e91c0fb, #ac1856c09d92: the AA shape pipeline's first use. */
+  @Test
+  public void startupInitializesTheAntiAliasedShapePipeline() {
+    for (String name :
+        List.of(
+            "sun.java2d.pipe.PixelToParallelogramConverter",
+            "sun.java2d.pipe.AAShapePipe",
+            "sun.java2d.pipe.AlphaPaintPipe",
+            "sun.java2d.loops.MaskBlit")) {
+      assertTrue(
+          JdkWarmUp.OPTIONAL_JDK_CLASSES_TO_INITIALIZE.contains(name), name + " is not warmed up");
+    }
+    assertDoesNotThrow(
+        () -> JdkWarmUp.initializeOptionalClasses(JdkWarmUp.OPTIONAL_JDK_CLASSES_TO_INITIALIZE));
+  }
+
   /** Icebase #692d1188f8b1: QuestionsHandler read its properties file on the EDT. */
   @Test
   public void mainWindowWarmUpInitializesTheSettingsGroupsThatReadFiles() throws IOException {
