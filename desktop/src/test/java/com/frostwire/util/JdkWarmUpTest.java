@@ -868,6 +868,40 @@ class JdkWarmUpTest {
     assertDoesNotThrow(JdkWarmUp::initializeSplashClasses);
   }
 
+  /** Icebase #692d1188f8b1: QuestionsHandler read its properties file on the EDT. */
+  @Test
+  public void mainWindowWarmUpInitializesTheSettingsGroupsThatReadFiles() throws IOException {
+    for (String group :
+        List.of("LimeProps", "InstallSettings", "QuestionsHandler", "TablesHandlerSettings")) {
+      assertTrue(
+          JdkWarmUp.SETTINGS_GROUPS_TO_INITIALIZE.contains(
+              "com.limegroup.gnutella.settings." + group),
+          group + " is not initialized off the EDT");
+    }
+    String source =
+        Files.readString(
+                Path.of(System.getProperty("user.dir"))
+                    .resolve("src/main/java/com/frostwire/util/JdkWarmUp.java"))
+            .replaceAll("\\s+", "");
+    assertTrue(
+        source.contains("warmUpToolTipManager();initializeClasses(SETTINGS_GROUPS_TO_INITIALIZE);"),
+        "the main-window warm-up skips the settings groups");
+    // Every class that builds a settings file in its static initializer is listed.
+    try (var files = Files.walk(Path.of("src/main/java/com/limegroup/gnutella/settings"))) {
+      for (Path file :
+          (Iterable<Path>) files.filter(f -> f.toString().endsWith(".java"))::iterator) {
+        String text = Files.readString(file);
+        if (text.contains("extends LimeWireSettings")) {
+          String name = file.getFileName().toString().replace(".java", "");
+          assertTrue(
+              JdkWarmUp.SETTINGS_GROUPS_TO_INITIALIZE.contains(
+                  "com.limegroup.gnutella.settings." + name),
+              name + " reads a file in its static initializer and is not warmed up");
+        }
+      }
+    }
+  }
+
   /** Icebase #4c2a010a8600: the shared ToolTipManager was first built on the EDT by a menu. */
   @Test
   public void mainWindowWarmUpBuildsTheSharedToolTipManager() throws IOException {

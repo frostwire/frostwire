@@ -362,6 +362,19 @@ public final class JdkWarmUp {
   static final List<String> WINDOWS_SPLASH_CLASSES_TO_INITIALIZE =
       List.of("sun.java2d.windows.GDIWindowSurfaceData");
 
+  /**
+   * The settings groups that read their properties file in a static initializer, on whichever
+   * thread touches them first. QuestionsHandler's was the Options window's Associations pane on the
+   * EDT, where the read waited on the disk (Icebase #692d1188f8b1); the others are built the same
+   * way.
+   */
+  static final List<String> SETTINGS_GROUPS_TO_INITIALIZE =
+      List.of(
+          "com.limegroup.gnutella.settings.LimeProps",
+          "com.limegroup.gnutella.settings.InstallSettings",
+          "com.limegroup.gnutella.settings.QuestionsHandler",
+          "com.limegroup.gnutella.settings.TablesHandlerSettings");
+
   /** Initializes {@code classNames} in order, silently skipping those this JDK doesn't have. */
   static void initializeOptionalClasses(List<String> classNames) {
     for (String className : classNames) {
@@ -962,6 +975,7 @@ public final class JdkWarmUp {
     initializeClasses(MAIN_WINDOW_CLASSES_TO_INITIALIZE);
     initializeOptionalClasses(OPTIONAL_JDK_CLASSES_TO_INITIALIZE);
     warmUpToolTipManager();
+    initializeClasses(SETTINGS_GROUPS_TO_INITIALIZE);
     try {
       Map<?, ?> desktopHints = desktopFontHints();
       for (Font font : mainWindowPlatformFonts()) {
