@@ -7186,3 +7186,47 @@ msgid ""
 "FrostWire started with the default theme because your theme {0} could not be "
 "loaded. Logs and error reports are in {1}"
 msgstr "আপনার থিম {0} লোড করা যায়নি, তাই FrostWire ডিফল্ট থিম দিয়ে চালু হয়েছে। লগ ও ত্রুটির রিপোর্ট আছে {1}-এ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java
+msgid "Network"
+msgstr "নেটওয়ার্ক"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "Mixed"
+msgstr "মিশ্র"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "I2P only"
+msgstr "শুধু I2P"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "Clearnet only"
+msgstr "শুধু সাধারণ ইন্টারনেট"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "Use regular internet and I2P peers, as FrostWire always has."
+msgstr "সাধারণ ইন্টারনেট ও I2P পিয়ার ব্যবহার করুন, FrostWire যেমন সবসময় করে এসেছে।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "Only use I2P peers. Needs I2P enabled in Options, and web seeds are not used. While any torrent is I2P only, mixed mode is off for all torrents."
+msgstr "শুধু I2P পিয়ার ব্যবহার করুন। অপশন-এ I2P চালু থাকতে হবে, এবং ওয়েব সিড ব্যবহার হয় না। কোনো টরেন্ট শুধু I2P থাকলে সব টরেন্টের জন্য মিশ্র মোড বন্ধ থাকে।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "Only use regular internet peers. Best effort: FrostWire does not refuse I2P peers for this torrent yet."
+msgstr "শুধু সাধারণ ইন্টারনেট পিয়ার ব্যবহার করুন। সাধ্যমতো: FrostWire এখনও এই টরেন্টের জন্য I2P পিয়ার প্রত্যাখ্যান করে না।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "On hold: I2P is not enabled. Turn it on in Options > I2P."
+msgstr "অপেক্ষায়: I2P চালু নেই। অপশন > I2P-এ গিয়ে চালু করুন।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "On hold: the I2P router is not reachable. Check Options > I2P."
+msgstr "অপেক্ষায়: I2P রাউটারে পৌঁছানো যাচ্ছে না। অপশন > I2P দেখুন।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "While a torrent is set to I2P only, mixed mode stays off for all torrents, whatever is checked here."
+msgstr "কোনো টরেন্ট শুধু I2P-এ সেট থাকলে এখানে যা-ই চিহ্নিত থাকুক, সব টরেন্টের জন্য মিশ্র মোড বন্ধ থাকে।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentNetworkChoice.java
+msgid "A torrent set to Clearnet only is best effort: I2P peers are not refused for it yet."
+msgstr "শুধু সাধারণ ইন্টারনেটে সেট করা টরেন্ট সাধ্যমতো কাজ করে: এর জন্য I2P পিয়ার এখনও প্রত্যাখ্যান করা হয় না।"

@@ -1,0 +1,3 @@
+# FrostWire per-torrent network policy v1
+0123456789abcdef0123456789abcdef01234567=I2P_ONLY
+89abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567=CLEARNET_ONLY

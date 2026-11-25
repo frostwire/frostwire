@@ -20,6 +20,8 @@
 package com.frostwire.gui.components.transfers;
 
 import com.frostwire.bittorrent.BTDownload;
+import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.bittorrent.TorrentNetworkMode;
 import com.frostwire.gui.bittorrent.BTDownloadDataLine;
 import com.frostwire.gui.bittorrent.BittorrentDownload;
 import com.frostwire.gui.theme.ThemeMediator;
@@ -74,6 +76,7 @@ public final class TransferDetailGeneral extends JPanel
   private final JButton copyMagnetURLButton;
   private final JButton checkLocalDataButton;
   private final JCheckBox sequentialDownloadCheckbox;
+  private final TransferNetworkRow networkRow;
   private final CardLayout recheckCardLayout;
   private final JPanel recheckCardPanel;
   private final JProgressBar recheckProgressBar;
@@ -204,6 +207,11 @@ public final class TransferDetailGeneral extends JPanel
     sequentialDownloadCheckbox.setToolTipText(
         I18n.tr("Download pieces in order (helps previewing media)"));
     sequentialDownloadCheckbox.addActionListener(e -> onSequentialDownloadToggled());
+    // Which networks this torrent may use (frostwire/frostwire#1304)
+    midPanel.add(new JGrayLabel(I18n.tr("Network") + ":"), "split 2, gapright 10");
+    networkRow = new TransferNetworkRow();
+    networkRow.onUserChange(this::onNetworkChosen);
+    midPanel.add(networkRow, "span 3, gapright 50, wrap");
     // 3rd Section, "GENERAL"
     // Save location
     // InfoHash
@@ -317,6 +325,9 @@ public final class TransferDetailGeneral extends JPanel
     String magnetURI = btDownload.magnetUri();
     final BTDownload expectedBtDownload = btDownload;
     final RecheckSnapshot recheckSnapshot = computeRecheckSnapshot(btDownload, state, status);
+    // Memory reads behind one hash lookup, already off the EDT here
+    final TorrentNetworkMode networkMode = btDownload.getNetworkMode();
+    final BTEngine.NetworkHold networkHold = btDownload.getNetworkHold();
 
     GUIMediator.safeInvokeLater(
         () -> {
@@ -358,6 +369,7 @@ public final class TransferDetailGeneral extends JPanel
                   I18n.tr("total")));
           uploadSpeedLimitLabel.setText(GUIUtils.getBytesInHuman(uploadLimit));
           sequentialDownloadCheckbox.setSelected(btDownload.isSequentialDownload());
+          networkRow.show(networkMode, networkHold);
           if (recheckSnapshot.showProgress) {
             recheckCardLayout.show(recheckCardPanel, "progress");
             recheckProgressBar.setValue(recheckSnapshot.barValue);
@@ -423,6 +435,7 @@ public final class TransferDetailGeneral extends JPanel
     peersLabel.setText("");
     uploadSpeedLimitLabel.setText("");
     sequentialDownloadCheckbox.setSelected(false);
+    networkRow.clear();
     recheckPhase = RecheckPhase.IDLE;
     recheckTarget = null;
     recheckCardLayout.show(recheckCardPanel, "button");
@@ -516,6 +529,15 @@ public final class TransferDetailGeneral extends JPanel
     recheckStartNanos = System.nanoTime();
     checkLocalDataButton.setEnabled(false);
     BackgroundQueuedExecutorService.schedule(target::forceRecheck);
+  }
+
+  /** The user picked a network mode: libtorrent work, so not on the EDT. */
+  private void onNetworkChosen(TorrentNetworkMode mode) {
+    BTDownload target = btDownload;
+    if (target == null) {
+      return;
+    }
+    BackgroundQueuedExecutorService.schedule(() -> target.setNetworkMode(mode));
   }
 
   private void onSequentialDownloadToggled() {

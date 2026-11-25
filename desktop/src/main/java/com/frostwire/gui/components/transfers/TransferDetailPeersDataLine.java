@@ -61,7 +61,7 @@ public final class TransferDetailPeersDataLine
   // private static final int upload_only = 1 << 13;
   // private static final int endgame_mode = 1 << 14;
   // private static final int holepunched = 1 << 15;
-  // private static final int i2p_socket = 1 << 16;
+  private static final int i2p_socket = 1 << 16;
   private static final int utp_socket = 1 << 17;
   private static final int ssl_socket = 1 << 18;
   private static final int rc4_encrypted = 1 << 19;
@@ -287,6 +287,11 @@ public final class TransferDetailPeersDataLine
     if ((flags & utp_socket) == utp_socket) {
       sb.append("P");
     }
+    // i = Peer is on the I2P network (its destination is not bound in jlibtorrent yet, so the
+    // address column shows no address for it)
+    if ((flags & i2p_socket) == i2p_socket) {
+      sb.append("i");
+    }
     // L = Peer is local (discovered through network broadcast, or in reserved local IP ranges)
     // BUGGY FLAG: if ((flags & local_connection) == local_connection) {
     if ((sourceFlags & lsd) == lsd) {
@@ -296,6 +301,9 @@ public final class TransferDetailPeersDataLine
   }
 
   private static String connectionTypeAsString(PeerInfo.ConnectionType t, int flags) {
+    if ((flags & i2p_socket) == i2p_socket) {
+      return "i2p";
+    }
     switch (t) {
       case WEB_SEED:
         return "web_seed";
@@ -312,6 +320,14 @@ public final class TransferDetailPeersDataLine
   }
 
   public static String getBittorrentAddress(PeerInfo peer) {
-    return connectionTypeAsString(peer.connectionType(), peer.flags()) + "://" + peer.ip();
+    return addressOf(peer.connectionType(), peer.flags(), peer.ip());
+  }
+
+  /** The address column text: scheme and endpoint; an I2P peer has no IP endpoint to show. */
+  static String addressOf(PeerInfo.ConnectionType type, int flags, String ip) {
+    if ((flags & i2p_socket) == i2p_socket) {
+      return "i2p://destination-not-available";
+    }
+    return connectionTypeAsString(type, flags) + "://" + ip;
   }
 }

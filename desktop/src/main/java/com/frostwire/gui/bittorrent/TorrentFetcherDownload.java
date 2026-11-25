@@ -21,6 +21,7 @@ package com.frostwire.gui.bittorrent;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.CopyrightLicenseBroker;
 import com.frostwire.bittorrent.PaymentOptions;
+import com.frostwire.bittorrent.TorrentNetworkMode;
 import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TcpEndpoint;
@@ -289,6 +290,7 @@ public class TorrentFetcherDownload implements BTDownload {
               try {
                 boolean[] selection = null;
                 File saveFolder = null;
+                TorrentNetworkMode networkMode = TorrentNetworkMode.DEFAULT;
                 if (partial) {
                   PartialFilesDialog dlg =
                       new PartialFilesDialog(GUIMediator.getAppFrame(), contents, displayName);
@@ -298,21 +300,26 @@ public class TorrentFetcherDownload implements BTDownload {
                     return;
                   }
                   saveFolder = dlg.getSaveFolder();
+                  networkMode = dlg.getNetworkMode();
                 }
                 // download() is libtorrent work: back to the background queue.
                 boolean[] finalSelection = selection;
                 File finalSaveFolder = saveFolder;
+                final TorrentNetworkMode finalNetworkMode = networkMode;
                 BackgroundQueuedExecutorService.schedule(
                     () -> {
                       try {
-                        BTEngine.getInstance()
-                            .download(
-                                ti,
-                                finalSaveFolder,
-                                finalSelection,
-                                peers,
-                                true,
-                                distributedSourcePeerPub);
+                        BTEngine engine = BTEngine.getInstance();
+                        // Before the torrent is added, so it is added with the mode
+                        TorrentNetworkChoice.recordBeforeAdd(
+                            engine.canonicalInfoHash(ti), finalNetworkMode, engine::setNetworkMode);
+                        engine.download(
+                            ti,
+                            finalSaveFolder,
+                            finalSelection,
+                            peers,
+                            true,
+                            distributedSourcePeerPub);
                       } catch (Throwable e) {
                         LOG.error("Error downloading torrent", e);
                       }

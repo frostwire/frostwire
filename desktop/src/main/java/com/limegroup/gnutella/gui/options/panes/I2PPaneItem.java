@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui.options.panes;
 
+import com.frostwire.gui.bittorrent.TorrentNetworkChoice;
 import com.frostwire.jlibtorrent.swig.settings_pack;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.GUIUtils.SizePolicy;
@@ -78,6 +79,9 @@ public final class I2PPaneItem extends AbstractPaneItem {
 
     // Mixed mode checkbox
     add(I2P_ALLOW_MIXED_CHECKBOX);
+    // What the per-torrent Network choice does to it (frostwire/frostwire#1304), plain text
+    add(TorrentNetworkChoice.plainNote(TorrentNetworkChoice.mixedModeNote()));
+    add(TorrentNetworkChoice.plainNote(TorrentNetworkChoice.clearnetNote()));
     add(getHorizontalSeparator());
 
     // Tunnel settings
