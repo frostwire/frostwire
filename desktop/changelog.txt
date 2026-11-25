@@ -1,4 +1,5 @@
 FrostWire 7.1.6 UNRELEASED
+   - fix:dragging a finished download with a big folder out of FrostWire (to Finder, for example) no longer freezes the window while its files are listed; the list is prepared in the background as the drag starts (#1511)
    - fix:opening Tools > Options no longer freezes the window while FrostWire reads its saved answers file from a busy disk (#1563)
    - new:Linux: the tar.gz installer now installs FrostWire into /opt/frostwire for every user (or into ~/.local/share/frostwire with --user, no administrator rights), and running the install.sh of a newer package updates that installation in place, replacing the old files and keeping your settings, library and transfers; uninstall.sh removes it
    - fix:starting FrostWire on Windows no longer freezes the splash while FlatLaf's native library is copied to the temp folder, and the first menu no longer builds the tooltip manager on the interface thread (#1330, #1563)
