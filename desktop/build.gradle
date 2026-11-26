@@ -13,7 +13,7 @@ plugins {
     id 'java'
     id 'application'
     id 'jacoco'
-    id 'com.diffplug.spotless' version '8.10.4'
+    id 'com.diffplug.spotless' version '8.12.0'
 }
 
 group = 'com.frostwire'
