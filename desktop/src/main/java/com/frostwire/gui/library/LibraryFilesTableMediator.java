@@ -91,7 +91,7 @@ public final class LibraryFilesTableMediator
     super("LIBRARY_FILES_TABLE");
   }
 
-  public static LibraryFilesTableMediator instance() {
+  public static synchronized LibraryFilesTableMediator instance() {
     if (INSTANCE == null) {
       INSTANCE = new LibraryFilesTableMediator();
     }

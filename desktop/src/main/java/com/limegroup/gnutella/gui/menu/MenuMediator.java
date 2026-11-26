@@ -67,7 +67,7 @@ public final class MenuMediator {
    *
    * @return the `MenuMediator` instance
    */
-  public static MenuMediator instance() {
+  public static synchronized MenuMediator instance() {
     if (INSTANCE == null) {
       INSTANCE = new MenuMediator();
     }

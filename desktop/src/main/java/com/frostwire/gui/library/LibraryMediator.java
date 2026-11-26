@@ -88,7 +88,7 @@ public class LibraryMediator {
   /**
    * @return the `LibraryMediator` instance
    */
-  public static LibraryMediator instance() {
+  public static synchronized LibraryMediator instance() {
     if (INSTANCE == null) {
       INSTANCE = new LibraryMediator();
     }

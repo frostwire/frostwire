@@ -127,7 +127,7 @@ public final class BTDownloadMediator
     BackgroundQueuedExecutorService.schedule(this::restoreSorting);
   }
 
-  public static BTDownloadMediator instance() {
+  public static synchronized BTDownloadMediator instance() {
     if (INSTANCE == null) {
       INSTANCE = new BTDownloadMediator();
     }
