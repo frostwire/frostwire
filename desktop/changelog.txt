@@ -1,4 +1,8 @@
 FrostWire 7.1.6 UNRELEASED
+   - fix:when Java's own files are damaged and FrostWire can't start (a Java class missing right after launch), it now says so in the system's own dialog and offers the download page instead of closing without a word (#1541)
+   - fix:on computers where FrostWire runs in Lite mode, the first text in a language the interface font lacks no longer freezes the window while Java reads the installed fonts; the list is read in the background after the window shows (#1562)
+   - change:Automatic performance mode now picks Lite on computers with 4 or fewer processors and the 512 MB memory limit, which ran slowly in Full mode (#1512)
+   - update:re2j 1.9, Spotless 8.12.0
    - change:reports of the Windows input method opening its candidate list, which FrostWire cannot change, are no longer sent (#1351)
    - fix:opening the Library tab right after starting FrostWire no longer fails with a "duplicate setting key" error when two parts of the program ask for the Library table at once
    - fix:the first progress bar or skinned control painted after starting FrostWire no longer freezes the window while Java loads its smooth-edge drawing code (#1563)
