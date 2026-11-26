@@ -1,4 +1,5 @@
 FrostWire 7.1.6 UNRELEASED
+   - fix:opening the Library tab right after starting FrostWire no longer fails with a "duplicate setting key" error when two parts of the program ask for the Library table at once
    - fix:the first progress bar or skinned control painted after starting FrostWire no longer freezes the window while Java loads its smooth-edge drawing code (#1563)
    - fix:dragging a finished download with a big folder out of FrostWire (to Finder, for example) no longer freezes the window while its files are listed; the list is prepared in the background as the drag starts (#1511)
    - fix:opening Tools > Options no longer freezes the window while FrostWire reads its saved answers file from a busy disk (#1563)
