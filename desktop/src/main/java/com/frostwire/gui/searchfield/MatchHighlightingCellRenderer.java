@@ -63,7 +63,26 @@ final class MatchHighlightingCellRenderer extends JComponent implements ListCell
 
   private static final int MAX_CACHED_LAYOUTS = 64;
 
-  private record LayoutKey(String text, BitSet bold, Font font, FontRenderContext frc) {}
+  /**
+   * The cache key of one laid-out line. equals and hashCode are written out because a record's are
+   * linked on first use through invokedynamic (ObjectMethods), which defined a hidden class on the
+   * EDT while the first suggestion painted (Icebase #83d7ce9e0dc4, #d5f23e9abcc5).
+   */
+  private record LayoutKey(String text, BitSet bold, Font font, FontRenderContext frc) {
+    @Override
+    public boolean equals(Object other) {
+      return other instanceof LayoutKey key
+          && java.util.Objects.equals(text, key.text)
+          && java.util.Objects.equals(bold, key.bold)
+          && java.util.Objects.equals(font, key.font)
+          && java.util.Objects.equals(frc, key.frc);
+    }
+
+    @Override
+    public int hashCode() {
+      return java.util.Objects.hash(text, bold, font, frc);
+    }
+  }
 
   MatchHighlightingCellRenderer(ListCellRenderer<? super String> delegate, Supplier<String> query) {
     this.delegate = delegate;
