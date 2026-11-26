@@ -1,19 +1,19 @@
-FrostWire Android UNRELEASED
+FrostWire 3.2.5 build 781 NOV/26/2026
+  - new:Pieces tab: tap a piece to see its details (state, size, byte range, peers, SHA-1, files) and change its download priority; Don't Download pieces are drawn red and High ones orange, like on desktop; torrents with more than 1,200 pieces now show all of them (#1566)
   - new:FrostWire targets Android 16 (API 36); every screen keeps clear of the status and navigation bars, the camera cutout and the keyboard now that Android 15 and 16 draw apps edge to edge
   - fix:search: MagnetDL's dead proxy is replaced by ApiBay (apibay.org), a search engine that works
   - fix:a long seeding session in the background no longer ends with Android killing FrostWire after it times out the data-sync foreground service; the engine service stops itself when Android asks
+  - fix:crash when leaving the Distributed Search settings screen while its identity and karma were still loading, or when an identity action finished after the screen closed (#1569)
   - fix:the play, pause, next, previous and dismiss buttons of the music notification and a headset button work on Android 8 to 12
   - fix:music files whose names contain #, ? or % (a fresh download, or a file opened from a file manager) play instead of failing to open
+  - change:the Reddit buttons and links are gone from About, Settings and the social dialog, and Support opens our Discord chat
+  - change:IceBridge (Distributed Search) uses less CPU and memory for each packet it handles
+  - fix:Distributed Search peer discovery uses much less CPU: it reads the phone's network addresses once per pass instead of once per peer it checks (#1574)
+  - fix:Pieces tab: the tapped piece's card is readable in the dark theme (it was white with light text)  (#1566)
+  - fix:the Pieces tab keeps the tapped piece and its card when the screen is recreated (theme or font change, split-screen resize, large screens, app restored after being killed) (#1566)
   - fix:the now-playing screen no longer keeps refreshing and listening to the player after you leave it, and a ringtone preview that fails to open ends instead of staying marked as playing
   - fix:the music screen's foreground state is recorded on Android 8 to 11, so the player knows when the app is on screen
-  - change:the Reddit buttons and links are gone from About, Settings and the social dialog, and Support opens our Discord chat
   - update:netty 4.2.21, BouncyCastle 1.87, re2j 1.9, Firebase BoM 35.2.0, lifecycle 2.11.1, Robolectric 4.18.1, Android Gradle plugin 9.5.3, google-services 4.6.0
-  - change:IceBridge (Distributed Search) uses less CPU and memory for each packet it handles
-  - fix:Pieces tab: the tapped piece's card is readable in the dark theme (it was white with light text)  (#1566)
-  - fix:Distributed Search peer discovery uses much less CPU: it reads the phone's network addresses once per pass instead of once per peer it checks (#1574)
-  - fix:the Pieces tab keeps the tapped piece and its card when the screen is recreated (theme or font change, split-screen resize, large screens, app restored after being killed) (#1566)
-  - fix:crash when leaving the Distributed Search settings screen while its identity and karma were still loading, or when an identity action finished after the screen closed (#1569)
-  - new:Pieces tab: tap a piece to see its details (state, size, byte range, peers, SHA-1, files) and change its download priority; Don't Download pieces are drawn red and High ones orange, like on desktop; torrents with more than 1,200 pieces now show all of them (#1566)
 
 FrostWire 3.2.4 build 780 NOV/09/2026
   - new:BitTorrent engine updated to libtorrent 2.1 (jlibtorrent 2.1.2.1): many fixes for stalls and rechecks, and smaller saved resume data; disk access stays on the POSIX back-end it used before; WebTorrent support is built in and uses the STUN server of Google by default until the FrostWire setting is decided
