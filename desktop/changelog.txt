@@ -1,4 +1,4 @@
-FrostWire 7.1.6 UNRELEASED
+FrostWire 7.1.6 NOV/26/2026
    - fix:the first search suggestion painted after starting FrostWire no longer freezes the window while Java links its record comparison code (#1563)
    - fix:when Java's own files are damaged and FrostWire can't start (a Java class missing right after launch), it now says so in the system's own dialog and offers the download page instead of closing without a word (#1541)
    - fix:on computers where FrostWire runs in Lite mode, the first text in a language the interface font lacks no longer freezes the window while Java reads the installed fonts; the list is read in the background after the window shows (#1562)
