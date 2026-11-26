@@ -382,7 +382,7 @@ dependencies {
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
     implementation 'com.google.android.material:material:1.14.0'
     implementation 'com.google.code.gson:gson:2.15.0'
-    implementation 'com.google.re2j:re2j:1.8'
+    implementation 'com.google.re2j:re2j:1.9'
     implementation 'com.squareup.okhttp3:okhttp:5.5.1'
     implementation 'io.coil-kt.coil3:coil:3.6.3'
     implementation 'io.coil-kt.coil3:coil-network-okhttp:3.6.3'
