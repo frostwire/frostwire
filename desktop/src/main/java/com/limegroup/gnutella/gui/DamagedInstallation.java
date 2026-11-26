@@ -76,7 +76,18 @@ public final class DamagedInstallation {
     }
     return message.startsWith("com/limegroup/")
         || message.startsWith("com/frostwire/")
-        || message.startsWith("org/limewire/");
+        || message.startsWith("org/limewire/")
+        || isMissingRuntimeClass(message);
+  }
+
+  /**
+   * A class of the bundled Java runtime's public packages that cannot be found at all: a runtime
+   * that ships a class cannot lose it unless its files are damaged (Icebase #69e248a3e3ca:
+   * java/awt/GraphicsEnvironment$LocalGE missing 7 s after start, frostwire/frostwire#1541). The
+   * internal packages (sun/, jdk/) stay out: their classes come and go between JDK builds.
+   */
+  private static boolean isMissingRuntimeClass(String message) {
+    return message.startsWith("java/") || message.startsWith("javax/");
   }
 
   /** ZipError is deprecated for removal: named, not referenced, so it compiles on any JDK. */
@@ -116,7 +127,13 @@ public final class DamagedInstallation {
    */
   public static void show() {
     System.err.println(message());
-    if (GraphicsEnvironment.isHeadless()) {
+    try {
+      if (GraphicsEnvironment.isHeadless()) {
+        return;
+      }
+    } catch (Throwable awtIsBroken) {
+      // The damaged files may be AWT's own: go straight to the system's dialog.
+      showNatively();
       return;
     }
     try {
@@ -134,8 +151,62 @@ public final class DamagedInstallation {
       if (choice == 0 && Desktop.isDesktopSupported()) {
         Desktop.getDesktop().browse(new URI(DOWNLOAD_URL));
       }
-    } catch (Throwable ignored) {
-      // The message is on stderr; nothing else can be done.
+    } catch (Throwable swingFailed) {
+      // Swing could not show it (a damaged runtime): ask the operating system instead.
+      showNatively();
     }
+  }
+
+  /**
+   * The same message in the operating system's own dialog, run as a separate process because the
+   * runtime that would draw it is the damaged one. Never throws; the message is on stderr anyway.
+   */
+  private static void showNatively() {
+    try {
+      String title = tr("FrostWire can't start");
+      String text = message();
+      java.util.List<String> command =
+          nativeDialogCommand(System.getProperty("os.name", ""), title, text);
+      if (!command.isEmpty()) {
+        ProcessBuilder dialog = new ProcessBuilder(command).redirectErrorStream(true);
+        // The Windows script reads its text from the environment, so no quoting is involved.
+        dialog.environment().put("FW_DIALOG_TEXT", text);
+        dialog.environment().put("FW_DIALOG_TITLE", title);
+        dialog.start();
+      }
+    } catch (Throwable ignored) {
+      // Nothing else can be done.
+    }
+  }
+
+  /**
+   * The command that shows {@code text} in a native dialog for {@code osName}; empty on a system
+   * without a known one. Arguments, never a shell line: the text is not parsed by a shell.
+   */
+  static java.util.List<String> nativeDialogCommand(String osName, String title, String text) {
+    String os = osName == null ? "" : osName.toLowerCase(java.util.Locale.ROOT);
+    if (os.contains("win")) {
+      String script =
+          "Add-Type -AssemblyName PresentationFramework; "
+              + "[System.Windows.MessageBox]::Show($env:FW_DIALOG_TEXT, $env:FW_DIALOG_TITLE) | Out-Null";
+      return java.util.List.of("powershell", "-NoProfile", "-NonInteractive", "-Command", script);
+    }
+    if (os.contains("mac")) {
+      return java.util.List.of(
+          "osascript",
+          "-e",
+          "on run argv",
+          "-e",
+          "display dialog (item 1 of argv) with title (item 2 of argv) buttons {\"OK\"} "
+              + "default button 1 with icon stop",
+          "-e",
+          "end run",
+          text,
+          title);
+    }
+    if (os.contains("linux") || os.contains("nix") || os.contains("bsd")) {
+      return java.util.List.of("zenity", "--error", "--title=" + title, "--text=" + text);
+    }
+    return java.util.List.of();
   }
 }

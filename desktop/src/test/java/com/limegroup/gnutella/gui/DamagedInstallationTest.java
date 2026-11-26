@@ -51,6 +51,37 @@ class DamagedInstallationTest {
                 new NoClassDefFoundError("com/limegroup/gnutella/gui/I18n"))));
   }
 
+  /** Icebase #69e248a3e3ca: a public runtime class gone 7 s after start is a damaged runtime. */
+  @Test
+  void aMissingPublicClassOfTheBundledRuntimeMeansADamagedInstallation() {
+    assertTrue(
+        DamagedInstallation.isDamaged(
+            new NoClassDefFoundError("java/awt/GraphicsEnvironment$LocalGE")));
+    assertTrue(DamagedInstallation.isDamaged(new NoClassDefFoundError("javax/swing/JFrame")));
+    assertFalse(
+        DamagedInstallation.isDamaged(new NoClassDefFoundError("java.awt.GraphicsEnvironment")),
+        "a dotted name is the 'Could not initialize class' kind");
+  }
+
+  @Test
+  void theNativeDialogFallbackIsBuiltPerSystemWithoutAShell() {
+    java.util.List<String> windows =
+        DamagedInstallation.nativeDialogCommand("Windows 11", "Title", "Text");
+    assertEquals("powershell", windows.get(0));
+    assertFalse(
+        String.join(" ", windows).contains("Text"), "the text goes through the environment");
+    java.util.List<String> mac =
+        DamagedInstallation.nativeDialogCommand("Mac OS X", "Title", "Text");
+    assertEquals("osascript", mac.get(0));
+    assertEquals("Text", mac.get(mac.size() - 2));
+    java.util.List<String> linux =
+        DamagedInstallation.nativeDialogCommand("Linux", "Title", "Text");
+    assertEquals("zenity", linux.get(0));
+    assertTrue(linux.contains("--text=Text"));
+    assertTrue(DamagedInstallation.nativeDialogCommand("Plan 9", "Title", "Text").isEmpty());
+    assertTrue(DamagedInstallation.nativeDialogCommand(null, "Title", "Text").isEmpty());
+  }
+
   @Test
   void aMissingJdkClassOrAFailedInitializerIsNotCalledDamage() {
     assertFalse(DamagedInstallation.isDamaged(new NoClassDefFoundError("sun/nio/ch/Net")));
