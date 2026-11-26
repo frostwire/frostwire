@@ -868,6 +868,22 @@ class JdkWarmUpTest {
     assertDoesNotThrow(JdkWarmUp::initializeSplashClasses);
   }
 
+  /** Icebase #ef148312442a: Lite reads the installed font list once, off the EDT. */
+  @Test
+  public void liteSweepReadsTheInstalledFontList() throws IOException {
+    String source =
+        Files.readString(
+                Path.of(System.getProperty("user.dir"))
+                    .resolve("src/main/java/com/frostwire/util/JdkWarmUp.java"))
+            .replaceAll("\\s+", "");
+    String lite = source.substring(source.indexOf("privatestaticvoidsweepFallbackFontsLite(){"));
+    lite = lite.substring(0, lite.indexOf("staticvoidreadInstalledFontList"));
+    assertTrue(lite.contains("readInstalledFontList();"), "Lite doesn't read the font list");
+    int priority = Thread.currentThread().getPriority();
+    assertDoesNotThrow(JdkWarmUp::readInstalledFontList);
+    assertEquals(priority, Thread.currentThread().getPriority(), "the priority was not restored");
+  }
+
   /** Icebase #163e75738185, #fff67e91c0fb, #ac1856c09d92: the AA shape pipeline's first use. */
   @Test
   public void startupInitializesTheAntiAliasedShapePipeline() {

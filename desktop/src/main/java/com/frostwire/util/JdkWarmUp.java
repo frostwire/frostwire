@@ -1142,6 +1142,27 @@ public final class JdkWarmUp {
     } catch (Throwable t) {
       LOG.warn("Lite script glyph warm-up failed: " + t.getMessage(), t);
     }
+    readInstalledFontList();
+  }
+
+  /**
+   * Reads the list of every installed font once, at the lowest priority, so the first text that
+   * needs a font the label font lacks does not do it on the EDT: FontResolver.getAllFonts opened
+   * and read every TrueType file there (Icebase #ef148312442a, frostwire/frostwire#1562). Full
+   * mode's slot sweep loads the same list; Lite now reads it too, but only this, after the main
+   * window is showing.
+   */
+  static void readInstalledFontList() {
+    Thread thread = Thread.currentThread();
+    int priority = thread.getPriority();
+    try {
+      thread.setPriority(Thread.MIN_PRIORITY);
+      java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
+    } catch (Throwable t) {
+      LOG.warn("Installed font list warm-up failed: " + t.getMessage(), t);
+    } finally {
+      thread.setPriority(priority);
+    }
   }
 
   /** How many of the text fonts (the table and label ones come first) Lite rasterizes. */
