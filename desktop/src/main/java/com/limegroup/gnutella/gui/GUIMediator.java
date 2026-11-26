@@ -215,15 +215,11 @@ public final class GUIMediator {
             else ErrorService.error(t);
           }
           if (visible) {
+            // No forced invalidate and validate of the content pane here: it worked around Java
+            // 1.5 not validating a frame made visible, and on current Java it laid the whole
+            // window out a second time on the EDT (Icebase #bf6bd56df8f5, #0079a1281dda,
+            // frostwire/frostwire#1552).
             SearchMediator.requestSearchFocus();
-            // forcibly revalidate the FRAME
-            // after making it visible.
-            // on Java 1.5, it does not validate correctly.
-            SwingUtilities.invokeLater(
-                () -> {
-                  getAppFrame().getContentPane().invalidate();
-                  getAppFrame().getContentPane().validate();
-                });
           }
           // If the app has already been made visible, don't display extra
           // dialogs. We could display the pro dialog here, but it causes
