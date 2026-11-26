@@ -339,6 +339,25 @@ class StrictEdtModeTest {
         "sampled in the native call itself");
   }
 
+  /**
+   * Icebase #cd014524ede8 (GitHub #1351): the toolkit posting WInputMethod's request to open the
+   * IME candidate list, with no FrostWire frame; an app frame above it is still reported.
+   */
+  @Test
+  void imeCandidateWindowRequestIsWindowsToolkitOnlyStall() {
+    StackTraceElement[] request = {
+      frame("sun.awt.windows.WInputMethod", "openCandidateWindow"),
+      frame("sun.awt.windows.WInputMethod$1", "run")
+    };
+    assertTrue(StrictEdtMode.isWindowsToolkitOnlyStall(stack(request, EDT_LOOP)));
+    StackTraceElement[] underApp = {
+      frame("sun.awt.windows.WInputMethod", "openCandidateWindow"),
+      frame("sun.awt.windows.WInputMethod$1", "run"),
+      frame("com.limegroup.gnutella.gui.SomeListener", "run")
+    };
+    assertFalse(StrictEdtMode.isWindowsToolkitOnlyStall(stack(underApp, EDT_LOOP)));
+  }
+
   /** An app frame above the IME call, e.g. a focus listener it called back, is still reported. */
   @Test
   void imeDeactivationUnderAnAppFrameIsReported() {

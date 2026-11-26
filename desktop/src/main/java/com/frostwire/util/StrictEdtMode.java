@@ -868,7 +868,11 @@ public final class StrictEdtMode {
       "java.awt.Component.dispatchEventImpl",
       "java.awt.Container.dispatchEventImpl",
       "java.awt.Component.dispatchEvent"
-    }
+    },
+    // The toolkit's own request to open the Windows input method's candidate list while the user
+    // types with an IME: posted by WInputMethod itself, with no FrostWire frame (Icebase
+    // #cd014524ede8, GitHub #1351; 4 reports in 11 days, builds 337 and 338).
+    {"sun.awt.windows.WInputMethod.openCandidateWindow", "sun.awt.windows.WInputMethod$1.run"}
   };
 
   /** Frames where the EDT's event loop dispatches; frames above the first one are the stall. */
