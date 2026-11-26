@@ -47,6 +47,12 @@ class PerformanceModeTest {
     // Under 4 GB of RAM.
     assertTrue(PerformanceMode.isWeak(new MachineFacts(8, 4095, 2048, 3000)));
     assertFalse(PerformanceMode.isWeak(new MachineFacts(8, 4096, 2048, 3000)));
+    // The Windows launcher's fixed 512 MB heap on a 3-4 CPU machine (frostwire/frostwire#1512).
+    assertTrue(PerformanceMode.isWeak(new MachineFacts(4, 16384, 8192, 3000, 512)));
+    assertTrue(PerformanceMode.isWeak(new MachineFacts(3, 16384, 8192, 3000, 512)));
+    assertFalse(PerformanceMode.isWeak(new MachineFacts(8, 16384, 8192, 3000, 512)));
+    assertFalse(PerformanceMode.isWeak(new MachineFacts(4, 16384, 8192, 3000, 1024)));
+    assertFalse(PerformanceMode.isWeak(new MachineFacts(4, 16384, 8192, 3000, -1)));
     // Icebase #0207d9b0209b: 8 CPUs but 103 MB free.
     assertTrue(PerformanceMode.isWeak(new MachineFacts(8, 16384, 103, 3000)));
     assertFalse(PerformanceMode.isWeak(new MachineFacts(8, 16384, 1024, 3000)));

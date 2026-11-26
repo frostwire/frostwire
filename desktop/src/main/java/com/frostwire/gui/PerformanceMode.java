@@ -78,8 +78,24 @@ public final class PerformanceMode {
    */
   static final long SLOW_WARM_UP_MS = 30_000;
 
+  /**
+   * 3-4 CPUs with a Java heap this small (MB) or smaller is weak too. The Windows launcher fixes
+   * the heap at 512 MB whatever the memory, and the 4-CPU machines with it that ran Full in Icebase
+   * reports (frostwire/frostwire#1512: warm-up 64 to 120 s, three collections in a 2.9 s window,
+   * the EDT using 15-46 ms of it) did better as Lite.
+   */
+  static final long WEAK_SMALL_HEAP_MB = 512;
+
+  static final int WEAK_SMALL_HEAP_MAX_CPUS = 4;
+
   /** What Automatic looks at. A value below 0 is unknown and does not count. */
-  public record MachineFacts(int cpus, long totalMemoryMb, long freeMemoryMb, long lastWarmUpMs) {
+  public record MachineFacts(
+      int cpus, long totalMemoryMb, long freeMemoryMb, long lastWarmUpMs, long maxHeapMb) {
+    /** Facts without the heap size, which is then unknown. */
+    public MachineFacts(int cpus, long totalMemoryMb, long freeMemoryMb, long lastWarmUpMs) {
+      this(cpus, totalMemoryMb, freeMemoryMb, lastWarmUpMs, -1);
+    }
+
     /** This machine now, with the warm-up time recorded last session. Reads the OS: off the EDT. */
     static MachineFacts current(long lastWarmUpMs) {
       long total = -1;
@@ -98,7 +114,8 @@ public final class PerformanceMode {
           Runtime.getRuntime().availableProcessors(),
           total,
           free,
-          lastWarmUpMs > 0 ? lastWarmUpMs : -1);
+          lastWarmUpMs > 0 ? lastWarmUpMs : -1,
+          Runtime.getRuntime().maxMemory() / (1024 * 1024));
     }
   }
 
@@ -114,7 +131,10 @@ public final class PerformanceMode {
     return facts.cpus() <= WEAK_MAX_CPUS
         || (facts.totalMemoryMb() >= 0 && facts.totalMemoryMb() < WEAK_TOTAL_MEMORY_MB)
         || (facts.freeMemoryMb() >= 0 && facts.freeMemoryMb() < WEAK_FREE_MEMORY_MB)
-        || facts.lastWarmUpMs() >= SLOW_WARM_UP_MS;
+        || facts.lastWarmUpMs() >= SLOW_WARM_UP_MS
+        || (facts.maxHeapMb() >= 0
+            && facts.maxHeapMb() <= WEAK_SMALL_HEAP_MB
+            && facts.cpus() <= WEAK_SMALL_HEAP_MAX_CPUS);
   }
 
   /**
