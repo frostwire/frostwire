@@ -127,8 +127,15 @@ public final class OptionsMediator {
    * @param node the node of the panel to show
    */
   public final void handleSelection(final OptionsTreeNode node) {
-    _paneManager.show(node);
-    if (_constructor.isOptionsVisible()) {
+    // A tree click can still be dispatched after the dialog was disposed (a modal dialog's
+    // nested event loop keeps delivering events): there is no pane left to show (#1594).
+    OptionsPaneManager paneManager = _paneManager;
+    OptionsConstructor constructor = _constructor;
+    if (paneManager == null || constructor == null) {
+      return;
+    }
+    paneManager.show(node);
+    if (constructor.isOptionsVisible()) {
       ApplicationSettings.OPTIONS_LAST_SELECTED_KEY.setValue(node.getTitleKey());
     }
   }
@@ -180,6 +187,10 @@ public final class OptionsMediator {
   }
 
   public void reinitPane(String paneKey) {
-    _paneManager.reinitPane(paneKey);
+    OptionsPaneManager paneManager = _paneManager;
+    if (paneManager == null) {
+      return;
+    }
+    paneManager.reinitPane(paneKey);
   }
 }
