@@ -235,6 +235,39 @@ public class MusicBrowserFragmentsTest {
   }
 
   @Test
+  public void anArtistsContextMenuPlaysAndQueuesTheArtistsSongs() {
+    HomeActivity activity = launch();
+    ArtistFragment artists = page(activity, ArtistFragment.class);
+    rows(artists, 1);
+    Menu menu = contextMenuFor(artists, 0);
+
+    assertTrue(artists.onContextItemSelected(menu.findItem(FragmentMenuItems.PLAY_SELECTION)));
+    assertTrue(artists.onContextItemSelected(menu.findItem(FragmentMenuItems.ADD_TO_QUEUE)));
+
+    ApolloUiTestSupport.waitUntil(
+        "the artist's songs play " + calls, () -> calls.contains("playFDs[[1]0 false]"));
+    ApolloUiTestSupport.waitUntil(
+        "the artist's songs are queued " + calls, () -> calls.contains("addToQueue[[1]]"));
+  }
+
+  @Test
+  public void anAlbumsContextMenuPlaysAndDeletesTheAlbumsSongs() {
+    HomeActivity activity = launch();
+    AlbumFragment albums = page(activity, AlbumFragment.class);
+    rows(albums, 1);
+    Menu menu = contextMenuFor(albums, 0);
+
+    assertTrue(albums.onContextItemSelected(menu.findItem(FragmentMenuItems.PLAY_SELECTION)));
+    assertTrue(albums.onContextItemSelected(menu.findItem(FragmentMenuItems.DELETE)));
+
+    ApolloUiTestSupport.waitUntil(
+        "the album's songs play " + calls, () -> calls.contains("playFDs[[1]0 false]"));
+    ApolloUiTestSupport.waitUntil(
+        "the delete confirmation shows",
+        () -> albums.getParentFragmentManager().findFragmentByTag("DeleteDialog") != null);
+  }
+
+  @Test
   public void thePlaylistTabStartsWithTheThreeFixedEntries() {
     HomeActivity activity = launch();
     PlaylistFragment playlists = page(activity, PlaylistFragment.class);
@@ -333,7 +366,7 @@ public class MusicBrowserFragmentsTest {
   }
 
   @Test
-  public void aPlaylistCanBeDeletedFromItsDialog() {
+  public void decliningTheDeleteDialogKeepsThePlaylist() {
     HomeActivity activity = launch();
     PlaylistFragment playlists = page(activity, PlaylistFragment.class);
     rows(playlists, 4);
@@ -342,10 +375,53 @@ public class MusicBrowserFragmentsTest {
     ApolloUiTestSupport.settle();
 
     android.app.Dialog dialog = org.robolectric.shadows.ShadowDialog.getLatestDialog();
-
     assertNotNull(dialog);
     dialog.findViewById(R.id.dialog_default_button_no).performClick();
     ApolloUiTestSupport.settle();
+
+    assertFalse(dialog.isShowing());
+  }
+
+  @Test
+  public void confirmingTheDeleteOfAPlaylistTheAppOwnsReloadsTheList() {
+    FakeMediaProvider.deleteResult = 1;
+    HomeActivity activity = launch();
+    PlaylistFragment playlists = page(activity, PlaylistFragment.class);
+    rows(playlists, 4);
+    Menu menu = contextMenuFor(playlists, 3);
+    playlists.onContextItemSelected(menu.findItem(FragmentMenuItems.DELETE));
+    ApolloUiTestSupport.settle();
+    int queries = FakeMediaProvider.QUERIES.size();
+
+    org.robolectric.shadows.ShadowDialog.getLatestDialog()
+        .findViewById(R.id.dialog_default_button_yes)
+        .performClick();
+
+    ApolloUiTestSupport.waitUntil(
+        "the playlists are loaded again", () -> FakeMediaProvider.QUERIES.size() > queries);
+  }
+
+  @Test
+  public void aPlaylistAnotherAppOwnsCannotBeDeletedAndTheUserIsTold() {
+    FakeMediaProvider.deleteResult = 0;
+    HomeActivity activity = launch();
+    PlaylistFragment playlists = page(activity, PlaylistFragment.class);
+    rows(playlists, 4);
+    Menu menu = contextMenuFor(playlists, 3);
+    playlists.onContextItemSelected(menu.findItem(FragmentMenuItems.DELETE));
+    ApolloUiTestSupport.settle();
+
+    org.robolectric.shadows.ShadowDialog.getLatestDialog()
+        .findViewById(R.id.dialog_default_button_yes)
+        .performClick();
+
+    ApolloUiTestSupport.waitUntil(
+        "the user is told", () -> activity.findViewById(android.R.id.message) != null);
+    assertEquals(
+        activity.getString(R.string.playlist_belongs_to_another_app),
+        ((android.widget.TextView) activity.findViewById(android.R.id.message))
+            .getText()
+            .toString());
   }
 
   @Test

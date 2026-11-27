@@ -219,18 +219,62 @@ public class ProfileFragmentsTest {
   }
 
   @Test
-  public void addingToFavoritesAndANewPlaylistAndDeletingAreHandled() {
+  public void addingToFavoritesConfirmsOnTheScreen() {
     ProfileActivity activity = launch(MediaStore.Audio.Artists.CONTENT_TYPE, "The Beatles");
     ArtistSongFragment songs = fragment(activity, ArtistSongFragment.class);
     rows(songs, 2);
     Menu menu = contextMenuFor(songs, FIRST);
 
-    // the songs are gone from the library by the time the action runs: nothing to confirm
-    FakeMediaProvider.clear();
     assertTrue(select(songs, menu, FragmentMenuItems.ADD_TO_FAVORITES));
-    assertTrue(select(songs, menu, FragmentMenuItems.NEW_PLAYLIST));
-    assertTrue(select(songs, menu, FragmentMenuItems.DELETE));
+
+    ApolloUiTestSupport.waitUntil(
+        "the confirmation shows", () -> activity.findViewById(android.R.id.message) != null);
+  }
+
+  @Test
+  public void addingToFavoritesAnEmptiedLibraryConfirmsNothing() {
+    ProfileActivity activity = launch(MediaStore.Audio.Artists.CONTENT_TYPE, "The Beatles");
+    ArtistSongFragment songs = fragment(activity, ArtistSongFragment.class);
+    rows(songs, 2);
+    Menu menu = contextMenuFor(songs, FIRST);
+    FakeMediaProvider.clear();
+    int before = FakeMediaProvider.QUERIES.size();
+
+    assertTrue(select(songs, menu, FragmentMenuItems.ADD_TO_FAVORITES));
+
+    ApolloUiTestSupport.waitUntil(
+        "the songs are looked up", () -> FakeMediaProvider.QUERIES.size() > before);
     ApolloUiTestSupport.settle();
+    assertEquals(null, activity.findViewById(android.R.id.message));
+  }
+
+  @Test
+  public void aNewPlaylistFromTheSelectionAsksForItsName() {
+    ProfileActivity activity = launch(MediaStore.Audio.Artists.CONTENT_TYPE, "The Beatles");
+    ArtistSongFragment songs = fragment(activity, ArtistSongFragment.class);
+    rows(songs, 2);
+    Menu menu = contextMenuFor(songs, FIRST);
+    int fragments = songs.getParentFragmentManager().getFragments().size();
+
+    assertTrue(select(songs, menu, FragmentMenuItems.NEW_PLAYLIST));
+
+    ApolloUiTestSupport.waitUntil(
+        "the name dialog is added",
+        () -> songs.getParentFragmentManager().getFragments().size() > fragments);
+  }
+
+  @Test
+  public void deletingTheSelectionAsksForConfirmation() {
+    ProfileActivity activity = launch(MediaStore.Audio.Artists.CONTENT_TYPE, "The Beatles");
+    ArtistSongFragment songs = fragment(activity, ArtistSongFragment.class);
+    rows(songs, 2);
+    Menu menu = contextMenuFor(songs, FIRST);
+
+    assertTrue(select(songs, menu, FragmentMenuItems.DELETE));
+
+    ApolloUiTestSupport.waitUntil(
+        "the confirmation dialog is added",
+        () -> songs.getParentFragmentManager().findFragmentByTag("DeleteDialog") != null);
   }
 
   @Test
@@ -367,5 +411,57 @@ public class ProfileFragmentsTest {
     ApolloUiTestSupport.settle();
 
     assertEquals(2, size(songs));
+  }
+
+  @Test
+  public void theFavoritesProfileListsTheFavoritesAndCanRemoveOne() {
+    com.andrew.apollo.provider.FavoritesStore.getInstance(
+            androidx.test.core.app.ApplicationProvider.getApplicationContext())
+        .addSongId(11L, "Help", "Help!", "The Beatles");
+    ProfileActivity activity =
+        launch(
+            androidx.test.core.app.ApplicationProvider.getApplicationContext()
+                .getString(R.string.playlist_favorites),
+            "Favorites");
+    FavoriteFragment favorites = fragment(activity, FavoriteFragment.class);
+    rows(favorites, 1);
+
+    listOf(favorites).performItemClick(null, FIRST, 11);
+    waitForCall("playFDs[[11]0 false]");
+
+    Menu menu = contextMenuFor(favorites, FIRST);
+    for (int i = 0; i < menu.size(); i++) {
+      assertFalse(
+          "no top level add to favorites on the favorites list",
+          menu.getItem(i).getItemId() == FragmentMenuItems.ADD_TO_FAVORITES);
+    }
+    assertNotNull(menu.findItem(FragmentMenuItems.REMOVE_FROM_FAVORITES));
+    favorites.onMetaChanged();
+    assertTrue(
+        favorites.onContextItemSelected(menu.findItem(FragmentMenuItems.REMOVE_FROM_FAVORITES)));
+  }
+
+  @Test
+  public void theLastAddedProfileListsTheNewestSongsOrSaysThereAreNone() {
+    ProfileActivity activity =
+        launch(
+            androidx.test.core.app.ApplicationProvider.getApplicationContext()
+                .getString(R.string.playlist_last_added),
+            "Last added");
+    LastAddedFragment lastAdded = fragment(activity, LastAddedFragment.class);
+    rows(lastAdded, 2);
+    listOf(lastAdded).performItemClick(null, FIRST, 11);
+    waitForCall("playFDs[[11, 12]0 false]");
+
+    FakeMediaProvider.clear();
+    lastAdded.refresh();
+    ApolloUiTestSupport.waitUntil("the list empties", () -> size(lastAdded) == 0);
+    ApolloUiTestSupport.waitUntil(
+        "the empty message",
+        () -> {
+          android.widget.TextView empty = lastAdded.getView().findViewById(R.id.empty);
+          return empty != null
+              && activity.getString(R.string.empty_last_added).contentEquals(empty.getText());
+        });
   }
 }

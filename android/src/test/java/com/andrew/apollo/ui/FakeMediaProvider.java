@@ -35,8 +35,12 @@ public final class FakeMediaProvider extends ContentProvider {
   /** Every query the provider has answered, as {@code uri}. */
   public static final List<String> QUERIES = new java.util.concurrent.CopyOnWriteArrayList<>();
 
+  /** What a delete answers: the number of rows the MediaStore says it removed. */
+  public static volatile int deleteResult = 0;
+
   /** Registers the provider for the MediaStore authority and starts it with no rows. */
   public static void install() {
+    deleteResult = 0;
     clear();
     lastSelection = null;
     lastSelectionArgs = null;
@@ -166,7 +170,7 @@ public final class FakeMediaProvider extends ContentProvider {
 
   @Override
   public int delete(Uri uri, String selection, String[] selectionArgs) {
-    return 0;
+    return deleteResult;
   }
 
   @Override
