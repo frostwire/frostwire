@@ -57,4 +57,13 @@ final class StringTrieRegressionTest {
       assertEquals(expected, got);
     }
   }
+
+  @Test
+  void trimAppliesCompactorToEveryNode() {
+    StringTrie<String> trie = new StringTrie<>(false);
+    String[] words = {"", "he", "hello", "help", "world", "wore"};
+    for (String w : words) trie.add(w, w);
+    trie.trim(v -> v + "!");
+    for (String w : words) assertEquals(w + "!", trie.get(w), "value of '" + w + "'");
+  }
 }

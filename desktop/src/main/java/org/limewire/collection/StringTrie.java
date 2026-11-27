@@ -468,7 +468,7 @@ public class StringTrie<V> {
           if (children.hasNext()) // save siblings
           stack.add(children);
           // check current node and scan its sibling if necessary
-          if (withNulls || node.getValue() == null)
+          if (!withNulls && node.getValue() == null)
             children = node.childrenForward(); // loop from there
           else { // node qualifies for next()
             nextNode = node;
