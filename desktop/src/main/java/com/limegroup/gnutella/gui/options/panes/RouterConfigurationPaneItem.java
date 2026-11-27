@@ -165,7 +165,7 @@ public final class RouterConfigurationPaneItem extends AbstractPaneItem {
     int tcpRangeEnd = PORT_1_FIELD.getValue();
     if (manualPort) {
       if (!NetworkUtils.isValidPort(tcpRangeStart, PORT_RANGE_MIN, PORT_RANGE_MAX)) {
-        GUIMediator.showError(
+        reportError(
             I18n.tr(
                 "You must enter a port between {0} and {1} when manually forcing port.",
                 PORT_RANGE_MIN, PORT_RANGE_MAX));
@@ -173,14 +173,14 @@ public final class RouterConfigurationPaneItem extends AbstractPaneItem {
       }
 
       if (tcpRangeStart < 0 || tcpRangeEnd < tcpRangeStart) {
-        GUIMediator.showError(I18n.tr("You must enter a valid port range."));
+        reportError(I18n.tr("You must enter a valid port range."));
         throw new IOException("bad port: " + tcpRangeEnd);
       }
     }
     String natpmpGateway = NATPMP_GATEWAY_FIELD.getText().trim();
     int natpmpLeaseDuration = NATPMP_LEASE_DURATION_FIELD.getValue();
     if (natpmpLeaseDuration <= 0) {
-      GUIMediator.showError(I18n.tr("NAT-PMP lease duration must be greater than 0 seconds."));
+      reportError(I18n.tr("NAT-PMP lease duration must be greater than 0 seconds."));
       throw new IOException("bad NAT-PMP lease duration: " + natpmpLeaseDuration);
     }
     apply(manualPort, tcpRangeStart, tcpRangeEnd, natpmpGateway, natpmpLeaseDuration);

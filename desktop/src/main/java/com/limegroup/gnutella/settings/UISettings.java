@@ -82,6 +82,10 @@ public final class UISettings extends LimeProps {
 
   /** For people with bad eyes. */
   private static boolean isResolutionLow() {
+    if (GraphicsEnvironment.isHeadless()) {
+      // No screen to measure (CI, tests): the toolkit would throw HeadlessException.
+      return false;
+    }
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     return screenSize.width <= 800 || screenSize.height <= 600;
   }

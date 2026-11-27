@@ -168,11 +168,11 @@ public final class I2PPaneItem extends AbstractPaneItem {
 
     // Validate tunnel settings
     if (inboundQty < 1 || inboundQty > 16 || outboundQty < 1 || outboundQty > 16) {
-      GUIMediator.showError(I18n.tr("Tunnel quantities must be between 1 and 16"));
+      reportError(I18n.tr("Tunnel quantities must be between 1 and 16"));
       return false;
     }
     if (inboundLen < 0 || inboundLen > 7 || outboundLen < 0 || outboundLen > 7) {
-      GUIMediator.showError(I18n.tr("Tunnel hop lengths must be between 0 and 7"));
+      reportError(I18n.tr("Tunnel hop lengths must be between 0 and 7"));
       return false;
     }
 

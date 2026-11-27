@@ -143,12 +143,12 @@ public final class MCPSettingsPaneItem extends AbstractPaneItem {
   public boolean applyOptions() {
     int port = PORT_FIELD.getValue();
     if (port < 1 || port > 65535) {
-      GUIMediator.showError(I18n.tr("Port must be between 1 and 65535"));
+      reportError(I18n.tr("Port must be between 1 and 65535"));
       return false;
     }
     String host = HOST_FIELD.getText().trim();
     if (host.isEmpty()) {
-      GUIMediator.showError(I18n.tr("Host cannot be empty"));
+      reportError(I18n.tr("Host cannot be empty"));
       return false;
     }
 

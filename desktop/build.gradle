@@ -1110,6 +1110,8 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.EarlyWindowTextTest"
         includeTestsMatching "com.limegroup.gnutella.gui.TipOfTheDayHtmlFontTest"
         includeTestsMatching "com.limegroup.gnutella.gui.StatusLineEngineNotReadyTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.options.panes.*"
+        includeTestsMatching "com.frostwire.gui.updates.*"
         includeTestsMatching "com.limegroup.gnutella.gui.options.panes.TorrentSaveFolderPaneItemTest"
         includeTestsMatching "com.limegroup.gnutella.gui.options.panes.TorrentFilesFolderPaneItemTest"
         includeTestsMatching "com.limegroup.gnutella.gui.options.panes.KarmaDatabasePathTest"

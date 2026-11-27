@@ -479,12 +479,16 @@ public final class ThemeMediator {
       fixKeyStroke(textField, "caret-end-line", KeyEvent.VK_RIGHT, 0);
       fixKeyStroke(textField, "selection-begin-line", KeyEvent.VK_LEFT, KeyEvent.SHIFT_DOWN_MASK);
       fixKeyStroke(textField, "selection-end-line", KeyEvent.VK_RIGHT, KeyEvent.SHIFT_DOWN_MASK);
-      fixKeyStroke(
-          textField,
-          "select-all",
-          KeyEvent.VK_A,
-          Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx());
+      fixKeyStroke(textField, "select-all", KeyEvent.VK_A, menuShortcutKeyMask());
     }
+  }
+
+  /** The menu shortcut modifier; Command (Meta) where there is no toolkit to ask (headless). */
+  private static int menuShortcutKeyMask() {
+    if (GraphicsEnvironment.isHeadless()) {
+      return KeyEvent.META_DOWN_MASK;
+    }
+    return Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
   }
 
   static void testComponentCreationThreadingViolation() {
@@ -507,10 +511,7 @@ public final class ThemeMediator {
             textField.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
           };
       for (InputMap i : inputMaps) {
-        i.put(
-            KeyStroke.getKeyStroke(
-                vk, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx() | mask),
-            action);
+        i.put(KeyStroke.getKeyStroke(vk, menuShortcutKeyMask() | mask), action);
       }
     }
   }

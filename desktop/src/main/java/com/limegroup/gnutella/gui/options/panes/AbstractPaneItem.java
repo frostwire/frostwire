@@ -22,6 +22,7 @@ import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.GUIUtils.SizePolicy;
 import java.awt.*;
 import java.io.IOException;
+import java.util.function.Consumer;
 import javax.swing.*;
 
 /**
@@ -36,6 +37,9 @@ import javax.swing.*;
  * <p>Subclasses only need to override the applyOptions() method for storing options to disk.
  */
 public abstract class AbstractPaneItem implements PaneItem {
+  /** Where a pane's validation errors are shown; tests record them instead of opening a dialog. */
+  static Consumer<String> errorReporter = GUIMediator::showError;
+
   /** The container that elements in the pane are added to. */
   private final TitledPaddedPanel CONTAINER = new TitledPaddedPanel();
 
@@ -101,6 +105,11 @@ public abstract class AbstractPaneItem implements PaneItem {
    */
   final void add(Component comp) {
     CONTAINER.add(comp);
+  }
+
+  /** Tells the user why the options could not be applied. */
+  static void reportError(String message) {
+    errorReporter.accept(message);
   }
 
   /**
