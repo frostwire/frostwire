@@ -88,6 +88,40 @@ public final class FakeMediaProvider extends ContentProvider {
         id);
   }
 
+  /**
+   * One row that answers every list the music browser loads (an artist, an album, a song and a
+   * playlist at once): the loaders each read the columns they asked for.
+   */
+  public static void addLibraryRow() {
+    addRow(
+        "_id",
+        1L,
+        "artist",
+        "The Beatles",
+        "album",
+        "Help!",
+        "title",
+        "Help",
+        "name",
+        "Mix",
+        "number_of_albums",
+        1,
+        "number_of_tracks",
+        2,
+        "numsongs",
+        2,
+        "minyear",
+        "1965",
+        "duration",
+        180000L,
+        "album_id",
+        5L,
+        "artist_id",
+        1L,
+        "audio_id",
+        1L);
+  }
+
   public static void clear() {
     synchronized (ROWS) {
       ROWS.clear();
