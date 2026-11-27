@@ -123,4 +123,28 @@ class ThemeStartupFallbackTest {
     assertSame(damaged, thrown.getCause());
     assertTrue(applied.isEmpty());
   }
+
+  /**
+   * frostwire/frostwire#1620: a runtime DLL that Windows blocks fails the default theme the same
+   * way, so there is no fallback to try: the failure ends the launch with a message of its own.
+   */
+  @Test
+  void aRuntimeFileBlockedByApplicationControlDoesNotFallBackToTheDefaultTheme() {
+    UnsatisfiedLinkError blocked =
+        new UnsatisfiedLinkError(
+            "C:\\FrostWire 7\\jre\\bin\\fontmanager.dll: An Application Control policy has blocked this file");
+    ThemeStartup.Applier applier =
+        (theme, step) -> {
+          if (theme == ThemeEnum.DARK_FLAT_LAF) {
+            throw new ExceptionInInitializerError(blocked);
+          }
+          applied.add(theme); // the default theme would load, were it tried
+        };
+
+    assertThrows(
+        RuntimeException.class,
+        () -> ThemeStartup.load(ThemeEnum.DARK_FLAT_LAF, applier, reported::add));
+
+    assertTrue(applied.isEmpty(), "the default theme must not have been tried");
+  }
 }

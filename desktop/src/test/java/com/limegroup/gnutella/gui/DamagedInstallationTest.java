@@ -144,4 +144,42 @@ class DamagedInstallationTest {
         CrashReportSpooler.missingClass(
             new ClassFormatError("in class file /Users/someone/secret path")));
   }
+
+  private static Throwable blockedFontManager() {
+    return new RuntimeException(
+        "Unable to load theme at startup",
+        new ExceptionInInitializerError(
+            new UnsatisfiedLinkError(
+                "C:\\FrostWire 7\\jre\\bin\\fontmanager.dll: An Application Control policy has blocked this file")));
+  }
+
+  /** Icebase #662ab45d2a7e, frostwire/frostwire#1620. */
+  @Test
+  void aRuntimeFileWindowsBlockedIsFoundBehindOtherErrors() {
+    assertTrue(DamagedInstallation.isBlockedByApplicationControl(blockedFontManager()));
+    assertEquals(
+        "C:\\FrostWire 7\\jre\\bin\\fontmanager.dll",
+        DamagedInstallation.blockedFile(blockedFontManager()));
+    assertFalse(
+        DamagedInstallation.isDamaged(blockedFontManager()),
+        "the files are not damaged: reinstalling does not help");
+  }
+
+  @Test
+  void otherLinkErrorsAreNotCalledBlocked() {
+    assertFalse(
+        DamagedInstallation.isBlockedByApplicationControl(
+            new UnsatisfiedLinkError("no jlibtorrent in java.library.path")));
+    assertFalse(DamagedInstallation.isBlockedByApplicationControl(null));
+  }
+
+  @Test
+  void theBlockedMessageNamesTheFileAndWhatToDo() {
+    String message =
+        DamagedInstallation.blockedMessage("C:\\FrostWire 7\\jre\\bin\\fontmanager.dll");
+
+    assertTrue(message.contains("fontmanager.dll"), message);
+    assertTrue(message.contains("Smart App Control"), message);
+    assertFalse(message.contains("download FrostWire again"), "a reinstall does not help here");
+  }
 }

@@ -71,9 +71,10 @@ class GUILoader {
       initializer.initialize(args, frame);
     } catch (Throwable err) {
       hideSplash(frame);
-      if (DamagedInstallation.isDamaged(err)) {
+      if (DamagedInstallation.isDamaged(err)
+          || DamagedInstallation.isBlockedByApplicationControl(err)) {
         CrashReportSpooler.recordSync(err);
-        DamagedInstallation.show();
+        DamagedInstallation.show(err);
         System.exit(1);
       }
       try {

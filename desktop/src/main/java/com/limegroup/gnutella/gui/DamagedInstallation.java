@@ -50,6 +50,36 @@ public final class DamagedInstallation {
     return false;
   }
 
+  /** What Windows says when an Application Control policy refuses to load a DLL. */
+  private static final String BLOCKED_PHRASE =
+      "an application control policy has blocked this file";
+
+  /**
+   * Whether Windows refused to load one of the runtime's files because of an Application Control
+   * policy (Smart App Control, Windows Defender Application Control, AppLocker): an error whose
+   * message says so, anywhere in the cause chain (Icebase #662ab45d2a7e: fontmanager.dll,
+   * frostwire/frostwire#1620). The files are not damaged and reinstalling does not help.
+   */
+  public static boolean isBlockedByApplicationControl(Throwable problem) {
+    return blockedFile(problem) != null;
+  }
+
+  /** The file the blocked-by-policy error names, "" when it names none, null when not blocked. */
+  static String blockedFile(Throwable problem) {
+    for (int depth = 0; problem != null && depth < 8; depth++) {
+      String message = problem.getMessage();
+      if (message != null) {
+        int at = message.toLowerCase(java.util.Locale.ROOT).indexOf(BLOCKED_PHRASE);
+        if (at >= 0) {
+          String file = message.substring(0, at).trim();
+          return file.endsWith(":") ? file.substring(0, file.length() - 1).trim() : file;
+        }
+      }
+      problem = problem.getCause();
+    }
+    return null;
+  }
+
   /**
    * A ClassFormatError, but not its subclass UnsupportedClassVersionError: that one means a Java
    * too old for the class, which reinstalling FrostWire would not fix.
@@ -96,6 +126,18 @@ public final class DamagedInstallation {
         && "java.util.zip.ZipError".equals(problem.getClass().getName());
   }
 
+  /** The message for a runtime file Windows blocked: what happened, which file, what to do. */
+  static String blockedMessage(String file) {
+    return tr("Windows blocked a file FrostWire needs, so it can't start.")
+        + (file == null || file.isEmpty() ? "" : "\n\n" + file)
+        + "\n\n"
+        + tr(
+            "An Application Control policy on this computer (Smart App Control, Windows Defender Application Control or AppLocker) refused to load it. FrostWire's files are not damaged.")
+        + "\n\n"
+        + tr(
+            "To fix it, turn off Smart App Control (Windows Security > App & browser control > Smart App Control settings), or ask the administrator of this computer to allow FrostWire's program folder, then start FrostWire again.");
+  }
+
   /** The plain message users see, in the user's language when the translations can be read. */
   static String message() {
     return tr(
@@ -126,14 +168,29 @@ public final class DamagedInstallation {
    * without a display.
    */
   public static void show() {
-    System.err.println(message());
+    show(null);
+  }
+
+  /**
+   * Like {@link #show()}, but says what Windows blocked when {@code problem} is that (a blocked
+   * runtime DLL, frostwire/frostwire#1620); otherwise the damaged-installation message.
+   */
+  public static void show(Throwable problem) {
+    final String blocked = blockedFile(problem);
+    final String text = blocked != null ? blockedMessage(blocked) : message();
+    System.err.println(text);
+    if (blocked != null) {
+      // fontmanager.dll is typically the blocked file, and Swing cannot draw text without it
+      showNatively(text);
+      return;
+    }
     try {
       if (GraphicsEnvironment.isHeadless()) {
         return;
       }
     } catch (Throwable awtIsBroken) {
       // The damaged files may be AWT's own: go straight to the system's dialog.
-      showNatively();
+      showNatively(text);
       return;
     }
     try {
@@ -141,7 +198,7 @@ public final class DamagedInstallation {
       int choice =
           JOptionPane.showOptionDialog(
               null,
-              message(),
+              text,
               tr("FrostWire can't start"),
               JOptionPane.DEFAULT_OPTION,
               JOptionPane.ERROR_MESSAGE,
@@ -153,7 +210,7 @@ public final class DamagedInstallation {
       }
     } catch (Throwable swingFailed) {
       // Swing could not show it (a damaged runtime): ask the operating system instead.
-      showNatively();
+      showNatively(text);
     }
   }
 
@@ -161,10 +218,9 @@ public final class DamagedInstallation {
    * The same message in the operating system's own dialog, run as a separate process because the
    * runtime that would draw it is the damaged one. Never throws; the message is on stderr anyway.
    */
-  private static void showNatively() {
+  private static void showNatively(String text) {
     try {
       String title = tr("FrostWire can't start");
-      String text = message();
       java.util.List<String> command =
           nativeDialogCommand(System.getProperty("os.name", ""), title, text);
       if (!command.isEmpty()) {

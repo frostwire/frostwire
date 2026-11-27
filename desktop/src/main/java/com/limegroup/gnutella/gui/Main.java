@@ -165,8 +165,9 @@ public class Main {
     } catch (Throwable e) {
       CrashReportSpooler.recordSync(e);
       e.printStackTrace();
-      if (DamagedInstallation.isDamaged(e)) {
-        DamagedInstallation.show();
+      if (DamagedInstallation.isDamaged(e)
+          || DamagedInstallation.isBlockedByApplicationControl(e)) {
+        DamagedInstallation.show(e);
       }
       System.exit(1);
     }

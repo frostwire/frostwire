@@ -61,7 +61,10 @@ final class ThemeStartup {
       RuntimeException failure =
           new RuntimeException(
               "Unable to load theme " + theme + " at startup, failed at step: " + step[0], e);
-      if (theme == ThemeEnum.DEFAULT || DamagedInstallation.isDamaged(e)) {
+      // A runtime file Windows blocked fails the default theme the same way: no fallback to try.
+      if (theme == ThemeEnum.DEFAULT
+          || DamagedInstallation.isDamaged(e)
+          || DamagedInstallation.isBlockedByApplicationControl(e)) {
         LOG.error(failure.getMessage(), failure);
         throw failure;
       }
