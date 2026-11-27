@@ -221,6 +221,9 @@ class TransferToolsTest {
   @Test
   void detailDescribesTheTransferAndItsFiles() {
     ubuntu.handle().status().setTotal_done(15_000);
+    // the ETA counts the bytes still WANTED (frostwire/frostwire#1671), so both fields are set
+    ubuntu.handle().status().setTotal_wanted(60_000);
+    ubuntu.handle().status().setTotal_wanted_done(15_000);
     ubuntu.handle().status().setTotal_upload(3_000);
     ubuntu.handle().status().setNum_seeds(4);
     ubuntu.handle().status().setList_seeds(9);
