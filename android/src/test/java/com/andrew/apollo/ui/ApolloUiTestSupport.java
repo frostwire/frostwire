@@ -73,6 +73,57 @@ public final class ApolloUiTestSupport {
     }
   }
 
+  /** Names of the {@code MusicUtils} calls that reach the playback service or change what plays. */
+  private static final java.util.Set<String> SERVICE_CALLS =
+      java.util.Set.of(
+          "playFDs",
+          "playNext",
+          "addToQueue",
+          "addToPlaylist",
+          "playPlaylist",
+          "playFavorites",
+          "playLastAdded",
+          "shuffleAll",
+          "movePlaylistMember",
+          "removePlaylistMember",
+          "removeFromPlaylist",
+          "notifyForegroundStateChanged");
+
+  /**
+   * A {@code MusicUtils} with no service behind it: the calls that would reach the service are
+   * recorded in {@code calls} as {@code name[long args...]} instead of running, the waits for the
+   * service run their work at once, and everything else is the real code. Close it after the test.
+   */
+  public static org.mockito.MockedStatic<com.andrew.apollo.utils.MusicUtils> mockMusicUtils(
+      java.util.List<String> calls) {
+    return org.mockito.Mockito.mockStatic(
+        com.andrew.apollo.utils.MusicUtils.class,
+        invocation -> {
+          String name = invocation.getMethod().getName();
+          if ("executeWithMusicPlaybackService".equals(name)) {
+            ((Runnable) invocation.getArgument(1)).run();
+            return null;
+          }
+          if ("startMusicPlaybackService".equals(name)) {
+            ((Runnable) invocation.getArgument(2)).run();
+            return null;
+          }
+          if (SERVICE_CALLS.contains(name)) {
+            StringBuilder call = new StringBuilder(name).append('[');
+            for (Object argument : invocation.getArguments()) {
+              if (argument instanceof long[]) {
+                call.append(java.util.Arrays.toString((long[]) argument));
+              } else if (argument instanceof Number || argument instanceof Boolean) {
+                call.append(argument).append(' ');
+              }
+            }
+            calls.add(call.append(']').toString().replace(" ]", "]"));
+            return null;
+          }
+          return invocation.callRealMethod();
+        });
+  }
+
   public static void installAll() {
     installPlatform();
     installConfiguration();
