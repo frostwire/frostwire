@@ -6,6 +6,7 @@
  */
 package com.frostwire.android.gui;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -58,5 +59,18 @@ public class DiskCrawlCacheTest {
     cache.clear();
     assertEquals(0, cache.sizeInBytes());
     assertNull(cache.get("k"));
+  }
+
+  /**
+   * put failed at commit for every entry (the cache expected two values), so get was always a miss.
+   */
+  @Test
+  public void aStoredEntryComesBack() {
+    byte[] value = "value".getBytes(StandardCharsets.UTF_8);
+
+    cache.put("k", value);
+
+    assertArrayEquals(value, cache.get("k"));
+    assertEquals(value.length, cache.sizeInBytes());
   }
 }

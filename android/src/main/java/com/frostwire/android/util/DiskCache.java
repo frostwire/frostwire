@@ -43,8 +43,13 @@ public final class DiskCache {
   private static final Logger LOG = Logger.getLogger(DiskCache.class);
 
   private static final int APP_VERSION = 1;
-  private static final int VALUE_COUNT_PER_CACHE_ENTRY =
-      2; // seen at okhttp3.Cache use of DiskLruCache constructor
+
+  /**
+   * One value per entry, the only one we write. okhttp3.Cache uses 2 (headers and body); opening
+   * with 2 here made DiskLruCache's commit fail with IllegalStateException for the missing second
+   * value, so nothing was ever stored.
+   */
+  private static final int VALUE_COUNT_PER_CACHE_ENTRY = 1;
 
   private final DiskLruCache cache;
 

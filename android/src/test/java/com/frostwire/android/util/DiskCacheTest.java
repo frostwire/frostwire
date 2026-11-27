@@ -19,18 +19,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 /** DiskCache over a real DiskLruCache in a temporary folder: no Android runtime needed. */
 public class DiskCacheTest {
-
-  private static final String BUG =
-      "DiskCache opens its DiskLruCache with 2 values per entry but only writes value 0, so every"
-          + " put fails at commit with IllegalStateException (the crawl cache swallows it)."
-          + " Enable once DiskCache writes both values or opens with one.";
 
   @Rule public TemporaryFolder folder = new TemporaryFolder();
 
@@ -52,7 +46,6 @@ public class DiskCacheTest {
     }
   }
 
-  @Ignore(BUG)
   @Test
   public void putBytesThenGetReturnsSameBytes() throws IOException {
     DiskCache cache = newCache(1024 * 1024);
@@ -62,7 +55,6 @@ public class DiskCacheTest {
     assertArrayEquals(data, read(cache.get("k")));
   }
 
-  @Ignore(BUG)
   @Test
   public void putStreamThenGetReturnsSameBytes() throws IOException {
     DiskCache cache = newCache(1024 * 1024);
@@ -74,7 +66,6 @@ public class DiskCacheTest {
     assertArrayEquals(data, read(cache.get("stream")));
   }
 
-  @Ignore(BUG)
   @Test
   public void removeDropsTheEntry() {
     DiskCache cache = newCache(1024 * 1024);
@@ -83,7 +74,6 @@ public class DiskCacheTest {
     assertFalse(cache.containsKey("k"));
   }
 
-  @Ignore(BUG)
   @Test
   public void sizeGrowsWithEntries() {
     DiskCache cache = newCache(4096);
