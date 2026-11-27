@@ -287,4 +287,14 @@ public class SearchActivityTest {
 
     assertTrue(activity.isFinishing());
   }
+
+  @Test
+  public void resettingTheLoaderEmptiesTheList() throws Exception {
+    FakeMediaProvider.addSong(3, "Help", "Help!", "The Beatles");
+    SearchActivity activity = withRows(launch("help").get(), 1);
+
+    activity.onLoaderReset(null);
+
+    assertEquals(0, grid(activity).getAdapter().getCount());
+  }
 }

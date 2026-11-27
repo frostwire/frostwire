@@ -20,6 +20,7 @@ import android.os.SystemClock;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import com.andrew.apollo.MusicPlaybackService;
 import com.frostwire.android.R;
 import com.frostwire.platform.Platform;
 import com.frostwire.platform.Platforms;
@@ -301,5 +302,69 @@ public class PlaybackButtonsTest {
 
     assertEquals(-1, (int) counts.get(counts.size() - 1));
     assertFalse("other keys fall through", button.onKeyDown(KeyEvent.KEYCODE_A, down));
+  }
+
+  @Test
+  public void repeatingAllShowsTheRepeatAllIconAndDescription() {
+    music
+        .when(com.andrew.apollo.utils.MusicUtils::getRepeatMode)
+        .thenReturn(MusicPlaybackService.REPEAT_ALL);
+    RepeatButton button = new RepeatButton(activity, null);
+
+    button.updateRepeatState();
+
+    assertEquals(
+        activity.getString(R.string.accessibility_repeat_all), button.getContentDescription());
+    assertEquals(
+        R.drawable.btn_playback_repeat_all, shadowOf(button.getDrawable()).getCreatedFromResId());
+  }
+
+  @Test
+  public void repeatingTheCurrentTrackShowsTheRepeatOneIconAndDescription() {
+    music
+        .when(com.andrew.apollo.utils.MusicUtils::getRepeatMode)
+        .thenReturn(MusicPlaybackService.REPEAT_CURRENT);
+    RepeatButton button = new RepeatButton(activity, null);
+
+    button.updateRepeatState();
+
+    assertEquals(
+        activity.getString(R.string.accessibility_repeat_one), button.getContentDescription());
+    assertEquals(
+        R.drawable.btn_playback_repeat_one, shadowOf(button.getDrawable()).getCreatedFromResId());
+  }
+
+  @Test
+  public void anUnknownRepeatModeLeavesTheButtonAsItWas() {
+    music.when(com.andrew.apollo.utils.MusicUtils::getRepeatMode).thenReturn(7);
+    RepeatButton button = new RepeatButton(activity, null);
+    button.setContentDescription("as it was");
+
+    button.updateRepeatState();
+
+    assertEquals("as it was", button.getContentDescription());
+  }
+
+  @Test
+  public void shufflingShowsTheShuffleAllDescription() {
+    music.when(com.andrew.apollo.utils.MusicUtils::isShuffleEnabled).thenReturn(true);
+    ShuffleButton button = new ShuffleButton(activity, null);
+
+    button.updateShuffleState();
+
+    assertEquals(
+        activity.getString(R.string.accessibility_shuffle_all), button.getContentDescription());
+  }
+
+  @Test
+  public void aPlayingPlayerOffersPause() {
+    music.when(com.andrew.apollo.utils.MusicUtils::isPlaying).thenReturn(true);
+    PlayPauseButton button = new PlayPauseButton(activity, null);
+
+    button.updateState();
+
+    assertEquals(activity.getString(R.string.accessibility_pause), button.getContentDescription());
+    assertEquals(
+        R.drawable.btn_playback_pause, shadowOf(button.getDrawable()).getCreatedFromResId());
   }
 }

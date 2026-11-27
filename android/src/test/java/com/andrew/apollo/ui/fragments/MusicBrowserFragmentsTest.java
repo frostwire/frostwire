@@ -563,4 +563,33 @@ public class MusicBrowserFragmentsTest {
     assertEquals(TabFragmentOrder.ALBUMS_POSITION, PreferenceUtils.getInstance().getStartPage());
     PreferenceUtils.getInstance().setStartPage(TabFragmentOrder.SONGS_POSITION);
   }
+
+  @Test
+  public void aNewPlaylistFromTheMenuAsksForItsName() {
+    HomeActivity activity = launch();
+    Menu menu = menuFor(activity, TabFragmentOrder.PLAYLISTS_POSITION);
+    int fragments = activity.getSupportFragmentManager().getFragments().size();
+
+    assertTrue(choose(activity, menu, R.id.menu_player_new_playlist));
+
+    ApolloUiTestSupport.waitUntil(
+        "the name dialog is added",
+        () ->
+            activity.getSupportFragmentManager().getFragments().size() > fragments
+                || org.robolectric.shadows.ShadowDialog.getLatestDialog() != null);
+  }
+
+  @Test
+  public void anArtistsContextMenuCanDeleteTheArtistsSongs() {
+    HomeActivity activity = launch();
+    ArtistFragment artists = page(activity, ArtistFragment.class);
+    rows(artists, 1);
+    Menu menu = contextMenuFor(artists, 0);
+
+    assertTrue(artists.onContextItemSelected(menu.findItem(FragmentMenuItems.DELETE)));
+
+    ApolloUiTestSupport.waitUntil(
+        "the delete confirmation shows",
+        () -> artists.getParentFragmentManager().findFragmentByTag("DeleteDialog") != null);
+  }
 }

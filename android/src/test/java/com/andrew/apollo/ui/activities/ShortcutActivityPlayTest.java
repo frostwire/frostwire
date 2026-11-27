@@ -154,4 +154,47 @@ public class ShortcutActivityPlayTest {
 
     ApolloUiTestSupport.waitUntil("the screen closes", activity::isFinishing);
   }
+
+  @Test
+  public void aVoiceMatchOnAnAlbumPlaysTheAlbumsSongs() {
+    long[] songs = offMain(new com.andrew.apollo.model.Song(5, null, "The Beatles", "Help!", 0));
+
+    assertEquals(1, songs.length);
+    assertEquals(21L, songs[0]);
+  }
+
+  @Test
+  public void aVoiceMatchOnAnArtistPlaysTheArtistsSongs() {
+    long[] songs = offMain(new com.andrew.apollo.model.Song(5, null, "The Beatles", null, 0));
+
+    assertEquals(1, songs.length);
+    assertEquals(21L, songs[0]);
+  }
+
+  @Test
+  public void aVoiceMatchOfNothingPlaysNothing() {
+    assertEquals(
+        null,
+        ShortcutActivity.songListForVoiceMatch(
+            ApplicationProvider.getApplicationContext(),
+            new com.andrew.apollo.model.Song(5, null, null, null, 0)));
+  }
+
+  /** The MediaStore lookups refuse to run on the UI thread, as they do in the app. */
+  private static long[] offMain(com.andrew.apollo.model.Song match) {
+    final long[][] result = new long[1][];
+    Thread thread =
+        new Thread(
+            () ->
+                result[0] =
+                    ShortcutActivity.songListForVoiceMatch(
+                        ApplicationProvider.getApplicationContext(), match));
+    thread.start();
+    try {
+      thread.join(10_000);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
+    return result[0];
+  }
 }

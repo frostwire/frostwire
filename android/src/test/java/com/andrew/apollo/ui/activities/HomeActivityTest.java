@@ -260,7 +260,7 @@ public class HomeActivityTest {
     activity.handleOnBackPressed();
 
     shadowOf(Looper.getMainLooper()).idle();
-    assertNotNull(activity);
+    assertFalse("the exit offer decides, the screen does not just close", activity.isFinishing());
   }
 
   // ---------------------------------------------------------------------------------------------
@@ -470,5 +470,33 @@ public class HomeActivityTest {
     Intent search = shadowOf(activity).getNextStartedActivity();
     assertNotNull(search);
     assertEquals(SearchActivity.class.getName(), search.getComponent().getClassName());
+  }
+
+  @Test
+  public void aDeleteResultTheMusicCodeHandlesIsNotPassedOn() {
+    HomeActivity activity = launch().get();
+    music
+        .when(
+            () ->
+                MusicUtils.handleDeleteTracksActivityResult(
+                    Mockito.any(), Mockito.anyInt(), Mockito.anyInt()))
+        .thenReturn(true);
+
+    activity.onActivityResult(77, android.app.Activity.RESULT_OK, null);
+
+    music.verify(
+        () ->
+            MusicUtils.handleDeleteTracksActivityResult(
+                activity, 77, android.app.Activity.RESULT_OK));
+    assertFalse(activity.isFinishing());
+  }
+
+  @Test
+  public void aResultNobodyHandlesGoesToTheBaseScreen() {
+    HomeActivity activity = launch().get();
+
+    activity.onActivityResult(12345, android.app.Activity.RESULT_CANCELED, null);
+
+    assertFalse(activity.isFinishing());
   }
 }

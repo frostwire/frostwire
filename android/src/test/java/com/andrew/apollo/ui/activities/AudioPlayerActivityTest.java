@@ -19,7 +19,6 @@ import android.app.Application;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Looper;
 import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.view.Menu;
@@ -272,9 +271,9 @@ public class AudioPlayerActivityTest {
     music.when(MusicUtils::getMusicPlaybackService).thenReturn(null);
     Uri song = Uri.parse("file:///music/song.mp3");
 
-    AudioPlayerActivity activity = launch(new Intent(Intent.ACTION_VIEW, song)).get();
+    launch(new Intent(Intent.ACTION_VIEW, song));
 
-    assertNotNull(activity);
+    assertTrue(calls.toString(), calls.stream().noneMatch(c -> c.startsWith("playFileFromUri")));
   }
 
   @Test
@@ -450,14 +449,18 @@ public class AudioPlayerActivityTest {
   }
 
   @Test
-  public void theBannerDecidesAfterTheTrackHasPlayedAWhile() {
+  public void theAlbumArtIsShownOnceTheTrackHasPlayedAWhile() {
     AudioPlayerActivity activity = launch().get();
+    idleFor(600);
     music.when(MusicUtils::getCurrentAudioId).thenReturn(11L);
     music.when(MusicUtils::position).thenReturn(5_000L);
+    idleFor(1200);
+    View art = activity.findViewById(R.id.audio_player_album_art);
+    art.setVisibility(View.GONE);
 
     idleFor(9_000);
 
-    assertNotNull(activity.findViewById(R.id.audio_player_320x50_banner_view));
+    assertEquals(View.VISIBLE, art.getVisibility());
   }
 
   @Test
@@ -567,8 +570,110 @@ public class AudioPlayerActivityTest {
   }
 
   @Test
-  public void thePlayerShowsWithNoLooperMessagesLeftOver() {
-    launch();
-    assertTrue(shadowOf(Looper.getMainLooper()) != null);
+  public void holdingPreviousPastTheStartOfTheTrackGoesToThePreviousTrack() {
+    AudioPlayerActivity activity = launch().get();
+    com.andrew.apollo.widgets.RepeatingImageButton previous =
+        activity.findViewById(R.id.action_button_previous);
+
+    previous.setPressed(true);
+    previous.performLongClick();
+    idleFor(8000);
+    previous.setPressed(false);
+    long now = SystemClock.uptimeMillis();
+    previous.onTouchEvent(MotionEvent.obtain(now, now, MotionEvent.ACTION_UP, 1f, 1f, 0));
+
+    assertTrue(calls.toString(), calls.contains("previous[]"));
+  }
+
+  @Test
+  public void holdingNextPastTheEndOfTheTrackGoesToTheNextTrack() {
+    AudioPlayerActivity activity = launch().get();
+    com.andrew.apollo.widgets.RepeatingImageButton next =
+        activity.findViewById(R.id.action_button_next);
+
+    next.setPressed(true);
+    next.performLongClick();
+    idleFor(8000);
+    next.setPressed(false);
+    long now = SystemClock.uptimeMillis();
+    next.onTouchEvent(MotionEvent.obtain(now, now, MotionEvent.ACTION_UP, 1f, 1f, 0));
+
+    assertTrue(calls.toString(), calls.contains("next[]"));
+  }
+
+  @Test
+  public void aHandledDeleteResultIsNotPassedOn() {
+    AudioPlayerActivity activity = launch().get();
+    music
+        .when(
+            () ->
+                MusicUtils.handleDeleteTracksActivityResult(
+                    Mockito.any(), Mockito.anyInt(), Mockito.anyInt()))
+        .thenReturn(true);
+
+    activity.onActivityResult(1, 0, null);
+
+    assertFalse(activity.isFinishing());
+  }
+
+  @Test
+  public void searchingFromTheMenuOpensTheSearchScreen() {
+    AudioPlayerActivity activity = launch().get();
+    Menu menu = new MenuBuilder(activity);
+    activity.onCreateOptionsMenu(menu);
+    androidx.appcompat.widget.SearchView searchView =
+        (androidx.appcompat.widget.SearchView)
+            menu.findItem(R.id.menu_player_search).getActionView();
+
+    searchView.setQuery("typing", false);
+    searchView.setQuery("beatles", true);
+
+    Intent search = shadowOf(activity).getNextStartedActivity();
+    assertNotNull(search);
+    assertEquals(SearchActivity.class.getName(), search.getComponent().getClassName());
+    assertEquals("beatles", search.getStringExtra(android.app.SearchManager.QUERY));
+  }
+
+  @Test
+  public void aTrackThatChangedAgainBeforeTheBannerTimerFiredLeavesTheAlbumArtAlone() {
+    AudioPlayerActivity activity = launch().get();
+    idleFor(600);
+    music.when(MusicUtils::getCurrentAudioId).thenReturn(11L);
+    idleFor(1200);
+    View art = activity.findViewById(R.id.audio_player_album_art);
+    art.setVisibility(View.GONE);
+    music.when(MusicUtils::getCurrentAudioId).thenReturn(12L);
+    idleFor(1200);
+
+    idleFor(9_000);
+
+    assertEquals(View.GONE, art.getVisibility());
+  }
+
+  @Test
+  public void aTrackStillAtItsStartWhenTheTimerFiresLeavesTheAlbumArtAlone() {
+    AudioPlayerActivity activity = launch().get();
+    idleFor(600);
+    music.when(MusicUtils::position).thenReturn(1_000L);
+    music.when(MusicUtils::getCurrentAudioId).thenReturn(11L);
+    idleFor(1200);
+    View art = activity.findViewById(R.id.audio_player_album_art);
+    art.setVisibility(View.GONE);
+
+    idleFor(9_000);
+
+    assertEquals(View.GONE, art.getVisibility());
+  }
+
+  @Test
+  public void whileTheUserHoldsTheSeekBarTheTimeRefreshesSlowly() {
+    AudioPlayerActivity activity = launch().get();
+    SeekBar progress = activity.findViewById(android.R.id.progress);
+
+    activity.onStartTrackingTouch(progress);
+    idleFor(1200);
+    activity.onStopTrackingTouch(progress);
+
+    assertEquals("0:50", text(activity, R.id.audio_player_current_time));
   }
 }

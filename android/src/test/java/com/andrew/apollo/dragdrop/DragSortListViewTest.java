@@ -521,4 +521,48 @@ public class DragSortListViewTest {
     assertEquals(1, drops.size());
     assertEquals(0, drops.get(0)[0]);
   }
+
+  @Test
+  public void aRowViewIsReusedWhenTheListAsksForTheSamePositionAgain() {
+    View first = list.getAdapter().getView(0, null, list);
+    View again = list.getAdapter().getView(1, first, list);
+
+    assertSame("the wrapper row is recycled", first, again);
+  }
+
+  @Test
+  public void draggingToTheLastVisibleRowOfALongListMeasuresTheRowsBelow() {
+    adapter.count = 20;
+    adapter.notifyDataSetChanged();
+    layoutAgain();
+
+    touch(MotionEvent.ACTION_DOWN, 10, 350);
+    layoutAgain();
+    touch(MotionEvent.ACTION_MOVE, 10, 420);
+    layoutAgain();
+    touch(MotionEvent.ACTION_MOVE, 10, 480);
+    layoutAgain();
+    touch(MotionEvent.ACTION_MOVE, 10, 495);
+    layoutAgain();
+    touch(MotionEvent.ACTION_UP, 10, 495);
+
+    assertEquals(1, drops.size());
+    assertEquals(3, drops.get(0)[0]);
+    assertTrue("it moved down: " + drops.get(0)[1], drops.get(0)[1] >= 4);
+  }
+
+  @Test
+  public void draggingAboveTheFirstRowKeepsTheItemInTheList() {
+    touch(MotionEvent.ACTION_DOWN, 10, 250);
+    layoutAgain();
+    touch(MotionEvent.ACTION_MOVE, 10, 120);
+    layoutAgain();
+    touch(MotionEvent.ACTION_MOVE, 10, -50);
+    layoutAgain();
+    touch(MotionEvent.ACTION_UP, 10, -50);
+
+    assertEquals(1, drops.size());
+    assertEquals(2, drops.get(0)[0]);
+    assertEquals(0, drops.get(0)[1]);
+  }
 }
