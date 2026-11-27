@@ -334,7 +334,7 @@ public class StringTrie<V> {
    */
   public int size() {
     int ret = 0;
-    for (Iterator<V> iter = getIterator(); iter.hasNext(); ) ret++;
+    for (Iterator<V> iter = getIterator(); iter.hasNext(); iter.next()) ret++;
     return ret;
   }
 
@@ -595,23 +595,15 @@ final class TrieNode<E> {
    * @modifies this
    */
   public void put(String label, TrieNode<E> child) {
-    char labelStart;
-    int i = 0;
+    char labelStart = label.charAt(0);
     // If there's a match it is the closest lower or equal one, and
     // precondition requires it to be lower, so we add the edge *after*
     // it. If there's no match, there are two cases: the Trie is empty,
     // or the closest match returned is the last edge in the list.
-    assert (i =
-                    search(
-                        labelStart = label.charAt(0), // find closest match
-                        false))
-                < 0
-            || get(i).getLabelStart() != labelStart
-        : "Precondition of TrieNode.put violated.";
-    try {
-      children.add(i + 1, new TrieEdge<>(label, child));
-    } catch (Throwable ignored) {
-    }
+    // The search must not live inside an assert: production runs without -ea.
+    int i = search(labelStart, false);
+    assert i < 0 || get(i).getLabelStart() != labelStart : "Precondition of TrieNode.put violated.";
+    children.add(i + 1, new TrieEdge<>(label, child));
   }
 
   /**
