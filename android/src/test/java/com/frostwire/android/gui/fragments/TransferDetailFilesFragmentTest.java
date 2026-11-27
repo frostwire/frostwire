@@ -8,6 +8,7 @@
 package com.frostwire.android.gui.fragments;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
@@ -277,5 +278,28 @@ public class TransferDetailFilesFragmentTest {
     assertEquals(
         fragment.getString(R.string.n_files, 1200),
         text(fragment, R.id.fragment_transfer_detail_files_file_number));
+  }
+
+  /**
+   * Scrolling to the end of the first page asked for the next one, but the request was dropped (it
+   * checked a flag the request had just set), so torrents with 1000+ files stopped at 500.
+   */
+  @Test
+  public void scrollingToTheEndOfAHugeTorrentsFirstPageLoadsTheNext() throws Exception {
+    List<TransferItem> items = new ArrayList<>();
+    for (int i = 0; i < 1200; i++) {
+      items.add(item("file" + i + ".txt", i % 100, false));
+    }
+    TransferDetailFilesFragment fragment = launch();
+    fragment.bindToTransfer(download(HASH, items));
+    shadowOf(Looper.getMainLooper()).idle();
+    FragmentTestHost.settleUntil(() -> count(fragment) == 500);
+
+    recycler(fragment).scrollToPosition(499);
+    layout(recycler(fragment));
+    FragmentTestHost.settleUntil(() -> count(fragment) > 500);
+
+    assertTrue("only the first page was loaded", count(fragment) > 500);
+    assertTrue(count(fragment) <= 1200);
   }
 }

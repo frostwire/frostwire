@@ -369,8 +369,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
     }
 
     void loadMorePages() {
-      if (hasMorePages() && pendingLoadMoreRunnable == null) {
-        int startIndex = combinedItems.size();
+      if (hasMorePages()) {
         loadNextPage();
         submitList(new LinkedList<>(combinedItems));
       }
@@ -401,8 +400,10 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         if (pendingLoadMoreRunnable == null) {
           pendingLoadMoreRunnable =
               () -> {
-                loadMorePages();
+                // Cleared first: while it is set no further page is asked for, and it used to be
+                // set when loadMorePages ran, so page 2 was never loaded.
                 pendingLoadMoreRunnable = null;
+                loadMorePages();
               };
           mainHandler.post(pendingLoadMoreRunnable);
         }
@@ -434,10 +435,14 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
     }
 
     private void setSortedItems(List<TransferItem> sortedItems) {
+      // A refresh keeps as many pages as the user already scrolled through.
+      final int pagesShown = Math.max(1, currentPage);
       allItems = sortedItems;
       currentPage = 0;
       combinedItems.clear();
-      loadNextPage();
+      for (int page = 0; page < pagesShown; page++) {
+        loadNextPage();
+      }
       submitList(new LinkedList<>(combinedItems));
     }
 
