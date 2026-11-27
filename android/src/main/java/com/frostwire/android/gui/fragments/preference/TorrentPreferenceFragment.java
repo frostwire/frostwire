@@ -38,7 +38,7 @@ import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.SettingsPack;
 
-public final class TorrentPreferenceFragment extends AbstractPreferenceFragment {
+public class TorrentPreferenceFragment extends AbstractPreferenceFragment {
 
   public TorrentPreferenceFragment() {
     super(R.xml.settings_torrent);
@@ -130,13 +130,18 @@ public final class TorrentPreferenceFragment extends AbstractPreferenceFragment 
           });
     }
 
-    final BTEngine e = BTEngine.getInstance();
+    final BTEngine e = currentBTEngine();
     setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED, e);
     setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED, e);
     setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS, e);
     setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_UPLOADS, e);
     setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS, e);
     setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_PEERS, e);
+  }
+
+  /** The engine the seekbar options apply to: loading it loads libtorrent, a test returns none. */
+  BTEngine currentBTEngine() {
+    return BTEngine.getInstance();
   }
 
   private void setupAdvancedJlibtorrentOptions() {
