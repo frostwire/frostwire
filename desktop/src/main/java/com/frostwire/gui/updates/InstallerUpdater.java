@@ -172,15 +172,13 @@ class InstallerUpdater implements Runnable {
     }
   }
 
-  private String getFileNameFromHttpUrl() {
-    int index = updateMessage.getInstallerUrl().lastIndexOf('/');
-    return updateMessage.getInstallerUrl().substring(index + 1);
-  }
-
   private void handleHttpDownload() {
     File updateFolder = UpdateSettings.UPDATES_DIR;
-    String fileName =
-        updateMessage.getSaveAs() != null ? updateMessage.getSaveAs() : getFileNameFromHttpUrl();
+    String fileName = UpdateMediator.getInstallerFilename(updateMessage);
+    if (fileName == null) {
+      isDownloadingUpdate = false;
+      return;
+    }
     File installerFileLocation = new File(updateFolder, fileName);
     if (!updateFolder.exists()) {
       updateFolder.mkdir();
@@ -457,7 +455,8 @@ class InstallerUpdater implements Runnable {
                   + " (file size: "
                   + file.length()
                   + " bytes)");
-          if (updateMessage.getInstallerUrl() != null && updateMessage.getInstallerUrl() != "") {
+          if (updateMessage.getInstallerUrl() != null
+              && !updateMessage.getInstallerUrl().isEmpty()) {
             System.out.println(
                 "InstallerUpdater.cleanupInvalidUpdates() -> downloaded from "
                     + updateMessage.getInstallerUrl());

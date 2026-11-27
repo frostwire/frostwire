@@ -63,6 +63,45 @@ class UpdateMediatorTest {
   }
 
   @Test
+  void anEmptySaveAsFallsBackToTheTorrentAndThenTheInstallerUrl() {
+    UpdateMessage m = update("9.9.9", null);
+    // A parsed saveAs="" is a new String, not the interned "".
+    m.setSaveAs(new String(""));
+    m.setTorrent("http://example.com/dl/FrostWire.dmg.torrent");
+    assertEquals("FrostWire.dmg", UpdateMediator.getInstallerFilename(m));
+    m.setTorrent(null);
+    m.setInstallerUrl("https://example.com/dl/FrostWire.dmg");
+    assertEquals("FrostWire.dmg", UpdateMediator.getInstallerFilename(m));
+  }
+
+  @Test
+  void aTorrentUrlWithoutTheTorrentExtensionStillHasAName() {
+    UpdateMessage m = update("9.9.9", null);
+    m.setTorrent("http://example.com/dl?id=3");
+    assertEquals("dl", UpdateMediator.getInstallerFilename(m));
+    m.setTorrent("http://example.com/dl/FrostWire-9.9.9.dmg");
+    assertEquals("FrostWire-9.9.9.dmg", UpdateMediator.getInstallerFilename(m));
+    m.setTorrent("http://example.com/dl/FrostWire-9.9.9.dmg.torrent?token=1#x");
+    assertEquals("FrostWire-9.9.9.dmg", UpdateMediator.getInstallerFilename(m));
+  }
+
+  @Test
+  void aQueryOrFragmentIsNotPartOfTheInstallerUrlName() {
+    UpdateMessage m = update("9.9.9", null);
+    m.setInstallerUrl("https://example.com/dl/FrostWire.dmg?mirror=2");
+    assertEquals("FrostWire.dmg", UpdateMediator.getInstallerFilename(m));
+  }
+
+  @Test
+  void aTorrentUrlThatEndsInASlashFallsBackToTheInstallerUrl() {
+    UpdateMessage m = update("9.9.9", null);
+    m.setTorrent("http://example.com/dl/");
+    m.setInstallerUrl("https://example.com/dl/FrostWire.dmg");
+    assertNull(UpdateMediator.getInstallerFilename(update("9.9.9", null)));
+    assertEquals("FrostWire.dmg", UpdateMediator.getInstallerFilename(m));
+  }
+
+  @Test
   void aMessageWithNothingToDownloadHasNoInstallerName() {
     assertNull(UpdateMediator.getInstallerFilename(update("9.9.9", null)));
   }

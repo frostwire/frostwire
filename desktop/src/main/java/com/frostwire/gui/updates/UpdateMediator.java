@@ -47,19 +47,42 @@ public final class UpdateMediator {
     return instance;
   }
 
+  /**
+   * The file name the installer is saved as: the announced saveAs name, else the name of the
+   * torrent (without ".torrent") or the last segment of the installer URL; null when the message
+   * names none of them.
+   */
   static String getInstallerFilename(UpdateMessage message) {
-    String installerFilename = null;
-    if (message.getSaveAs() != null && message.getSaveAs() != "") {
-      installerFilename = message.getSaveAs();
-    } else if (message.getTorrent() != null) {
-      int index1 = message.getTorrent().lastIndexOf('/') + 1;
-      int index2 = message.getTorrent().lastIndexOf(".torrent");
-      installerFilename = message.getTorrent().substring(index1, index2);
-    } else if (message.getInstallerUrl() != null) {
-      int index1 = message.getInstallerUrl().lastIndexOf('/') + 1;
-      installerFilename = message.getInstallerUrl().substring(index1);
+    String saveAs = message.getSaveAs();
+    if (saveAs != null && !saveAs.isEmpty()) {
+      return saveAs;
     }
-    return installerFilename;
+    String torrentName = lastPathSegment(message.getTorrent());
+    if (torrentName != null) {
+      if (torrentName.endsWith(".torrent") && torrentName.length() > ".torrent".length()) {
+        torrentName = torrentName.substring(0, torrentName.length() - ".torrent".length());
+      }
+      return torrentName;
+    }
+    return lastPathSegment(message.getInstallerUrl());
+  }
+
+  /** The last segment of the path of the URL, without query or fragment; null if there is none. */
+  private static String lastPathSegment(String url) {
+    if (url == null) {
+      return null;
+    }
+    int end = url.length();
+    int query = url.indexOf('?');
+    if (query >= 0) {
+      end = query;
+    }
+    int fragment = url.indexOf('#');
+    if (fragment >= 0 && fragment < end) {
+      end = fragment;
+    }
+    String segment = url.substring(url.lastIndexOf('/', end - 1) + 1, end);
+    return segment.isEmpty() ? null : segment;
   }
 
   static void openInstallerAndShutdown(File executableFile) {
