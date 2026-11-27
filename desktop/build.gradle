@@ -194,8 +194,16 @@ java {
 }
 
 compileJava {
-    options.encoding = '8859_1'
     options.fork = true
+}
+
+// Every source file (desktop/ and common/) is UTF-8 on disk. This used to be ISO-8859-1 for
+// compileJava only, which turned every non-ASCII literal into mojibake at runtime (#1644).
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+tasks.withType(Javadoc).configureEach {
+    options.encoding = 'UTF-8'
 }
 
 // Every javac lint check, and warnings fail the build so new ones can't creep back in. Three
@@ -1181,6 +1189,7 @@ test {
         includeTestsMatching "com.frostwire.gui.tabs.TransfersTabSelectionValidatesOnlyOnOpenTest"
         includeTestsMatching "com.frostwire.gui.library.OnceReadyTest"
         includeTestsMatching "com.frostwire.gui.updates.UpdateMessageDialogTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.options.panes.SharedTorrentsDatabasePaneItemEncodingTest"
         includeTestsMatching "com.frostwire.gui.library.LibrarySelectBeforeTreeTest"
         includeTestsMatching "com.frostwire.gui.library.LibrarySearchBeforeFieldTest"
         includeTestsMatching "com.frostwire.gui.library.LibraryActionsHolderTest"
