@@ -24,6 +24,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -251,9 +252,10 @@ public abstract class AbstractHttpClient implements HttpClient {
     if (formData != null && formData.size() > 0) {
       for (Map.Entry<String, String> kv : formData.entrySet()) {
         sb.append("&");
-        sb.append(kv.getKey());
+        sb.append(URLEncoder.encode(kv.getKey(), StandardCharsets.UTF_8));
         sb.append("=");
-        sb.append(kv.getValue());
+        String value = kv.getValue();
+        sb.append(value == null ? "" : URLEncoder.encode(value, StandardCharsets.UTF_8));
       }
       sb.deleteCharAt(0);
     }
