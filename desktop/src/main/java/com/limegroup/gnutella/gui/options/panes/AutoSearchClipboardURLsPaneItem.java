@@ -66,7 +66,7 @@ public class AutoSearchClipboardURLsPaneItem extends AbstractPaneItem {
 
   @Override
   public boolean isDirty() {
-    return false; // SearchSettings.AUTO_SEARCH_CLIPBOARD_URL.getValue() !=
-    // AUTO_SEARCH_CHECK_BOX.isSelected();
+    return SearchSettings.AUTO_SEARCH_CLIPBOARD_URL.getValue()
+        != AUTO_SEARCH_CHECK_BOX.isSelected();
   }
 }
