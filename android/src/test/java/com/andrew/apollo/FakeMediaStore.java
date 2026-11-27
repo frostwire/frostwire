@@ -38,6 +38,10 @@ public final class FakeMediaStore extends ContentProvider {
   public static volatile int deleteResult = 1;
   public static volatile int bulkInsertResult = -1;
   public static volatile RuntimeException failure;
+
+  /** What openFile hands out (album art), or null for "no such file". */
+  public static volatile java.io.File openableFile;
+
   public static final List<String> queries = new ArrayList<>();
   public static final List<String> inserts = new ArrayList<>();
   public static final List<ContentValues> insertedValues = new ArrayList<>();
@@ -53,6 +57,7 @@ public final class FakeMediaStore extends ContentProvider {
     deleteResult = 1;
     bulkInsertResult = -1;
     failure = null;
+    openableFile = null;
     queries.clear();
     inserts.clear();
     insertedValues.clear();
@@ -155,6 +160,16 @@ public final class FakeMediaStore extends ContentProvider {
   public Bundle call(String method, String arg, Bundle extras) {
     calls.add(method + "|" + arg);
     return Bundle.EMPTY;
+  }
+
+  @Override
+  public android.os.ParcelFileDescriptor openFile(Uri uri, String mode)
+      throws java.io.FileNotFoundException {
+    if (openableFile == null) {
+      throw new java.io.FileNotFoundException(uri.toString());
+    }
+    return android.os.ParcelFileDescriptor.open(
+        openableFile, android.os.ParcelFileDescriptor.MODE_READ_ONLY);
   }
 
   private static void throwIfFailing() {
