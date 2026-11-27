@@ -119,7 +119,6 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog
   public void show(FragmentManager manager) {
     try {
       super.show(manager);
-      super.show(manager);
     } catch (Throwable e) {
       // java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState
       // TODO: this needs a refactor
