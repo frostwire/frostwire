@@ -104,7 +104,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author gubatron
  * @author aldenml
  */
-public final class SearchFragment extends AbstractFragment
+public class SearchFragment extends AbstractFragment
     implements MainFragment,
         OnDialogClickListener,
         SearchProgressView.CurrentQueryReporter,
@@ -148,6 +148,11 @@ public final class SearchFragment extends AbstractFragment
     lastInstance = this;
   }
 
+  /** Runs {@code task} on one of the app's background threads, a test runs it on its own. */
+  void postInBackground(SystemUtils.HandlerThreadName thread, Runnable task) {
+    postToHandler(thread, task);
+  }
+
   private void setupPromoSlides() {
     if (slides != null) {
       promotions.setSlides(slides);
@@ -162,7 +167,8 @@ public final class SearchFragment extends AbstractFragment
     }
   }
 
-  private List<Slide> loadSlidesInBackground() {
+  /** Reads the promotions from the server, off the main thread; a test returns its own. */
+  List<Slide> loadSlidesInBackground() {
     SystemUtils.ensureBackgroundThreadOrCrash("SearchFragment::loadSlidesInBackground");
     try {
       HttpClient http = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
@@ -367,7 +373,7 @@ public final class SearchFragment extends AbstractFragment
 
     showSupportBanner();
 
-    postToHandler(
+    postInBackground(
         SEARCH_PERFORMER, () -> SearchMediator.instance().performTellurideSearch(pageUrl));
     searchInput.setText(" "); // an empty space so the 'x' button is shown.
     switchView(view, R.id.fragment_search_list);
@@ -528,8 +534,8 @@ public final class SearchFragment extends AbstractFragment
     SystemUtils.ensureUIThreadOrCrash("SearchFragment::cancelSearch");
     adapter.clear();
     fileTypeCounter.clear();
-    postToHandler(SEARCH_PERFORMER, () -> SearchMediator.instance().cancelSearch());
-    postToHandler(SEARCH_PERFORMER, TellurideCourier::abortCurrentQuery);
+    postInBackground(SEARCH_PERFORMER, () -> SearchMediator.instance().cancelSearch());
+    postInBackground(SEARCH_PERFORMER, TellurideCourier::abortCurrentQuery);
     searchInput.setFileTypeCountersVisible(false);
     hideSupportBanner();
     currentQuery = null;
@@ -969,7 +975,8 @@ public final class SearchFragment extends AbstractFragment
         // UI first so promotions disappear and the spinner shows immediately;
         // Distributed / mesh results can take many seconds.
         fragment.prepareUIForSearch(mediaTypeId);
-        postToHandler(SEARCH_PERFORMER, () -> SearchMediator.instance().performSearch(query));
+        fragment.postInBackground(
+            SEARCH_PERFORMER, () -> SearchMediator.instance().performSearch(query));
       }
     }
 
@@ -982,7 +989,7 @@ public final class SearchFragment extends AbstractFragment
       // field — tapping a tab should restore the query box for clear / re-search.
       fragment.showSearchBox();
       if (fragment.adapter.getFileType() != mediaTypeId) {
-        postToHandler(
+        fragment.postInBackground(
             SystemUtils.HandlerThreadName.CONFIG_MANAGER,
             () -> ConfigurationManager.instance().setLastMediaTypeFilter(mediaTypeId));
         fragment.adapter.setFileType(
@@ -1074,7 +1081,8 @@ public final class SearchFragment extends AbstractFragment
           return;
         }
         searchFragment.prepareUIForSearch(adapter.getFileType());
-        postToHandler(SEARCH_PERFORMER, () -> SearchMediator.instance().performSearch(query));
+        searchFragment.postInBackground(
+            SEARCH_PERFORMER, () -> SearchMediator.instance().performSearch(query));
       }
       // cancel
       else {
