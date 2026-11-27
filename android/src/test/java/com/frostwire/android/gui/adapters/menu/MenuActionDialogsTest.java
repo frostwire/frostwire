@@ -366,4 +366,97 @@ public class MenuActionDialogsTest {
     music.verify(() -> MusicUtils.addToPlaylist(any(), eq(new long[] {11, 12}), eq(5L)));
     assertFalse(activity.isFinishing());
   }
+
+  // ---- AbstractDeleteFilesMenuAction
+
+  private AbstractDeleteFilesMenuAction deleteAction(
+      AtomicInteger deletes, List<String> listenerCalls) {
+    return new AbstractDeleteFilesMenuAction(
+        activity,
+        R.drawable.contextmenu_icon_trash,
+        R.string.delete_files,
+        (tag, which) -> listenerCalls.add("which=" + which)) {
+      @Override
+      protected void onDeleteClicked() {
+        deletes.incrementAndGet();
+      }
+    };
+  }
+
+  @Test
+  public void confirmingTheDeleteDialogDeletesAndNotifiesTheListener() {
+    AtomicInteger deletes = new AtomicInteger();
+    List<String> calls = new ArrayList<>();
+    deleteAction(deletes, calls).onClick();
+    AbstractDeleteFilesMenuAction.DeleteFileMenuActionDialog dialog =
+        shownDialog(AbstractDeleteFilesMenuAction.DeleteFileMenuActionDialog.class);
+    assertNotNull(dialog);
+    Dialog dlg = dialogOf(dialog);
+    assertEquals(
+        activity.getString(R.string.are_you_sure_delete_files),
+        ((TextView) dlg.findViewById(R.id.dialog_default_text)).getText().toString());
+    ((Button) dlg.findViewById(R.id.dialog_default_button_yes)).performClick();
+    assertEquals(1, deletes.get());
+    assertEquals(Arrays.asList("which=1"), calls);
+    assertNull(shownDialog(AbstractDeleteFilesMenuAction.DeleteFileMenuActionDialog.class));
+  }
+
+  @Test
+  public void decliningTheDeleteDialogKeepsTheFilesButStillNotifiesTheListener() {
+    AtomicInteger deletes = new AtomicInteger();
+    List<String> calls = new ArrayList<>();
+    deleteAction(deletes, calls).onClick();
+    Dialog dlg =
+        dialogOf(shownDialog(AbstractDeleteFilesMenuAction.DeleteFileMenuActionDialog.class));
+    ((Button) dlg.findViewById(R.id.dialog_default_button_no)).performClick();
+    assertEquals(0, deletes.get());
+    assertEquals(Arrays.asList("which=0"), calls);
+  }
+
+  // ---- dialogs re-created from saved state
+
+  @Test
+  public void aRecreatedRenameDialogKeepsTheFilePathItWasShowing() {
+    FWFileDescriptor fd = fileDescriptor("/sdcard/Music/keep.mp3");
+    org.robolectric.android.controller.ActivityController<ObserverActivity> controller =
+        Robolectric.buildActivity(ObserverActivity.class);
+    controller.get().setTheme(R.style.Theme_FrostWire);
+    controller.setup();
+    activity = controller.get();
+    new RenameFileMenuAction(activity, fd).onClick();
+    assertNotNull(shownDialog(RenameFileMenuAction.RenameFileMenuActionDialog.class));
+    controller.recreate();
+    activity = controller.get();
+    RenameFileMenuAction.RenameFileMenuActionDialog restored =
+        shownDialog(RenameFileMenuAction.RenameFileMenuActionDialog.class);
+    assertNotNull(restored);
+    assertEquals(
+        "keep",
+        ((EditText) dialogOf(restored).findViewById(R.id.dialog_default_input_text))
+            .getText()
+            .toString());
+  }
+
+  @Test
+  public void aRecreatedFileInformationDialogShowsTheSameFile() {
+    FWFileDescriptor fd = fileDescriptor("/sdcard/Music/info.mp3");
+    fd.fileSize = 10;
+    org.robolectric.android.controller.ActivityController<ObserverActivity> controller =
+        Robolectric.buildActivity(ObserverActivity.class);
+    controller.get().setTheme(R.style.Theme_FrostWire);
+    controller.setup();
+    activity = controller.get();
+    new FileInformationAction(activity, fd).onClick();
+    assertNotNull(shownDialog(FileInformationAction.FileInformationDialog.class));
+    controller.recreate();
+    activity = controller.get();
+    FileInformationAction.FileInformationDialog restored =
+        shownDialog(FileInformationAction.FileInformationDialog.class);
+    assertNotNull(restored);
+    assertEquals(
+        "info.mp3",
+        ((TextView) dialogOf(restored).findViewById(R.id.dialog_file_information_filename))
+            .getText()
+            .toString());
+  }
 }

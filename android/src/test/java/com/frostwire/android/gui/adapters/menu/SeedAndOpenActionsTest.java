@@ -378,4 +378,33 @@ public class SeedAndOpenActionsTest {
     // no menu action left to retry: nothing is posted to the main thread
     assertTrue(shadowOf(Looper.getMainLooper()).isIdle());
   }
+
+  // ---- ResumeDownloadMenuAction reconnect flow
+
+  @Test
+  public void resumingWhileDisconnectedAsksToReconnectAndYesStartsTheEngine() {
+    when(manager.isBittorrentDisconnected()).thenReturn(true);
+    BittorrentDownload dl = mock(BittorrentDownload.class);
+    ExecutorService pool = mock(ExecutorService.class);
+    Engine engine = mock(Engine.class);
+    when(engine.getThreadPool()).thenReturn(pool);
+    try (MockedStatic<Engine> engines = mockStatic(Engine.class)) {
+      engines.when(Engine::instance).thenReturn(engine);
+      new ResumeDownloadMenuAction(activity, dl, R.string.resume_torrent_menu_action).onClick();
+      YesNoDialog dialog = shownYesNo();
+      assertNotNull(dialog);
+      ((Button) dialog.getDialog().findViewById(R.id.dialog_default_button_yes)).performClick();
+      verify(pool).execute(any(OnBittorrentConnectRunnable.class));
+    }
+    verify(dl, never()).resume();
+  }
+
+  @Test
+  public void reconnectOutsideAnActivityWithoutAVpnTunnelShowsTheMessageOnTheContext() {
+    when(config.getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY)).thenReturn(true);
+    when(network.isTunnelUp()).thenReturn(false);
+    android.content.Context app = activity.getApplicationContext();
+    new OnBittorrentConnectRunnable(new SeedAction(activity)).onBittorrentConnect(app);
+    ui.verify(() -> UIUtils.showShortMessage(app, R.string.cannot_start_engine_without_vpn));
+  }
 }
