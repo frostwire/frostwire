@@ -94,13 +94,14 @@ public final class ArtistAlbumFragment extends ApolloFragment<ArtistAlbumAdapter
       com.frostwire.android.util.SystemUtils.postToHandler(
           com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
           () -> {
+            // finishing is the profile's job once it started: this Activity can't start it
+            // once it is finishing, and the start is posted after this task
             NavUtils.openAlbumProfile(
                 activity,
                 mItem.mAlbumName,
                 mItem.mArtistName,
                 mItem.mAlbumId,
-                MusicUtils.getSongListForAlbum(activity, mItem.mAlbumId));
-            com.frostwire.android.util.SystemUtils.postToUIThread(
+                MusicUtils.getSongListForAlbum(activity, mItem.mAlbumId),
                 () -> {
                   if (!activity.isFinishing() && !activity.isDestroyed()) {
                     activity.finish();

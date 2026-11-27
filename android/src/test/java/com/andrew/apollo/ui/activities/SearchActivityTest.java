@@ -272,23 +272,47 @@ public class SearchActivityTest {
     assertTrue(activity.isFinishing());
   }
 
+  /**
+   * The search used to finish() right after queueing the profile: a finishing Activity can't start
+   * anything, so tapping an artist closed the search and opened nothing.
+   */
   @Test
-  public void tappingAnArtistClosesTheSearch() throws Exception {
+  public void tappingAnArtistOpensItsProfileAndThenClosesTheSearch() throws Exception {
     FakeMediaProvider.addArtist(1, "Beach Boys");
     SearchActivity activity = withRows(launch("beach").get(), 1);
 
     grid(activity).performItemClick(row(activity, 0), 0, 1);
 
-    assertTrue(activity.isFinishing());
+    assertFalse("closed before the profile could start", activity.isFinishing());
+    assertProfileStartedThenFinished(activity);
   }
 
   @Test
-  public void tappingAnAlbumClosesTheSearch() throws Exception {
+  public void tappingAnAlbumOpensItsProfileAndThenClosesTheSearch() throws Exception {
     FakeMediaProvider.addAlbum(2, "Pet Sounds", "Beach Boys");
     SearchActivity activity = withRows(launch("pet").get(), 1);
 
     grid(activity).performItemClick(row(activity, 0), 0, 2);
 
+    assertFalse("closed before the profile could start", activity.isFinishing());
+    assertProfileStartedThenFinished(activity);
+  }
+
+  private static void assertProfileStartedThenFinished(SearchActivity activity)
+      throws InterruptedException {
+    android.content.Intent started = null;
+    for (int i = 0; i < 1000 && started == null; i++) {
+      settle();
+      started = shadowOf(activity).peekNextStartedActivity();
+      if (started == null) {
+        Thread.sleep(10);
+      }
+    }
+    assertNotNull("the profile was never started", started);
+    assertEquals(
+        com.andrew.apollo.ui.activities.ProfileActivity.class.getName(),
+        started.getComponent().getClassName());
+    settle();
     assertTrue(activity.isFinishing());
   }
 

@@ -286,7 +286,10 @@ public final class SearchActivity extends AbstractActivity
           cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Artists.ARTIST));
       com.frostwire.android.util.SystemUtils.postToHandler(
           com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
-          () -> NavUtils.openArtistProfile(this, artistName, null));
+          () -> NavUtils.openArtistProfile(this, artistName, null, this::finish));
+      // finish() is the profile's job, once it is started (a finishing Activity can't start it)
+      cursor.close();
+      return;
     } else if ("album".equals(mimeType)) {
       int albumIdCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums._ID);
       final String albumName =
@@ -302,7 +305,10 @@ public final class SearchActivity extends AbstractActivity
                   albumName,
                   artistName,
                   albumIdValue,
-                  MusicUtils.getSongListForAlbum(this, albumIdValue)));
+                  MusicUtils.getSongListForAlbum(this, albumIdValue),
+                  this::finish));
+      cursor.close();
+      return;
     } else if (position >= 0 && id >= 0) {
       // If it's a song, play it and leave
       final long[] list = new long[] {id};

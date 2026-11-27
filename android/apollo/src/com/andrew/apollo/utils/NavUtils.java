@@ -52,6 +52,19 @@ public final class NavUtils {
    */
   public static void openArtistProfile(
       final Activity context, final String artistName, final long[] songs) {
+    openArtistProfile(context, artistName, songs, null);
+  }
+
+  /**
+   * Opens the profile of an artist, then runs {@code afterStarted} on the UI thread. A screen that
+   * wants to close itself must do it there: finishing it before the profile starts makes this
+   * method give up (a finishing Activity can't start anything).
+   */
+  public static void openArtistProfile(
+      final Activity context,
+      final String artistName,
+      final long[] songs,
+      final Runnable afterStarted) {
     if (!isActivityAlive(context) || TextUtils.isEmpty(artistName)) {
       return;
     }
@@ -77,6 +90,9 @@ public final class NavUtils {
                 final Intent intent = new Intent(context, ProfileActivity.class);
                 intent.putExtras(bundle);
                 context.startActivity(intent);
+                if (afterStarted != null) {
+                  afterStarted.run();
+                }
               });
         });
   }
@@ -95,6 +111,17 @@ public final class NavUtils {
       final String artistName,
       final long albumId,
       final long[] songs) {
+    openAlbumProfile(context, albumName, artistName, albumId, songs, null);
+  }
+
+  /** Like {@link #openArtistProfile(Activity, String, long[], Runnable)}, for an album. */
+  public static void openAlbumProfile(
+      final Activity context,
+      final String albumName,
+      final String artistName,
+      final long albumId,
+      final long[] songs,
+      final Runnable afterStarted) {
     if (!isActivityAlive(context)) {
       return;
     }
@@ -123,6 +150,9 @@ public final class NavUtils {
                 final Intent intent = new Intent(context, ProfileActivity.class);
                 intent.putExtras(bundle);
                 context.startActivity(intent);
+                if (afterStarted != null) {
+                  afterStarted.run();
+                }
               });
         });
   }
