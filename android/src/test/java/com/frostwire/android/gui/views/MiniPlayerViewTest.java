@@ -67,9 +67,7 @@ public class MiniPlayerViewTest {
     music = mockStatic(MusicUtils.class);
     nav = mockStatic(NavUtils.class);
     throttle = mockStatic(TaskThrottle.class);
-    throttle
-        .when(() -> TaskThrottle.isReadyToSubmitTask(anyString(), anyLong()))
-        .thenReturn(true);
+    throttle.when(() -> TaskThrottle.isReadyToSubmitTask(anyString(), anyLong())).thenReturn(true);
     imageLoader = mock(FWImageLoader.class);
     images = mockStatic(FWImageLoader.class);
     images.when(() -> FWImageLoader.getInstance(any())).thenReturn(imageLoader);
@@ -208,9 +206,7 @@ public class MiniPlayerViewTest {
 
   @Test
   public void aThrottledCoverRefreshLoadsNothing() {
-    throttle
-        .when(() -> TaskThrottle.isReadyToSubmitTask(anyString(), anyLong()))
-        .thenReturn(false);
+    throttle.when(() -> TaskThrottle.isReadyToSubmitTask(anyString(), anyLong())).thenReturn(false);
     music.when(MusicUtils::isMusicPlaybackServiceRunning).thenReturn(true);
     music.when(MusicUtils::isPlaying).thenReturn(true);
     music.when(MusicUtils::getCurrentAlbumId).thenReturn(42L);
