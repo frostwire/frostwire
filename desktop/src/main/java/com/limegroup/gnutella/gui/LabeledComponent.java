@@ -137,7 +137,12 @@ public final class LabeledComponent {
         || alignment == BOTTOM_LEFT
         || alignment == BOTTOM_CENTER
         || alignment == BOTTOM_RIGHT);
-    assert (glue == LEFT_GLUE || glue == RIGHT_GLUE || glue == SURROUND_GLUE || glue == NO_GLUE);
+    assert (glue == LEFT_GLUE
+        || glue == RIGHT_GLUE
+        || glue == TOP_GLUE
+        || glue == BOTTOM_GLUE
+        || glue == SURROUND_GLUE
+        || glue == NO_GLUE);
     String text = I18n.tr(key);
     JLabel label = new JLabel(text);
     if (alignment == LEFT || alignment == RIGHT) {

@@ -84,6 +84,24 @@ class LabeledComponentTest {
   }
 
   @Test
+  void topAndBottomGlueAreAcceptedAndPutTheGlueOnThatSide() throws Exception {
+    final int topGlue = 100; // private in the class
+    final int bottomGlue = 110;
+    onEdt(
+        () -> {
+          JTextField field = new JTextField();
+          JComponent top = new LabeledComponent("Name", field, topGlue, TOP_CENTER).getComponent();
+          assertTrue(isGlue(top.getComponent(0)));
+          assertTrue(!isGlue(top.getComponent(top.getComponentCount() - 1)));
+          JComponent bottom =
+              new LabeledComponent("Name", new JTextField(), bottomGlue, BOTTOM_CENTER)
+                  .getComponent();
+          assertTrue(isGlue(bottom.getComponent(bottom.getComponentCount() - 1)));
+          assertTrue(!isGlue(bottom.getComponent(0)));
+        });
+  }
+
+  @Test
   void theLabelCanFollowTheComponent() throws Exception {
     onEdt(
         () -> {
