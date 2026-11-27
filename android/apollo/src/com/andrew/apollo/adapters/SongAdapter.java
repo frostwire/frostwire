@@ -194,8 +194,15 @@ public class SongAdapter extends ApolloFragmentAdapter<Song>
   @Override
   public void insert(Song object, int index) {
     synchronized (mDataListLock) {
-      super.insert(object, index);
-      mDataList.add(index, object);
+      // The lists can be shorter than the index (an empty adapter, a drop past the end): insert at
+      // the end instead of throwing IndexOutOfBoundsException.
+      final int at = Math.max(0, index);
+      try {
+        super.insert(object, at);
+      } catch (IndexOutOfBoundsException shorterList) {
+        super.add(object);
+      }
+      mDataList.add(Math.min(at, mDataList.size()), object);
     }
   }
 

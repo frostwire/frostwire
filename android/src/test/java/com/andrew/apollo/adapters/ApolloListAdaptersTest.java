@@ -552,4 +552,28 @@ public class ApolloListAdaptersTest {
 
     waitForQuery("album_id=7");
   }
+
+  /** SongAdapter.insert threw IndexOutOfBoundsException for any index past the end. */
+  @Test
+  public void insertingASongPastTheEndOrBeforeTheStartKeepsTheAdapterUsable() {
+    SongAdapter adapter = songs(new Song(1, "A", "x", "y", 10));
+
+    adapter.insert(new Song(2, "B", "x", "y", 10), 5);
+    adapter.insert(new Song(3, "C", "x", "y", 10), -3);
+
+    assertEquals(3, adapter.getCount());
+    assertEquals(3, adapter.getItemId(0));
+    assertEquals(2, adapter.getItemId(2));
+  }
+
+  @Test
+  public void insertingASongIntoAnEmptyProfileAdapterDoesNotThrow() {
+    ProfileSongAdapter adapter =
+        new ProfileSongAdapter(
+            activity, R.layout.list_item_simple, ProfileSongAdapter.DISPLAY_DEFAULT_SETTING);
+
+    adapter.insert(new Song(1, "A", "x", "y", 10), 3);
+
+    assertEquals(1, adapter.getItem(0).mSongId);
+  }
 }
