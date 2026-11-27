@@ -27,6 +27,7 @@ import com.frostwire.gui.theme.SkinPopupMenu;
 import com.frostwire.jlibtorrent.Priority;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.PaddedPanel;
+import com.limegroup.gnutella.gui.dnd.DNDUtils;
 import com.limegroup.gnutella.gui.search.GenericCellEditor;
 import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
 import com.limegroup.gnutella.gui.tables.LimeJTable;
@@ -288,7 +289,7 @@ public class TransferDetailFilesTableMediator
 
   @Override
   protected void setupDragAndDrop() {
-    TABLE.setDragEnabled(true);
+    DNDUtils.enableDrag(TABLE);
     TABLE.setTransferHandler(new TransferDetailFilesTableTransferHandler(this));
   }
 }

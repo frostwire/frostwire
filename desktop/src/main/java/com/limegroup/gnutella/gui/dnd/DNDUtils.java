@@ -162,6 +162,23 @@ public class DNDUtils {
     return support.isDrop() ? support.getDropLocation() : null;
   }
 
+  /**
+   * Lets the user drag rows out of the table. Swing refuses it without a display
+   * (HeadlessException), and there is nobody to drag then, as in unit tests.
+   */
+  public static void enableDrag(javax.swing.JTable table) {
+    if (!java.awt.GraphicsEnvironment.isHeadless()) {
+      table.setDragEnabled(true);
+    }
+  }
+
+  /** Lets the user drag nodes out of the tree, as {@link #enableDrag(javax.swing.JTable)}. */
+  public static void enableDrag(javax.swing.JTree tree) {
+    if (!java.awt.GraphicsEnvironment.isHeadless()) {
+      tree.setDragEnabled(true);
+    }
+  }
+
   public static boolean supportCanImport(
       DataFlavor dataFlavor,
       TransferHandler.TransferSupport support,

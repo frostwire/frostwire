@@ -36,6 +36,7 @@ import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.actions.AbstractAction;
 import com.limegroup.gnutella.gui.actions.LimeAction;
 import com.limegroup.gnutella.gui.actions.SearchAction;
+import com.limegroup.gnutella.gui.dnd.DNDUtils;
 import com.limegroup.gnutella.gui.search.GenericCellEditor;
 import com.limegroup.gnutella.gui.tables.LimeJTable;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
@@ -245,7 +246,7 @@ public final class LibraryFilesTableMediator
 
   /** Sets up drag and drop for the table. */
   protected void setupDragAndDrop() {
-    TABLE.setDragEnabled(true);
+    DNDUtils.enableDrag(TABLE);
     TABLE.setTransferHandler(new LibraryFilesTableTransferHandler(this));
   }
 

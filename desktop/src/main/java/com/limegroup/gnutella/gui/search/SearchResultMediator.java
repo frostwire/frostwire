@@ -185,7 +185,7 @@ public final class SearchResultMediator
 
   @Override
   protected void setupDragAndDrop() {
-    TABLE.setDragEnabled(true);
+    DNDUtils.enableDrag(TABLE);
     TABLE.setTransferHandler(
         new MulticastTransferHandler(
             new ResultPanelTransferHandler(this), DNDUtils.DEFAULT_TRANSFER_HANDLERS));

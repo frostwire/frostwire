@@ -26,6 +26,7 @@ import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.actions.LimeAction;
+import com.limegroup.gnutella.gui.dnd.DNDUtils;
 import com.limegroup.gnutella.gui.options.ConfigureOptionsAction;
 import com.limegroup.gnutella.gui.options.OptionsConstructor;
 import com.limegroup.gnutella.gui.search.NamedMediaType;
@@ -190,7 +191,7 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
     tree.setShowsRootHandles(false);
     tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
     tree.setCellRenderer(new NodeRenderer());
-    tree.setDragEnabled(true);
+    DNDUtils.enableDrag(tree);
     tree.setTransferHandler(new LibraryFilesTransferHandler(tree));
     ((BasicTreeUI) tree.getUI()).setExpandedIcon(null);
     ((BasicTreeUI) tree.getUI()).setCollapsedIcon(null);
