@@ -12,6 +12,7 @@ import android.os.Looper;
 import android.view.ContextThemeWrapper;
 import androidx.test.core.app.ApplicationProvider;
 import com.frostwire.android.R;
+import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.platform.Platform;
 import com.frostwire.platform.Platforms;
 import java.lang.reflect.Proxy;
@@ -31,6 +32,16 @@ public final class ViewTestSupport {
                     "isUIThread".equals(method.getName())
                         ? Looper.myLooper() == Looper.getMainLooper()
                         : null));
+  }
+
+  /** The preferences singleton, created once per JVM no matter how many tests ask for it. */
+  public static ConfigurationManager configuration() {
+    try {
+      ConfigurationManager.create(ApplicationProvider.getApplicationContext());
+    } catch (RuntimeException alreadyCreated) {
+      // created by an earlier test
+    }
+    return ConfigurationManager.instance();
   }
 
   /** The app's theme over the test application, so styled attributes resolve. */
