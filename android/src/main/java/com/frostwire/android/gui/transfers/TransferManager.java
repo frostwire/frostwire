@@ -546,12 +546,7 @@ public final class TransferManager {
               new TorrentFetcherDownload(
                   this,
                   new TorrentUrlInfo(u.toString(), tempDownloadTitle, distributedSourcePeerPub));
-          synchronized (downloadsListMonitor) {
-            bittorrentDownloadsList.add(download);
-          }
-          synchronized (downloadsMapMonitor) {
-            bittorrentDownloadsMap.put(download.getInfoHash(), download);
-          }
+          registerBittorrentDownload(download);
         }
       } else {
         if (scheme != null && scheme.equalsIgnoreCase("file")) {
@@ -579,12 +574,7 @@ public final class TransferManager {
                   this,
                   new TorrentUrlInfo(u.toString(), tempDownloadTitle, distributedSourcePeerPub),
                   fetcherListener);
-          synchronized (downloadsListMonitor) {
-            bittorrentDownloadsList.add(download);
-          }
-          synchronized (downloadsMapMonitor) {
-            bittorrentDownloadsMap.put(download.getInfoHash(), download);
-          }
+          registerBittorrentDownload(download);
           incrementStartedTransfers();
           return download;
         }
@@ -596,6 +586,16 @@ public final class TransferManager {
     } catch (Throwable e) {
       LOG.warn("Error creating download from uri: " + url, e);
       return new InvalidBittorrentDownload(R.string.torrent_scheme_download_not_supported, null);
+    }
+  }
+
+  /** Adds the transfer to the list the UI shows and indexes it by its info hash. */
+  void registerBittorrentDownload(BittorrentDownload download) {
+    synchronized (downloadsListMonitor) {
+      bittorrentDownloadsList.add(download);
+    }
+    synchronized (downloadsMapMonitor) {
+      bittorrentDownloadsMap.put(download.getInfoHash(), download);
     }
   }
 
@@ -635,12 +635,7 @@ public final class TransferManager {
       }
       BittorrentDownload bittorrentDownload = createBittorrentDownload(this, sr);
       if (bittorrentDownload != null) {
-        synchronized (downloadsListMonitor) {
-          bittorrentDownloadsList.add(bittorrentDownload);
-        }
-        synchronized (downloadsMapMonitor) {
-          bittorrentDownloadsMap.put(bittorrentDownload.getInfoHash(), bittorrentDownload);
-        }
+        registerBittorrentDownload(bittorrentDownload);
       }
       return bittorrentDownload;
     } catch (Throwable e) {

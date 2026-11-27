@@ -40,6 +40,7 @@ import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.Transfer;
+import com.frostwire.transfers.TransferState;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -499,6 +500,175 @@ public class TransferManagerTest {
   @Test
   public void aMissingTorrentHandleHasNoUiDownload() {
     assertNull(manager.ensureUiDownload(null));
+  }
+
+  private BittorrentDownload registered(String hash, TransferState state) {
+    BittorrentDownload bt = mock(BittorrentDownload.class);
+    when(bt.getInfoHash()).thenReturn(hash);
+    when(bt.getState()).thenReturn(state);
+    manager.registerBittorrentDownload(bt);
+    return bt;
+  }
+
+  private UIBittorrentDownload registeredUi(String hash) {
+    UIBittorrentDownload ui = mock(UIBittorrentDownload.class);
+    when(ui.getInfoHash()).thenReturn(hash);
+    when(ui.getState()).thenReturn(TransferState.DOWNLOADING);
+    manager.registerBittorrentDownload(ui);
+    return ui;
+  }
+
+  @Test
+  public void registeredTransfersAreListedIndexedByHashAndRemovable() {
+    BittorrentDownload bt = registered("h1", TransferState.DOWNLOADING);
+    assertTrue(manager.getTransfers().contains(bt));
+    assertSame(bt, manager.getBittorrentDownload("h1"));
+    assertTrue(manager.remove(bt));
+    assertNull(manager.getBittorrentDownload("h1"));
+    assertFalse(manager.remove(bt));
+    assertTrue(manager.getTransfers().isEmpty());
+  }
+
+  @Test
+  public void removingATransferThatIsNotTheIndexedOneKeepsTheIndexEntry() {
+    BittorrentDownload first = registered("same", TransferState.DOWNLOADING);
+    BittorrentDownload second = registered("same", TransferState.DOWNLOADING);
+    assertSame(
+        "the later registration owns the hash", second, manager.getBittorrentDownload("same"));
+    assertTrue(manager.remove(first));
+    assertSame(second, manager.getBittorrentDownload("same"));
+  }
+
+  @Test
+  public void onlyHealthyUnfinishedTransfersThatMoveBytesAreActiveDownloads() {
+    BittorrentDownload moving = registered("moving", TransferState.DOWNLOADING);
+    when(moving.isDownloading()).thenReturn(true);
+    BittorrentDownload errored = registered("errored", TransferState.ERROR);
+    when(errored.isDownloading()).thenReturn(true);
+    BittorrentDownload done = registered("done", TransferState.SEEDING);
+    when(done.isDownloading()).thenReturn(true);
+    when(done.isComplete()).thenReturn(true);
+    BittorrentDownload idle = registered("idle", TransferState.DOWNLOADING);
+    assertEquals(1, manager.getActiveDownloads());
+    assertNotNull(idle);
+  }
+
+  @Test
+  public void finishedUnpausedTransfersAreActiveUploads() {
+    BittorrentDownload seeding = registered("seeding", TransferState.SEEDING);
+    when(seeding.isFinished()).thenReturn(true);
+    BittorrentDownload pausedSeed = registered("pausedSeed", TransferState.SEEDING);
+    when(pausedSeed.isFinished()).thenReturn(true);
+    when(pausedSeed.isPaused()).thenReturn(true);
+    BittorrentDownload erroredSeed = registered("erroredSeed", TransferState.ERROR);
+    when(erroredSeed.isFinished()).thenReturn(true);
+    registered("downloading", TransferState.DOWNLOADING);
+    assertEquals(1, manager.getActiveUploads());
+  }
+
+  @Test
+  public void stoppingSeedingPausesSeedingAndCompleteTransfersOnly() {
+    BittorrentDownload seeding = registered("seeding", TransferState.SEEDING);
+    when(seeding.isSeeding()).thenReturn(true);
+    BittorrentDownload complete = registered("complete", TransferState.SEEDING);
+    when(complete.isComplete()).thenReturn(true);
+    BittorrentDownload downloading = registered("downloading", TransferState.DOWNLOADING);
+    manager.stopSeedingTorrents();
+    verify(seeding).pause();
+    verify(complete).pause();
+    verify(downloading, never()).pause();
+    manager.pauseTorrents();
+    verify(downloading).pause();
+  }
+
+  @Test
+  public void policyPausesApplyToUiTransfersOnly() {
+    UIBittorrentDownload seeding = registeredUi("ui-seeding");
+    when(seeding.isSeeding()).thenReturn(true);
+    UIBittorrentDownload downloading = registeredUi("ui-downloading");
+    BittorrentDownload plain = registered("plain", TransferState.SEEDING);
+    when(plain.isSeeding()).thenReturn(true);
+    manager.suspendSeedingTorrents();
+    verify(seeding).pauseForPolicy();
+    verify(downloading, never()).pauseForPolicy();
+    manager.suspendTorrentsForPolicy();
+    verify(downloading).pauseForPolicy();
+    verify(plain, never()).pause();
+  }
+
+  @Test
+  public void policySuspendedTransfersResumeWhenThePolicyAllowsIt() {
+    UIBittorrentDownload downloading = registeredUi("ui-downloading");
+    UIBittorrentDownload complete = registeredUi("ui-complete");
+    when(complete.isComplete()).thenReturn(true);
+    manager.resumePolicySuspendedDownloads();
+    verify(downloading).resumeFromPolicy();
+    verify(complete, never()).resumeFromPolicy();
+    manager.resumePolicySuspendedSeeding();
+    verify(complete).resumeFromPolicy();
+    verify(downloading, org.mockito.Mockito.times(1)).resumeFromPolicy();
+  }
+
+  @Test
+  public void seedingStaysSuspendedWhileMobileDataSavingsOrTheVpnGuardApply() {
+    UIBittorrentDownload complete = registeredUi("ui-complete");
+    when(complete.isComplete()).thenReturn(true);
+    when(network.isDataMobileUp()).thenReturn(true);
+    when(config.getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY)).thenReturn(true);
+    manager.resumePolicySuspendedSeeding();
+    verify(complete, never()).resumeFromPolicy();
+  }
+
+  @Test
+  public void finishedAndErroredTransfersAreClearedAndOthersStay() {
+    BittorrentDownload finished = registered("finished", TransferState.SEEDING);
+    when(finished.isComplete()).thenReturn(true);
+    when(finished.isPaused()).thenReturn(true);
+    BittorrentDownload seeding = registered("seeding", TransferState.SEEDING);
+    when(seeding.isComplete()).thenReturn(true);
+    BittorrentDownload errored = registered("errored", TransferState.ERROR);
+    BittorrentDownload downloading = registered("downloading", TransferState.DOWNLOADING);
+    manager.clearComplete();
+    verify(finished).remove(false);
+    verify(errored).remove(false);
+    verify(seeding, never()).remove(false);
+    verify(downloading, never()).remove(false);
+  }
+
+  @Test
+  public void pausedUnfinishedTransfersResumeAndFinishedOnesSeedWhenAllowed() {
+    when(config.isSeedFinishedTorrents()).thenReturn(true);
+    BittorrentDownload paused = registered("paused", TransferState.PAUSED);
+    when(paused.isPaused()).thenReturn(true);
+    BittorrentDownload finished = registered("finished", TransferState.SEEDING);
+    when(finished.isFinished()).thenReturn(true);
+    when(finished.isPaused()).thenReturn(true);
+    BittorrentDownload running = registered("running", TransferState.DOWNLOADING);
+    manager.resumeResumableTransfers();
+    verify(paused).resume();
+    verify(finished, never()).resume();
+    verify(running, never()).resume();
+    manager.seedFinishedTransfers();
+    verify(finished).resume();
+    verify(paused, org.mockito.Mockito.times(1)).resume();
+  }
+
+  @Test
+  public void nothingResumesWhileAPolicyBlocksTorrents() {
+    BittorrentDownload paused = registered("paused", TransferState.PAUSED);
+    when(paused.isPaused()).thenReturn(true);
+    when(config.getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY)).thenReturn(true);
+    manager.resumeResumableTransfers();
+    manager.seedFinishedTransfers();
+    verify(paused, never()).resume();
+  }
+
+  @Test
+  public void bothKindsOfUiTransferCountAsBittorrentDownloads() {
+    UIBittorrentDownload ui = registeredUi("ui");
+    assertTrue(manager.isBittorrentDownload(ui));
+    assertFalse(manager.isBittorrentDownload(mock(Transfer.class)));
+    assertFalse(manager.isBittorrentDownloadAndMobileDataSavingsOn(ui));
   }
 
   private static TorrentSearchResult torrent(String url, String hash) {
