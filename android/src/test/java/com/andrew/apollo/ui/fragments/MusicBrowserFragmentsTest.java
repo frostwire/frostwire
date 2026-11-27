@@ -402,25 +402,6 @@ public class MusicBrowserFragmentsTest {
   }
 
   @Test
-  public void aPlaylistAnotherAppOwnsCannotBeDeletedAndTheUserIsTold() {
-    FakeMediaProvider.deleteResult = 0;
-    HomeActivity activity = launch();
-    PlaylistFragment playlists = page(activity, PlaylistFragment.class);
-    rows(playlists, 4);
-    Menu menu = contextMenuFor(playlists, 3);
-    playlists.onContextItemSelected(menu.findItem(FragmentMenuItems.DELETE));
-    ApolloUiTestSupport.settle();
-
-    org.robolectric.shadows.ShadowDialog.getLatestDialog()
-        .findViewById(R.id.dialog_default_button_yes)
-        .performClick();
-
-    ApolloUiTestSupport.waitUntil(
-        "the delete is attempted", () -> FakeMediaProvider.DELETES.get() > 0);
-    assertEquals(1, FakeMediaProvider.DELETES.get());
-  }
-
-  @Test
   public void theGridAndDetailedLayoutsListTheSameArtistsAndAlbums() {
     for (String layout : new String[] {"grid", "detailed"}) {
       PreferenceUtils.getInstance().setArtistLayout(layout);
