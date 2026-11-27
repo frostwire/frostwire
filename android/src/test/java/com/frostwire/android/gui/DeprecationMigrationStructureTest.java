@@ -10,8 +10,6 @@ package com.frostwire.android.gui;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import android.app.Service;
-import com.frostwire.android.gui.services.EngineIntentService;
 import com.frostwire.android.gui.services.IEngineService;
 import java.lang.reflect.Method;
 import java.util.HashSet;
@@ -28,25 +26,6 @@ import org.junit.Test;
  * <p>Pure JVM test — no Android framework, no Robolectric required.
  */
 public class DeprecationMigrationStructureTest {
-
-  // -------------------------------------------------------------------------
-  // L2: EngineIntentService — must be plain Service, NOT JobIntentService
-  // -------------------------------------------------------------------------
-
-  @Test
-  public void engineIntentService_superclassChain_neverIncludesJobIntentService() {
-    assertNoDeprecatedAncestor(
-        EngineIntentService.class,
-        "androidx.core.app.JobIntentService",
-        "EngineIntentService must NOT extend deprecated JobIntentService");
-  }
-
-  @Test
-  public void engineIntentService_superclassChain_includesService() {
-    assertTrue(
-        "EngineIntentService must be a Service",
-        Service.class.isAssignableFrom(EngineIntentService.class));
-  }
 
   // -------------------------------------------------------------------------
   // M3: Activities that had onBackPressed() overrides — must NOT have them anymore

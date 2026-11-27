@@ -52,8 +52,6 @@ public final class Engine implements IEngineService {
 
   private static final ExecutorService MAIN_THREAD_POOL = new EngineThreadPool();
 
-  // private EngineIntentService service;
-
   private EngineBroadcastReceiver receiver;
 
   private static final Object pythonStarterLock = new Object();

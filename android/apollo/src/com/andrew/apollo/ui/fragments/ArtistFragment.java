@@ -101,23 +101,6 @@ public final class ArtistFragment extends ApolloFragment<ArtistAdapter, Artist> 
     return new ArtistLoader(getActivity());
   }
 
-  /**
-   * @return The position of an item in the list or grid based on the name of the currently playing
-   *     artist.
-   */
-  private int getItemPositionByArtist() {
-    final long artistId = MusicUtils.getCurrentArtistId();
-    if (mAdapter == null) {
-      return 0;
-    }
-    for (int i = 0; i < mAdapter.getCount(); i++) {
-      if (mAdapter.getItem(i).mArtistId == artistId) {
-        return i;
-      }
-    }
-    return 0;
-  }
-
   @Override
   protected boolean isSimpleLayout() {
     return PreferenceUtils.getInstance().isSimpleLayout(getLayoutTypeName());

@@ -588,20 +588,6 @@ public final class Librarian {
     handler = new Handler(handlerThread.getLooper());
   }
 
-  private static String buildSet(List<?> list) {
-    StringBuilder sb = new StringBuilder("(");
-    int i = 0;
-    for (Object id : list) {
-      sb.append(id);
-      if (i++ < (list.size() - 1)) {
-        sb.append(",");
-      }
-    }
-    sb.append(")");
-
-    return sb.toString();
-  }
-
   public Handler getHandler() {
     return handler;
   }

@@ -2193,37 +2193,6 @@ public class MusicPlaybackService extends MediaSessionService {
 
   @SuppressWarnings("unused")
   /**
-   * Use this to print all the _id and _data of the files in Downloads as stored by the Media Store
-   * Useful for debugging
-   */
-  private void debugPrintAllFilesInDownloads() {
-    ContentResolver contentResolver = getContentResolver();
-    Uri downloadsExternalUri = Uri.parse("content://media/external/downloads");
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-      downloadsExternalUri = MediaStore.Downloads.getContentUri("external");
-    }
-    Cursor query =
-        contentResolver.query(
-            downloadsExternalUri,
-            SIMPLE_PROJECTION,
-            "_data LIKE ?",
-            new String[] {"%/Download/%"},
-            null,
-            null);
-    if (query != null && query.moveToFirst()) {
-      do {
-        LOG.info(
-            "MusicPlaybackService::debugPrintAllFilesInDownloads _id: "
-                + query.getLong(0)
-                + " _data:"
-                + query.getString(1));
-      } while (query.moveToNext());
-      query.close();
-    }
-  }
-
-  /**
    * Seeks the current track to a specific time
    *
    * @param position The time to seek to
