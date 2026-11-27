@@ -192,4 +192,24 @@ class ButtonRowTest {
           assertSame(act, row.getButtonAtIndex(0).getAction());
         });
   }
+
+  @Test
+  void aRowWithoutButtonsIsEmptyInsteadOfThrowing() throws Exception {
+    onEdt(
+        () -> {
+          ButtonRow fromKeys =
+              new ButtonRow(new String[0], new String[0], new EventListener[0], null);
+          assertEquals(0, count(fromKeys, JButton.class));
+          ButtonRow fromKeysVertical =
+              new ButtonRow(
+                  new String[0],
+                  new String[0],
+                  new EventListener[0],
+                  BoxLayout.Y_AXIS,
+                  ButtonRow.NO_GLUE);
+          assertEquals(0, count(fromKeysVertical, JButton.class));
+          ButtonRow fromActions = new ButtonRow(new Action[0], BoxLayout.X_AXIS, ButtonRow.NO_GLUE);
+          assertEquals(0, count(fromActions, JButton.class));
+        });
+  }
 }

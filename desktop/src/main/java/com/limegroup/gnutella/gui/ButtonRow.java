@@ -86,7 +86,7 @@ public final class ButtonRow extends JPanel {
     BoxLayout bl = new BoxLayout(this, orientation);
     setLayout(bl);
     final int length = labelKeys.length;
-    final int sepLength = length - 1;
+    final int sepLength = Math.max(0, length - 1);
     _buttons = new JButton[length];
     Component[] separators = new Component[sepLength];
     int i = 0;
@@ -152,7 +152,7 @@ public final class ButtonRow extends JPanel {
   private ButtonRow(Action[] actions, int orientation, int glue, JComponent extraComponent) {
     BoxLayout bl = new BoxLayout(this, orientation);
     setLayout(bl);
-    final int sepLength = actions.length - 1;
+    final int sepLength = Math.max(0, actions.length - 1);
     _buttons = new JButton[actions.length];
     Component[] separators = new Component[sepLength];
     for (int i = 0; i < actions.length; i++) {
