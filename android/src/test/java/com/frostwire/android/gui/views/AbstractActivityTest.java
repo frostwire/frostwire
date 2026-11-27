@@ -194,6 +194,9 @@ public class AbstractActivityTest {
     Field optionalIcons = MenuBuilder.class.getDeclaredField("mOptionalIconsVisible");
     optionalIcons.setAccessible(true);
 
+    // the flag is application wide and other tests may have left it on
+    AbstractActivity.setMenuIconsVisible(false);
+    optionalIcons.setBoolean(menu, false);
     activity.onCreateOptionsMenu(menu);
     assertFalse(optionalIcons.getBoolean(menu));
 
