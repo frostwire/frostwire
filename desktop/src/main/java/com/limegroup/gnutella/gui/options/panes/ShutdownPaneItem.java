@@ -57,7 +57,7 @@ public class ShutdownPaneItem extends AbstractPaneItem {
     ButtonGroup bg = new ButtonGroup();
     buttonPanel.add(shutdownImmediately);
     bg.add(shutdownImmediately);
-    if (OSUtils.supportsTray() && ResourceManager.instance().isTrayIconAvailable()) {
+    if (trayOffered()) {
       buttonPanel.add(minimizeToTray);
       bg.add(minimizeToTray);
     }
@@ -82,13 +82,8 @@ public class ShutdownPaneItem extends AbstractPaneItem {
 
   /** Sets the options for the fields in this `PaneItem` when the window is shown. */
   public void initOptions() {
-    if (ApplicationSettings.MINIMIZE_TO_TRAY.getValue()) {
-      //            if (OSUtils.supportsTray() && !ResourceManager.instance().isTrayIconAvailable())
-      // {
-      //                //shutdownAfterTransfers.setSelected(true);
-      //            } else {
+    if (effectiveMinimizeToTray()) {
       minimizeToTray.setSelected(true);
-      //            }
     } else {
       shutdownImmediately.setSelected(true);
     }
@@ -96,12 +91,23 @@ public class ShutdownPaneItem extends AbstractPaneItem {
   }
 
   public boolean isDirty() {
-    boolean minimized = ApplicationSettings.MINIMIZE_TO_TRAY.getValue();
-    boolean reallyMinimized = minimized && ResourceManager.instance().isTrayIconAvailable();
-    boolean immediate = !ApplicationSettings.MINIMIZE_TO_TRAY.getValue();
-    return minimizeToTray.isSelected() != reallyMinimized
-        || shutdownImmediately.isSelected() != immediate
+    boolean minimized = effectiveMinimizeToTray();
+    return minimizeToTray.isSelected() != minimized
+        || shutdownImmediately.isSelected() == minimized
         || _checkBoxShowHideExitDialog.isSelected()
             != ApplicationSettings.SHOW_HIDE_EXIT_DIALOG.getValue();
+  }
+
+  /** Whether the minimize to tray radio is offered on this system. */
+  static boolean trayOffered() {
+    return OSUtils.supportsTray() && ResourceManager.instance().isTrayIconAvailable();
+  }
+
+  /**
+   * The stored choice as this pane can show it: a stored "minimize to tray" falls back to "shutdown
+   * immediately" when the system cannot offer the tray.
+   */
+  private static boolean effectiveMinimizeToTray() {
+    return ApplicationSettings.MINIMIZE_TO_TRAY.getValue() && trayOffered();
   }
 }
