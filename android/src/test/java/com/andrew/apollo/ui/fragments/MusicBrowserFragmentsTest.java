@@ -592,4 +592,31 @@ public class MusicBrowserFragmentsTest {
         "the delete confirmation shows",
         () -> artists.getParentFragmentManager().findFragmentByTag("DeleteDialog") != null);
   }
+
+  @Test
+  public void aTappedRecentSongPlaysFromThatSong() {
+    HomeActivity activity = launch();
+    RecentFragment recent = page(activity, RecentFragment.class);
+    List<com.andrew.apollo.model.Song> songs =
+        List.of(new com.andrew.apollo.model.Song(31, "Help", "The Beatles", "Help!", 180));
+    recent.getAdapter().unload();
+    recent.getAdapter().setDataList(songs);
+    recent.getAdapter().add(songs.get(0));
+    recent.getAdapter().notifyDataSetChanged();
+
+    listOf(recent).performItemClick(null, 0, 31);
+
+    ApolloUiTestSupport.waitUntil(
+        "the recent song plays " + calls, () -> calls.contains("playFDs[[31]0 false]"));
+  }
+
+  @Test
+  public void theSongTabsFavoriteIconShowsAFavorite() {
+    music.when(MusicUtils::isFavorite).thenReturn(true);
+    HomeActivity activity = launch();
+
+    Menu menu = menuFor(activity, TabFragmentOrder.SONGS_POSITION);
+
+    assertNotNull(menu.findItem(R.id.menu_player_favorite).getIcon());
+  }
 }

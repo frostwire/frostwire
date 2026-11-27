@@ -297,4 +297,18 @@ public class ProfileTabCarouselTest {
             .toString());
     assertNotNull(tab(R.id.profile_tab_carousel_tab_one));
   }
+
+  @Test
+  public void aSecondSlideCancelsTheFirstAndTheCarouselKeepsReportingItself() {
+    carousel.storeYCoordinate(0, -20f);
+    carousel.storeYCoordinate(1, -50f);
+
+    carousel.restoreYCoordinate(300, 0);
+    carousel.restoreYCoordinate(300, 1);
+    assertTrue(carousel.isTabCarouselIsAnimating());
+    ShadowLooper.idleMainLooper(600, TimeUnit.MILLISECONDS);
+
+    assertFalse(carousel.isTabCarouselIsAnimating());
+    assertEquals(-50f, carousel.getY(), 0.5f);
+  }
 }

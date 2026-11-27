@@ -133,4 +133,17 @@ public class PlayerSmallActivitiesTest {
 
     assertTrue(new StopListener(activity, false).onLongClick(new View(activity)));
   }
+
+  @Test
+  public void aLongPressOnAPlayerScreenStopsTheMusicAndGoesBack() {
+    MusicPlaybackService service = Mockito.mock(MusicPlaybackService.class);
+    music.when(MusicUtils::getMusicPlaybackService).thenReturn(service);
+    androidx.activity.ComponentActivity activity =
+        Robolectric.buildActivity(androidx.activity.ComponentActivity.class).setup().get();
+
+    assertTrue(new StopListener(activity, true).onLongClick(new View(activity)));
+
+    Mockito.verify(service).stop();
+    assertTrue("the back press closed the screen", activity.isFinishing());
+  }
 }

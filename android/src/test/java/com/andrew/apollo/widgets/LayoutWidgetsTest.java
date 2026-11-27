@@ -282,4 +282,21 @@ public class LayoutWidgetsTest {
 
     verify(header).onScrollStateChanged(list, 2);
   }
+
+  @Test
+  public void aSquareViewWhoseChildCannotBeMeasuredMeasuresNothing() {
+    SquareView square = new SquareView(activity, null);
+    square.addView(
+        new View(activity) {
+          @Override
+          protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+            throw new IllegalStateException("cannot measure");
+          }
+        });
+
+    square.measure(exactly(240), exactly(240));
+
+    assertEquals(0, square.getMeasuredWidth());
+    assertEquals(0, square.getMeasuredHeight());
+  }
 }
