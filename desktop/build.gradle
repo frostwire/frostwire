@@ -1233,6 +1233,7 @@ test {
         includeTestsMatching "org.limewire.util.*"
         includeTestsMatching "org.limewire.collection.*"
         includeTestsMatching "com.frostwire.jpeg.*"
+        includeTestsMatching "org.limewire.setting.*"
     }
 
     testLogging {
