@@ -205,6 +205,12 @@ public class UIBittorrentDownloadTest {
           return ui.isComplete();
         },
         "the whole album arrived");
+    // the finished listener ran on libtorrent's thread, with the app's real settings (seeding
+    // is off by default, which pauses the transfer): the user turns seeding back on
+    TestEngine.Events.next(local.events.finished, "album");
+    ui.resume();
+    dl.refreshStatusCache();
+    ui.updateCachedState();
 
     assertEquals(100, ui.getProgress());
     assertTrue(ui.isFinished() || ui.isSeeding());

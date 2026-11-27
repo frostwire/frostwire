@@ -134,6 +134,24 @@ public class TransferManagerEngineTest {
     system.close();
   }
 
+  /**
+   * Waits until the transfer is complete and its finished listener, which ran on libtorrent's
+   * thread with the app's real settings (seeding is off by default, which pauses the transfer), has
+   * had its say; then resumes it so every test starts from a seeding transfer.
+   */
+  private void awaitCompleteAndSeeding(UIBittorrentDownload ui) {
+    TestEngine.await(
+        () -> {
+          ui.updateCachedState();
+          return ui.isComplete();
+        },
+        "the whole album arrived");
+    TestEngine.Events.next(local.events.finished, "album");
+    ui.resume();
+    ui.getDl().refreshStatusCache();
+    ui.updateCachedState();
+  }
+
   private UIBittorrentDownload awaitTransfer() throws Exception {
     String hash = torrent.album.infoHashV1().toHex();
     TestEngine.await(() -> manager.getBittorrentDownload(hash) != null, "the transfer is listed");
@@ -149,12 +167,7 @@ public class TransferManagerEngineTest {
     assertEquals("album", ui.getDisplayName());
     assertTrue(manager.getTransfers().contains(ui));
     assertTrue(ui.getDl().getListener() instanceof UIBTDownloadListener);
-    TestEngine.await(
-        () -> {
-          ui.updateCachedState();
-          return ui.isComplete();
-        },
-        "the whole album arrived");
+    awaitCompleteAndSeeding(ui);
     assertEquals(TransferState.SEEDING, ui.getState());
     assertEquals(0, manager.getActiveDownloads());
     manager.clearComplete();
@@ -213,12 +226,7 @@ public class TransferManagerEngineTest {
       throws Exception {
     torrent.add(null, true);
     UIBittorrentDownload ui = awaitTransfer();
-    TestEngine.await(
-        () -> {
-          ui.updateCachedState();
-          return ui.isComplete();
-        },
-        "the whole album arrived");
+    awaitCompleteAndSeeding(ui);
 
     manager.suspendSeedingTorrents();
     assertTrue(ui.isPaused());
