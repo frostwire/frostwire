@@ -2123,6 +2123,11 @@ public final class MusicUtils {
     }
   }
 
+  /** setRingtone runs on a worker thread; a Toast may only be shown from the UI thread. */
+  private static void showRingtoneNotSet(Context context) {
+    SystemUtils.postToUIThread(() -> UIUtils.showLongMessage(context, R.string.ringtone_not_set));
+  }
+
   /**
    * @param context The {@link Context} to use
    * @param id The song ID.
@@ -2167,10 +2172,10 @@ public final class MusicUtils {
         final String message = context.getString(R.string.set_as_ringtone, cursor.getString(2));
         AppMsg.makeText(context, message, AppMsg.STYLE_CONFIRM).show();
       } else {
-        UIUtils.showLongMessage(context, R.string.ringtone_not_set);
+        showRingtoneNotSet(context);
       }
     } catch (Throwable ignored) {
-      UIUtils.showLongMessage(context, R.string.ringtone_not_set);
+      showRingtoneNotSet(context);
     }
   }
 

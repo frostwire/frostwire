@@ -521,4 +521,21 @@ public class MusicUtilsMediaStoreTest {
     assertNull(MusicUtils.getLastAlbumForArtist(context, "nobody"));
     assertFalse(MusicUtils.isPaused());
   }
+
+  /**
+   * setRingtone runs on a worker thread; its failure message used to be shown from there, which
+   * UIUtils refuses (it crashes off the UI thread). It is posted to the UI thread now.
+   */
+  @Test
+  public void aRingtoneThatCouldNotBeSetIsReportedOnTheUiThread() throws Exception {
+    FakeMediaStore.onQuery = (u, p, s, a, o) -> cursor(p);
+
+    MusicUtils.setRingtone(context, 5, (byte) 0);
+
+    ApolloServiceFixture.installPlatform(true);
+    org.robolectric.shadows.ShadowLooper.idleMainLooper();
+    assertEquals(
+        context.getString(com.frostwire.android.R.string.ringtone_not_set),
+        org.robolectric.shadows.ShadowToast.getTextOfLatestToast());
+  }
 }
