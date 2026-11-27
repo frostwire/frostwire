@@ -1228,7 +1228,8 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.WindowBoundTooltipsTest"
         includeTestsMatching "com.limegroup.gnutella.gui.URLLabelTest"
         includeTestsMatching "com.limegroup.gnutella.gui.LinkLabelTest"
-        includeTestsMatching "org.limewire.util.FileUtilsListFilesTest"
+        includeTestsMatching "org.limewire.util.*"
+        includeTestsMatching "org.limewire.collection.*"
     }
 
     testLogging {
