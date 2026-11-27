@@ -45,6 +45,10 @@ import org.robolectric.shadows.ShadowLooper;
 @Config(sdk = 34, application = Application.class)
 public class PlaybackButtonsTest {
 
+  @org.junit.Rule
+  public final com.andrew.apollo.ui.ApolloUiTestSupport.CleanAppMessages cleanAppMessages =
+      new com.andrew.apollo.ui.ApolloUiTestSupport.CleanAppMessages();
+
   private Activity activity;
   private org.mockito.MockedStatic<com.andrew.apollo.utils.MusicUtils> music;
 

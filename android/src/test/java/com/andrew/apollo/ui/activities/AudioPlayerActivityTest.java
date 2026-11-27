@@ -59,6 +59,10 @@ import org.robolectric.shadows.ShadowLooper;
 @Config(sdk = 34, application = Application.class)
 public class AudioPlayerActivityTest {
 
+  @org.junit.Rule
+  public final com.andrew.apollo.ui.ApolloUiTestSupport.CleanAppMessages cleanAppMessages =
+      new com.andrew.apollo.ui.ApolloUiTestSupport.CleanAppMessages();
+
   private MockedStatic<MusicUtils> music;
   private final List<String> calls = new CopyOnWriteArrayList<>();
   private MusicPlaybackService service;

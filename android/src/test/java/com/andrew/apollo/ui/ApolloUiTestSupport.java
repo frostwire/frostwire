@@ -150,6 +150,30 @@ public final class ApolloUiTestSupport {
     return music;
   }
 
+  /**
+   * The message queue behind {@code AppMsg} is a singleton that outlives a test: a message a screen
+   * showed last keeps the next test's messages waiting (and starts its own timers on a looper that
+   * has moved on). Starts the next test with a fresh one.
+   */
+  public static void resetAppMessages() {
+    try {
+      java.lang.reflect.Field instance =
+          Class.forName("com.devspark.appmsg.MsgManager").getDeclaredField("mInstance");
+      instance.setAccessible(true);
+      instance.set(null, null);
+    } catch (ReflectiveOperationException e) {
+      throw new AssertionError(e);
+    }
+  }
+
+  /** Rule that leaves no {@code AppMsg} behind once the test is over. */
+  public static final class CleanAppMessages extends org.junit.rules.ExternalResource {
+    @Override
+    protected void after() {
+      resetAppMessages();
+    }
+  }
+
   public static void installAll() {
     installPlatform();
     installConfiguration();

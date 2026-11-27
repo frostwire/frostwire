@@ -52,6 +52,10 @@ import org.robolectric.shadows.ShadowToast;
 @Config(sdk = 34, application = Application.class)
 public class HomeActivityTest {
 
+  @org.junit.Rule
+  public final com.andrew.apollo.ui.ApolloUiTestSupport.CleanAppMessages cleanAppMessages =
+      new com.andrew.apollo.ui.ApolloUiTestSupport.CleanAppMessages();
+
   private MockedStatic<MusicUtils> music;
 
   private final java.util.List<String> calls = new java.util.concurrent.CopyOnWriteArrayList<>();

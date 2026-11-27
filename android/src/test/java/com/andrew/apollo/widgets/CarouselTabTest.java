@@ -38,6 +38,10 @@ import org.robolectric.annotation.Config;
 @Config(sdk = 34, application = Application.class)
 public class CarouselTabTest {
 
+  @org.junit.Rule
+  public final com.andrew.apollo.ui.ApolloUiTestSupport.CleanAppMessages cleanAppMessages =
+      new com.andrew.apollo.ui.ApolloUiTestSupport.CleanAppMessages();
+
   private Activity activity;
   private CarouselTab tab;
 

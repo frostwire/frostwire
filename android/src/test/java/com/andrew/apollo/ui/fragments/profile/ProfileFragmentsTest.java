@@ -52,6 +52,10 @@ import org.robolectric.RobolectricTestRunner;
 @org.robolectric.annotation.Config(sdk = 34, application = Application.class)
 public class ProfileFragmentsTest {
 
+  @org.junit.Rule
+  public final com.andrew.apollo.ui.ApolloUiTestSupport.CleanAppMessages cleanAppMessages =
+      new com.andrew.apollo.ui.ApolloUiTestSupport.CleanAppMessages();
+
   /** The first item sits below the header row of the profile lists. */
   private static final int FIRST = 1;
 
@@ -465,5 +469,27 @@ public class ProfileFragmentsTest {
           return empty != null
               && activity.getString(R.string.empty_last_added).contentEquals(empty.getText());
         });
+  }
+
+  @Test
+  public void anAlbumOnAnArtistsProfileOffersTheAlbumActions() {
+    FakeMediaProvider.clear();
+    FakeMediaProvider.addRow(
+        "_id", 5L, "album", "Help!", "artist", "The Beatles", "numsongs", 14, "minyear", "1965");
+    FakeMediaProvider.addSong(11, "Help", "Help!", "The Beatles");
+    ProfileActivity activity = launch(MediaStore.Audio.Artists.CONTENT_TYPE, "The Beatles");
+    androidx.viewpager.widget.ViewPager pager =
+        activity.findViewById(R.id.activity_profile_base_pager);
+    pager.setCurrentItem(1);
+    ApolloUiTestSupport.settle();
+    ArtistAlbumFragment albums = fragment(activity, ArtistAlbumFragment.class);
+    rows(albums, 2);
+    Menu menu = contextMenuFor(albums, FIRST);
+
+    assertTrue(select(albums, menu, FragmentMenuItems.PLAY_SELECTION));
+
+    ApolloUiTestSupport.waitUntil(
+        "the album's songs play " + calls,
+        () -> calls.stream().anyMatch(c -> c.startsWith("playFDs[[")));
   }
 }

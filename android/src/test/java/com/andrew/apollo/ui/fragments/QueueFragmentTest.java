@@ -45,6 +45,10 @@ import org.robolectric.annotation.Config.*;
 @org.robolectric.annotation.Config(sdk = 34, application = Application.class)
 public class QueueFragmentTest {
 
+  @org.junit.Rule
+  public final com.andrew.apollo.ui.ApolloUiTestSupport.CleanAppMessages cleanAppMessages =
+      new com.andrew.apollo.ui.ApolloUiTestSupport.CleanAppMessages();
+
   private MockedStatic<MusicUtils> music;
   private final List<String> calls = new CopyOnWriteArrayList<>();
 
