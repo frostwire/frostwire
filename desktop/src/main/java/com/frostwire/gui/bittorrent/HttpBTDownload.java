@@ -74,7 +74,6 @@ abstract class HttpBTDownload implements BTDownload {
 
   static boolean copyPlayingTemp(File temp, File dest) {
     boolean r;
-    System.out.println(temp);
     try {
       FileUtils.copyFile(temp, dest);
       r = true;

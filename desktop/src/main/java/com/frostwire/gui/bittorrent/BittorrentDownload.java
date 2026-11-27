@@ -518,7 +518,6 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
         final com.frostwire.gui.bittorrent.BTDownload dl, final boolean showShareTorrentDialog) {
       boolean canShareNow = canShareNow(dl);
       if (!canShareNow) {
-        System.out.println("Not doing anything.");
         return;
       }
       if (dl instanceof BittorrentDownload

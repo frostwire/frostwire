@@ -497,7 +497,6 @@ class CopyrightLicenseSelectorPanel extends JPanel {
 
   private void onLicenseTypeChanged() {
     if (confirmRightfulUseOfLicense.isSelected()) {
-      System.out.println("onLicenseTypeChanged()");
       CardLayout deck = (CardLayout) licenseTypesCardLayoutContainer.getLayout();
       String currentPanelName = null;
       if (licenseTypeCC.isSelected()) {

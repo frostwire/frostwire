@@ -67,8 +67,6 @@ public final class VisualConnectionCallback implements ActivityCallback {
     SwingUtilities.invokeLater(
         () -> {
           GUIMediator.instance().setRemoteDownloadsAllowed(partialDownload);
-          System.out.println("VisualConnectionCallback about to call openTorrentURI of request.");
-          System.out.println(request);
           GUIMediator.instance().openTorrentURI(request, partialDownload);
         });
   }

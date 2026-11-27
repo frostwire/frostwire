@@ -135,7 +135,6 @@ public final class LibraryFoldersPaneItem extends AbstractPaneItem {
         if (f.equals(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue())) {
           LibrarySettings.DIRECTORIES_TO_INCLUDE.add(f);
         } else {
-          System.out.println("Not including " + f.getAbsolutePath());
           LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.add(f);
         }
       }
