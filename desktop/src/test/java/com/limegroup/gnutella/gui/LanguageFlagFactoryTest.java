@@ -20,6 +20,7 @@ package com.limegroup.gnutella.gui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
@@ -66,6 +67,37 @@ class LanguageFlagFactoryTest {
     assertNotNull(bigGlobe);
     assertNotNull(smallGlobe);
     assertSame(bigGlobe, LanguageFlagFactory.getFlag("QQ", "zz", false));
+  }
+
+  @Test
+  void belarusianGalicianAndSinhalaGetTheirOwnCountriesFlags() {
+    assertSame(
+        LanguageFlagFactory.getFlag("BY", "xx", false),
+        LanguageFlagFactory.getFlag(null, "be", false));
+    assertSame(
+        LanguageFlagFactory.getFlag("ES", "xx", false),
+        LanguageFlagFactory.getFlag(null, "gl", false));
+    assertSame(
+        LanguageFlagFactory.getFlag("LK", "xx", false),
+        LanguageFlagFactory.getFlag(null, "si", false));
+    assertNotSame(
+        LanguageFlagFactory.getFlag("BO", "xx", false),
+        LanguageFlagFactory.getFlag(null, "be", false));
+  }
+
+  @Test
+  void everyLanguageInTheTableHasAnExistingFlagFile() throws Exception {
+    java.lang.reflect.Field f = LanguageFlagFactory.class.getDeclaredField("lc2cc");
+    f.setAccessible(true);
+    @SuppressWarnings("unchecked")
+    java.util.Map<String, String> table = (java.util.Map<String, String>) f.get(null);
+    ImageIcon globe = LanguageFlagFactory.getFlag(null, "zz", false);
+    for (java.util.Map.Entry<String, String> e : table.entrySet()) {
+      assertNotSame(
+          globe,
+          LanguageFlagFactory.getFlag(null, e.getKey(), false),
+          e.getKey() + " -> " + e.getValue());
+    }
   }
 
   @Test

@@ -36,7 +36,7 @@ public class LanguageFlagFactory {
     lc2cc.put("af", "ZA"); // Aafrican, South Africa
     lc2cc.put("am", "ET"); // Amharic, Ethiopia
     lc2cc.put("ar", "EG"); // arabic, Egypt
-    lc2cc.put("be", "BO"); // belarusian, Belarus
+    lc2cc.put("be", "BY"); // belarusian, Belarus
     lc2cc.put("bg", "BG"); // Bulgarian, Bulgaria
     lc2cc.put("bn", "BD"); // Bengali, Bangladesh
     lc2cc.put("bo", "CN"); // Tibetan, China
@@ -60,7 +60,7 @@ public class LanguageFlagFactory {
     lc2cc.put("ga", "IE"); // Irish, Ireland
     lc2cc.put("gez", "ET"); // Geez, Ethiopia
     lc2cc.put("gu", "IN"); // Gujarati, India
-    lc2cc.put("gl", "GL"); // Gallego, Spain
+    lc2cc.put("gl", "ES"); // Gallego, Spain
     lc2cc.put("hi", "IN"); // Hindi, India
     lc2cc.put("hr", "HR"); // Hrvatski, Croatia
     lc2cc.put("hu", "HU"); // Magyar, Hungary
@@ -100,7 +100,7 @@ public class LanguageFlagFactory {
     lc2cc.put("ro", "RO"); // Romanian, Romania
     lc2cc.put("ru", "RU"); // Russian, Russia
     // lc2cc.put("sh","YU"); //Serbian, Serbia
-    lc2cc.put("si", "IN"); // Singhalese, India
+    lc2cc.put("si", "LK"); // Sinhala, Sri Lanka
     lc2cc.put("sk", "SK"); // Slovak, Slovakia
     lc2cc.put("sl", "SI"); // Slovenian, Slovenia
     lc2cc.put("sq", "AL"); // Shqipe Albanian, Albania
