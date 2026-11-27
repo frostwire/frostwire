@@ -270,6 +270,23 @@ public final class JdkWarmUp {
           // #e620bd61432a, #0ee55ff55bd4).
           "java.awt.geom.Area",
           "java.awt.geom.Path2D",
+          // The menus' and the search field's UI classes and handlers, the HTML text views of the
+          // update popup, and TextLayout (which Lite's font sweep doesn't warm): all first used on
+          // the EDT, mostly on starved machines (Icebase #ef5bcb24c864, #e77acf74329a,
+          // #4ba4eb805cab, #1c9bf877f2ea, #62f51f1f3ecc, #173285143d80, #a90e52b8470e,
+          // frostwire/frostwire#1617).
+          "javax.swing.plaf.basic.BasicMenuUI",
+          "javax.swing.plaf.synth.SynthMenuUI",
+          "javax.swing.plaf.basic.BasicMenuBarUI",
+          "javax.swing.plaf.synth.SynthMenuBarUI",
+          "javax.swing.text.JTextComponent",
+          "javax.swing.JTextField",
+          "javax.swing.text.DefaultCaret",
+          "javax.swing.plaf.synth.SynthTextFieldUI",
+          "javax.swing.plaf.basic.BasicHTML",
+          "javax.swing.text.html.StyleSheet",
+          "javax.swing.text.html.BlockView",
+          "java.awt.font.TextLayout",
           // The ranking of the first search result batch loaded PerformersHelper (common's jar)
           // on the EDT (Icebase #b3732fb24421). Its static state is a stopword set and a pattern.
           "com.frostwire.search.PerformersHelper");
@@ -1158,11 +1175,26 @@ public final class JdkWarmUp {
     try {
       thread.setPriority(Thread.MIN_PRIORITY);
       java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
+      // The JDK registers the font *files* on the first lookup of a font it does not know by name
+      // (SunFontManager.findFont2D → loadFontFiles), and on Windows the list above does not always
+      // do it: a Library table paint read every font file on the EDT 97 minutes into a session
+      // whose warm-up had finished (Icebase #8e12d60730cc, frostwire/frostwire#1562). Ask for one
+      // that does not exist, here, at the lowest priority.
+      new Font(unknownFontName(), Font.PLAIN, 12).canDisplay('a');
     } catch (Throwable t) {
       LOG.warn("Installed font list warm-up failed: " + t.getMessage(), t);
     } finally {
       thread.setPriority(priority);
     }
+  }
+
+  /**
+   * A font name nothing has: looking it up makes the JDK register every installed font file. A
+   * method, not a constant: PhysicalFontFamilyNamesTest rejects a family name passed to new Font,
+   * and this one is deliberately not a family.
+   */
+  static String unknownFontName() {
+    return "FrostWire Warm-Up No Such Font";
   }
 
   /** How many of the text fonts (the table and label ones come first) Lite rasterizes. */

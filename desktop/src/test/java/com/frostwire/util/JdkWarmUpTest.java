@@ -660,6 +660,33 @@ class JdkWarmUpTest {
   }
 
   /**
+   * The menus' and the search field's UI classes, the HTML text views of the update popup and
+   * TextLayout were first initialized on the EDT (frostwire/frostwire#1617).
+   */
+  @Test
+  void theMenuTextFieldHtmlAndTextLayoutClassesAreInitializedOffTheEdt() {
+    for (String className :
+        List.of(
+            "javax.swing.plaf.basic.BasicMenuUI",
+            "javax.swing.plaf.synth.SynthMenuUI",
+            "javax.swing.plaf.basic.BasicMenuBarUI",
+            "javax.swing.plaf.synth.SynthMenuBarUI",
+            "javax.swing.text.JTextComponent",
+            "javax.swing.JTextField",
+            "javax.swing.text.DefaultCaret",
+            "javax.swing.plaf.synth.SynthTextFieldUI",
+            "javax.swing.plaf.basic.BasicHTML",
+            "javax.swing.text.html.StyleSheet",
+            "javax.swing.text.html.BlockView",
+            "java.awt.font.TextLayout")) {
+      assertTrue(
+          JdkWarmUp.MAIN_WINDOW_CLASSES_TO_INITIALIZE.contains(className),
+          className + " is not initialized by the startup thread");
+      assertDoesNotThrow(() -> Class.forName(className), className);
+    }
+  }
+
+  /**
    * The search field's suggestions list was the first JList: BasicListUI's static initializer ran
    * on the EDT as the first suggestions popped up (Icebase #c0e323953897,
    * frostwire/frostwire#1501).
@@ -882,6 +909,49 @@ class JdkWarmUpTest {
     int priority = Thread.currentThread().getPriority();
     assertDoesNotThrow(JdkWarmUp::readInstalledFontList);
     assertEquals(priority, Thread.currentThread().getPriority(), "the priority was not restored");
+  }
+
+  /**
+   * After the installed font list is read, the JDK has registered every font file: a later
+   * Font.canDisplay does not read them on the EDT (Icebase #8e12d60730cc).
+   */
+  @Test
+  void readingTheInstalledFontListRegistersEveryFontFile() throws Exception {
+    Process probe =
+        new ProcessBuilder(
+                Path.of(System.getProperty("java.home"), "bin", "java").toString(),
+                "-Djava.awt.headless=true",
+                "--add-opens",
+                "java.desktop/sun.font=ALL-UNNAMED",
+                "-cp",
+                System.getProperty("java.class.path"),
+                FontFilesProbe.class.getName())
+            .redirectErrorStream(true)
+            .start();
+    String log = new String(probe.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+    assertTrue(probe.waitFor(120, TimeUnit.SECONDS), "probe timed out");
+    assertEquals(0, probe.exitValue(), log);
+    assertTrue(log.contains("registered=true"), log);
+  }
+
+  /** Runs in a fresh JVM: reads the font list the way the Lite warm-up does. */
+  static final class FontFilesProbe {
+    public static void main(String[] args) throws Exception {
+      Object manager =
+          Class.forName("sun.font.FontManagerFactory").getMethod("getInstance").invoke(null);
+      Field registered = null;
+      for (Class<?> c = manager.getClass();
+          c != null && registered == null;
+          c = c.getSuperclass()) {
+        try {
+          registered = c.getDeclaredField("loadedAllFontFiles");
+        } catch (NoSuchFieldException ignored) {
+        }
+      }
+      registered.setAccessible(true);
+      JdkWarmUp.readInstalledFontList();
+      System.out.println("registered=" + registered.getBoolean(manager));
+    }
   }
 
   /** Icebase #163e75738185, #fff67e91c0fb, #ac1856c09d92: the AA shape pipeline's first use. */
