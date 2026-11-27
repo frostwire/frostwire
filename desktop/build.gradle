@@ -1230,6 +1230,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.LinkLabelTest"
         includeTestsMatching "org.limewire.util.*"
         includeTestsMatching "org.limewire.collection.*"
+        includeTestsMatching "com.frostwire.jpeg.*"
     }
 
     testLogging {
