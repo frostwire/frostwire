@@ -40,7 +40,7 @@ public final class TrackFragmentBaseMediaDecodeTimeBox extends FullBox {
       base_media_decode_time = buf.getLong();
     } else { // version == 0
       IO.read(ch, 4, buf);
-      base_media_decode_time = buf.getInt();
+      base_media_decode_time = buf.getInt() & 0xFFFFFFFFL;
     }
   }
 

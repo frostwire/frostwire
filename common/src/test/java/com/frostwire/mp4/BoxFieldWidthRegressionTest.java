@@ -94,4 +94,13 @@ final class BoxFieldWidthRegressionTest {
     assertEquals(65535, stz2.entries[1].entry_size);
     assertRoundTrips(file);
   }
+
+  @Test
+  void tfdtVersionZeroTimeIsUnsigned() throws IOException {
+    byte[] file = fullBox("tfdt", 0, new byte[] {(byte) 0xf0, 0, 0, 1});
+    TrackFragmentBaseMediaDecodeTimeBox tfdt =
+        assertInstanceOf(TrackFragmentBaseMediaDecodeTimeBox.class, parse(file).getFirst());
+    assertEquals(0xf0000001L, tfdt.base_media_decode_time);
+    assertRoundTrips(file);
+  }
 }
