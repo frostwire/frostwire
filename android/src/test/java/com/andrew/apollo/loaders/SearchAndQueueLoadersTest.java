@@ -156,6 +156,9 @@ public class SearchAndQueueLoadersTest {
     assertFalse("past the end", queue.moveToPosition(2));
     queue.deactivate();
     queue.close();
+    assertEquals("a closed cursor reads as blank, not as a crash", "", queue.getString(1));
+    assertEquals(0, queue.getInt(4));
+    assertEquals(0, queue.getLong(0));
   }
 
   @Test
