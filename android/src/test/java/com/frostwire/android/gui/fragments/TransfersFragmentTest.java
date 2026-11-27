@@ -40,6 +40,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.NetworkManager;
+import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.activities.SettingsActivity;
 import com.frostwire.android.gui.activities.VPNStatusDetailActivity;
 import com.frostwire.android.gui.fragments.preference.TorrentPreferenceFragment;
@@ -77,8 +78,12 @@ public class TransfersFragmentTest {
   private final List<Transfer> transfers = new ArrayList<>();
 
   @Before
-  public void setUp() {
+  public void setUp() throws Exception {
     TestTransfersFragment.engineStarted = false;
+    // static state other test classes in the same JVM leave behind
+    setStatic(TransfersFragment.class, "firstTimeShown", true);
+    setStatic(SearchFragment.class, "lastInstance", null);
+    setStatic(MainActivity.class, "lastInstance", null);
     transferManager = mock(TransferManager.class);
     networkManager = mock(NetworkManager.class);
     configuration = mock(ConfigurationManager.class);
@@ -101,6 +106,12 @@ public class TransfersFragmentTest {
     networkManagers.close();
     configurations.close();
     engines.close();
+  }
+
+  private static void setStatic(Class<?> type, String field, Object value) throws Exception {
+    java.lang.reflect.Field f = type.getDeclaredField(field);
+    f.setAccessible(true);
+    f.set(null, value);
   }
 
   private static Transfer transfer(String name, TransferState state, long created) {
