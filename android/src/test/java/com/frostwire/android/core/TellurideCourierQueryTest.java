@@ -283,4 +283,23 @@ public class TellurideCourierQueryTest {
                   .count());
         });
   }
+
+  /** yt-dlp's playlist query returning None (null from Chaquopy) threw a NullPointerException. */
+  @Test
+  public void aNullPlaylistResultEndsTheSearchEmpty() throws Exception {
+    FakePython fake = new FakePython();
+    withPython(
+        fake,
+        (engine, f) -> {
+          when(f.module.callAttr("query_playlist", URL)).thenReturn(null);
+          RecordingListener listener = new RecordingListener();
+          TellurideCourierSearchPerformer p = new TellurideCourierSearchPerformer(8, URL, true);
+          p.setListener(listener);
+
+          p.perform();
+
+          assertTrue(listener.results.isEmpty());
+          assertEquals(List.of(8L), listener.stopped);
+        });
+  }
 }

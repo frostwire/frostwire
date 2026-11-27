@@ -201,6 +201,14 @@ public final class TellurideCourier {
       }
       return;
     }
+    // Chaquopy hands back null when the Python function returned None
+    if (query_playlist_result == null) {
+      LOG.error("TellurideCourier::queryPlaylist query_playlist returned nothing");
+      if (callback != null) {
+        callback.onResults((List<TellurideSearchResult>) null, true);
+      }
+      return;
+    }
     String result = query_playlist_result.toString();
     if (callback != null && !callback.aborted()) {
       callback.onResults(result, true);
