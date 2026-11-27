@@ -63,14 +63,16 @@ jobs:
         working-directory: android
         run: ./gradlew createPlus1DebugUnitTestCoverageReport --no-daemon --continue
 
-      # Coverage may only go up; raise the minimum as tests are added (goal: 100%). Baseline
-      # 2026-11-01: 9.1% of lines (the report also counts common/, which the desktop suite tests).
+      # Coverage may only go up; raise the minimum as tests are added. The gate counts the Android
+      # app and Apollo only (the report also carries common/, which the desktop suite tests):
+      # 19.3% of 28,902 lines on 2026-11-26 (14.5% of the whole report), goal: 90%.
       - name: Coverage summary
         if: always() && hashFiles('android/build/reports/coverage/test/plus1/debug/report.xml') != ''
         run: |
-          python3 -I .github/scripts/coverage_summary.py "Android coverage" \
+          python3 -I .github/scripts/coverage_summary.py "Android coverage (app + Apollo)" \
             android/build/reports/coverage/test/plus1/debug/report.xml \
-            --fail-under-line 9 >> "$GITHUB_STEP_SUMMARY"
+            --only com/frostwire/android com/andrew/apollo com/devspark \
+            --fail-under-line 19 >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload coverage report
         if: always() && hashFiles('android/build/reports/coverage/test/plus1/debug/report.xml') != ''
