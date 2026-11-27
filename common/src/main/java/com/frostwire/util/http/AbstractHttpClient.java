@@ -251,11 +251,12 @@ public abstract class AbstractHttpClient implements HttpClient {
     StringBuilder sb = new StringBuilder();
     if (formData != null && formData.size() > 0) {
       for (Map.Entry<String, String> kv : formData.entrySet()) {
+        // the Charset overloads of URLEncoder need Android API 33 (minSdk is 26): use the name
         sb.append("&");
-        sb.append(URLEncoder.encode(kv.getKey(), StandardCharsets.UTF_8));
+        sb.append(URLEncoder.encode(kv.getKey(), StandardCharsets.UTF_8.name()));
         sb.append("=");
         String value = kv.getValue();
-        sb.append(value == null ? "" : URLEncoder.encode(value, StandardCharsets.UTF_8));
+        sb.append(value == null ? "" : URLEncoder.encode(value, StandardCharsets.UTF_8.name()));
       }
       sb.deleteCharAt(0);
     }
