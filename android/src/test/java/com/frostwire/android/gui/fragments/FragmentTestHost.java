@@ -16,6 +16,8 @@ import androidx.fragment.app.Fragment;
 import com.frostwire.android.R;
 import com.frostwire.platform.Platform;
 import com.frostwire.platform.Platforms;
+import com.frostwire.platform.SystemPaths;
+import java.io.File;
 import java.lang.reflect.Proxy;
 import java.util.function.BooleanSupplier;
 import org.robolectric.Robolectric;
@@ -43,7 +45,13 @@ public final class FragmentTestHost extends AppCompatActivity {
 
   /** Starts a host and resumes {@code fragment} in it. */
   public static <F extends Fragment> ActivityController<FragmentTestHost> launch(F fragment) {
-    installPlatform();
+    return launch(fragment, null);
+  }
+
+  /** Like {@link #launch(Fragment)}, with {@code libtorrentDir} as the app's libtorrent dir. */
+  public static <F extends Fragment> ActivityController<FragmentTestHost> launch(
+      F fragment, File libtorrentDir) {
+    installPlatform(libtorrentDir);
     ActivityController<FragmentTestHost> controller =
         Robolectric.buildActivity(FragmentTestHost.class).setup();
     controller
@@ -57,24 +65,47 @@ public final class FragmentTestHost extends AppCompatActivity {
 
   /** The Platform the app sets at startup: only the UI thread question has an answer. */
   public static void installPlatform() {
-    Platforms.set(
-        (Platform)
+    installPlatform(null);
+  }
+
+  /** The Platform with system paths whose libtorrent dir is {@code libtorrentDir}. */
+  public static void installPlatform(File libtorrentDir) {
+    Platforms.set(newPlatform(libtorrentDir));
+  }
+
+  /**
+   * A Platform that answers the UI thread question and has system paths whose libtorrent dir is
+   * {@code libtorrentDir}. Platforms keeps the first one set for the whole JVM, so a test that
+   * needs its own mocks Platforms.get().
+   */
+  public static Platform newPlatform(File libtorrentDir) {
+    SystemPaths paths =
+        (SystemPaths)
             Proxy.newProxyInstance(
-                Platform.class.getClassLoader(),
-                new Class<?>[] {Platform.class},
-                (proxy, method, args) -> {
-                  if ("isUIThread".equals(method.getName())) {
-                    return Looper.myLooper() == Looper.getMainLooper();
-                  }
-                  Class<?> type = method.getReturnType();
-                  if (type == boolean.class) {
-                    return false;
-                  }
-                  if (type == int.class || type == long.class) {
-                    return 0;
-                  }
-                  return null;
-                }));
+                SystemPaths.class.getClassLoader(),
+                new Class<?>[] {SystemPaths.class},
+                (proxy, method, args) ->
+                    "libtorrent".equals(method.getName()) ? libtorrentDir : null);
+    return (Platform)
+        Proxy.newProxyInstance(
+            Platform.class.getClassLoader(),
+            new Class<?>[] {Platform.class},
+            (proxy, method, args) -> {
+              if ("isUIThread".equals(method.getName())) {
+                return Looper.myLooper() == Looper.getMainLooper();
+              }
+              if ("systemPaths".equals(method.getName())) {
+                return paths;
+              }
+              Class<?> type = method.getReturnType();
+              if (type == boolean.class) {
+                return false;
+              }
+              if (type == int.class || type == long.class) {
+                return 0;
+              }
+              return null;
+            });
   }
 
   /** Runs the main looper until {@code done}, other threads post their results to it. */

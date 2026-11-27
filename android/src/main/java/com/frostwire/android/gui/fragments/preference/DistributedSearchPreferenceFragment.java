@@ -154,7 +154,7 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
   /** Point host cache at app-private libtorrent dir before reading. */
   private void ensureHostCachePath() {
     try {
-      File home = BTEngine.ctx != null ? BTEngine.ctx.homeDir : null;
+      File home = btEngineHomeDir();
       if (home == null) {
         home = Platforms.get().systemPaths().libtorrent();
       }
@@ -319,8 +319,21 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
     return IdentityLifecycle.resolve(AndroidSearchEngines.distributed().identity(), identityFile());
   }
 
+  /**
+   * The BitTorrent engine's home directory, or null when it has none yet. Reading BTEngine loads
+   * libtorrent's native library, which can fail (and always does in a unit test): then there is
+   * none either.
+   */
+  private static File btEngineHomeDir() {
+    try {
+      return BTEngine.ctx != null ? BTEngine.ctx.homeDir : null;
+    } catch (Throwable t) {
+      return null;
+    }
+  }
+
   private static File identityFile() {
-    File homeDir = BTEngine.ctx != null ? BTEngine.ctx.homeDir : null;
+    File homeDir = btEngineHomeDir();
     if (homeDir == null) {
       try {
         homeDir = Platforms.get().systemPaths().libtorrent();
