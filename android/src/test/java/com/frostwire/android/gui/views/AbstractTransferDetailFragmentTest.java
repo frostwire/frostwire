@@ -419,9 +419,9 @@ public class AbstractTransferDetailFragmentTest {
     List<String> items = new ArrayList<>(Arrays.asList("a", "b", "c"));
     AbstractTransferDetailFragment.updateAdapterItems(adapter, items, Arrays.asList("A"));
     assertEquals(List.of("A"), items);
-    assertEquals("changed0", adapter.events.get(0));
-    // one removal notification for each item dropped
-    assertEquals(3, adapter.events.size());
+    // one removal notification for each item dropped, at the position the item had; it used to
+    // announce the position before it, which is an item that stays
+    assertEquals(List.of("changed0", "removed2x1", "removed1x1"), adapter.events);
   }
 
   @Test

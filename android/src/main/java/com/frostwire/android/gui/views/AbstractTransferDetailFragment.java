@@ -398,8 +398,10 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
         } else if (freshItems.size() < items.size()) {
           // New list is smaller, shorten our list to match new list size
           while ((items.size() - freshItems.size()) > 0) {
-            items.remove(items.size() - 1);
-            adapter.notifyItemRangeRemoved(items.size() - 1, 1);
+            // notify the position the item had, not the one before it (that is a kept item)
+            final int removedPosition = items.size() - 1;
+            items.remove(removedPosition);
+            adapter.notifyItemRemoved(removedPosition);
           }
         }
       }
