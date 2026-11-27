@@ -52,7 +52,7 @@ class LibraryScanBeforeExplorerTest {
     assertEquals(2, holders.size());
     assertSame(audio, holders.get(0));
     assertSame(video, holders.get(1));
-    assertFalse(holders.contains(null));
+    assertTrue(holders.stream().noneMatch(java.util.Objects::isNull));
   }
 
   @Test
