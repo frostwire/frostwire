@@ -26,11 +26,13 @@ import com.frostwire.android.gui.tasks.AsyncStartDownload;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
-import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Ref;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class ConfirmSoundcloudDownloadDialog
     extends AbstractConfirmListDialog<SoundcloudSearchResult> {
@@ -38,14 +40,14 @@ public class ConfirmSoundcloudDownloadDialog
   public static ConfirmSoundcloudDownloadDialog newInstance(
       Context ctx, String dialogTitle, String dialogText, List<SoundcloudSearchResult> listData) {
     ConfirmSoundcloudDownloadDialog dlg = new ConfirmSoundcloudDownloadDialog();
-    SoundcloudSearchResultList srList = new SoundcloudSearchResultList();
-    srList.listData = listData;
 
+    // The results (a live HttpClient, a BooleanSupplier) can't go through Gson: the dialog's
+    // arguments carry a key to the list kept here, which survives a configuration change.
     dlg.prepareArguments(
         R.drawable.download_icon,
         dialogTitle,
         dialogText,
-        JsonUtils.toJson(srList),
+        rememberResults(listData),
         SelectionMode.MULTIPLE_SELECTION);
 
     dlg.setOnYesListener(new OnStartDownloadsClickListener(ctx, dlg));
@@ -61,11 +63,34 @@ public class ConfirmSoundcloudDownloadDialog
     }
   }
 
+  /** Keeps the lists of the last few dialogs; a dialog the user never answered can't pile up. */
+  private static final Map<String, List<SoundcloudSearchResult>> RESULTS =
+      new LinkedHashMap<String, List<SoundcloudSearchResult>>() {
+        @Override
+        protected boolean removeEldestEntry(
+            Map.Entry<String, List<SoundcloudSearchResult>> eldest) {
+          return size() > 8;
+        }
+      };
+
+  private static String rememberResults(List<SoundcloudSearchResult> listData) {
+    final String key = UUID.randomUUID().toString();
+    synchronized (RESULTS) {
+      RESULTS.put(key, listData);
+    }
+    return key;
+  }
+
+  /**
+   * @param listDataKey the key {@link #newInstance} stored the results under. A dialog the system
+   *     restored after the process died finds nothing, and shows an empty list.
+   */
   @Override
-  public List<SoundcloudSearchResult> deserializeData(String listDataInJSON) {
-    SoundcloudSearchResultList srList =
-        JsonUtils.toObject(listDataInJSON, SoundcloudSearchResultList.class);
-    return srList.listData;
+  public List<SoundcloudSearchResult> deserializeData(String listDataKey) {
+    synchronized (RESULTS) {
+      final List<SoundcloudSearchResult> results = RESULTS.get(listDataKey);
+      return results != null ? results : new ArrayList<>();
+    }
   }
 
   @Override
@@ -80,10 +105,6 @@ public class ConfirmSoundcloudDownloadDialog
   @Override
   protected OnStartDownloadsClickListener createOnYesListener() {
     return new OnStartDownloadsClickListener(getActivity(), this);
-  }
-
-  private static class SoundcloudSearchResultList {
-    List<SoundcloudSearchResult> listData;
   }
 
   // TODO: this class needs heavy refactor/cleanup

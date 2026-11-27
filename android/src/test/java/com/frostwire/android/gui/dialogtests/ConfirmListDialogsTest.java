@@ -203,8 +203,37 @@ public class ConfirmListDialogsTest {
 
   // ---- Soundcloud
   //
-  // Showing the dialog is not tested: JsonUtils.toObject() can not rebuild a SoundcloudSearchResult
-  // (its BooleanSupplier field is an interface), so onCreateDialog throws a JsonIOException.
+  // The results used to travel through Gson, which can not rebuild a SoundcloudSearchResult (its
+  // BooleanSupplier field is an interface), so showing the dialog threw a JsonIOException.
+
+  @Test
+  public void soundcloudDialogShowsTheResultsItWasGiven() {
+    ConfirmSoundcloudDownloadDialog dialog =
+        ConfirmSoundcloudDownloadDialog.newInstance(
+            host.activity,
+            "Confirm",
+            "Sure?",
+            Arrays.asList(soundcloud(1, "One"), soundcloud(2, "Two")));
+
+    host.show(dialog, "t");
+
+    assertEquals(2, dialog.getAdapter().getCount());
+    assertEquals("One", dialog.getAdapter().getItem(0).getDisplayName());
+  }
+
+  /** show(FragmentManager) added the fragment twice; the second add failed and was swallowed. */
+  @Test
+  public void showAddsTheDialogFragmentOnlyOnce() {
+    TellurideSearchResultDownloadDialog dialog =
+        TellurideSearchResultDownloadDialog.newInstance(
+            host.activity, Arrays.asList(telluride("a", "Video A", 1000)));
+
+    dialog.show(host.activity.getSupportFragmentManager());
+    ShadowLooper.idleMainLooper();
+
+    assertEquals(1, host.activity.getSupportFragmentManager().getFragments().size());
+    assertNotNull(dialog.getDialog());
+  }
 
   @Test
   public void soundcloudDialogKeepsItsTitleInItsArguments() {
