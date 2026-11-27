@@ -266,7 +266,7 @@ public final class NotificationUpdateDaemon {
         }
       };
 
-  private long updateNotification() {
+  long updateNotification() {
     if (!ensureNotificationEnabled()) {
       return IDLE_UPDATE_INTERVAL_MS;
     }
