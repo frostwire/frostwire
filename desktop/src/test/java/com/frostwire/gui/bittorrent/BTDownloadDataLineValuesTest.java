@@ -207,6 +207,7 @@ class BTDownloadDataLineValuesTest {
     BTDownloadDataLine line = new BTDownloadDataLine();
     assertEquals("", line.getDisplayName());
     assertFalse(line.isSeeding());
+    assertFalse(line.isDownloading(), "no download, nothing to dereference");
     assertFalse(line.isFinished());
   }
 

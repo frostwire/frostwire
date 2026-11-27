@@ -304,6 +304,9 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
   }
 
   public boolean isDownloading() {
+    if (initializer == null) {
+      return false;
+    }
     final TransferState state = initializer.getState();
     // almost like TorrentUtils.isActive() but doesn't consider uploading or seeding.
     final boolean downloading =
@@ -312,7 +315,7 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
             || state == TransferState.DOWNLOADING_METADATA
             || state == TransferState.DOWNLOADING_TORRENT;
     final boolean pausedButUnfinished = !initializer.isCompleted() && state == TransferState.PAUSED;
-    return initializer != null && (downloading || pausedButUnfinished);
+    return downloading || pausedButUnfinished;
   }
 
   public boolean isFinished() {
