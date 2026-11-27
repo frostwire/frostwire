@@ -110,6 +110,7 @@ class DndHandlersTest {
     assertEquals(3, uris.length);
     assertEquals("http://a.test/x.torrent", uris[0].toString());
     assertEquals("file:///tmp/a.mp3", uris[1].toString());
+    assertEquals("/tmp/my song.mp3", uris[2].getPath(), "a space is not a plus");
   }
 
   @Test

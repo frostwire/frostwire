@@ -1,15 +1,13 @@
 package com.limegroup.gnutella.util;
 
-import com.frostwire.service.ErrorService;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.util.StringTokenizer;
+import java.nio.charset.StandardCharsets;
 
 /** Utilities for URIs */
 public class URIUtils {
   private static final String RESERVED = ";/?:@&=+$,";
+  private static final char[] HEX = "0123456789ABCDEF".toCharArray();
 
   /**
    * Creates a <code>URI</code> from the input string. The preferred way to invoke this method is
@@ -52,30 +50,43 @@ public class URIUtils {
     return uri;
   }
 
+  /**
+   * Percent-encodes (UTF-8) everything that is not allowed in a URI, leaving the reserved
+   * delimiters, the unreserved characters and already valid %XX escapes as they are. A space
+   * becomes %20 (not '+', which in a path means a plus).
+   */
   private static String encodeURI(String url) {
     StringBuilder encodedURL = new StringBuilder();
-    StringTokenizer st = new StringTokenizer(url, RESERVED, true);
-    while (st.hasMoreElements()) {
-      String s = st.nextToken();
-      if (isDelimiter(s)) {
-        encodedURL.append(s);
+    int i = 0;
+    while (i < url.length()) {
+      int cp = url.codePointAt(i);
+      int len = Character.charCount(cp);
+      if (cp < 128 && (RESERVED.indexOf(cp) >= 0 || isUnreserved(cp))) {
+        encodedURL.append((char) cp);
+      } else if (cp == '%' && isEscapeAt(url, i)) {
+        encodedURL.append('%');
       } else {
-        try {
-          /*
-           Identifier for ISO-Latin-1 encoding
-          */
-          String ASCII_ENCODING = "ISO-8859-1";
-          encodedURL.append(URLEncoder.encode(s, ASCII_ENCODING));
-        } catch (UnsupportedEncodingException e1) {
-          // should never happen
-          ErrorService.error(e1);
+        for (byte b : url.substring(i, i + len).getBytes(StandardCharsets.UTF_8)) {
+          encodedURL.append('%');
+          encodedURL.append(HEX[(b >> 4) & 0xF]);
+          encodedURL.append(HEX[b & 0xF]);
         }
       }
+      i += len;
     }
     return encodedURL.toString();
   }
 
-  private static boolean isDelimiter(String s) {
-    return RESERVED.contains(s);
+  private static boolean isUnreserved(int c) {
+    return (c >= 'a' && c <= 'z')
+        || (c >= 'A' && c <= 'Z')
+        || (c >= '0' && c <= '9')
+        || "-_.!~*'()".indexOf(c) >= 0;
+  }
+
+  private static boolean isEscapeAt(String s, int i) {
+    return i + 2 < s.length()
+        && Character.digit(s.charAt(i + 1), 16) >= 0
+        && Character.digit(s.charAt(i + 2), 16) >= 0;
   }
 }
