@@ -687,6 +687,20 @@ class JdkWarmUpTest {
   }
 
   /**
+   * Path2D.getPathIterator constructs an iterator nested in Path2D.Double/Float: a skin painting a
+   * gradient loaded it on the EDT (Icebase #c984d7010b0f, frostwire/frostwire#1619).
+   */
+  @Test
+  void thePathIteratorClassesOfPath2DAreInitializedOffTheEdt() {
+    for (String className : List.of("java.awt.geom.Path2D$Double", "java.awt.geom.Path2D$Float")) {
+      assertTrue(
+          JdkWarmUp.MAIN_WINDOW_CLASSES_TO_INITIALIZE.contains(className),
+          className + " is not initialized by the startup thread");
+      assertDoesNotThrow(() -> Class.forName(className), className);
+    }
+  }
+
+  /**
    * The search field's suggestions list was the first JList: BasicListUI's static initializer ran
    * on the EDT as the first suggestions popped up (Icebase #c0e323953897,
    * frostwire/frostwire#1501).

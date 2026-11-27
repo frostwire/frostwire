@@ -270,6 +270,11 @@ public final class JdkWarmUp {
           // #e620bd61432a, #0ee55ff55bd4).
           "java.awt.geom.Area",
           "java.awt.geom.Path2D",
+          // Path2D.getPathIterator builds a CopyIterator nested in Double/Float, one level below
+          // what initializeClasses reaches from Path2D (Icebase #c984d7010b0f,
+          // frostwire/frostwire#1619).
+          "java.awt.geom.Path2D$Double",
+          "java.awt.geom.Path2D$Float",
           // The menus' and the search field's UI classes and handlers, the HTML text views of the
           // update popup, and TextLayout (which Lite's font sweep doesn't warm): all first used on
           // the EDT, mostly on starved machines (Icebase #ef5bcb24c864, #e77acf74329a,
