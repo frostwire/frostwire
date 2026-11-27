@@ -22,6 +22,7 @@ import android.app.Application;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -328,6 +329,30 @@ public class PreferencesTest {
     assertEquals(7L, config.getLong(MAX_DOWNLOADS, -1));
   }
 
+  @Test
+  public void theSeekBarDialogSavesWhereTheUserLeftIt() {
+    config.setLong(MAX_DOWNLOAD_SPEED, 4096);
+    CustomSeekBarPreference preference = pref(MAX_DOWNLOAD_SPEED);
+    CustomSeekBarPreference.CustomSeekBarPreferenceDialog dialog =
+        CustomSeekBarPreference.CustomSeekBarPreferenceDialog.newInstance(preference);
+    settings.show(dialog);
+    ShadowLooper.idleMainLooper();
+    seekBar(dialog.getDialog()).setProgress(8192);
+    unlimited(dialog.getDialog()).performClick();
+    Bundle saved = new Bundle();
+
+    dialog.onSaveInstanceState(saved);
+
+    assertEquals(1024, saved.getInt("startRange"));
+    assertEquals(5242880, saved.getInt("endRange"));
+    assertEquals(0, saved.getInt("defaultValue"));
+    assertTrue(saved.getBoolean("isByteRate"));
+    assertTrue(saved.getBoolean("supportsUnlimited"));
+    assertEquals(0, saved.getInt("unlimitedValue"));
+    assertTrue(saved.getBoolean("unlimitedChecked"));
+    assertEquals(seekBar(dialog.getDialog()).getProgress(), saved.getInt("currentValue"));
+  }
+
   // ---- PortRangePreference
 
   private Dialog showPortDialog() {
@@ -469,6 +494,27 @@ public class PreferencesTest {
 
     assertEquals(start, preference.getStartPort());
     assertNull(ShadowToast.getLatestToast());
+  }
+
+  @Test
+  public void changingThePortRangeFromAnActivityOffersToRestartTheEngineLater() {
+    PortRangePreference preference = new PortRangePreference(activity, null);
+    try (MockedStatic<UIUtils> ui = mockStatic(UIUtils.class)) {
+      preference.setPortRange(3000, 3100);
+
+      AlertDialog dialog =
+          (AlertDialog) org.robolectric.shadows.ShadowAlertDialog.getLatestDialog();
+      assertNotNull(dialog);
+      assertTrue(dialog.isShowing());
+      dialog.getButton(AlertDialog.BUTTON_NEGATIVE).performClick();
+      ShadowLooper.idleMainLooper();
+
+      ui.verify(
+          () ->
+              UIUtils.showLongMessage(
+                  any(Context.class), eq(R.string.port_settings_saved_restart_later)));
+    }
+    assertEquals(3000, config.getInt(Constants.PREF_KEY_TORRENT_INCOMING_PORT_START, -1));
   }
 
   // ---- ButtonActionPreference
