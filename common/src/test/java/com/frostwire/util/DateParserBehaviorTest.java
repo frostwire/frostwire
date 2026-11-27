@@ -21,6 +21,13 @@ import org.junit.jupiter.api.Test;
 /** JUnit coverage for DateParser (the sibling DateParserTest is a main-method program). */
 final class DateParserBehaviorTest {
 
+  /** A timestamp written with a trailing Z is UTC, whatever zone the JVM runs in (#1637). */
+  private static long utc(int y, int mo, int d, int h, int mi, int sec) {
+    return java.time.LocalDateTime.of(y, mo, d, h, mi, sec)
+        .toInstant(java.time.ZoneOffset.UTC)
+        .toEpochMilli();
+  }
+
   private static long local(int y, int mo, int d, int h, int mi, int s) {
     Calendar c = Calendar.getInstance();
     c.clear();
@@ -35,11 +42,9 @@ final class DateParserBehaviorTest {
   @Test
   void torrentDatesAcceptEveryKnownFormat() {
     assertEquals(local(2024, 3, 5, 14, 30, 15), DateParser.parseTorrentDate("2024-03-05 14:30:15"));
+    assertEquals(utc(2024, 3, 5, 14, 30, 15), DateParser.parseTorrentDate("2024-03-05T14:30:15Z"));
     assertEquals(
-        local(2024, 3, 5, 14, 30, 15), DateParser.parseTorrentDate("2024-03-05T14:30:15Z"));
-    assertEquals(
-        local(2024, 3, 5, 14, 30, 15) + 123,
-        DateParser.parseTorrentDate("2024-03-05T14:30:15.123Z"));
+        utc(2024, 3, 5, 14, 30, 15) + 123, DateParser.parseTorrentDate("2024-03-05T14:30:15.123Z"));
     assertEquals(local(2024, 3, 5, 0, 0, 0), DateParser.parseTorrentDate("2024-03-05"));
     assertEquals(local(2024, 3, 25, 0, 0, 0), DateParser.parseTorrentDate("25/03/2024"));
     assertEquals(local(2024, 3, 25, 0, 0, 0), DateParser.parseTorrentDate("03/25/2024"));
@@ -58,9 +63,8 @@ final class DateParserBehaviorTest {
 
   @Test
   void isoDatesWithAndWithoutMillis() {
-    assertEquals(local(2020, 1, 2, 3, 4, 5), DateParser.parseIsoDate("2020-01-02T03:04:05Z"));
-    assertEquals(
-        local(2020, 1, 2, 3, 4, 5) + 7, DateParser.parseIsoDate("2020-01-02T03:04:05.007Z"));
+    assertEquals(utc(2020, 1, 2, 3, 4, 5), DateParser.parseIsoDate("2020-01-02T03:04:05Z"));
+    assertEquals(utc(2020, 1, 2, 3, 4, 5) + 7, DateParser.parseIsoDate("2020-01-02T03:04:05.007Z"));
     assertEquals(-1, DateParser.parseIsoDate("garbage"));
     assertEquals(-1, DateParser.parseIsoDate(null));
     assertEquals(-1, DateParser.parseIsoDate(" "));
