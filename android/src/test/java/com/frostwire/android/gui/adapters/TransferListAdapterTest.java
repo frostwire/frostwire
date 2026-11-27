@@ -765,4 +765,66 @@ public class TransferListAdapterTest {
           org.mockito.Mockito.times(1));
     }
   }
+
+  @Test
+  public void playingAnAudioFileFromTheRowGoesThroughTheMusicPlayer() throws Exception {
+    HttpDownload dl = mock(HttpDownload.class);
+    when(dl.getDisplayName()).thenReturn("Song");
+    when(dl.getState()).thenReturn(TransferState.DOWNLOADING);
+    when(dl.getSavePath()).thenReturn(new File("/tmp/song.mp3"));
+    when(dl.previewFile()).thenReturn(new File("/tmp/song.mp3"));
+    TransferListAdapter adapter = new TransferListAdapter(activity, Arrays.asList(dl));
+    settle(adapter, 1);
+    View play = bind(adapter, 0).itemView.findViewById(R.id.view_transfer_list_item_button_play);
+    TransferItem complete = mock(TransferItem.class);
+    when(complete.isComplete()).thenReturn(true);
+    when(complete.getFile()).thenReturn(new File("/tmp/a.mp3"));
+    try (MockedStatic<com.frostwire.android.gui.util.UIUtils> ui =
+            mockStatic(com.frostwire.android.gui.util.UIUtils.class);
+        MockedStatic<com.andrew.apollo.utils.MusicUtils> music =
+            mockStatic(com.andrew.apollo.utils.MusicUtils.class)) {
+      ui.when(() -> com.frostwire.android.gui.util.UIUtils.isAudioFile(any())).thenReturn(true);
+      play.performClick();
+      music.verify(
+          () ->
+              com.andrew.apollo.utils.MusicUtils.playFileFromUserItemClick(
+                  activity, new File("/tmp/song.mp3")));
+      play.setTag(complete);
+      play.performClick();
+      music.verify(
+          () ->
+              com.andrew.apollo.utils.MusicUtils.playFileFromUserItemClick(
+                  activity, new File("/tmp/a.mp3")));
+    }
+  }
+
+  @Test
+  public void anErroredInvalidTransferOffersRetryBeforeCancel() {
+    HttpDownload errored =
+        mock(
+            HttpDownload.class,
+            org.mockito.Mockito.withSettings()
+                .extraInterfaces(com.frostwire.android.gui.transfers.InvalidTransfer.class));
+    when(errored.getDisplayName()).thenReturn("Broken");
+    when(errored.getState()).thenReturn(TransferState.ERROR);
+    when(errored.getSavePath()).thenReturn(new File("/tmp/broken"));
+    TransferListAdapter adapter = new TransferListAdapter(activity, Arrays.asList(errored));
+    settle(adapter, 1);
+    assertEquals(
+        Arrays.asList("RetryDownloadAction", "CancelMenuAction"), kinds(longClickMenu(adapter, 0)));
+  }
+
+  @Test
+  public void aRowWhoseMenuCannotBeBuiltReportsTheLongPressAsUnhandled() {
+    Transfer broken = mock(Transfer.class);
+    when(broken.getDisplayName()).thenReturn("Broken");
+    TransferListAdapter adapter = new TransferListAdapter(activity, Arrays.asList(broken));
+    settle(adapter, 1);
+    View row = bind(adapter, 0).itemView;
+    row.setTag(broken);
+    parent.addView(row);
+    // getState() is null for this fake, so building the menu throws and the press is not consumed
+    assertFalse(row.performLongClick());
+    assertNull(ShadowDialog.getLatestDialog());
+  }
 }
