@@ -1,6 +1,5 @@
 package com.limegroup.gnutella.gui.options;
 
-import java.io.IOException;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 
@@ -18,30 +17,23 @@ final class OptionsTreeModel extends DefaultTreeModel {
 
   /**
    * Adds a new `OptionsTreeNode` to one of the root node's children. This should only be called
-   * during tree construction. The first key cannot denote the root.
+   * during tree construction. The first key may denote the root or any node already in the tree.
    *
    * @param parentKey the unique identifying key of the node to add as well as the key for the
    *     locale-specific name for the node as it appears to the user
    * @param key the unique identifying key of the node to add as well as the key for the
    *     locale-specific name for the node as it appears to the user
    * @param displayName the name of the node as it is displayed to the user
-   * @return the created node
-   * @throws IllegalArgumentException if the parentKey does not correspond to any top-level node in
-   *     the tree
+   * @return the created node, or null if the parentKey does not correspond to any node in the tree
    */
   final OptionsTreeNode addNode(
       final String parentKey, final String key, final String displayName) {
     OptionsTreeNode newNode = new OptionsTreeNode(key, displayName);
     MutableTreeNode parentNode;
-    if (parentKey == OptionsMediator.ROOT_NODE_KEY) {
+    if (OptionsMediator.ROOT_NODE_KEY.equals(parentKey)) {
       parentNode = ROOT;
     } else {
-      try {
-        parentNode = getParentNode(ROOT, parentKey);
-      } catch (IOException ioe) {
-        // the parent node could not be found, so return
-        return null;
-      }
+      parentNode = getParentNode(ROOT, parentKey);
       if (parentNode == null) return null;
     }
     // insert the new node
@@ -57,24 +49,16 @@ final class OptionsTreeModel extends DefaultTreeModel {
    * @param parentKey the key that will match the key of the parent node we are searching for
    * @return the `MutableTreeNode` instance corresponding to the specified key, or `null` if it
    *     could not be found
-   * @throws IOException if a corresponding key does not exist
    */
-  private MutableTreeNode getParentNode(MutableTreeNode node, final String parentKey)
-      throws IOException {
+  private MutableTreeNode getParentNode(MutableTreeNode node, final String parentKey) {
     // note that we use the key to denote equality, as each node may
     // have the same visual name, but it will not have the same key
     for (int i = 0, length = node.getChildCount(); i < length; i++) {
       OptionsTreeNode curNode = (OptionsTreeNode) node.getChildAt(i);
-      if (curNode.getTitleKey().equals((parentKey))) return curNode;
-      getParentNode(curNode, parentKey);
-      if (curNode.isRoot() && i == (length - 1)) {
-        // this means we have looped through all of the nodes
-        // without finding the parent key, so throw an exception
-        String msg = "Parent node not in options tree.";
-        throw new IOException(msg);
-      }
+      if (curNode.getTitleKey().equals(parentKey)) return curNode;
+      MutableTreeNode found = getParentNode(curNode, parentKey);
+      if (found != null) return found;
     }
-    // this will never happen -- the exception should always be thrown
     return null;
   }
 }

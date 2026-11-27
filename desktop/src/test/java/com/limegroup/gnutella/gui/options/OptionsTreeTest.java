@@ -41,6 +41,20 @@ class OptionsTreeTest {
     assertEquals("CHILD", child.getTitleKey());
   }
 
+  /** A parent nested deeper than a child of the root was never found (frostwire/frostwire#1656). */
+  @Test
+  void nodesAreAddedUnderParentsAtAnyDepth() {
+    OptionsTreeModel model = new OptionsTreeModel();
+    model.addNode(ROOT, "GROUP", "Group");
+    OptionsTreeNode mid = model.addNode("GROUP", "MID", "Mid");
+    OptionsTreeNode leaf = model.addNode("MID", "LEAF", "Leaf");
+    assertNotNull(leaf);
+    assertSame(mid, leaf.getParent());
+    OptionsTreeNode deepest = model.addNode("LEAF", "DEEPEST", "Deepest");
+    assertNotNull(deepest);
+    assertSame(leaf, deepest.getParent());
+  }
+
   @Test
   void aNodeWithoutAKnownParentIsNotAdded() {
     OptionsTreeModel model = new OptionsTreeModel();
