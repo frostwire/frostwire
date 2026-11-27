@@ -87,7 +87,17 @@ public final class ApolloUiTestSupport {
           "movePlaylistMember",
           "removePlaylistMember",
           "removeFromPlaylist",
-          "notifyForegroundStateChanged");
+          "notifyForegroundStateChanged",
+          "seek",
+          "next",
+          "previous",
+          "toggleFavorite",
+          "playFileFromUri",
+          "playAlbum",
+          "playArtist",
+          "playPauseOrResume",
+          "cycleRepeat",
+          "cycleShuffle");
 
   /**
    * A {@code MusicUtils} with no service behind it: the calls that would reach the service are
@@ -114,6 +124,8 @@ public final class ApolloUiTestSupport {
               if (argument instanceof long[]) {
                 call.append(java.util.Arrays.toString((long[]) argument));
               } else if (argument instanceof Number || argument instanceof Boolean) {
+                call.append(argument).append(' ');
+              } else if (argument instanceof android.net.Uri) {
                 call.append(argument).append(' ');
               }
             }
