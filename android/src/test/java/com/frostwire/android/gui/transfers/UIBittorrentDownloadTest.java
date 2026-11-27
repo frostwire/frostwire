@@ -22,10 +22,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.app.Application;
+import com.frostwire.android.libtorrent.LoopbackTorrent;
 import com.frostwire.android.libtorrent.TestEngine;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTDownload;
-import com.frostwire.jlibtorrent.SessionManager;
 import com.frostwire.jlibtorrent.TcpEndpoint;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.transfers.Transfer;
@@ -34,7 +34,6 @@ import com.frostwire.transfers.TransferState;
 import com.frostwire.transfers.TransferStateListener;
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.After;
@@ -58,13 +57,11 @@ public class UIBittorrentDownloadTest {
 
   @Rule public TemporaryFolder tmp = new TemporaryFolder();
 
+  private LoopbackTorrent torrent;
   private TestEngine local;
   private TransferManager manager;
   private TorrentInfo album;
-  private File seedDir;
-  private SessionManager seeder;
   private MockedStatic<SystemUtils> system;
-  private final List<SessionManager> seeders = new ArrayList<>();
 
   @Before
   public void setUp() throws Exception {
@@ -76,39 +73,25 @@ public class UIBittorrentDownloadTest {
               ((Runnable) call.getArgument(1)).run();
               return null;
             });
-    Path root = tmp.newFolder("root").toPath();
-    local = TestEngine.start(root.resolve("engine"));
+    torrent = new LoopbackTorrent(tmp.newFolder("root").toPath());
+    local = torrent.local;
+    album = torrent.album;
     manager = mock(TransferManager.class);
-    seedDir = root.resolve("seed").toFile();
-    TestEngine.content(seedDir.toPath().resolve("album/one.mp3"), 40_000, 1);
-    TestEngine.content(seedDir.toPath().resolve("album/two.txt"), 20_000, 2);
-    album =
-        TestEngine.torrent(
-            new File(seedDir, "album"), com.frostwire.jlibtorrent.swig.create_torrent.v1_only);
   }
 
   @After
   public void tearDown() {
-    for (SessionManager s : seeders) {
-      s.stop();
-    }
-    local.close();
+    torrent.close();
     system.close();
   }
 
   private TcpEndpoint seederEndpoint() {
-    SessionManager s = TestEngine.seed(album, seedDir);
-    seeders.add(s);
-    TestEngine.await(() -> s.swig().listen_port() > 0, "the seeder listens");
-    return new TcpEndpoint("127.0.0.1", s.swig().listen_port());
+    return torrent.seederEndpoint();
   }
 
   /** The engine's download of {@code album}, optionally fed by a local seeder. */
   private BTDownload add(boolean[] selection, boolean withSeeder) throws Exception {
-    File saveDir = tmp.newFolder();
-    List<TcpEndpoint> peers = withSeeder ? List.of(seederEndpoint()) : null;
-    local.engine.download(album, saveDir, selection, peers);
-    return TestEngine.Events.next(local.events.added, "album");
+    return torrent.add(selection, withSeeder);
   }
 
   private static void waitUntil(java.util.function.BooleanSupplier condition, String what) {
