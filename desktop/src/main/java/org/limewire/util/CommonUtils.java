@@ -115,7 +115,8 @@ public class CommonUtils {
         case '%':
           try {
             sb.append((char) Integer.parseInt(s.substring(i + 1, i + 3), 16));
-          } catch (NumberFormatException e) {
+          } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
+            // like URLDecoder: a malformed or truncated escape is an illegal argument
             throw new IllegalArgumentException(s);
           }
           i += 2;
