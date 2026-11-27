@@ -1141,6 +1141,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.tables.*"
         includeTestsMatching "com.frostwire.gui.library.*"
         includeTestsMatching "com.limegroup.gnutella.gui.dnd.*"
+        includeTestsMatching "com.frostwire.gui.components.transfers.TransferDetailDataLinesTest"
         includeTestsMatching "com.limegroup.gnutella.gui.GUIUtilsFormattingTest"
         includeTestsMatching "com.frostwire.gui.components.transfers.TransferDetailFilesShareTest"
         includeTestsMatching "com.frostwire.gui.components.transfers.KeyedRowSyncTest"
