@@ -31,7 +31,6 @@ import com.frostwire.jlibtorrent.swig.settings_pack;
 import com.frostwire.platform.Platform;
 import com.frostwire.platform.Platforms;
 import java.io.File;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -101,11 +100,13 @@ public final class TestEngine implements AutoCloseable {
     return new TestEngine(dir, ctx, newEngine(), previous);
   }
 
-  /** A fresh engine, never the application's singleton. */
-  public static BTEngine newEngine() throws Exception {
-    Constructor<BTEngine> constructor = BTEngine.class.getDeclaredConstructor();
-    constructor.setAccessible(true);
-    return constructor.newInstance();
+  /**
+   * The application's engine: the code under test asks {@link BTEngine#getInstance()} for it from
+   * any thread, and a static mock of that call would only reach the test's own thread. It is
+   * stopped again by {@link #close()}, so every test starts it afresh.
+   */
+  public static BTEngine newEngine() {
+    return BTEngine.getInstance();
   }
 
   @Override
