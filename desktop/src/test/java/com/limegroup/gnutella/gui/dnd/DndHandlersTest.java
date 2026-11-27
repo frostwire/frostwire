@@ -298,6 +298,18 @@ class DndHandlersTest {
   }
 
   @Test
+  void httpAndHttpsTorrentUrlsAreBothRecognised() throws Exception {
+    java.lang.reflect.Method m =
+        TorrentURITransferHandler.class.getDeclaredMethod("areAllTorrentURLs", URI[].class);
+    m.setAccessible(true);
+    TorrentURITransferHandler h = new TorrentURITransferHandler();
+    assertTrue((boolean) m.invoke(h, (Object) new URI[] {URI.create("http://a.test/x.torrent")}));
+    assertTrue((boolean) m.invoke(h, (Object) new URI[] {URI.create("HTTPS://a.test/x.TORRENT")}));
+    assertFalse((boolean) m.invoke(h, (Object) new URI[] {URI.create("https://a.test/x.mp3")}));
+    assertFalse((boolean) m.invoke(h, (Object) new URI[] {URI.create("ftp://a.test/x.torrent")}));
+  }
+
+  @Test
   void torrentFileHandlerTakesFileListsAndUriListsAndOnlyImportsTorrents() throws Exception {
     JComponent c = new JPanel();
     TorrentFilesTransferHandler h = new TorrentFilesTransferHandler();

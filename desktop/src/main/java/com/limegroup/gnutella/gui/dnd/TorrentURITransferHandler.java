@@ -28,11 +28,11 @@ import java.util.Locale;
 import javax.swing.*;
 
 /**
- * TransferHandler that handles uris pointing to http urls of torrent files. Downloads are started
- * if all uris are of this type.
+ * TransferHandler that handles uris pointing to http or https urls of torrent files. Downloads are
+ * started if all uris are of this type.
  *
- * <p>The scheme of the uri has to be "http" and the path name of the uri has to end with ".torrent"
- * not regarding casing.
+ * <p>The scheme of the uri has to be "http" or "https" and the path name of the uri has to end with
+ * ".torrent" not regarding casing.
  */
 public class TorrentURITransferHandler extends LimeTransferHandler {
   /** */
@@ -75,7 +75,8 @@ public class TorrentURITransferHandler extends LimeTransferHandler {
   private boolean areAllTorrentURLs(URI[] uris) {
     for (URI uri : uris) {
       String scheme = uri.getScheme();
-      if (scheme == null || !scheme.equalsIgnoreCase("http")) {
+      if (scheme == null
+          || !(scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https"))) {
         return false;
       }
       String path = uri.getPath();
