@@ -161,8 +161,8 @@ public class HashBasedDataLineModel<T extends DataLine<E>, E> extends BasicDataL
    * Overrides the default getRow to look in the HashMap instead of a linear search.
    *
    * @param o the object whose index we want.
-   * @return the index of the DataLine initialized by object o.
-   * @throws ArrayIndexOutOfBoundsException if no dataline was initialized by o.
+   * @return the index of the DataLine initialized by object o, or -1 if no dataline was initialized
+   *     by o.
    */
   public int getRow(E o) {
     synchronized (getListLock()) {
