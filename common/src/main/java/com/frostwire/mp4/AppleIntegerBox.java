@@ -35,21 +35,24 @@ public class AppleIntegerBox extends AppleDataBox {
 
   public int value() {
     if (value != null) {
-      ByteBuffer t = ByteBuffer.allocate(4);
-      t.put(value);
-      t.flip();
-      return t.getInt();
+      // big-endian two's complement, sign-extended from the payload width
+      int start = Math.max(0, value.length - 4); // keep the low-order 4 bytes
+      int v = start < value.length && value[start] < 0 ? -1 : 0;
+      for (int i = start; i < value.length; i++) {
+        v = (v << 8) | (value[i] & 0xFF);
+      }
+      return v;
     } else {
       return 0;
     }
   }
 
   public void value(int value) {
-    if (value <= 127 && value > -128) {
+    if (value <= 127 && value >= -128) {
       this.value = new byte[] {Bits.int0(value)};
-    } else if (value <= 32767 && value > -32768) {
+    } else if (value <= 32767 && value >= -32768) {
       this.value = new byte[] {Bits.int1(value), Bits.int0(value)};
-    } else if (value <= 8388607 && value > -838860) {
+    } else if (value <= 8388607 && value >= -8388608) {
       this.value = new byte[] {Bits.int2(value), Bits.int1(value), Bits.int0(value)};
     } else {
       this.value =

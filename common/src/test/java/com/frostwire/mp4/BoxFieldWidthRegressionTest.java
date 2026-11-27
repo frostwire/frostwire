@@ -33,6 +33,18 @@ final class BoxFieldWidthRegressionTest {
     return b.array();
   }
 
+  private static byte[] dataBox(String type, int dataType, byte[] payload) {
+    ByteBuffer b = ByteBuffer.allocate(8 + 16 + payload.length);
+    b.putInt(8 + 16 + payload.length);
+    b.putInt(Bits.make4cc(type));
+    b.putInt(16 + payload.length);
+    b.putInt(Box.data);
+    b.putInt(dataType);
+    b.putInt(0);
+    b.put(payload);
+    return b.array();
+  }
+
   private static LinkedList<Box> parse(byte[] file) throws IOException {
     LinkedList<Box> top = new LinkedList<>();
     IsoMedia.read(
@@ -102,5 +114,69 @@ final class BoxFieldWidthRegressionTest {
         assertInstanceOf(TrackFragmentBaseMediaDecodeTimeBox.class, parse(file).getFirst());
     assertEquals(0xf0000001L, tfdt.base_media_decode_time);
     assertRoundTrips(file);
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      ints = {
+        0,
+        5,
+        127,
+        -1,
+        -5,
+        -128,
+        128,
+        300,
+        32767,
+        -129,
+        -32768,
+        32768,
+        70000,
+        8388607,
+        -32769,
+        -8388608,
+        -8000000,
+        8388608,
+        123456789,
+        -123456789,
+        Integer.MIN_VALUE,
+        Integer.MAX_VALUE
+      })
+  void appleIntegerSetterAndGetterAgree(int v) throws IOException {
+    AppleIntegerBox box = new AppleIntegerBox(Box.stik);
+    box.value(v);
+    assertEquals(v, box.value());
+    LinkedList<Box> boxes = new LinkedList<>();
+    boxes.add(box);
+    box.update();
+    box.size = (int) box.length() + 8;
+    AppleIntegerBox again = assertInstanceOf(AppleIntegerBox.class, parse(write(boxes)).getFirst());
+    assertEquals(v, again.value());
+  }
+
+  @Test
+  void appleIntegerUsesTheNarrowestPayload() {
+    int[][] cases = {
+      {5, 1}, {-128, 1}, {128, 2}, {-32768, 2}, {32768, 3}, {-8388608, 3}, {8388608, 4}
+    };
+    for (int[] c : cases) {
+      AppleIntegerBox box = new AppleIntegerBox(Box.stik);
+      box.value(c[0]);
+      assertEquals(c[1] + 16, box.dataLength, "value " + c[0]);
+    }
+  }
+
+  @Test
+  void appleIntegerShortPayloadsReadBigEndianSigned() throws IOException {
+    assertEquals(
+        5, ((AppleIntegerBox) parse(dataBox("stik", 15, new byte[] {5})).getFirst()).value());
+    assertEquals(
+        -2,
+        ((AppleIntegerBox)
+                parse(dataBox("stik", 15, new byte[] {(byte) 0xff, (byte) 0xfe})).getFirst())
+            .value());
+    assertEquals(
+        0x010203,
+        ((AppleIntegerBox) parse(dataBox("stik", 15, new byte[] {1, 2, 3})).getFirst()).value());
   }
 }
