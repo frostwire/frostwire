@@ -183,21 +183,29 @@ public final class UpdateManager implements Serializable {
 
   /** Starts a torrent download */
   private static void openTorrent(String uriStr) {
+    URI uri = torrentUri(uriStr);
+    if (uri != null) {
+      GUIMediator.instance().openTorrentURI(uri.toString(), false);
+    }
+  }
+
+  /** The URI to open for a torrent URL: http or https with a valid host; null for anything else. */
+  static URI torrentUri(String uriStr) {
     try {
       URI uri = new URI(uriStr);
       String scheme = uri.getScheme();
-      if (scheme == null || !scheme.equalsIgnoreCase("http")) {
-        // LOG.error("Not a torrent URL");
-        return;
+      if (scheme == null
+          || !(scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https"))) {
+        return null;
       }
       String authority = uri.getAuthority();
-      if (authority == null || authority.equals("") || authority.indexOf(' ') != -1) {
-        // LOG.error("Invalid authority");
-        return;
+      if (authority == null || authority.isEmpty() || authority.indexOf(' ') != -1) {
+        return null;
       }
-      GUIMediator.instance().openTorrentURI(uri.toString(), false);
+      return uri;
     } catch (URISyntaxException e) {
       LOG.error(e.getMessage(), e);
+      return null;
     }
   }
 
