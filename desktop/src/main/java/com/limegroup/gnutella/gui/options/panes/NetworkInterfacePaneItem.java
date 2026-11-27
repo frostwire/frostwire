@@ -28,6 +28,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.function.Supplier;
 import javax.swing.*;
 import org.limewire.util.NetworkUtils;
 
@@ -38,6 +39,11 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
       I18n.tr(
           "You can tell FrostWire to bind outgoing connections to an IP address from a specific network interface. Listening sockets will still listen on all available interfaces. This is useful on multi-homed hosts. If you later disable this interface, FrostWire will revert to binding to an arbitrary address.");
   private static final String ADDRESS_KEY = "frostwire.networkinterfacepane.address";
+
+  /** How the page lists the machine's interfaces; replaced by tests to make it fail. */
+  static Supplier<List<EnumNet.IpInterface>> interfaces =
+      () -> EnumNet.enumInterfaces(BTEngine.getInstance());
+
   private final ButtonGroup GROUP = new ButtonGroup();
   private final JCheckBox CUSTOM;
   private final List<JRadioButton> activeButtons = new ArrayList<>();
@@ -49,7 +55,7 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
     CUSTOM.addItemListener(e -> updateButtons(CUSTOM.isSelected()));
     add(CUSTOM);
     try {
-      List<EnumNet.IpInterface> ipInterfaces = EnumNet.enumInterfaces(BTEngine.getInstance());
+      List<EnumNet.IpInterface> ipInterfaces = interfaces.get();
       JPanel panel = new JPanel(new GridBagLayout());
       GridBagConstraints gbc = new GridBagConstraints();
       gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -91,7 +97,9 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
       // initialize
       updateButtons(CUSTOM.isSelected());
     } catch (Throwable se) {
-      CUSTOM.setSelected(false);
+      // Keep showing the saved choice (so the page is not dirty and Apply keeps it), but there is
+      // nothing to pick from.
+      CUSTOM.setEnabled(false);
       JPanel labelPanel = new BoxPanel(BoxPanel.X_AXIS);
       labelPanel.add(
           new JLabel(
