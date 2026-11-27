@@ -15,6 +15,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -805,5 +806,26 @@ public class MainActivityBootTest {
       }
     }
     verify(download).remove(true);
+  }
+
+  /**
+   * The "no data" message was only shown while the screen was paused (the check read
+   * '!!isPaused()'), which a screen that receives the broadcast never is.
+   */
+  @Test
+  public void losingTheDataConnectionTellsTheUserWhileTheScreenIsShown() {
+    MainActivity activity = controller(new Intent()).create().start().resume().get();
+    shadowOf(Looper.getMainLooper()).idle();
+
+    sendBroadcast(
+        activity,
+        new Intent(Constants.ACTION_NOTIFY_DATA_INTERNET_CONNECTION).putExtra("isDataUp", false));
+    shadowOf(Looper.getMainLooper()).idle();
+
+    ui.verify(
+        () ->
+            UIUtils.showDismissableMessage(
+                any(android.view.View.class), eq(R.string.no_data_check_internet_connection)),
+        org.mockito.Mockito.atLeastOnce());
   }
 }
