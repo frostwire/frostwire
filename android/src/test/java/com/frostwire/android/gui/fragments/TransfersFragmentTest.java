@@ -300,6 +300,54 @@ public class TransfersFragmentTest {
     assertEquals(View.GONE, urlBox(fragment).getVisibility());
   }
 
+  @Test
+  public void theMenuOffersWhatAppliesToTheListedTransfers() {
+    Transfer downloading = transfer("downloading", TransferState.DOWNLOADING, 4);
+    Transfer paused = transfer("paused", TransferState.PAUSED, 3);
+    Transfer seeding = transfer("seeding", TransferState.SEEDING, 2);
+    when(seeding.isComplete()).thenReturn(true);
+    Transfer errored = transfer("errored", TransferState.ERROR, 1);
+    transfers.add(downloading);
+    transfers.add(paused);
+    transfers.add(seeding);
+    transfers.add(errored);
+    TestTransfersFragment fragment = new TestTransfersFragment();
+    ActivityController<FragmentTestHost> host = FragmentTestHost.launch(fragment);
+    fragment.onTime(true);
+    FragmentTestHost activity = host.get();
+    Menu menu = new PopupMenu(activity, new View(activity)).getMenu();
+    activity.onCreatePanelMenu(Window.FEATURE_OPTIONS_PANEL, menu);
+    activity.onPreparePanel(Window.FEATURE_OPTIONS_PANEL, null, menu);
+
+    assertTrue(menu.findItem(R.id.fragment_transfers_menu_clear_all).isVisible());
+    assertTrue(menu.findItem(R.id.fragment_transfers_menu_pause_stop_all).isVisible());
+    assertTrue(menu.findItem(R.id.fragment_transfers_menu_resume_all).isVisible());
+    assertTrue(menu.findItem(R.id.fragment_transfers_menu_seed_all).isVisible());
+    assertTrue(menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).isVisible());
+
+    // nothing downloading when BitTorrent is disconnected: no pause all
+    when(transferManager.isBittorrentDisconnected()).thenReturn(true);
+    activity.onPreparePanel(Window.FEATURE_OPTIONS_PANEL, null, menu);
+    assertFalse(menu.findItem(R.id.fragment_transfers_menu_pause_stop_all).isVisible());
+
+    // only a finished transfer: it can be seeded, nothing can stop seeding
+    transfers.clear();
+    Transfer finished = transfer("finished", TransferState.FINISHED, 1);
+    when(finished.isComplete()).thenReturn(true);
+    transfers.add(finished);
+    fragment.onTime(true);
+    activity.onPreparePanel(Window.FEATURE_OPTIONS_PANEL, null, menu);
+    assertTrue(menu.findItem(R.id.fragment_transfers_menu_seed_all).isVisible());
+    assertFalse(menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).isVisible());
+
+    // an empty list resets all of it
+    transfers.clear();
+    fragment.onTime(true);
+    activity.onPreparePanel(Window.FEATURE_OPTIONS_PANEL, null, menu);
+    assertFalse(menu.findItem(R.id.fragment_transfers_menu_clear_all).isVisible());
+    assertFalse(menu.findItem(R.id.fragment_transfers_menu_seed_all).isVisible());
+  }
+
   private static boolean select(FragmentTestHost activity, Menu menu, int id) {
     MenuItem item = menu.findItem(id);
     assertNotNull(item);
