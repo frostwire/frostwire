@@ -261,9 +261,13 @@ public class StringUtils {
    * @return the modified str.
    */
   public static String replace(String str, String old_str, String new_str) {
+    if (old_str.isEmpty()) {
+      return str;
+    }
     int o = 0;
     StringBuilder buf = new StringBuilder();
-    for (int i = str.indexOf(old_str); i > -1; i = str.indexOf(old_str, i + 1)) {
+    // the next search starts after the previous match: matches never overlap
+    for (int i = str.indexOf(old_str); i > -1; i = str.indexOf(old_str, o)) {
       if (i > o) {
         buf.append(str.substring(o, i));
       }
