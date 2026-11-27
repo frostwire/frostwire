@@ -22,11 +22,12 @@ public class StringTrieSet implements AutoCompleteDictionary, Iterable<String> {
   private final transient StringTrie<String> map;
 
   /**
-   * This constructor sets up a dictionary where case IS significant but whose sort order is binary
-   * based. All Strings are stored with the case of the last entry added.
+   * Sets up a dictionary whose sort order is binary based. If <code>ignoreCase</code> is true,
+   * lookups are case-insensitive and all Strings are stored with the case of the last entry added;
+   * otherwise case IS significant.
    */
-  public StringTrieSet(boolean caseSensitive) {
-    map = new StringTrie<>(caseSensitive);
+  public StringTrieSet(boolean ignoreCase) {
+    map = new StringTrie<>(ignoreCase);
   }
 
   /**

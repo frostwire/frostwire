@@ -8,6 +8,7 @@
 package org.limewire.collection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 
 import java.net.URL;
@@ -65,5 +66,16 @@ final class StringTrieRegressionTest {
     for (String w : words) trie.add(w, w);
     trie.trim(v -> v + "!");
     for (String w : words) assertEquals(w + "!", trie.get(w), "value of '" + w + "'");
+  }
+
+  @Test
+  void stringTrieSetIgnoreCaseFlagControlsCaseSensitivity() {
+    StringTrieSet insensitive = new StringTrieSet(true);
+    insensitive.addEntry("Hello");
+    assertEquals("Hello", insensitive.lookup("he"));
+    StringTrieSet sensitive = new StringTrieSet(false);
+    sensitive.addEntry("Hello");
+    assertNull(sensitive.lookup("he"));
+    assertEquals("Hello", sensitive.lookup("He"));
   }
 }
