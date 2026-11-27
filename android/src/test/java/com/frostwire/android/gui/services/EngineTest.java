@@ -94,6 +94,14 @@ public class EngineTest {
       assertSame(app, engine.getApplication());
       engine.notifyDownloadFinished("nothing to notify", new File("/x"));
 
+      // the app is not in the foreground yet: Android 12+ would refuse the service, so it waits
+      system.when(() -> SystemUtils.isAppInForeground(any())).thenReturn(false);
+      engine.onApplicationCreate(app);
+      misc.get(0).run();
+      assertNull(Shadows.shadowOf(app).getNextStartedService());
+      misc.clear();
+      system.when(() -> SystemUtils.isAppInForeground(any())).thenReturn(true);
+
       // application start posts the service start, which promotes through startForegroundService
       engine.onApplicationCreate(app);
       assertEquals(1, misc.size());
@@ -164,6 +172,10 @@ public class EngineTest {
           .ensureRelayStack(anyBoolean(), any());
       engine.ensureDistributedSearchReady(0);
       verify(service).ensureRelayStack(anyBoolean(), any());
+      // not ready at first, ready after a short wait: the engine polls until the deadline
+      relay.when(AndroidRelayStack::isParticipationEnabled).thenReturn(true);
+      when(distributed.isReady()).thenReturn(false, false, true);
+      engine.ensureDistributedSearchReady(2_000);
       // participation switched off: nothing to wait for
       relay.when(AndroidRelayStack::isParticipationEnabled).thenReturn(false);
       engine.ensureDistributedSearchReady(10_000);
