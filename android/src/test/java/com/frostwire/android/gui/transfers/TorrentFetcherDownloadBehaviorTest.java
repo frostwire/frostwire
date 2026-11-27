@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 
 import android.app.Application;
 import com.frostwire.android.gui.AndroidSearchEngines;
+import com.frostwire.android.libtorrent.NoLibtorrent;
 import com.frostwire.search.relay.MeshTorrentMetadataFetcher;
 import com.frostwire.search.relay.RelaySearchWiring;
 import com.frostwire.transfers.TransferState;
@@ -151,7 +152,7 @@ public class TorrentFetcherDownloadBehaviorTest {
     try (MockedStatic<HttpClientFactory> http = mockStatic(HttpClientFactory.class)) {
       http.when(() -> HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD))
           .thenReturn(client);
-      work.get(0).run();
+      NoLibtorrent.run(work.get(0));
     }
     verify(listener)
         .onTorrentInfoFetched(eq(data), eq("https://example.invalid/a.torrent"), eq(fetch.tokenId));
@@ -169,11 +170,11 @@ public class TorrentFetcherDownloadBehaviorTest {
     try (MockedStatic<HttpClientFactory> http = mockStatic(HttpClientFactory.class)) {
       http.when(() -> HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD))
           .thenReturn(client);
-      work.get(0).run();
+      NoLibtorrent.run(work.get(0));
       assertEquals(TransferState.ERROR, empty.getState());
       when(client.getBytes(any(), org.mockito.ArgumentMatchers.anyInt(), any()))
           .thenThrow(new IllegalStateException("offline"));
-      work2.get(0).run();
+      NoLibtorrent.run(work2.get(0));
       assertEquals(TransferState.ERROR, failing.getState());
     }
   }
@@ -190,7 +191,7 @@ public class TorrentFetcherDownloadBehaviorTest {
     try (MockedStatic<HttpClientFactory> http = mockStatic(HttpClientFactory.class)) {
       http.when(() -> HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD))
           .thenReturn(client);
-      work.get(0).run();
+      NoLibtorrent.run(work.get(0));
     }
     assertEquals(TransferState.ERROR, fetch.getState());
   }
@@ -203,7 +204,7 @@ public class TorrentFetcherDownloadBehaviorTest {
         queued(info("https://example.invalid/a.torrent"), listener, work);
     fetch.remove(true, true);
     assertEquals(TransferState.CANCELED, fetch.getState());
-    work.get(0).run();
+    NoLibtorrent.run(work.get(0));
     verify(listener, never()).onTorrentInfoFetched(any(), any(), anyLong());
   }
 
@@ -211,7 +212,7 @@ public class TorrentFetcherDownloadBehaviorTest {
   public void linksThatAreNeitherHttpNorMagnetAreFetchedByTheEngineAndFailWithoutIt() {
     List<Runnable> work = new ArrayList<>();
     TorrentFetcherDownload fetch = queued(info("test:something"), null, work);
-    work.get(0).run();
+    NoLibtorrent.run(work.get(0));
     assertEquals(TransferState.ERROR, fetch.getState());
   }
 
@@ -219,7 +220,7 @@ public class TorrentFetcherDownloadBehaviorTest {
   public void aMagnetWithoutAHolderIsAddedDirectlyAndFailsWithoutTheEngine() {
     List<Runnable> work = new ArrayList<>();
     TorrentFetcherDownload fetch = queued(info("magnet:?xt=urn:btih:" + HASH), null, work);
-    work.get(0).run();
+    NoLibtorrent.run(work.get(0));
     assertEquals(TransferState.ERROR, fetch.getState());
   }
 
@@ -244,7 +245,7 @@ public class TorrentFetcherDownloadBehaviorTest {
       engines.when(AndroidSearchEngines::distributed).thenReturn(wiring);
       mesh.when(() -> MeshTorrentMetadataFetcher.fetch(any(), any(), any(), any(), anyLong()))
           .thenReturn(null);
-      work.get(0).run();
+      NoLibtorrent.run(work.get(0));
       mesh.verify(() -> MeshTorrentMetadataFetcher.fetch(any(), any(), any(), any(), anyLong()));
     }
     // the mesh had nothing, the direct add needs the engine
@@ -268,7 +269,7 @@ public class TorrentFetcherDownloadBehaviorTest {
       mesh.when(() -> MeshTorrentMetadataFetcher.fetch(any(), any(), any(), any(), anyLong()))
           .thenReturn(new byte[] {1, 2, 3});
       mesh.when(() -> MeshTorrentMetadataFetcher.matchesInfoHash(any(), any())).thenReturn(true);
-      work.get(0).run();
+      NoLibtorrent.run(work.get(0));
     }
     assertEquals(TransferState.ERROR, fetch.getState());
   }
@@ -293,10 +294,10 @@ public class TorrentFetcherDownloadBehaviorTest {
     TorrentFetcherDownload broken = queued(throwing, null, work3);
     try (MockedStatic<AndroidSearchEngines> engines = mockStatic(AndroidSearchEngines.class)) {
       engines.when(AndroidSearchEngines::distributed).thenReturn(unwired);
-      work.get(0).run();
-      work2.get(0).run();
+      NoLibtorrent.run(work.get(0));
+      NoLibtorrent.run(work2.get(0));
       engines.when(AndroidSearchEngines::distributed).thenThrow(new IllegalStateException("down"));
-      work3.get(0).run();
+      NoLibtorrent.run(work3.get(0));
     }
     assertEquals(TransferState.ERROR, noTransport.getState());
     assertEquals(TransferState.ERROR, badHash.getState());
@@ -323,7 +324,7 @@ public class TorrentFetcherDownloadBehaviorTest {
                 fetch.remove(false);
                 return new byte[] {1, 2, 3};
               });
-      work.get(0).run();
+      NoLibtorrent.run(work.get(0));
     }
     assertEquals(TransferState.CANCELED, fetch.getState());
   }

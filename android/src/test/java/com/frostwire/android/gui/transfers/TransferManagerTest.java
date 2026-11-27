@@ -29,6 +29,7 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.MainApplication;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.libtorrent.NoLibtorrent;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.frostclick.Slide;
 import com.frostwire.platform.FileSystem;
@@ -160,7 +161,7 @@ public class TransferManagerTest {
     main.verify(() -> MainApplication.recordBTEngineInitializationFailure(any()), never());
     // the engine cannot be created here (no native library): the failure is recorded once
     main.when(MainApplication::hasBTEngineInitializationFailure).thenReturn(false);
-    configThread.get(0).run();
+    NoLibtorrent.run(configThread.get(0));
     main.verify(() -> MainApplication.recordBTEngineInitializationFailure(any()));
   }
 
@@ -172,7 +173,7 @@ public class TransferManagerTest {
     downloader.get(downloader.size() - 1).run();
     main.verify(() -> MainApplication.recordBTEngineInitializationFailure(any()), never());
     main.when(MainApplication::hasBTEngineInitializationFailure).thenReturn(false);
-    downloader.get(downloader.size() - 1).run();
+    NoLibtorrent.run(downloader.get(downloader.size() - 1));
     main.verify(() -> MainApplication.recordBTEngineInitializationFailure(any()));
   }
 
@@ -262,7 +263,7 @@ public class TransferManagerTest {
   public void aCrawledTorrentNeedsTheEngineAndFailsAsAPlaceholderWithoutIt() {
     TorrentCrawledSearchResult crawled = mock(TorrentCrawledSearchResult.class);
     when(crawled.getHash()).thenReturn(null);
-    Transfer transfer = manager.download(crawled);
+    Transfer transfer = NoLibtorrent.call(() -> manager.download(crawled));
     assertTrue(transfer instanceof InvalidBittorrentDownload);
     assertEquals(R.string.empty_string, ((InvalidBittorrentDownload) transfer).getReasonResId());
   }
@@ -366,7 +367,8 @@ public class TransferManagerTest {
 
   @Test
   public void aLocalTorrentFileWithoutAListenerNeedsTheEngine() {
-    BittorrentDownload download = manager.downloadTorrent("file:///tmp/none.torrent", null);
+    BittorrentDownload download =
+        NoLibtorrent.call(() -> manager.downloadTorrent("file:///tmp/none.torrent", null));
     assertTrue(download instanceof InvalidBittorrentDownload);
   }
 

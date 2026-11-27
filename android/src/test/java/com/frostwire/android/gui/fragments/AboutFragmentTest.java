@@ -25,7 +25,9 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.TellurideCourier;
+import com.frostwire.android.gui.MainApplication;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.jlibtorrent.LibTorrent;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockedStatic;
@@ -55,10 +57,28 @@ public class AboutFragmentTest {
         ((TextView) root.findViewById(R.id.fragment_about_jlibtorrent_version))
             .getText()
             .toString();
-    // libtorrent's native library can't be loaded here
-    assertEquals("jlibtorrent unavailable", jlibtorrent);
+    assertTrue(
+        jlibtorrent, jlibtorrent.startsWith("jlibtorrent v" + LibTorrent.jlibtorrentVersion()));
 
     assertTrue(((TextView) root.findViewById(R.id.fragment_about_content)).getText().length() > 0);
+  }
+
+  @Test
+  public void aMissingNativeLibraryShowsJlibtorrentAsUnavailableAndIsRecorded() {
+    try (MockedStatic<LibTorrent> libtorrent = mockStatic(LibTorrent.class);
+        MockedStatic<MainApplication> main = mockStatic(MainApplication.class)) {
+      libtorrent
+          .when(LibTorrent::jlibtorrentVersion)
+          .thenThrow(new UnsatisfiedLinkError("no jlibtorrent"));
+      AboutFragment fragment = new AboutFragment();
+      FragmentTestHost.launch(fragment);
+      String jlibtorrent =
+          ((TextView) fragment.requireView().findViewById(R.id.fragment_about_jlibtorrent_version))
+              .getText()
+              .toString();
+      assertEquals("jlibtorrent unavailable", jlibtorrent);
+      main.verify(() -> MainApplication.recordBTEngineInitializationFailure(any()));
+    }
   }
 
   @Test
