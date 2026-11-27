@@ -201,7 +201,7 @@ public class FileUtils {
    *     copied.
    */
   private static long copy(File src, long amount, File dst) {
-    final int BUFFER_SIZE = 1024;
+    final int BUFFER_SIZE = 64 * 1024;
     long amountToRead = amount;
     InputStream in = null;
     OutputStream out = null;
@@ -232,13 +232,16 @@ public class FileUtils {
 
   /**
    * Copies the file 'src' to 'dst', returning true iff the copy succeeded. If 'dst' already exists,
-   * the copy may or may not succeed. May also fail for VERY large source files.
+   * the copy may or may not succeed. Fails, without creating 'dst', if 'src' is not a readable
+   * file.
    */
   public static boolean copy(File src, File dst) {
-    // Downcasting length can result in a sign change, causing
-    // copy(File,int,File) to terminate immediately.
+    if (!src.isFile() || !src.canRead()) {
+      return false;
+    }
+    // keep the length a long: casting it to int truncates it (and flips its sign) over 2 GiB
     long length = src.length();
-    return copy(src, (int) length, dst) == length;
+    return copy(src, length, dst) == length;
   }
 
   public static File getJarFromClasspath(ClassLoader classLoader, String markerFile) {
@@ -311,7 +314,7 @@ public class FileUtils {
     File f = new File(savePath, name);
     int i = 1;
     while (f.exists() && i < Integer.MAX_VALUE) {
-      f = new File(savePath, baseName + " (" + i + ")." + ext);
+      f = new File(savePath, baseName + " (" + i + ")" + (ext.isEmpty() ? "" : "." + ext));
       i++;
     }
     return org.apache.commons.io.FileUtils.validFilepathLengthFile(f);
