@@ -193,7 +193,10 @@ class PaymentOptionsPanelTest {
           bitcoin.setText(ADDRESS.substring(0, 10) + " " + ADDRESS.substring(10));
           keyReleased(bitcoin);
           assertEquals(ADDRESS, bitcoin.getText(), "spaces are removed");
-          // the next key release judges the cleaned text (the first one judged it with the space)
+          assertEquals(
+              Color.black,
+              bitcoin.getForeground(),
+              "a valid address typed with a space is judged without the space");
           keyReleased(bitcoin);
           assertEquals(Color.black, bitcoin.getForeground());
           bitcoin.setText("litecoin:" + ADDRESS);

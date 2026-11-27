@@ -71,18 +71,18 @@ class PaymentOptionsPanel extends JPanel {
   }
 
   private void onCryptoAddressPressed(CryptoCurrencyTextField textField) {
-    boolean hasValidPrefixOrNoPrefix = false;
-    hasValidPrefixOrNoPrefix = textField.hasValidPrefixOrNoPrefix();
-    if (!textField.hasValidAddress() || !hasValidPrefixOrNoPrefix) {
-      textField.setForeground(Color.red);
-    } else {
-      textField.setForeground(Color.black);
-    }
     int caretPosition = textField.getCaretPosition();
     int lengthBefore = textField.getText().length();
     int selectionStart = textField.getSelectionStart();
     int selectionEnd = textField.getSelectionEnd();
     textField.setText(textField.getText().replaceAll(" ", ""));
+    // judge the text only after the spaces are gone
+    boolean hasValidPrefixOrNoPrefix = textField.hasValidPrefixOrNoPrefix();
+    if (!textField.hasValidAddress() || !hasValidPrefixOrNoPrefix) {
+      textField.setForeground(Color.red);
+    } else {
+      textField.setForeground(Color.black);
+    }
     int lengthAfter = textField.getText().length();
     if (lengthAfter < lengthBefore) {
       int delta = (lengthBefore - lengthAfter);
