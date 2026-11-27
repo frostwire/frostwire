@@ -22,6 +22,7 @@ import static org.robolectric.Shadows.shadowOf;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Looper;
 import android.view.View;
@@ -205,5 +206,36 @@ public class PromotionsAdapterTest {
     PromotionsAdapter adapter = new PromotionsAdapter(activity, null, s -> {});
     adapter.onDestroyView();
     assertEquals(1, adapter.getCount());
+  }
+
+  private Intent previewIntentFor(String videoUrl) {
+    com.frostwire.android.gui.activities.MainActivity main =
+        mock(com.frostwire.android.gui.activities.MainActivity.class);
+    when(main.getSystemService(android.content.Context.LAYOUT_INFLATER_SERVICE))
+        .thenReturn(activity.getSystemService(android.content.Context.LAYOUT_INFLATER_SERVICE));
+    Slide s = slide("https://example.com/a.jpg", videoUrl, null);
+    PromotionsAdapter adapter = new PromotionsAdapter(main, Collections.singletonList(s), sl -> {});
+    View row = View.inflate(activity, R.layout.view_promotions_item, null);
+    adapter.setupView(row, grid, s);
+    row.findViewById(R.id.view_promotions_item_preview_imageview).performClick();
+    org.mockito.ArgumentCaptor<Intent> captor = org.mockito.ArgumentCaptor.forClass(Intent.class);
+    verify(main).launchPromoVideoPreview(captor.capture());
+    return captor.getValue();
+  }
+
+  @Test
+  public void previewingAPromoVideoViewsItsUrl() {
+    Intent intent = previewIntentFor("https://videos.example.com/promo.mp4");
+    assertEquals(Intent.ACTION_VIEW, intent.getAction());
+    assertEquals("https://videos.example.com/promo.mp4", intent.getDataString());
+  }
+
+  @Test
+  public void aPreviewSiteWrapperUrlIsUnwrappedToTheRealVideoPage() {
+    Intent intent =
+        previewIntentFor(
+            Constants.FROSTWIRE_PREVIEW_DOT_COM_URL
+                + "?x=1&detailsUrl=https://www.youtube.com/watch?v=abc");
+    assertEquals("https://www.youtube.com/watch?v=abc", intent.getDataString());
   }
 }
