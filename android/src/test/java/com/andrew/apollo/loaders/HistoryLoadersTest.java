@@ -24,7 +24,6 @@ import com.andrew.apollo.FakeMediaStore;
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.provider.FavoritesStore;
 import com.andrew.apollo.provider.RecentStore;
-import java.lang.reflect.Field;
 import java.util.List;
 import org.junit.After;
 import org.junit.Before;
@@ -46,21 +45,13 @@ public class HistoryLoadersTest {
     ApolloServiceFixture.installPlatform(false);
     FakeMediaStore.install();
     FakeConfig.install();
-    forget(FavoritesStore.class);
-    forget(RecentStore.class);
+    FakeConfig.resetStores();
   }
 
   @After
   public void tearDown() throws Exception {
-    forget(FavoritesStore.class);
-    forget(RecentStore.class);
+    FakeConfig.resetStores();
     FakeConfig.uninstall();
-  }
-
-  private static void forget(Class<?> store) throws Exception {
-    Field field = store.getDeclaredField("sInstance");
-    field.setAccessible(true);
-    field.set(null, null);
   }
 
   @Test

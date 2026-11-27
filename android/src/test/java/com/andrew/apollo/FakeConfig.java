@@ -69,10 +69,38 @@ public final class FakeConfig {
     Field prefs = PreferenceUtils.class.getDeclaredField("sInstance");
     prefs.setAccessible(true);
     prefs.set(null, null);
+    resetStores();
     return config;
   }
 
+  /**
+   * The favorites and recent databases are singletons with files that outlive a test; start every
+   * test with none of them.
+   */
+  public static void resetStores() throws Exception {
+    for (Class<?> store :
+        new Class<?>[] {
+          com.andrew.apollo.provider.FavoritesStore.class,
+          com.andrew.apollo.provider.RecentStore.class
+        }) {
+      Field field = store.getDeclaredField("sInstance");
+      field.setAccessible(true);
+      Object instance = field.get(null);
+      if (instance instanceof android.database.sqlite.SQLiteOpenHelper) {
+        ((android.database.sqlite.SQLiteOpenHelper) instance).close();
+      }
+      field.set(null, null);
+    }
+    android.content.Context context =
+        androidx.test.core.app.ApplicationProvider.getApplicationContext();
+    context.deleteDatabase(com.andrew.apollo.provider.FavoritesStore.DATABASE_NAME);
+    context.deleteDatabase(com.andrew.apollo.provider.RecentStore.DATABASE_NAME);
+  }
+
   public static void uninstall() throws Exception {
+    resetStores();
+    // Other tests expect the main thread to be the UI thread.
+    ApolloServiceFixture.installPlatform(true);
     Field instance = ConfigurationManager.class.getDeclaredField("instance");
     instance.setAccessible(true);
     instance.set(null, null);

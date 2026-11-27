@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 import android.app.Application;
 import android.content.Context;
 import androidx.test.core.app.ApplicationProvider;
-import java.lang.reflect.Field;
+import com.andrew.apollo.FakeConfig;
 import java.util.List;
 import org.junit.After;
 import org.junit.Before;
@@ -35,21 +35,12 @@ public class FavoritesAndRecentStoresTest {
   @Before
   public void setUp() throws Exception {
     context = ApplicationProvider.getApplicationContext();
-    forget(FavoritesStore.class);
-    forget(RecentStore.class);
+    FakeConfig.resetStores();
   }
 
   @After
   public void tearDown() throws Exception {
-    forget(FavoritesStore.class);
-    forget(RecentStore.class);
-  }
-
-  /** The stores are singletons; a test must not use the database of the test before it. */
-  private static void forget(Class<?> store) throws Exception {
-    Field field = store.getDeclaredField("sInstance");
-    field.setAccessible(true);
-    field.set(null, null);
+    FakeConfig.resetStores();
   }
 
   @Test
