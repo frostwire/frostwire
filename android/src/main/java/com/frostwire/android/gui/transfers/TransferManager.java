@@ -200,9 +200,16 @@ public final class TransferManager {
   // (frostwire/frostwire#1386).
   public void forceReannounceTorrents() {
     for (BittorrentDownload d : bittorrentDownloadsList) {
-      if (d instanceof BTDownload) {
-        BTDownload bt = (BTDownload) d;
-        bt.getTorrentHandle().forceReannounce(0, -1, TorrentHandle.IGNORE_MIN_INTERVAL);
+      // the list holds the app's wrappers, never the engine's BTDownload itself
+      if (d instanceof UIBittorrentDownload) {
+        try {
+          TorrentHandle th = ((UIBittorrentDownload) d).getDl().getTorrentHandle();
+          if (th != null && th.isValid()) {
+            th.forceReannounce(0, -1, TorrentHandle.IGNORE_MIN_INTERVAL);
+          }
+        } catch (Throwable t) {
+          LOG.warn("forceReannounceTorrents() could not reannounce a torrent", t);
+        }
       }
     }
   }

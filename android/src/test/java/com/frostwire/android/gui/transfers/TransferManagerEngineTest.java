@@ -428,4 +428,24 @@ public class TransferManagerEngineTest {
 
     main.verify(() -> MainApplication.recordBTEngineInitializationFailure(any()), atLeastOnce());
   }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void forcingAReannounceReachesTheTorrentsOfTheListedTransfers() throws Exception {
+    BTDownload dl = torrent.add(null, false);
+    awaitTransfer();
+    // the list holds the app's wrappers: put one around a download whose handle can be observed
+    BTDownload spied = org.mockito.Mockito.spy(dl);
+    TorrentHandle observed = mock(TorrentHandle.class);
+    when(observed.isValid()).thenReturn(true);
+    org.mockito.Mockito.doReturn(observed).when(spied).getTorrentHandle();
+    java.lang.reflect.Field list =
+        TransferManager.class.getDeclaredField("bittorrentDownloadsList");
+    list.setAccessible(true);
+    ((List<BittorrentDownload>) list.get(manager)).add(new UIBittorrentDownload(manager, spied));
+
+    manager.forceReannounceTorrents();
+
+    verify(observed).forceReannounce(0, -1, TorrentHandle.IGNORE_MIN_INTERVAL);
+  }
 }
