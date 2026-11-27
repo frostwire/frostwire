@@ -90,7 +90,18 @@ public final class ApolloServiceFixture {
     forgetCachedService();
   }
 
+  /** The static handler the service posts its player-thread work to. */
+  public static void setPlayerHandler(Handler handler) throws Exception {
+    setStatic(MusicPlaybackService.class, "mPlayerHandler", handler);
+  }
+
   public void stop() throws Exception {
+    // Media3 refuses a second session with the same id, in the same process. Destroying the
+    // service would idle the main looper, which a pending toast keeps busy forever.
+    for (androidx.media3.session.MediaSession session :
+        new java.util.ArrayList<>(service.getSessions())) {
+      session.release();
+    }
     if (player != null) {
       new Handler(player.getApplicationLooper()).post(player::release);
     }
