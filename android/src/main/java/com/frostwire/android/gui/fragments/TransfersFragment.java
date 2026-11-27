@@ -723,7 +723,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     if (getActivity() != null && isVisible()) {
       getActivity().invalidateOptionsMenu();
     }
-    if (BTEngine.ctx != null) {
+    if (isBittorrentEngineStarted()) {
       if (TaskThrottle.isReadyToSubmitTask(
           "TransfersFragment::getStatusBarDataBackground",
           TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000)) {
@@ -765,6 +765,14 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
       // Update UI with cached DHT state
       onCheckDHT();
     }
+  }
+
+  /**
+   * Whether libtorrent's session has a context to run in: touching BTEngine loads libtorrent's
+   * native library, which a unit test can't, so a test overrides this.
+   */
+  boolean isBittorrentEngineStarted() {
+    return BTEngine.ctx != null;
   }
 
   private static class StatusBarData {
@@ -816,7 +824,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
    */
   private void updateDHTCache() {
     try {
-      if (BTEngine.ctx == null) {
+      if (!isBittorrentEngineStarted()) {
         cachedDhtEnabled = false;
         cachedDhtPeers = 0;
         return;
@@ -832,7 +840,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
   }
 
   private void onCheckDHT() {
-    if (textDHTPeers == null || !TransfersFragment.this.isAdded() || BTEngine.ctx == null) {
+    if (textDHTPeers == null || !TransfersFragment.this.isAdded() || !isBittorrentEngineStarted()) {
       return;
     }
     textDHTPeers.setVisibility(View.VISIBLE);
