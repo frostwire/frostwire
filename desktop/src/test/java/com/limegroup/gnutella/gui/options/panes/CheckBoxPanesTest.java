@@ -18,6 +18,7 @@ import com.limegroup.gnutella.settings.SearchSettings;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.settings.StartupSettings;
 import com.limegroup.gnutella.settings.StatusBarSettings;
+import com.limegroup.gnutella.settings.UISettings;
 import com.limegroup.gnutella.settings.UpdateManagerSettings;
 import javax.swing.JCheckBox;
 import org.junit.jupiter.api.AfterEach;
@@ -38,6 +39,8 @@ class CheckBoxPanesTest {
   private boolean details;
   private boolean promos;
   private boolean recommendations;
+  private boolean autocomplete;
+  private boolean notifications;
   private int licenseWarning;
 
   @BeforeEach
@@ -50,6 +53,8 @@ class CheckBoxPanesTest {
     details = SearchSettings.SHOW_DETAIL_PAGE_AFTER_DOWNLOAD_START.getValue();
     promos = UpdateManagerSettings.SHOW_PROMOTION_OVERLAYS.getValue();
     recommendations = UpdateManagerSettings.SHOW_FROSTWIRE_RECOMMENDATIONS.getValue();
+    autocomplete = UISettings.AUTOCOMPLETE_ENABLED.getValue();
+    notifications = UISettings.SHOW_NOTIFICATIONS.getValue();
     licenseWarning = QuestionsHandler.SKIP_FIRST_DOWNLOAD_WARNING.getValue();
   }
 
@@ -63,6 +68,8 @@ class CheckBoxPanesTest {
     SearchSettings.SHOW_DETAIL_PAGE_AFTER_DOWNLOAD_START.setValue(details);
     UpdateManagerSettings.SHOW_PROMOTION_OVERLAYS.setValue(promos);
     UpdateManagerSettings.SHOW_FROSTWIRE_RECOMMENDATIONS.setValue(recommendations);
+    UISettings.AUTOCOMPLETE_ENABLED.setValue(autocomplete);
+    UISettings.SHOW_NOTIFICATIONS.setValue(notifications);
     QuestionsHandler.SKIP_FIRST_DOWNLOAD_WARNING.setValue(licenseWarning);
   }
 
@@ -144,6 +151,18 @@ class CheckBoxPanesTest {
     assertApplyWrites(
         ShowFrostWireRecommendationsPaneItem::new,
         UpdateManagerSettings.SHOW_FROSTWIRE_RECOMMENDATIONS);
+  }
+
+  @Test
+  void autocompletionReadsAndWrites() throws Exception {
+    assertFollowsSetting(AutoCompletePaneItem::new, UISettings.AUTOCOMPLETE_ENABLED);
+    assertApplyWrites(AutoCompletePaneItem::new, UISettings.AUTOCOMPLETE_ENABLED);
+  }
+
+  @Test
+  void notificationsReadAndWrite() throws Exception {
+    assertFollowsSetting(NotificationsPaneItem::new, UISettings.SHOW_NOTIFICATIONS);
+    assertApplyWrites(NotificationsPaneItem::new, UISettings.SHOW_NOTIFICATIONS);
   }
 
   /** The license warning box is the inverse of the "skip the first download warning" answer. */
