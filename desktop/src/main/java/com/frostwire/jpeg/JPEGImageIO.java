@@ -73,6 +73,8 @@ public class JPEGImageIO {
           || 0xffc9 <= seg.marker && seg.marker <= 0xffcb
           || 0xffcd <= seg.marker && seg.marker <= 0xffcf) {
         DataInputStream dis = new DataInputStream(fifi);
+        // SOF: precision(1), height(2), width(2), Nf(1)
+        dis.readFully(new byte[5]);
         numberOfComponentsInFrame = dis.readUnsignedByte();
         break;
       } else if (seg.marker == 0xffe2) {
