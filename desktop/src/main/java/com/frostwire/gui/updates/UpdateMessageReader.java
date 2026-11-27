@@ -228,9 +228,9 @@ final class UpdateMessageReader implements ContentHandler {
    * <p>If you want a full-blown validation use isMessageForMe()
    */
   private boolean isMessageEligibleForMyVersion(UpdateMessage msg) {
-    return msg.getVersion() == null
-        || msg.getMessageType().equalsIgnoreCase("update")
-        || !UpdateManager.isFrostWireOld(msg);
+    // isFrostWireOld(msg) checks the build, and the version only when there is no build; it is
+    // false when the message names neither.
+    return msg.getMessageType().equalsIgnoreCase("update") || !UpdateManager.isFrostWireOld(msg);
   }
 
   /**

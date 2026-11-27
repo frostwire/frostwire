@@ -39,7 +39,7 @@ final class UpdateMessage implements Serializable {
   private String _showOnce = "false"; // if this message is to be shown once or not
   private String _src = ""; // image src for overlay image message
   private boolean _intro = false; // if overlay should be shown at intro, or after searches.
-  private String _lang = "en"; // default language for image
+  private String _lang = null; // null: no language attribute, valid for any language
   private String _md5 = ""; // md5 hash code for overlay image
   private String _saveAs =
       null; // optional, makes InstallerUpdater set a name for the downloaded file

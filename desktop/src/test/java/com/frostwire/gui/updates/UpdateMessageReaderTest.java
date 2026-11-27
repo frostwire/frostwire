@@ -252,6 +252,37 @@ class UpdateMessageReaderTest {
   }
 
   @Test
+  void aMessageWithoutALanguageIsValidForEveryLanguage() throws Exception {
+    ApplicationSettings.LANGUAGE.setValue("es");
+    ApplicationSettings.COUNTRY.setValue("VE");
+    UpdateMessageReader reader =
+        read(
+            "<message type=\"update\" version=\"9.9.9\" url=\"https://a\" />"
+                + "<message type=\"announcement\" value=\"any\" url=\"https://b\" />");
+    assertNotNull(reader.getUpdateMessage(), "no language attribute means valid for any language");
+    assertNull(reader.getUpdateMessage().getLanguage());
+    assertEquals(
+        List.of("any"), reader.getAnnouncements().stream().map(UpdateMessage::getMessage).toList());
+  }
+
+  @Test
+  void anAnnouncementForAFutureBuildWithoutAVersionWaits() throws Exception {
+    int build = FrostWireUtils.getBuildNumber();
+    UpdateMessageReader reader =
+        read(
+            "<message type=\"announcement\" value=\"ahead\" build=\""
+                + (build + 1)
+                + "\" url=\"https://a\" />"
+                + "<message type=\"announcement\" value=\"same\" build=\""
+                + build
+                + "\" url=\"https://b\" />"
+                + "<message type=\"announcement\" value=\"none\" url=\"https://c\" />");
+    assertEquals(
+        List.of("none", "same"),
+        reader.getAnnouncements().stream().map(UpdateMessage::getMessage).sorted().toList());
+  }
+
+  @Test
   void overlaysAreNeitherTheUpdateNorAnnouncements() throws Exception {
     UpdateMessageReader reader =
         read(
