@@ -46,6 +46,33 @@ public final class ApolloUiTestSupport {
     ConfigurationManager.instance();
   }
 
+  /**
+   * Runs the main looper until the condition holds, for work that hops to a background handler
+   * thread and back; fails after ten seconds.
+   */
+  public static void waitUntil(String what, java.util.function.BooleanSupplier condition) {
+    long deadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(10);
+    while (!condition.getAsBoolean() && System.nanoTime() < deadline) {
+      org.robolectric.shadows.ShadowLooper.idleMainLooper();
+      try {
+        Thread.sleep(2);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        break;
+      }
+    }
+    if (!condition.getAsBoolean()) {
+      throw new AssertionError("timed out waiting for " + what);
+    }
+  }
+
+  /** Lets work already posted to the main looper, and what it posts in turn, run. */
+  public static void settle() {
+    for (int i = 0; i < 5; i++) {
+      org.robolectric.shadows.ShadowLooper.idleMainLooper();
+    }
+  }
+
   public static void installAll() {
     installPlatform();
     installConfiguration();

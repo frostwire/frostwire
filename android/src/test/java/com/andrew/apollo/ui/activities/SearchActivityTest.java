@@ -161,7 +161,7 @@ public class SearchActivityTest {
 
   @Test
   public void aRowOfAnotherTypeIsLeftUntouched() throws Exception {
-    FakeMediaProvider.addRow(4, "image/png", "a picture");
+    FakeMediaProvider.addRow("_id", 4L, "mime_type", "image/png");
     SearchActivity activity = withRows(launch("a").get(), 1);
 
     View row = row(activity, 0);

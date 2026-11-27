@@ -13,57 +13,85 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.robolectric.Robolectric;
 
 /**
- * A stand-in for the MediaStore: every query answers with the rows the test set, whatever columns
- * were asked for, so the screens that load their lists through a {@code CursorLoader} can be shown
- * real rows. Rows are plain {@code column -> value} arrays over {@link #COLUMNS}.
+ * A stand-in for the MediaStore: every query answers with the rows the test set, with exactly the
+ * columns that were asked for (a column a row does not define reads as null or 0), so the screens
+ * that load their lists through loaders can be shown real rows.
  */
 public final class FakeMediaProvider extends ContentProvider {
 
-  /** Every column the Apollo list screens read. */
-  public static final String[] COLUMNS = {
-    "_id", "mime_type", "artist", "album", "title", "_data", "duration", "album_id", "artist_id"
-  };
-
-  private static final List<Object[]> ROWS = new ArrayList<>();
+  private static final List<Map<String, Object>> ROWS = new ArrayList<>();
 
   /** Selection and arguments of the latest query, for assertions on what was asked. */
   public static volatile String lastSelection;
 
   public static volatile String[] lastSelectionArgs;
 
+  /** Every query the provider has answered, as {@code uri}. */
+  public static final List<String> QUERIES = new java.util.concurrent.CopyOnWriteArrayList<>();
+
   /** Registers the provider for the MediaStore authority and starts it with no rows. */
   public static void install() {
-    ROWS.clear();
+    clear();
     lastSelection = null;
     lastSelectionArgs = null;
+    QUERIES.clear();
     Robolectric.setupContentProvider(FakeMediaProvider.class, "media");
+  }
+
+  /** A row with the given column name/value pairs. */
+  public static void addRow(Object... namesAndValues) {
+    Map<String, Object> row = new HashMap<>();
+    for (int i = 0; i < namesAndValues.length; i += 2) {
+      row.put((String) namesAndValues[i], namesAndValues[i + 1]);
+    }
+    synchronized (ROWS) {
+      ROWS.add(row);
+    }
   }
 
   /** A row for an artist, as the search screen's cursor lists them. */
   public static void addArtist(long id, String artist) {
-    ROWS.add(new Object[] {id, "artist", artist, null, null, null, 0L, 0L, id});
+    addRow("_id", id, "mime_type", "artist", "artist", artist, "artist_id", id);
   }
 
   public static void addAlbum(long id, String album, String artist) {
-    ROWS.add(new Object[] {id, "album", artist, album, null, null, 0L, id, 0L});
+    addRow("_id", id, "mime_type", "album", "artist", artist, "album", album, "album_id", id);
   }
 
   public static void addSong(long id, String title, String album, String artist) {
-    ROWS.add(
-        new Object[] {id, "audio/mpeg", artist, album, title, "/music/" + title, 1000L, 1L, 1L});
-  }
-
-  /** A row of any other mime type. */
-  public static void addRow(long id, String mimeType, String title) {
-    ROWS.add(new Object[] {id, mimeType, null, null, null, null, 0L, 0L, 0L});
+    addRow(
+        "_id",
+        id,
+        "mime_type",
+        "audio/mpeg",
+        "artist",
+        artist,
+        "album",
+        album,
+        "title",
+        title,
+        "_data",
+        "/music/" + title,
+        "duration",
+        180000L,
+        "album_id",
+        1L,
+        "artist_id",
+        1L,
+        "audio_id",
+        id);
   }
 
   public static void clear() {
-    ROWS.clear();
+    synchronized (ROWS) {
+      ROWS.clear();
+    }
   }
 
   @Override
@@ -76,9 +104,18 @@ public final class FakeMediaProvider extends ContentProvider {
       Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
     lastSelection = selection;
     lastSelectionArgs = selectionArgs;
-    MatrixCursor cursor = new MatrixCursor(COLUMNS);
-    for (Object[] row : ROWS) {
-      cursor.addRow(row);
+    QUERIES.add(String.valueOf(uri));
+    String[] columns =
+        projection != null ? projection : new String[] {"_id", "title", "artist", "album"};
+    MatrixCursor cursor = new MatrixCursor(columns);
+    synchronized (ROWS) {
+      for (Map<String, Object> row : ROWS) {
+        Object[] values = new Object[columns.length];
+        for (int i = 0; i < columns.length; i++) {
+          values[i] = row.get(columns[i]);
+        }
+        cursor.addRow(values);
+      }
     }
     return cursor;
   }
