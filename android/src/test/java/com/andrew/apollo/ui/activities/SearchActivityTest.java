@@ -180,8 +180,8 @@ public class SearchActivityTest {
 
     assertFalse("an empty change is ignored", activity.onQueryTextChange(""));
     assertTrue(activity.onQueryTextChange("beat"));
-    settle();
-    assertEquals("%beat%", lastLikeArgument());
+    ApolloUiTestSupport.waitUntil(
+        "the narrowed query reaches the media store", () -> "%beat%".equals(lastLikeArgument()));
 
     assertFalse("an empty submit is ignored", activity.onQueryTextSubmit(""));
     assertTrue(activity.onQueryTextSubmit("beat"));

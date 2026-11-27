@@ -20,9 +20,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.frostwire.android.R;
-import com.frostwire.platform.Platform;
-import com.frostwire.platform.Platforms;
-import java.lang.reflect.Proxy;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.junit.Before;
@@ -46,13 +43,7 @@ public class CarouselTabTest {
 
   @Before
   public void setUp() {
-    Platforms.set(
-        (Platform)
-            Proxy.newProxyInstance(
-                Platform.class.getClassLoader(),
-                new Class<?>[] {Platform.class},
-                (proxy, method, args) ->
-                    "isUIThread".equals(method.getName()) ? Boolean.FALSE : null));
+    com.andrew.apollo.ui.ApolloUiTestSupport.installPlatform();
     activity = Robolectric.buildActivity(Activity.class).create().start().resume().visible().get();
     activity.setTheme(R.style.Theme_FrostWire);
     tab = (CarouselTab) LayoutInflater.from(activity).inflate(R.layout.profile_tab, null, false);
@@ -122,31 +113,34 @@ public class CarouselTabTest {
   @Test
   public void anAlbumWithoutANameGetsThePlaceholder() {
     tab.setAlbumPhoto(activity, "", "Some Artist");
-    shadowOf(android.os.Looper.getMainLooper()).idle();
 
+    com.andrew.apollo.ui.ApolloUiTestSupport.waitUntil(
+        "the placeholder", () -> photo().getDrawable() != null);
     assertEquals(R.drawable.header_temp, photoResource());
   }
 
   @Test
   public void anAlbumWithANameShowsTheAlbumArtView() {
     tab.setAlbumPhoto(activity, "An Album", "Some Artist");
-    shadowOf(android.os.Looper.getMainLooper()).idle();
 
-    assertEquals(View.VISIBLE, tab.findViewById(R.id.profile_tab_album_art).getVisibility());
+    com.andrew.apollo.ui.ApolloUiTestSupport.waitUntil(
+        "the album art shows",
+        () -> tab.findViewById(R.id.profile_tab_album_art).getVisibility() == View.VISIBLE);
   }
 
   @Test
   public void anArtistWithNoPlayedAlbumGetsThePlaceholder() {
     tab.setArtistAlbumPhoto(activity, "Some Artist");
-    shadowOf(android.os.Looper.getMainLooper()).idle();
 
+    com.andrew.apollo.ui.ApolloUiTestSupport.waitUntil(
+        "the placeholder", () -> photo().getDrawable() != null);
     assertEquals(R.drawable.header_temp, photoResource());
   }
 
   @Test
   public void aBlurredPhotoIsRequestedForTheAlbum() {
     tab.blurPhoto(activity, "Some Artist", "An Album");
-    shadowOf(android.os.Looper.getMainLooper()).idle();
+    com.andrew.apollo.ui.ApolloUiTestSupport.settle();
 
     assertNotNull(photo());
   }
@@ -163,11 +157,8 @@ public class CarouselTabTest {
         });
 
     assertTrue(asked.await(10, TimeUnit.SECONDS));
-    long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
-    while (photo().getDrawable() == null && System.nanoTime() < deadline) {
-      shadowOf(android.os.Looper.getMainLooper()).idle();
-      Thread.onSpinWait();
-    }
+    com.andrew.apollo.ui.ApolloUiTestSupport.waitUntil(
+        "the placeholder", () -> photo().getDrawable() != null);
     assertEquals(R.drawable.header_temp, photoResource());
   }
 }
