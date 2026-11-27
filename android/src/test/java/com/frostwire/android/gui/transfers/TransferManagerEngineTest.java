@@ -14,10 +14,12 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -33,12 +35,15 @@ import com.frostwire.android.libtorrent.TestEngine;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.bittorrent.BTEngineListener;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.Transfer;
 import com.frostwire.transfers.TransferState;
 import java.io.File;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import org.junit.After;
 import org.junit.Before;
@@ -341,5 +346,86 @@ public class TransferManagerEngineTest {
   public void aTransferWithEveryFileWantedSkipsNothing() throws Exception {
     BTDownload dl = torrent.add(null, false);
     assertTrue(Transfers.getSkippedFiles(dl).isEmpty());
+  }
+
+  @Test
+  public void anEngineThatIsNotStartedYetIsWaitedForAndEventuallyGivenUpOn() {
+    Engine notStarted = Engine.instance();
+    when(notStarted.isStarted()).thenReturn(false);
+    List<Runnable> retries = new ArrayList<>();
+    system
+        .when(() -> SystemUtils.postToHandlerDelayed(any(), any(Runnable.class), anyLong()))
+        .thenAnswer(
+            call -> {
+              retries.add(call.getArgument(1));
+              return null;
+            });
+
+    manager.reset();
+
+    assertEquals("waits for the engine", 1, retries.size());
+    // every retry finds it still not started: after the last allowed one, it stops asking
+    int rounds = 0;
+    while (!retries.isEmpty() && rounds < 1000) {
+      retries.remove(0).run();
+      rounds++;
+    }
+    assertEquals(121, rounds + 1);
+    assertTrue(retries.isEmpty());
+  }
+
+  @Test
+  public void aFailureRestoringThePreviousSessionIsRecordedAndRetriedByTheNextReset() {
+    BTEngine broken = org.mockito.Mockito.spy(local.engine);
+    org.mockito.Mockito.doThrow(new IllegalStateException("resume files unreadable"))
+        .when(broken)
+        .restoreDownloads();
+    engines.when(BTEngine::getInstance).thenReturn(broken);
+
+    manager.reset();
+
+    main.verify(() -> MainApplication.recordBTEngineInitializationFailure(any()));
+    // the next reset restores again (it was not marked as restored)
+    engines.when(BTEngine::getInstance).thenReturn(local.engine);
+    manager.reset();
+    verify(config, atLeastOnce())
+        .getBoolean(Constants.PREF_KEY_TORRENT_SEQUENTIAL_TRANSFERS_ENABLED);
+  }
+
+  @Test
+  public void theEnginesListenerIgnoresDownloadsWithoutAHashAndRefreshesTheKnownOnes()
+      throws Exception {
+    BTDownload dl = torrent.add(null, false);
+    UIBittorrentDownload ui = awaitTransfer();
+    BTEngineListener listener = local.engine.getListener();
+    BTDownload noHash = mock(BTDownload.class);
+    when(noHash.getInfoHash()).thenReturn(null);
+
+    listener.downloadAdded(local.engine, noHash);
+    listener.downloadUpdate(local.engine, noHash);
+
+    // not listed, and no listener was given to it
+    org.mockito.Mockito.verify(noHash, never()).setListener(any());
+    // an update of a listed transfer refreshes its wrapper; one the list lost lists it again
+    dl.setListener(null);
+    listener.downloadUpdate(local.engine, dl);
+    assertTrue(dl.getListener() instanceof UIBTDownloadListener);
+    assertSame(ui, manager.getBittorrentDownload(torrent.album.infoHashV1().toHex()));
+    manager.onShutdown(false);
+    assertNull(manager.getBittorrentDownload(torrent.album.infoHashV1().toHex()));
+    listener.downloadUpdate(local.engine, dl);
+    assertNotNull(manager.getBittorrentDownload(torrent.album.infoHashV1().toHex()));
+  }
+
+  @Test
+  public void aSessionThatCannotBeAskedItsRatesCountsAsNoTraffic() {
+    engines
+        .when(BTEngine::getInstance)
+        .thenThrow(new UnsatisfiedLinkError("jlibtorrent native library is not available"));
+
+    assertEquals(0, manager.getDownloadsBandwidth());
+    assertEquals(0.0, manager.getUploadsBandwidth(), 0.0);
+
+    main.verify(() -> MainApplication.recordBTEngineInitializationFailure(any()), atLeastOnce());
   }
 }
