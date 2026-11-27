@@ -159,7 +159,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
   @Override
   public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-    transferUpdateExecutor = new TransferUpdateExecutor();
+    transferUpdateExecutor = createTransferUpdateExecutor();
     transferUpdateExecutor.initialize();
     initTimerServiceSubscription();
     requireActivity()
@@ -227,6 +227,11 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
               }
             },
             getViewLifecycleOwner());
+  }
+
+  /** The executor the list's refreshes run on, a test makes them run on its own thread. */
+  TransferUpdateExecutor createTransferUpdateExecutor() {
+    return new TransferUpdateExecutor();
   }
 
   private void tryTimerServiceUnsubscribe() {
