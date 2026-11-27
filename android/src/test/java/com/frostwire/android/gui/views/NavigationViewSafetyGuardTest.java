@@ -12,6 +12,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import android.app.Application;
 import android.os.DeadSystemException;
 import android.view.ContextThemeWrapper;
 import android.view.ViewTreeObserver;
@@ -24,9 +25,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
+/**
+ * Runs with a plain Application: build.gradle excludes the old NavigationViewSafetyTest name
+ * because it booted MainApplication.
+ */
 @RunWith(RobolectricTestRunner.class)
-public class NavigationViewSafetyTest {
+@Config(sdk = 34, application = Application.class)
+public class NavigationViewSafetyGuardTest {
+
+  @Test
+  public void installInsetListenerGuard_ignoresANullView() {
+    NavigationViewSafety.installInsetListenerGuard(null);
+  }
 
   @Test
   public void installInsetListenerGuard_wrapsAndSwallowsDeadSystemException() throws Exception {
