@@ -138,7 +138,7 @@ public final class JdkHttpClient extends AbstractHttpClient {
         fos = new FileOutputStream(file, false);
         rangeStart = -1;
       }
-      get(url, fos, timeout, userAgent, null, referrer, rangeStart);
+      get(url, fos, timeout, userAgent, referrer, null, rangeStart, -1, extraHeaders);
     } finally {
       closeQuietly(fos);
     }
@@ -191,6 +191,9 @@ public final class JdkHttpClient extends AbstractHttpClient {
     conn.setRequestMethod("POST");
     conn.setRequestProperty("Content-Type", postContentType);
     conn.setRequestProperty("charset", "utf-8");
+    if (gzip) {
+      conn.setRequestProperty("Content-Encoding", "gzip");
+    }
     conn.setUseCaches(false);
     ByteArrayInputStream in = new ByteArrayInputStream(data);
     try {
