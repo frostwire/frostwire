@@ -133,7 +133,7 @@ public class Action {
    * @return a hash code for this <code>Action</code>.
    */
   public int hashCode() {
-    if (hashcode != 0) {
+    if (hashcode == 0) {
       int result = 17;
       if (this.description != null) {
         result = 37 * result + this.description.hashCode();

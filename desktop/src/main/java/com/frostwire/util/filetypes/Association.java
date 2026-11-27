@@ -63,9 +63,6 @@ public class Association {
   /** Action list of the association. */
   private List<Action> actionList;
 
-  /** Hashcode for this association */
-  private int hashcode;
-
   /**
    * Returns the name of the MIME files the association is stored in for Gnome/Unix platforms.
    *
@@ -297,16 +294,8 @@ public class Association {
     // Compare if the action list equals
     List<Action> otherActionList = otherAssoc.getActionList();
     isActionListEquals = false;
-    // action list Equlas when
-    // 1. both action lists are null
-    // 2. neither action lists is null and they have same elements
-    if ((actionList == null) && (otherActionList != null)) {
-      isActionListEquals = true;
-    } else if ((actionList != null) && (otherActionList != null)) {
-      if ((actionList.containsAll(otherActionList)) && (otherActionList.containsAll(actionList))) {
-        isActionListEquals = true;
-      }
-    }
+    // the action lists are equal when they have the same elements (a missing list is empty)
+    isActionListEquals = new HashSet<>(getActionList()).equals(new HashSet<>(otherActionList));
     return isActionListEquals;
   }
 
@@ -318,29 +307,16 @@ public class Association {
    * @return a hash code for this <code>Association</code>.
    */
   public int hashCode() {
-    if (hashcode != 0) {
-      int result = 17;
-      if (this.name != null) {
-        result = result * 37 + this.name.hashCode();
-      }
-      if (this.description != null) {
-        result = result * 37 + this.description.hashCode();
-      }
-      if (this.mimeType != null) {
-        result = result * 37 + this.mimeType.hashCode();
-      }
-      if (this.iconFileName != null) {
-        result = result * 37 + this.iconFileName.hashCode();
-      }
-      if (this.fileExtensionList != null) {
-        result = result * 37 + this.fileExtensionList.hashCode();
-      }
-      if (this.actionList != null) {
-        result = result * 37 + this.actionList.hashCode();
-      }
-      hashcode = result;
-    }
-    return hashcode;
+    // Not cached: Association is mutable. Must agree with equals(): the name is not part of it,
+    // and the extension and action lists are compared as sets, ignoring order and duplicates.
+    int result = 17;
+    result = result * 37 + Objects.hashCode(description);
+    result = result * 37 + Objects.hashCode(mimeType);
+    result = result * 37 + Objects.hashCode(iconFileName);
+    result =
+        result * 37 + (fileExtensionList == null ? 0 : new HashSet<>(fileExtensionList).hashCode());
+    result = result * 37 + new HashSet<>(getActionList()).hashCode();
+    return result;
   }
 
   /**
