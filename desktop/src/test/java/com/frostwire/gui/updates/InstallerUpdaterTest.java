@@ -17,6 +17,8 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.MessageDigest;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
@@ -102,6 +104,34 @@ class InstallerUpdaterTest {
     assertFalse(half.exists());
     assertTrue(installer.exists(), "the file with the announced MD5 is the update");
     assertEquals("new installer", Files.readString(installer.toPath()));
+  }
+
+  @Test
+  void contentLengthIsReadWhateverTheCaseOfTheHeaderName() {
+    assertEquals(1234, InstallerUpdater.contentLength(Map.of("Content-Length", List.of("1234"))));
+    assertEquals(1234, InstallerUpdater.contentLength(Map.of("content-length", List.of("1234"))));
+    assertEquals(1234, InstallerUpdater.contentLength(Map.of("CONTENT-LENGTH", List.of(" 1234 "))));
+  }
+
+  @Test
+  void anAbsentOrBrokenContentLengthIsZero() {
+    assertEquals(0, InstallerUpdater.contentLength(null));
+    assertEquals(0, InstallerUpdater.contentLength(Map.of()));
+    assertEquals(0, InstallerUpdater.contentLength(Map.of("Content-Type", List.of("text/html"))));
+    assertEquals(0, InstallerUpdater.contentLength(Map.of("Content-Length", List.of())));
+    assertEquals(0, InstallerUpdater.contentLength(Map.of("Content-Length", List.of("many"))));
+    assertEquals(0, InstallerUpdater.contentLength(Map.of("Content-Length", List.of("-5"))));
+  }
+
+  @Test
+  void progressIsAPercentageThatNeverDividesByZero() {
+    assertEquals(0, InstallerUpdater.progressPercent(0, 200));
+    assertEquals(50, InstallerUpdater.progressPercent(100, 200));
+    assertEquals(100, InstallerUpdater.progressPercent(200, 200));
+    assertEquals(100, InstallerUpdater.progressPercent(300, 200), "never above 100");
+    assertEquals(0, InstallerUpdater.progressPercent(4096, 0), "unknown size");
+    assertEquals(
+        99, InstallerUpdater.progressPercent(Long.MAX_VALUE / 100 - 1, Long.MAX_VALUE / 100));
   }
 
   @Test

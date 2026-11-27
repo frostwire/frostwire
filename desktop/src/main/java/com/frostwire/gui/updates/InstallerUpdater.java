@@ -172,6 +172,37 @@ class InstallerUpdater implements Runnable {
     }
   }
 
+  /**
+   * The Content-Length of the response; header names are case-insensitive (HTTP/2 sends them in
+   * lower case). 0 when it is absent or not a number.
+   */
+  static long contentLength(Map<String, List<String>> headerFields) {
+    if (headerFields == null) {
+      return 0;
+    }
+    for (Map.Entry<String, List<String>> header : headerFields.entrySet()) {
+      List<String> values = header.getValue();
+      if ("Content-Length".equalsIgnoreCase(header.getKey())
+          && values != null
+          && !values.isEmpty()) {
+        try {
+          return Math.max(0, Long.parseLong(values.get(0).trim()));
+        } catch (NumberFormatException e) {
+          return 0;
+        }
+      }
+    }
+    return 0;
+  }
+
+  /** Percentage downloaded, 0 to 100; 0 while the total size is unknown. */
+  static int progressPercent(long downloaded, long contentLength) {
+    if (contentLength <= 0) {
+      return 0;
+    }
+    return (int) Math.min(100, downloaded * 100 / contentLength);
+  }
+
   private void handleHttpDownload() {
     File updateFolder = UpdateSettings.UPDATES_DIR;
     String fileName = UpdateMediator.getInstallerFilename(updateMessage);
@@ -199,7 +230,7 @@ class InstallerUpdater implements Runnable {
             @Override
             public void onData(HttpClient client, byte[] buffer, int offset, int length) {
               downloaded += length;
-              downloadProgress = (int) ((float) downloaded / contentLength * 100.0);
+              downloadProgress = progressPercent(downloaded, contentLength);
             }
 
             @Override
@@ -210,9 +241,7 @@ class InstallerUpdater implements Runnable {
 
             @Override
             public void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields) {
-              if (headerFields.containsKey("Content-Length")) {
-                contentLength = Long.parseLong(headerFields.get("Content-Length").get(0));
-              }
+              contentLength = contentLength(headerFields);
             }
           });
       try {
