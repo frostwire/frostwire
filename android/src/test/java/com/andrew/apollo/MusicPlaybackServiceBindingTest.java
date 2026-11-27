@@ -8,6 +8,7 @@
 package com.andrew.apollo;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -90,5 +91,22 @@ public class MusicPlaybackServiceBindingTest {
     idle();
 
     assertEquals(2, service.getAudioId());
+  }
+
+  /**
+   * onCreateSafe waited on a latch nothing ever released, so on a worker thread it never returned
+   * (and on the UI thread it parked the shared MISC thread for good).
+   */
+  @Test
+  public void onCreateSafeReturnsOnceTheServiceIsReady() throws Exception {
+    service.onRebind(new Intent());
+    assertTrue(MusicPlaybackService.instanceReady());
+
+    Thread caller = new Thread(MusicPlaybackService::onCreateSafe, "onCreateSafe-test");
+    caller.setUncaughtExceptionHandler((t, e) -> {});
+    caller.start();
+    caller.join(5_000);
+
+    assertFalse("onCreateSafe never returned", caller.isAlive());
   }
 }

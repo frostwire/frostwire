@@ -157,8 +157,6 @@ public class MusicPlaybackService extends MediaSessionService {
 
   private static MusicPlaybackService INSTANCE = null;
 
-  private static final CountDownLatch initLatch = new CountDownLatch(1);
-
   private static final LocalBinder binder = new LocalBinder();
 
   /** Indicates that the music has paused or resumed */
@@ -392,9 +390,8 @@ public class MusicPlaybackService extends MediaSessionService {
     return INSTANCE != null && initServiceLatch.getCount() == 0;
   }
 
-  private static CountDownLatch getInitLatch() {
-    return initLatch;
-  }
+  /** How long {@link #onCreateSafe()} waits for the service instance before giving up. */
+  private static final long ON_CREATE_SAFE_WAIT_SECONDS = 10;
 
   /**
    * If we are on the UI thread, we go to a background service and wait for the MusicPlaybackService
@@ -403,24 +400,29 @@ public class MusicPlaybackService extends MediaSessionService {
   public static void onCreateSafe() {
     if (SystemUtils.isUIThread()) {
       SystemUtils.postToHandler(
-          SystemUtils.HandlerThreadName.MISC,
-          () -> {
-            try {
-              MusicPlaybackService.getInitLatch().await();
-              assert MusicPlaybackService.getInstance() != null;
-              MusicPlaybackService.getInstance().onCreate();
-            } catch (InterruptedException e) {
-              throw new RuntimeException(e);
-            }
-          });
+          SystemUtils.HandlerThreadName.MISC, MusicPlaybackService::onCreateWhenInstanceReady);
     } else {
-      try {
-        MusicPlaybackService.getInitLatch().await();
-        assert MusicPlaybackService.getInstance() != null;
-        MusicPlaybackService.getInstance().onCreate();
-      } catch (InterruptedException e) {
-        throw new RuntimeException(e);
+      onCreateWhenInstanceReady();
+    }
+  }
+
+  /**
+   * Waits for the service the system creates (initServiceLatch), a bounded time: this runs on the
+   * shared MISC thread, and waiting for ever there holds every other task queued behind it.
+   */
+  private static void onCreateWhenInstanceReady() {
+    try {
+      if (!initServiceLatch.await(ON_CREATE_SAFE_WAIT_SECONDS, TimeUnit.SECONDS)) {
+        LOG.warn("onCreateSafe: the service was not created in time, not calling onCreate()");
+        return;
       }
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      return;
+    }
+    final MusicPlaybackService service = getInstance();
+    if (service != null) {
+      service.onCreate();
     }
   }
 
