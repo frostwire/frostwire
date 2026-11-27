@@ -386,4 +386,40 @@ public class TransferDetailTabsRealTest {
         },
         "both files show 100%");
   }
+
+  @Test
+  public void tappingAPieceOfTheHiveShowsItsDetailsReadFromLibtorrent() throws Exception {
+    TransferDetailPiecesFragment tab = open(new TransferDetailPiecesFragment(), null, true, true);
+    int total = transfer.torrent.album.numPieces();
+    tickUntil(
+        tab,
+        () -> text(tab, R.id.fragment_transfer_detail_pieces_pieces_number).contains("/" + total));
+    com.frostwire.android.gui.views.HexHiveView<?> hive =
+        tab.requireView().findViewById(R.id.fragment_transfer_detail_pieces_hexhive_view);
+    hive.measure(
+        View.MeasureSpec.makeMeasureSpec(800, View.MeasureSpec.EXACTLY),
+        View.MeasureSpec.makeMeasureSpec(800, View.MeasureSpec.EXACTLY));
+    hive.layout(0, 0, 800, 800);
+    tickUntil(tab, hive::ready);
+    android.graphics.Point center = new android.graphics.Point();
+    assertTrue(hive.pieceCenter(total - 1, center));
+
+    long now = android.os.SystemClock.uptimeMillis();
+    hive.dispatchTouchEvent(
+        android.view.MotionEvent.obtain(
+            now, now, android.view.MotionEvent.ACTION_DOWN, center.x, center.y, 0));
+    hive.dispatchTouchEvent(
+        android.view.MotionEvent.obtain(
+            now, now + 50, android.view.MotionEvent.ACTION_UP, center.x, center.y, 0));
+
+    View panel = tab.requireView().findViewById(R.id.view_transfer_detail_piece_panel);
+    tickUntil(tab, () -> panel.getVisibility() == View.VISIBLE);
+    String title = text(tab, R.id.view_transfer_detail_piece_panel_title);
+    assertTrue(title, title.contains(String.valueOf(total - 1)));
+    String details = text(tab, R.id.view_transfer_detail_piece_panel_details);
+    assertTrue(details, details.contains("one.mp3"));
+    // closing the card clears the selection
+    tab.requireView().findViewById(R.id.view_transfer_detail_piece_panel_close).performClick();
+    assertEquals(-1, hive.getSelectedPiece());
+  }
 }
