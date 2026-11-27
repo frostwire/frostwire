@@ -34,7 +34,7 @@ public final class TimeRemainingHolder implements Comparable<TimeRemainingHolder
   }
 
   public int compareTo(TimeRemainingHolder o) {
-    return (int) (o._timeRemaining - _timeRemaining);
+    return Long.compare(o._timeRemaining, _timeRemaining);
   }
 
   @Override
