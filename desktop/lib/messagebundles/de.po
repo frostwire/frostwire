@@ -7377,3 +7377,21 @@ msgid ""
 "FrostWire started with the default theme because your theme {0} could not be "
 "loaded. Logs and error reports are in {1}"
 msgstr "FrostWire wurde mit dem Standard-Design gestartet, weil Ihr Design {0} nicht geladen werden konnte. Protokolle und Fehlerberichte befinden sich in {1}"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
+msgid "Windows blocked a file FrostWire needs, so it can't start."
+msgstr "Windows hat eine Datei blockiert, die FrostWire benötigt, daher kann es nicht gestartet werden."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
+msgid ""
+"An Application Control policy on this computer (Smart App Control, Windows "
+"Defender Application Control or AppLocker) refused to load it. FrostWire's "
+"files are not damaged."
+msgstr "Eine Application-Control-Richtlinie auf diesem Computer (Smart App Control, Windows Defender Application Control oder AppLocker) hat das Laden verweigert. Die Dateien von FrostWire sind nicht beschädigt."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
+msgid ""
+"To fix it, turn off Smart App Control (Windows Security > App & browser "
+"control > Smart App Control settings), or ask the administrator of this "
+"computer to allow FrostWire's program folder, then start FrostWire again."
+msgstr "Schalten Sie zur Behebung Smart App Control aus (Windows-Sicherheit > App- & Browsersteuerung > Smart App Control-Einstellungen) oder bitten Sie den Administrator dieses Computers, den Programmordner von FrostWire zuzulassen. Starten Sie FrostWire dann erneut."

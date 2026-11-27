@@ -6832,3 +6832,21 @@ msgid ""
 "FrostWire started with the default theme because your theme {0} could not be "
 "loaded. Logs and error reports are in {1}"
 msgstr "FrostWire ਡਿਫ਼ਾਲਟ ਥੀਮ ਨਾਲ ਸ਼ੁਰੂ ਹੋਇਆ ਕਿਉਂਕਿ ਤੁਹਾਡੀ ਥੀਮ {0} ਲੋਡ ਨਹੀਂ ਹੋ ਸਕੀ। ਲਾਗ ਅਤੇ ਗਲਤੀ ਰਿਪੋਰਟਾਂ {1} ਵਿੱਚ ਹਨ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
+msgid "Windows blocked a file FrostWire needs, so it can't start."
+msgstr "Windows ਨੇ FrostWire ਲਈ ਲੋੜੀਂਦੀ ਇੱਕ ਫ਼ਾਈਲ ਨੂੰ ਬਲੌਕ ਕਰ ਦਿੱਤਾ, ਇਸ ਲਈ ਇਹ ਸ਼ੁਰੂ ਨਹੀਂ ਹੋ ਸਕਦਾ।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
+msgid ""
+"An Application Control policy on this computer (Smart App Control, Windows "
+"Defender Application Control or AppLocker) refused to load it. FrostWire's "
+"files are not damaged."
+msgstr "ਇਸ ਕੰਪਿਊਟਰ ਦੀ ਇੱਕ Application Control ਨੀਤੀ (Smart App Control, Windows Defender Application Control ਜਾਂ AppLocker) ਨੇ ਇਸਨੂੰ ਲੋਡ ਕਰਨ ਤੋਂ ਇਨਕਾਰ ਕਰ ਦਿੱਤਾ। FrostWire ਦੀਆਂ ਫ਼ਾਈਲਾਂ ਖ਼ਰਾਬ ਨਹੀਂ ਹਨ।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DamagedInstallation.java
+msgid ""
+"To fix it, turn off Smart App Control (Windows Security > App & browser "
+"control > Smart App Control settings), or ask the administrator of this "
+"computer to allow FrostWire's program folder, then start FrostWire again."
+msgstr "ਇਸਨੂੰ ਠੀਕ ਕਰਨ ਲਈ Smart App Control ਬੰਦ ਕਰੋ (Windows Security > App & browser control > Smart App Control settings), ਜਾਂ ਇਸ ਕੰਪਿਊਟਰ ਦੇ ਪ੍ਰਸ਼ਾਸਕ ਨੂੰ FrostWire ਦੇ ਪ੍ਰੋਗਰਾਮ ਫੋਲਡਰ ਦੀ ਇਜਾਜ਼ਤ ਦੇਣ ਲਈ ਕਹੋ, ਫਿਰ FrostWire ਦੁਬਾਰਾ ਸ਼ੁਰੂ ਕਰੋ।"
