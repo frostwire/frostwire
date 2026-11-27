@@ -15,6 +15,8 @@ import static org.junit.Assert.assertTrue;
 import android.app.Application;
 import android.os.StrictMode;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -23,6 +25,13 @@ import org.robolectric.annotation.Config;
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 34, application = Application.class)
 public class RunStrictTest {
+
+  @Before
+  @After
+  public void startAndLeaveWithAPermissivePolicy() {
+    // The policy is per thread and other tests in the same JVM may have left one behind.
+    StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().permitAll().build());
+  }
 
   @Test
   public void runStrictRunsTheRunnableOnce() {
