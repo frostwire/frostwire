@@ -66,9 +66,7 @@ class MiscPanesTest {
     return PaneSupport.all(pane.getContainer(), javax.swing.JLabel.class).stream()
         .map(javax.swing.JLabel::getText)
         .filter(
-            t ->
-                t != null
-                    && t.startsWith(I18n.tr("Running now:").replace(": ", ": ").substring(0, 12)))
+            t -> I18n.tr("Running now: Full").equals(t) || I18n.tr("Running now: Lite").equals(t))
         .findFirst()
         .orElseThrow();
   }
