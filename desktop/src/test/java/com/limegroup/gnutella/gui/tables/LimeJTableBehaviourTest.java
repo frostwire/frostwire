@@ -30,24 +30,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.KeyEvent;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.JLabel;
-import javax.swing.JTable;
 import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.plaf.metal.MetalLookAndFeel;
-import javax.swing.table.TableModel;
 import javax.swing.text.Position;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import sun.reflect.ReflectionFactory;
 
 /**
  * The shared table component: selection helpers, hidden columns, type-ahead matching and the
@@ -113,29 +107,12 @@ class LimeJTableBehaviourTest {
     }
   }
 
-  /**
-   * LimeJTable's constructor reads the theme's table font, which needs a display and writes the
-   * theme setting, so the table is built through JTable's constructor only, and the fields the
-   * skipped constructor would have initialized are set here.
-   */
   private static LimeJTable fruitTable(String... fruit) {
     Model model = new Model();
     for (String f : fruit) {
       model.add(f, model.getRowCount());
     }
-    try {
-      Constructor<?> constructor =
-          ReflectionFactory.getReflectionFactory()
-              .newConstructorForSerialization(
-                  LimeJTable.class, JTable.class.getDeclaredConstructor(TableModel.class));
-      LimeJTable table = (LimeJTable) constructor.newInstance(model);
-      Field hidden = LimeJTable.class.getDeclaredField("_hiddenColumns");
-      hidden.setAccessible(true);
-      hidden.set(table, new HashMap<Object, LimeTableColumn>());
-      return table;
-    } catch (ReflectiveOperationException e) {
-      throw new AssertionError(e);
-    }
+    return new LimeJTable(model);
   }
 
   private static void onEdt(Runnable r) throws Exception {
