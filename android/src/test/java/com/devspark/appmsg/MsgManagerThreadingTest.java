@@ -19,6 +19,8 @@
 package com.devspark.appmsg;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.robolectric.Shadows.shadowOf;
 
@@ -76,9 +78,36 @@ public class MsgManagerThreadingTest {
     assertTrue("the message was not displayed", msg.isShowing());
   }
 
-  private static Queue<?> queue() throws Exception {
+  @SuppressWarnings("unchecked")
+  private static Queue<Object> queue() throws Exception {
     Field field = MsgManager.class.getDeclaredField("msgQueue");
     field.setAccessible(true);
-    return (Queue<?>) field.get(MsgManager.getInstance());
+    return (Queue<Object>) field.get(MsgManager.getInstance());
+  }
+
+  /**
+   * A message with no Activity is thrown away; the code used to carry on and display it anyway,
+   * starting a fade-in animation that was never loaded for it (a null animation).
+   */
+  @Test
+  public void aMessageWithoutAnActivityIsDroppedNotDisplayed() throws Exception {
+    Activity activity = Robolectric.buildActivity(Activity.class).setup().get();
+    queue().clear(); // a message an earlier test left showing would be queued ahead of ours
+    forget("inAnimation");
+    forget("outAnimation");
+    AppMsg orphan = AppMsg.makeText(activity.getApplication(), "no activity", AppMsg.STYLE_CONFIRM);
+
+    orphan.show();
+    shadowOf(Looper.getMainLooper()).idle();
+
+    assertFalse("the orphan stayed queued", queue().contains(orphan));
+    assertFalse("the orphan was displayed", orphan.isShowing());
+    assertNull("the orphan was animated", orphan.getView().getAnimation());
+  }
+
+  private static void forget(String field) throws Exception {
+    Field f = MsgManager.class.getDeclaredField(field);
+    f.setAccessible(true);
+    f.set(MsgManager.getInstance(), null);
   }
 }

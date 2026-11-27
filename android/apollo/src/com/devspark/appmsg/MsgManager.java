@@ -103,13 +103,16 @@ class MsgManager extends Handler {
 
     // First peek whether the AppMsg is being displayed.
     final AppMsg appMsg = msgQueue.peek();
-    // If the activity is null we throw away the AppMsg.
+    // If the activity is null we throw away the AppMsg, and move on to the next one: showing it
+    // would start the animations that were never loaded for it (inAnimation is null).
     if (appMsg.getActivity() == null) {
       try {
         msgQueue.poll();
       } catch (Throwable t) {
         // Android's LinkedList implementation can throw NoSuchElementException
       }
+      displayMsg();
+      return;
     }
     final Message msg;
     if (!appMsg.isShowing()) {
