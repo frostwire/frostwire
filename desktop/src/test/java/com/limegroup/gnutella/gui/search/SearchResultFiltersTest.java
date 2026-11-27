@@ -113,6 +113,14 @@ class SearchResultFiltersTest {
     assertFalse(filter.allow(l));
   }
 
+  @Test
+  void aResultWithoutAnEngineHasNoCheckboxSoItIsHiddenNotAnError() {
+    SearchEngineFilter filter = new SearchEngineFilter(new HashMap<>());
+    StubUISearchResult stub = new StubUISearchResult("a.mp3", "mp3", 1, 1, "Archive");
+    stub.engine = null;
+    assertFalse(filter.allow(stub.line()));
+  }
+
   // --- GeneralResultFilter: seeds, size and keyword ranges. The mediator is only needed by the
   // setters that report a change, so the tests set the ranges directly.
 

@@ -34,6 +34,10 @@ class SearchEngineFilter implements TableLineFilter<SearchResultDataLine> {
   public boolean allow(SearchResultDataLine node) {
     boolean result = false;
     final SearchEngine searchEngine = node.getSearchEngine();
+    if (searchEngine == null) {
+      // no engine means no engine checkbox, and results without a checkbox are hidden
+      return false;
+    }
     if (searchEngine.getId().equals(SearchEngineID.TELLURIDE_ID)
         || searchEngine.getId().equals(SearchEngineID.YT_ID)) {
       return true;
