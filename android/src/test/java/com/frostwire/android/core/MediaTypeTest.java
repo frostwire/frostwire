@@ -188,4 +188,13 @@ public class MediaTypeTest {
       return (MediaType) in.readObject();
     }
   }
+
+  /** "mka, aac" was one extension, so neither .mka nor .aac files were audio. */
+  @Test
+  public void aacAndMkaFilesAreAudio() {
+    assertSame(MediaType.getAudioMediaType(), MediaType.getMediaTypeForExtension("aac"));
+    assertSame(MediaType.getAudioMediaType(), MediaType.getMediaTypeForExtension("mka"));
+    assertTrue(MediaType.getAudioMediaType().matches("song.aac"));
+    assertTrue(MediaType.getAudioMediaType().matches("track.mka"));
+  }
 }
