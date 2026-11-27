@@ -280,6 +280,11 @@ public class DangerousPermissionsCheckerTest {
     assertEquals(-1, DangerousPermissionsChecker.AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK);
     assertEquals(-1, DangerousPermissionsChecker.FILE_TYPE_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK);
     assertEquals(1, posted.size());
+    // the task runs after the statics were reset: it must still carry the pending song
+    try (MockedStatic<MusicUtils> music = mockStatic(MusicUtils.class)) {
+      posted.get(0).run();
+      music.verify(() -> MusicUtils.setRingtone(activity, 5L, (byte) 2));
+    }
   }
 
   @Test

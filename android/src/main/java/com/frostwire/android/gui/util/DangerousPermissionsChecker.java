@@ -190,13 +190,12 @@ public final class DangerousPermissionsChecker<
       return false;
     }
 
+    // The task runs later, after the statics below are reset: hand it the values now.
+    final long audioId = AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK;
+    final byte fileType = FILE_TYPE_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK;
     SystemUtils.postToHandler(
         SystemUtils.HandlerThreadName.MISC,
-        () ->
-            MusicUtils.setRingtone(
-                handlerActivity,
-                AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK,
-                FILE_TYPE_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK));
+        () -> MusicUtils.setRingtone(handlerActivity, audioId, fileType));
     AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK = -1;
     FILE_TYPE_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK = -1;
     return true;
