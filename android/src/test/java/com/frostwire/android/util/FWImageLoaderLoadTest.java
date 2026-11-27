@@ -59,6 +59,23 @@ public class FWImageLoaderLoadTest {
     loader.shutdown();
   }
 
+  /**
+   * Idles the main looper until the condition holds. When another test started the loader's
+   * background handler the request reaches the UI thread a moment later, hence the wait.
+   */
+  private static boolean awaitMain(java.util.function.BooleanSupplier condition)
+      throws InterruptedException {
+    long deadline = System.nanoTime() + 10_000_000_000L;
+    while (System.nanoTime() < deadline) {
+      ShadowLooper.idleMainLooper();
+      if (condition.getAsBoolean()) {
+        return true;
+      }
+      Thread.sleep(5);
+    }
+    return condition.getAsBoolean();
+  }
+
   /** A filter that pins a Context, which the loader refuses (it would leak the Activity). */
   private static final class LeakyFilter implements FWImageLoader.Filter {
     final Context leaked;
@@ -93,19 +110,18 @@ public class FWImageLoaderLoadTest {
   }
 
   @Test
-  public void aLoadShowsThePlaceholderBeforeTheImageArrives() {
+  public void aLoadShowsThePlaceholderBeforeTheImageArrives() throws Exception {
     FWImageLoader.Params p = new FWImageLoader.Params();
     p.placeholderResId = android.R.drawable.ic_menu_gallery;
     p.targetWidth = 4;
     p.targetHeight = 4;
     p.noCache = true;
     loader.load(Uri.fromFile(new File(folder.getRoot(), "a.png")), target, p);
-    ShadowLooper.idleMainLooper();
-    assertNotNull(target.getDrawable());
+    assertTrue(awaitMain(() -> target.getDrawable() != null));
   }
 
   @Test
-  public void everyLoadOverloadPreparesItsRequest() {
+  public void everyLoadOverloadPreparesItsRequest() throws Exception {
     Uri uri = Uri.fromFile(new File(folder.getRoot(), "b.png"));
     int placeholder = android.R.drawable.ic_menu_gallery;
     ImageView[] views = new ImageView[6];
@@ -121,27 +137,26 @@ public class FWImageLoaderLoadTest {
     loader.load(uri, new ImageView(context));
     loader.load(placeholder, new ImageView(context));
     loader.load(uri, uri, new ImageView(context), 8, 8);
-    ShadowLooper.idleMainLooper();
     for (int i = 0; i < 4; i++) {
-      assertNotNull("placeholder " + i, views[i].getDrawable());
+      final ImageView view = views[i];
+      assertTrue("placeholder " + i, awaitMain(() -> view.getDrawable() != null));
     }
   }
 
   @Test
-  public void aRetryUriMakesTheLoaderWatchTheFirstLoadForFailure() {
+  public void aRetryUriMakesTheLoaderWatchTheFirstLoadForFailure() throws Exception {
     ImageView view = new ImageView(context);
     Uri primary = Uri.fromFile(new File(folder.getRoot(), "primary.png"));
     Uri retry = Uri.fromFile(new File(folder.getRoot(), "retry.png"));
     loader.load(primary, retry, null, view, true, android.R.drawable.ic_menu_gallery);
-    ShadowLooper.idleMainLooper();
-    assertNotNull(view.getDrawable());
+    assertTrue(awaitMain(() -> view.getDrawable() != null));
   }
 
   @Test
   public void aLoadWithNeitherAUriNorAResourceFailsLoudlyInDebugBuilds() {
     FWImageLoader.Params p = new FWImageLoader.Params();
     loader.load(-1, target, p);
-    assertThrows(IllegalArgumentException.class, ShadowLooper::idleMainLooper);
+    assertThrows(IllegalArgumentException.class, () -> awaitMain(() -> false));
   }
 
   @Test
