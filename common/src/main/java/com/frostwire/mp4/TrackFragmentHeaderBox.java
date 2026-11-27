@@ -121,19 +121,19 @@ public final class TrackFragmentHeaderBox extends FullBox {
     s += 4; // full box
     s += 4; // track_ID
     if ((flags & 0x1) == 0x1) {
-      size += 8; // base_data_offset
+      s += 8; // base_data_offset
     }
     if ((flags & 0x2) == 0x2) {
-      size += 4; // sample_description_index
+      s += 4; // sample_description_index
     }
     if ((flags & 0x8) == 0x8) {
-      size += 4; // default_sample_duration
+      s += 4; // default_sample_duration
     }
     if ((flags & 0x10) == 0x10) {
-      size += 4; // default_sample_size
+      s += 4; // default_sample_size
     }
     if ((flags & 0x20) == 0x20) {
-      size += 4; // default_sample_flags
+      s += 4; // default_sample_flags
     }
     length(s);
   }
