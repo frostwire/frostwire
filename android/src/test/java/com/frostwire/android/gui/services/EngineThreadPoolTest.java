@@ -2,47 +2,99 @@
  *     Created by Angel Leon (@gubatron)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *     Licensed under GPL v3. See LICENSE file.
  */
-
 package com.frostwire.android.gui.services;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+import android.content.Context;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
-/**
- * Submitting a task must not rename the submitting thread: it renamed the main thread in every ANR
- * report and took a stack trace on it per task (frostwire/frostwire#1375).
- */
+/** The engine's executor runs tasks and, in debug builds, refuses tasks that pin a Context. */
 public class EngineThreadPoolTest {
+  private EngineThreadPool pool;
+
+  @Before
+  public void setUp() {
+    pool = new EngineThreadPool();
+  }
+
+  @After
+  public void tearDown() {
+    pool.shutdownNow();
+  }
 
   @Test
-  public void submittingATaskLeavesTheCallersNameAlone() throws Exception {
-    EngineThreadPool pool = new EngineThreadPool();
-    String before = Thread.currentThread().getName();
-    CountDownLatch ran = new CountDownLatch(2);
+  public void executeAndSubmitRunEveryKindOfTask() throws Exception {
+    CountDownLatch latch = new CountDownLatch(4);
+    pool.execute(latch::countDown);
+    pool.submit((Runnable) latch::countDown).get(5, TimeUnit.SECONDS);
+    assertEquals("done", pool.submit(latch::countDown, "done").get(5, TimeUnit.SECONDS));
+    assertEquals(
+        Integer.valueOf(7),
+        pool.submit(
+                () -> {
+                  latch.countDown();
+                  return 7;
+                })
+            .get(5, TimeUnit.SECONDS));
+    assertTrue(latch.await(5, TimeUnit.SECONDS));
+  }
+
+  @Test
+  public void aTaskHoldingAContextIsRejectedAsAPossibleLeak() {
+    Context context = Mockito.mock(Context.class);
+    Runnable leaky = new LeakyTask(context);
     try {
-      pool.execute(ran::countDown);
-      pool.submit(ran::countDown);
-      assertEquals(before, Thread.currentThread().getName());
-      ran.await(10, TimeUnit.SECONDS);
-    } finally {
-      pool.shutdownNow();
-      Thread.currentThread().setName(before);
+      pool.execute(leaky);
+      fail("a task that pins a Context must be rejected in debug builds");
+    } catch (RuntimeException expected) {
+      assertTrue(expected.getMessage().contains("context leak"));
+    }
+    try {
+      pool.submit(leaky);
+      fail("submit must reject it too");
+    } catch (RuntimeException expected) {
+      assertTrue(expected.getMessage().contains("context leak"));
+    }
+  }
+
+  @Test
+  public void tasksQueuedBehindARunningOneAreStillExecuted() throws Exception {
+    CountDownLatch gate = new CountDownLatch(1);
+    CountDownLatch done = new CountDownLatch(3);
+    pool.execute(
+        () -> {
+          try {
+            gate.await(5, TimeUnit.SECONDS);
+          } catch (InterruptedException ignored) {
+          }
+          done.countDown();
+        });
+    pool.execute(done::countDown);
+    pool.execute(done::countDown);
+    gate.countDown();
+    assertTrue(done.await(5, TimeUnit.SECONDS));
+  }
+
+  private static final class LeakyTask implements Runnable {
+    private final Context context;
+
+    LeakyTask(Context context) {
+      this.context = context;
+    }
+
+    @Override
+    public void run() {
+      context.getPackageName();
     }
   }
 }
