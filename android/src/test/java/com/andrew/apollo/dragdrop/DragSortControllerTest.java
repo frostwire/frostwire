@@ -409,4 +409,18 @@ public class DragSortControllerTest {
   public void thereIsNoFloatViewForARowThatIsNotOnScreen() {
     assertNull(new SimpleFloatViewManager(list).onCreateFloatView(40));
   }
+
+  /** Destroying a float view that this manager did not create, or twice, used to crash. */
+  @Test
+  public void destroyingAForeignOrAlreadyDestroyedFloatViewDoesNotThrow() {
+    touch(MotionEvent.ACTION_DOWN, 10, 150);
+    layoutAgain();
+    SimpleFloatViewManager manager = new SimpleFloatViewManager(list);
+    View floatView = manager.onCreateFloatView(1);
+
+    manager.onDestroyFloatView(floatView);
+    manager.onDestroyFloatView(floatView);
+    manager.onDestroyFloatView(new View(list.getContext()));
+    new SimpleFloatViewManager(list).onDestroyFloatView(floatView);
+  }
 }

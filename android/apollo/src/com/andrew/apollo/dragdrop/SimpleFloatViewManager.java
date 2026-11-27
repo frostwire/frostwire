@@ -74,10 +74,14 @@ public class SimpleFloatViewManager implements DragSortListView.FloatViewManager
    */
   @Override
   public void onDestroyFloatView(View floatView) {
-    ((ImageView) floatView).setImageDrawable(null);
+    if (floatView instanceof ImageView) {
+      ((ImageView) floatView).setImageDrawable(null);
+    }
 
-    mFloatBitmap.recycle();
-    mFloatBitmap = null;
+    if (mFloatBitmap != null) {
+      mFloatBitmap.recycle();
+      mFloatBitmap = null;
+    }
   }
 
   /** {@inheritDoc} */
