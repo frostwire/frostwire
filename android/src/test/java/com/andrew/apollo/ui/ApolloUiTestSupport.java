@@ -97,7 +97,11 @@ public final class ApolloUiTestSupport {
           "playArtist",
           "playPauseOrResume",
           "cycleRepeat",
-          "cycleShuffle");
+          "cycleShuffle",
+          "setQueuePosition",
+          "removeTrack",
+          "moveQueueItem",
+          "clearQueue");
 
   /**
    * A {@code MusicUtils} with no service behind it: the calls that would reach the service are
