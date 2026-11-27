@@ -295,6 +295,8 @@ android {
                 // JaCoCo's agent appends to the bootstrap classpath, which turns class data sharing
                 // off for all but boot classes and prints a VM warning in every test JVM.
                 jvmArgs '-Xshare:off'
+                // Hundreds of Robolectric sandboxes in one JVM outgrow Gradle's 512 MB default.
+                maxHeapSize = '3g'
                 filter {
                     excludeTestsMatching "com.frostwire.android.gui.dialogs.*"
                     // The view tests from before the views package ran (NavigationViewSafetyTest boots
