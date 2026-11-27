@@ -81,6 +81,10 @@ public class TransferDetailActivityTest {
     system
         .when(() -> SystemUtils.postToHandler(any(SystemUtils.HandlerThreadName.class), any()))
         .thenAnswer(i -> null);
+    // Platforms keeps the first platform any test installed, so state the thread check here.
+    system
+        .when(SystemUtils::isUIThread)
+        .thenAnswer(i -> Looper.myLooper() == Looper.getMainLooper());
   }
 
   @After

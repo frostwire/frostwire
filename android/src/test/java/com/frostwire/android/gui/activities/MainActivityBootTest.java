@@ -88,22 +88,10 @@ public class MainActivityBootTest {
             Proxy.newProxyInstance(
                 Platform.class.getClassLoader(),
                 new Class<?>[] {Platform.class},
-                (proxy, method, args) -> {
-                  if ("isUIThread".equals(method.getName())) {
-                    return Looper.myLooper() == Looper.getMainLooper();
-                  }
-                  if ("systemPaths".equals(method.getName())) {
-                    return Proxy.newProxyInstance(
-                        Platform.class.getClassLoader(),
-                        new Class<?>[] {com.frostwire.platform.SystemPaths.class},
-                        (p, m, a) ->
-                            "temp".equals(m.getName())
-                                ? new java.io.File(
-                                    System.getProperty("java.io.tmpdir"), "fw-main-test")
-                                : null);
-                  }
-                  return null;
-                }));
+                (proxy, method, args) ->
+                    "isUIThread".equals(method.getName())
+                        ? Looper.myLooper() == Looper.getMainLooper()
+                        : null));
     config = mock(ConfigurationManager.class);
     configs = mockStatic(ConfigurationManager.class);
     configs.when(ConfigurationManager::instance).thenReturn(config);
@@ -121,6 +109,10 @@ public class MainActivityBootTest {
               return null;
             });
     system.when(SystemUtils::stopAllHandlerThreads).thenAnswer(i -> null);
+    // Platforms keeps the first platform any test installed, so don't depend on it here.
+    system
+        .when(SystemUtils::isUIThread)
+        .thenAnswer(i -> Looper.myLooper() == Looper.getMainLooper());
     updaters = mockStatic(SoftwareUpdater.class);
     updaters.when(SoftwareUpdater::getInstance).thenReturn(mock(SoftwareUpdater.class));
     manager = mock(TransferManager.class);
@@ -262,7 +254,12 @@ public class MainActivityBootTest {
         new Intent(Intent.ACTION_VIEW, Uri.parse("content://nobody/some.torrent")));
     assertEquals(1, background.size());
     // nothing can read that content uri: no download is started
-    background.get(0).run();
+    try (MockedStatic<Platforms> platforms = mockStatic(Platforms.class)) {
+      platforms
+          .when(Platforms::temp)
+          .thenReturn(new java.io.File(System.getProperty("java.io.tmpdir"), "fw-main-test"));
+      background.get(0).run();
+    }
     verify(manager, never()).downloadTorrent(anyString(), any());
   }
 
