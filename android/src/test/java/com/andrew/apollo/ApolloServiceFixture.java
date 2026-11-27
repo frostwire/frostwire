@@ -84,6 +84,26 @@ public final class ApolloServiceFixture {
     setStatic(com.andrew.apollo.utils.MusicUtils.class, "serviceConnectionListener", null);
   }
 
+  /**
+   * A "running" service whose every call fails, as a service that died mid-call does, with the main
+   * looper as its player thread.
+   */
+  public static MusicPlaybackService installFailingService() throws Exception {
+    MusicPlaybackService failing =
+        Mockito.mock(
+            MusicPlaybackService.class,
+            invocation -> {
+              throw new IllegalStateException("the service died: " + invocation.getMethod());
+            });
+    setStatic(MusicPlaybackService.class, "INSTANCE", failing);
+    setStatic(
+        MusicPlaybackService.class,
+        "mPlayerHandler",
+        new MusicPlaybackService.MusicPlayerHandler(Looper.getMainLooper()));
+    forgetCachedService();
+    return failing;
+  }
+
   /** No service is running: what MusicUtils sees before the service starts or after it dies. */
   public static void noService() throws Exception {
     setStatic(MusicPlaybackService.class, "INSTANCE", null);

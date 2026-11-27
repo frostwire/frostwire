@@ -360,4 +360,62 @@ public class MusicUtilsPlaybackTest {
     MusicUtils.savePendingTrackDelete(after);
     assertFalse(after.containsKey("com.andrew.apollo.pendingTrackDelete.ids"));
   }
+
+  // --- adding to playlists ---
+
+  @Test
+  public void songsAddedToAPlaylistAlreadyInTheQueueAreAddedToTheQueueToo() {
+    MusicUtils.playFDs(new long[] {1, 2, 3}, 0, false);
+    idle();
+    FakeMediaStore.onQuery =
+        (u, p, s, a, o) ->
+            u.getPath().contains("members")
+                ? cursor(
+                    p, row("audio_id", 1L, "play_order", 4L), row("audio_id", 2L, "play_order", 7L))
+                : cursor(p);
+
+    MusicUtils.addToPlaylistSilently(context, new long[] {9}, 5);
+
+    assertEquals(
+        "the whole playlist is in the queue, so the new song joins it",
+        4,
+        MusicUtils.getQueue().length);
+    assertTrue(
+        "numbered after the highest play order", FakeMediaStore.bulkInserts.get(0).endsWith("|1"));
+  }
+
+  @Test
+  public void songsAddedToAPlaylistThatIsNotInTheQueueLeaveTheQueueAlone() {
+    MusicUtils.playFDs(new long[] {1, 2, 3}, 0, false);
+    idle();
+    FakeMediaStore.onQuery =
+        (u, p, s, a, o) ->
+            u.getPath().contains("members")
+                ? cursor(p, row("audio_id", 77L, "play_order", 0L))
+                : cursor(p);
+
+    MusicUtils.addToPlaylistSilently(context, new long[] {9}, 5);
+
+    assertEquals(3, MusicUtils.getQueue().length);
+    assertEquals(1, FakeMediaStore.bulkInserts.size());
+  }
+
+  @Test
+  public void addingNothingOrToNoContextDoesNotTouchMediaStore() {
+    MusicUtils.addToPlaylist(null, new long[] {1}, 5);
+    MusicUtils.addToPlaylist(context, null, 5);
+    MusicUtils.addToPlaylist(context, MusicUtils.getSongListForCursor(null), 5);
+
+    assertTrue(FakeMediaStore.bulkInserts.isEmpty());
+    assertTrue(FakeMediaStore.queries.isEmpty());
+  }
+
+  @Test
+  public void aPlaylistThatCantBeReadGetsNothingAdded() {
+    FakeMediaStore.failure = new IllegalStateException("down");
+
+    MusicUtils.addToPlaylistSilently(context, new long[] {9}, 5);
+
+    assertTrue(FakeMediaStore.bulkInserts.isEmpty());
+  }
 }
