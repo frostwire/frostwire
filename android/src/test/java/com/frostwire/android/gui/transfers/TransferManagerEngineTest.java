@@ -155,6 +155,11 @@ public class TransferManagerEngineTest {
   private UIBittorrentDownload awaitTransfer() throws Exception {
     String hash = torrent.album.infoHashV1().toHex();
     TestEngine.await(() -> manager.getBittorrentDownload(hash) != null, "the transfer is listed");
+    // The wrapper the engine's listener made was made on libtorrent's thread, where the free
+    // space of the test's storage is whatever Robolectric says (often none: a disk full
+    // transfer). The same refresh the screens ask for makes it again on this thread.
+    manager.updateUIBittorrentDownload(
+        ((UIBittorrentDownload) manager.getBittorrentDownload(hash)).getDl().getTorrentHandle());
     return (UIBittorrentDownload) manager.getBittorrentDownload(hash);
   }
 

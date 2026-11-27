@@ -21,8 +21,8 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 /**
- * Seeding needs libtorrent's native library, which the unit JVM does not have; what can be checked
- * is that a file that can't be seeded is reported as not seeded instead of throwing.
+ * A file that can't be seeded is reported as not seeded instead of throwing. (Seeding that works,
+ * with a real engine, is in TorrentUtilsSeedingTest.)
  */
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 34, application = Application.class)
@@ -40,7 +40,8 @@ public class TorrentUtilsTest {
   public void aFileThatCannotBeHashedIsReportedAsNotSeeded() throws IOException {
     File file = folder.newFile("song.mp3");
     Files.write(file.toPath(), new byte[] {1, 2, 3});
-    // Without the native library the torrent can't be built; the failure is contained.
+    // Without a transfer manager, and an engine that is not running, the seed can't be completed;
+    // the failure is contained.
     assertFalse(TorrentUtils.seedFile(file, null, null, null));
     assertFalse(TorrentUtils.seedFile(file, "A name", null, null));
   }
