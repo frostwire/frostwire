@@ -64,19 +64,31 @@ public final class ZipUtils {
       item++;
       String fileName = ze.getName();
       File newFile = new File(folder, fileName);
+      // zip-slip: an entry such as "../x" must not be written outside the output directory.
+      String folderPath = folder.getCanonicalPath();
+      String newFilePath = newFile.getCanonicalPath();
+      if (!newFilePath.equals(folderPath) && !newFilePath.startsWith(folderPath + File.separator)) {
+        throw new IOException("Zip entry outside the output directory: " + fileName);
+      }
+      File canonicalFile = new File(newFilePath);
       LOG.debug("unzip: " + newFile.getAbsoluteFile());
       if (ze.isDirectory()) {
-        if (!newFile.mkdirs()) {
+        if (!canonicalFile.isDirectory() && !canonicalFile.mkdirs()) {
           break;
         }
         continue;
+      }
+      // zips are not required to carry directory entries for the folders of their files.
+      File parent = canonicalFile.getParentFile();
+      if (parent != null && !parent.isDirectory() && !parent.mkdirs()) {
+        throw new IOException("Could not create directory: " + parent);
       }
       if (listener != null) {
         int progress =
             (item == itemCount) ? 100 : (int) (((double) (item * 100)) / (double) (itemCount));
         listener.onUnzipping(fileName, progress);
       }
-      try (FileOutputStream fos = new FileOutputStream(newFile);
+      try (FileOutputStream fos = new FileOutputStream(canonicalFile);
           BufferedOutputStream bos = new BufferedOutputStream(fos, 32768)) { // 32 KiB buffer
         int n;
         while ((n = zis.read(buffer)) > 0) {
@@ -88,7 +100,7 @@ public final class ZipUtils {
       } finally {
         zis.closeEntry();
       }
-      newFile.setLastModified(time);
+      canonicalFile.setLastModified(time);
     }
   }
 
