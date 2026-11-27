@@ -42,6 +42,7 @@ import com.frostwire.android.gui.SearchMediator;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.views.SearchInputView;
 import com.frostwire.android.gui.views.SearchProgressView;
+import com.frostwire.android.search.AndroidRelayStack;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.frostclick.Slide;
 import com.frostwire.search.FileSearchResult;
@@ -69,6 +70,7 @@ public class SearchFragmentTest {
   private MockedStatic<ConfigurationManager> configurations;
   private MockedStatic<TransferManager> transferManagers;
   private MockedStatic<AndroidSearchEngines> engines;
+  private MockedStatic<AndroidRelayStack> stacks;
   private SearchMediator mediator;
   private ConfigurationManager configuration;
   private TransferManager transferManager;
@@ -83,6 +85,7 @@ public class SearchFragmentTest {
     configurations = mockStatic(ConfigurationManager.class);
     transferManagers = mockStatic(TransferManager.class);
     engines = mockStatic(AndroidSearchEngines.class);
+    stacks = mockStatic(AndroidRelayStack.class);
     mediators.when(SearchMediator::instance).thenReturn(mediator);
     configurations.when(ConfigurationManager::instance).thenReturn(configuration);
     transferManagers.when(TransferManager::instance).thenReturn(transferManager);
@@ -98,6 +101,7 @@ public class SearchFragmentTest {
     mediators.close();
     configurations.close();
     transferManagers.close();
+    stacks.close();
     engines.close();
   }
 
@@ -127,10 +131,12 @@ public class SearchFragmentTest {
     return -1;
   }
 
-  private static TestSearchFragment launch(List<Slide> slides) {
+  private ActivityController<FragmentTestHost> controller;
+
+  private TestSearchFragment launch(List<Slide> slides) {
     TestSearchFragment fragment = new TestSearchFragment();
     TestSearchFragment.slidesFromServer = slides;
-    FragmentTestHost.launch(fragment);
+    controller = FragmentTestHost.launch(fragment);
     return fragment;
   }
 
@@ -313,6 +319,97 @@ public class SearchFragmentTest {
         shadowOf((Application) ApplicationProvider.getApplicationContext())
             .getNextStartedActivity());
     verify(transferManager, never()).downloadTorrent(anyString(), any());
+  }
+
+  @Test
+  public void theCancelButtonCancelsASearchInProgressAndRetriesAFinishedOne() {
+    TestSearchFragment fragment = launch(Collections.emptyList());
+    when(mediator.isSearchFinished()).thenReturn(false);
+    search(fragment, "creative commons");
+    verify(mediator).performSearch("creative commons");
+
+    // searching: the button cancels
+    fragment.requireView().findViewById(R.id.view_search_progress_button_cancel).performClick();
+    shadowOf(Looper.getMainLooper()).idle();
+    verify(mediator).cancelSearch();
+    assertNull(fragment.getCurrentQuery());
+
+    // finished with no results: the button retries the query still in the box
+    when(mediator.isSearchFinished()).thenReturn(true);
+    input(fragment).setText("creative commons");
+    fragment.requireView().findViewById(R.id.view_search_progress_button_cancel).performClick();
+    shadowOf(Looper.getMainLooper()).idle();
+    verify(mediator, org.mockito.Mockito.times(2)).performSearch("creative commons");
+    assertEquals("creative commons", fragment.getCurrentQuery());
+
+    // and with nothing in the box there is nothing to retry
+    input(fragment).setText("   ");
+    fragment.requireView().findViewById(R.id.view_search_progress_button_cancel).performClick();
+    verify(mediator, org.mockito.Mockito.times(2)).performSearch(anyString());
+  }
+
+  @Test
+  public void resumingWithResultsRestoresTheCountersAndTheSearchBox() throws Exception {
+    when(configuration.getBoolean(Constants.PREF_KEY_GUI_DISTRACTION_FREE_SEARCH)).thenReturn(true);
+    TestSearchFragment fragment = launch(Collections.emptyList());
+    ArgumentCaptor<SearchListener> listener = ArgumentCaptor.forClass(SearchListener.class);
+    verify(mediator, atLeastOnce()).setSearchListener(listener.capture());
+    search(fragment, "creative commons");
+    List<FileSearchResult> results = new ArrayList<>();
+    results.add(fileResult("creative commons song.mp3"));
+    listener.getValue().onResults(1, results);
+    FragmentTestHost.settleUntil(() -> list(fragment).getAdapter().getCount() == 1);
+
+    input(fragment).hideTextInput();
+    controller.pause().resume();
+    shadowOf(Looper.getMainLooper()).idle();
+
+    assertEquals(
+        View.VISIBLE,
+        input(fragment).findViewById(R.id.view_search_input_text_input).getVisibility());
+    assertEquals(1, list(fragment).getAdapter().getCount());
+  }
+
+  @Test
+  public void destroyingTheFragmentDetachesItFromTheSearch() {
+    TestSearchFragment fragment = launch(Collections.emptyList());
+    assertSame(fragment, SearchFragment.instance());
+    controller.pause().stop().destroy();
+    verify(mediator).setSearchListener(null);
+    assertNull(SearchFragment.instance());
+  }
+
+  @Test
+  public void theSearchSpinnerHintsAtTheIceBridgeState() {
+    TestSearchFragment fragment = launch(Collections.emptyList());
+    TextView hint = fragment.requireView().findViewById(R.id.view_search_progress_text_icebridge);
+
+    // the distributed engine is off: no hint
+    when(distributed.isEnabled()).thenReturn(false);
+    search(fragment, "one");
+    assertEquals(View.GONE, hint.getVisibility());
+
+    // on but not ready, and the relay stack not allowed to start: not running
+    when(distributed.isEnabled()).thenReturn(true);
+    when(distributed.isReady()).thenReturn(false);
+    stacks.when(AndroidRelayStack::isParticipationEnabled).thenReturn(false);
+    search(fragment, "two");
+    assertEquals(View.VISIBLE, hint.getVisibility());
+    assertEquals(
+        fragment.getString(R.string.search_icebridge_not_running), hint.getText().toString());
+
+    // not ready but the stack is starting
+    stacks.when(AndroidRelayStack::isParticipationEnabled).thenReturn(true);
+    search(fragment, "two and a half");
+    assertEquals(fragment.getString(R.string.search_icebridge_starting), hint.getText().toString());
+
+    // ready: how many peers it reached
+    when(distributed.isReady()).thenReturn(true);
+    when(mediator.distributedPeersContacted()).thenReturn(3);
+    search(fragment, "three");
+    assertEquals(
+        fragment.getString(R.string.search_icebridge_peers_contacted, 3),
+        hint.getText().toString());
   }
 
   /** Promotions come from here instead of the server. */
