@@ -42,6 +42,8 @@ class PlayableCell implements Comparable<PlayableCell> {
     this.wrappedObject = wrapMe;
     this.strValue = strValue;
     this.localeString = new LocaleString(strValue);
+    this.playing = isPlaying;
+    this.column = columnIndex;
   }
 
   public boolean isPlaying() {

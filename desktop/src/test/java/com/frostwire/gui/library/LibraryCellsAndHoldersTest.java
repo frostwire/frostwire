@@ -68,6 +68,16 @@ class LibraryCellsAndHoldersTest {
   }
 
   @Test
+  void aCellStartsWithTheFlagAndColumnItWasBuiltWith() {
+    PlayableCell playing = new PlayableCell(null, "x", true, 7);
+    assertTrue(playing.isPlaying());
+    assertEquals(7, playing.getColumn());
+    PlayableCell wrapped = new PlayableCell(null, new SizeHolder(1), "1 B", true, 2);
+    assertTrue(wrapped.isPlaying());
+    assertEquals(2, wrapped.getColumn());
+  }
+
+  @Test
   void aCellRemembersWhetherItIsPlayingAndItsColumn() {
     PlayableCell cell = new PlayableCell(null, "x", false, 0);
     assertFalse(cell.isPlaying());
