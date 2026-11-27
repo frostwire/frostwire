@@ -36,10 +36,12 @@ import org.robolectric.shadows.ShadowLooper;
 /**
  * FWImageLoader over a real Coil loader. Coil's own decoding doesn't run to completion under
  * Robolectric, so these tests check what FWImageLoader itself does: the instance lifecycle, the
- * guards, and the request it prepares on the UI thread (the placeholder goes in first).
+ * guards, and the request it prepares on the UI thread (the placeholder goes in first). Its own SDK
+ * level keeps it away from tests that start the loader's static background handler, whose looper
+ * Robolectric quits after each test (a post to it is then silently dropped).
  */
 @RunWith(RobolectricTestRunner.class)
-@Config(sdk = 34, application = Application.class)
+@Config(sdk = 31, application = Application.class)
 public class FWImageLoaderLoadTest {
 
   @Rule public TemporaryFolder folder = new TemporaryFolder();
