@@ -12,13 +12,16 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.limegroup.gnutella.settings.UpdateSettings;
+import com.sun.net.httpserver.HttpServer;
 import java.io.File;
 import java.math.BigInteger;
+import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
@@ -97,13 +100,86 @@ class InstallerUpdaterTest {
   void filesThatAreNotTheAnnouncedInstallerAreRemovedAndTheRightOneKept() throws Exception {
     UpdateSettings.AUTOMATIC_INSTALLER_DOWNLOAD.setValue(true);
     File stale = write("stale.bin", "old installer");
-    File half = write("half.part", "new inst");
+    // Part of some other file, not of the announced installer: stale like the rest.
+    File half = write("other-installer.part", "new inst");
     File installer = write("installer.bin", "new installer");
     new InstallerUpdater(updateWithMd5(md5("new installer")), false).run();
     assertFalse(stale.exists());
     assertFalse(half.exists());
     assertTrue(installer.exists(), "the file with the announced MD5 is the update");
     assertEquals("new installer", Files.readString(installer.toPath()));
+  }
+
+  @Test
+  void aPartialInstallerOfTheAnnouncedNameSurvivesTheCleanupBeforeTheDownload() throws Exception {
+    File partial = write("FrostWire-9.9.9.dmg", "new inst");
+    File stale = write("FrostWire-9.9.8.dmg", "old installer");
+    File torrent = write("FrostWire-9.9.9.dmg.torrent", "d8:announce0:e");
+    UpdateMessage m = updateWithMd5(md5("new installer"));
+    m.setInstallerUrl("https://example.com/dl/FrostWire-9.9.9.dmg");
+    new InstallerUpdater(m, true).cleanupInvalidUpdates(true);
+    assertTrue(partial.exists(), "kept so that the download can resume it");
+    assertFalse(stale.exists(), "an installer of another version is stale");
+    assertFalse(torrent.exists(), "the torrent file is fetched again anyway");
+  }
+
+  @Test
+  void onceTheDownloadIsOverAWrongInstallerIsRemovedEvenUnderTheAnnouncedName() throws Exception {
+    File wrong = write("FrostWire-9.9.9.dmg", "corrupt installer");
+    UpdateMessage m = updateWithMd5(md5("new installer"));
+    m.setInstallerUrl("https://example.com/dl/FrostWire-9.9.9.dmg");
+    new InstallerUpdater(m, true).cleanupInvalidUpdates(false);
+    assertFalse(wrong.exists());
+  }
+
+  @Test
+  void aCorrectInstallerIsKeptEitherWay() throws Exception {
+    File right = write("FrostWire-9.9.9.dmg", "new installer");
+    UpdateMessage m = updateWithMd5(md5("new installer"));
+    m.setInstallerUrl("https://example.com/dl/FrostWire-9.9.9.dmg");
+    new InstallerUpdater(m, true).cleanupInvalidUpdates(false);
+    new InstallerUpdater(m, true).cleanupInvalidUpdates(true);
+    assertTrue(right.exists());
+  }
+
+  /** The download asks the server for the rest of the partial file instead of starting over. */
+  @Test
+  void theHttpDownloadResumesAPartialInstaller() throws Exception {
+    UpdateSettings.AUTOMATIC_INSTALLER_DOWNLOAD.setValue(true);
+    byte[] full = new byte[4096];
+    for (int i = 0; i < full.length; i++) {
+      full[i] = (byte) i;
+    }
+    File partial = new File(UpdateSettings.UPDATES_DIR, "resumable.bin");
+    Files.write(partial.toPath(), java.util.Arrays.copyOf(full, 1000));
+    AtomicReference<String> rangeAsked = new AtomicReference<>();
+    HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+    server.createContext(
+        "/dl/resumable.bin",
+        exchange -> {
+          String range = exchange.getRequestHeaders().getFirst("Range");
+          rangeAsked.set(range);
+          int from = range == null ? 0 : Integer.parseInt(range.replaceAll("\\D", ""));
+          exchange.getResponseHeaders().add("Accept-Ranges", "bytes");
+          if (range != null) {
+            exchange
+                .getResponseHeaders()
+                .add(
+                    "Content-Range", "bytes " + from + "-" + (full.length - 1) + "/" + full.length);
+          }
+          exchange.sendResponseHeaders(range == null ? 200 : 206, full.length - from);
+          exchange.getResponseBody().write(full, from, full.length - from);
+          exchange.close();
+        });
+    server.start();
+    try {
+      UpdateMessage m = updateWithMd5(md5("an installer this server does not have"));
+      m.setInstallerUrl("http://127.0.0.1:" + server.getAddress().getPort() + "/dl/resumable.bin");
+      new InstallerUpdater(m, false).run();
+    } finally {
+      server.stop(0);
+    }
+    assertEquals("bytes=1000-", rangeAsked.get(), "the server was asked only for the missing part");
   }
 
   @Test

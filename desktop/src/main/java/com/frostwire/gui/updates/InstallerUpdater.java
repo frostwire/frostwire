@@ -138,7 +138,9 @@ class InstallerUpdater implements Runnable {
     if (!forceUpdate && !UpdateSettings.AUTOMATIC_INSTALLER_DOWNLOAD.getValue()) {
       return;
     }
-    cleanupInvalidUpdates();
+    // An incomplete download of the announced installer is kept: the HTTP download resumes it
+    // (a server that cannot resume makes it start over) and libtorrent rechecks it.
+    cleanupInvalidUpdates(true);
     if (checkIfDownloaded()) {
       showUpdateMessage();
     } else {
@@ -459,13 +461,22 @@ class InstallerUpdater implements Runnable {
   private void downloadComplete() {
     System.out.println("InstallerUpdater.downloadComplete()!!!!");
     printTorrentHandleStatus(torrentHandle);
-    cleanupInvalidUpdates();
+    // The download is over: whatever is left under the installer's name is complete, and wrong.
+    cleanupInvalidUpdates(false);
     if (checkIfDownloaded()) {
       showUpdateMessage();
     }
   }
 
-  private void cleanupInvalidUpdates() {
+  /**
+   * Deletes the files of the updates folder that are not the announced installer: older installers
+   * and files with another MD5.
+   *
+   * @param keepPartialInstaller keep the file named as the announced installer even if its MD5 does
+   *     not match: before a download it is most likely the part of the installer already
+   *     downloaded, and deleting it would make resuming impossible.
+   */
+  void cleanupInvalidUpdates(boolean keepPartialInstaller) {
     if (!UpdateSettings.UPDATES_DIR.exists() || !UpdateSettings.UPDATES_DIR.isDirectory()) {
       return;
     }
@@ -474,8 +485,12 @@ class InstallerUpdater implements Runnable {
       return;
     }
     String currentMD5 = updateMessage.getRemoteMD5();
+    String installerFilename = UpdateMediator.getInstallerFilename(updateMessage);
     for (File file : files) {
       try {
+        if (keepPartialInstaller && file.getName().equals(installerFilename)) {
+          continue;
+        }
         String fileMD5 = DigestUtils.getMD5(file);
         if (!DigestUtils.compareMD5(currentMD5, fileMD5)) {
           System.out.println(
