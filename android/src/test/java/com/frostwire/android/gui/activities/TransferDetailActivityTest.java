@@ -177,4 +177,38 @@ public class TransferDetailActivityTest {
     assertTrue(state.containsKey("lastSelectedTabIndex"));
     controller.destroy();
   }
+
+  @Test
+  public void aRecreatedScreenReopensTheTabItWasOn() {
+    torrent(TransferState.DOWNLOADING);
+    when(config.getInt(Constants.PREF_KEY_TORRENT_TRANSFER_DETAIL_LAST_SELECTED_TAB_INDEX))
+        .thenReturn(1);
+    ActivityController<TransferDetailActivity> controller = controllerFor(HASH).create().start();
+    ViewPager2 pager = controller.get().findViewById(R.id.transfer_detail_viewpager);
+    pager.setCurrentItem(3, false);
+    shadowOf(Looper.getMainLooper()).idle();
+    controller.resume();
+    controller.recreate();
+    shadowOf(Looper.getMainLooper()).idle();
+    ViewPager2 restored = controller.get().findViewById(R.id.transfer_detail_viewpager);
+    assertEquals(3, restored.getCurrentItem());
+  }
+
+  @Test
+  public void theTimerTickRefreshesTheVisibleTabOnlyWhileSubscribed() {
+    UIBittorrentDownload dl = torrent(TransferState.SEEDING);
+    ActivityController<TransferDetailActivity> controller =
+        controllerFor(HASH).create().start().resume().visible();
+    shadowOf(Looper.getMainLooper()).idle();
+    TransferDetailActivity activity = controller.get();
+    org.mockito.Mockito.clearInvocations(dl);
+    shadowOf(Looper.getMainLooper()).idleFor(java.time.Duration.ofSeconds(5));
+    activity.onTime();
+    verify(dl, org.mockito.Mockito.atLeastOnce()).getInfoHash();
+    // after pausing the subscription is gone and ticks no longer touch the torrent
+    controller.pause();
+    org.mockito.Mockito.clearInvocations(dl);
+    activity.onTime();
+    org.mockito.Mockito.verifyNoInteractions(dl);
+  }
 }
