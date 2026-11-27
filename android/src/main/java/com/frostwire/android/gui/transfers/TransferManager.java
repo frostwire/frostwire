@@ -511,6 +511,11 @@ public final class TransferManager {
       return new InvalidBittorrentDownload(R.string.cannot_start_engine_without_vpn, null);
     }
 
+    if (uri == null || uri.trim().isEmpty()) {
+      LOG.warn("downloadTorrent: no uri");
+      return new InvalidBittorrentDownload(R.string.torrent_scheme_download_not_supported, null);
+    }
+
     String url = uri.trim();
     try {
       if (url.contains("urn%3Abtih%3A")) {
@@ -524,11 +529,11 @@ public final class TransferManager {
 
       Uri u = Uri.parse(url);
       String scheme = u.getScheme();
-      if (scheme != null
-          && !scheme.equalsIgnoreCase("file")
-          && !scheme.equalsIgnoreCase("http")
-          && !scheme.equalsIgnoreCase("https")
-          && !scheme.equalsIgnoreCase("magnet")) {
+      if (scheme == null
+          || (!scheme.equalsIgnoreCase("file")
+              && !scheme.equalsIgnoreCase("http")
+              && !scheme.equalsIgnoreCase("https")
+              && !scheme.equalsIgnoreCase("magnet"))) {
         LOG.warn("Invalid URI scheme: " + u);
         return new InvalidBittorrentDownload(R.string.torrent_scheme_download_not_supported, null);
       }
@@ -536,12 +541,10 @@ public final class TransferManager {
       BittorrentDownload download = null;
 
       if (fetcherListener == null) {
-        if (scheme != null && scheme.equalsIgnoreCase("file")) {
+        if (scheme.equalsIgnoreCase("file")) {
           BTEngine.getInstance()
               .download(new File(Objects.requireNonNull(u.getPath())), null, null);
-        } else if (scheme != null && scheme.equalsIgnoreCase("http")
-            || scheme.equalsIgnoreCase("https")
-            || scheme.equalsIgnoreCase("magnet")) {
+        } else {
           download =
               new TorrentFetcherDownload(
                   this,

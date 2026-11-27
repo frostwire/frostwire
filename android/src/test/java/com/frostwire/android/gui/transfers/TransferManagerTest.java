@@ -689,4 +689,12 @@ public class TransferManagerTest {
     }
     f.delete();
   }
+
+  /** downloadTorrent(null, ...) threw a NullPointerException outside its try block. */
+  @Test
+  public void aMissingOrBlankUriIsAnInvalidDownloadNotAnException() {
+    assertTrue(manager.downloadTorrent(null, null) instanceof InvalidBittorrentDownload);
+    assertTrue(manager.downloadTorrent("   ", null) instanceof InvalidBittorrentDownload);
+    assertTrue(manager.downloadTorrent("", null) instanceof InvalidBittorrentDownload);
+  }
 }
