@@ -76,6 +76,14 @@ public final class FakeMediaStore extends ContentProvider {
   /** A cursor with the projection's columns (or the rows' own when null) filled from the rows. */
   @SafeVarargs
   public static Cursor cursor(String[] projection, Map<String, Object>... rows) {
+    List<Map<String, Object>> list = new ArrayList<>();
+    for (Map<String, Object> r : rows) {
+      list.add(r);
+    }
+    return cursor(projection, list);
+  }
+
+  public static Cursor cursor(String[] projection, List<Map<String, Object>> rows) {
     String[] columns = projection;
     if (columns == null) {
       LinkedHashSet<String> names = new LinkedHashSet<>();
