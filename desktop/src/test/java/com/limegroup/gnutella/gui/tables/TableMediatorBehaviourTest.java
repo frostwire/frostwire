@@ -179,8 +179,10 @@ class TableMediatorBehaviourTest {
     FruitMediator[] holder = new FruitMediator[1];
     SwingUtilities.invokeAndWait(
         () -> {
-          FruitLine.prefix = id;
-          holder[0] = new FruitMediator(id);
+          // the test home keeps the table settings between runs: a fresh id each time
+          String unique = id + "_" + Long.toHexString(System.nanoTime());
+          FruitLine.prefix = unique;
+          holder[0] = new FruitMediator(unique);
           for (String f : fruit) {
             holder[0].add(f);
           }

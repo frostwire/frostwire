@@ -231,8 +231,7 @@ public final class GUIUtils {
   /** Gets the keystroke for hiding a window according to the platform. */
   private static KeyStroke getHideKeystroke() {
     if (OSUtils.isMacOSX())
-      return KeyStroke.getKeyStroke(
-          KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx());
+      return KeyStroke.getKeyStroke(KeyEvent.VK_W, ThemeMediator.menuShortcutKeyMask());
     else return KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
   }
 
