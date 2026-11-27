@@ -44,15 +44,21 @@ class SafeToolTipUITest {
   @BeforeEach
   void useSynthWithTheSafeToolTipUI() throws Exception {
     previous = UIManager.getLookAndFeel();
-    UIManager.setLookAndFeel(new NimbusLookAndFeel()); // Synth, like FrostWire's skin
+    // Read before switching: under Nimbus this is Nimbus's own Synth UI, and putting that back
+    // left a Synth tooltip UI behind under every other look and feel in the test JVM.
     previousToolTipUI = UIManager.get("ToolTipUI");
+    if (java.util.Objects.equals(
+        previousToolTipUI, UIManager.getLookAndFeelDefaults().get("ToolTipUI"))) {
+      previousToolTipUI = null; // the look and feel's own, not an override to restore
+    }
+    UIManager.setLookAndFeel(new NimbusLookAndFeel()); // Synth, like FrostWire's skin
     UIManager.put("ToolTipUI", SafeToolTipUI.class.getName()); // what ThemeMediator does
   }
 
   @AfterEach
   void restore() throws Exception {
-    UIManager.put("ToolTipUI", previousToolTipUI);
     UIManager.setLookAndFeel(previous);
+    UIManager.put("ToolTipUI", previousToolTipUI);
   }
 
   /** Shows the tip the way ToolTipManager.showTipWindow does, and paints it. */
