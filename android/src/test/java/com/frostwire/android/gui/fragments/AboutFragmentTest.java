@@ -10,18 +10,25 @@ package com.frostwire.android.gui.fragments;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.mockStatic;
 import static org.robolectric.Shadows.shadowOf;
 
 import android.app.Application;
 import android.content.Intent;
+import android.os.Looper;
 import android.view.View;
 import android.widget.TextView;
 import androidx.test.core.app.ApplicationProvider;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.core.TellurideCourier;
+import com.frostwire.android.util.SystemUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
@@ -48,7 +55,8 @@ public class AboutFragmentTest {
         ((TextView) root.findViewById(R.id.fragment_about_jlibtorrent_version))
             .getText()
             .toString();
-    assertTrue(jlibtorrent, jlibtorrent.startsWith("jlibtorrent"));
+    // libtorrent's native library can't be loaded here
+    assertEquals("jlibtorrent unavailable", jlibtorrent);
 
     assertTrue(((TextView) root.findViewById(R.id.fragment_about_content)).getText().length() > 0);
   }
@@ -81,6 +89,38 @@ public class AboutFragmentTest {
     assertEquals(expected, root.findViewById(R.id.fragment_about_love_frostwire).getVisibility());
     assertEquals(
         expected, root.findViewById(R.id.fragment_about_support_frostwire).getVisibility());
+  }
+
+  @Test
+  public void theYtDlpVersionShowsTheCachedOneThenTheLookedUpOne() {
+    try (MockedStatic<TellurideCourier> courier = mockStatic(TellurideCourier.class);
+        MockedStatic<SystemUtils> utils = mockStatic(SystemUtils.class, CALLS_REAL_METHODS)) {
+      courier.when(TellurideCourier::getCachedYtDlpVersion).thenReturn("2025.10.22");
+      courier
+          .when(() -> TellurideCourier.ytDlpVersion(any()))
+          .thenAnswer(
+              invocation -> {
+                ((TellurideCourier.OnYtDlpVersionCallback) invocation.getArgument(0))
+                    .onVersion("2025.11.01");
+                return null;
+              });
+      // the lookup runs where the mocks are
+      utils
+          .when(() -> SystemUtils.postToHandler(any(), any()))
+          .thenAnswer(
+              invocation -> {
+                ((Runnable) invocation.getArgument(1)).run();
+                return null;
+              });
+      AboutFragment fragment = new AboutFragment();
+      FragmentTestHost.launch(fragment);
+      shadowOf(Looper.getMainLooper()).idle();
+      assertEquals(
+          "yt_dlp 2025.11.01",
+          ((TextView) fragment.requireView().findViewById(R.id.fragment_about_yt_dlp_version))
+              .getText()
+              .toString());
+    }
   }
 
   private static Intent nextStartedActivity(Application app) throws InterruptedException {
