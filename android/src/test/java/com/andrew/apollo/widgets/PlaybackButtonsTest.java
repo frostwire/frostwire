@@ -45,9 +45,18 @@ import org.robolectric.shadows.ShadowLooper;
 public class PlaybackButtonsTest {
 
   private Activity activity;
+  private org.mockito.MockedStatic<com.andrew.apollo.utils.MusicUtils> music;
+
+  @org.junit.After
+  public void tearDown() {
+    music.close();
+  }
 
   @Before
   public void setUp() {
+    music =
+        com.andrew.apollo.ui.ApolloUiTestSupport.mockMusicUtils(
+            new java.util.concurrent.CopyOnWriteArrayList<>());
     Platforms.set(
         (Platform)
             Proxy.newProxyInstance(

@@ -52,9 +52,12 @@ public class ProfileActivityTest {
 
   private MockedStatic<MusicUtils> music;
 
+  private final java.util.List<String> calls = new java.util.concurrent.CopyOnWriteArrayList<>();
+
   @Before
   public void setUp() {
     ApolloUiTestSupport.installAll();
+    music = ApolloUiTestSupport.mockMusicUtils(calls);
     FakeMediaProvider.install();
     FakeMediaProvider.addSong(11, "Help", "Help!", "The Beatles");
     FakeMediaProvider.addSong(12, "Yesterday", "Help!", "The Beatles");
@@ -240,7 +243,6 @@ public class ProfileActivityTest {
 
   @Test
   public void aPlaylistChosenInTheMenuReceivesTheArtistsTracks() {
-    music = Mockito.mockStatic(MusicUtils.class, Mockito.CALLS_REAL_METHODS);
     music
         .when(() -> MusicUtils.addToPlaylist(Mockito.any(), Mockito.any(), Mockito.anyLong()))
         .thenAnswer(i -> null);

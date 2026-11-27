@@ -110,34 +110,44 @@ public final class ApolloUiTestSupport {
    */
   public static org.mockito.MockedStatic<com.andrew.apollo.utils.MusicUtils> mockMusicUtils(
       java.util.List<String> calls) {
-    return org.mockito.Mockito.mockStatic(
-        com.andrew.apollo.utils.MusicUtils.class,
-        invocation -> {
-          String name = invocation.getMethod().getName();
-          if ("executeWithMusicPlaybackService".equals(name)) {
-            ((Runnable) invocation.getArgument(1)).run();
-            return null;
-          }
-          if ("startMusicPlaybackService".equals(name)) {
-            ((Runnable) invocation.getArgument(2)).run();
-            return null;
-          }
-          if (SERVICE_CALLS.contains(name)) {
-            StringBuilder call = new StringBuilder(name).append('[');
-            for (Object argument : invocation.getArguments()) {
-              if (argument instanceof long[]) {
-                call.append(java.util.Arrays.toString((long[]) argument));
-              } else if (argument instanceof Number || argument instanceof Boolean) {
-                call.append(argument).append(' ');
-              } else if (argument instanceof android.net.Uri) {
-                call.append(argument).append(' ');
+    org.mockito.MockedStatic<com.andrew.apollo.utils.MusicUtils> music =
+        org.mockito.Mockito.mockStatic(
+            com.andrew.apollo.utils.MusicUtils.class,
+            invocation -> {
+              String name = invocation.getMethod().getName();
+              if ("executeWithMusicPlaybackService".equals(name)) {
+                ((Runnable) invocation.getArgument(1)).run();
+                return null;
               }
-            }
-            calls.add(call.append(']').toString().replace(" ]", "]"));
-            return null;
-          }
-          return invocation.callRealMethod();
-        });
+              if ("startMusicPlaybackService".equals(name)) {
+                ((Runnable) invocation.getArgument(2)).run();
+                return null;
+              }
+              if (SERVICE_CALLS.contains(name)) {
+                StringBuilder call = new StringBuilder(name).append('[');
+                for (Object argument : invocation.getArguments()) {
+                  if (argument instanceof long[]) {
+                    call.append(java.util.Arrays.toString((long[]) argument));
+                  } else if (argument instanceof Number || argument instanceof Boolean) {
+                    call.append(argument).append(' ');
+                  } else if (argument instanceof android.net.Uri) {
+                    call.append(argument).append(' ');
+                  }
+                }
+                calls.add(call.append(']').toString().replace(" ]", "]"));
+                return null;
+              }
+              return invocation.callRealMethod();
+            });
+    // other tests in the JVM may have left a service behind: start from an idle player
+    music.when(com.andrew.apollo.utils.MusicUtils::getMusicPlaybackService).thenReturn(null);
+    music.when(com.andrew.apollo.utils.MusicUtils::isMusicPlaybackServiceRunning).thenReturn(false);
+    music.when(com.andrew.apollo.utils.MusicUtils::isStopped).thenReturn(true);
+    music.when(com.andrew.apollo.utils.MusicUtils::isPlaying).thenReturn(false);
+    music.when(com.andrew.apollo.utils.MusicUtils::isShuffleEnabled).thenReturn(false);
+    music.when(com.andrew.apollo.utils.MusicUtils::getRepeatMode).thenReturn(0);
+    music.when(com.andrew.apollo.utils.MusicUtils::getCurrentAudioId).thenReturn(-1L);
+    return music;
   }
 
   public static void installAll() {

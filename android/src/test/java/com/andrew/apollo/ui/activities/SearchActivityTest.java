@@ -47,9 +47,12 @@ public class SearchActivityTest {
 
   private MockedStatic<MusicUtils> music;
 
+  private final java.util.List<String> calls = new java.util.concurrent.CopyOnWriteArrayList<>();
+
   @Before
   public void setUp() {
     ApolloUiTestSupport.installAll();
+    music = ApolloUiTestSupport.mockMusicUtils(calls);
     FakeMediaProvider.install();
   }
 
@@ -230,7 +233,6 @@ public class SearchActivityTest {
 
   @Test
   public void showingAndLeavingTheScreenReportsTheForegroundChange() {
-    music = Mockito.mockStatic(MusicUtils.class, Mockito.CALLS_REAL_METHODS);
     music
         .when(() -> MusicUtils.notifyForegroundStateChanged(Mockito.any(), Mockito.anyBoolean()))
         .thenAnswer(i -> null);
@@ -245,7 +247,6 @@ public class SearchActivityTest {
   @Test
   public void tappingASongPlaysItAndClosesTheSearch() throws Exception {
     FakeMediaProvider.addSong(33, "Help", "Help!", "The Beatles");
-    music = Mockito.mockStatic(MusicUtils.class, Mockito.CALLS_REAL_METHODS);
     music
         .when(() -> MusicUtils.playFDs(Mockito.any(), Mockito.anyInt(), Mockito.anyBoolean()))
         .thenAnswer(i -> null);

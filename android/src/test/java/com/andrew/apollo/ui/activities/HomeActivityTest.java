@@ -54,9 +54,12 @@ public class HomeActivityTest {
 
   private MockedStatic<MusicUtils> music;
 
+  private final java.util.List<String> calls = new java.util.concurrent.CopyOnWriteArrayList<>();
+
   @Before
   public void setUp() {
     ApolloUiTestSupport.installAll();
+    music = ApolloUiTestSupport.mockMusicUtils(calls);
   }
 
   @After
@@ -78,7 +81,6 @@ public class HomeActivityTest {
 
   /** A player that is playing "Song" by "Artist". */
   private void playing() {
-    music = Mockito.mockStatic(MusicUtils.class, Mockito.CALLS_REAL_METHODS);
     music.when(MusicUtils::isStopped).thenReturn(false);
     music.when(MusicUtils::isPlaying).thenReturn(true);
     music.when(MusicUtils::getTrackName).thenReturn("Song");
