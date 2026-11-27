@@ -1526,6 +1526,10 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
     public void remove() {
       // If the current entry we're removing is the subtree
       // then we need to find a new subtree parent.
+      if (subtree == null) { // view already empty; super throws IllegalStateException
+        super.remove();
+        return;
+      }
       boolean needsFixing = false;
       int bitIdx = subtree.bitIndex;
       if (current == subtree) needsFixing = true;
@@ -1533,6 +1537,12 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
       // If the subtree changed its bitIndex or we
       // removed the old subtree, get a new one.
       if (bitIdx != subtree.bitIndex || needsFixing) subtree = subtree(prefix, offset, length);
+      // No subtree left: the last element of the prefix view was removed.
+      if (subtree == null) {
+        lastOne = true;
+        next = null;
+        return;
+      }
       // If the subtree's bitIndex is less than the
       // length of our prefix, it's the last item
       // in the prefix tree.

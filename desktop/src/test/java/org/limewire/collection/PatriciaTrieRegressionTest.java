@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -67,5 +68,30 @@ final class PatriciaTrieRegressionTest {
     assertFalse(trie.entrySet().remove(new AbstractMap.SimpleEntry<>("Lake", "Lake")));
     assertFalse(trie.entrySet().remove("not an entry"));
     assertEquals(size - 1, trie.size());
+  }
+
+  @Test
+  void removingEveryElementOfAPrefixViewThroughItsIteratorWorks() {
+    PatriciaTrie<String, String> trie = lakeTrie();
+    Iterator<Map.Entry<String, String>> it = trie.getPrefixedBy("La").entrySet().iterator();
+    int removed = 0;
+    while (it.hasNext()) {
+      it.next();
+      it.remove();
+      removed++;
+    }
+    assertEquals(2, removed);
+    assertFalse(trie.containsKey("Lake"));
+    assertFalse(trie.containsKey("Lax"));
+    assertEquals(4, trie.size());
+  }
+
+  @Test
+  void clearingAPrefixViewRemovesOnlyThePrefixedKeys() {
+    PatriciaTrie<String, String> trie = lakeTrie();
+    trie.getPrefixedBy("Lime").clear();
+    assertEquals(new ArrayList<>(List.of("Lake", "Lax", "Lovely")), new ArrayList<>(trie.keySet()));
+    trie.getPrefixedBy("Lo").clear();
+    assertEquals(2, trie.size());
   }
 }
