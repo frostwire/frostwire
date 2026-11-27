@@ -464,6 +464,8 @@ public class StringUtils {
     private static final Pattern STRONG = Pattern.compile("(?i)<(strong|b)>(.*?)</\\1>");
     private static final Pattern ANY_TAG = Pattern.compile("<.*?>", Pattern.DOTALL);
     private static final Pattern MULTI_SPACE = Pattern.compile("\\s+");
+    private static final Pattern REPEATED_SPACES = Pattern.compile(" {2,}");
+    private static final Pattern SPACES_AROUND_BREAK = Pattern.compile(" ?\n ?");
   }
 
   public static String fromHtml(String html) {
@@ -487,14 +489,17 @@ public class StringUtils {
             .replace("&apos;", "'");
 
     // --- small regexes that need capturing groups ----------------------------------
-    html = HtmlPatterns.BR_TAG.matcher(html).replaceAll(System.lineSeparator());
+    // Source whitespace (including its newlines) is collapsed first: only BR tags are line breaks.
+    html = HtmlPatterns.MULTI_SPACE.matcher(html).replaceAll(" ");
+    html = HtmlPatterns.BR_TAG.matcher(html).replaceAll("\n");
     html = HtmlPatterns.EMPHASIS.matcher(html).replaceAll("_$2_");
     html = HtmlPatterns.STRONG.matcher(html).replaceAll("*$2*");
 
     // --- final cleanup --------------------------------------------------------------
     html = HtmlPatterns.ANY_TAG.matcher(html).replaceAll("");
-    html = HtmlPatterns.MULTI_SPACE.matcher(html).replaceAll(" ");
-
-    return html.trim();
+    html = HtmlPatterns.REPEATED_SPACES.matcher(html).replaceAll(" ");
+    html = HtmlPatterns.SPACES_AROUND_BREAK.matcher(html).replaceAll("\n");
+    html = html.trim();
+    return "\n".equals(System.lineSeparator()) ? html : html.replace("\n", System.lineSeparator());
   }
 }
