@@ -281,4 +281,29 @@ public class MediaStoreLoadersTest {
     assertNotNull(cursor);
     cursor.close();
   }
+
+  /** The genre projection listed album before artist, so each song showed its album as artist. */
+  @Test
+  public void aGenresSongKeepsItsArtistAndAlbumApart() {
+    FakeMediaStore.onQuery =
+        (u, p, s, a, o) ->
+            cursor(
+                p,
+                row(
+                    "_id",
+                    3L,
+                    "title",
+                    "Riff",
+                    "artist",
+                    "Ann",
+                    "album",
+                    "LP",
+                    "duration",
+                    65000L));
+
+    Song song = new GenreSongLoader(context, 9L).loadInBackground().get(0);
+
+    assertEquals("Ann", song.mArtistName);
+    assertEquals("LP", song.mAlbumName);
+  }
 }

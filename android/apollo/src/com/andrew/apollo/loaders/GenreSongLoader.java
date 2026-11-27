@@ -72,9 +72,9 @@ public class GenreSongLoader extends SongLoader {
               /* 1 */
               MediaStore.Audio.Genres.Members.TITLE,
               /* 2 */
-              MediaStore.Audio.Genres.Members.ALBUM,
-              /* 3 */
               MediaStore.Audio.Genres.Members.ARTIST,
+              /* 3 */
+              MediaStore.Audio.Genres.Members.ALBUM,
               /* 4 */
               MediaStore.Audio.Genres.Members.DURATION
             },
