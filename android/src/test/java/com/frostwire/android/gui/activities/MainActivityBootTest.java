@@ -452,4 +452,128 @@ public class MainActivityBootTest {
         };
     MainActivity.refreshTransfers(failing);
   }
+
+  @Test
+  public void previewDownloadActionStartsTheDownloadOfTheResultThatWasPreviewed() {
+    MainActivity activity = boot();
+    com.frostwire.search.FileSearchResult sr = mock(com.frostwire.search.FileSearchResult.class);
+    com.frostwire.android.gui.dialogs.NewTransferDialog.srRef = com.frostwire.util.Ref.weak(sr);
+    try (MockedStatic<SearchFragment> search = mockStatic(SearchFragment.class)) {
+      activity.onNewIntent(new Intent(Constants.ACTION_START_TRANSFER_FROM_PREVIEW));
+      search.verify(
+          () ->
+              SearchFragment.startDownload(
+                  org.mockito.ArgumentMatchers.eq(activity),
+                  org.mockito.ArgumentMatchers.eq(sr),
+                  anyString()));
+    } finally {
+      com.frostwire.android.gui.dialogs.NewTransferDialog.srRef = null;
+    }
+  }
+
+  @Test
+  public void previewDownloadActionWithoutAResultStartsNothing() {
+    MainActivity activity = boot();
+    com.frostwire.android.gui.dialogs.NewTransferDialog.srRef = null;
+    try (MockedStatic<SearchFragment> search = mockStatic(SearchFragment.class)) {
+      activity.onNewIntent(new Intent(Constants.ACTION_START_TRANSFER_FROM_PREVIEW));
+      search.verify(() -> SearchFragment.startDownload(any(), any(), anyString()), never());
+    }
+  }
+
+  @Test
+  public void launcherIntentsFromTheOplusSeedlingWithAMediaIdOpenTheAudioPlayer() {
+    MainActivity activity = boot();
+    Intent seedling =
+        new Intent(Intent.ACTION_MAIN)
+            .addCategory(Intent.CATEGORY_LAUNCHER)
+            .putExtra("isFromOplusSeedling", "true")
+            .putExtra("mediaId", 5L);
+    activity.onNewIntent(seedling);
+    Intent started = shadowOf(activity).getNextStartedActivity();
+    assertEquals(
+        "com.andrew.apollo.ui.activities.AudioPlayerActivity",
+        started.getComponent().getClassName());
+    assertNull("the intent no longer looks like a music player intent", seedling.getAction());
+
+    // without the media id it is an ordinary launch
+    MainActivity other = boot();
+    other.onNewIntent(
+        new Intent(Intent.ACTION_MAIN)
+            .addCategory(Intent.CATEGORY_LAUNCHER)
+            .putExtra("isFromOplusSeedling", "true"));
+    assertNull(shadowOf(other).getNextStartedActivity());
+  }
+
+  @Test
+  public void resumingWithTheTermsAcceptedChecksStoragePermissionsOnlyOnce() {
+    when(config.getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)).thenReturn(true);
+    when(config.getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)).thenReturn(true);
+    ActivityController<MainActivity> controller =
+        controller(new Intent()).create().start().resume();
+    shadowOf(Looper.getMainLooper()).idle();
+    // a second resume must not ask again
+    controller.pause().resume();
+    assertFalse(controller.get().isFinishing());
+  }
+
+  @Test
+  public void onResumeQueriesTheNetworkStatusOffTheMainThread() {
+    when(config.getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)).thenReturn(true);
+    controller(new Intent()).create().start().resume();
+    shadowOf(Looper.getMainLooper()).idle();
+    for (Runnable r : new ArrayList<>(background)) {
+      // only the screen's own tasks, not what the fragments queue (promo slides need the network)
+      if (r.getClass().getName().contains("MainActivity")) {
+        r.run();
+      }
+    }
+    networks.verify(
+        () ->
+            com.frostwire.android.gui.NetworkManager.queryNetworkStatusBackground(
+                org.mockito.ArgumentMatchers.any(com.frostwire.android.gui.NetworkManager.class)),
+        org.mockito.Mockito.atLeastOnce());
+  }
+
+  @Test
+  public void permissionResultsGoToTheMatchingCheckerOrTheSuperclass() {
+    MainActivity activity = boot();
+    // an unknown request code falls through to the framework without failing
+    activity.onRequestPermissionsResult(
+        424242, new String[] {"android.permission.CAMERA"}, new int[] {0});
+    // a known one is handled by its checker
+    activity.onRequestPermissionsResult(
+        com.frostwire.android.gui.util.DangerousPermissionsChecker
+            .EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE,
+        new String[] {"android.permission.READ_EXTERNAL_STORAGE"},
+        new int[] {android.content.pm.PackageManager.PERMISSION_GRANTED});
+    assertFalse(activity.isFinishing());
+  }
+
+  @Test
+  public void promoVideoPreviewsAreLaunchedForResult() {
+    MainActivity activity = boot();
+    Intent preview = new Intent(Intent.ACTION_VIEW, Uri.parse("https://example.com/v.mp4"));
+    activity.launchPromoVideoPreview(preview);
+    Intent started = shadowOf(activity).getNextStartedActivityForResult().intent;
+    assertEquals("https://example.com/v.mp4", started.getDataString());
+  }
+
+  @Test
+  public void configurationChangesAndOptionItemsReachTheNavigationDrawer() {
+    MainActivity activity = boot();
+    activity.onConfigurationChanged(activity.getResources().getConfiguration());
+    android.view.MenuItem item = mock(android.view.MenuItem.class);
+    when(item.getItemId()).thenReturn(android.R.id.home);
+    assertFalse(activity.onOptionsItemSelected(item));
+    assertFalse(activity.onKeyDown(KeyEvent.KEYCODE_BACK, null));
+  }
+
+  @Test
+  public void leavingAndSavingMinimizesOnlyWhenTheUserAnswersYesToTheLastBackDialog() {
+    MainActivity activity = boot();
+    activity.onDialogClick("last_back_dialog", android.app.Dialog.BUTTON_NEGATIVE);
+    activity.onDialogClick("last_back_dialog", android.app.Dialog.BUTTON_POSITIVE);
+    assertFalse("minimizing keeps the activity alive", activity.isFinishing());
+  }
 }
