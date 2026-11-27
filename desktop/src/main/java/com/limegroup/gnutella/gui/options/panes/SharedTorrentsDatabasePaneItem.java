@@ -217,7 +217,7 @@ public final class SharedTorrentsDatabasePaneItem extends AbstractPaneItem {
     return "—";
   }
 
-  private static String formatSize(long bytes) {
+  static String formatSize(long bytes) {
     if (bytes < 0) return "—";
     if (bytes < 1024) return bytes + " B";
     double kb = bytes / 1024.0;
@@ -228,7 +228,7 @@ public final class SharedTorrentsDatabasePaneItem extends AbstractPaneItem {
     return String.format("%.1f GB", gb);
   }
 
-  private static String formatTimestamp(long seconds) {
+  static String formatTimestamp(long seconds) {
     if (seconds <= 0) return "—";
     try {
       return new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date(seconds * 1000L));
@@ -237,12 +237,12 @@ public final class SharedTorrentsDatabasePaneItem extends AbstractPaneItem {
     }
   }
 
-  private static String shortHex(String hex, int max) {
+  static String shortHex(String hex, int max) {
     if (hex == null) return "—";
     return hex.length() <= max ? hex : hex.substring(0, max);
   }
 
-  private static String shortHex(byte[] bytes, int max) {
+  static String shortHex(byte[] bytes, int max) {
     if (bytes == null || bytes.length == 0) return "—";
     return shortHex(Hex.encode(bytes), max);
   }
@@ -251,7 +251,7 @@ public final class SharedTorrentsDatabasePaneItem extends AbstractPaneItem {
     GUIMediator.setClipboardContent(text);
   }
 
-  private static String magnetLink(LocalSharedTorrent t) {
+  static String magnetLink(LocalSharedTorrent t) {
     return "magnet:?xt=urn:btih:" + t.infoHashHex();
   }
 
@@ -293,7 +293,7 @@ public final class SharedTorrentsDatabasePaneItem extends AbstractPaneItem {
     }
   }
 
-  private static final class TorrentTableModel extends AbstractTableModel {
+  static final class TorrentTableModel extends AbstractTableModel {
     private static final String[] COLUMNS = {
       I18n.tr("Name"),
       I18n.tr("Size"),
