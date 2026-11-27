@@ -484,7 +484,7 @@ public final class ThemeMediator {
   }
 
   /** The menu shortcut modifier; Command (Meta) where there is no toolkit to ask (headless). */
-  private static int menuShortcutKeyMask() {
+  public static int menuShortcutKeyMask() {
     if (GraphicsEnvironment.isHeadless()) {
       return KeyEvent.META_DOWN_MASK;
     }

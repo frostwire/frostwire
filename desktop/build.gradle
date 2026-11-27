@@ -98,9 +98,9 @@ jacoco {
 
 // Coverage may only go up. CI runs the verification after the tests. Raise the minimums as coverage
 // grows; the goal is 95%. Baseline 2026-11-01: 30.9% of lines, 26.2% of branches; 2026-11-27 (vendored
-// libraries left out): 45.5% of lines, 42.4% of branches; 49.5% / 46.0% after the common/util tests, 53.8% / 48.5% after the settings tests.
-def minimumLineCoverage = 0.53
-def minimumBranchCoverage = 0.48
+// libraries left out): 45.5% of lines, 42.4% of branches; 49.5% / 46.0% after the common/util tests, 53.8% / 48.5% after the settings tests, 60.5% / 53.0% after the GUI logic tests.
+def minimumLineCoverage = 0.60
+def minimumBranchCoverage = 0.52
 
 // Third-party sources vendored into this source set (Apache commons-lang3 and commons-io, MigLayout,
 // Apple's LAF stubs) aren't ours to test: they are left out of the report and the verification.
