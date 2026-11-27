@@ -57,7 +57,7 @@ public class NamedMediaType implements IconAndNameHolder, Comparable<NamedMediaT
    * The icon used to display this mediaType/LimeXMLSchema. Loaded lazily to avoid EDT blocking
    * during initialization.
    */
-  private Icon _icon;
+  private volatile Icon _icon;
 
   /** Constructs a new NamedMediaType, associating the MediaType with the LimeXMLSchema. */
   private NamedMediaType(MediaType mt) {
@@ -147,6 +147,37 @@ public class NamedMediaType implements IconAndNameHolder, Comparable<NamedMediaT
     }
     return _icon;
   }
+
+  /** Whether {@link #getIcon()} already loaded the icon. */
+  boolean isIconLoaded() {
+    return _icon != null;
+  }
+
+  /**
+   * Loads the icons of the media types the Library tree shows (frostwire/frostwire#1616). Call it
+   * off the EDT, at startup: each is a PNG decoded from the jar, which the first paint of the tree
+   * did on the EDT.
+   */
+  public static void preloadLibraryIcons() {
+    for (MediaType type : LIBRARY_TREE_MEDIA_TYPES.get()) {
+      try {
+        getFromMediaType(type).getIcon();
+      } catch (RuntimeException e) {
+        // an icon that can't load is found again, and reported, when the tree asks for it
+      }
+    }
+  }
+
+  /** The media types of LibraryExplorer's nodes. */
+  static final java.util.function.Supplier<java.util.List<MediaType>> LIBRARY_TREE_MEDIA_TYPES =
+      () ->
+          java.util.List.of(
+              MediaType.getAudioMediaType(),
+              MediaType.getVideoMediaType(),
+              MediaType.getImageMediaType(),
+              MediaType.getProgramMediaType(),
+              MediaType.getDocumentMediaType(),
+              MediaType.getTorrentMediaType());
 
   /** Returns the description of this NamedMediaType. */
   public String toString() {

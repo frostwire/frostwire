@@ -76,6 +76,7 @@ import com.limegroup.gnutella.gui.notify.NotifyUserProxy;
 import com.limegroup.gnutella.gui.search.DistributedSearchEngineWire;
 import com.limegroup.gnutella.gui.search.IceBridgeUrlHandler;
 import com.limegroup.gnutella.gui.search.LocalSearchEngineWire;
+import com.limegroup.gnutella.gui.search.NamedMediaType;
 import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import com.limegroup.gnutella.settings.*;
 import com.limegroup.gnutella.util.FrostWireUtils;
@@ -400,6 +401,8 @@ final class Initializer {
     // spinner, the search tab's spinner), and the status bar's icons are first set from refreshes
     // on the EDT.
     ResourceManager.preloadStartupThemeImages();
+    // The Library tree's media-type icons: PNGs decoded from the jar, off the EDT (#1616)
+    NamedMediaType.preloadLibraryIcons();
     // The first folder chooser's shell setup, and the warm-up's worker thread, start here rather
     // than when the first component with a Browse button is built on the EDT (#1411).
     ShellFolderWarmUp.warmUpForDirectoryChooser();
