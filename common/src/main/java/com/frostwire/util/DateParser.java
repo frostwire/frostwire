@@ -21,6 +21,7 @@ package com.frostwire.util;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Thread-safe date parser utility that caches SimpleDateFormat instances to eliminate per-result
@@ -47,6 +48,8 @@ public final class DateParser {
           () -> {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
             sdf.setLenient(false);
+            // the quoted Z literal means UTC; without this the JVM default zone is used
+            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
             return sdf;
           });
 
@@ -55,6 +58,8 @@ public final class DateParser {
           () -> {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
             sdf.setLenient(false);
+            // the quoted Z literal means UTC; without this the JVM default zone is used
+            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
             return sdf;
           });
 
