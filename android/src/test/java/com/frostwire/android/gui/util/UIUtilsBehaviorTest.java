@@ -353,6 +353,19 @@ public class UIUtilsBehaviorTest {
   }
 
   @Test
+  public void theScreenSizeInInchesComesFromTheDefaultDisplayBeforeAndroid11() {
+    Activity activity = Robolectric.buildActivity(Activity.class).create().get();
+    android.util.DisplayMetrics metrics = new android.util.DisplayMetrics();
+    activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+    double expected =
+        Math.sqrt(
+            Math.pow(metrics.widthPixels / metrics.xdpi, 2)
+                + Math.pow(metrics.heightPixels / metrics.ydpi, 2));
+    assertTrue(expected > 0);
+    assertEquals(expected, UIUtils.getScreenInches(activity), 1e-9);
+  }
+
+  @Test
   public void screenshotsOfEmptyViewsAreNull() {
     assertNull(UIUtils.takeScreenshot(null));
     assertNull(UIUtils.takeScreenshot(new View(app)));
