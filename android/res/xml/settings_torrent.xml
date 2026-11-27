@@ -101,7 +101,7 @@
 
     <PreferenceCategory android:title="@string/bandwidth_usage_settings">
         <SwitchPreference
-            android:key="froswire.prefs.network.enable_dht"
+            android:key="frostwire.prefs.network.enable_dht"
             android:summary="@string/enable_dht_summary"
             android:title="@string/enable_dht"/>
         <SwitchPreference
