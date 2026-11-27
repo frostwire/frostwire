@@ -150,4 +150,17 @@ class OptionsPaneManagerTest {
           manager.reinitPane("NOT_OPENED");
         });
   }
+
+  /**
+   * The former SAVE_BASIC_KEY branch built a second pane for the node (frostwire/frostwire#1655).
+   */
+  @Test
+  void showingAnyNodeAddsExactlyOneCard() throws Exception {
+    OptionsPaneManager manager = manager();
+    SwingUtilities.invokeAndWait(
+        () -> {
+          manager.show(node("OPTIONS_SAVE_BASIC_MAIN_TITLE", List.of(DetailsPaneItem.class)));
+          assertEquals(1, ((JPanel) manager.getComponent()).getComponentCount());
+        });
+  }
 }

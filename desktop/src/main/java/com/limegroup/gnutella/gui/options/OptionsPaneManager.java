@@ -80,15 +80,6 @@ public final class OptionsPaneManager {
         e.printStackTrace();
       }
       addPane(pane);
-      // If this was the 'SAVED' key, then also load shared,
-      // since setting save stuff requires that sharing be updated also.
-      if (node.getTitleKey().equals(OptionsConstructor.SAVE_BASIC_KEY)
-          && !panesByKey.containsKey(OptionsConstructor.SHARED_BASIC_KEY)) {
-        OptionsPane shared = FACTORY.createOptionsPane(node);
-        shared.initOptions();
-        addPane(shared);
-        panesByKey.put(node.getTitleKey(), shared);
-      }
     }
     CARD_LAYOUT.show(MAIN_PANEL, node.getTitleKey());
   }
