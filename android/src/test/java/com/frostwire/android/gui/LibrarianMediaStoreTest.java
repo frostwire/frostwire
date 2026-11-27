@@ -8,6 +8,7 @@ package com.frostwire.android.gui;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -234,6 +235,79 @@ public class LibrarianMediaStoreTest {
     } finally {
       song.delete();
       video.delete();
+    }
+  }
+
+  @Test
+  public void audioMetadataFromTheFileFillsTheRowOnAndroid11() throws Exception {
+    File song = File.createTempFile("librarian-tagged", ".mp3");
+    try {
+      String path = song.getAbsolutePath();
+      org.robolectric.shadows.ShadowMediaMetadataRetriever.addMetadata(
+          path, android.media.MediaMetadataRetriever.METADATA_KEY_TITLE, "Song title");
+      org.robolectric.shadows.ShadowMediaMetadataRetriever.addMetadata(
+          path, android.media.MediaMetadataRetriever.METADATA_KEY_ARTIST, "The Artist");
+      org.robolectric.shadows.ShadowMediaMetadataRetriever.addMetadata(
+          path, android.media.MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST, "Album Artist");
+      org.robolectric.shadows.ShadowMediaMetadataRetriever.addMetadata(
+          path, android.media.MediaMetadataRetriever.METADATA_KEY_ALBUM, "The Album");
+      org.robolectric.shadows.ShadowMediaMetadataRetriever.addMetadata(
+          path, android.media.MediaMetadataRetriever.METADATA_KEY_DURATION, "215000");
+      system.when(SystemUtils::hasAndroid11OrNewer).thenReturn(true);
+      mediaStoreEmpty();
+      insertReturns(Uri.parse("content://media/external/downloads/13"));
+      assertTrue(
+          Librarian.mediaStoreSaveToDownloads(
+              song, new File(DESTINATION_DIR, song.getName()), false));
+      ContentValues row = inserted.get(0);
+      assertEquals("Song title", row.getAsString("title"));
+      assertEquals("The Artist", row.getAsString("artist"));
+      assertEquals("Album Artist", row.getAsString("album_artist"));
+      assertEquals("The Album", row.getAsString("album"));
+      assertEquals(Long.valueOf(215000), row.getAsLong("duration"));
+      assertEquals(song.getName(), row.getAsString("_display_name"));
+    } finally {
+      song.delete();
+    }
+  }
+
+  @Test
+  public void aTitleWithoutAnAudioTypeOrOnOlderAndroidSkipsTheAudioColumns() throws Exception {
+    File video = File.createTempFile("librarian-titled", ".mp4");
+    try {
+      org.robolectric.shadows.ShadowMediaMetadataRetriever.addMetadata(
+          video.getAbsolutePath(), android.media.MediaMetadataRetriever.METADATA_KEY_TITLE, "Clip");
+      system.when(SystemUtils::hasAndroid11OrNewer).thenReturn(true);
+      mediaStoreEmpty();
+      insertReturns(Uri.parse("content://media/external/downloads/14"));
+      assertTrue(
+          Librarian.mediaStoreSaveToDownloads(
+              video, new File(DESTINATION_DIR, video.getName()), false));
+      assertEquals("Clip", inserted.get(0).getAsString("title"));
+      assertFalse(inserted.get(0).containsKey("artist"));
+    } finally {
+      video.delete();
+    }
+  }
+
+  @Test
+  public void aRetrieverThatCannotReadTheFileLeavesTheFileNameAsTheTitle() throws Exception {
+    File song = File.createTempFile("librarian-unreadable", ".mp3");
+    try {
+      org.robolectric.shadows.ShadowMediaMetadataRetriever.addException(
+          org.robolectric.shadows.util.DataSource.toDataSource(song.getAbsolutePath()),
+          new IllegalArgumentException("cannot read"));
+      mediaStoreEmpty();
+      insertReturns(Uri.parse("content://media/external/downloads/15"));
+      assertTrue(
+          Librarian.mediaStoreSaveToDownloads(
+              song, new File(DESTINATION_DIR, song.getName()), false));
+      String title = inserted.get(0).getAsString("title");
+      assertNotNull(title);
+      assertTrue(title.startsWith("librarian-unreadable"));
+      assertFalse("the extension is not part of the title", title.endsWith("mp3"));
+    } finally {
+      song.delete();
     }
   }
 
