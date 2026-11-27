@@ -22,6 +22,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.app.Application;
+import com.frostwire.android.core.ConfigurationManager;
+import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.libtorrent.LoopbackTorrent;
 import com.frostwire.android.libtorrent.TestEngine;
 import com.frostwire.android.util.SystemUtils;
@@ -62,6 +65,9 @@ public class UIBittorrentDownloadTest {
   private TransferManager manager;
   private TorrentInfo album;
   private MockedStatic<SystemUtils> system;
+  private MockedStatic<TransferManager> managers;
+  private MockedStatic<ConfigurationManager> configStatic;
+  private MockedStatic<NetworkManager> networkStatic;
 
   @Before
   public void setUp() throws Exception {
@@ -77,11 +83,26 @@ public class UIBittorrentDownloadTest {
     local = torrent.local;
     album = torrent.album;
     manager = mock(TransferManager.class);
+    // plenty of space, whatever the Robolectric file system says
+    managers = mockStatic(TransferManager.class);
+    managers.when(TransferManager::getCurrentMountAvailableBytes).thenReturn(Long.MAX_VALUE);
+    // a finished transfer keeps seeding (the finished listener pauses it otherwise)
+    ConfigurationManager config = mock(ConfigurationManager.class);
+    when(config.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS)).thenReturn(true);
+    configStatic = mockStatic(ConfigurationManager.class);
+    configStatic.when(ConfigurationManager::instance).thenReturn(config);
+    NetworkManager network = mock(NetworkManager.class);
+    when(network.isDataWIFIUp()).thenReturn(true);
+    networkStatic = mockStatic(NetworkManager.class);
+    networkStatic.when(NetworkManager::instance).thenReturn(network);
   }
 
   @After
   public void tearDown() {
     torrent.close();
+    networkStatic.close();
+    configStatic.close();
+    managers.close();
     system.close();
   }
 
@@ -265,19 +286,14 @@ public class UIBittorrentDownloadTest {
   @Test
   public void aFullDiskShowsTheDiskFullState() throws Exception {
     BTDownload dl = add(null, false);
-    try (MockedStatic<TransferManager> managers = mockStatic(TransferManager.class)) {
-      managers.when(TransferManager::getCurrentMountAvailableBytes).thenReturn(0L);
-      UIBittorrentDownload ui = new UIBittorrentDownload(manager, dl);
-      assertEquals(TransferState.ERROR_DISK_FULL, ui.getState());
-    }
+    managers.when(TransferManager::getCurrentMountAvailableBytes).thenReturn(0L);
+    assertEquals(TransferState.ERROR_DISK_FULL, new UIBittorrentDownload(manager, dl).getState());
     // when the free space can't be read the transfer is not blamed for it
-    try (MockedStatic<TransferManager> managers = mockStatic(TransferManager.class)) {
-      managers
-          .when(TransferManager::getCurrentMountAvailableBytes)
-          .thenThrow(new IllegalStateException("no storage path"));
-      UIBittorrentDownload ui = new UIBittorrentDownload(manager, dl);
-      assertNotEquals(TransferState.ERROR_DISK_FULL, ui.getState());
-    }
+    managers
+        .when(TransferManager::getCurrentMountAvailableBytes)
+        .thenThrow(new IllegalStateException("no storage path"));
+    assertNotEquals(
+        TransferState.ERROR_DISK_FULL, new UIBittorrentDownload(manager, dl).getState());
   }
 
   @Test

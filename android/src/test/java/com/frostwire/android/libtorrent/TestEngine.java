@@ -28,14 +28,17 @@ import com.frostwire.jlibtorrent.swig.entry;
 import com.frostwire.jlibtorrent.swig.save_state_flags_t;
 import com.frostwire.jlibtorrent.swig.session_params;
 import com.frostwire.jlibtorrent.swig.settings_pack;
+import com.frostwire.platform.Platform;
 import com.frostwire.platform.Platforms;
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
 
 /**
@@ -53,9 +56,11 @@ public final class TestEngine implements AutoCloseable {
   public final Events events = new Events();
 
   private final Path dir;
+  private final Platform previousPlatform;
 
-  private TestEngine(Path dir, BTContext ctx, BTEngine engine) {
+  private TestEngine(Path dir, BTContext ctx, BTEngine engine, Platform previousPlatform) {
     this.dir = dir;
+    this.previousPlatform = previousPlatform;
     this.ctx = ctx;
     this.engine = engine;
     engine.setListener(events);
@@ -77,7 +82,9 @@ public final class TestEngine implements AutoCloseable {
   /** An engine with its context set up but no session, as before startup or after shutdown. */
   public static TestEngine create(Path dir) throws Exception {
     Application app = ApplicationProvider.getApplicationContext();
-    Platforms.set(new AndroidPlatform(app));
+    // Platforms.set keeps the first platform of the sandbox, which an earlier test may have
+    // mocked: this engine needs the real one, and puts the other back on close.
+    Platform previous = installPlatform(new AndroidPlatform(app));
     BTContext ctx = new BTContext();
     ctx.homeDir = Files.createDirectories(dir.resolve("home")).toFile();
     ctx.torrentsDir = Files.createDirectories(dir.resolve("torrents")).toFile();
@@ -91,7 +98,7 @@ public final class TestEngine implements AutoCloseable {
     ctx.version[3] = 1;
     writeLocalOnlySettings(new File(ctx.homeDir, "settings.dat"));
     BTEngine.ctx = ctx;
-    return new TestEngine(dir, ctx, newEngine());
+    return new TestEngine(dir, ctx, newEngine(), previous);
   }
 
   /** A fresh engine, never the application's singleton. */
@@ -107,6 +114,20 @@ public final class TestEngine implements AutoCloseable {
       engine.stop();
     } finally {
       BTEngine.ctx = null;
+      installPlatform(previousPlatform);
+    }
+  }
+
+  /** Makes {@code platform} the current one (or none), returning the one it replaced. */
+  @SuppressWarnings("unchecked")
+  private static Platform installPlatform(Platform platform) {
+    try {
+      Field field = Platforms.class.getDeclaredField("platform");
+      field.setAccessible(true);
+      AtomicReference<Platform> reference = (AtomicReference<Platform>) field.get(null);
+      return reference.getAndSet(platform);
+    } catch (ReflectiveOperationException e) {
+      throw new AssertionError(e);
     }
   }
 
