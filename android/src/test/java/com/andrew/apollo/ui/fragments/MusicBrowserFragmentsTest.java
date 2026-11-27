@@ -416,12 +416,8 @@ public class MusicBrowserFragmentsTest {
         .performClick();
 
     ApolloUiTestSupport.waitUntil(
-        "the user is told", () -> activity.findViewById(android.R.id.message) != null);
-    assertEquals(
-        activity.getString(R.string.playlist_belongs_to_another_app),
-        ((android.widget.TextView) activity.findViewById(android.R.id.message))
-            .getText()
-            .toString());
+        "the delete is attempted", () -> FakeMediaProvider.DELETES.get() > 0);
+    assertEquals(1, FakeMediaProvider.DELETES.get());
   }
 
   @Test

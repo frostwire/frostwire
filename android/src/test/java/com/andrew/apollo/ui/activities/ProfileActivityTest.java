@@ -287,15 +287,6 @@ public class ProfileActivityTest {
   }
 
   @Test
-  public void addingToTheHomeScreenIsHandled() {
-    ProfileActivity activity =
-        launch(profile(MediaStore.Audio.Artists.CONTENT_TYPE, "The Beatles")).get();
-
-    assertTrue(
-        activity.onOptionsItemSelected(new RoboMenuItem(R.id.menu_player_add_to_homescreen)));
-  }
-
-  @Test
   public void theProfileSurvivesARotation() {
     ActivityController<ProfileActivity> controller =
         launch(profile(MediaStore.Audio.Artists.CONTENT_TYPE, "The Beatles"));

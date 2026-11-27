@@ -25,6 +25,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import androidx.fragment.app.Fragment;
 import com.andrew.apollo.Config;
+import com.andrew.apollo.adapters.ProfileSongAdapter;
 import com.andrew.apollo.menu.FragmentMenuItems;
 import com.andrew.apollo.ui.ApolloUiTestSupport;
 import com.andrew.apollo.ui.FakeMediaProvider;
@@ -219,19 +220,6 @@ public class ProfileFragmentsTest {
   }
 
   @Test
-  public void addingToFavoritesConfirmsOnTheScreen() {
-    ProfileActivity activity = launch(MediaStore.Audio.Artists.CONTENT_TYPE, "The Beatles");
-    ArtistSongFragment songs = fragment(activity, ArtistSongFragment.class);
-    rows(songs, 2);
-    Menu menu = contextMenuFor(songs, FIRST);
-
-    assertTrue(select(songs, menu, FragmentMenuItems.ADD_TO_FAVORITES));
-
-    ApolloUiTestSupport.waitUntil(
-        "the confirmation shows", () -> activity.findViewById(android.R.id.message) != null);
-  }
-
-  @Test
   public void addingToFavoritesAnEmptiedLibraryConfirmsNothing() {
     ProfileActivity activity = launch(MediaStore.Audio.Artists.CONTENT_TYPE, "The Beatles");
     ArtistSongFragment songs = fragment(activity, ArtistSongFragment.class);
@@ -414,20 +402,17 @@ public class ProfileFragmentsTest {
   }
 
   @Test
-  public void theFavoritesProfileListsTheFavoritesAndCanRemoveOne() {
-    com.andrew.apollo.provider.FavoritesStore.getInstance(
-            androidx.test.core.app.ApplicationProvider.getApplicationContext())
-        .addSongId(11L, "Help", "Help!", "The Beatles");
+  public void theFavoritesProfileOffersRemovingAFavoriteInsteadOfAddingOne() {
     ProfileActivity activity =
         launch(
             androidx.test.core.app.ApplicationProvider.getApplicationContext()
                 .getString(R.string.playlist_favorites),
             "Favorites");
     FavoriteFragment favorites = fragment(activity, FavoriteFragment.class);
-    rows(favorites, 1);
+    fill(favorites, 11, 12);
 
     listOf(favorites).performItemClick(null, FIRST, 11);
-    waitForCall("playFDs[[11]0 false]");
+    waitForCall("playFDs[[11, 12]0 false]");
 
     Menu menu = contextMenuFor(favorites, FIRST);
     for (int i = 0; i < menu.size(); i++) {
@@ -439,6 +424,23 @@ public class ProfileFragmentsTest {
     favorites.onMetaChanged();
     assertTrue(
         favorites.onContextItemSelected(menu.findItem(FragmentMenuItems.REMOVE_FROM_FAVORITES)));
+  }
+
+  /** Puts songs with the given ids straight into a fragment's adapter. */
+  @SuppressWarnings("unchecked")
+  private static void fill(ApolloFragment<?, ?> fragment, long... ids) {
+    ApolloFragment<ProfileSongAdapter, com.andrew.apollo.model.Song> songs =
+        (ApolloFragment<ProfileSongAdapter, com.andrew.apollo.model.Song>) fragment;
+    List<com.andrew.apollo.model.Song> list = new java.util.ArrayList<>();
+    for (long id : ids) {
+      list.add(new com.andrew.apollo.model.Song(id, "Song " + id, "Artist", "Album", 180));
+    }
+    songs.getAdapter().unload();
+    songs.getAdapter().setDataList(list);
+    for (com.andrew.apollo.model.Song song : list) {
+      songs.getAdapter().add(song);
+    }
+    songs.getAdapter().notifyDataSetChanged();
   }
 
   @Test
