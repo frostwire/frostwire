@@ -79,7 +79,9 @@ class LanguagePanelTest {
   @Test
   void aSavedRegionPicksTheMatchingRegionalVariant() throws Exception {
     assertEquals("pt_BR", startsOn("pt", "BR", "").toString());
-    assertEquals("zh_TW", startsOn("zh", "TW", "").toString());
+    // Latin-script variants only: the list holds the languages the machine's fonts can display, so
+    // zh_TW is missing on a runner without CJK fonts (the CI failure that taught us).
+    assertEquals("en_CA", startsOn("en", "CA", "").toString());
     assertEquals("en_GB", startsOn("en", "GB", "").toString());
   }
 
