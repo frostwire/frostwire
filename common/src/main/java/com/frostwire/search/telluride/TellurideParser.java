@@ -25,15 +25,17 @@ import com.frostwire.util.Logger;
 public final class TellurideParser {
   static final Logger LOG = Logger.getLogger(TellurideParser.class);
   static final String DECIMAL_GROUP_FORMAT = "(?<%s>\\d{1,3}\\.\\d{1,3})";
+  // sizes and rates have no upper bound on their integer part (1234.56MiB, 1234.50KiB/s)
+  static final String UNBOUNDED_DECIMAL_GROUP_FORMAT = "(?<%s>\\d+\\.\\d{1,3})";
   static final String ETA_GROUP = "(?<eta>\\d{1,3}\\:\\d{1,3})";
   // [download]  30.5% of 277.93MiB at 507.50KiB/s ETA 06:29
   static final String REGEX_PROGRESS =
       "(?is)"
           + String.format(DECIMAL_GROUP_FORMAT, "percentage")
           + "\\% of .*?"
-          + String.format(DECIMAL_GROUP_FORMAT, "size")
+          + String.format(UNBOUNDED_DECIMAL_GROUP_FORMAT, "size")
           + "(?<unitSize>[KMGTP]iB) at.*?"
-          + String.format(DECIMAL_GROUP_FORMAT, "rate")
+          + String.format(UNBOUNDED_DECIMAL_GROUP_FORMAT, "rate")
           + "(?<unitRate>[KMGTP]iB/s) ETA "
           + ETA_GROUP;
   static final Pattern downloadPattern = Pattern.compile(REGEX_PROGRESS);
