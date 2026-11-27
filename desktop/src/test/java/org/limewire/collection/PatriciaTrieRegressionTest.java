@@ -8,8 +8,10 @@
 package org.limewire.collection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -51,5 +53,19 @@ final class PatriciaTrieRegressionTest {
     assertEquals("Lovely", trie.tailMap("Lime").lastKey());
     assertEquals("Lake", trie.headMap("Lime").firstKey());
     assertTrue(trie.headMap("Lime").lastKey().compareTo("Lime") < 0);
+  }
+
+  @Test
+  void entrySetRemoveRemovesByKeyAndOnlyWhenValueMatches() {
+    PatriciaTrie<String, String> trie = lakeTrie();
+    int size = trie.size();
+    assertFalse(trie.entrySet().remove(new AbstractMap.SimpleEntry<>("Lake", "other")));
+    assertEquals(size, trie.size());
+    assertTrue(trie.entrySet().remove(new AbstractMap.SimpleEntry<>("Lake", "Lake")));
+    assertEquals(size - 1, trie.size());
+    assertFalse(trie.containsKey("Lake"));
+    assertFalse(trie.entrySet().remove(new AbstractMap.SimpleEntry<>("Lake", "Lake")));
+    assertFalse(trie.entrySet().remove("not an entry"));
+    assertEquals(size - 1, trie.size());
   }
 }

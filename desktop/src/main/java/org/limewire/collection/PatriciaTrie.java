@@ -1571,9 +1571,11 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
     }
 
     public boolean remove(Object o) {
-      int size = size();
-      PatriciaTrie.this.remove(o);
-      return size != size();
+      if (!(o instanceof Map.Entry)) return false;
+      TrieEntry<K, V> candidate = getEntry(((Map.Entry<?, ?>) o).getKey());
+      if (candidate == null || !candidate.equals(o)) return false;
+      PatriciaTrie.this.removeEntry(candidate);
+      return true;
     }
 
     public int size() {
