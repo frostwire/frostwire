@@ -500,4 +500,56 @@ public class ApolloListAdaptersTest {
 
     assertTrue(row.getTag() instanceof MusicViewHolder);
   }
+
+  // --- tapping the art plays the album or artist ---
+
+  /** The tap hands the lookup to a background thread; its MediaStore query is the proof. */
+  private static void waitForQuery(String fragment) {
+    long deadline = System.nanoTime() + 10_000_000_000L;
+    while (System.nanoTime() < deadline) {
+      for (String query : new java.util.ArrayList<>(FakeMediaStore.queries)) {
+        if (query.contains(fragment)) {
+          return;
+        }
+      }
+      Thread.onSpinWait();
+    }
+    throw new AssertionError("no query for " + fragment + " in " + FakeMediaStore.queries);
+  }
+
+  @Test
+  public void tappingAnAlbumsArtLooksUpItsSongsToPlay() {
+    AlbumAdapter adapter = albums(R.layout.list_item_detailed_no_background);
+    adapter.setLoadExtraData(true);
+    View row = adapter.getView(0, null, parent);
+
+    row.findViewById(R.id.list_item_image).performClick();
+
+    waitForQuery("album_id=7");
+  }
+
+  @Test
+  public void tappingAnArtistsArtLooksUpTheirSongsToPlay() {
+    ArtistAdapter adapter = new ArtistAdapter(activity, R.layout.list_item_detailed_no_background);
+    adapter.setDataList(List.of(new Artist(3, "Ann", 14, 2)));
+    adapter.buildCache();
+    adapter.setLoadExtraData(true);
+    View row = adapter.getView(0, null, parent);
+
+    row.findViewById(R.id.list_item_image).performClick();
+
+    waitForQuery("artist_id=3");
+  }
+
+  @Test
+  public void tappingAnAlbumInAnArtistsProfilePlaysThatAlbum() {
+    ArtistAlbumAdapter adapter =
+        new ArtistAlbumAdapter(activity, R.layout.list_item_detailed_no_background);
+    adapter.setDataList(List.of(new Album(7, "LP", "Ann", 11, "1999")));
+    View row = adapter.getView(1, null, parent);
+
+    row.findViewById(R.id.list_item_image).performClick();
+
+    waitForQuery("album_id=7");
+  }
 }

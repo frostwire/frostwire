@@ -81,6 +81,7 @@ public final class ApolloServiceFixture {
   /** MusicUtils caches the service weakly; a test must not see the one from the test before. */
   public static void forgetCachedService() throws Exception {
     setStatic(com.andrew.apollo.utils.MusicUtils.class, "musicPlaybackServiceRef", null);
+    setStatic(com.andrew.apollo.utils.MusicUtils.class, "serviceConnectionListener", null);
   }
 
   /** No service is running: what MusicUtils sees before the service starts or after it dies. */
