@@ -668,4 +668,142 @@ public class MainActivityBootTest {
     update.performClick();
     verify(updater).notifyUserAboutUpdate(activity);
   }
+
+  @Test
+  public void aRecreatedScreenRestoresItsFragmentStack() {
+    ActivityController<MainActivity> controller =
+        controller(new Intent()).create().start().resume();
+    MainActivity first = controller.get();
+    shadowOf(Looper.getMainLooper()).idle();
+    first.switchContent(first.getFragmentByNavMenuId(R.id.menu_main_transfers));
+    controller.recreate();
+    shadowOf(Looper.getMainLooper()).idle();
+    MainActivity second = controller.get();
+    assertTrue(second.getCurrentFragment() instanceof TransfersFragment);
+    // back pops the restored stack to the search fragment
+    second.handleOnBackPressed();
+    assertTrue(second.getCurrentFragment() instanceof SearchFragment);
+  }
+
+  @Test
+  public void destroyingTheScreenForgetsTheLastInstance() {
+    ActivityController<MainActivity> controller =
+        controller(new Intent()).create().start().resume();
+    assertNotNull(MainActivity.instance());
+    controller.pause().stop().destroy();
+    assertNull(MainActivity.instance());
+  }
+
+  @Test
+  public void aStaleLastSeenVersionIsReplacedByTheCurrentOneOnResume() {
+    when(config.getString(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION_BUILD)).thenReturn("0.0.0.0");
+    controller(new Intent()).create().start().resume();
+    verify(config)
+        .setString(
+            org.mockito.ArgumentMatchers.eq(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION_BUILD),
+            org.mockito.ArgumentMatchers.argThat(v -> !"0.0.0.0".equals(v)));
+  }
+
+  @Test
+  public void anUpToDateLastSeenVersionIsLeftAlone() {
+    when(config.getString(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION_BUILD))
+        .thenReturn(Constants.FROSTWIRE_VERSION_STRING + "." + Constants.FROSTWIRE_BUILD);
+    controller(new Intent()).create().start().resume();
+    verify(config, never())
+        .setString(
+            org.mockito.ArgumentMatchers.eq(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION_BUILD),
+            anyString());
+  }
+
+  @Test
+  public void activityResultsAreLeftToTheFrameworkWhenNoSettingsPermissionFlowIsPending() {
+    MainActivity activity = boot();
+    activity.onActivityResult(1, android.app.Activity.RESULT_CANCELED, null);
+    assertFalse(activity.isFinishing());
+  }
+
+  @Test
+  public void theShutdownDialogIsNotShownOnceTheStateWasSaved() {
+    ActivityController<MainActivity> controller =
+        controller(new Intent()).create().start().resume();
+    MainActivity activity = controller.get();
+    shadowOf(Looper.getMainLooper()).idle();
+    controller.saveInstanceState(new Bundle());
+    activity.showShutdownDialog();
+    shadowOf(Looper.getMainLooper()).idle();
+    assertNull(activity.getSupportFragmentManager().findFragmentByTag(YES_NO_TAG));
+  }
+
+  @Test
+  public void aCompletedDownloadNotificationOpensTheFinishedFileAndClearsTheReviewList()
+      throws Exception {
+    MainActivity activity = boot();
+    java.io.File done = java.io.File.createTempFile("done", ".mp3");
+    done.deleteOnExit();
+    background.clear();
+    activity.onNewIntent(
+        new Intent()
+            .putExtra(Constants.EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION, true)
+            .putExtra(Constants.EXTRA_DOWNLOAD_COMPLETE_PATH, done.getAbsolutePath()));
+    background.get(0).run();
+    shadowOf(Looper.getMainLooper()).idle();
+    ui.verify(() -> UIUtils.openFile(activity, done.getAbsoluteFile()));
+    verify(manager).clearDownloadsToReview();
+  }
+
+  @Test
+  public void aContentUriTorrentIsCopiedToTheTempFolderAndThenDownloaded() throws Exception {
+    MainActivity activity = boot();
+    Uri content = Uri.parse("content://torrents.test/some.torrent");
+    shadowOf(activity.getContentResolver())
+        .registerInputStream(content, new java.io.ByteArrayInputStream(new byte[] {1, 2, 3}));
+    background.clear();
+    activity.onNewIntent(new Intent(Intent.ACTION_VIEW, content));
+    java.io.File temp = java.nio.file.Files.createTempDirectory("fw-main-test").toFile();
+    try (MockedStatic<Platforms> platforms = mockStatic(Platforms.class)) {
+      platforms.when(Platforms::temp).thenReturn(temp);
+      background.get(0).run();
+    }
+    java.io.File copy = new java.io.File(temp, "content-intent.torrent");
+    assertEquals(3, copy.length());
+    verify(manager)
+        .downloadTorrent(
+            org.mockito.ArgumentMatchers.eq("file://" + copy.getAbsolutePath()), any());
+    copy.delete();
+    temp.delete();
+  }
+
+  @Test
+  public void cancellingATransferFromTheMainScreenRemovesItFromTheTransfersListAndTheSession() {
+    ActivityController<MainActivity> controller =
+        controller(new Intent()).create().start().resume();
+    MainActivity activity = controller.get();
+    shadowOf(Looper.getMainLooper()).idle();
+    com.frostwire.transfers.HttpDownload download =
+        mock(com.frostwire.transfers.HttpDownload.class);
+    background.clear();
+    new com.frostwire.android.gui.adapters.menu.CancelMenuAction(activity, download, true)
+        .onClick();
+    shadowOf(Looper.getMainLooper()).idle();
+    androidx.fragment.app.Fragment dialog = null;
+    for (androidx.fragment.app.Fragment f : activity.getSupportFragmentManager().getFragments()) {
+      if (f
+          instanceof
+          com.frostwire.android.gui.adapters.menu.CancelMenuAction.CancelMenuActionDialog) {
+        dialog = f;
+      }
+    }
+    assertNotNull(dialog);
+    ((android.widget.Button)
+            ((androidx.fragment.app.DialogFragment) dialog)
+                .getDialog()
+                .findViewById(R.id.dialog_default_button_yes))
+        .performClick();
+    for (Runnable r : new ArrayList<>(background)) {
+      if (r.getClass().getName().contains("CancelMenuAction")) {
+        r.run();
+      }
+    }
+    verify(download).remove(true);
+  }
 }
