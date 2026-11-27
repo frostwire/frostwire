@@ -55,11 +55,11 @@ public final class CompactSampleSizeBox extends FullBox {
           throw new UnsupportedOperationException();
         case 8:
           IO.read(ch, 1, buf);
-          e.entry_size = buf.get();
+          e.entry_size = buf.get() & 0xFF;
           break;
         case 16:
           IO.read(ch, 2, buf);
-          e.entry_size = buf.getShort();
+          e.entry_size = buf.getShort() & 0xFFFF;
           break;
       }
       entries[i] = e;
@@ -83,7 +83,7 @@ public final class CompactSampleSizeBox extends FullBox {
           IO.write(ch, 1, buf);
           break;
         case 16:
-          buf.putShort(e.entry_size);
+          buf.putShort((short) e.entry_size);
           IO.write(ch, 2, buf);
           break;
       }
@@ -95,11 +95,11 @@ public final class CompactSampleSizeBox extends FullBox {
     long s = 0;
     s += 4; // full box
     s += 8;
-    s += sample_count * field_size;
+    s += ((long) sample_count * field_size + 7) / 8; // field_size is in bits
     length(s);
   }
 
   public static final class Entry {
-    public short entry_size;
+    public int entry_size; // unsigned 8 or 16 bits
   }
 }

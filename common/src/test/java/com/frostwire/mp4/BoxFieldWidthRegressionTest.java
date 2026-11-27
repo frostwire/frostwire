@@ -8,6 +8,8 @@
 package com.frostwire.mp4;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -15,6 +17,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.util.LinkedList;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -68,5 +71,27 @@ final class BoxFieldWidthRegressionTest {
     p.flip();
     p.get(payload);
     assertRoundTrips(fullBox("tfhd", flags, payload));
+  }
+
+  @Test
+  void stz2EightBitSizesAreUnsignedAndRoundTrip() throws IOException {
+    byte[] payload = {0, 0, 0, 8, 0, 0, 0, 3, 10, (byte) 200, (byte) 255};
+    byte[] file = fullBox("stz2", 0, payload);
+    CompactSampleSizeBox stz2 =
+        assertInstanceOf(CompactSampleSizeBox.class, parse(file).getFirst());
+    assertEquals(200, stz2.entries[1].entry_size);
+    assertEquals(255, stz2.entries[2].entry_size);
+    assertRoundTrips(file);
+  }
+
+  @Test
+  void stz2SixteenBitSizesAreUnsignedAndRoundTrip() throws IOException {
+    byte[] payload = {0, 0, 0, 16, 0, 0, 0, 2, (byte) 0x80, 0, (byte) 0xff, (byte) 0xff};
+    byte[] file = fullBox("stz2", 0, payload);
+    CompactSampleSizeBox stz2 =
+        assertInstanceOf(CompactSampleSizeBox.class, parse(file).getFirst());
+    assertEquals(32768, stz2.entries[0].entry_size);
+    assertEquals(65535, stz2.entries[1].entry_size);
+    assertRoundTrips(file);
   }
 }
