@@ -576,4 +576,96 @@ public class MainActivityBootTest {
     activity.onDialogClick("last_back_dialog", android.app.Dialog.BUTTON_POSITIVE);
     assertFalse("minimizing keeps the activity alive", activity.isFinishing());
   }
+
+  private static void select(MainActivity activity, int menuItemId) {
+    com.google.android.material.navigation.NavigationView nav =
+        activity.findViewById(R.id.activity_main_nav_view);
+    assertTrue(nav.getMenu().performIdentifierAction(menuItemId, 0));
+  }
+
+  @Test
+  public void drawerMenuKeyOpensAndClosesTheNavigationDrawer() {
+    MainActivity activity = boot();
+    androidx.drawerlayout.widget.DrawerLayout drawer =
+        activity.findViewById(R.id.activity_main_drawer_layout);
+    com.google.android.material.navigation.NavigationView nav =
+        activity.findViewById(R.id.activity_main_nav_view);
+    KeyEvent menu = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MENU);
+    assertTrue(activity.onKeyDown(KeyEvent.KEYCODE_MENU, menu));
+    assertTrue(drawer.isDrawerOpen(nav));
+    // back closes the open drawer before anything else
+    activity.handleOnBackPressed();
+    shadowOf(Looper.getMainLooper()).idleFor(java.time.Duration.ofSeconds(1));
+    assertFalse(drawer.isDrawerOpen(nav));
+    assertNull(activity.getSupportFragmentManager().findFragmentByTag(YES_NO_TAG));
+  }
+
+  @Test
+  public void navigationItemsSwitchFragmentsOrOpenTheirScreens() {
+    MainActivity activity = boot();
+    select(activity, R.id.menu_main_transfers);
+    shadowOf(Looper.getMainLooper()).idle();
+    assertTrue(activity.getCurrentFragment() instanceof TransfersFragment);
+    select(activity, R.id.menu_main_search);
+    assertTrue(activity.getCurrentFragment() instanceof SearchFragment);
+
+    select(activity, R.id.menu_main_settings);
+    assertEquals(
+        SettingsActivity.class.getName(),
+        shadowOf(activity).getNextStartedActivity().getComponent().getClassName());
+    select(activity, R.id.menu_main_my_music);
+    assertEquals(
+        com.andrew.apollo.ui.activities.HomeActivity.class.getName(),
+        shadowOf(activity).getNextStartedActivity().getComponent().getClassName());
+    select(activity, R.id.menu_downloads);
+    assertEquals(
+        android.app.DownloadManager.ACTION_VIEW_DOWNLOADS,
+        shadowOf(activity).getNextStartedActivity().getAction());
+  }
+
+  @Test
+  public void shutdownNavigationItemAsksForConfirmation() {
+    MainActivity activity = controller(new Intent()).create().start().resume().get();
+    shadowOf(Looper.getMainLooper()).idle();
+    select(activity, R.id.menu_main_shutdown);
+    shadowOf(Looper.getMainLooper()).idle();
+    assertNotNull(activity.getSupportFragmentManager().findFragmentByTag(YES_NO_TAG));
+  }
+
+  @Test
+  public void navigationHeaderLinksToTheDonationPageAndTheAboutScreen() {
+    MainActivity activity = boot();
+    android.view.View header =
+        ((com.google.android.material.navigation.NavigationView)
+                activity.findViewById(R.id.activity_main_nav_view))
+            .getHeaderView(0);
+    header.findViewById(R.id.nav_view_header_main_app_logo).performClick();
+    ui.verify(() -> UIUtils.openURL(any(android.content.Context.class), anyString()));
+    header.findViewById(R.id.nav_view_header_main_title).performClick();
+    assertEquals(
+        AboutActivity.class.getName(),
+        shadowOf(activity).getNextStartedActivity().getComponent().getClassName());
+    assertTrue(
+        ((android.widget.TextView) header.findViewById(R.id.nav_view_header_main_version))
+            .getText()
+            .toString()
+            .startsWith(" v"));
+  }
+
+  @Test
+  public void anAvailableUpdateRevealsTheUpdateButtonWhichNotifiesTheUser() {
+    SoftwareUpdater updater = mock(SoftwareUpdater.class);
+    updaters.when(SoftwareUpdater::getInstance).thenReturn(updater);
+    MainActivity activity = boot();
+    android.view.View update =
+        ((com.google.android.material.navigation.NavigationView)
+                activity.findViewById(R.id.activity_main_nav_view))
+            .getHeaderView(0)
+            .findViewById(R.id.nav_view_header_main_update);
+    assertEquals(android.view.View.GONE, update.getVisibility());
+    activity.updateNavigationMenu(true);
+    assertEquals(android.view.View.VISIBLE, update.getVisibility());
+    update.performClick();
+    verify(updater).notifyUserAboutUpdate(activity);
+  }
 }
