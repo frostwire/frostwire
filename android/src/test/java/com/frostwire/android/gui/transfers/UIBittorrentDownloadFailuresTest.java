@@ -243,4 +243,35 @@ public class UIBittorrentDownloadFailuresTest {
 
     assertTrue(first.isFile());
   }
+
+  /** The real download of the album, removed from the engine until its handle is invalid. */
+  private BTDownload removedDownload() throws Exception {
+    BTDownload dl = realDownload();
+    dl.remove(false, false);
+    TestEngine.await(() -> !dl.getTorrentHandle().isValid(), "the torrent left the session");
+    return dl;
+  }
+
+  @Test
+  public void aTransferThatAlreadyLeftTheSessionCanBeWrapped() throws Exception {
+    BTDownload gone = removedDownload();
+
+    UIBittorrentDownload ui = new UIBittorrentDownload(manager, gone);
+
+    assertEquals(0, ui.getSize());
+    assertTrue(ui.getItems().isEmpty());
+  }
+
+  @Test
+  public void aTransferThatLeftTheSessionKeepsItsNameWhenRefreshed() throws Exception {
+    BTDownload dl = realDownload();
+    UIBittorrentDownload ui = new UIBittorrentDownload(manager, dl);
+    assertEquals("album", ui.getDisplayName());
+    dl.remove(false, false);
+    TestEngine.await(() -> !dl.getTorrentHandle().isValid(), "the torrent left the session");
+
+    ui.updateUI(dl);
+
+    assertEquals("album", ui.getDisplayName());
+  }
 }

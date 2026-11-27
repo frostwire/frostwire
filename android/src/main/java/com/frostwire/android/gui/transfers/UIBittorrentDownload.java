@@ -92,7 +92,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
       this.dl.setListener(new UIBTDownloadListener());
     }
 
-    this.displayName = dl.getDisplayName();
+    this.displayName = readDisplayName(dl, "");
     this.size = calculateSize(dl);
     // Don't eagerly load items to prevent excessive memory retention.
     // Items will be lazily loaded when first accessed via getItems().
@@ -495,7 +495,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
   }
 
   void updateUI(BTDownload dl) {
-    displayName = dl.getDisplayName();
+    displayName = readDisplayName(dl, displayName);
     size = calculateSize(dl);
     updateCachedState();
     // Recalculate items only if they're already loaded (avoid forcing large list into memory)
@@ -512,6 +512,16 @@ public final class UIBittorrentDownload implements BittorrentDownload {
    */
   public void clearCachedItems() {
     items = null;
+  }
+
+  /** The torrent may have left the session already, which makes libtorrent throw. */
+  private static String readDisplayName(BTDownload dl, String fallback) {
+    try {
+      return dl.getDisplayName();
+    } catch (Throwable t) {
+      LOG.warn("Could not read the torrent display name", t);
+      return fallback;
+    }
   }
 
   private long calculateSize(BTDownload dl) {
