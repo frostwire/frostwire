@@ -526,7 +526,8 @@ public final class BTDownload implements BittorrentDownload {
     if (status == null) {
       return 0;
     }
-    long left = ti.totalSize() - status.totalDone();
+    // only what the user wants: unselected files and BEP-47 pad files are never downloaded
+    long left = status.totalWanted() - status.totalWantedDone();
     long rate = status.downloadPayloadRate();
     if (left <= 0) {
       return 0;

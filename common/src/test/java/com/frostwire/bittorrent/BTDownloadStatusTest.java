@@ -236,6 +236,7 @@ class BTDownloadStatusTest {
     assertEquals(10, etaOf(ti, total - 1000, 100));
     assertEquals(-1, etaOf(ti, total - 1000, 0), "unknown without a rate");
     assertEquals(0, etaOf(ti, total, 100), "nothing left");
+    assertEquals(0, etaOf(ti, total / 2, total / 2, 100), "unwanted files are not left");
   }
 
   @Test
@@ -604,9 +605,15 @@ class BTDownloadStatusTest {
   }
 
   private long etaOf(TorrentInfo ti, long done, int rate) {
+    return etaOf(ti, ti.totalSize(), done, rate);
+  }
+
+  private long etaOf(TorrentInfo ti, long wanted, long wantedDone, int rate) {
     FakeTorrentHandle handle = new FakeTorrentHandle(ti);
     handle.status.setSave_path(dir.toString());
-    handle.status.setTotal_done(done);
+    handle.status.setTotal_done(wantedDone);
+    handle.status.setTotal_wanted(wanted);
+    handle.status.setTotal_wanted_done(wantedDone);
     handle.status.setDownload_payload_rate(rate);
     return new BTDownload(local.engine, new TorrentHandle(handle)).getETA();
   }
