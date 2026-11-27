@@ -36,15 +36,7 @@ public final class ApolloServiceFixture {
 
   public static ApolloServiceFixture start() throws Exception {
     ApolloServiceFixture f = new ApolloServiceFixture();
-    Platforms.set(
-        (Platform)
-            Proxy.newProxyInstance(
-                Platform.class.getClassLoader(),
-                new Class<?>[] {Platform.class},
-                (proxy, method, args) ->
-                    "isUIThread".equals(method.getName())
-                        ? Looper.myLooper() == Looper.getMainLooper()
-                        : null));
+    installPlatform(true);
     setStatic(ConfigurationManager.class, "instance", Mockito.mock(ConfigurationManager.class));
     f.controller = Robolectric.buildService(MusicPlaybackService.class).create();
     f.service = f.controller.get();
@@ -59,6 +51,31 @@ public final class ApolloServiceFixture {
     f.service.attachPlayer(f.player);
     forgetCachedService();
     return f;
+  }
+
+  /**
+   * Installs the Platform the code asks "am I on the UI thread?". With {@code mainIsUi} false
+   * nothing is the UI thread, so code that would hop to a background thread runs inline.
+   */
+  @SuppressWarnings("unchecked")
+  public static void installPlatform(boolean mainIsUi) {
+    Platform platform =
+        (Platform)
+            Proxy.newProxyInstance(
+                Platform.class.getClassLoader(),
+                new Class<?>[] {Platform.class},
+                (proxy, method, args) ->
+                    "isUIThread".equals(method.getName())
+                        ? mainIsUi && Looper.myLooper() == Looper.getMainLooper()
+                        : null);
+    try {
+      // Platforms.set keeps the first Platform for good, and another test may have set its own.
+      Field field = Platforms.class.getDeclaredField("platform");
+      field.setAccessible(true);
+      ((java.util.concurrent.atomic.AtomicReference<Platform>) field.get(null)).set(platform);
+    } catch (ReflectiveOperationException e) {
+      throw new AssertionError(e);
+    }
   }
 
   /** MusicUtils caches the service weakly; a test must not see the one from the test before. */
