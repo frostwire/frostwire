@@ -200,4 +200,17 @@ public class QueueFragmentTest {
 
     assertTrue(queue.isAdded());
   }
+
+  /** Dropping a row that isn't there removed and inserted null, and still moved the real queue. */
+  @Test
+  public void droppingARowThatIsNotThereLeavesTheQueueAlone() {
+    QueueFragment queue = queue();
+    int rows = queue.getAdapter().getCount();
+
+    queue.drop(7, 0);
+
+    assertFalse(calls.toString(), calls.stream().anyMatch(c -> c.startsWith("moveQueueItem")));
+    assertEquals(rows, queue.getAdapter().getCount());
+    assertEquals("Song 1", queue.getAdapter().getItem(0).mSongName);
+  }
 }

@@ -193,6 +193,11 @@ public final class QueueFragment extends ApolloFragment<SongAdapter, Song>
 
     try {
       mItem = mAdapter.getItem(from);
+      if (mItem == null) {
+        // nothing at that row (a stale drag): don't move a null song in the playing queue
+        mAdapter.notifyDataSetChanged();
+        return;
+      }
       int count = mAdapter.getCount();
       mAdapter.remove(mItem);
       int adjustedTo = (to >= count) ? count - 1 : to;
