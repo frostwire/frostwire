@@ -1121,6 +1121,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.options.panes.OptionsEngineApplyOffEdtTest"
         includeTestsMatching "com.limegroup.gnutella.gui.options.panes.IcebaseReportsPaneItemTest"
         includeTestsMatching "com.limegroup.gnutella.gui.options.panes.PerformancePaneItemTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.options.panes.IPFilterDatFormatTest"
         includeTestsMatching "com.limegroup.gnutella.gui.VPNStatusButtonRefreshTest"
         includeTestsMatching "com.limegroup.gnutella.gui.VPNWarningLabelBoldTest"
         includeTestsMatching "com.limegroup.gnutella.gui.VPNDropProtectionLinkTest"

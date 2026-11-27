@@ -37,6 +37,7 @@ import com.limegroup.gnutella.gui.IconButton;
 import com.limegroup.gnutella.gui.ShellFolderWarmUp;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.AddRangeManuallyDialog;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.CidrFilterInputStreamReader;
+import com.limegroup.gnutella.gui.options.panes.ipfilter.DatFilterInputStreamReader;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.HostsFilterInputStreamReader;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.IPFilterFormat;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.IPFilterHttpListener;
@@ -68,6 +69,9 @@ public class IPFilterPaneItem extends AbstractPaneItem {
           "You can manually enter IP addresses ranges to filter out, you can also import bulk addresses from an IP block list file or URL (.p2p, .dat, .cidr, .hosts — compressed as .gz or .zip)");
   private static final Pattern P2P_LINE_PATTERN =
       Pattern.compile("(.*)\\:(.*)\\-(.*)$", java.util.regex.Pattern.COMMENTS);
+  private static final Pattern EMULE_DAT_LINE_PATTERN =
+      Pattern.compile(
+          "(?m)^\\s*\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\s*-\\s*\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\s*,");
   private static final Logger LOG = Logger.getLogger(IPFilterPaneItem.class);
   private final String decompressingString = I18n.tr("Decompressing");
   private final ExecutorService httpExecutor;
@@ -319,8 +323,10 @@ public class IPFilterPaneItem extends AbstractPaneItem {
           final IPFilterInputStreamReader ipFilterReader;
           switch (format) {
             case P2P:
-            case DAT:
               ipFilterReader = new P2PIPFilterInputStreamReader(decompressedFile);
+              break;
+            case DAT:
+              ipFilterReader = new DatFilterInputStreamReader(decompressedFile);
               break;
             case CIDR:
               ipFilterReader = new CidrFilterInputStreamReader(decompressedFile);
@@ -446,6 +452,17 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     }
     if (cidrMatches >= 3) {
       return IPFilterFormat.CIDR;
+    }
+
+    // Try eMule DAT detection (pattern: low - high , level , description). Must come before HOSTS,
+    // whose regex matches the leading address of these lines.
+    Matcher datMatcher = EMULE_DAT_LINE_PATTERN.matcher(sampleStr);
+    int datMatches = 0;
+    while (datMatches < 3 && datMatcher.find()) {
+      datMatches++;
+    }
+    if (datMatches >= 3) {
+      return IPFilterFormat.DAT;
     }
 
     // Try HOSTS detection (pattern: 0.0.0.0 domain or 127.0.0.1 domain)

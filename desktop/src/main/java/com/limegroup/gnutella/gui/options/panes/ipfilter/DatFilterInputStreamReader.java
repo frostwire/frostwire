@@ -31,6 +31,12 @@ import java.io.InputStreamReader;
 public class DatFilterInputStreamReader implements IPFilterInputStreamReader {
   private static final Pattern P2P_LINE_PATTERN =
       Pattern.compile("(.*)\\:(.*)\\-(.*)$", java.util.regex.Pattern.COMMENTS);
+
+  /** eMule ipfilter.dat line: `001.002.003.004 - 001.002.003.255 , 000 , description`. */
+  private static final Pattern EMULE_LINE_PATTERN =
+      Pattern.compile(
+          "^(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s*-\\s*(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s*(?:,\\s*\\d*\\s*(?:,(.*))?)?$");
+
   private final BufferedReader br;
   private InputStream is;
   private int bytesRead;
@@ -55,6 +61,11 @@ public class DatFilterInputStreamReader implements IPFilterInputStreamReader {
         if (line.isEmpty() || line.startsWith("#")) {
           continue;
         }
+        Matcher emule = EMULE_LINE_PATTERN.matcher(line);
+        if (emule.find()) {
+          String description = emule.group(3) == null ? "" : emule.group(3).trim();
+          return new IPRange(description, stripZeros(emule.group(1)), stripZeros(emule.group(2)));
+        }
         Matcher matcher = P2P_LINE_PATTERN.matcher(line);
         if (matcher.find()) {
           return new IPRange(matcher.group(1), matcher.group(2), matcher.group(3));
@@ -64,6 +75,19 @@ public class DatFilterInputStreamReader implements IPFilterInputStreamReader {
       e.printStackTrace();
     }
     return null;
+  }
+
+  /** `001.002.000.010` to `1.2.0.10`. */
+  private static String stripZeros(String address) {
+    String[] octets = address.split("\\.");
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < octets.length; i++) {
+      if (i > 0) {
+        sb.append('.');
+      }
+      sb.append(Integer.parseInt(octets[i]));
+    }
+    return sb.toString();
   }
 
   @Override
