@@ -303,6 +303,41 @@ class ResourceManagerAnimatedImagePreloadTest {
     }
   }
 
+  /**
+   * The Library tree's Torrent Data node loaded its icon from the jar on the EDT the first time the
+   * tree was laid out (Icebase #b5b06359002f, frostwire/frostwire#1595). The startup preload loads
+   * it.
+   */
+  @Test
+  void theLibraryTreeIconIsPreloadedOffTheEdt() throws Exception {
+    ResourceManager.LIBRARY_TREE_THEME_IMAGES.forEach(ResourceManager::forgetThemeImage);
+
+    Thread worker = new Thread(ResourceManager::preloadStartupThemeImages, "startup");
+    worker.start();
+    worker.join(30_000);
+
+    for (String name : ResourceManager.LIBRARY_TREE_THEME_IMAGES) {
+      assertTrue(ResourceManager.isThemeImageCached(name), name + " was not preloaded");
+    }
+  }
+
+  /** The tree preload list names exactly the theme image SavedFilesDirectoryHolder loads. */
+  @Test
+  void theLibraryTreePreloadListMatchesSavedFilesDirectoryHolder() throws IOException {
+    Matcher m =
+        Pattern.compile("getThemeImage\\(\"([^\"]+)\"\\)")
+            .matcher(
+                Files.readString(
+                    Path.of(
+                        "src/main/java/com/frostwire/gui/library/SavedFilesDirectoryHolder.java"),
+                    StandardCharsets.UTF_8));
+    Set<String> icons = new TreeSet<>();
+    while (m.find()) {
+      icons.add(m.group(1));
+    }
+    assertEquals(new TreeSet<>(ResourceManager.LIBRARY_TREE_THEME_IMAGES), icons);
+  }
+
   /** The preload list names exactly the icons PaymentOptionsRenderer loads. */
   @Test
   void theLibraryPaymentPreloadListMatchesPaymentOptionsRenderer() throws IOException {

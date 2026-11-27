@@ -207,12 +207,19 @@ public final class ResourceManager {
       List.of("bitcoin_enabled", "bitcoin_disabled", "paypal_enabled", "paypal_disabled");
 
   /**
+   * The theme image the Library tree's Torrent Data folder node shows (SavedFilesDirectoryHolder).
+   * The first layout of the tree decoded it from the jar on the EDT (Icebase #b5b06359002f,
+   * frostwire/frostwire#1595).
+   */
+  static final List<String> LIBRARY_TREE_THEME_IMAGES = List.of("save");
+
+  /**
    * Loads {@link #ANIMATED_THEME_IMAGES}, {@link #STATUS_BAR_THEME_IMAGES}, {@link
-   * #SEARCH_SOURCE_THEME_IMAGES}, {@link #LIBRARY_TABLE_THEME_IMAGES} and the theme images behind
-   * {@link #SEARCH_BUTTON_ICONS}, {@link #LIBRARY_BUTTON_ICONS} and {@link #TRANSFER_BUTTON_ICONS}
-   * into the theme-image cache. Call it off the EDT, at startup before the main window is built, so
-   * the EDT finds them cached. Only this synchronized cache is filled; the button icon cache stays
-   * EDT-only.
+   * #SEARCH_SOURCE_THEME_IMAGES}, {@link #LIBRARY_TABLE_THEME_IMAGES}, {@link
+   * #LIBRARY_TREE_THEME_IMAGES} and the theme images behind {@link #SEARCH_BUTTON_ICONS}, {@link
+   * #LIBRARY_BUTTON_ICONS} and {@link #TRANSFER_BUTTON_ICONS} into the theme-image cache. Call it
+   * off the EDT, at startup before the main window is built, so the EDT finds them cached. Only
+   * this synchronized cache is filled; the button icon cache stays EDT-only.
    */
   static void preloadStartupThemeImages() {
     for (List<String> names :
@@ -220,7 +227,8 @@ public final class ResourceManager {
             ANIMATED_THEME_IMAGES,
             STATUS_BAR_THEME_IMAGES,
             SEARCH_SOURCE_THEME_IMAGES,
-            LIBRARY_TABLE_THEME_IMAGES)) {
+            LIBRARY_TABLE_THEME_IMAGES,
+            LIBRARY_TREE_THEME_IMAGES)) {
       for (String name : names) {
         try {
           getThemeImage(name);
