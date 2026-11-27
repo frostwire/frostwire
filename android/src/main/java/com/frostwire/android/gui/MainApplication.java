@@ -207,7 +207,7 @@ public class MainApplication extends Application {
 
   // don't try to refactor this into an async call since this guy runs on a thread
   // outside the Engine thread pool
-  private static class BTEngineInitializer implements Runnable {
+  static class BTEngineInitializer implements Runnable {
     BTEngineInitializer() {}
 
     public void run() {
@@ -328,8 +328,7 @@ public class MainApplication extends Application {
    * Lifecycle callbacks to handle FWImageLoader health during app transitions. This helps prevent
    * crashes when the app is backgrounded and foregrounded.
    */
-  private static class ImageLoaderLifecycleCallbacks
-      implements Application.ActivityLifecycleCallbacks {
+  static class ImageLoaderLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
     private int activityCount = 0;
 
     private static final androidx.fragment.app.FragmentManager.FragmentLifecycleCallbacks
