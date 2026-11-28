@@ -1,3 +1,27 @@
+FrostWire 7.1.7 UNRELEASED
+   - fix:unpacking a zip file with a crafted entry name can no longer write files outside the folder it is unpacked into
+   - fix:a torrent you picked only some files of no longer shows an infinite time remaining; the estimate counts only the data you asked for, and transfers sort by time remaining correctly even when two ETAs are far apart (#1671)
+   - fix:search results whose search engine is missing are hidden instead of failing with an error
+   - fix:Tools > Options no longer fails when a page of the dialog is chosen after the dialog closed, or when its tree has a page more than one level down (#1594)
+   - fix:Windows: when Windows Application Control (Smart App Control, WDAC or AppLocker) blocks one of Java's own libraries, FrostWire now says what was blocked and how to allow it instead of failing in silence (#1620)
+   - fix:the first Library tree paint no longer loads its media-type and Torrent Data icons on the window's thread (#1616)
+   - fix:the first menu, text, HTML label, text layout and skinned gradient painted after starting FrostWire no longer freeze the window while Java loads their classes; they are prepared in the background at startup (#1617, #1619)
+   - fix:the first text in a font Java has not seen no longer freezes the window while it registers the installed font files (#1618)
+   - fix:dropping an https .torrent link on FrostWire starts the download, and dropped addresses with spaces or non-English characters are encoded correctly
+   - fix:an update installer that was only partly downloaded is kept and resumed instead of started over; the file name is right when the update has no name or points at a torrent, and the progress no longer divides by zero
+   - fix:a custom network interface you chose is kept when the computer cannot list its network interfaces for a moment
+   - fix:the tray choice falls back to an immediate shutdown when it cannot be offered, instead of leaving FrostWire open
+   - fix:eMule .dat IP filter files are recognized and read
+   - fix:Belarusian, Galician and Sinhala show their own country's flag
+   - fix:the Options page for Auto-search URLs knows when its checkbox changed, so the change can be saved
+   - fix:a crypto address with spaces around it is checked after the spaces are removed
+   - fix:no more debug text printed to the console from the interface
+   - fix:copying a file no longer fails for missing sources, and files over 2 GiB are copied whole
+   - fix:common: form posts encode their keys and values, downloads over HTTP send the right referrer and compression headers, ISO times ending in Z are read as UTC, and video and music files with unusual MP4 headers or JPEG headers are read correctly
+   - fix:common: Telluride's progress sizes and speeds of 1000 or more are read correctly, and HTML links keep their line breaks
+   - fix:JPEG images are read with the right number of color components
+   - change:FrostWire's own sources are compiled as UTF-8 instead of Latin-1, so names with accents are no longer garbled in the program
+
 FrostWire 7.1.6 NOV/26/2026
    - fix:the first search suggestion painted after starting FrostWire no longer freezes the window while Java links its record comparison code (#1563)
    - fix:when Java's own files are damaged and FrostWire can't start (a Java class missing right after launch), it now says so in the system's own dialog and offers the download page instead of closing without a word (#1541)
