@@ -239,20 +239,20 @@ public class TransferManagerEngineTest {
     awaitCompleteAndSeeding(ui);
 
     manager.suspendSeedingTorrents();
-    assertTrue(ui.isPaused());
+    awaitPaused(ui);
     manager.resumePolicySuspendedSeeding();
     awaitResumed(ui);
 
     manager.suspendTorrentsForPolicy();
-    assertTrue(ui.isPaused());
+    awaitPaused(ui);
     // not complete downloads only: a complete one waits for the seeding policy
     manager.resumePolicySuspendedDownloads();
-    assertTrue(ui.isPaused());
+    awaitPaused(ui);
     // data savings on: seeding stays suspended
     when(network.isDataMobileUp()).thenReturn(true);
     when(config.getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY)).thenReturn(true);
     manager.resumePolicySuspendedSeeding();
-    assertTrue(ui.isPaused());
+    awaitPaused(ui);
     when(network.isDataMobileUp()).thenReturn(false);
     manager.resumePolicySuspendedSeeding();
     awaitResumed(ui);
@@ -446,6 +446,16 @@ public class TransferManagerEngineTest {
   }
 
   /** A resume is posted to libtorrent's thread: refresh until the state shows it (slow runners). */
+  private static void awaitPaused(UIBittorrentDownload ui) throws Exception {
+    TestEngine.await(
+        () -> {
+          ui.getDl().refreshStatusCache();
+          ui.updateCachedState();
+          return ui.isPaused();
+        },
+        "the transfer is paused");
+  }
+
   private static void awaitResumed(UIBittorrentDownload ui) throws Exception {
     TestEngine.await(
         () -> {
