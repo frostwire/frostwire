@@ -1,3 +1,28 @@
+FrostWire 3.2.6 build 782 UNRELEASED
+  - fix:unpacking a zip file with a crafted entry name can no longer write files outside the folder it is unpacked into (shared code)
+  - fix:a torrent you picked only some files of no longer shows an infinite time remaining for the rest of the download; the estimate counts only the data you asked for (#1671)
+  - fix:transfers paused by the Wi-Fi-only, data-saver or battery policy announce themselves to their trackers again when they resume, so they find peers sooner (#1672)
+  - fix:the Transfers screen no longer fails with an error when a torrent has just left the BitTorrent engine (removed or finished) while its row is being drawn (#1673)
+  - fix:the music player no longer hangs or crashes the app when it starts before its service is ready; it waits at most 10 seconds and continues
+  - fix:tapping a magnet link, a .torrent link or an empty address in a download dialog no longer crashes FrostWire with an error when the link has no scheme
+  - fix:the SoundCloud download confirmation no longer crashes when it restores its list of results after the screen is rotated or the app is restored
+  - fix:the DHT switch in the BitTorrent settings is saved under the right name now, so turning DHT off or on takes effect
+  - fix:setting a song as your ringtone sets the song you chose, also when the permission is granted after you ask, and its "ringtone not set" message no longer fails off the main thread
+  - fix:the music queue no longer crashes when you drop a song outside of the list, and songs added to a list in the wrong place no longer fail with an error
+  - fix:AAC (.aac) and Matroska audio (.mka) files are recognized as audio
+  - fix:the genre list shows each song's real artist and album instead of the wrong columns
+  - fix:very large torrents list their files in pages as you scroll, so the file list opens quickly and keeps your place when it refreshes
+  - fix:opening an artist or an album from a search result closes the search only after the profile has opened, so you land on the profile instead of the previous screen
+  - fix:the "no data, check your connection" message is shown while the screen is on, not when it is paused, so it no longer pops up in the background
+  - fix:removing a file or peer from a transfer's detail tabs animates the row that was removed instead of a neighbour
+  - fix:the disk cache stores its entries again (it was opened with the wrong number of values per entry, so puts were never committed)
+  - fix:the playlist search ends with no results when the video site returns nothing, instead of failing with an error
+  - fix:a message shown while no screen is open is dropped instead of crashing the app, and the confirmation dialogs open only once
+  - fix:common: form posts encode their keys and values, downloads over HTTP send the right referrer and compression headers, and ISO times ending in Z are read as UTC
+  - fix:common: videos and music with unusual MP4 headers (stz2, tfhd, tfdt and Apple tags) are read correctly instead of being misread or rejected
+  - fix:common: file sizes and speeds over 1000 in the video downloader's progress are read correctly, and HTML links keep their line breaks
+  - change:the engine's old background intent service and unused debug helpers are removed
+
 FrostWire 3.2.5 build 781 NOV/26/2026
   - new:Pieces tab: tap a piece to see its details (state, size, byte range, peers, SHA-1, files) and change its download priority; Don't Download pieces are drawn red and High ones orange, like on desktop; torrents with more than 1,200 pieces now show all of them (#1566)
   - new:FrostWire targets Android 16 (API 36); every screen keeps clear of the status and navigation bars, the camera cutout and the keyboard now that Android 15 and 16 draw apps edge to edge
