@@ -872,7 +872,55 @@ public final class StrictEdtMode {
     // The toolkit's own request to open the Windows input method's candidate list while the user
     // types with an IME: posted by WInputMethod itself, with no FrostWire frame (Icebase
     // #cd014524ede8, GitHub #1351; 4 reports in 11 days, builds 337 and 338).
-    {"sun.awt.windows.WInputMethod.openCandidateWindow", "sun.awt.windows.WInputMethod$1.run"}
+    {"sun.awt.windows.WInputMethod.openCandidateWindow", "sun.awt.windows.WInputMethod$1.run"},
+    // The Windows input method handling a key event: the key goes to the IME before any key
+    // listener, and the native call waits on Windows' text input service (Icebase
+    // #04da2e144187, 15 ms of EDT CPU in the stall window). Not Windows-only in name: the macOS
+    // signature below is the same kind of stall and shares this list.
+    {
+      ANY_JDK_FRAMES,
+      "sun.awt.windows.WInputMethod.handleNativeIMEEvent",
+      "sun.awt.windows.WInputMethod.dispatchEvent",
+      "sun.awt.im.InputContext.dispatchEvent",
+      "sun.awt.im.InputMethodContext.dispatchEvent",
+      "java.awt.Component.dispatchEventImpl",
+      "java.awt.Container.dispatchEventImpl",
+      "java.awt.Component.dispatchEvent",
+      "java.awt.KeyboardFocusManager.redispatchEvent",
+      "java.awt.DefaultKeyboardFocusManager.dispatchKeyEvent",
+      "java.awt.DefaultKeyboardFocusManager.preDispatchKeyEvent",
+      "java.awt.DefaultKeyboardFocusManager.typeAheadAssertions",
+      "java.awt.DefaultKeyboardFocusManager.dispatchEvent",
+      "java.awt.Component.dispatchEventImpl",
+      "java.awt.Container.dispatchEventImpl",
+      "java.awt.Window.dispatchEventImpl",
+      "java.awt.Component.dispatchEvent"
+    },
+    // macOS: the first mouse event over a window makes the input context ask the system for the
+    // installed input methods, a native call into AppKit that FrostWire does not make (Icebase
+    // #f78543105350, 0 ms of EDT CPU in the stall window).
+    {
+      ANY_JDK_FRAMES,
+      "sun.lwawt.macosx.CInputMethodDescriptor.nativeGetAvailableLocales",
+      "sun.lwawt.macosx.CInputMethodDescriptor.getAvailableLocalesInternal",
+      "sun.lwawt.macosx.CInputMethod.setLocale",
+      "sun.lwawt.macosx.CInputMethod.setLocale",
+      "sun.awt.im.InputContext.getInputMethodInstance",
+      "sun.awt.im.InputContext.getInputMethod",
+      "sun.awt.im.InputContext.dispatchEvent",
+      "sun.awt.im.InputMethodContext.dispatchEvent",
+      "java.awt.Component.dispatchEventImpl",
+      "java.awt.Container.dispatchEventImpl",
+      "java.awt.Component.dispatchEvent",
+      "java.awt.LightweightDispatcher.retargetMouseEvent",
+      "java.awt.LightweightDispatcher.retargetMouseEnterExit",
+      "java.awt.LightweightDispatcher.trackMouseEnterExit",
+      "java.awt.LightweightDispatcher.processMouseEvent",
+      "java.awt.LightweightDispatcher.dispatchEvent",
+      "java.awt.Container.dispatchEventImpl",
+      "java.awt.Window.dispatchEventImpl",
+      "java.awt.Component.dispatchEvent"
+    }
   };
 
   /** Frames where the EDT's event loop dispatches; frames above the first one are the stall. */

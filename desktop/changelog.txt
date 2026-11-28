@@ -20,6 +20,7 @@ FrostWire 7.1.7 UNRELEASED
    - fix:common: form posts encode their keys and values, downloads over HTTP send the right referrer and compression headers, ISO times ending in Z are read as UTC, and video and music files with unusual MP4 headers or JPEG headers are read correctly
    - fix:common: Telluride's progress sizes and speeds of 1000 or more are read correctly, and HTML links keep their line breaks
    - fix:JPEG images are read with the right number of color components
+   - change:freeze reports caused by the system's input method (a key press waiting on the Windows text input service, or macOS listing the installed input methods on the first mouse move) are no longer sent, since FrostWire does not run in them
    - change:FrostWire's own sources are compiled as UTF-8 instead of Latin-1, so names with accents are no longer garbled in the program
 
 FrostWire 7.1.6 NOV/26/2026

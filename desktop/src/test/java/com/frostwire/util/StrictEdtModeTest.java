@@ -358,6 +358,76 @@ class StrictEdtModeTest {
     assertFalse(StrictEdtMode.isWindowsToolkitOnlyStall(stack(underApp, EDT_LOOP)));
   }
 
+  private static final StackTraceElement[] IME_KEY_EVENT = {
+    frame("sun.awt.windows.WInputMethod", "handleNativeIMEEvent"),
+    frame("sun.awt.windows.WInputMethod", "dispatchEvent"),
+    frame("sun.awt.im.InputContext", "dispatchEvent"),
+    frame("sun.awt.im.InputMethodContext", "dispatchEvent"),
+    frame("java.awt.Component", "dispatchEventImpl"),
+    frame("java.awt.Container", "dispatchEventImpl"),
+    frame("java.awt.Component", "dispatchEvent"),
+    frame("java.awt.KeyboardFocusManager", "redispatchEvent"),
+    frame("java.awt.DefaultKeyboardFocusManager", "dispatchKeyEvent"),
+    frame("java.awt.DefaultKeyboardFocusManager", "preDispatchKeyEvent"),
+    frame("java.awt.DefaultKeyboardFocusManager", "typeAheadAssertions"),
+    frame("java.awt.DefaultKeyboardFocusManager", "dispatchEvent"),
+    frame("java.awt.Component", "dispatchEventImpl"),
+    frame("java.awt.Container", "dispatchEventImpl"),
+    frame("java.awt.Window", "dispatchEventImpl"),
+    frame("java.awt.Component", "dispatchEvent")
+  };
+
+  private static final StackTraceElement[] MAC_IME_LOCALES = {
+    frame("sun.lwawt.macosx.CInputMethodDescriptor", "nativeGetAvailableLocales"),
+    frame("sun.lwawt.macosx.CInputMethodDescriptor", "getAvailableLocalesInternal"),
+    frame("sun.lwawt.macosx.CInputMethod", "setLocale"),
+    frame("sun.lwawt.macosx.CInputMethod", "setLocale"),
+    frame("sun.awt.im.InputContext", "getInputMethodInstance"),
+    frame("sun.awt.im.InputContext", "getInputMethod"),
+    frame("sun.awt.im.InputContext", "dispatchEvent"),
+    frame("sun.awt.im.InputMethodContext", "dispatchEvent"),
+    frame("java.awt.Component", "dispatchEventImpl"),
+    frame("java.awt.Container", "dispatchEventImpl"),
+    frame("java.awt.Component", "dispatchEvent"),
+    frame("java.awt.LightweightDispatcher", "retargetMouseEvent"),
+    frame("java.awt.LightweightDispatcher", "retargetMouseEnterExit"),
+    frame("java.awt.LightweightDispatcher", "trackMouseEnterExit"),
+    frame("java.awt.LightweightDispatcher", "processMouseEvent"),
+    frame("java.awt.LightweightDispatcher", "dispatchEvent"),
+    frame("java.awt.Container", "dispatchEventImpl"),
+    frame("java.awt.Window", "dispatchEventImpl"),
+    frame("java.awt.Component", "dispatchEvent")
+  };
+
+  /**
+   * Icebase #04da2e144187: a key event waiting in the Windows input method's native handler, and
+   * Icebase #f78543105350: macOS listing the installed input methods on the first mouse event.
+   * Neither has a FrostWire frame; an app frame on top, or only the bottom of the chain, is still
+   * reported.
+   */
+  @Test
+  void imeNativeCallsOnKeyAndMouseEventsAreToolkitOnlyStalls() {
+    assertTrue(StrictEdtMode.isWindowsToolkitOnlyStall(stack(IME_KEY_EVENT, EDT_LOOP)));
+    assertTrue(StrictEdtMode.isWindowsToolkitOnlyStall(stack(MAC_IME_LOCALES, EDT_LOOP)));
+    StackTraceElement[] inJdkCallback = {frame("java.util.Locale", "forLanguageTag")};
+    assertTrue(
+        StrictEdtMode.isWindowsToolkitOnlyStall(stack(inJdkCallback, MAC_IME_LOCALES, EDT_LOOP)));
+    StackTraceElement[] underApp = {frame("com.frostwire.gui.SomeListener", "keyTyped")};
+    assertFalse(StrictEdtMode.isWindowsToolkitOnlyStall(stack(underApp, IME_KEY_EVENT, EDT_LOOP)));
+    assertFalse(
+        StrictEdtMode.isWindowsToolkitOnlyStall(stack(underApp, MAC_IME_LOCALES, EDT_LOOP)));
+    assertFalse(
+        StrictEdtMode.isWindowsToolkitOnlyStall(
+            stack(java.util.Arrays.copyOfRange(IME_KEY_EVENT, 7, IME_KEY_EVENT.length), EDT_LOOP)),
+        "only the bottom of the signature");
+    assertFalse(
+        StrictEdtMode.isWindowsToolkitOnlyStall(
+            stack(
+                java.util.Arrays.copyOfRange(MAC_IME_LOCALES, 4, MAC_IME_LOCALES.length),
+                EDT_LOOP)),
+        "only the bottom of the signature");
+  }
+
   /** An app frame above the IME call, e.g. a focus listener it called back, is still reported. */
   @Test
   void imeDeactivationUnderAnAppFrameIsReported() {
